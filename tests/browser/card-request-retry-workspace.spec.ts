@@ -1,0 +1,83 @@
+import { randomUUID } from "node:crypto";
+import { expect, test } from "@playwright/test";
+import { cardDashboard, openCardholder } from "./helpers/fresh";
+
+test("one card form starts only on review and safely retries lost start, save and creation responses", async ({ page }) => {
+  test.setTimeout(120_000);
+  const { data } = await openCardholder(page), serviceId = data.primaryService!.id;
+  const name = `Retry card ${randomUUID().slice(0, 8)}`;
+  const workspace = async () => (await page.request.get(`/api/v1/cardholder-services/${serviceId}/workspace`)).json();
+  const before = await workspace();
+  const attempts: Record<string, Record<string, unknown>[]> = { start: [], save: [], submit: [] };
+  await page.route(`**/api/v1/cardholder-services/${serviceId}/card-requests**`, async route => {
+    const request = route.request(), path = new URL(request.url()).pathname;
+    const kind = request.method() === "PATCH" ? "save" : path.endsWith("/submit") ? "submit" : request.method() === "POST" && path.endsWith("/card-requests") ? "start" : null;
+    if (!kind) { await route.continue(); return; }
+    attempts[kind]!.push(request.postDataJSON() as Record<string, unknown>);
+    if (attempts[kind]!.length === 1) {
+      // Commit the actual command, then lose its response as on an interrupted connection.
+      const response = await route.fetch();
+      expect(response.status()).toBe(200);
+      await route.abort("connectionfailed");
+    } else await route.continue();
+  });
+  // An unknown holder in the URL cannot add an option or gain cardholding access.
+  await page.goto(`/cardholder-services?new=1&holder=${randomUUID()}`);
+  const dialog = page.getByRole("dialog"), cardName = dialog.getByRole("textbox", { name: "Card name", exact: true });
+  await expect(cardName).toBeVisible();
+  const initialReview = dialog.getByRole("button", { name: "Review card", exact: true });
+  const viewport = page.viewportSize();
+  if (viewport && viewport.width <= 600) {
+    // The action stays reachable before scrolling, even when the details need
+    // more room than a narrow phone provides. Resizing never submits a command.
+    await expect(initialReview).toBeInViewport({ ratio: 1 });
+    try {
+      await page.setViewportSize({ width: 320, height: 568 });
+      await expect(initialReview).toBeInViewport({ ratio: 1 });
+      expect((await initialReview.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    } finally { await page.setViewportSize(viewport); }
+  }
+  expect((await workspace()).cardRequests).toEqual(before.cardRequests);
+  expect(attempts.start).toEqual([]);
+  const self = dialog.getByRole("radio", { name: new RegExp(data.person.displayName) });
+  await expect(dialog).toContainText("That cardholder isn’t available");
+  await expect(self).not.toBeChecked();
+  await self.check();
+  await cardName.fill(name);
+  await dialog.getByRole("textbox", { name: "Starting balance (USD)", exact: true }).fill("16.00");
+  await initialReview.click();
+  const retry = dialog.getByRole("button", { name: "Retry the same request", exact: true });
+  await expect(retry).toBeEnabled();
+  await expect(cardName).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeVisible();
+  await retry.click();
+  await expect.poll(() => attempts.save!.length).toBe(1);
+  await expect(retry).toBeEnabled();
+  await expect(cardName).toBeDisabled();
+  await retry.click();
+  await expect(dialog.getByRole("heading", { name: "Review your card", exact: true })).toBeVisible();
+  await expect(dialog).toContainText("$16.00");
+  expect(attempts.start).toHaveLength(2);
+  expect(attempts.start![0]).toEqual(attempts.start![1]);
+  expect(attempts.save).toHaveLength(2);
+  expect(attempts.save![0]).toEqual(attempts.save![1]);
+  // Intentionally click as soon as review renders, without waiting for its URL.
+  // Navigation must keep Create disabled until this form can retain the attempt.
+  await dialog.getByRole("button", { name: "Create card", exact: true }).click();
+  await expect(retry).toBeEnabled();
+  await expect(dialog.getByRole("button", { name: "Edit details", exact: true })).toBeDisabled();
+  await retry.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Selected card overview", exact: true })).toContainText(name);
+  expect(attempts.submit).toHaveLength(2);
+  expect(attempts.submit![0]).toEqual(attempts.submit![1]);
+  const created = (await cardDashboard(page.request)).cards.filter(card => card.nickname === name);
+  expect(created).toHaveLength(1);
+  expect(created[0]!.available.minor).toBe("1600");
+  expect(new URL(page.url()).searchParams.get("focus")).toBe(created[0]!.id);
+  const after = await workspace();
+  expect(after.cardRequests).toHaveLength(before.cardRequests.length + 1);
+  expect(after.cardRequests.filter((request: { nickname: string }) => request.nickname === name)).toHaveLength(1);
+});

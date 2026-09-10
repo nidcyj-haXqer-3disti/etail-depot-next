@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { CardPurchaseResult, CardRequestProjection, WorkspaceCard, WorkspaceProjection } from "@/modules/workspace/contracts";
 import { Button, EmptyState, Feedback, StatusBadge, WorkspaceCommandError, WorkspaceDialog, capability, formatMoney, workspaceCommand } from "./primitives";
@@ -21,12 +21,13 @@ export function CardsWorkspace({ workspace, routeBase, initialControl = false, o
   const [purchaseAttempts, setPurchaseAttempts] = useState<Record<string, PurchaseAttempt | undefined>>({});
   const [requestUpdates, setRequestUpdates] = useState<Record<string, CardRequestProjection>>({});
   const requestId = params.get("request")?.toLowerCase();
-  const showIntro = !requestId && params.get("new") === "1";
-  const selectedId = requestId || showIntro ? null : params.get("card")?.toLowerCase();
+  const showNew = !requestId && params.get("new") === "1";
+  const selectedId = requestId || showNew ? null : params.get("card")?.toLowerCase();
   const [confirmControl, setConfirmControl] = useState(initialControl);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const requestBusy = useCallback((value: boolean) => setBusy(value ? "request" : ""), []);
   const commandIds = useRef(new Map<string, string>());
   const cards = workspace.cards.map((card) => cardUpdates[card.id] && cardUpdates[card.id].version >= card.version ? cardUpdates[card.id] : card);
   const requestMap = new Map(workspace.cardRequests.map((item) => [item.id, item]));
@@ -47,7 +48,7 @@ export function CardsWorkspace({ workspace, routeBase, initialControl = false, o
   function navigateDialog(kind: "card" | "request" | "new" | null, value = "", push = false) {
     const query = new URLSearchParams(params.toString());
     // A route has one active card surface. Other page query state survives opening and closing it.
-    for (const key of ["card", "request", "new", "manage", "transaction"]) query.delete(key);
+    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review"]) query.delete(key);
     if (kind) query.set(kind, kind === "new" ? "1" : value);
     const suffix = query.toString();
     const url = `${cardRoute}${suffix ? `?${suffix}` : ""}`;
@@ -68,22 +69,10 @@ export function CardsWorkspace({ workspace, routeBase, initialControl = false, o
     return result;
   }
   function updateRequest(next: CardRequestProjection) { setRequestUpdates((current) => ({ ...current, [next.id]: next })); if (next.status === "ISSUED") router.refresh(); }
-  function openRequest(next: CardRequestProjection) {
-    setError(""); setNotice(""); setConfirmControl(false);
-    navigateDialog("request", next.id);
-  }
   function closeRequest() {
     if (busy) return;
     setError(""); navigateDialog(null);
     router.refresh();
-  }
-  async function startRequest() {
-    setBusy("start"); setError(""); setNotice("");
-    try {
-      const next = await command<CardRequestProjection>("/card-requests", "POST");
-      updateRequest(next); openRequest(next);
-    } catch (failure) { setError(failure instanceof Error ? failure.message : "We couldn’t start your card request."); }
-    finally { setBusy(""); }
   }
   async function controlCard() {
     if (!selected) return;
@@ -113,18 +102,18 @@ export function CardsWorkspace({ workspace, routeBase, initialControl = false, o
         <div className="consumer-action-row" aria-label="Related cardholder services">{capability(workspace,"activity.read")?.allowed && <Link className="consumer-button consumer-button-secondary" href={cardholderTaskHref("reports", {cardId:selected.id})}>Statements & reports</Link>}<Link className="consumer-button consumer-button-secondary" href={cardholderTaskHref("settings", {cardId:selected.id})}>Notification preferences</Link><Link className="consumer-button consumer-button-secondary" href={cardholderTaskHref("help", {cardId:selected.id})}>Help with this card</Link></div>
       </>}
     </WorkspaceDialog>}
-    {showIntro && !request && <WorkspaceDialog open onClose={closeCard} title="Add a card" serviceName={serviceName}><Feedback kind="error" message={error} /><h3>A card, with you in control</h3><p>Choose a cardholder, name the card and review before you create it.</p><div className="consumer-review-highlight"><strong>Your progress will be saved</strong><span>You can leave at any step and finish from Saved requests.</span></div>{requestCapability?.allowed && <div className="consumer-action-row consumer-detail-back"><Button busy={busy === "start"} disabled={Boolean(busy)} onClick={() => void startRequest()}>Start card request</Button></div>}{!requestCapability?.allowed && <p className="consumer-muted">Card requests aren’t available with your current access.</p>}</WorkspaceDialog>}
-    {request && <WorkspaceDialog open onClose={closeRequest} title="Add card" serviceName={serviceName} wide><CardRequestForm key={request.id} request={request} workspace={workspace} canEdit={requestCapability?.allowed === true} command={command} routeBase={cardRoute} onUpdate={updateRequest} onClose={closeRequest} /></WorkspaceDialog>}
+    {(showNew || request) && <WorkspaceDialog open onClose={closeRequest} title="Add card" serviceName={serviceName} wide><CardRequestForm key={request?.id ?? "new"} request={request ?? null} workspace={workspace} canEdit={requestCapability?.allowed === true} command={command} routeBase={cardRoute} onUpdate={updateRequest} onBusy={requestBusy} onClose={closeRequest} /></WorkspaceDialog>}
   </section>;
 }
 
 interface CardRequestFormProps {
-  request: CardRequestProjection;
+  request: CardRequestProjection | null;
   workspace: WorkspaceProjection;
   canEdit: boolean;
   routeBase: string;
   command: <T>(path: string, method: "POST" | "PATCH", input?: Record<string, unknown>) => Promise<T>;
   onUpdate: (request: CardRequestProjection) => void;
+  onBusy: (busy: boolean) => void;
   onClose: () => void;
 }
 function limitInput(minor: string) {
@@ -136,62 +125,96 @@ function limitWire(input: string) {
   const [whole, fraction = ""] = input.split(".");
   return `${whole}${fraction.padEnd(2, "0")}`.replace(/^0+(?=\d)/, "");
 }
-function CardRequestForm({ request, workspace, canEdit, command, onUpdate, onClose, routeBase }: CardRequestFormProps) {
-  const params = useSearchParams();
-  const issuedQuery = new URLSearchParams(params.toString());
-  for (const key of ["card", "request", "new", "manage", "transaction"]) issuedQuery.delete(key);
-  if (request.issuedCardId) issuedQuery.set("card", request.issuedCardId);
-  const serviceName = workspace.customerService?.displayName ?? "Cardholder services";
-  const [step, setStep] = useState(!canEdit || request.status === "BLOCKED" || request.status === "CANCELED" || request.status === "ISSUED" ? 2 : 0);
-  const [holderId, setHolderId] = useState(request.holderId);
-  const [nickname, setNickname] = useState(request.nickname || "New card");
-  const [format, setFormat] = useState(request.format);
-  const [limit, setLimit] = useState(limitInput(request.requestedLimitMinor));
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [uncertain, setUncertain] = useState(false);
-  const retry = useRef<(() => Promise<void>) | null>(null);
-  const frozen = !canEdit || request.status === "CANCELED" || request.status === "ISSUED";
-  const holder = workspace.cardholderOptions.find((person) => person.id === holderId);
-  const path = `/card-requests/${encodeURIComponent(request.id)}`;
-  async function save(nextStep: number, closeAfter = false) {
-    retry.current = () => save(nextStep, closeAfter);
+type CardFormAttempt =
+  | { kind: "save"; fields: {holderId: string; nickname: string; format: "VIRTUAL" | "PHYSICAL"; requestedLimitMinor: string}; request: CardRequestProjection | null; closeAfter: boolean }
+  | { kind: "submit" | "cancel"; request: CardRequestProjection };
+
+function CardRequestForm({ request: initialRequest, workspace, canEdit, command, onUpdate, onBusy, onClose, routeBase }: CardRequestFormProps) {
+  const params = useSearchParams(), router = useRouter();
+  const [isNavigating, startNavigation] = useTransition();
+  const [request, setRequest] = useState(initialRequest);
+  const [step, setStep] = useState(params.get("review") === "1" || initialRequest?.status === "BLOCKED" || initialRequest?.status === "CANCELED" || initialRequest?.status === "ISSUED" ? 1 : 0);
+  const preferredHolder = params.getAll("holder").length === 1 ? workspace.cardholderOptions.find(person => person.id === params.get("holder")?.toLowerCase()) : undefined;
+  const defaultHolder = params.has("holder") ? undefined : workspace.cardholderOptions.find(person => person.id === workspace.member.id) ?? (workspace.cardholderOptions.length === 1 ? workspace.cardholderOptions[0] : undefined);
+  const [holderId, setHolderId] = useState(initialRequest?.holderId ?? preferredHolder?.id ?? defaultHolder?.id ?? "");
+  const [nickname, setNickname] = useState(initialRequest?.nickname || "");
+  const [format, setFormat] = useState<"VIRTUAL" | "PHYSICAL">(initialRequest?.format ?? "VIRTUAL");
+  const [limit, setLimit] = useState(initialRequest ? limitInput(initialRequest.requestedLimitMinor) : "");
+  const [busy, setBusy] = useState(false), [error, setError] = useState(!initialRequest && params.has("holder") && !preferredHolder ? "That cardholder isn’t available. Choose a person below to continue." : ""), [uncertain, setUncertain] = useState(false);
+  const pending = useRef<CardFormAttempt | null>(null), inFlight = useRef(false);
+  const frozen = !canEdit || request?.status === "CANCELED" || request?.status === "ISSUED";
+  const working = busy || isNavigating;
+  const disabled = frozen || working || uncertain;
+  const holder = workspace.cardholderOptions.find(person => person.id === holderId);
+  useEffect(() => { onBusy(working || uncertain); }, [onBusy, working, uncertain]);
+  function update(next: CardRequestProjection) { setRequest(next); onUpdate(next); }
+  function navigate(next: CardRequestProjection, closeAfter = false) {
+    const query = new URLSearchParams(params.toString());
+    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review"]) query.delete(key);
+    if (next.status === "ISSUED" && next.issuedCardId) {
+      for (const key of ["view", "page", "activityCard"]) query.delete(key);
+      query.set("focus", next.issuedCardId);
+    } else if (!closeAfter) { query.set("request", next.id); query.set("review", "1"); }
+    // The saved request URL can replace this form. Hold all actions until the
+    // transition settles so a rapid Create click cannot lose its retry state.
+    startNavigation(() => {
+      router.replace(`${routeBase}${query.size ? `?${query}` : ""}`, {scroll: false});
+      router.refresh();
+    });
+  }
+  async function execute(attempt: CardFormAttempt) {
+    if (inFlight.current || isNavigating) return;
+    inFlight.current = true; pending.current = attempt;
+    setBusy(true); onBusy(true); setError(""); setUncertain(false);
+    let unknown = false;
+    try {
+      if (attempt.kind === "save") {
+        // Keep the confirmed draft and immutable field snapshot through a lost
+        // start/save response. The command wrapper retains each command identity.
+        if (!attempt.request) { attempt.request = await command<CardRequestProjection>("/card-requests", "POST"); update(attempt.request); }
+        const next = await command<CardRequestProjection>(`/card-requests/${encodeURIComponent(attempt.request.id)}`, "PATCH", {expectedVersion: attempt.request.version, ...attempt.fields});
+        update(next); pending.current = null; setStep(1); navigate(next, attempt.closeAfter);
+      } else {
+        const action = attempt.kind === "submit" ? "submit" : "cancel";
+        const next = await command<CardRequestProjection>(`/card-requests/${encodeURIComponent(attempt.request.id)}/${action}`, "POST", {expectedVersion: attempt.request.version});
+        update(next); pending.current = null; setStep(1);
+        if (next.status === "ISSUED") navigate(next);
+      }
+    } catch (failure) {
+      unknown = failure instanceof WorkspaceCommandError && failure.uncertain;
+      setUncertain(unknown);
+      if (!unknown) pending.current = null;
+      setError(failure instanceof Error ? failure.message : "We couldn’t confirm your card request. Please try again.");
+    } finally { inFlight.current = false; setBusy(false); }
+  }
+  function save(closeAfter = false) {
+    if (working || uncertain) return;
     const minor = limitWire(limit.trim());
     if (!holder) { setError("Choose an available cardholder before continuing."); return; }
     if (!nickname.trim()) { setError("Enter a name for this card."); return; }
-    if (minor === null) { setError("Enter a starting balance in dollars, using no more than two decimal places."); return; }
-    setBusy(true); setError(""); setMessage(""); setUncertain(false);
-    try {
-      const next = await command<CardRequestProjection>(path, "PATCH", { expectedVersion: request.version, holderId, nickname: nickname.trim(), format, requestedLimitMinor: minor });
-      onUpdate(next); setStep(nextStep); setMessage("Your card request has been saved.");
-      if (closeAfter) onClose();
-    } catch (failure) { setUncertain(failure instanceof WorkspaceCommandError && failure.uncertain); setError(failure instanceof Error ? failure.message : "We couldn’t save your request."); }
-    finally { setBusy(false); }
+    if (minor === null || (!closeAfter && minor === "0")) { setError("Enter a starting balance greater than zero, using no more than two decimal places."); return; }
+    void execute({kind: "save", fields: {holderId, nickname: nickname.trim(), format, requestedLimitMinor: minor}, request, closeAfter});
   }
-  async function finish(action: "submit" | "cancel") {
-    retry.current = () => finish(action);
-    setBusy(true); setError(""); setMessage(""); setUncertain(false);
-    try {
-      const next = await command<CardRequestProjection>(`${path}/${action}`, "POST", { expectedVersion: request.version });
-      onUpdate(next); setSubmitted(action === "submit");
-      setMessage(action === "cancel" ? `The card request for ${serviceName} is canceled.` : next.status === "ISSUED" ? "Your card is ready to use." : "Your request is saved. Review the requirements below.");
-    } catch (failure) { setUncertain(failure instanceof WorkspaceCommandError && failure.uncertain); setError(failure instanceof Error ? failure.message : "We couldn’t update your request."); }
-    finally { setBusy(false); }
-  }
-  return <div className="consumer-card-form" aria-busy={busy}>
-    <ol className="consumer-stepper" aria-label="Card request progress">{["Cardholder", "Card details", "Review"].map((label, index) => <li key={label} className={step === index ? "is-current" : step > index ? "is-complete" : ""} aria-current={step === index ? "step" : undefined}><span>{index + 1}</span>{label}</li>)}</ol>
-    <Feedback kind="error" message={error} /><Feedback kind="info" message={message} />{uncertain && <Button variant="secondary" busy={busy} onClick={() => void retry.current?.()}>Retry the same request</Button>}
-    {step === 0 && <><h3>Who is this card for?</h3><p className="consumer-muted">Choose yourself or a cardholder who has accepted your invitation.</p><div className="consumer-holder-options">{workspace.cardholderOptions.map((person) => <label key={person.id} className={`consumer-holder-option ${holderId === person.id ? "is-selected" : ""}`}><input type="radio" name="cardholder" value={person.id} checked={holderId === person.id} disabled={frozen || busy || uncertain} onChange={() => setHolderId(person.id)} /><span className="consumer-avatar" aria-hidden="true">{person.displayName.slice(0, 1)}</span><span><strong>{person.displayName}</strong><small>{person.id === workspace.member.id ? "You" : "Invited cardholder"}</small></span></label>)}</div>{!workspace.cardholderOptions.length && <EmptyState title="No cardholders available" description="Invite a cardholder and allow them to use a card before completing these details." />}</>}
-    {step === 1 && <><h3>Make this card yours</h3><div className="consumer-form-fields"><label>Card name<input name="nickname" value={nickname} maxLength={60} disabled={frozen || busy || uncertain} onChange={(event) => setNickname(event.target.value)} autoComplete="off" placeholder="For example, Everyday purchases" /></label><fieldset disabled={frozen || busy || uncertain}><legend>Card format</legend><div className="consumer-format-options">{(["VIRTUAL", "PHYSICAL"] as const).map((value) => <label key={value}><input type="radio" name="format" checked={format === value} onChange={() => setFormat(value)} /><span><strong>{value === "VIRTUAL" ? "Virtual card" : "Physical card"}</strong><small>{value === "VIRTUAL" ? "Digital format" : "Preview only · No delivery"}</small></span></label>)}</div></fieldset><div className="consumer-funds-field"><label htmlFor="card-starting-balance">Starting balance (USD)</label><div className="consumer-money-input"><span aria-hidden="true">$</span><input id="card-starting-balance" name="requested-limit" value={limit} inputMode="decimal" disabled={frozen || busy || uncertain} onChange={(event) => setLimit(event.target.value)} aria-describedby="limit-explanation" /></div><small id="limit-explanation">Choose the amount available for purchases when this card is created.</small></div></div></>}
-    {step === 2 && <><div className="consumer-section-heading"><h3>{request.status === "ISSUED" ? "Your card is ready" : request.status === "CANCELED" ? "Request canceled" : submitted ? "Your request needs attention" : "Review your card request"}</h3><StatusBadge status={request.status} label={request.status === "BLOCKED" ? "Needs attention" : undefined} /></div><dl className="consumer-detail-list consumer-review-list"><div><dt>Cardholder service</dt><dd>{serviceName}</dd></div><div><dt>Cardholder</dt><dd>{holder?.displayName ?? request.holderName ?? "Not selected"}</dd></div><div><dt>Card name</dt><dd>{request.nickname}</dd></div><div><dt>Format</dt><dd>{request.format === "VIRTUAL" ? "Virtual" : "Physical"}</dd></div><div><dt>Starting balance</dt><dd>{formatMoney(request.requestedLimitMinor, request.currency)}</dd></div></dl>
-      {request.status !== "CANCELED" && request.status !== "ISSUED" && <div className="consumer-prerequisites"><h4>Before you create this card</h4>{request.prerequisites.length ? <ul>{request.prerequisites.map((item) => <li key={item.code}><strong>{item.title}</strong><p>{item.detail}</p></li>)}</ul> : <p>Creating this card adds the starting balance shown above. No real money is used.</p>}</div>}
-      {request.status === "ISSUED" && request.issuedCardId && <Link className="consumer-text-link" href={`${routeBase}?${issuedQuery}`}>Open card →</Link>}
+  return <div className="consumer-card-form" aria-busy={working}>
+    <div className="consumer-card-form-content">
+    <ol className="consumer-stepper consumer-card-stepper" aria-label="Card request progress">{["Card details", "Review & create"].map((label, index) => <li key={label} className={step === index ? "is-current" : step > index ? "is-complete" : ""} aria-current={step === index ? "step" : undefined}><span>{index + 1}</span>{label}</li>)}</ol>
+    <Feedback kind="error" message={error}/>{uncertain && <div className="consumer-card-retry"><p>Keep this form open while we confirm your request. Your details are held safely for this retry.</p><Button variant="secondary" busy={working} onClick={() => pending.current && void execute(pending.current)}>Retry the same request</Button></div>}
+    {step === 0 && <><h3>Who is this card for?</h3>{workspace.cardholderOptions.length === 1 && holder ? <div className="consumer-cardholder-selected"><span className="consumer-avatar" aria-hidden="true">{holder?.displayName.slice(0, 1)}</span><span><strong>{holder?.displayName}</strong><small>{holder?.id === workspace.member.id ? "You · Primary cardholder" : "Invited cardholder"}</small></span></div> : <div className="consumer-holder-options">{workspace.cardholderOptions.map(person => <label key={person.id} className={`consumer-holder-option ${holderId === person.id ? "is-selected" : ""}`}><input type="radio" name="cardholder" checked={holderId === person.id} disabled={disabled} onChange={() => setHolderId(person.id)}/><span><strong>{person.displayName}</strong><small>{person.id === workspace.member.id ? "You" : "Invited cardholder"}</small></span></label>)}</div>}
+      {!workspace.cardholderOptions.length && <EmptyState title="No cardholders available" description="Invite a cardholder and allow them to use a card before completing these details."/>}
+      <div className="consumer-form-fields consumer-card-details-fields"><label>Card name<input name="nickname" value={nickname} maxLength={60} disabled={disabled} onChange={event => setNickname(event.target.value)} autoComplete="off" placeholder="For example, Everyday purchases"/></label>
+        <div className="consumer-funds-field"><label htmlFor="card-starting-balance">Starting balance (USD)</label><div className="consumer-money-input"><span aria-hidden="true">$</span><input id="card-starting-balance" name="requested-limit" value={limit} inputMode="decimal" disabled={disabled} onChange={event => setLimit(event.target.value)} aria-describedby="limit-explanation" placeholder="0.00"/></div><small id="limit-explanation">Practice money for trying purchases. No bank account or real funds are needed.</small></div>
+        <details className="consumer-format-details"><summary>{format === "VIRTUAL" ? "Virtual card" : "Physical card preview"} <span>Change format</span></summary><fieldset disabled={disabled}><legend>Card format</legend><div className="consumer-format-options">{(["VIRTUAL", "PHYSICAL"] as const).map(value => <label key={value}><input type="radio" name="format" checked={format === value} onChange={() => setFormat(value)}/><span><strong>{value === "VIRTUAL" ? "Virtual card" : "Physical card"}</strong><small>{value === "VIRTUAL" ? "Ready to try online" : "Preview only · No delivery"}</small></span></label>)}</div></fieldset></details>
+      </div></>}
+    {step === 1 && request && <><div className="consumer-section-heading"><h3>{request.status === "ISSUED" ? "Your card is ready" : request.status === "CANCELED" ? "Request canceled" : request.status === "BLOCKED" ? "Your card needs attention" : "Review your card"}</h3>{["BLOCKED", "CANCELED", "ISSUED"].includes(request.status) && <StatusBadge status={request.status} label={request.status === "BLOCKED" ? "Needs attention" : undefined}/>}</div>
+      <dl className="consumer-detail-list consumer-review-list"><div><dt>Cardholder</dt><dd>{holder?.displayName ?? request.holderName}</dd></div><div><dt>Card name</dt><dd>{request.nickname}</dd></div><div><dt>Format</dt><dd>{request.format === "VIRTUAL" ? "Virtual" : "Physical · Preview only"}</dd></div><div><dt>Starting balance</dt><dd>{formatMoney(request.requestedLimitMinor, request.currency)}</dd></div></dl>
+      {request.status !== "CANCELED" && request.status !== "ISSUED" && <div className="consumer-prerequisites">{request.prerequisites.length ? <><h4>Before you create this card</h4><ul>{request.prerequisites.map(item => <li key={item.code}><strong>{item.title}</strong><p>{item.detail}</p></li>)}</ul></> : <p>Your card will be ready to try with the practice balance above. No real money is used.</p>}</div>}
+      {request.status === "ISSUED" && request.issuedCardId && <Button onClick={() => navigate(request)}>View your card</Button>}
     </>}
-    <div className="consumer-wizard-footer"><div>{step > 0 && !frozen && <Button variant="quiet" disabled={busy || uncertain} onClick={() => { setStep(step - 1); setError(""); setMessage(""); }}>Back</Button>}</div><div className="consumer-action-row"><Button variant="secondary" disabled={busy || uncertain} onClick={() => { if (frozen || step === 2) onClose(); else void save(step, true); }}>{frozen || step === 2 ? "Close" : "Save for later"}</Button>{step < 2 ? <Button busy={busy} disabled={frozen || uncertain || !workspace.cardholderOptions.length} onClick={() => void save(step + 1)}>{step === 0 ? "Continue" : "Save & review"}</Button> : !frozen && <Button busy={busy} disabled={uncertain || !request.canSubmit} onClick={() => void finish("submit")}>Create card</Button>}</div></div>
-    {step === 2 && !frozen && <button className="consumer-cancel-request" type="button" disabled={busy || uncertain} onClick={() => void finish("cancel")}>Cancel this request</button>}
-    {request.status === "CANCELED" && <p className="consumer-form-footnote">This request remains in your history. No card was created.</p>}
+
+    {!frozen && request && <button className="consumer-cancel-request" type="button" disabled={working || uncertain} onClick={() => void execute({kind: "cancel", request})}>Cancel this request</button>}
+    {request?.status === "CANCELED" && <p className="consumer-form-footnote">This request remains in your history. No card was created.</p>}
+    </div>
+    <div className="consumer-form-footer">{step === 1 && !frozen && <Button variant="quiet" disabled={working || uncertain} onClick={() => setStep(0)}>Edit details</Button>}<div>{frozen || !request && !nickname && !limit ? <Button variant="secondary" disabled={working || uncertain} onClick={onClose}>Close</Button> : <Button variant="secondary" disabled={working || uncertain} onClick={() => step === 0 ? save(true) : request && navigate(request, true)}>Save for later</Button>}{!frozen && (step === 0 ? <Button busy={working} disabled={uncertain || !workspace.cardholderOptions.length} onClick={() => save()}>Review card</Button> : request && <Button busy={working} disabled={uncertain || !request.canSubmit} onClick={() => void execute({kind: "submit", request})}>Create card</Button>)}</div></div>
   </div>;
 }
 

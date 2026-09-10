@@ -18,6 +18,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   if (session === undefined) return <PageNotice title="We couldn’t load your session"><p>Please try signing in again.</p></PageNotice>;
   if (!session) redirect("/login");
   const sandbox = await getSandboxOverview(session.personId);
+  if (!sandbox.joined) return <Shell authenticated><div className="page-container services-page"><div className="page-heading"><p className="eyebrow">CARDHOLDER SERVICES</p><h1>Cards for you and your people</h1><p>A clear view of spending, with you in control.</p></div><SandboxEntry initial={sandbox} service="cardholder"/></div></Shell>;
   const query = await searchParams;
   const pageValue = query.page ?? "0";
   if (typeof pageValue !== "string" || !/^\d{1,5}$/.test(pageValue)) return <PageNotice title="This card page is unavailable" authenticated><p>Return to your cards to continue.</p><Link href="/cardholder-services">Your cards</Link></PageNotice>;
@@ -60,5 +61,5 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     if (query.transaction !== undefined) for (const value of Array.isArray(query.transaction) ? query.transaction : [query.transaction]) target.append("transaction", value);
     redirect(`/cardholder-services/activity${target.size ? `?${target}` : ""}`);
   }
-  return <Shell authenticated><div className="page-container"><SandboxEntry initial={sandbox}/></div><CardholderDashboard dashboard={result.dashboard} detail={result.detail} access={result.access} selectionUnavailable={selectionRequested && !result.detail} focusedCard={result.focusedCard} focusedWorkspace={result.focusedWorkspace} focusUnavailable={result.focusUnavailable}/></Shell>;
+  return <Shell authenticated><CardholderDashboard dashboard={result.dashboard} detail={result.detail} access={result.access} selectionUnavailable={selectionRequested && !result.detail} focusedCard={result.focusedCard} focusedWorkspace={result.focusedWorkspace} focusUnavailable={result.focusUnavailable}/></Shell>;
 }

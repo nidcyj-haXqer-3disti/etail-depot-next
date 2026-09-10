@@ -14,7 +14,8 @@ export default async function Page(){
  if(session===undefined)return <PageNotice title="We couldn’t load your session"><p>Please try signing in again.</p></PageNotice>;
  if(!session)redirect("/login");
  const sandbox=await getSandboxOverview(session.personId);
+ if(!sandbox.joined)return <MerchantShell><div className="page-heading"><p className="eyebrow">MERCHANT SERVICES</p><h1>More ways to get paid</h1><p>Start with your business. Bring your people in when you’re ready.</p></div><SandboxEntry initial={sandbox} service="merchant"/></MerchantShell>;
  const dashboard=await getMerchantDashboard(session.personId).catch(()=>null);
  if(!dashboard)return <PageNotice title="Merchant services couldn’t load" authenticated><p>Please retry. Your selected merchant and saved records have not changed.</p></PageNotice>;
- return <MerchantShell><SandboxEntry initial={sandbox}/><MerchantDashboard initial={dashboard}/></MerchantShell>;
+ return <MerchantShell><MerchantDashboard initial={dashboard}/></MerchantShell>;
 }

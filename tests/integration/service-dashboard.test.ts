@@ -50,6 +50,22 @@ describe("service-first Cardholder dashboard", () => {
     expect(await f.snapshot()).toEqual(before);
   });
 
+  it("shows an accepted person before their first card, independently of the card page and current grants", async () => {
+    const primary = await cardPrimary("Directory primary"), member = await cardPerson("Accepted without a card"), stranger = await cardPrimary("Other directory primary");
+    await enrollCardholder(primary.personId, primary.serviceId, member);
+    const before = await getDb().select().from(cards).where(eq(cards.serviceId, primary.serviceId));
+    expect((await getCardholderDashboard(primary.personId)).cardholders).toEqual([{id: member, displayName: "Accepted without a card", serviceId: primary.serviceId, cardCount: 0, canAddCard: true}]);
+    expect((await getCardholderDashboard(member)).cardholders).toEqual([]);
+    expect((await getCardholderDashboard(stranger.personId)).cardholders).toEqual([]);
+    await getDb().update(permissionGrants).set({state: "REVOKED"}).where(and(eq(permissionGrants.serviceId, primary.serviceId), eq(permissionGrants.personId, member), eq(permissionGrants.action, "cards.hold")));
+    expect((await getCardholderDashboard(primary.personId)).cardholders).toMatchObject([{id: member, canAddCard: false}]);
+    await getDb().update(permissionGrants).set({state: "REVOKED"}).where(and(eq(permissionGrants.serviceId, primary.serviceId), eq(permissionGrants.personId, primary.personId), eq(permissionGrants.action, "cards.read")));
+    expect((await getCardholderDashboard(primary.personId)).cardholders).toMatchObject([{id: member, cardCount: null}]);
+    await getDb().update(permissionGrants).set({state: "REVOKED"}).where(and(eq(permissionGrants.serviceId, primary.serviceId), eq(permissionGrants.personId, primary.personId), eq(permissionGrants.action, "people.read")));
+    expect((await getCardholderDashboard(primary.personId)).cardholders).toEqual([]);
+    expect(await getDb().select().from(cards).where(eq(cards.serviceId, primary.serviceId))).toEqual(before);
+  });
+
   it("resolves card, request and transaction to the stored service and rejects forged mixed selectors", async () => {
     const f = await fixture(), before = await f.snapshot();
     expect(await getCardholderDashboardDetail(f.actor.personId, { card: f.ownSecondary.card.id.toUpperCase() })).toMatchObject({ kind: "CARD", workspace: { service: { id: f.otherPrimary.serviceId }, cardholderRole: "SECONDARY" } });
