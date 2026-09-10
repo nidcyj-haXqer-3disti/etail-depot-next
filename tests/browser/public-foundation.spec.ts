@@ -184,7 +184,7 @@ test("a first-time visitor can find registration, confirmation and password reco
   await expect(confirmation).toBeVisible();
   await expect(confirmation.getByLabel("Confirmation link", {exact:true})).toBeDisabled();
   await expect(confirmation.getByRole("button", {name:"Confirm email", exact:true})).toBeDisabled();
-  await page.getByRole("button", {name:"Request a new confirmation email", exact:true}).click();
+  await page.getByRole("button", {name:"Back to registration", exact:true}).click();
   await expect(register).toBeVisible();
   await page.getByRole("button", {name:"Back to sign in", exact:true}).click();
   await expect(signIn).toBeVisible();
