@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { identityBindings, serviceMembers, permissionGrants } from "../../src/platform/database/schema";
@@ -12,6 +12,8 @@ import { passwordAttemptLimiter } from "../../src/modules/identity/password-thro
 import { passwordLoginThrottle } from "../../src/modules/identity/schema";
 import { withPasswordAuthentication } from "../../src/modules/identity/password-boundary";
 import { SecurityError } from "../../src/platform/security/origin";
+import { merchantAssignments } from "../../src/modules/access/schema";
+import { operatorServiceAccess } from "../../src/modules/operations/schema";
 
 afterAll(closeDatabase);
 const globalKey = createHash("sha256").update("password-login:global").digest("hex");
@@ -88,5 +90,45 @@ describe("persistent password login boundaries", () => {
     expect(await getDb().select().from(permissionGrants).where(eq(permissionGrants.personId, current!.personId))).toEqual([]);
     expect(await getDb().select().from(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId, current!.personId))).toEqual([]);
     await service.logout(cookie.split(";")[0]!); await service.logout(separate.cookie.split(";")[0]!);
+  });
+
+  it("completes first sign-in through the authentication lock, durable limiter, binding and HTTPS session without granting services", async () => {
+    expect(process.env.APP_ENV).toBe("test");
+    await getDb().delete(passwordLoginThrottle);
+    const email = `first-login-${randomUUID()}@example.test`;
+    const issuer = "https://new-provider.example.test/.netlify/identity", subject = randomUUID();
+    const service = new SessionService(sessionRepository, { appEnv: "production", publicOrigin: "https://fresh-auth.example.test" });
+    // Only upstream verification is substituted; every application/database step is real.
+    const provider = {
+      passwordLoginAvailability: vi.fn(async () => ({ available: true, reason: "AVAILABLE" as const })),
+      verifyPassword: vi.fn(async () => ({ issuer, subject, providerConfirmed: true as const })),
+    };
+    const cookie = await withPasswordAuthentication(() => signInWithPassword(email, "synthetic-verified-password", null, {
+      provider, limiter: passwordAttemptLimiter, bind: bindIdentity, sessions: service,
+    }));
+    const cookieHeader = cookie.split(";")[0]!;
+    try {
+      expect(provider.passwordLoginAvailability).toHaveBeenCalledOnce();
+      expect(provider.verifyPassword).toHaveBeenCalledExactlyOnceWith(email, "synthetic-verified-password");
+      expect(cookie).toMatch(/^__Host-etail_session=[A-Za-z0-9_-]{43}; Path=\/; HttpOnly; SameSite=Strict; Max-Age=28800; Secure$/);
+      expect(cookie).not.toMatch(/synthetic-verified-password|access_token|refresh_token|Domain=/);
+      const current = await service.authenticate(cookieHeader);
+      expect(current).not.toBeNull();
+      expect(current!.issuedAt).toBeInstanceOf(Date); expect(current!.expiresAt).toBeInstanceOf(Date);
+      expect((await getDb().select().from(identityBindings).where(eq(identityBindings.id, current!.identityId)))[0]).toMatchObject({ issuer, subject, personId: current!.personId });
+      const budgets = await getDb().select().from(passwordLoginThrottle);
+      expect(budgets).toHaveLength(2);
+      expect(budgets.every(row => /^[a-f0-9]{64}$/.test(row.key) && row.attempts === 1)).toBe(true);
+      expect(JSON.stringify(budgets)).not.toContain(email);
+      expect(await listServicesForPerson(current!.personId)).toEqual([]);
+      expect(await getDb().select().from(serviceMembers).where(eq(serviceMembers.personId, current!.personId))).toEqual([]);
+      expect(await getDb().select().from(permissionGrants).where(eq(permissionGrants.personId, current!.personId))).toEqual([]);
+      expect(await getDb().select().from(merchantAssignments).where(eq(merchantAssignments.personId, current!.personId))).toEqual([]);
+      expect(await getDb().select().from(operatorServiceAccess).where(eq(operatorServiceAccess.personId, current!.personId))).toEqual([]);
+      expect(await getDb().select().from(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId, current!.personId))).toEqual([]);
+    } finally {
+      await service.logout(cookieHeader);
+    }
+    expect(await service.authenticate(cookieHeader)).toBeNull();
   });
 });
