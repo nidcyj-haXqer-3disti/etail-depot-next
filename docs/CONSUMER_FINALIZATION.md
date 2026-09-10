@@ -31,6 +31,8 @@ Manual review inspected desktop/mobile home views, the full home layout, 320px h
 
 ## GitHub handoff
 
+Completed: [draft PR#1](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/1). [Publication record](GITHUB_DELIVERY.md) contains exact local/remote source identities, readback and the hosting hold result.
+
 Verified private target: `nidcyj-haXqer-3disti/etail-depot-next`, repository ID1361184741. It was empty. Terminal Git had no authentication; the connected integration has write permission. The handoff uses a project-marker bootstrap on main, an exact tracked-file snapshot on `feature/fresh-two-services`, and a draft PR without merging. Local source history and recovery archives remain intact.
 
 Upload excludes ignored databases, credentials, logs and build outputs. Blob/tree hashes and executable modes must match the local committed Git tree. Publication IDs and remote CI results are recorded after actual readback, not inferred from local passes. CI includes all18 new public browser cases and18 SEO unit tests; it does not deploy or merge. The broader financial/provider scope remains open as recorded in D52.
