@@ -44,4 +44,12 @@ Screenshots under `artifacts/journey-refinement/after/` were visually reviewed f
 
 Environment: Node 24.19.0, pnpm 11.19.0, Next 16.3.4, TypeScript 6.0.3, PostgreSQL 18.6. Database tests ran only in `etail_depot_next_services_test`; existing preview and hosted data were not reset. Publication identifiers are recorded below after deployment.
 
+## Published release
+
+- Tested local application commit `f5a0d58b57d40f6319d181faf8e3da96a7d82883` and published GitHub `28516d6e6e542e6fc0033484aa66314fbf13cc55` share the exact tree `1cddba963fc5af6fee2bf450f686508f96ef5cbc`. [Draft PR8](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/8) remains open for review; the agent performed no merge.
+- Owned Netlify site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`, deployment `6aa277921086e3391ccf5ab8`, production context, ready/published `2026-09-10T09:28:11.474Z`, exact GitHub application revision above. [Open services](https://etail-depot-next.netlify.app/services).
+- All nine post-publication public/protected-route checks passed without credentials: landing/login200; service pages307 to login; sandbox, recipient, Cardholder and Merchant dashboard APIs401. Email controls remain enabled. Full authenticated workflows were verified in the isolated test database, not with the user's own hosted credentials.
+- Netlify's normal source branch is verified restored to `main`. The first temporary branch-selection attempt was rejected by automatic approval review; exact-site, production-only sign-in and prior authorized sandbox-publication evidence resolved the rejection. The ready build was then explicitly published after source restoration. Access, Identity settings, secrets, DNS and database schema were unchanged.
+- Local preview3100 is restored using existing preview records, with no startup migration or seed writes. The final two first-use capture checks passed after restoring page scroll/focus; all 76 distinct browser cases remain passed. GitHub workflow34460331626 was still in progress at the last observation, with its desktop/mobile phase running; local results do not claim that remote workflow completed.
+
 Live cards, money, outbound messages, actual provider verification, new billing/rewards and other unimplemented commercial capabilities remain outside this simulation. This refinement improves the usable implemented journeys; it does not claim completion of every commercial feature.
