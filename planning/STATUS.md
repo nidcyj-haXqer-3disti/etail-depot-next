@@ -1,6 +1,8 @@
-# Hosted email and authorized deployment — preparation
+# Hosted email and authorized deployment — runtime correction verified
 
-D56 follows the user's explicit “push and deploy” instruction. The previous PR2 is merged and its final GitHub checks passed; remote main `fb64fa7c986f7bdce6b1060c71a6392c23b4c9d9` matches the preserved local tree. The new `feature/hosted-email-deploy` enables the existing email flow only on the exact canonical production site, with real money and fixture identity off. It also gives hosted confirmation/recovery links direct callback instructions. All507 unit/database/concurrency/contract tests and all62 browser cases pass, along with production Next/offline Netlify packaging, lint/types, source architecture/security, dependency audit and35 source-only handoff tests. Live deployment acceptance follows. No additional migration, demo-data import or user creation is part of this change.
+D56 follows the user's explicit “push and deploy” instruction. PR2 is merged and its final GitHub checks passed; remote main `fb64fa7c986f7bdce6b1060c71a6392c23b4c9d9` matches the preserved local baseline. The initial feature revision `740690f5174dd88b18121ea5b7ea793f3f42efad` passed local/GitHub checks and deployed, but live acceptance exposed reliance on build-only Netlify environment variables. That failed receipt is retained.
+
+The corrected `feature/hosted-email-deploy` verifies the actual Netlify request context for the exact canonical production site, with real money and fixture identity off. Hosted confirmation/recovery links use direct callback instructions. All 513 unit/database/concurrency/contract tests and all 62 browser cases pass on this correction. Production Next/offline Netlify packaging, lint/types, architecture/security, dependency audit and 35 source-only handoff tests pass. Logs are under `artifacts/hosted-email-deploy/runtime-correction/`. Corrected live acceptance follows. No additional migration, demo-data import or user creation is part of this change.
 
 # People-focused marketing and first-time email access — D54–D55 history
 
