@@ -161,6 +161,9 @@
                       ],
                       "additionalProperties": false
                     },
+                    "canCreatePrimary": {
+                      "type": "boolean"
+                    },
                     "profiles": {
                       "type": "array",
                       "items": {
@@ -657,6 +660,7 @@
                   },
                   "required": [
                     "person",
+                    "canCreatePrimary",
                     "profiles",
                     "primaryService",
                     "cards",

@@ -1,8 +1,7 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
-import { SecurityError } from "../../platform/security/origin";
 import { merchantNow } from "../access/merchant-scope";
-import { requireMerchantApplicant } from "../services/merchant-eligibility";
+import { requireServiceReader } from "../services/service-reader";
 import { evaluate } from "../policy/evaluate";
 import { getBalance } from "../ledger/service";
 import { formatMoney } from "../workspace/service";
@@ -15,9 +14,8 @@ import type { MerchantDashboardProjection, MerchantDashboardTotals, MerchantDash
 export async function getMerchantDashboard(personId:string):Promise<MerchantDashboardProjection> {
  return getDb().transaction(async tx=>{
   const scopes=await listMerchantScopes(tx,personId),now=await merchantNow(tx);
-  let eligible=false;
-  try {await requireMerchantApplicant(tx,personId);eligible=true;}catch(error){if(!(error instanceof SecurityError&&error.status===403))throw error;}
-  const canCreatePrimary=eligible;
+  const {canCreatePrimary}=await requireServiceReader(tx,personId);
+  const eligible=canCreatePrimary;
   const paymentIds=scopes.filter(scope=>evaluate(scope.policy,"payments.read").allowed).map(scope=>scope.unit.id);
   const channelIds=scopes.filter(scope=>evaluate(scope.policy,"channels.read").allowed).map(scope=>scope.unit.id);
   const primaryServiceIds=[...new Set(scopes.map(scope=>scope.masterService.id))],unitIds=scopes.map(scope=>scope.unit.id);

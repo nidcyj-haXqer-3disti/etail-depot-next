@@ -7,6 +7,7 @@ import { assertFixtureIdentityAllowed } from "../identity";
 import { merchantProfiles,merchantUnits } from "../acquiring/schema";
 import { MERCHANT_ACTIONS,evaluate,type MerchantPolicyScope } from "../policy/evaluate";
 import { merchantAssignments,merchantPermissionGrants } from "./schema";
+import { requireServiceReader } from "../services/service-reader";
 import type { ScopedTransaction } from "./scope";
 
 export async function requireMerchantFixturePerson(tx:ScopedTransaction,personId:string) {
@@ -17,14 +18,15 @@ export async function requireMerchantFixturePerson(tx:ScopedTransaction,personId
 }
 export async function merchantNow(tx:ScopedTransaction) {const result=await tx.execute(sql`select clock_timestamp() as now`);return new Date(result.rows[0]!.now as string|Date);}
 export async function listMerchantAssignmentUnitIds(tx:ScopedTransaction,personId:string) {
-  await requireMerchantFixturePerson(tx,personId);
+  await requireServiceReader(tx,personId);
   const rows=await tx.select({id:merchantAssignments.merchantUnitId}).from(merchantAssignments).where(and(eq(merchantAssignments.personId,personId),eq(merchantAssignments.state,"ACCEPTED"))).orderBy(merchantAssignments.merchantUnitId);
   return rows.map(row=>row.id);
 }
 /** Merchant service lock precedes primary, unit, assignment and financial locks. */
 export async function loadMerchantUnitScope(tx:ScopedTransaction,personId:string,unitId:string,forWrite=false,options:{mode?:"OPERATING"|"OVERSIGHT";read?:boolean}={}) {
   if(!z.uuid().safeParse(unitId).success)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-  unitId=unitId.toLowerCase();await requireMerchantFixturePerson(tx,personId);
+  unitId=unitId.toLowerCase();
+  if(forWrite)await requireMerchantFixturePerson(tx,personId);else await requireServiceReader(tx,personId);
   const [hint]=await tx.select().from(merchantUnits).where(eq(merchantUnits.id,unitId));
   if(!hint)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
   if(forWrite)await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+hint.masterServiceId},0))`);

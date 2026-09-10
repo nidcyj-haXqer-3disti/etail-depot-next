@@ -8,6 +8,7 @@ import { services, serviceMembers, identityBindings, people } from "../../platfo
 import { getRuntimeConfig } from "../../platform/config";
 import { SecurityError } from "../../platform/security/origin";
 import { assertFixtureIdentityAllowed } from "../identity";
+import { requireServiceReader } from "../services/service-reader";
 import { requireMerchantApplicant } from "../services/merchant-eligibility";
 import { loadServiceScope, type ScopedTransaction } from "../access/scope";
 import { loadMerchantUnitScope, listMerchantAssignmentUnitIds } from "../access/merchant-scope";
@@ -159,7 +160,7 @@ function merchantSummary(scope:MerchantScope,eligible=true):MerchantUnitSummary 
 }
 /** Enumerate owned Merchant services and exact accepted assignments, never Cardholder participation. */
 export async function listMerchantScopes(tx:ScopedTransaction,personId:string):Promise<MerchantScope[]> {
-  await fixturePerson(tx,personId);
+  await requireServiceReader(tx,personId);
   const owned=await tx.select({id:services.id}).from(services).innerJoin(serviceMembers,and(eq(serviceMembers.serviceId,services.id),eq(serviceMembers.personId,personId),eq(serviceMembers.state,"ACCEPTED"))).where(and(eq(services.kind,"MERCHANT"),eq(services.primaryPersonId,personId)));
   const serviceIds=owned.map(row=>row.id),assignedIds=await listMerchantAssignmentUnitIds(tx,personId);
   const candidates=serviceIds.length||assignedIds.length?await tx.select({id:merchantUnits.id}).from(merchantUnits).where(or(serviceIds.length?inArray(merchantUnits.masterServiceId,serviceIds):sql`false`,assignedIds.length?inArray(merchantUnits.id,assignedIds):sql`false`)).orderBy(merchantUnits.displayName,merchantUnits.id):[];

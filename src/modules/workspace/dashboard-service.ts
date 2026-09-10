@@ -1,30 +1,22 @@
 import {and,desc,eq,inArray,or,sql} from "drizzle-orm";
 import {z} from "zod";
 import {getDb} from "../../platform/database/client";
-import {serviceActivity,services,cards,cardRequests,identityBindings,people} from "../../platform/database/schema";
+import {serviceActivity,services,cards,cardRequests,people} from "../../platform/database/schema";
 import {SecurityError} from "../../platform/security/origin";
-import {getRuntimeConfig} from "../../platform/config";
-import {assertFixtureIdentityAllowed} from "../identity";
+import {requireServiceReader} from "../services/service-reader";
 import {getCardholderContextPolicies} from "../services/service";
 import {evaluate} from "../policy/evaluate";
 import {cardholderRole} from "../policy/cardholder-scope";
 import {activityProjection,getCardProjection,getWorkspaceInTransaction,loadCardholderWorkspaceScope,requestProjection} from "./service";
 import type {CardholderDashboardDetail,CardholderDashboardProjection,CardholderServiceProfile,CardholderDashboardFocus} from "./dashboard-contracts";
-import type {ScopedTransaction} from "../access/scope";
 
 const pageSize=30;
 function uuid(value:string){if(!z.uuid().safeParse(value).success)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return value.toLowerCase();}
-async function fixturePerson(tx:ScopedTransaction,personId:string){
- const config=getRuntimeConfig();
- try{assertFixtureIdentityAllowed({...config,fixtureIdentityEnabled:config.localFixtureIdentity});}catch{throw new SecurityError("WORKSPACE_UNAVAILABLE",404);}
- const [person]=await tx.select({id:people.id,displayName:people.displayName}).from(identityBindings).innerJoin(people,eq(people.id,identityBindings.personId)).where(and(eq(identityBindings.personId,personId),eq(identityBindings.issuer,"urn:etail:isolated-fixture")));
- if(!person)throw new SecurityError("WORKSPACE_UNAVAILABLE",404);return person;
-}
 
 /** Navigation uses only the person's explicit primary service and its current capabilities. */
 export async function getPrimaryCardholderService(personId:string):Promise<CardholderServiceProfile|null>{
  return getDb().transaction(async tx=>{
-  const person=await fixturePerson(tx,personId);
+  const {person}=await requireServiceReader(tx,personId);
   const [profile]=await tx.select().from(services).where(and(eq(services.primaryPersonId,personId),eq(services.kind,"CARDHOLDER")));
   if(!profile)return null;
   let canAddCard=false,canInvite=false;
@@ -43,7 +35,7 @@ export async function getPrimaryCardholderService(personId:string):Promise<Cardh
 export async function getCardholderDashboardFocus(personId:string,cardId:string):Promise<CardholderDashboardFocus>{
  const id=uuid(cardId);
  return getDb().transaction(async tx=>{
-  await fixturePerson(tx,personId);
+  await requireServiceReader(tx,personId);
   const [row]=await tx.select().from(cards).where(eq(cards.id,id));
   if(!row)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
   const scope=await loadCardholderWorkspaceScope(tx,personId,row.serviceId),role=cardholderRole(scope.policy);
@@ -61,7 +53,7 @@ export async function getCardholderDashboardFocus(personId:string,cardId:string)
 export async function getCardholderDashboard(personId:string,page=0):Promise<CardholderDashboardProjection>{
  if(!Number.isSafeInteger(page)||page<0||page>100000)throw new SecurityError("INVALID_REQUEST",422);
  return getDb().transaction(async tx=>{
-  const person=await fixturePerson(tx,personId);
+  const {person,canCreatePrimary}=await requireServiceReader(tx,personId);
   const contexts=(await getCardholderContextPolicies(tx,personId)).filter(context=>cardholderRole(context.policy)!=="NONE");
   const primaryIds=[...new Set(contexts.flatMap(context=>context.primaryPersonId?[context.primaryPersonId]:[]))];
   const stored=primaryIds.length?await tx.select({profile:services,name:people.displayName}).from(services).innerJoin(people,eq(people.id,services.primaryPersonId)).where(and(eq(services.kind,"CARDHOLDER"),inArray(services.primaryPersonId,primaryIds))):[];
@@ -104,7 +96,7 @@ export async function getCardholderDashboard(personId:string,page=0):Promise<Car
    const [own]=await tx.select({id:services.id}).from(services).where(and(eq(services.kind,"CARDHOLDER"),eq(services.primaryPersonId,personId)));
    if(own)primaryService={id:own.id,primaryPersonId:personId,primaryName:person.displayName,displayName:"Your cardholder service",relationship:"PRIMARY",canAddCard:false,canInvite:false};
   }
-  return {person,profiles,primaryService,cards:visible,cardCount:count!.value,cardsPage:page,cardsHasMore:rows.length>pageSize,activity,requests,fictional:true};
+  return {person,canCreatePrimary,profiles,primaryService,cards:visible,cardCount:count!.value,cardsPage:page,cardsHasMore:rows.length>pageSize,activity,requests,fictional:true};
  },{isolationLevel:"repeatable read"});
 }
 
@@ -114,7 +106,7 @@ export async function getCardholderDashboardDetail(personId:string,input:{card?:
  if(!chosen.length)return null;
  if(chosen.length!==1)throw new SecurityError("INVALID_REQUEST",422);
  return getDb().transaction(async tx=>{
-  await fixturePerson(tx,personId);
+  await requireServiceReader(tx,personId);
   let serviceId:string|undefined,kind:CardholderDashboardDetail["kind"];
   if(input.card){const [row]=await tx.select({serviceId:cards.serviceId}).from(cards).where(eq(cards.id,uuid(input.card)));serviceId=row?.serviceId;kind="CARD";}
   else if(input.request){const [row]=await tx.select({serviceId:cardRequests.serviceId}).from(cardRequests).where(eq(cardRequests.id,uuid(input.request)));serviceId=row?.serviceId;kind="REQUEST";}
