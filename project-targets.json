@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "project_key": "ETAIL_DEPOT_NEXT_GREENFIELD_2026",
+  "delivery": "fresh-sandbox",
+  "github": {
+    "owner": "nidcyj-haXqer-3disti",
+    "repository_name": "etail-depot-next",
+    "repository_id": 1361184741,
+    "private": true
+  },
+  "netlify": {
+    "site_name": "etail-depot-next",
+    "site_id": "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
+    "team_id": "685ae8f4e6ce519ecf6b267d",
+    "canonical_origin": "https://etail-depot-next.netlify.app"
+  },
+  "isolation": {
+    "new_database_required": true,
+    "new_identity_required": true,
+    "new_secrets_required": true,
+    "import_old_customer_data": false,
+    "copy_old_application_code": false
+  },
+  "release": {
+    "real_money_allowed": false,
+    "public_access_requires_review_approval": true,
+    "feature_merge_requires_review_approval": true,
+    "purchases_or_plan_upgrades_require_approval": true
+  },
+  "denied": {
+    "repository_names": [
+      "etail-depot-member-commerce",
+      "etail-depot-webapp"
+    ],
+    "netlify_site_names": [
+      "etail-depot-member-commerce",
+      "etail-depot-webapp"
+    ],
+    "netlify_site_ids": [
+      "7e49e5cf-5938-4e90-8c0e-026432311e0b"
+    ],
+    "domains": [
+      "etaildepot.com",
+      "www.etaildepot.com",
+      "etail-depot-member-commerce.netlify.app",
+      "etail-depot-webapp.netlify.app"
+    ]
+  },
+  "binding_instructions": "Names are unreserved. Verify owner/availability; abort on unrelated collisions. After creation, record actual stable IDs and read back metadata before mutations. Do not remove denied targets. Local guard checks are not remote authorization."
+}
