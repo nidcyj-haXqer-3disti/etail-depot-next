@@ -1,4 +1,8 @@
-# Hosted email and authorized deployment — published and accepted
+# Sign-in session reader correction — verified for deployment
+
+D57 repairs a reproduced hosted database-reader incompatibility after successful provider login. `feature/sign-in-session-read` starts from the exact tree merged by PR3. The shared HTTP compatibility adapter preserves the existing Netlify connection and all authentication/permission boundaries. All517 domain/database/contract tests and all62 browser cases pass, including the three actual-library serverless regressions and combined PostgreSQL authentication case. Production Next/offline Netlify packaging, lint/types, architecture, security/dependency audit and35 handoff helper tests pass. Deployment acceptance follows. [Correction evidence](../docs/SIGN_IN_SESSION_FIX.md) records the initial live503 and the expected401 for an unknown synthetic cookie after repair. No user credential or record is changed.
+
+# Hosted email and authorized deployment — D56 history
 
 **Published:** [Etail Depot](https://etail-depot-next.netlify.app) now shows enabled email sign-in and first-time registration. Deployed GitHub revision `3aa28d28532fd3790f1c51f87cbc7913fe585814` exactly matches tested local `0143e2749f8bc99ba38a2eddc22dadbca2f6efc8`; Netlify deploy `6aa23e2b077dc331492708b5` is ready. The actual hosted database/provider negative-login path, all15 email request-boundary cases and live registration controls passed. Production branch configuration is restored to `main`; PR3 remains open, with corrected-revision GitHub checks still running at the last observation. [Release evidence](../docs/HOSTED_EMAIL_DEPLOYMENT.md) records the failed first attempt, correction, exact trees, checks and remaining mailbox/enrollment limits. Local preview3100 is running again.
 

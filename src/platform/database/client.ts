@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/netlify-db";
 import { getRuntimeConfig } from "../config";
 import { SecurityError } from "../security/origin";
 import { validateLocalDatabaseTarget } from "./local-target";
+import { netlifyHttpQueryClient } from "./netlify-http-client";
 
 function connect() {
   const config = getRuntimeConfig();
@@ -16,6 +17,7 @@ function connect() {
   // Site ID and origin must already match the new project's recorded binding.
   if (!process.env.NETLIFY_DB_URL) throw new SecurityError("NEW_DATABASE_REQUIRED",503);
   const connection = getDatabase();
+  if (connection.driver === "serverless") connection.httpClient = netlifyHttpQueryClient(connection.httpClient);
   return {db:drizzle({client:connection}),connection};
 }
 let cached: ReturnType<typeof connect> | undefined;
