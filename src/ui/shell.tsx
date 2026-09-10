@@ -11,7 +11,7 @@ export function Header({ authenticated = false }: { authenticated?: boolean }) {
 }
 
 export function Footer({ authenticated = false }: { authenticated?: boolean }) {
-  return <footer className={`site-footer${authenticated ? "" : " public-footer"}`}>{!authenticated && <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Your cards. Your business. All in view.</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cardholder services</Link><Link href="/payment-services">Merchant services</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>}<div className="footer-inner"><span>Etail Depot</span><p>Sandbox · Demo cards and payments. No real money moves.</p>{authenticated && <Link href="/help">Help center</Link>}</div></footer>;
+  return <footer className={`site-footer${authenticated ? "" : " public-footer"}`}>{!authenticated && <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Cards for your people. More ways to get paid.</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cardholder services</Link><Link href="/payment-services">Merchant services</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>}<div className="footer-inner"><span>Etail Depot</span><p>Sandbox · Demo cards and payments. No real money moves.</p>{authenticated && <Link href="/help">Help center</Link>}</div></footer>;
 }
 
 export function Shell({ children, authenticated = false }: { children: React.ReactNode; authenticated?: boolean }) {

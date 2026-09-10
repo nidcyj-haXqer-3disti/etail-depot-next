@@ -5,6 +5,8 @@ import type { SessionOverview } from "../../modules/identity/security-contracts"
 import { SecurityError } from "../security/origin";
 import { getDb } from "./client";
 import { identityBindings, sessions } from "./schema";
+import { identityPasswordResets } from "../../modules/identity/schema";
+import { randomUUID } from "node:crypto";
 
 type DatabaseTransaction = Parameters<Parameters<ReturnType<typeof getDb>["transaction"]>[0]>[0];
 
@@ -15,10 +17,17 @@ async function lockIdentity(tx: DatabaseTransaction, identityId: string): Promis
   if (!binding) throw new SecurityError("INVALID_SESSION_IDENTITY", 500);
 }
 
+/** Always called after the binding lock, in the same transaction as session insertion. */
+async function assertNoPendingReset(tx: DatabaseTransaction, identityId: string): Promise<void> {
+  const [reset] = await tx.select({ state: identityPasswordResets.state }).from(identityPasswordResets).where(eq(identityPasswordResets.identityId, identityId));
+  if (reset?.state === "RESET_PENDING") throw new SecurityError("PASSWORD_RESET_PENDING", 409);
+}
+
 export const sessionRepository: SessionRepository = {
   async insert(record) {
     await getDb().transaction(async (tx) => {
       await lockIdentity(tx, record.identityId);
+      await assertNoPendingReset(tx, record.identityId);
       await tx.insert(sessions).values(record);
     });
   },
@@ -45,9 +54,37 @@ export const sessionRepository: SessionRepository = {
   async rotate(oldHash,newRecord,at) {
     return getDb().transaction(async (tx) => {
       await lockIdentity(tx, newRecord.identityId);
+      await assertNoPendingReset(tx, newRecord.identityId);
       const updated=await tx.update(sessions).set({revokedAt:at}).where(and(eq(sessions.tokenHash,oldHash),eq(sessions.identityId,newRecord.identityId),eq(sessions.personId,newRecord.personId),eq(sessions.familyId,newRecord.familyId),eq(sessions.issuedAt,newRecord.issuedAt),eq(sessions.expiresAt,newRecord.expiresAt),isNull(sessions.revokedAt),gt(sessions.expiresAt,at))).returning();
       if(!updated.length) return false;
       await tx.insert(sessions).values(newRecord); return true;
+    });
+  },
+};
+
+export interface PasswordResetAttempt { identityId: string; attemptId: string }
+/** Reuses binding → reset marker → sessions ordering; no provider credential is persisted. */
+export const passwordResetRepository = {
+  async begin(identityId: string): Promise<PasswordResetAttempt> {
+    return getDb().transaction(async tx => {
+      await lockIdentity(tx, identityId);
+      await assertNoPendingReset(tx, identityId);
+      const attemptId = randomUUID(), now = new Date();
+      await tx.insert(identityPasswordResets).values({ identityId, attemptId, state: "RESET_PENDING", startedAt: now, completedAt: null })
+        .onConflictDoUpdate({ target: identityPasswordResets.identityId, set: { attemptId, state: "RESET_PENDING", startedAt: now, completedAt: null } });
+      await tx.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.identityId, identityId), isNull(sessions.revokedAt)));
+      return { identityId, attemptId };
+    });
+  },
+  /** Call only after a definite successful response for this exact external update. */
+  async complete(attempt: PasswordResetAttempt): Promise<void> {
+    await getDb().transaction(async tx => {
+      await lockIdentity(tx, attempt.identityId);
+      const [reset] = await tx.select().from(identityPasswordResets).where(eq(identityPasswordResets.identityId, attempt.identityId)).for("update");
+      if (reset?.state !== "RESET_PENDING" || reset.attemptId !== attempt.attemptId) throw new SecurityError("PASSWORD_RESET_PENDING", 409);
+      const now = new Date();
+      await tx.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.identityId, attempt.identityId), isNull(sessions.revokedAt)));
+      await tx.update(identityPasswordResets).set({ state: "COMPLETE", completedAt: now }).where(eq(identityPasswordResets.identityId, attempt.identityId));
     });
   },
 };

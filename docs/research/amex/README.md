@@ -1,5 +1,7 @@
 # American Express as Etail's primary business and product reference
 
+Latest marketing refresh (10 September 2026): [Amex people and card positioning](MARKETING_POSITIONING_2026_09_10.md) and [delegated collection research](MERCHANT_MARKETING_FIT_2026_09_10.md). These support [the redesigned landing page](../../MARKETING_REFRESH.md); proposed audience jobs remain hypotheses for customer testing.
+
 Latest dashboard/role refresh: [Cardholder dashboards](CARDHOLDER_DASHBOARD_ROLES.md) and [Merchant dashboards](MERCHANT_DASHBOARD_ROLES.md), with official sources, observed illustrations, historical video and evidence limits. These inform [the implemented service design](../../SERVICE_DASHBOARD_DESIGN.md).
 
 **Latest correction: front-end experience. Start with [the actual screen and interaction reference](FRONTEND_EXPERIENCE.md).** The user wants the Amex layouts, navigation, controls, page sequences and visible feedback for issuing, account management and merchant servicing. This supersedes the business-audit emphasis below. The front-end reference includes visually inspected official screenshots and identifies missing visual evidence.

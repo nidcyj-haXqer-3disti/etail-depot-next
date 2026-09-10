@@ -2,9 +2,9 @@ import type { Metadata, MetadataRoute } from "next";
 import targets from "../../../project-targets.json" with { type: "json" };
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Cards and payments, clearly managed", description: "Explore Etail Depot: card controls, shared cardholder access and merchant payment tools. Try the interactive demo with fictional money." },
-  "/card-services": { title: "Card services", description: "Explore card controls, activity and shared cardholder access. Manage connected cards while secondary cardholders see their own information." },
-  "/payment-services": { title: "Payment services", description: "Explore payment links, QR codes, merchant payments and team access in the Etail Depot demo. No real payments or bank transfers." },
+  "/": { title: "Cards for family and teams, shared payment tools", description: "Explore cards for adult family members and teams, plus shared payment tools by text, email, invoice, QR code and more. Try the Etail Depot sandbox." },
+  "/card-services": { title: "Cards for your family, team and trusted people", description: "Give trusted adults their own cards with permissions you manage. Explore primary oversight, private cardholder activity and card controls in the sandbox." },
+  "/payment-services": { title: "Get paid together with shared merchant payment tools", description: "Give family, teams and helpers payment tools for your merchant. Explore text, email, invoice, bill, social, QR and web payment requests in the sandbox." },
   "/help": { title: "Help with cards and payments", description: "Learn how Etail Depot card controls, payment tools and shared access work. Find help with the demo and what is available today." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
