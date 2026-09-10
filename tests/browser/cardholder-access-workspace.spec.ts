@@ -19,6 +19,35 @@ async function signIn(context: BrowserContext, personId: string) {
 }
 
 test.afterAll(closeDatabase);
+test("cardholder task choices respect the current permission ceiling and require an explicit reviewed invitation", async ({page}) => {
+  const primary = await cardPrimary(`Limited UI primary ${randomUUID().slice(0, 8)}`);
+  await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),inArray(permissionGrants.action,["cards.purchase","cards.freeze","cards.unfreeze"])));
+  await signIn(page.context(),primary.personId);
+  const initial=await getAccessOverview(primary.personId,primary.serviceId), recipient=initial.recipients[0]!;
+  await page.goto(`${origin}/cardholder-services?manage=${primary.serviceId}`);
+  await page.getByRole("button",{name:"Invite a person",exact:true}).click();
+  const dialog=page.getByRole("dialog",{name:"Invite a person",exact:true});
+  await dialog.getByRole("combobox",{name:"Named recipient",exact:true}).selectOption(recipient.id);
+  await expect(dialog.getByRole("radio",{name:/^Use their own card/})).toBeDisabled();
+  await expect(dialog.getByRole("button",{name:"Review access",exact:true})).toBeDisabled();
+  await dialog.getByRole("radio",{name:/^View their own card/}).check();
+  await dialog.getByRole("button",{name:"Review access",exact:true}).click();
+  expect((await getAccessOverview(primary.personId,primary.serviceId)).invitations).toEqual([]);
+  const review=page.getByRole("dialog",{name:"Review cardholder access",exact:true});
+  await expect(review).toContainText("without making purchases");
+  await review.getByRole("button",{name:"Save invitation",exact:true}).click();
+  await expect(review).toHaveCount(0);
+  const result=await getAccessOverview(primary.personId,primary.serviceId), invitation=result.invitations[0]!;
+  expect(invitation.status).toBe("PENDING");
+  expect(invitation.permissions).toEqual(expect.arrayContaining(["cards.read","cards.hold","activity.read"]));
+  expect(invitation.permissions.every(action=>initial.permissionOptions.some(option=>option.action===action))).toBe(true);
+  expect(invitation.permissions).not.toContain("cards.purchase");
+  expect(invitation.permissions).not.toContain("cards.freeze");
+  expect(invitation.permissions).not.toContain("people.invite");
+  expect(invitation.delegablePermissions).toEqual([]);
+  expect(result.people.some(person=>person.id===recipient.id&&person.state==="ACCEPTED")).toBe(false);
+});
+
 test("primary invitation, intended acceptance, permission changes and revocation stay in one new Cardholder service", async ({ page, browser }) => {
   const primary = await cardPrimary(`UI primary ${randomUUID().slice(0, 8)}`);
   // The picker intentionally contains only the named demo recipients. Enroll Alex solely
@@ -43,7 +72,7 @@ test("primary invitation, intended acceptance, permission changes and revocation
     await page.getByRole("button", { name: "Invite a person", exact: true }).click();
     const invite = page.getByRole("dialog", { name: "Invite a person", exact: true });
     await invite.getByRole("combobox", { name: "Named recipient" }).selectOption(recipient.id);
-    for (const label of ["View cards", "Be selected as a cardholder", "Make purchases", "Freeze cards", "Unfreeze cards", "View activity"]) await invite.getByRole("checkbox", { name: new RegExp(`^${label}`) }).check();
+    await invite.getByRole("radio", {name: /^Use their own card/}).check();
     await invite.getByRole("button", { name: "Review access", exact: true }).click();
     const review = page.getByRole("dialog", { name: "Review cardholder access", exact: true });
     await expect(review.getByRole("heading", { name: recipient.name, exact: true })).toBeVisible();
@@ -51,6 +80,8 @@ test("primary invitation, intended acceptance, permission changes and revocation
     await expect(review).toBeHidden();
     const pending = (await getAccessOverview(primary.personId, primary.serviceId)).invitations.find(row => row.recipientId === recipient.id && row.status === "PENDING")!;
     expect(pending).toBeTruthy();
+    expect(pending.permissions).toEqual(expect.arrayContaining(["cards.read", "cards.hold", "cards.purchase", "activity.read"]));
+    expect(pending.delegablePermissions).toEqual([]);
     expect((await page.request.post(`${origin}/api/v1/invitations/${pending.id}/accept`, { headers, data: { commandId: randomUUID(), expectedVersion: pending.version } })).status()).toBe(404);
     expect((await recipientPage.request.get(`${origin}/api/v1/cardholder-services/${primary.serviceId}/workspace`)).status()).toBe(404);
 
@@ -76,7 +107,7 @@ test("primary invitation, intended acceptance, permission changes and revocation
     await page.locator("button.ws-person-row").filter({ hasText: recipient.name }).click();
     await page.getByRole("dialog", { name: recipient.name, exact: true }).getByRole("button", { name: "Change access", exact: true }).click();
     const edit = page.getByRole("dialog", { name: "Change cardholder access", exact: true });
-    await edit.getByRole("checkbox", { name: /^Make purchases/ }).uncheck();
+    await edit.getByRole("radio", {name: /^View their own card/}).check();
     await edit.getByRole("button", { name: "Review access", exact: true }).click();
     const editReview = page.getByRole("dialog", { name: "Review cardholder access", exact: true });
     await editReview.getByRole("button", { name: "Save these permissions", exact: true }).click();

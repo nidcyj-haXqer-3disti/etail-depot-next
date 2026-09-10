@@ -1,5 +1,9 @@
 # Source precedence and explicit overrides
 
+## End-to-end journey correction — 2026-09-10
+
+The user rejected both D60 sandbox journeys as a poor experience. D61 and [the journey refinement](SANDBOX_JOURNEY_REFINEMENT.md) govern the next implementation: task-oriented first use, one card details/review form, connected merchant setup/channel/checkout, visible accepted cardholders and clear invitation handoffs. Reduce redundant screens while preserving explicit financial actions, canonical commands, permissions and reliable retries. Passing functional tests alone do not establish experience quality.
+
 ## Hosted sandbox availability — 2026-09-10
 
 The latest explicit request authorizes the full implemented customer sandbox for verified email members. [Hosted sandbox product](HOSTED_SANDBOX_PRODUCT.md) and D60 supersede D59’s prohibition on provider-member setup and mutations. Deliberate sandbox opt-in enables simulated product participation; financial services and permissions still require the existing explicit commands. Hosted fixture login, real money and automatic operator grants remain forbidden.

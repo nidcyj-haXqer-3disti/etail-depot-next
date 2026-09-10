@@ -10,7 +10,7 @@ export function MerchantShell({ merchantId, name, kind, tab = "channels", showPe
   tab?: MerchantTab; showPeople?: boolean; primaryAccess?: boolean; children: React.ReactNode;
 }) {
   const hierarchy = kind === "MASTER" ? "Primary merchant" : kind === "SUB" ? "Submerchant" : "Merchant";
-  return <div className="mn-app"><Header authenticated /><div className="mn-frame"><aside className="mn-sidebar">
+  return <div className="mn-app"><Header authenticated /><div className="mn-frame"><aside className={`mn-sidebar${merchantId ? " mn-sidebar-with-merchant" : ""}`}>
     <p className="consumer-eyebrow">MERCHANT SERVICES</p>
     <Link href="/merchant-services" className="mn-directory-link"><WorkspaceIcon name="merchant" /><span>{name ?? "Merchant overview"}<small>{name ? hierarchy : "Collections, people and payment tools"}</small></span><WorkspaceIcon name="chevron" /></Link>
     <nav aria-label="Merchant navigation"><Link href="/merchant-services" aria-current={!merchantId ? "page" : undefined}><WorkspaceIcon name="overview" />Overview</Link>{merchantId && ([

@@ -67,7 +67,7 @@ for(const width of [1440,320]) {
     await accessible(page,`Merchant ${view.toLowerCase()}`);
    }
    await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Payment setup",exact:true}).click();
-   await expect(page.getByRole("heading",{name:"Payment setup",exact:true})).toBeVisible();
+   await expect(page.getByRole("heading",{name:"Your sandbox payments are ready",exact:true})).toBeVisible();
    await accessible(page,"Merchant payment setup");
    if(persona==="viewer") {
     await expect(page.getByRole("button",{name:"Transfer out",exact:true})).toHaveCount(0);

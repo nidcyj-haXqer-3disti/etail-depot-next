@@ -694,6 +694,47 @@
                     "cardsHasMore": {
                       "type": "boolean"
                     },
+                    "cardholders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "displayName": {
+                            "type": "string"
+                          },
+                          "serviceId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "cardCount": {
+                            "nullable": true,
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "canAddCard": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "displayName",
+                          "serviceId",
+                          "cardCount",
+                          "canAddCard"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "cardholdersHasMore": {
+                      "type": "boolean"
+                    },
                     "activity": {
                       "type": "array",
                       "items": {
@@ -934,6 +975,8 @@
                     "cardCount",
                     "cardsPage",
                     "cardsHasMore",
+                    "cardholders",
+                    "cardholdersHasMore",
                     "activity",
                     "requests",
                     "fictional"

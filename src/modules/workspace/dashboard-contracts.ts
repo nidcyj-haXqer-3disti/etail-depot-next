@@ -29,6 +29,8 @@ export interface CardholderDashboardProjection {
  cardCount:number;
  cardsPage:number;
  cardsHasMore:boolean;
+ cardholders:{id:string;displayName:string;serviceId:string;cardCount:number|null;canAddCard:boolean}[];
+ cardholdersHasMore:boolean;
  activity:DashboardActivity[];
  requests:CardRequestProjection[];
  fictional:true;

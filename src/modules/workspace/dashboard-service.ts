@@ -1,7 +1,7 @@
-import {and,desc,eq,inArray,or,sql} from "drizzle-orm";
+import {and,desc,eq,inArray,ne,or,sql} from "drizzle-orm";
 import {z} from "zod";
 import {getDb} from "../../platform/database/client";
-import {serviceActivity,services,cards,cardRequests,people} from "../../platform/database/schema";
+import {serviceActivity,services,cards,cardRequests,people,serviceMembers,permissionGrants} from "../../platform/database/schema";
 import {SecurityError} from "../../platform/security/origin";
 import {requireServiceReader} from "../services/service-reader";
 import {getCardholderContextPolicies} from "../services/service";
@@ -96,7 +96,20 @@ export async function getCardholderDashboard(personId:string,page=0):Promise<Car
    const [own]=await tx.select({id:services.id}).from(services).where(and(eq(services.kind,"CARDHOLDER"),eq(services.primaryPersonId,personId)));
    if(own)primaryService={id:own.id,primaryPersonId:personId,primaryName:person.displayName,displayName:"Your cardholder service",relationship:"PRIMARY",canAddCard:false,canInvite:false};
   }
-  return {person,canCreatePrimary,profiles,primaryService,cards:visible,cardCount:count!.value,cardsPage:page,cardsHasMore:rows.length>pageSize,activity,requests,fictional:true};
+  // Accepted people remain visible before their first card exists. This directory
+  // has its own bounded page and never derives membership from a page of cards.
+  const cardholders:CardholderDashboardProjection["cardholders"]=[];
+  let cardholdersHasMore=false;
+  const ownContext=linked.find(context=>context.serviceId===primaryService?.id&&cardholderRole(context.policy)==="PRIMARY");
+  if(ownContext&&evaluate(ownContext.policy,"people.read").allowed){
+   const memberRows=await tx.select({id:people.id,displayName:people.displayName,
+    canHold:sql<boolean>`exists(select 1 from ${permissionGrants} where ${permissionGrants.serviceId}=${serviceMembers.serviceId} and ${permissionGrants.personId}=${people.id} and ${permissionGrants.action}='cards.hold' and ${permissionGrants.state}='ACCEPTED')`,
+    cardCount:sql<number>`(select count(*)::integer from ${cards} where ${cards.serviceId}=${serviceMembers.serviceId} and ${cards.holderId}=${people.id})`
+   }).from(serviceMembers).innerJoin(people,eq(people.id,serviceMembers.personId)).where(and(eq(serviceMembers.serviceId,ownContext.serviceId),eq(serviceMembers.state,"ACCEPTED"),ne(people.id,personId))).orderBy(people.displayName,people.id).limit(pageSize+1).offset(page*pageSize);
+   cardholdersHasMore=memberRows.length>pageSize;
+   for(const member of memberRows.slice(0,pageSize))cardholders.push({id:member.id,displayName:member.displayName,serviceId:ownContext.serviceId,cardCount:evaluate(ownContext.policy,"cards.read").allowed?member.cardCount:null,canAddCard:member.canHold&&evaluate(ownContext.policy,"cards.request").allowed&&evaluate(ownContext.policy,"cards.manageMembers").allowed});
+  }
+  return {person,canCreatePrimary,profiles,primaryService,cards:visible,cardCount:count!.value,cardsPage:page,cardsHasMore:rows.length>pageSize,cardholders,cardholdersHasMore,activity,requests,fictional:true};
  },{isolationLevel:"repeatable read"});
 }
 

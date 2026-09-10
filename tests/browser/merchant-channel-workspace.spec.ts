@@ -7,7 +7,7 @@ import {merchantDashboard,signIn} from "./helpers/fresh";
 const formats=[['SMS','SMS / text'],['EMAIL','Email'],['INVOICE','Invoice'],['BILL','Bill'],['SOCIAL','Social media'],['QR','QR code'],['WEB','Website link']] as const;
 async function operations(page:Page,merchantId:string){const response=await page.request.get(`/api/v1/merchants/${merchantId}/operations`);expect(response.status()).toBe(200);return merchantOperationsProjectionSchema.parse(await response.json());}
 async function approve(page:Page,merchantId:string,channelId:string){
- await page.getByRole("button",{name:"Try approved payment",exact:true}).click();
+ await page.getByRole("button",{name:"Pay $12.50 with test funds",exact:true}).click();
  const review=page.getByRole("dialog",{name:"Review sandbox payment",exact:true});await expect(review).toContainText("$12.50");
  const pending=page.waitForResponse(response=>new URL(response.url()).pathname===`/api/v1/merchants/${merchantId}/channels/${channelId}/test-payments`&&response.request().method()==="POST");
  await review.getByRole("button",{name:"Confirm sandbox payment",exact:true}).click();const response=await pending;expect(response.status()).toBe(200);
@@ -23,12 +23,15 @@ test("seven channel formats share one saved request, with an exact receipt, full
  await page.goto(`/merchants/${merchantId}?tab=channels`);
  await page.getByRole("button",{name:"New payment channel",exact:true}).click();
  const form=page.getByRole("dialog",{name:"New payment channel",exact:true});
+ await expect(form.getByRole("button",{name:"Review channel",exact:true})).toBeInViewport({ratio:1});
  await form.getByRole("textbox",{name:"Channel name or purpose",exact:true}).fill(name);
  await form.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill("12.50");
+ await form.getByText("More options · use, expiry and access",{exact:true}).click();
  await form.getByRole("combobox",{name:"Request use",exact:true}).selectOption("REUSABLE");
  await form.getByLabel("Expires at (UTC)",{exact:true}).fill(new Date(Date.now()+7*86400000).toISOString().slice(0,16));
  for(const [,label] of formats)await form.getByRole("checkbox",{name:label,exact:true}).setChecked(true);
  await form.getByRole("combobox",{name:"Channel visibility",exact:true}).selectOption("CREATOR_PRIVATE");
+ await expect(form.getByRole("button",{name:"Review channel",exact:true})).toBeInViewport({ratio:1});
  await form.getByRole("button",{name:"Review channel",exact:true}).click();
  const review=page.getByRole("dialog",{name:"Review payment channel",exact:true});await expect(review).toContainText(name);await expect(review).toContainText("$12.50");
  for(const [,label] of formats)await expect(review).toContainText(label);
@@ -36,14 +39,13 @@ test("seven channel formats share one saved request, with an exact receipt, full
  await review.getByRole("button",{name:"Save payment channel",exact:true}).click();const saved=await saving;expect(saved.status()).toBe(200);
  const channel=paymentChannelSchema.parse(await saved.json());expect(channel).toMatchObject({merchantUnitId:merchantId,description:name,usage:"REUSABLE",amount:{minor:"1250",currency:"USD"},visibility:"CREATOR_PRIVATE"});expect(new Set(channel.presentations)).toEqual(new Set(formats.map(([value])=>value)));
  const details=page.getByRole("dialog",{name:"Payment channel details",exact:true});await expect(details).toContainText(name);
- await details.getByRole("link",{name:"Open payment setup",exact:true}).click();await page.waitForURL(url=>url.pathname===`/merchants/${merchantId}`&&url.searchParams.get("tab")==="verification");
- await expect(page.getByRole("heading",{name:"Payment setup",exact:true})).toBeVisible();
  const row=page.getByRole("listitem").filter({has:page.getByText(name,{exact:true})});
  await row.getByRole("button",{name:"Turn on channel",exact:true}).click();
  const activation=page.getByRole("dialog",{name:"Turn on this channel?",exact:true});await expect(activation).toContainText(name);await expect(activation).toContainText("$12.50");
  await activation.getByRole("button",{name:"Confirm setting",exact:true}).click();await expect(activation).toBeHidden();
- await row.getByRole("link",{name:"Preview payment",exact:true}).click();await page.waitForURL(url=>url.pathname===`/pay/${channel.id}`);
+ await row.getByRole("link",{name:"Open checkout",exact:true}).click();await page.waitForURL(url=>url.pathname===`/pay/${channel.id}`);
  await expect(page.getByRole("heading",{name,level:1,exact:true})).toBeVisible();
+ await page.getByText("Preview sharing formats",{exact:true}).click();
  const presentation=page.getByRole("region",{name:"Channel presentation preview"});
  for(const [value] of formats){
   await presentation.getByRole("combobox",{name:"Preview format",exact:true}).selectOption(value);

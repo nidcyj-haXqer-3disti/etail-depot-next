@@ -235,6 +235,23 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
   for (const file of files.values()) {
     const name = relative(file.filename);
     const bindings = importBindings(file);
+    // A combined setup may continue only to the exact enrollment command that
+    // was captured inside its reviewed gateway attempt, using the same transport.
+    const continuations = name === operationUiOwner ? visitNodes(file.tree, node => ts.isPropertyAssignment(node) && node.name.getText(file.tree) === "next") : [];
+    const fixedEnrollmentContinuation = continuations.length === 1 && continuations.every(node => {
+      const value = ts.isAsExpression(node.initializer) ? node.initializer.expression : node.initializer;
+      const body = propertyValue(value, "body");
+      const keys = value && ts.isObjectLiteralExpression(value) ? value.properties.map(property => property.name?.getText(file.tree)).sort().join(",") : "";
+      const bodyKeys = body && ts.isObjectLiteralExpression(body) ? body.properties.map(property => property.name?.getText(file.tree)).sort().join(",") : "";
+      let caller=node.parent;while(caller&&!ts.isCallExpression(caller))caller=caller.parent;
+      const id = propertyValue(body, "commandId"), version = propertyValue(body, "expectedVersion");
+      return functionChain(node).join("/") === "MerchantOperations/confirm" && keys === "body,kind,method,path,setup" && bodyKeys === "commandId,enabled,expectedVersion"
+        && stringValues(file, propertyValue(value, "path")).join() === "/test-enrollment" && stringValues(file, propertyValue(value, "method")).join() === "PUT"
+        && stringValues(file, propertyValue(value, "kind")).join() === "enrollment" && propertyValue(value, "setup")?.kind === ts.SyntaxKind.TrueKeyword && propertyValue(body, "enabled")?.kind === ts.SyntaxKind.TrueKeyword
+        && id && ts.isCallExpression(id) && id.arguments.length === 0 && id.expression.getText(file.tree) === "crypto.randomUUID"
+        && version?.getText(file.tree) === "operations.enrollment.version" && caller && namedCallee(caller) === "send" && stringValues(file, propertyValue(caller.arguments[0], "path")).join() === "/gateway";
+    });
+    if(continuations.length&&!fixedEnrollmentContinuation)emit(file,continuations[0],"OPERATION_SETUP_CONTINUATION","The reviewed gateway may capture only a fixed enabled enrollment step with its own original identifier and version.");
     const isUi = file.client || name.startsWith("src/ui/");
     const retiredTables = new Set(["disputes", "disputeTimeline", "settlements", "workspaceBalances"]);
     for (const node of visitNodes(file.tree, node => ts.isIdentifier(node) || ts.isPropertyAccessExpression(node))) {
@@ -290,7 +307,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
             const expected = paths.length === 1 ? operationUiPaths.get(paths[0]) : null;
             if (chain.join("/") !== "MerchantOperations/confirm" || !expected || hasTarget || methods.length !== 1 || methods[0] !== expected[0]) emit(file, call, "OPERATION_UI_ROUTE", "A reviewed operation attempt must select one finite owning route, target and HTTP method.");
             else operationUiStages.set(paths[0], (operationUiStages.get(paths[0]) ?? 0) + 1);
-          } else if (!identifierIs(argument, "attempt")) emit(file, call, "OPERATION_ATTEMPT_SOURCE", "Operation retries must reuse the unchanged saved attempt.");
+          } else if (!identifierIs(argument, "attempt") && !(fixedEnrollmentContinuation && chain.join("/") === "MerchantOperations/send" && argument && ts.isPropertyAccessExpression(argument) && identifierIs(argument.expression,"command") && argument.name.text === "next")) emit(file, call, "OPERATION_ATTEMPT_SOURCE", "Operation retries must reuse the unchanged saved attempt or its exact reviewed enrollment continuation.");
         }
         if (callee === "setAttempt" && call.arguments[0]?.kind !== ts.SyntaxKind.NullKeyword && !(chain.join("/") === "MerchantOperations/send" && identifierIs(call.arguments[0], "command"))) emit(file, call, "OPERATION_ATTEMPT_SOURCE", "Only the reviewed command may populate an operation retry attempt.");
       }
@@ -446,7 +463,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         if (!/(?:^|\/)card-requests(?:\/|$)/.test(targetPath)) continue;
         counts.requestUiCalls++;
         const stage = targetPath === "/card-requests" ? "start" : targetPath === "/card-requests/:id" ? "update" : targetPath === "/card-requests/:id/submit" ? "submit" : targetPath === "/card-requests/:id/cancel" ? "cancel" : null;
-        const expectedChain = stage === "start" ? "CardsWorkspace/startRequest" : stage === "update" ? "CardRequestForm/save" : "CardRequestForm/finish";
+        const expectedChain = "CardRequestForm/execute";
         const method = stringValues(file, call.arguments[ownerWrapper ? 1 : 2]);
         const expectedMethod = stage === "update" ? "PATCH" : "POST";
         if (!stage || !ownerWrapper || chain.join("/") !== expectedChain || method.length !== 1 || method[0] !== expectedMethod) emit(file, call, "PARALLEL_CARD_REQUEST_UI", "Start, update, submit and cancel must use the one saved CardsWorkspace request component and canonical command routes.");
@@ -498,15 +515,21 @@ function selfTest() {
     return findings;
   };
   const canonicalUi = `"use client";
-    function CardsWorkspace() { async function startRequest() { await command("/card-requests", "POST"); } return <CardRequestForm/>; }
-    function CardRequestForm() { const path = \`/card-requests/\${encodeURIComponent(request.id)}\`;
-      async function save() { await command(path, "PATCH"); }
-      async function finish(action: "submit" | "cancel") { await command(\`\${path}/\${action}\`, "POST"); }
+    function CardsWorkspace() { return <CardRequestForm/>; }
+    function CardRequestForm() {
+      async function execute(attempt) {
+        await command("/card-requests", "POST");
+        await command(\`/card-requests/\${encodeURIComponent(attempt.request.id)}\`, "PATCH");
+        const action = attempt.kind === "submit" ? "submit" : "cancel";
+        await command(\`/card-requests/\${encodeURIComponent(attempt.request.id)}/\${action}\`, "POST");
+      }
     }`;
   assert.deepEqual(probe(cardUiOwner, canonicalUi), []);
   assert.ok(probe("src/ui/second-card-flow.tsx", canonicalUi).includes("PARALLEL_CARD_REQUEST_UI"), "A copied, mutated second Add card workflow must be rejected.");
   assert.ok(probe(cardUiOwner, canonicalUi + '\nfunction SecondForm() { return <CardRequestForm/>; }').includes("PARALLEL_CARD_FORM"));
   assert.ok(probe(cardUiOwner, canonicalUi + '\nfunction bypass() { fetch("/api/v1/cardholder-services/x/card-requests", {method:"POST"}); }').includes("PARALLEL_CARD_REQUEST_UI"));
+  assert.ok(probe(cardUiOwner, canonicalUi.replace('const action = attempt.kind === "submit" ? "submit" : "cancel";', 'const action = attempt.kind;')).includes("UNINSPECTABLE_UI_COMMAND_PATH"), "Unbounded request actions must not pass the canonical form guard.");
+  assert.ok(probe(cardUiOwner, canonicalUi.replace('async function execute(attempt)', 'async function secondRequestEngine(attempt)')).includes("PARALLEL_CARD_REQUEST_UI"), "All request stages belong to the one explicit attempt executor.");
   assert.deepEqual(probe("src/ui/workspace/member-code-picker.tsx", '"use client"; function find(code) { fetch(`/api/v1/sandbox/recipient?code=${encodeURIComponent(code)}`,{cache:"no-store"}); }'), []);
   assert.ok(probe("src/ui/workspace/member-code-picker.tsx", '"use client"; function find(code) { fetch(`/api/v1/sandbox/recipient?code=${encodeURIComponent(code)}`,{method:"POST"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
   assert.ok(probe("src/modules/other/service.ts", 'import {sandboxParticipants} from "@/modules/sandbox/schema"; function grant(){tx.insert(sandboxParticipants).values({});}').includes("SANDBOX_ENROLLMENT_OWNER"));
@@ -540,6 +563,12 @@ function selfTest() {
   assert.ok(probe("src/app/api/approve/route.ts", 'import {seedAcquiringFixtures} from "@/modules/acquiring/fixtures";').includes("FIXTURE_RUNTIME_IMPORT"));
   assert.ok(probe("src/modules/services/create-merchant.ts", 'import {merchantSetupEligibility as eligibility} from "./schema"; function bypass(){tx.update(eligibility).set({personaKind:"FICTIONAL_ADULT"});}').includes("MERCHANT_PERSONA_OWNERSHIP"));
   const merchantRoute='import {createPrimaryMerchant as begin} from "@/modules/services/create-merchant"; export async function POST(){return begin();}';
+  const reviewedSetup='function MerchantOperations(){async function send(command){await send(command.next);}function confirm(){send({path:"/gateway",method:"PUT",next:{kind:"enrollment",path:"/test-enrollment",method:"PUT",body:{commandId:crypto.randomUUID(),expectedVersion:operations.enrollment.version,enabled:true},setup:true}});}}';
+  assert.deepEqual(probe(operationUiOwner,reviewedSetup),[]);
+  assert.ok(probe(operationUiOwner,reviewedSetup.replace('path:"/test-enrollment"','path:"/payouts"')).includes("OPERATION_SETUP_CONTINUATION"));
+  assert.ok(probe(operationUiOwner,reviewedSetup.replace('enabled:true','enabled:false')).includes("OPERATION_SETUP_CONTINUATION"));
+  assert.ok(probe(operationUiOwner,reviewedSetup.replace('await send(command.next)','await send({...command.next})')).includes("OPERATION_UI_ROUTE"));
+  assert.ok(probe(operationUiOwner,'function MerchantOperations(){function send(command){send(command.next);}}').includes("OPERATION_ATTEMPT_SOURCE"));
   assert.deepEqual(probe("src/app/api/v1/merchants/route.ts",merchantRoute),[]);
   assert.ok(probe("src/app/api/quick-sell/route.ts",merchantRoute).includes("PARALLEL_MERCHANT_CREATION_ROUTE"));
   assert.deepEqual(probe(workspaceTransport, '"use client"; function merchantCommand(merchantId,path,method) { return fetch(`/api/v1/merchants/${encodeURIComponent(merchantId)}${path}`,{method}); }'),[]);
