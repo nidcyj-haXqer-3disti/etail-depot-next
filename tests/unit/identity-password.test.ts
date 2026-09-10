@@ -25,10 +25,43 @@ function dependencies() {
   };
 }
 
-describe("explicit local password configuration", () => {
+describe("explicit password configuration", () => {
   it("binds the local browser application to the recorded owned provider, independently of sample identity", () => {
     expect(getPasswordIdentityConfiguration(local)).toMatchObject({ appEnv: "local", publicOrigin: local.ETAIL_PUBLIC_ORIGIN, providerOrigin: targets.netlify.canonical_origin, expectedSiteId: targets.netlify.site_id, runtimeSiteId: null, localRemoteProvider: true });
     expect(getPasswordIdentityConfiguration({ ...local, ENABLE_LOCAL_FIXTURE_IDENTITY: "false" })).toEqual(getPasswordIdentityConfiguration(local));
+  });
+  const production = { APP_ENV: "production", ETAIL_PUBLIC_ORIGIN: targets.netlify.canonical_origin, SITE_ID: targets.netlify.site_id, ENABLE_REAL_MONEY: "false", ENABLE_LOCAL_FIXTURE_IDENTITY: "false" };
+  const productionContext = () => ({ site: { id: targets.netlify.site_id }, deploy: { context: "production" } });
+  it("enables the recorded production request without build-only NETLIFY or CONTEXT variables", () => {
+    expect(getPasswordIdentityConfiguration(production, productionContext)).toEqual({ appEnv: "production", publicOrigin: targets.netlify.canonical_origin, identityEndpoint: verified.issuer, expectedSiteId: targets.netlify.site_id, runtimeSiteId: targets.netlify.site_id, providerOrigin: targets.netlify.canonical_origin, localRemoteProvider: false });
+  });
+  it("does not treat production-looking build flags as proof of an actual hosted request", () => {
+    expect(() => getPasswordIdentityConfiguration({ ...production, NETLIFY: "true", CONTEXT: "production" })).toThrow("HOSTED_IDENTITY_NOT_READY");
+  });
+  it.each(["deploy-preview", "branch-deploy", "dev", "", "unknown"])("rejects actual %s context even with production-looking build variables", context => {
+    expect(() => getPasswordIdentityConfiguration({ ...production, NETLIFY: "true", CONTEXT: "production" }, () => ({ ...productionContext(), deploy: { context } }))).toThrow("HOSTED_IDENTITY_NOT_READY");
+  });
+  it.each([undefined, "unrelated-site", targets.denied.netlify_site_ids[0]])("rejects a missing or mismatched request-context site: %s", id => {
+    expect(() => getPasswordIdentityConfiguration(production, () => ({ ...productionContext(), site: { id } }))).toThrow("HOSTED_IDENTITY_NOT_READY");
+  });
+  it("does not need a hosted request context in the isolated local preview", () => {
+    const context = vi.fn(() => { throw new Error("No request context in local preview"); });
+    expect(getPasswordIdentityConfiguration(local, context).localRemoteProvider).toBe(true);
+    expect(context).not.toHaveBeenCalled();
+  });
+  it("reads the actual context each time, including an async request scope change", () => {
+    const context = vi.fn().mockReturnValueOnce(productionContext()).mockReturnValueOnce({ ...productionContext(), deploy: { context: "deploy-preview" } });
+    expect(getPasswordIdentityConfiguration(production, context).localRemoteProvider).toBe(false);
+    expect(() => getPasswordIdentityConfiguration(production, context)).toThrow("HOSTED_IDENTITY_NOT_READY");
+  });
+  it.each([
+    { APP_ENV: "preview" }, { APP_ENV: "local" }, { APP_ENV: "test" }, { APP_ENV: undefined },
+    { SITE_ID: "unrelated-site" }, { SITE_ID: targets.denied.netlify_site_ids[0] }, { SITE_ID: undefined },
+    { ETAIL_PUBLIC_ORIGIN: "https://branch--etail-depot-next.netlify.app" }, { ETAIL_PUBLIC_ORIGIN: "https://unrelated.example.test" }, { ETAIL_PUBLIC_ORIGIN: undefined },
+    { ENABLE_REAL_MONEY: undefined }, { ENABLE_REAL_MONEY: "true" }, { ENABLE_LOCAL_FIXTURE_IDENTITY: undefined }, { ENABLE_LOCAL_FIXTURE_IDENTITY: "true" },
+    { CI: "true" }, { CI: "1" },
+  ])("does not let a production-like environment bypass its site, context or sandbox boundary %#", change => {
+    expect(() => getPasswordIdentityConfiguration({ ...production, ...change }, productionContext)).toThrow(SecurityError);
   });
   it.each([
     {}, { ...local, APP_ENV: undefined }, { ...local, ETAIL_PUBLIC_ORIGIN: undefined },

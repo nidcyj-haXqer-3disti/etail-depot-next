@@ -3,7 +3,7 @@ import { NetlifyIdentityAdapter, type NetlifyIdentityConfiguration } from "../..
 
 const endpoint = "https://fresh-sandbox.example.test/.netlify/identity";
 const configuration: NetlifyIdentityConfiguration = {
-  appEnv: "preview", publicOrigin: "https://fresh-sandbox.example.test", identityEndpoint: endpoint,
+  appEnv: "production", publicOrigin: "https://fresh-sandbox.example.test", identityEndpoint: endpoint,
   expectedSiteId: "fresh-site-id", runtimeSiteId: "fresh-site-id",
 };
 const verifiedUser = { id: "new-provider-subject", confirmed_at: "2026-09-08T00:00:00Z", email: "member@example.test" };
