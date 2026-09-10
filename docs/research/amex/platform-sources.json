@@ -1,0 +1,156 @@
+{
+  "researchDate": "2026-09-08",
+  "usableSourceCount": 10,
+  "sources": [
+    {
+      "id": "P01",
+      "title": "Migrating the Payments Network Twice with Zero Downtime",
+      "url": "https://americanexpress.io/migrating-the-payments-network-twice/",
+      "published": "2026-03-12",
+      "accessed": "2026-09-08",
+      "evidence_class": "direct_amex_engineering",
+      "scope": "Core payments network; routing, processing, migration sections",
+      "evidence": "Router/processor separation and staged migration.",
+      "limitations": "Self-reported operational result; no full issuer/acquirer topology or independently measured uptime."
+    },
+    {
+      "id": "P02",
+      "title": "Cell-Based Architecture for Resilient Payment Systems",
+      "url": "https://www.americanexpress.io/cell-based-architecture-for-resilient-payment-systems/",
+      "published": "2026-06-11",
+      "accessed": "2026-09-08",
+      "evidence_class": "direct_amex_engineering",
+      "scope": "Core payments; locality, routing, recovery sections",
+      "evidence": "Independent payment cells and explicit recovery boundaries.",
+      "limitations": "Does not disclose each database product, failover-state algorithm or ledger schema."
+    },
+    {
+      "id": "P03",
+      "title": "Go at American Express Today: Seven Key Learnings",
+      "url": "https://americanexpress.io/go-at-american-express-today/",
+      "published": "2025-07-16",
+      "accessed": "2026-09-08",
+      "evidence_class": "direct_amex_engineering",
+      "scope": "Go platform engineering; sections 2, 4, 5",
+      "evidence": "Internal service framework and concurrency/performance practices.",
+      "limitations": "Internal libraries are described, not published by this article."
+    },
+    {
+      "id": "P04",
+      "title": "Choosing Go at American Express",
+      "url": "https://americanexpress.io/choosing-go/",
+      "published": "2019-11-25",
+      "accessed": "2026-09-08",
+      "evidence_class": "direct_amex_engineering",
+      "scope": "Payment/rewards platform language evaluation; Background, Language Showdown and pilot discussion",
+      "evidence": "Production pilots plus workload-based language selection.",
+      "limitations": "Historical microbenchmark is not live transaction throughput or a current language comparison."
+    },
+    {
+      "id": "P05",
+      "title": "CNCF Welcomes American Express as Gold Member",
+      "url": "https://www.cncf.io/announcements/2021/10/13/cloud-native-computing-foundation-welcomes-american-express-as-gold-member/",
+      "published": "2021-10-13",
+      "accessed": "2026-09-08",
+      "evidence_class": "named_customer_ecosystem_statement",
+      "scope": "Enterprise cloud-native infrastructure; named Amex infrastructure executive",
+      "evidence": "Kubernetes, Prometheus and Envoy adoption.",
+      "limitations": "Not detailed per-service topology or proof each component remains deployed everywhere."
+    },
+    {
+      "id": "P06",
+      "title": "EMVCo Letter of Approval: Gravity ACS 2.2",
+      "url": "https://www.emvco.com/wp-content/uploads/loa/3DS_LOA_ACS_AMEX_020200_00315_10Sep20.pdf",
+      "published": "2020-09-10",
+      "accessed": "2026-09-08",
+      "evidence_class": "independent_product_approval",
+      "scope": "Amex TRS authentication product; PDF p.1 rendered and visually checked; p.2 terms read",
+      "evidence": "Names Gravity ACS and OpenShift platform.",
+      "limitations": "Approval expiry stated as 2022-08-04; not current approval or proof of production deployment."
+    },
+    {
+      "id": "P07",
+      "title": "Get Low (Latency) — Benjamin Cane and Tyler Wedin",
+      "url": "https://www.slideshare.net/slideshow/get-low-latency-by-benjamin-cane-and-tyler-wedin/272350368",
+      "published": "2024 conference; exact upload date unverified",
+      "accessed": "2026-09-08",
+      "evidence_class": "named_amex_engineers_conference",
+      "scope": "Amex payments; slide text for modernization, optimizations, locality, data caching, HTTP2 and mesh",
+      "evidence": "Concrete runtime and locality design choices.",
+      "limitations": "Read original slide text, not AI-enhanced description. Embedded video not watched; organizer is not thereby the database supplier."
+    },
+    {
+      "id": "P08",
+      "title": "Route It Like It's Hot — Benjamin Cane",
+      "url": "https://www.slideshare.net/slideshow/route-it-like-it-s-hot-scaling-payments-routing-at-american-express-by-benjamin-cane/276319457",
+      "published": "2025 conference; exact upload date unverified",
+      "accessed": "2026-09-08",
+      "evidence_class": "named_amex_engineer_conference",
+      "scope": "GTR; design, build and operate slide text",
+      "evidence": "Router design and release validation practices.",
+      "limitations": "No exact production throughput inferred. Slide text read; no video viewing claimed."
+    },
+    {
+      "id": "P09",
+      "title": "Get Low (Latency) — event session",
+      "url": "https://p99conf.io/session/get-low-latency/",
+      "published": "2024 conference",
+      "accessed": "2026-09-08",
+      "evidence_class": "conference_provenance",
+      "scope": "Named Amex engineers and session description",
+      "evidence": "Corroborates P07 authors and topic.",
+      "limitations": "Summary and speaker biographies, not a separate full architectural source; embedded video not watched."
+    },
+    {
+      "id": "P10",
+      "title": "Route It Like It's Hot — Monster Scale session",
+      "url": "https://www.scylladb.com/tech-talk/route-it-like-its-hot-scaling-payments-routing-at-american-express/",
+      "published": "2025 conference",
+      "accessed": "2026-09-08",
+      "evidence_class": "conference_provenance",
+      "scope": "Named Amex engineer and session description",
+      "evidence": "Corroborates P08 author and GTR topic.",
+      "limitations": "Conference hosting does not establish ScyllaDB deployment; video not watched."
+    }
+  ],
+  "excluded": [
+    {
+      "topic": "Cluster API webinar",
+      "url": "https://www.cncf.io/wp-content/uploads/2020/08/Cluster-API-CNCF-Webinar-20200611.pdf",
+      "reason": "General project tutorial with an Amex engineer; read for scope, not used as Amex-specific topology."
+    },
+    {
+      "topic": "OpenShift Commons participants",
+      "url": "https://commons.openshift.org/participants/",
+      "reason": "Membership/listing alone does not establish a particular deployed system; historical Gravity ACS approval provides narrower evidence."
+    },
+    {
+      "topic": "Isracard Red Hat case study",
+      "url": "https://www.redhat.com/rhdc/managed-files/rh-isracard-case-study-295259pr-202304-en.pdf",
+      "reason": "Third-party network partner, not Amex internal card architecture."
+    },
+    {
+      "topic": "Red Hat/Sysdig customer presentation",
+      "url": "https://people.redhat.com/mskinner/rhug/q1.2019/2019-February-MSP-RHUG-Sysdig.pdf",
+      "reason": "Logo-level search lead; no subsystem adoption assertion relied on."
+    },
+    {
+      "topic": "HashiCorp Protecting Workflows and Secrets",
+      "url": "https://www.hashicorp.com/en/resources/protecting-workflows-and-secrets",
+      "reason": "Card-format example is not evidence of Amex as a customer."
+    },
+    {
+      "topic": "Search-indexed Network Specifications Authorization October2022 Version2",
+      "reason": "Explicit sensitive/confidential/trade-secret marking in search result. No detailed extraction or reuse."
+    },
+    {
+      "topic": "Engineer CVs, contact aggregators and consultant resumes",
+      "reason": "Uncorroborated leads; no personal contact data collected or used."
+    },
+    {
+      "topic": "Secondary millions-of-transactions-per-second summary",
+      "url": "https://blog.bytebytego.com/p/how-amex-processes-millions-of-daily",
+      "reason": "Not used as technical authority or throughput evidence; followed primary talks instead."
+    }
+  ]
+}

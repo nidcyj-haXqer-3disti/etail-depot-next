@@ -1,0 +1,185 @@
+[
+  {
+    "id": "E01",
+    "title": "One App lifecycle",
+    "url": "https://github.com/americanexpress/one-app/blob/7a8181ddb3893ababd8bd26c76b4f1773931149c/docs/overview/Lifecycle.md",
+    "accessed": "2026-09-08",
+    "scope": "Repository guide: startup, module updates and request rendering",
+    "evidence": [
+      "The guide separates startup/module-map validation, subsequent module polling and the request-specific data/render lifecycle.",
+      "Inspected at commit 7a8181ddb3893ababd8bd26c76b4f1773931149c."
+    ],
+    "limitations": [
+      "A public framework guide is not evidence that this exact revision runs in current Amex payment processing.",
+      "Its Express wording differs from the inspected request code's Fastify types; the report does not infer a single current server framework from this guide."
+    ]
+  },
+  {
+    "id": "E02",
+    "title": "One App loadModules implementation",
+    "url": "https://github.com/americanexpress/one-app/blob/7a8181ddb3893ababd8bd26c76b4f1773931149c/src/server/utils/loadModules.js",
+    "accessed": "2026-09-08",
+    "scope": "Source code: module-map hashing, registry update, rejected-module handling and root configuration",
+    "evidence": [
+      "The function hashes a fetched module map, updates the module registry, records rejected modules and refreshes client map/CSP state for applicable loaded modules.",
+      "Inspected at commit 7a8181ddb3893ababd8bd26c76b4f1773931149c."
+    ],
+    "limitations": [
+      "This establishes code behavior at the revision, not a deployment topology, release-security guarantee or account authorization mechanism."
+    ]
+  },
+  {
+    "id": "E03",
+    "title": "One App createRequestStore implementation",
+    "url": "https://github.com/americanexpress/one-app/blob/7a8181ddb3893ababd8bd26c76b4f1773931149c/src/server/plugins/reactHtml/createRequestStore.js",
+    "accessed": "2026-09-08",
+    "scope": "Source code: per-request Holocron store, request-bound fetch and server/client configuration",
+    "evidence": [
+      "The function constructs server state and client initial-state inputs, creates a request-bound fetch client and attaches a new Holocron store to the request.",
+      "Inspected at commit 7a8181ddb3893ababd8bd26c76b4f1773931149c."
+    ],
+    "limitations": [
+      "Downstream serialization and the complete safeRequest/stateConfig implementations were not audited; this file alone cannot prove secret exclusion or tenant isolation."
+    ]
+  },
+  {
+    "id": "E04",
+    "title": "One App API-call guide",
+    "url": "https://github.com/americanexpress/one-app/blob/7a8181ddb3893ababd8bd26c76b4f1773931149c/docs/guides/Making-An-Api-Call.md",
+    "accessed": "2026-09-08",
+    "scope": "Repository guide and sample code: server/client data loading and shared fetch cache",
+    "evidence": [
+      "The guide describes loadModuleData and fetchClient, then Fetchye/One App provider and cache integration for reuse of requests across modules.",
+      "Inspected at commit 7a8181ddb3893ababd8bd26c76b4f1773931149c."
+    ],
+    "limitations": [
+      "The books API is illustrative. The examples do not establish an Amex issuer backend, authorization policy or production payment API."
+    ]
+  },
+  {
+    "id": "E05",
+    "title": "Flowret runtime service Rts",
+    "url": "https://github.com/americanexpress/unify-flowret/blob/1449bebe1051dd09a268735a982aad350e1280cb/src/main/java/com/americanexpress/unify/flowret/Rts.java",
+    "accessed": "2026-09-08",
+    "scope": "Source code: case start/resume, case-linked journey persistence and lifecycle/SLA hooks",
+    "evidence": [
+      "startCase writes journey data under a case key; resumeCase reloads persisted case context. The runtime accepts host-provided component, event, storage and SLA interfaces.",
+      "Inspected at commit 1449bebe1051dd09a268735a982aad350e1280cb."
+    ],
+    "limitations": [
+      "Case-linked persistence is not proof of immutable version enforcement or atomic coupling to a financial ledger.",
+      "No reviewed source establishes which current Amex production payment system deploys this engine."
+    ]
+  },
+  {
+    "id": "E06",
+    "title": "Flowret persistence interface FlowretDao",
+    "url": "https://github.com/americanexpress/unify-flowret/blob/1449bebe1051dd09a268735a982aad350e1280cb/src/main/java/com/americanexpress/unify/flowret/FlowretDao.java",
+    "accessed": "2026-09-08",
+    "scope": "Source code: storage contract",
+    "evidence": [
+      "The interface exposes write(key, Document), read(key) and incrCounter(key); it declares no multi-record transaction or conditional-write operation.",
+      "Inspected at commit 1449bebe1051dd09a268735a982aad350e1280cb."
+    ],
+    "limitations": [
+      "Absence of an explicit interface guarantee does not establish a defect in any particular DAO implementation. Host storage and concurrency semantics require separate verification."
+    ]
+  },
+  {
+    "id": "E07",
+    "title": "Flowret execution task and persist-step behavior",
+    "url": "https://github.com/americanexpress/unify-flowret/blob/1449bebe1051dd09a268735a982aad350e1280cb/src/main/java/com/americanexpress/unify/flowret/ExecThreadTask.java",
+    "accessed": "2026-09-08",
+    "scope": "Source code: response-state handling, parallel paths, persistence callbacks and error workbasket",
+    "evidence": [
+      "processPersist invokes ON_PERSIST; an exception sets ERROR_PEND and the configured error workbasket. Parallel-route handling updates process state and audit before executing branches.",
+      "Inspected at commit 1449bebe1051dd09a268735a982aad350e1280cb."
+    ],
+    "limitations": [
+      "JVM locks do not demonstrate cross-process serialization. Audit/process-state writes depend on configuration and host storage; external effects are not thereby exactly once."
+    ]
+  },
+  {
+    "id": "E08",
+    "title": "Synapse architecture README",
+    "url": "https://github.com/americanexpress/synapse/blob/ea981729a13e7e56a8d678c9292c6e00c3bbcf61/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Repository architecture: business, client/data, subscriber/publisher and utility boundaries",
+    "evidence": [
+      "The README describes HTTP/business/subscriber responsibilities, external-service clients, resource access, publishers and cross-cutting utilities. It names Spring WebFlux/Netty reactive support and a Spring Web option.",
+      "Inspected at commit ea981729a13e7e56a8d678c9292c6e00c3bbcf61."
+    ],
+    "limitations": [
+      "The architecture is a toolkit description, not a verified inventory of every Amex service. The referenced architecture image was not independently inspected; findings use the README text."
+    ]
+  },
+  {
+    "id": "E09",
+    "title": "Synapse reactive create controller",
+    "url": "https://github.com/americanexpress/synapse/blob/ea981729a13e7e56a8d678c9292c6e00c3bbcf61/api/synapse-api-rest-reactive/src/main/java/io/americanexpress/synapse/api/rest/reactive/controller/BaseCreateReactiveRestController.java",
+    "accessed": "2026-09-08",
+    "scope": "Source code: Spring HTTP controller using Reactive Streams and Reactor",
+    "evidence": [
+      "The controller imports Reactive Streams Publisher and Reactor Mono; its POST create method delegates to execute through a generic service/controller hierarchy.",
+      "Inspected at commit ea981729a13e7e56a8d678c9292c6e00c3bbcf61."
+    ],
+    "limitations": [
+      "This proves Reactor/Spring code in this library, not enterprise-wide RxJava or Vert.x use, deployed payment topology or suitability for Etail's architecture."
+    ]
+  },
+  {
+    "id": "E10",
+    "title": "Building trust in AI-powered transactions with Amex Agentic Commerce Experiences",
+    "url": "https://www.americanexpress.io/building-trust-in-ai-powered-transactions-with-amex-agentic-commerce-experiences/",
+    "accessed": "2026-09-08",
+    "scope": "First-party engineering design article; published 2026-04-22",
+    "evidence": [
+      "Amex engineering authors describe enrollment, structured intent, constrained credentials and asynchronous notifications. Partner authentication uses OAuth and mTLS; SDKs, Agent Skills, MCP and reference implementations are described as forthcoming."
+    ],
+    "limitations": [
+      "The article describes a design and development direction. It does not establish public SDK availability, a complete API contract or general production availability."
+    ]
+  },
+  {
+    "id": "E11",
+    "title": "US7835960B2 — System for facilitating a transaction",
+    "url": "https://patents.google.com/patent/US7835960B2/en",
+    "accessed": "2026-09-08",
+    "scope": "Patent publication: proposed secondary transaction-number authorization and capture architecture",
+    "evidence": [
+      "Published 2010-11-16; original assignee American Express Travel Related Services Co Inc. Figures 8, 9 and 12 describe secondary-number mapping, authorization checks and separate financial capture/AP/AR relationships."
+    ],
+    "limitations": [
+      "Patent embodiments are not deployed-system evidence. Google Patents currently lists Liberty Peak Ventures LLC as assignee; legal status and ownership were not independently determined.",
+      "Historical security examples and optional business rules are not implementation recommendations."
+    ]
+  },
+  {
+    "id": "E12",
+    "title": "US7962408B2 — Systems and methods for establishing an allocation of an amount between transaction accounts",
+    "url": "https://patents.google.com/patent/US7962408B2/en",
+    "accessed": "2026-09-08",
+    "scope": "Patent publication: proposed allocation, transaction management and financial submission components",
+    "evidence": [
+      "Published 2011-06-14; original assignee American Express Travel Related Services Co Inc. Figure 21 distinguishes a C2C service, transaction manager, business rules and financial transaction submission daemon."
+    ],
+    "limitations": [
+      "This is a proposed embodiment, not current deployed topology. Google Patents lists Liberty Peak Ventures LLC as assignee; no legal determination is made.",
+      "Patent allocation/approval examples are not authority for Etail account access, liability or economic rules."
+    ]
+  },
+  {
+    "id": "E13",
+    "title": "US20230206197A1 — Card to bank payments solution",
+    "url": "https://patents.google.com/patent/US20230206197A1/en",
+    "accessed": "2026-09-08",
+    "scope": "Patent application publication: proposed supplier payment routing and periodic reconciliation",
+    "evidence": [
+      "Published 2023-06-29; original assignee American Express Travel Related Services Co Inc. The disclosure connects supplier identity/preferences, direct-account or virtual-number routing, reconciliation and remittance notifications."
+    ],
+    "limitations": [
+      "An application publication is not a deployed product or available API. Google Patents labels the application abandoned, but that aggregate status was not independently legally verified.",
+      "No permission to implement patented subject matter or current commercial availability is inferred."
+    ]
+  }
+]

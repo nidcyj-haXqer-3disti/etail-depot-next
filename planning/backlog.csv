@@ -1,0 +1,33 @@
+ID,Milestone,Title,Area,Priority,Dependencies,Acceptance IDs,Status
+EDN-001,M0,"Verify new targets, source precedence and provenance",platform,P0,,NEW-01; NEW-02; NEW-03; NEW-04,Backlog
+EDN-002,M0,Create new private repository and delivery planning,platform,P0,EDN-001,NEW-01; NEW-03,Backlog
+EDN-003,M0,Scaffold supported stack and executable quality gates,platform,P0,EDN-001,REL-01; REL-02,Backlog
+EDN-004,M0,Provision new Identity and secure session foundations,security,P0,EDN-002; EDN-003,AUTH-01; AUTH-02; AUTH-03; AUTH-04; AUTH-05,Backlog
+EDN-005,M1,Implement three account types and explicit account directory,accounts,P0,EDN-003; EDN-004,ACC-01; ACC-02,Backlog
+EDN-006,M1,"Centralize role policy, capabilities and resource scope",security,P0,EDN-005,ACC-02; ACC-03; ACC-05; CARD-03,Backlog
+EDN-007,M1,"Implement invitation, Household guardianship and access lifecycle",accounts,P0,EDN-006,ACC-04; ACC-05; ACC-06; ACC-07; ACC-08,Backlog
+EDN-008,M1,Implement membership and source-defined commercial configuration,economics,P0,EDN-005,ECO-01; ECO-02; ECO-03,Backlog
+EDN-009,M2,Design ledger backing and explicit funding assignments,issuing,P0,EDN-006; EDN-007; EDN-008,MONEY-01; MONEY-02; MONEY-03; CARD-08,Backlog
+EDN-010,M2,Implement saved card requests and one issuance command,issuing,P0,EDN-009,CARD-02; CARD-03; CARD-04; CARD-05; CARD-06; CARD-07; CARD-08,Backlog
+EDN-011,M2,Build account shell and one canonical Add card component,ux,P0,EDN-010,CARD-01; CARD-02; CARD-10; UX-01; UX-03,Backlog
+EDN-012,M2,"Implement card lifecycle, assignments and composed controls",issuing,P0,EDN-010; EDN-011,CARD-09; CARD-10; MONEY-06; ACC-08,Backlog
+EDN-013,M3,"Implement atomic holds, purchases, funding and reconciliation",issuing,P0,EDN-009; EDN-012,MONEY-03; MONEY-04; MONEY-05; MONEY-06; MONEY-07; MONEY-08; MONEY-10,Backlog
+EDN-014,M3,Build durable mock event runner and one practice-purchase action,integrations,P0,EDN-013,SIM-01; SIM-02; SIM-03; SIM-04; SIM-05,Backlog
+EDN-015,M3,Implement consumer/commercial repayment and supervised funding,issuing,P0,EDN-013; EDN-014,MONEY-09; ACC-07; SIM-04,Backlog
+EDN-016,M3,"Implement reward accrual, reversals and membership-year posting",economics,P0,EDN-008; EDN-013; EDN-015,ECO-01; ECO-02; ECO-03; MONEY-10,Backlog
+EDN-017,M4,"Implement merchant hierarchy, onboarding and channel domain",acquiring,P1,EDN-006; EDN-008; EDN-009,ACQ-01; ACQ-08,Backlog
+EDN-018,M4,"Build channel distribution, guest checkout and payment documents",acquiring,P1,EDN-017; EDN-014,ACQ-02; ACQ-03; SIM-03,Backlog
+EDN-019,M4,"Implement settlement, reserves, refunds, disputes and payouts",acquiring,P1,EDN-018; EDN-013; EDN-016,ACQ-04; ACQ-05; ACQ-06; ACQ-07; MONEY-05; MONEY-10,Backlog
+EDN-020,M4,Unify sub-MID delegation and Seller merchant oversight UX,accounts,P1,EDN-007; EDN-012; EDN-019,ACC-05; ACC-07; ACQ-08; UX-01,Backlog
+EDN-021,M5,"Implement operational cases, queues and guarded adjustments",operations,P1,EDN-006; EDN-014; EDN-019,OPS-01; OPS-02,Backlog
+EDN-022,M5,Import management cost model with basis/version completeness,economics,P1,EDN-008; EDN-016,ECO-04; ECO-05; ECO-06; NEW-04,Backlog
+EDN-023,M5,Implement partner programs and three-way economics,partners,P1,EDN-019; EDN-021; EDN-022,OPS-03; MONEY-10,Backlog
+EDN-024,M5,"Implement partner portal, scoped API and signed webhooks",partners,P1,EDN-023,OPS-04; AUTH-05; AUTH-06,Backlog
+EDN-025,M6,"Complete public experience, documents, notifications and PWA",ux,P1,EDN-011; EDN-018; EDN-021,AUTH-06; UX-02; UX-03; UX-04,Backlog
+EDN-026,M6,"Run full-stack concurrency, security and API contract suite",security,P1,EDN-012; EDN-014; EDN-015; EDN-016; EDN-019; EDN-020; EDN-024; EDN-025,REL-02; MONEY-04; MONEY-05; AUTH-01; AUTH-02; AUTH-03; AUTH-04; AUTH-05; AUTH-06,Backlog
+EDN-027,M6,Run desktop/mobile task journeys and usability review,ux,P1,EDN-026,UX-01; UX-02; UX-03; UX-04; CARD-01,Backlog
+EDN-028,M6,"Finalize feature coverage, reconciliation and recovery rehearsal",operations,P1,EDN-026; EDN-027,MONEY-10; REL-07,Backlog
+EDN-029,M7,"Create and bind new Netlify site, database and private previews",platform,P0,EDN-002; EDN-004; EDN-009,NEW-01; NEW-03; REL-03; REL-04,Backlog
+EDN-030,M7,Configure effective runtime and protected deployment readiness,platform,P0,EDN-029; EDN-014; EDN-025,SIM-04; SIM-05; AUTH-03; AUTH-05; REL-01,Backlog
+EDN-031,M7,Execute actual hosted authenticated and guest acceptance,qa,P0,EDN-028; EDN-030,REL-03; REL-04; REL-05; AUTH-02; ACQ-02; SIM-01,Backlog
+EDN-032,M7,Review and publish new public sandbox with evidence receipt,release,P0,EDN-031,REL-06; REL-07; NEW-01,Backlog

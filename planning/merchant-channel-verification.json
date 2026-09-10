@@ -1,0 +1,1754 @@
+{
+  "id": "merchant-channel-verification-v1",
+  "date": "2026-09-09",
+  "status": "LOCAL_SOURCE_IMPLEMENTED_FULL_TARGET_SCENARIOS_NOT_RUN",
+  "design_contract": "contracts/merchant-channel-design.json",
+  "scope_note": "The local hierarchy/access/seven-presentation draft slice exists. Each case status measures its complete stated acceptance scenario, not source existence or a test count. Source-test links identify relevant local coverage without asserting execution. All broad cases remain NOT_RUN until complete run evidence is recorded. Separate migration evidence below establishes only fictional-data preservation for the observed upgrades; no provider, publishing, delivery, guest checkout or financial capability is inferred.",
+  "cases": [
+    {
+      "id": "MC-001",
+      "group": "hierarchy",
+      "title": "Typed merchant hierarchy",
+      "given": "Seller, Personal and Household accounts.",
+      "when": "Insert valid and invalid MASTER/SUB hosts and parents, including direct SQL.",
+      "required_result": "Only Seller MASTER and Personal/Household SUB under one MASTER are accepted; no SUB parent, self-cycle, reparent or ID reuse.",
+      "test_layers": [
+        "postgresql"
+      ],
+      "acceptance_ids": [
+        "ACC-01",
+        "ACQ-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/acquiring-channels.test.ts",
+          "test_name": "supports separate sub-units under multiple Sellers while rejecting duplicate, foreign and invalid parents",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Typed MASTER/SUB constraints and immutable multi-Seller relationships have local source tests; this register has not attached a complete scenario execution receipt."
+    },
+    {
+      "id": "MC-002",
+      "group": "hierarchy",
+      "title": "Two-sided sponsorship",
+      "given": "An unrelated master and private host with a pending request. Host controller has zero merchant assignments.",
+      "when": "Master proposes attachment; host rejects, accepts or loses authority during acceptance.",
+      "required_result": "No unilateral attachment; exact accepted payload and live authority on both sides; rejected/stale requests create no active relationship. Pending-offer read is minimal and does not grant merchant operations; MASTER roots require no parent sponsorship.",
+      "test_layers": [
+        "integration",
+        "concurrency",
+        "api"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "ACQ-08"
+      ],
+      "policy_actions": [
+        "merchant.relationship.request",
+        "merchant.relationship.accept"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/acquiring-channels.test.ts",
+          "test_name": "requires two explicit current controllers and preserves one relationship on retry",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/concurrency/acquiring-channels.test.ts",
+          "test_name": "serializes two-sided consent and retries the same proposal without another sub-MID",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "Household creates a sub-merchant, confirms both sides and opens only its merchant context",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Local request route is POST /api/v1/accounts/{accountId}/merchant-relationships; side acceptance is merchant-scoped and explicit. No provider activation follows."
+    },
+    {
+      "id": "MC-003",
+      "group": "hierarchy",
+      "title": "Product choice and provider readiness remain separate",
+      "given": "Master responsibility and multiple Seller associations confirmed; provider MID/program/routing missing.",
+      "when": "Prepare a private draft, accept sponsorship, and inspect publication/payment/payout readiness.",
+      "required_result": "Relationship/draft work proceeds under confirmed policy; payment/publication/payout stay unavailable with specific missing provider/ledger requirements.",
+      "test_layers": [
+        "unit",
+        "integration",
+        "ui"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "ACQ-06"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/merchant-access.test.ts",
+          "test_name": "permits explicit outside-helper channel preparation without implying account or financial authority",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-api.spec.ts",
+          "test_name": "payment channel HTTP preserves exact cents, independent approval, versioned cancellation and no financial effects",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Local consent and draft preparation are available under the confirmed model; financial/publication operations have no callable implementation."
+    },
+    {
+      "id": "MC-004",
+      "group": "hierarchy",
+      "title": "Sponsorship cardinality race",
+      "given": "Multiple explicit Seller associations are allowed, with unique master/host pair.",
+      "when": "Two Sellers concurrently request/accept host relationships.",
+      "required_result": "Different masters can obtain separate accepted relationships; duplicate same-pair requests converge under locks; every sub has one immutable master and no first-Seller fallback.",
+      "test_layers": [
+        "postgresql",
+        "concurrency"
+      ],
+      "acceptance_ids": [
+        "ACQ-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/acquiring-channels.test.ts",
+          "test_name": "supports separate sub-units under multiple Sellers while rejecting duplicate, foreign and invalid parents",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/concurrency/acquiring-channels.test.ts",
+          "test_name": "serializes two-sided consent and retries the same proposal without another sub-MID",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Local same-pair concurrency and multiple-Seller persistence tests exist; full scenario remains unrecorded here."
+    },
+    {
+      "id": "MC-005",
+      "group": "hierarchy",
+      "title": "Master restriction and closure",
+      "given": "Active master with several child channels and in-flight operations.",
+      "when": "Suspend master or close host while another connection starts checkout.",
+      "required_result": "New activity blocked consistently; outstanding obligations prevent destructive closure; accepted events reconcile without exposing host accounts.",
+      "test_layers": [
+        "concurrency",
+        "integration"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "ACQ-07"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/acquiring-channels.test.ts",
+          "test_name": "suspension stops writes and retries while retaining review history without a legacy read bypass",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/concurrency/acquiring-channels.test.ts",
+          "test_name": "rechecks sponsorship after waiting for a concurrent suspension, including an already saved command",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Local suspension and source-authority withdrawal are covered in source; complete closure/outstanding financial obligation checks remain future."
+    },
+    {
+      "id": "MC-006",
+      "group": "access",
+      "title": "Outside helper positive path and isolation",
+      "given": "Accepted Household sub-MID collector who is not a Household member.",
+      "when": "Use assigned channel; request account cards/balances/member directory, sibling or parent-private resources.",
+      "required_result": "Allowed merchant action succeeds; all financial-account and unrelated merchant requests fail; no account_memberships row is created.",
+      "test_layers": [
+        "postgresql",
+        "api",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "AUTH-01"
+      ],
+      "policy_actions": [
+        "payments.request"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "persists one named typed invitation and accepts outside access without any account membership",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "an outside helper accepts merchant-only access and sees assigned channels without Household financial data",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Local browser source follows a named outside recipient through the shared inbox into merchant-only assigned-channel access; no account membership is added."
+    },
+    {
+      "id": "MC-007",
+      "group": "access",
+      "title": "Household membership alone",
+      "given": "Household owner/member without accepted merchant appointment.",
+      "when": "Guess sub-MID API, channel and payment IDs.",
+      "required_result": "No merchant authority inferred from Household membership or role.",
+      "test_layers": [
+        "api",
+        "unit"
+      ],
+      "acceptance_ids": [
+        "ACQ-08"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "enforces read prerequisites, source ceiling, Personal privacy and immutable target kind",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/unit/merchant-access.test.ts",
+          "test_name": "permits explicit outside-helper channel preparation without implying account or financial authority",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Relevant local source exists; this full scenario has no execution receipt attached here."
+    },
+    {
+      "id": "MC-008",
+      "group": "access",
+      "title": "Personal privacy and master oversight",
+      "given": "Master has agreed child oversight; Personal host has cards/history and private drafts.",
+      "when": "Read child reports and guess host/private content.",
+      "required_result": "Only agreed merchant projections returned; no Personal financial data or creator-private drafts.",
+      "test_layers": [
+        "api",
+        "integration"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "ACC-03"
+      ],
+      "policy_actions": [
+        "merchant.children.read"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/acquiring-channels.test.ts",
+          "test_name": "keeps child drafts private until explicit sharing, then preserves creator on a permitted shared edit",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "enforces read prerequisites, source ceiling, Personal privacy and immutable target kind",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-api.spec.ts",
+          "test_name": "accepted Seller read access does not reveal another creator's drafts or permit channel mutations",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Relevant local source exists; this full scenario has no execution receipt attached here."
+    },
+    {
+      "id": "MC-009",
+      "group": "access",
+      "title": "Invitation target integrity",
+      "given": "Existing account invite and proposed merchant invite.",
+      "when": "Submit both target IDs, neither, wrong FK, CARDHOLDER merchant role or mixed action scope.",
+      "required_result": "Typed target constraints reject ambiguity; account invitation still works and merchant invite cannot grant issuing.",
+      "test_layers": [
+        "postgresql",
+        "unit",
+        "api"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "ACC-05"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "persists one named typed invitation and accepts outside access without any account membership",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "enforces read prerequisites, source ceiling, Personal privacy and immutable target kind",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Relevant local source exists; this full scenario has no execution receipt attached here."
+    },
+    {
+      "id": "MC-010",
+      "group": "access",
+      "title": "Intended person acceptance",
+      "given": "Pending merchant invitation to a named verified person. Recipient has zero merchant assignments.",
+      "when": "Different actor accepts; recipient accepts twice; payload changes or invitation expires.",
+      "required_result": "Wrong actor denied, single accepted assignment, stable replay under current authority; expired/changed invitation fails. Recipient may read only the pending offer until acceptance; no preexisting child access required.",
+      "test_layers": [
+        "api",
+        "concurrency"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "ACC-05"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "resolves decline, revocation and exact expiry once, without creating assignments",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "requires the same captured inviter generation at acceptance",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/concurrency/merchant-access.test.ts",
+          "test_name": "simultaneous invitation and acceptance retries persist one offer and one assignment",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Relevant local source exists; this full scenario has no execution receipt attached here."
+    },
+    {
+      "id": "MC-011",
+      "group": "access",
+      "title": "Delegation ceiling and lineage",
+      "given": "Manager has restricted channel/amount scope and limited delegation authority.",
+      "when": "Grant wider rights, replace a revoked ancestor grant, or accept a previously issued descendant invitation.",
+      "required_result": "No widening; revoked lineage stays invalid even after replacement grant; invitation cannot restore stale powers.",
+      "test_layers": [
+        "unit",
+        "integration",
+        "concurrency"
+      ],
+      "acceptance_ids": [
+        "ACQ-08"
+      ],
+      "policy_actions": [
+        "merchant.people.invite",
+        "merchant.people.change"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "preserves descendants only while every explicit delegation ancestor remains live",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "rechecks the originating master controller's current channel delegation ceiling",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/concurrency/merchant-access.test.ts",
+          "test_name": "queued ancestor revocation wins before pending descendant acceptance, without restoring authority",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Relevant local source exists; this full scenario has no execution receipt attached here."
+    },
+    {
+      "id": "MC-012",
+      "group": "access",
+      "title": "Member departure versus direct appointment",
+      "given": "One membership-dependent grant and one separately accepted direct appointment.",
+      "when": "Remove Household membership.",
+      "required_result": "Dependent assignment stops; explicitly independent appointment follows its own terms and remains visible for revocation; no accidental conversion.",
+      "test_layers": [
+        "integration",
+        "ui"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "ACC-08"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "requires explicit dependency for a host member; leave and rejoin never revive that assignment",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Relevant local source exists; this full scenario has no execution receipt attached here."
+    },
+    {
+      "id": "MC-013",
+      "group": "access",
+      "title": "Revocation overlap and queued work",
+      "given": "Stale open form, replay receipt and queued delivery.",
+      "when": "Revoke access concurrently with submit/retry/worker dispatch.",
+      "required_result": "All writers follow common lock order; new commands and pending user-initiated dispatch recheck authority; no lock inversion or resurrected grant.",
+      "test_layers": [
+        "concurrency",
+        "integration"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "AUTH-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "revokes accepted helper authority and saved retries never recreate permission",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/concurrency/merchant-access.test.ts",
+          "test_name": "queued helper revocation blocks a saved channel retry before its receipt is returned",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/concurrency/merchant-access.test.ts",
+          "test_name": "merchant writes wait for parent account authority withdrawal, including accepted-invitation retries",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Local authority revocation versus saved-channel/invitation replay has concurrency tests. Queued delivery/provider work does not exist yet."
+    },
+    {
+      "id": "MC-014",
+      "group": "access",
+      "title": "No role-based financial or issuing escalation",
+      "given": "Collector, manager and viewer presets.",
+      "when": "Attempt refund, payout, gateway change, card issue or spend without separate grants.",
+      "required_result": "Each action denied independently; explicit appropriately approved grant can act within original scope.",
+      "test_layers": [
+        "unit",
+        "api"
+      ],
+      "acceptance_ids": [
+        "ACQ-05",
+        "ACQ-06",
+        "ACQ-08",
+        "CARD-02"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/merchant-access.test.ts",
+          "test_name": "permits explicit outside-helper channel preparation without implying account or financial authority",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/unit/merchant-access.test.ts",
+          "test_name": "does not infer outside invitation permission for Personal units or public requests",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-api.spec.ts",
+          "test_name": "payment channel HTTP preserves exact cents, independent approval, versioned cancellation and no financial effects",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Relevant local source exists; this full scenario has no execution receipt attached here."
+    },
+    {
+      "id": "MC-015",
+      "group": "access",
+      "title": "Supervised participants",
+      "given": "Fictional minor/guardian personas; supervised collecting policy absent.",
+      "when": "Minor attempts onboarding, independent collection, delegation, routing, refunds or borrowing.",
+      "required_result": "Unavailable with correct guardian/product prerequisites; no fake age/KYC approval or independent minor responsibility.",
+      "test_layers": [
+        "unit",
+        "api",
+        "ui"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "ACC-07"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-016",
+      "group": "access",
+      "title": "Scoped lists, exports and pagination",
+      "given": "More than fifty authorized merchants/channels plus unauthorized siblings.",
+      "when": "Search/page/export and then revoke selected access.",
+      "required_result": "All permitted rows reachable with stable keyset pagination; no private rows, aggregate leakage or stale cached access.",
+      "test_layers": [
+        "api",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "AUTH-01"
+      ],
+      "policy_actions": [
+        "reports.export"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/acquiring-channels.test.ts",
+          "test_name": "keeps child drafts private until explicit sharing, then preserves creator on a permitted shared edit",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-api.spec.ts",
+          "test_name": "accepted Seller read access does not reveal another creator's drafts or permit channel mutations",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Local lists are authorized full sets with hasMore:false. Merchant exports/pagination are not implemented and this whole scenario is not completed."
+    },
+    {
+      "id": "MC-017",
+      "group": "verification",
+      "title": "Separate verification dimensions",
+      "given": "Verified login with incomplete merchant application.",
+      "when": "Load checklist and attempt channel activation.",
+      "required_result": "Identity, relationship, merchant requirements, MID, acceptance and payout are separate; sign-in verification does not approve merchant.",
+      "test_layers": [
+        "unit",
+        "ui"
+      ],
+      "acceptance_ids": [
+        "ACQ-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-018",
+      "group": "verification",
+      "title": "Legal party and representative",
+      "given": "Sole trader or business profile with declared fictional details.",
+      "when": "Submit missing/stale representative and organization requirements.",
+      "required_result": "Requirements tied to provider/program/jurisdiction/version; incomplete or unsupported evidence stays pending; no universal invented thresholds.",
+      "test_layers": [
+        "integration",
+        "adapter-contract"
+      ],
+      "acceptance_ids": [
+        "ACQ-01"
+      ],
+      "policy_actions": [
+        "merchant.verification.submit"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "Personal Quick Sell recovers one Seller creation, saves sole-proprietor setup and records only local review",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Existing fictional legal-name/applicant setup has a browser source test; real representative/provider verification is absent."
+    },
+    {
+      "id": "MC-019",
+      "group": "verification",
+      "title": "Delegated sub-unit requirements under responsible master Seller",
+      "given": "Confirmed model: master Seller responsible, sub-MIDs delegated collection units.",
+      "when": "Review Personal/Household sub-unit requirements.",
+      "required_result": "Master legal party and sub registration/relationship requirements follow supported provider program; Household/Personal label never proves independent merchant identity; no independent-sub-party default.",
+      "test_layers": [
+        "unit",
+        "adapter-contract",
+        "ui"
+      ],
+      "acceptance_ids": [
+        "ACQ-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-020",
+      "group": "verification",
+      "title": "Capability reduction and remediation",
+      "given": "Previously ready unit receives provider restriction/expired requirement.",
+      "when": "Replay/ reorder provider updates; attempt collection and payout; resolve evidence.",
+      "required_result": "Current versioned capabilities govern each action; no blanket active flag or self-approval; reactivation requires authoritative evidence. Provider deadlines may be null; evaluate current allowed/enabled flags during re-review and block affected new dispatch on missing/stale required evidence.",
+      "test_layers": [
+        "adapter-contract",
+        "integration",
+        "ui"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "ACQ-06"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-021",
+      "group": "gateway",
+      "title": "Provider identifier namespace",
+      "given": "Same external account string in two gateway namespaces/environments; approved shared processing resource.",
+      "when": "Bind and route mock transactions.",
+      "required_result": "Distinct namespaced resources remain distinct; supported sharing is explicit; no wrong-environment/default routing.",
+      "test_layers": [
+        "postgresql",
+        "adapter-contract"
+      ],
+      "acceptance_ids": [
+        "ACQ-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-022",
+      "group": "gateway",
+      "title": "Missing or mismatched binding",
+      "given": "Absent MID or incompatible currency, region, method, program, parent or capability.",
+      "when": "Activate channel or submit an order.",
+      "required_result": "Fail closed with exact prerequisite; never substitute first/default MID or relabel store as acquiring MID.",
+      "test_layers": [
+        "unit",
+        "adapter-contract",
+        "api"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "ACQ-02"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-023",
+      "group": "gateway",
+      "title": "Rebind after payment",
+      "given": "Order pins binding, responsibility and charge flow version.",
+      "when": "Change master/sub gateway then refund or receive dispute/settlement.",
+      "required_result": "Original route/debit accounts and liability snapshot used; later configuration cannot redirect historical money.",
+      "test_layers": [
+        "adapter-contract",
+        "integration"
+      ],
+      "acceptance_ids": [
+        "ACQ-04",
+        "ACQ-05",
+        "ACQ-07"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-024",
+      "group": "gateway",
+      "title": "Secret and evidence minimization",
+      "given": "Gateway setup and merchant verification records.",
+      "when": "Inspect client payloads, URLs, logs, browser storage and helper projections.",
+      "required_result": "Only authorized sanitized requirements; no credentials, verification documents or recipient personal data exposed.",
+      "test_layers": [
+        "security",
+        "api"
+      ],
+      "acceptance_ids": [
+        "AUTH-01",
+        "AUTH-06"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-025",
+      "group": "channels",
+      "title": "One canonical form and command",
+      "given": "Personal, Household, Seller and outside-helper entry points.",
+      "when": "Create/edit/review channel where permitted.",
+      "required_result": "Same merchant-scoped form/command; no duplicate draft engine; account context and exact selected merchant retained.",
+      "test_layers": [
+        "architecture",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "UX-01",
+        "ACQ-01"
+      ],
+      "policy_actions": [
+        "channels.create",
+        "channels.update"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "Household creates a sub-merchant, confirms both sides and opens only its merchant context",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "an outside helper accepts merchant-only access and sees assigned channels without Household financial data",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "The old account draft UI/routes are removed; canonical merchant form and channel command source exists. Architecture and browser execution need their own final receipts."
+    },
+    {
+      "id": "MC-026",
+      "group": "channels",
+      "title": "Creator-private sharing",
+      "given": "Migrated private draft and explicit shared channel.",
+      "when": "Master/manager/collector reads or shares without permission.",
+      "required_result": "Private draft excluded until authorized explicit share; access and visibility both required.",
+      "test_layers": [
+        "api",
+        "integration"
+      ],
+      "acceptance_ids": [
+        "ACQ-08"
+      ],
+      "policy_actions": [
+        "channels.share"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/acquiring-channels.test.ts",
+          "test_name": "keeps child drafts private until explicit sharing, then preserves creator on a permitted shared edit",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "an outside helper accepts merchant-only access and sees assigned channels without Household financial data",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-api.spec.ts",
+          "test_name": "accepted Seller read access does not reveal another creator's drafts or permit channel mutations",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Relevant local source exists; this full scenario has no execution receipt attached here."
+    },
+    {
+      "id": "MC-027",
+      "group": "channels",
+      "title": "Exact amounts and stale versions",
+      "given": "Saved channel with exact minor units/currency, expiry and version.",
+      "when": "Submit fractions, unsafe integer, wrong currency, expired limit or two concurrent edits.",
+      "required_result": "Exact bounded values only; one version wins; no silent override or client-side financial calculation.",
+      "test_layers": [
+        "unit",
+        "concurrency",
+        "api"
+      ],
+      "acceptance_ids": [
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/acquiring-channels.test.ts",
+          "test_name": "retains exact amount bounds and requires explicit visibility and optimistic edit version",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/integration/acquiring-channels.test.ts",
+          "test_name": "replays one current channel, rejects stale or changed commands, and closes expired drafts without payment effects",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/concurrency/acquiring-channels.test.ts",
+          "test_name": "has one channel creation effect and one optimistic edit winner across concurrent retries",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "lost-response retry creates one draft and stale edits preserve the entered details",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a committed payment channel followed by HTTP408 retries the same creation instead of duplicating it",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Exact USD amount and optimistic version input checks are implemented; these draft checks do not calculate or post financial balances."
+    },
+    {
+      "id": "MC-028",
+      "group": "channels",
+      "title": "One-time channel uniqueness",
+      "given": "One-time channel represented by email, QR and web with multiple revisions.",
+      "when": "Concurrent public opens create orders and attempts; edit after use.",
+      "required_result": "One order identity across channel lifetime; no second collectible obligation and no reset by edit/retry/new transport ID.",
+      "test_layers": [
+        "postgresql",
+        "concurrency",
+        "api"
+      ],
+      "acceptance_ids": [
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-029",
+      "group": "channels",
+      "title": "Reusable purchases and retry identity",
+      "given": "Reusable channel with two deliberate purchases.",
+      "when": "Start both purchases and retry the first after timeout.",
+      "required_result": "Two independent orders total; first retry resumes first order; each pins revision and provider operation.",
+      "test_layers": [
+        "concurrency",
+        "adapter-contract"
+      ],
+      "acceptance_ids": [
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-030",
+      "group": "channels",
+      "title": "Partial invoice concurrency",
+      "given": "Invoice remaining principal of 10000 minor units.",
+      "when": "Concurrent 8000 and 3000 requests, capture retries and expiry.",
+      "required_result": "Reservations prevent excess; valid partial payments persist; failed/expired reserved amount released exactly once.",
+      "test_layers": [
+        "postgresql",
+        "concurrency"
+      ],
+      "acceptance_ids": [
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-031",
+      "group": "channels",
+      "title": "Publication and public revocation",
+      "given": "Saved draft with unmet prerequisites, later ready/active channel.",
+      "when": "Forge READY/ACTIVE; distribute URL; pause/expire/master-suspend then open old URL.",
+      "required_result": "Readiness server-owned; blocked draft not published; old representations reject new checkout/payment while accepted effects reconcile.",
+      "test_layers": [
+        "api",
+        "integration",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "ACQ-02"
+      ],
+      "policy_actions": [
+        "channels.activate",
+        "channels.pause"
+      ],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-032",
+      "group": "channels",
+      "title": "Guest token isolation",
+      "given": "Channel token and order token for different sub-MIDs.",
+      "when": "Swap token/order IDs, reuse revoked token, call management APIs or read private documents.",
+      "required_result": "Hashed opaque scoped token grants only intended public actions; no cross-order/merchant/private authority.",
+      "test_layers": [
+        "api",
+        "security"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "AUTH-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-033",
+      "group": "presentation",
+      "title": "SMS presentation",
+      "given": "Assigned channel and eligible fictional recipient/request.",
+      "when": "Prepare/use SMS; retry, revoke and inspect mobile output.",
+      "required_result": "Text is an alias of SMS; reviewed recipient and canonical URL; send/delivery evidence distinct from paid. Unsupported transport clearly remains unavailable; no real message is sent.",
+      "test_layers": [
+        "adapter-contract",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/acquiring-channels.test.ts",
+          "test_name": "accepts the seven presentation choices without making receipts or publishing another payable channel",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "This presentation enum is validated and can be saved/reloaded on a local draft. Full transport/document/public-URL/checkout behavior described by the scenario is future; enum acceptance is not end-to-end completion."
+    },
+    {
+      "id": "MC-034",
+      "group": "presentation",
+      "title": "EMAIL presentation",
+      "given": "Assigned channel and eligible fictional recipient/request.",
+      "when": "Prepare/use EMAIL; retry, revoke and inspect mobile output.",
+      "required_result": "Approved document and canonical URL reference same obligation; provider timeout remains unknown/reconciling. Unsupported transport clearly remains unavailable; no real message is sent.",
+      "test_layers": [
+        "adapter-contract",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/acquiring-channels.test.ts",
+          "test_name": "accepts the seven presentation choices without making receipts or publishing another payable channel",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "This presentation enum is validated and can be saved/reloaded on a local draft. Full transport/document/public-URL/checkout behavior described by the scenario is future; enum acceptance is not end-to-end completion."
+    },
+    {
+      "id": "MC-035",
+      "group": "presentation",
+      "title": "INVOICE presentation",
+      "given": "Assigned channel and eligible fictional recipient/request.",
+      "when": "Prepare/use INVOICE; retry, revoke and inspect mobile output.",
+      "required_result": "Numbered payable document, exact line totals and remaining allocation; sending does not mark paid. Unsupported transport clearly remains unavailable; no real message is sent.",
+      "test_layers": [
+        "adapter-contract",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/acquiring-channels.test.ts",
+          "test_name": "accepts the seven presentation choices without making receipts or publishing another payable channel",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "This presentation enum is validated and can be saved/reloaded on a local draft. Full transport/document/public-URL/checkout behavior described by the scenario is future; enum acceptance is not end-to-end completion."
+    },
+    {
+      "id": "MC-036",
+      "group": "presentation",
+      "title": "BILL presentation",
+      "given": "Assigned channel and eligible fictional recipient/request.",
+      "when": "Prepare/use BILL; retry, revoke and inspect mobile output.",
+      "required_result": "Unpaid bill linked to order; never a receipt before confirmed payment. Unsupported transport clearly remains unavailable; no real message is sent.",
+      "test_layers": [
+        "adapter-contract",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/acquiring-channels.test.ts",
+          "test_name": "accepts the seven presentation choices without making receipts or publishing another payable channel",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "This presentation enum is validated and can be saved/reloaded on a local draft. Full transport/document/public-URL/checkout behavior described by the scenario is future; enum acceptance is not end-to-end completion."
+    },
+    {
+      "id": "MC-037",
+      "group": "presentation",
+      "title": "SOCIAL presentation",
+      "given": "Assigned channel and eligible fictional recipient/request.",
+      "when": "Prepare/use SOCIAL; retry, revoke and inspect mobile output.",
+      "required_result": "Share/copy uses scoped canonical URL; no claim of publication from opening composer. Unsupported transport clearly remains unavailable; no real message is sent.",
+      "test_layers": [
+        "adapter-contract",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/acquiring-channels.test.ts",
+          "test_name": "accepts the seven presentation choices without making receipts or publishing another payable channel",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "This presentation enum is validated and can be saved/reloaded on a local draft. Full transport/document/public-URL/checkout behavior described by the scenario is future; enum acceptance is not end-to-end completion."
+    },
+    {
+      "id": "MC-038",
+      "group": "presentation",
+      "title": "QR presentation",
+      "given": "Assigned channel and eligible fictional recipient/request.",
+      "when": "Prepare/use QR; retry, revoke and inspect mobile output.",
+      "required_result": "Payload is canonical public URL without private data; scan neither charges nor grants management access. Unsupported transport clearly remains unavailable; no real message is sent.",
+      "test_layers": [
+        "adapter-contract",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/acquiring-channels.test.ts",
+          "test_name": "accepts the seven presentation choices without making receipts or publishing another payable channel",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "This presentation enum is validated and can be saved/reloaded on a local draft. Full transport/document/public-URL/checkout behavior described by the scenario is future; enum acceptance is not end-to-end completion."
+    },
+    {
+      "id": "MC-039",
+      "group": "presentation",
+      "title": "WEB presentation",
+      "given": "Assigned channel and eligible fictional recipient/request.",
+      "when": "Prepare/use WEB; retry, revoke and inspect mobile output.",
+      "required_result": "Canonical hosted link or explicitly supported integration; no second checkout engine or default MID. Unsupported transport clearly remains unavailable; no real message is sent.",
+      "test_layers": [
+        "adapter-contract",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/acquiring-channels.test.ts",
+          "test_name": "accepts the seven presentation choices without making receipts or publishing another payable channel",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "This presentation enum is validated and can be saved/reloaded on a local draft. Full transport/document/public-URL/checkout behavior described by the scenario is future; enum acceptance is not end-to-end completion."
+    },
+    {
+      "id": "MC-040",
+      "group": "presentation",
+      "title": "Receipts and corrections",
+      "given": "Unpaid order, then confirmed captured payment and partial refund.",
+      "when": "Request receipt before payment, duplicate event, then corrected document.",
+      "required_result": "No premature paid receipt; authoritative successful payment produces evidence; immutable correction references original/refund; never another amount due.",
+      "test_layers": [
+        "integration",
+        "api",
+        "desktop",
+        "mobile"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-05"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-041",
+      "group": "delivery",
+      "title": "Delivery idempotency and unknown outcome",
+      "given": "Queued dispatch with stable operation identity.",
+      "when": "Worker crashes before/after adapter acknowledgement or loses authority.",
+      "required_result": "No new message identity on retry; truthful UNKNOWN with reconciliation where supported; predispatch access rechecked; no sent claim without acknowledgement.",
+      "test_layers": [
+        "concurrency",
+        "adapter-contract"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "SIM-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-042",
+      "group": "finance",
+      "title": "Webhook namespace and business dedupe",
+      "given": "Valid and invalid provider events for master/sibling bindings.",
+      "when": "Wrong signatures, wrong environment, two event IDs for one effect, stale/reordered events.",
+      "required_result": "Authenticate/map exact original operation; invalid events quarantined; one business effect; no sibling/default attribution.",
+      "test_layers": [
+        "adapter-contract",
+        "integration"
+      ],
+      "acceptance_ids": [
+        "ACQ-04",
+        "ACQ-07"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-043",
+      "group": "finance",
+      "title": "Explicit provider routing under responsible master Seller",
+      "given": "Confirmed master Seller responsibility; a future supported mock provider has distinct processing and debit-resource identifiers.",
+      "when": "Payment, refund, dispute and settlement occur.",
+      "required_result": "Financial records retain master Seller responsibility for sales, fees, refunds and chargebacks while following explicit approved provider debit/settlement mappings; no independent SUB liability or generic parent-ID routing.",
+      "test_layers": [
+        "integration",
+        "adapter-contract"
+      ],
+      "acceptance_ids": [
+        "ACQ-04",
+        "ACQ-05",
+        "ACQ-07"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-044",
+      "group": "finance",
+      "title": "Payout pledge refund contention",
+      "given": "Shared eligible settled backing with sub-MID attribution.",
+      "when": "Concurrent payout, commercial pledge, partial refund and dispute reservation.",
+      "required_result": "One ledger/backing transaction prevents double use; no pending/reserved funds reusable; exact original fee/reward reversals.",
+      "test_layers": [
+        "postgresql",
+        "concurrency"
+      ],
+      "acceptance_ids": [
+        "ACQ-04",
+        "ACQ-05",
+        "ACQ-06"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-045",
+      "group": "finance",
+      "title": "Shared membership cap",
+      "given": "Several sub-MIDs/accounts reference one sponsoring membership year.",
+      "when": "Apply eligible fees/rewards, reversal and reissue across contexts.",
+      "required_result": "One Premier cap, exact source attribution and no new membership charge/cap from sub-MID or invitation.",
+      "test_layers": [
+        "unit",
+        "integration"
+      ],
+      "acceptance_ids": [
+        "ACQ-04"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-046",
+      "group": "migration",
+      "title": "Preserve existing fictional data",
+      "given": "Preserved pre-upgrade six-migration local fictional databases and immutable migration 7.",
+      "when": "Apply migration 7 using the migration runner, verify a subsequent runner retry is a no-op, and compare documented row/hash snapshots.",
+      "required_result": "All IDs, exact amounts, private visibility, creator provenance, canceled states, versions and receipts preserved; no auto sub-MID, approval, share or publication.",
+      "test_layers": [
+        "migration",
+        "postgresql"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "ACQ-08"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "Actual six-to-seven test and preview preservation evidence is recorded separately. Physical CANCELED and existing receipts/IDs are retained; no CLOSED/closure_reason migration exists. Full case still needs repeated-run/recovery evidence.",
+      "related_evidence_ids": [
+        "MC-E-MIGRATION-TEST-6-7",
+        "MC-E-MIGRATION-PREVIEW-6-7"
+      ]
+    },
+    {
+      "id": "MC-047",
+      "group": "migration",
+      "title": "Revoked creator and invitation history",
+      "given": "Old creator account access revoked; pending/accepted account invitations and replay receipts exist.",
+      "when": "Upgrade then read/accept/retry from old and current sessions.",
+      "required_result": "History survives without reviving revoked author access; old account invitations keep behavior; merchant branch creates only merchant access.",
+      "test_layers": [
+        "migration",
+        "integration",
+        "api"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "ACC-08"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "revokes accepted helper authority and saved retries never recreate permission",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "requires explicit dependency for a host member; leave and rejoin never revive that assignment",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "requires the same captured inviter generation at acceptance",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Migration preserves original rows/columns; local live-authority tests cover access replay, but a complete combined upgrade/revocation scenario execution is not claimed."
+    },
+    {
+      "id": "MC-048",
+      "group": "migration",
+      "title": "Single workflow cutover and recovery",
+      "given": "Preserved local data and immutable migration 7; old account draft routes/clients are retired in source.",
+      "when": "Deploy coordinated schema/API/UI change and rehearse failure before and after new writes.",
+      "required_result": "One command/table/form owner; safe route retirement and data-preserving recovery; no reset or destructive rollback.",
+      "test_layers": [
+        "migration",
+        "architecture"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "UX-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "a private payment channel is reviewed, saved, edited and canceled across reloads without publishing",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Source cutover exists with one physical draft/channel owner. A deployed cutover/restore or post-write forward-recovery rehearsal is not recorded."
+    },
+    {
+      "id": "MC-049",
+      "group": "experience",
+      "title": "Collector complete task",
+      "given": "Outside collector with assigned channel and no channels.create grant.",
+      "when": "Sign in, use channel, enter allowed amount, review/distribute, reload and find outcome.",
+      "required_result": "Complete useful merchant-only journey; exact sub-MID/master/payee visible; separate delivery/payment; no dead-end create CTA or host financial sidebar.",
+      "test_layers": [
+        "desktop",
+        "mobile",
+        "accessibility"
+      ],
+      "acceptance_ids": [
+        "ACQ-08",
+        "UX-01"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-050",
+      "group": "experience",
+      "title": "Guest complete task and errors",
+      "given": "Public one-time/reusable channel and invoice links.",
+      "when": "Review confirmed merchant/amount, pay mock, refresh/back, encounter expired/paused/error/unknown states.",
+      "required_result": "Durable status and receipt from authoritative event; no fake success, private hierarchy or mandatory membership; recover without duplicate payment.",
+      "test_layers": [
+        "desktop",
+        "mobile",
+        "accessibility"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "UX-02"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "This full scenario requires future provider, verification, distribution, guest or financial implementation; local drafts/readiness are not completion evidence."
+    },
+    {
+      "id": "MC-051",
+      "group": "experience",
+      "title": "Context, keyboard and small screen",
+      "given": "Multiple permitted accounts/merchants, stale selection and no-permission state.",
+      "when": "Navigate at desktop and 320px using keyboard, reload/back and accept invitation.",
+      "required_result": "Correct account and merchant retained only while authorized; no first-MID fallback, overflow or hidden inaccessible financial sections; clear next actor and focus recovery.",
+      "test_layers": [
+        "desktop",
+        "mobile",
+        "accessibility"
+      ],
+      "acceptance_ids": [
+        "UX-01",
+        "UX-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "Household creates a sub-merchant, confirms both sides and opens only its merchant context",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-workspace.spec.ts",
+          "test_name": "an outside helper accepts merchant-only access and sees assigned channels without Household financial data",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-accessibility.spec.ts",
+          "test_name": "Personal, Household and Seller entries plus merchant-channel review retain scope, labels and keyboard focus at320",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Desktop/mobile/keyboard source tests target merchant context and outside-helper isolation; final full browser evidence is recorded by the release owner."
+    },
+    {
+      "id": "MC-052",
+      "group": "regression",
+      "title": "Issuing and account privacy unchanged",
+      "given": "Existing three-account/card/request and Household governance fixtures.",
+      "when": "Run all current policy, issuing, statement, invitation and session regressions after redesign.",
+      "required_result": "Existing allowed work succeeds; all existing privacy/revocation boundaries retained; merchant grants add no spending/card power.",
+      "test_layers": [
+        "unit",
+        "integration",
+        "concurrency",
+        "api",
+        "desktop",
+        "mobile",
+        "accessibility"
+      ],
+      "acceptance_ids": [
+        "ACC-01",
+        "ACC-03",
+        "CARD-01",
+        "CARD-02",
+        "ACQ-08"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [
+        {
+          "path": "tests/unit/merchant-access.test.ts",
+          "test_name": "permits explicit outside-helper channel preparation without implying account or financial authority",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/unit/merchant-access.test.ts",
+          "test_name": "does not infer outside invitation permission for Personal units or public requests",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/integration/merchant-access.test.ts",
+          "test_name": "persists one named typed invitation and accepts outside access without any account membership",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        },
+        {
+          "path": "tests/browser/seller-api.spec.ts",
+          "test_name": "accepted Seller read access does not reveal another creator's drafts or permit channel mutations",
+          "note": "Existing source reference; no run result asserted by this mapping.",
+          "evidence_status": "SOURCE_REFERENCE_ONLY"
+        }
+      ],
+      "local_coverage_note": "Merchant grants explicitly deny issuing/financial-account actions in local source; complete existing-account regression evidence must be attached separately."
+    },
+    {
+      "id": "MC-053",
+      "group": "release",
+      "title": "Truthful evidence and packaging",
+      "given": "Final implemented source SHA and isolated database/runtime receipts.",
+      "when": "Run required project checks, source-mapped tests, production and offline Netlify builds; inspect screenshots.",
+      "required_result": "Record actual commands/exits/environment/SHA; no skipped/fake gates, invented MID, external delivery, deployment or comparison points.",
+      "test_layers": [
+        "security",
+        "build",
+        "visual-review"
+      ],
+      "acceptance_ids": [
+        "REL-02",
+        "REL-03"
+      ],
+      "policy_actions": [],
+      "status": "NOT_RUN",
+      "evidence": [],
+      "local_source_tests": [],
+      "local_coverage_note": "Final source SHA, complete test/build/packaging and visual-review evidence belong to release closeout. Ongoing test output is not a final pass."
+    }
+  ],
+  "confirmed_product_choices": {
+    "responsibility": "Master Seller responsible for sales, fees, refunds and chargebacks; SUB units are delegated collection contexts",
+    "cardinality": "Multiple Seller associations allowed; one immutable MASTER per SUB and one unit per master/host pair"
+  },
+  "local_boundary": {
+    "implemented_source": [
+      "Typed hierarchy/request/two-sided acceptance/suspension",
+      "Merchant scope and canonical policy evaluation",
+      "Household SUB named-helper invitation/acceptance/revocation with no account membership",
+      "One channel form and merchant-scoped create/update/close commands",
+      "Seven saved presentation choices, exact USD draft fields, private/assigned visibility, expiry, optimistic version and retry recovery",
+      "Local Seller creation and fictional setup retained"
+    ],
+    "not_implemented": [
+      "Provider verification and evidence storage",
+      "External MID/gateway assignment",
+      "Active channel publication",
+      "Guest checkout/public tokens",
+      "Collector distribution",
+      "SMS/email transport",
+      "QR/public-link generation",
+      "Issued invoice/bill/receipt documents",
+      "Payable orders/payment effects/refunds/payouts/ledger writes"
+    ],
+    "status_mapping": "Physical DRAFT/CANCELED; API derives EXPIRED; CANCELED is displayed Closed. No physical CLOSED channel or closure_reason."
+  },
+  "recorded_local_evidence": [
+    {
+      "id": "MC-E-MIGRATION-TEST-6-7",
+      "status": "PASS",
+      "kind": "migration_preservation_only",
+      "database": "etail_depot_next_test",
+      "artifacts": [
+        "artifacts/merchant-channels/test-upgrade-before.json",
+        "artifacts/merchant-channels/test-upgrade-after.json"
+      ],
+      "migration_before": 6,
+      "migration_after": 7,
+      "migration": "netlify/database/migrations/20260909041111_glossy_black_panther/migration.sql",
+      "migration_sha256": "72df07b30912a75bafbc734e014447a8d2d04584ef938bdfd6fe76c8f1805cc4",
+      "original_tables_preserved": 35,
+      "total_after_checks": 36,
+      "preserved_selected_row_counts": {
+        "merchant_profiles": 117,
+        "payment_request_drafts": 445,
+        "payment_draft_commands": 83,
+        "account_invitations": 153,
+        "invitation_permissions": 213,
+        "access_command_receipts": 286,
+        "account_access_history": 286
+      },
+      "result": "One master per former profile; no sub-units or delegated access auto-created; all old channels remain private on their Seller master.",
+      "limits": "Observed upgrade and preservation only. Not a complete MC-046 run: repeated application/runner retry and restoration are not established. No whole UI, hosted, provider or financial scenario result."
+    },
+    {
+      "id": "MC-E-MIGRATION-PREVIEW-6-7",
+      "status": "PASS",
+      "kind": "migration_preservation_only",
+      "database": "etail_depot_next",
+      "artifacts": [
+        "artifacts/merchant-channels/preview-upgrade-before.json",
+        "artifacts/merchant-channels/preview-upgrade-after.json"
+      ],
+      "migration_before": 6,
+      "migration_after": 7,
+      "migration": "netlify/database/migrations/20260909041111_glossy_black_panther/migration.sql",
+      "migration_sha256": "72df07b30912a75bafbc734e014447a8d2d04584ef938bdfd6fe76c8f1805cc4",
+      "original_tables_preserved": 35,
+      "total_after_checks": 36,
+      "preserved_selected_row_counts": {
+        "merchant_profiles": 1,
+        "payment_request_drafts": 0,
+        "payment_draft_commands": 0,
+        "account_invitations": 0,
+        "invitation_permissions": 0,
+        "access_command_receipts": 0,
+        "account_access_history": 0
+      },
+      "result": "One master per former profile; no sub-units or delegated access auto-created; all old channels remain private on their Seller master.",
+      "limits": "Observed upgrade and preservation only. Not a complete MC-046 run: repeated application/runner retry and restoration are not established. No whole UI, hosted, provider or financial scenario result."
+    }
+  ],
+  "local_execution_evidence": [
+    {
+      "scope": "Implemented local unit, native PostgreSQL integration/concurrency and executable API contracts only; not all 53 full target cases",
+      "source_revision": "5e281b3df06dd045633ad282c61212ecaa8adc68",
+      "environment": "macOS ARM64; Node24.19.0; native PostgreSQL18.6 loopback55439 etail_depot_next_test; real money false",
+      "command": "node tools/run-with-database.mjs vitest run tests/unit tests/integration tests/concurrency tests/contracts",
+      "result": "PASS",
+      "tests_passed": 293,
+      "exit_code": 0,
+      "log": "artifacts/merchant-channels/final-vitest.log",
+      "delivery_evidence": "docs/MERCHANT_CHANNEL_EVIDENCE.md"
+    },
+    {
+      "scope": "Full implemented application API/desktop/mobile/accessibility suite; not all provider/financial target scenarios",
+      "source_revision": "5e281b3df06dd045633ad282c61212ecaa8adc68",
+      "command": "node tools/run-with-database.mjs playwright test",
+      "result": "PASS",
+      "tests_passed": 91,
+      "exit_code": 0,
+      "log": "artifacts/merchant-channels/final-browser.log"
+    },
+    {
+      "scope": "Expanded merchant browser regression after server-safe verification-history date fix",
+      "source_revision": "283a0744e6de8d133457c230b34ec132a58f462d",
+      "command": "node tools/run-with-database.mjs playwright test tests/browser/seller-api.spec.ts tests/browser/seller-workspace.spec.ts tests/browser/seller-accessibility.spec.ts",
+      "result": "PASS",
+      "tests_passed": 16,
+      "exit_code": 0,
+      "log": "artifacts/merchant-channels/history-fix-browser.log"
+    },
+    {
+      "scope": "Explicit local fictional demo and manual desktop/mobile visual review; no external operations",
+      "source_revision": "283a0744e6de8d133457c230b34ec132a58f462d",
+      "result": "PASS",
+      "reviewed_images": 12,
+      "log": "artifacts/merchant-channels/preview-demo-completed.log",
+      "manifest": "artifacts/merchant-channels/preview-demo.json"
+    }
+  ]
+}

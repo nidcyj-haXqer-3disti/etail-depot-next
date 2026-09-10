@@ -1,0 +1,714 @@
+{
+  "status": "planned core API surface, NOT generated OpenAPI and NOT exhaustive final auth/operator/partner resources",
+  "version_prefix": "/api/v1",
+  "routing_notes": [
+    "Typed account/merchant path and server-loaded resource are authoritative; never trust client roles or infer host membership from merchant access.",
+    "Replacement uses StartCardRequest with kind REPLACEMENT, not a separate issuing engine",
+    "Implement omitted auth, operator, partner and lifecycle resources from specifications and generate actual OpenAPI 3.1",
+    "Public guest paths use unguessable scoped tokens, CSRF and rate limiting; webhooks require verified signature",
+    "The merchant/channel target follows contracts/merchant-channel-design.json. This remains the planned full-product inventory. The generated foundation OpenAPI records the implemented local subset; retired payment-request-draft HTTP routes are removed.",
+    "Account Get paid pages are contextual entries; canonical merchant commands do not require host-account membership. Shared invitation lifecycle dispatches by ACCOUNT or MERCHANT_UNIT target, not by a second invitation engine."
+  ],
+  "operations": [
+    {
+      "operation_id": "ListAccounts",
+      "method": "GET",
+      "path": "/api/v1/accounts",
+      "module": "accounts",
+      "required_policy": "accounts.read",
+      "idempotency": "read-only",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "CreateAccount",
+      "method": "POST",
+      "path": "/api/v1/accounts",
+      "module": "accounts",
+      "required_policy": "accounts.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "GetAccount",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}",
+      "module": "accounts",
+      "required_policy": "account.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "GetCapabilities",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}/capabilities",
+      "module": "access",
+      "required_policy": "account.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "InvitePerson",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/invitations",
+      "module": "access",
+      "required_policy": "people.invite",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "AcceptInvitation",
+      "method": "POST",
+      "path": "/api/v1/invitations/{invitationId}/accept",
+      "module": "access",
+      "required_policy": "invitation.accept",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "ChangeRole",
+      "method": "PATCH",
+      "path": "/api/v1/accounts/{accountId}/people/{personId}",
+      "module": "access",
+      "required_policy": "people.changeRole",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "RevokeAccess",
+      "method": "DELETE",
+      "path": "/api/v1/accounts/{accountId}/people/{personId}",
+      "module": "access",
+      "required_policy": "people.revoke",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "StartCardRequest",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/card-requests",
+      "module": "issuing",
+      "required_policy": "cards.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "GetCardRequest",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}/card-requests/{requestId}",
+      "module": "issuing",
+      "required_policy": "cards.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "UpdateCardRequest",
+      "method": "PATCH",
+      "path": "/api/v1/accounts/{accountId}/card-requests/{requestId}",
+      "module": "issuing",
+      "required_policy": "cards.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "SubmitCardRequest",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/card-requests/{requestId}/submit",
+      "module": "issuing",
+      "required_policy": "cards.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "CancelCardRequest",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/card-requests/{requestId}/cancel",
+      "module": "issuing",
+      "required_policy": "cards.manage",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "ListCards",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}/cards",
+      "module": "issuing",
+      "required_policy": "cards.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "GetCard",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}/cards/{cardId}",
+      "module": "issuing",
+      "required_policy": "cards.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "FreezeCard",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/cards/{cardId}/freeze",
+      "module": "issuing",
+      "required_policy": "cards.freeze",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "UnfreezeCard",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/cards/{cardId}/unfreeze",
+      "module": "issuing",
+      "required_policy": "cards.unfreeze",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "UpdateCardControls",
+      "method": "PATCH",
+      "path": "/api/v1/accounts/{accountId}/cards/{cardId}/controls",
+      "module": "access",
+      "required_policy": "controls.update",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "StartSpendingApplication",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/spending-applications",
+      "module": "issuing",
+      "required_policy": "spending.apply",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "SubmitSpendingRequirements",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/spending-applications/{applicationId}/requirements",
+      "module": "issuing",
+      "required_policy": "spending.apply",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "CreateFundingRequest",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/funding-requests",
+      "module": "issuing",
+      "required_policy": "funding.deposit",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "CreateReleaseRequest",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/release-requests",
+      "module": "issuing",
+      "required_policy": "funding.release",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "CreateAllocation",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/allocations",
+      "module": "access",
+      "required_policy": "funding.allocate",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "CreatePracticePurchase",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/practice-purchases",
+      "module": "issuing",
+      "required_policy": "spend.authorize",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "GetOperation",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}/operations/{operationId}",
+      "module": "integrations",
+      "required_policy": "operations.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "CreateRepayment",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/repayments",
+      "module": "issuing",
+      "required_policy": "repayments.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "ListActivity",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}/activity",
+      "module": "accounts",
+      "required_policy": "activity.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "ListStatements",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}/statements",
+      "module": "issuing",
+      "required_policy": "statements.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "StartMerchantApplication",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/merchant-applications",
+      "module": "acquiring",
+      "required_policy": "merchant.verification.submit",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "exact merchant path/resource and current accepted merchant assignment or explicit agreed oversight; no host membership implied",
+      "notes": "Starts/saves the canonical application request; provider submission and result are separate transitions. Cannot self-approve or fabricate verification."
+    },
+    {
+      "operation_id": "CreatePaymentRequest",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/channels/{channelId}/payment-requests",
+      "module": "acquiring",
+      "required_policy": "payments.request",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "exact merchant path/resource and current accepted merchant assignment or explicit agreed oversight; no host membership implied",
+      "notes": "Creates/resumes a payable order using the channel; one-time channel uniqueness and per-purchase reusable identity. The account path is not a second write engine."
+    },
+    {
+      "operation_id": "CreateInvoice",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/invoices",
+      "module": "acquiring",
+      "required_policy": "payments.request",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "exact merchant path/resource and current accepted merchant assignment or explicit agreed oversight; no host membership implied",
+      "notes": "Creates a payable document for the canonical order, not a second payment operation; atomic partial allocation applies."
+    },
+    {
+      "operation_id": "ListPayments",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/payments",
+      "module": "acquiring",
+      "required_policy": "payments.read",
+      "idempotency": "read-only",
+      "account_binding": "exact merchant path/resource and current accepted merchant assignment or explicit agreed oversight; no host membership implied"
+    },
+    {
+      "operation_id": "CreateRefundRequest",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/payments/{paymentId}/refunds",
+      "module": "acquiring",
+      "required_policy": "payments.refund",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "exact merchant path/resource and current accepted merchant assignment or explicit agreed oversight; no host membership implied"
+    },
+    {
+      "operation_id": "CreatePayoutRequest",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/payout-requests",
+      "module": "acquiring",
+      "required_policy": "payouts.request",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "exact merchant path/resource and current accepted merchant assignment or explicit agreed oversight; no host membership implied"
+    },
+    {
+      "operation_id": "GetGuestCheckout",
+      "method": "GET",
+      "path": "/api/v1/public/payment-requests/{publicToken}",
+      "module": "acquiring",
+      "required_policy": "public.scopedCheckout",
+      "idempotency": "read-only",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "SubmitGuestPayment",
+      "method": "POST",
+      "path": "/api/v1/public/payment-requests/{publicToken}/payments",
+      "module": "acquiring",
+      "required_policy": "public.scopedCheckout",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "GetMembership",
+      "method": "GET",
+      "path": "/api/v1/me/membership",
+      "module": "membership",
+      "required_policy": "membership.readOwn",
+      "idempotency": "read-only",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "JoinMembership",
+      "method": "POST",
+      "path": "/api/v1/me/membership",
+      "module": "membership",
+      "required_policy": "membership.joinOwn",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "RequestPlanChange",
+      "method": "POST",
+      "path": "/api/v1/me/membership/plan-changes",
+      "module": "membership",
+      "required_policy": "membership.changeOwn",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "GetRewards",
+      "method": "GET",
+      "path": "/api/v1/me/rewards",
+      "module": "rewards",
+      "required_policy": "rewards.readOwn",
+      "idempotency": "read-only",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "CreateCase",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/cases",
+      "module": "operations",
+      "required_policy": "cases.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "CreateDocument",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/documents",
+      "module": "operations",
+      "required_policy": "documents.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "GetDocument",
+      "method": "GET",
+      "path": "/api/v1/accounts/{accountId}/documents/{documentId}",
+      "module": "operations",
+      "required_policy": "documents.read",
+      "idempotency": "read-only",
+      "account_binding": "explicit path/resource with server verification"
+    },
+    {
+      "operation_id": "RecordProviderEvent",
+      "method": "POST",
+      "path": "/api/v1/webhooks/{provider}",
+      "module": "integrations",
+      "required_policy": "provider.verifiedEvent",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "person/public-token/provider-namespace as applicable"
+    },
+    {
+      "operation_id": "ListMerchantUnits",
+      "method": "GET",
+      "path": "/api/v1/merchants",
+      "module": "acquiring",
+      "required_policy": "merchant.read",
+      "idempotency": "read-only",
+      "account_binding": "Current merchant assignments/oversight, plus minimal pending or suspended relationship review for independently authorized host/master controllers.",
+      "notes": "Directory of accepted merchant assignments/oversight only; no implicit first selection or directory of all hosts."
+    },
+    {
+      "operation_id": "ReadMerchantUnit",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}",
+      "module": "acquiring",
+      "required_policy": "merchant.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ListMerchantChildren",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/children",
+      "module": "acquiring",
+      "required_policy": "merchant.children.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "RequestMerchantRelationship",
+      "method": "POST",
+      "path": "/api/v1/accounts/{accountId}/merchant-relationships",
+      "module": "acquiring",
+      "required_policy": "merchant.relationship.request",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "Current named Personal/Household host controller plus access to the selected Merchant master; both sides must independently accept.",
+      "notes": "Both named sides require live appropriate authority; host acceptance uses that host authority without needing a preexisting merchant grant. No unilateral attachment. Multiple master associations per host are allowed; duplicate same-pair requests converge. Provider activation remains separately gated."
+    },
+    {
+      "operation_id": "AcceptMerchantRelationship",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/relationship/accept",
+      "module": "acquiring",
+      "required_policy": "merchant.relationship.acceptHost OR merchant.relationship.acceptMaster, selected by the requested side",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "Current named host or master controller for the selected side; no preexisting accepted child assignment is required.",
+      "notes": "Both named sides require live appropriate authority; host acceptance uses that host authority without needing a preexisting merchant grant. No unilateral attachment. Multiple master associations per host are allowed; duplicate same-pair requests converge. Provider activation remains separately gated."
+    },
+    {
+      "operation_id": "SuspendMerchantRelationship",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/relationship/suspend",
+      "module": "acquiring",
+      "required_policy": "merchant.relationship.suspend",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "CloseMerchantRelationship",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/relationship/close",
+      "module": "acquiring",
+      "required_policy": "merchant.relationship.close",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ReadMerchantVerification",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/verification",
+      "module": "acquiring",
+      "required_policy": "merchant.verification.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ReadMerchantGateway",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/gateway",
+      "module": "acquiring",
+      "required_policy": "merchant.gateway.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ConfigureMerchantGateway",
+      "method": "PUT",
+      "path": "/api/v1/merchants/{merchantId}/gateway",
+      "module": "acquiring",
+      "required_policy": "merchant.gateway.manage",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ConfigureMerchantResponsibility",
+      "method": "PUT",
+      "path": "/api/v1/merchants/{merchantId}/responsibility",
+      "module": "acquiring",
+      "required_policy": "merchant.responsibility.manage",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "UpdateMerchantControls",
+      "method": "PATCH",
+      "path": "/api/v1/merchants/{merchantId}/controls",
+      "module": "acquiring",
+      "required_policy": "merchant.controls.manage",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ListMerchantPeople",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/access",
+      "module": "access",
+      "required_policy": "merchant.people.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "InviteMerchantPerson",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/invitations",
+      "module": "access",
+      "required_policy": "merchant.people.invite",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied",
+      "notes": "One shared typed invitation command/lifecycle; acceptance uses the canonical intended-person inbox and creates only merchant access."
+    },
+    {
+      "operation_id": "ChangeMerchantAccess",
+      "method": "PATCH",
+      "path": "/api/v1/merchants/{merchantId}/people/{assignmentId}",
+      "module": "access",
+      "required_policy": "merchant.people.change",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "RevokeMerchantAccess",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/people/{assignmentId}/revoke",
+      "module": "access",
+      "required_policy": "merchant.people.revoke",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ListPaymentChannels",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/channels",
+      "module": "acquiring",
+      "required_policy": "channels.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ReadPaymentChannel",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/channels/{channelId}",
+      "module": "acquiring",
+      "required_policy": "channels.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "CreatePaymentChannel",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/channels",
+      "module": "acquiring",
+      "required_policy": "channels.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "UpdatePaymentChannel",
+      "method": "PATCH",
+      "path": "/api/v1/merchants/{merchantId}/channels/{channelId}",
+      "module": "acquiring",
+      "required_policy": "channels.update",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ActivatePaymentChannel",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/channels/{channelId}/activate",
+      "module": "acquiring",
+      "required_policy": "channels.activate",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "PausePaymentChannel",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/channels/{channelId}/pause",
+      "module": "acquiring",
+      "required_policy": "channels.pause",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ClosePaymentChannel",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/channels/{channelId}/close",
+      "module": "acquiring",
+      "required_policy": "channels.close",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "SharePaymentChannel",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/channels/{channelId}/visibility",
+      "module": "acquiring",
+      "required_policy": "channels.share",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "CreateChannelDelivery",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/deliveries",
+      "module": "acquiring",
+      "required_policy": "deliveries.create",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ReadChannelDelivery",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/deliveries/{deliveryId}",
+      "module": "acquiring",
+      "required_policy": "deliveries.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ReadMerchantDocument",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/documents/{documentId}",
+      "module": "acquiring",
+      "required_policy": "documents.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ReadMerchantReport",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/reports",
+      "module": "acquiring",
+      "required_policy": "reports.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ExportMerchantReport",
+      "method": "POST",
+      "path": "/api/v1/merchants/{merchantId}/report-exports",
+      "module": "acquiring",
+      "required_policy": "reports.export",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ReadMerchantPayouts",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/payouts",
+      "module": "acquiring",
+      "required_policy": "payouts.read",
+      "idempotency": "read-only",
+      "account_binding": "current merchant assignment and exact resource scope; no financial-account access implied"
+    },
+    {
+      "operation_id": "ReadPublicChannel",
+      "method": "GET",
+      "path": "/api/v1/public/channels/{publicToken}",
+      "module": "acquiring",
+      "required_policy": "public.scopedCheckout",
+      "idempotency": "read-only",
+      "account_binding": "scoped public token only"
+    },
+    {
+      "operation_id": "StartPublicChannelOrder",
+      "method": "POST",
+      "path": "/api/v1/public/channels/{publicToken}/payment-requests",
+      "module": "acquiring",
+      "required_policy": "public.scopedCheckout",
+      "idempotency": "business-request-and-transport",
+      "account_binding": "scoped public token only"
+    },
+    {
+      "operation_id": "ReadMerchantRelationshipRequest",
+      "method": "GET",
+      "path": "/api/v1/merchants/{merchantId}/relationship-requests/{requestId}",
+      "module": "acquiring",
+      "required_policy": "merchant.relationship.read",
+      "idempotency": "read-only",
+      "account_binding": "named host controller/master proposer; minimal pending offer only, no existing child assignment required"
+    }
+  ]
+}

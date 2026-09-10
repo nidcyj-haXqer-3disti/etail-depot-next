@@ -1,0 +1,649 @@
+#!/usr/bin/env node
+/** Dependency and local workspace source ownership guards; not financial lifecycle certification. */
+import assert from "node:assert/strict";
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import ts from "typescript";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const skipped = new Set(["node_modules", ".git", ".local", ".next", ".netlify", "coverage", "test-results", "playwright-report"]);
+const errors = [];
+const relative = (filename) => path.relative(root, filename).split(path.sep).join("/");
+const codeFile = (filename) => /\.(?:ts|tsx|js|jsx|mjs|cjs)$/.test(filename) && !filename.endsWith(".d.ts");
+
+async function walk(directory) {
+  const result = [];
+  for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+    if (skipped.has(entry.name) || entry.isSymbolicLink()) continue;
+    const filename = path.join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...await walk(filename));
+    else if (entry.isFile() && codeFile(filename)) result.push(filename);
+  }
+  return result;
+}
+
+function inspectSource(filename, text) {
+  const tree = ts.createSourceFile(filename, text, ts.ScriptTarget.Latest, true, filename.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const imports = [];
+  const calls = [];
+  const declarations = [];
+  const first = tree.statements[0];
+  const client = first && ts.isExpressionStatement(first) && ts.isStringLiteral(first.expression) && first.expression.text === "use client";
+  function visit(node) {
+    if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+      const clause = node.importClause;
+      const named = clause?.namedBindings;
+      const onlyTypes = clause?.isTypeOnly || (!clause?.name && named && ts.isNamedImports(named) && named.elements.every((entry) => entry.isTypeOnly));
+      if (!onlyTypes) imports.push({ specifier: node.moduleSpecifier.text, node });
+    } else if (ts.isExportDeclaration(node) && !node.isTypeOnly && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
+      const onlyTypes = node.exportClause && ts.isNamedExports(node.exportClause) && node.exportClause.elements.every((entry) => entry.isTypeOnly);
+      if (!onlyTypes) imports.push({ specifier: node.moduleSpecifier.text, node });
+    } else if (ts.isCallExpression(node)) {
+      calls.push(node);
+      if (node.expression.kind === ts.SyntaxKind.ImportKeyword || (ts.isIdentifier(node.expression) && node.expression.text === "require")) {
+        imports.push({ specifier: node.arguments[0] && ts.isStringLiteralLike(node.arguments[0]) ? node.arguments[0].text : null, node });
+      }
+    } else if (ts.isFunctionDeclaration(node) && node.name) declarations.push(node.name.text);
+    ts.forEachChild(node, visit);
+  }
+  visit(tree);
+  return { filename, text, tree, imports, calls, declarations, client: Boolean(client) };
+}
+
+function report(file, node, code, message) {
+  const line = node ? file.tree.getLineAndCharacterOfPosition(node.getStart(file.tree)).line + 1 : 1;
+  errors.push(`${relative(file.filename)}:${line} ${code}: ${message}`);
+}
+
+function isForbiddenClientDependency(specifier, resolved) {
+  return /^(?:node:|pg$|pg\/|drizzle-orm(?:\/|$)|@netlify\/(?:identity|database|blobs)(?:\/|$)|server-only$)/.test(specifier)
+    || Boolean(resolved && /\/src\/(?:modules|platform)\//.test(resolved));
+}
+
+const workspaceOwner = "src/modules/workspace/service.ts";
+const cardUiOwner = "src/ui/workspace/cards.tsx";
+const channelUiOwner = "src/ui/workspace/merchant-channels.tsx";
+const channelOwner = "src/modules/acquiring/service.ts";
+const operationsOwner = "src/modules/acquiring/operations-service.ts";
+const ledgerOwner = "src/modules/ledger/service.ts";
+const operationUiOwner = "src/ui/workspace/merchant-operations.tsx";
+const operationUiPaths = new Map([
+  ["/gateway", ["PUT"]], ["/test-enrollment", ["PUT"]],
+  ["/channels/:id/activation", ["PUT"]], ["/payments/:id/refund", ["POST"]], ["/payouts", ["POST"]],
+]);
+const workspaceTransport = "src/ui/workspace/primitives.tsx";
+const fixtureOwner = "src/modules/workspace/fixtures.ts";
+const cardRoutes = new Map([
+  ["card-requests/route.ts", ["POST", "startCardRequest"]],
+  ["card-requests/[requestId]/route.ts", ["PATCH", "updateCardRequest"]],
+  ["card-requests/[requestId]/submit/route.ts", ["POST", "submitCardRequest"]],
+  ["card-requests/[requestId]/cancel/route.ts", ["POST", "cancelCardRequest"]],
+  ["cards/[cardId]/control/route.ts", ["POST", "controlCard"]],
+  ["cards/[cardId]/purchase/route.ts", ["POST", "purchaseCard"]],
+]);
+const operationRoutes = new Map([
+  ["src/app/api/v1/merchants/[merchantId]/gateway/route.ts", ["PUT", "configureTestGateway"]],
+  ["src/app/api/v1/merchants/[merchantId]/test-enrollment/route.ts", ["PUT", "enrollTestMerchant"]],
+  ["src/app/api/v1/merchants/[merchantId]/channels/[channelId]/activation/route.ts", ["PUT", "setChannelActivation"]],
+  ["src/app/api/v1/merchants/[merchantId]/channels/[channelId]/test-payments/route.ts", ["POST", "simulateMerchantPayment"]],
+  ["src/app/api/v1/merchants/[merchantId]/payments/[paymentId]/refund/route.ts", ["POST", "refundMerchantPayment"]],
+  ["src/app/api/v1/merchants/[merchantId]/payouts/route.ts", ["POST", "createMerchantPayout"]],
+  ["src/app/api/v1/merchants/[merchantId]/operations/route.ts", ["GET", "getMerchantOperations"]],
+]);
+const operationWriters = {
+  testGateways: { insert: ["configureTestGateway"], update: ["configureTestGateway"] },
+  testMerchantEnrollments: { insert: ["enrollTestMerchant"], update: ["enrollTestMerchant"] },
+  channelActivations: { insert: ["setChannelActivation"], update: ["setChannelActivation"] },
+  merchantTestPayments: { insert: ["simulateMerchantPayment"] },
+  merchantTestRefunds: { insert: ["refundMerchantPayment"] },
+  merchantTestPayouts: { insert: ["createMerchantPayout"] },
+  merchantOperationCommands: { insert: ["finish"] },
+};
+const ledgerWriters = { ledgerJournals: { insert: ["postJournal"] }, ledgerEntries: { insert: ["postJournal"] } };
+const writerOwners = {
+  workspaceBalances: {}, serviceActivity: { insert: ["purchaseCard"] }, settlements: {},
+  cards: { insert: ["submitCardRequest"], update: ["controlCard", "purchaseCard"] },
+  cardRequests: { insert: ["startCardRequest"], update: ["updateCardRequest", "submitCardRequest", "cancelCardRequest"] },
+  disputes: {},
+  disputeTimeline: {},
+  notificationPreferences: { insert: ["saveNotificationPreferences"], update: ["saveNotificationPreferences"] },
+  workspaceCommands: { insert: ["command"] },
+};
+const canonicalCommands = ["controlCard", "startCardRequest", "updateCardRequest", "submitCardRequest", "cancelCardRequest", "purchaseCard", "saveNotificationPreferences"];
+
+function functionChain(node) {
+  const names = [];
+  for (let parent = node.parent; parent; parent = parent.parent) {
+    if (ts.isFunctionDeclaration(parent) && parent.name) names.unshift(parent.name.text);
+    else if ((ts.isArrowFunction(parent) || ts.isFunctionExpression(parent)) && ts.isVariableDeclaration(parent.parent) && ts.isIdentifier(parent.parent.name)) names.unshift(parent.parent.name.text);
+  }
+  return names;
+}
+function visitNodes(tree, predicate) {
+  const matches = [];
+  function visit(node) { if (predicate(node)) matches.push(node); ts.forEachChild(node, visit); }
+  visit(tree); return matches;
+}
+function importBindings(file) {
+  const bindings = new Map();
+  for (const { node, specifier } of file.imports) {
+    if (!ts.isImportDeclaration(node)) continue;
+    const named = node.importClause?.namedBindings;
+    if (named && ts.isNamedImports(named)) for (const entry of named.elements) bindings.set(entry.name.text, { imported: entry.propertyName?.text ?? entry.name.text, specifier });
+    else if (named && ts.isNamespaceImport(named)) bindings.set(named.name.text, { imported: "*", specifier });
+  }
+  return bindings;
+}
+function sourceModule(file, specifier) {
+  if (!specifier) return null;
+  const filename = specifier.startsWith("@/") ? path.join(root, "src", specifier.slice(2)) : specifier.startsWith(".") ? path.resolve(path.dirname(file.filename), specifier) : null;
+  return filename ? relative(filename).replace(/\.[cm]?[jt]sx?$/, "") : specifier;
+}
+function scopeContains(declaration, usage) {
+  const scope = declaration.parent;
+  for (let node = usage; node; node = node.parent) if (node === scope) return true;
+  // A variable declaration's immediate parent is a declaration list, not its lexical scope.
+  if (ts.isVariableDeclaration(declaration)) {
+    let container = declaration.parent;
+    while (container && !ts.isBlock(container) && !ts.isSourceFile(container) && !ts.isForOfStatement(container) && !ts.isForStatement(container)) container = container.parent;
+    for (let node = usage; node; node = node.parent) if (node === container) return true;
+  }
+  return false;
+}
+function localDeclaration(file, identifier) {
+  return visitNodes(file.tree, node => (ts.isVariableDeclaration(node) || ts.isParameter(node)) && ts.isIdentifier(node.name) && node.name.text === identifier.text && scopeContains(node, identifier))
+    .sort((a, b) => functionChain(b).length - functionChain(a).length || b.pos - a.pos)[0];
+}
+/** Resolve finite local URL expressions, preserving opaque resource IDs without guessing routes. */
+function stringValues(file, node, seen = new Set()) {
+  if (!node || seen.has(node)) return ["?"];
+  const next = new Set(seen).add(node);
+  if (ts.isStringLiteralLike(node)) return [node.text];
+  if (ts.isParenthesizedExpression(node) || ts.isAsExpression(node)) return stringValues(file, node.expression, next);
+  if (ts.isConditionalExpression(node)) return [...new Set([...stringValues(file, node.whenTrue, next), ...stringValues(file, node.whenFalse, next)])];
+  if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "encodeURIComponent") return [":id"];
+  if (ts.isPropertyAccessExpression(node) && /^(?:id|serviceId|requestId|cardId|merchantId|merchantUnitId|channelId|paymentId)$/.test(node.name.text)) return [":id"];
+  if (ts.isIdentifier(node)) {
+    const declaration = localDeclaration(file, node);
+    if (declaration?.initializer) return stringValues(file, declaration.initializer, next);
+    if (declaration && ts.isParameter(declaration) && declaration.type) {
+      const types = ts.isUnionTypeNode(declaration.type) ? declaration.type.types : [declaration.type];
+      if (types.every(type => ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal))) return types.map(type => type.literal.text);
+    }
+    return ["?"];
+  }
+  const combine = (left, right) => left.flatMap(a => right.map(b => a + b)).slice(0, 32);
+  if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.PlusToken) return combine(stringValues(file, node.left, next), stringValues(file, node.right, next));
+  if (ts.isTemplateExpression(node)) {
+    let result = [node.head.text];
+    for (const span of node.templateSpans) result = combine(result, stringValues(file, span.expression, next).map(value => value + span.literal.text));
+    return result;
+  }
+  return ["?"];
+}
+function boundName(file, expression, bindings, seen = new Set()) {
+  if (!expression || seen.has(expression)) return null;
+  const next = new Set(seen).add(expression);
+  if (ts.isIdentifier(expression)) {
+    if (bindings.has(expression.text)) return bindings.get(expression.text);
+    const declaration = localDeclaration(file, expression);
+    if (declaration?.initializer) return boundName(file, declaration.initializer, bindings, next);
+    const destructured = visitNodes(file.tree, node => ts.isVariableDeclaration(node) && ts.isObjectBindingPattern(node.name) && scopeContains(node, expression) && node.name.elements.some(entry => ts.isIdentifier(entry.name) && entry.name.text === expression.text))[0];
+    if (destructured?.initializer) {
+      const source = boundName(file, destructured.initializer, bindings, next);
+      const entry = destructured.name.elements.find(entry => ts.isIdentifier(entry.name) && entry.name.text === expression.text);
+      if (source?.imported === "*" && entry) return { ...source, imported: entry.propertyName?.getText(file.tree) ?? expression.text };
+    }
+  }
+  if (ts.isPropertyAccessExpression(expression) && ts.isIdentifier(expression.expression)) {
+    const namespace = bindings.get(expression.expression.text);
+    if (namespace?.imported === "*") return { ...namespace, imported: expression.name.text };
+  }
+  return null;
+}
+function namedCallee(call) { return ts.isIdentifier(call.expression) ? call.expression.text : ts.isPropertyAccessExpression(call.expression) ? call.expression.name.text : null; }
+function identifierIs(node, value) { return Boolean(node && ts.isIdentifier(node) && node.text === value); }
+function propertyValue(object, name) {
+  const property = object && ts.isObjectLiteralExpression(object) ? object.properties.find(item => item.name?.getText() === name) : null;
+  return property && ts.isPropertyAssignment(property) ? property.initializer : null;
+}
+function statusAssigned(call) {
+  const set = call.parent?.parent;
+  return set && ts.isCallExpression(set) && namedCallee(set) === "set" ? propertyValue(set.arguments[0], "status") : null;
+}
+function isBlockedOrIssuedBranch(sites) {
+  if (sites.length !== 2) return false;
+  const blocked = sites.find(site => ts.isStringLiteralLike(statusAssigned(site.call) ?? {}) && statusAssigned(site.call).text === "BLOCKED");
+  const issued = sites.find(site => ts.isStringLiteralLike(statusAssigned(site.call) ?? {}) && statusAssigned(site.call).text === "ISSUED");
+  if (!blocked || !issued) return false;
+  for (let parent = blocked.call.parent; parent; parent = parent.parent) {
+    if (ts.isIfStatement(parent) && ts.isBlock(parent.thenStatement) && ts.isReturnStatement(parent.thenStatement.statements.at(-1) ?? {}) && !parent.elseStatement) {
+      return issued.call.pos > parent.end && functionChain(blocked.call).join("/") === functionChain(issued.call).join("/");
+    }
+  }
+  return false;
+}
+
+function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
+  const counts = { requestUiCalls: 0, requestRouteCalls: 0, guardedWriters: 0, operationRouteCalls: 0, purchaseUiCalls: 0 };
+  const uiStages = new Map();
+  const routeStages = new Map();
+  const writerSites = new Map();
+  const operationStages = new Map();
+  const operationUiStages = new Map();
+  for (const file of files.values()) {
+    const name = relative(file.filename);
+    const bindings = importBindings(file);
+    const isUi = file.client || name.startsWith("src/ui/");
+    const retiredTables = new Set(["disputes", "disputeTimeline", "settlements", "workspaceBalances"]);
+    for (const node of visitNodes(file.tree, node => ts.isIdentifier(node) || ts.isPropertyAccessExpression(node))) {
+      const binding = boundName(file, node, bindings);
+      if (binding && sourceModule(file, binding.specifier) === "src/platform/database/schema" && retiredTables.has(binding.imported)) emit(file, node, "RETIRED_WORKSPACE_TABLE", "Retired dispute and illustrative balance/settlement records are not part of the service runtime.");
+    }
+    for (const dependency of file.imports) {
+      const importedModule = sourceModule(file, dependency.specifier);
+      if (name !== fixtureOwner && importedModule === fixtureOwner.slice(0, -3)) emit(file, dependency.node, "FIXTURE_RUNTIME_IMPORT", "Application source must not import the explicit local fixture seeder.");
+      if (importedModule === "src/modules/acquiring/fixtures" && name !== "src/modules/acquiring/fixtures.ts") emit(file, dependency.node, "FIXTURE_RUNTIME_IMPORT", "Merchant fixture approval is confined to explicit fixture preparation.");
+      if (ts.isExportDeclaration(dependency.node) && importedModule === workspaceOwner.slice(0, -3)) emit(file, dependency.node, "WORKSPACE_COMMAND_REEXPORT", "Keep workspace service commands directly inspectable; do not add a parallel re-export entry point.");
+      if (ts.isExportDeclaration(dependency.node) && importedModule === "src/platform/database/schema") emit(file, dependency.node, "WORKSPACE_TABLE_REEXPORT", "Import the canonical database schema directly so protected table writers remain inspectable.");
+      if (ts.isExportDeclaration(dependency.node) && ["src/modules/ledger/schema", "src/modules/acquiring/operations-schema"].includes(importedModule)) emit(file, dependency.node, "FINANCIAL_TABLE_REEXPORT", "Financial tables must be imported directly from their inspected schema owner.");
+      if (ts.isExportDeclaration(dependency.node) && importedModule === operationsOwner.slice(0, -3)) emit(file, dependency.node, "OPERATION_COMMAND_REEXPORT", "Operation commands remain directly inspectable in their single owner.");
+      if (ts.isExportDeclaration(dependency.node) && importedModule === ledgerOwner.slice(0, -3) && name !== "src/modules/ledger/index.ts") emit(file, dependency.node, "LEDGER_COMMAND_REEXPORT", "Only the ledger's own entry point may re-export its posting API.");
+    }
+    const apiPrefix = "src/app/api/v1/cardholder-services/[serviceId]/";
+    if (name.startsWith(apiPrefix) && /^(?:cards|card-requests)\//.test(name.slice(apiPrefix.length))) {
+      const route = name.slice(apiPrefix.length);
+      const allowedMethod = cardRoutes.get(route)?.[0] ?? null;
+      for (const statement of file.tree.statements) {
+        if (!statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) continue;
+        const names = ts.isFunctionDeclaration(statement) && statement.name ? [statement.name.text] : ts.isVariableStatement(statement) ? statement.declarationList.declarations.filter(node => ts.isIdentifier(node.name)).map(node => node.name.text) : [];
+        for (const method of names) if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && method !== allowedMethod) emit(file, statement, "PARALLEL_CARD_MUTATION_ROUTE", "Card writes use only the canonical saved request, card control and practice purchase routes.");
+      }
+    }
+    for (const declaration of visitNodes(file.tree, node => ts.isFunctionDeclaration(node) && Boolean(node.name))) {
+      const symbol = declaration.name.text;
+      if (canonicalCommands.includes(symbol) && name !== workspaceOwner && declaration.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) emit(file, declaration, "DUPLICATE_WORKSPACE_COMMAND", "The implemented workspace command has one owning service.");
+      if ([...operationRoutes.values()].some(([, command]) => command === symbol) && name !== operationsOwner && declaration.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) emit(file, declaration, "DUPLICATE_OPERATION_COMMAND", "Merchant operations have one canonical service.");
+      if (symbol === "postJournal" && name !== ledgerOwner) emit(file, declaration, "DUPLICATE_LEDGER_COMMAND", "There is exactly one ledger posting owner.");
+      const serviceCommandOwner={createCardholderService:"src/modules/services/service.ts",createPrimaryMerchant:"src/modules/services/create-merchant.ts",createOwnedSubmerchant:channelOwner,pauseMerchant:channelOwner,resumeMerchant:channelOwner,respondToCase:"src/modules/operations/service.ts"}[symbol];
+      if(serviceCommandOwner&&name!==serviceCommandOwner&&declaration.modifiers?.some(modifier=>modifier.kind===ts.SyntaxKind.ExportKeyword))emit(file,declaration,"DUPLICATE_SERVICE_COMMAND","Service enrollment, merchant hierarchy and assigned support responses each have one owning command.");
+      if (["MerchantOperations", "MerchantCheckout"].includes(symbol) && name !== operationUiOwner) emit(file, declaration, "DUPLICATE_OPERATION_UI", "Merchant setup/payment commands and checkout have their canonical operation UI owner.");
+      if (symbol === "MerchantChannels" && name !== channelUiOwner) emit(file, declaration, "DUPLICATE_CHANNEL_FORM", "Payment channels have one canonical form for all seven presentations.");
+      if (["createChannel", "updateChannel", "cancelChannel", "channelCommand"].includes(symbol) && name !== channelOwner) emit(file, declaration, "DUPLICATE_CHANNEL_COMMAND", "Channel mutations belong to the canonical acquiring command.");
+      if (["CardsWorkspace", "CardRequestForm", "CardPurchaseForm"].includes(symbol) && name !== cardUiOwner) emit(file, declaration, "DUPLICATE_CARD_FORM", "Saved card requests and practice purchases belong only to the canonical Cards workspace.");
+    }
+    for (const jsx of visitNodes(file.tree, node => ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node))) {
+      if (jsx.tagName.getText(file.tree) === "CardRequestForm" && (name !== cardUiOwner || functionChain(jsx).join("/") !== "CardsWorkspace")) emit(file, jsx, "PARALLEL_CARD_FORM", "Only CardsWorkspace may render the saved card-request form.");
+    }
+    for (const call of file.calls) {
+      const chain = functionChain(call);
+      const callee = namedCallee(call);
+      const bound = boundName(file, call.expression, bindings);
+      if (name === operationUiOwner && chain[0] === "MerchantOperations") {
+        if (callee === "send") {
+          const argument = call.arguments[0];
+          if (argument && ts.isObjectLiteralExpression(argument)) {
+            const paths = stringValues(file, propertyValue(argument, "path"));
+            const methods = stringValues(file, propertyValue(argument, "method"));
+            const hasTarget = propertyValue(argument, "target") !== null;
+            const expected = paths.length === 1 ? operationUiPaths.get(paths[0]) : null;
+            if (chain.join("/") !== "MerchantOperations/confirm" || !expected || hasTarget || methods.length !== 1 || methods[0] !== expected[0]) emit(file, call, "OPERATION_UI_ROUTE", "A reviewed operation attempt must select one finite owning route, target and HTTP method.");
+            else operationUiStages.set(paths[0], (operationUiStages.get(paths[0]) ?? 0) + 1);
+          } else if (!identifierIs(argument, "attempt")) emit(file, call, "OPERATION_ATTEMPT_SOURCE", "Operation retries must reuse the unchanged saved attempt.");
+        }
+        if (callee === "setAttempt" && call.arguments[0]?.kind !== ts.SyntaxKind.NullKeyword && !(chain.join("/") === "MerchantOperations/send" && identifierIs(call.arguments[0], "command"))) emit(file, call, "OPERATION_ATTEMPT_SOURCE", "Only the reviewed command may populate an operation retry attempt.");
+      }
+      if (["insert", "update", "delete"].includes(callee)) {
+        const table = boundName(file, call.arguments[0], bindings);
+        const tableModule=table && sourceModule(file,table.specifier);
+        for (const [module, owner, definitions, code] of [["src/modules/ledger/schema", ledgerOwner, ledgerWriters, "LEDGER_WRITER_OWNERSHIP"], ["src/modules/acquiring/operations-schema", operationsOwner, operationWriters, "OPERATION_WRITER_OWNERSHIP"]]) {
+          if (tableModule !== module) continue;
+          counts.guardedWriters++;
+          const allowed = name === owner && definitions[table.imported]?.[callee]?.includes(chain[0]);
+          if (!allowed) emit(file, call, code, `${table.imported}.${callee} belongs only to its finite canonical posting/operation function.`);
+          else {
+            const key = `${table.imported}.${callee}:${chain[0]}`;
+            writerSites.set(key, [...(writerSites.get(key) ?? []), { file, call }]);
+          }
+        }
+        if(tableModule === "src/modules/acquiring/schema" && !(name === "src/modules/acquiring/service.ts" || (name === "src/modules/acquiring/fixtures.ts" && callee === "insert"))) emit(file,call,"ACQUIRING_WRITER_OWNERSHIP","Merchant setup and payment channels have one owning service; fixture preparation may only insert fictional references.");
+        if (tableModule === "src/modules/acquiring/schema" && ["paymentChannels", "paymentChannelCommands"].includes(table.imported) && (name !== channelOwner || chain[0] !== "channelCommand")) emit(file,call,"CHANNEL_WRITER_OWNERSHIP","All channel writes and retry receipts belong to channelCommand.");
+        if(tableModule === "src/platform/database/schema" && ["services","cardholderCreationCommands"].includes(table.imported)) {
+          const primaryOwner=name === "src/modules/services/service.ts" && chain[0] === "createCardholderService";
+          const merchantOwner=table.imported === "services" && name === "src/modules/services/create-merchant.ts" && chain[0] === "createPrimaryMerchant";
+          if(callee !== "insert" || !(primaryOwner || merchantOwner)) emit(file,call,"SERVICE_RESPONSIBILITY_OWNER","Services and primary responsibility are created only by their canonical enrollment command; no arbitrary reassignment writer.");
+        }
+        if(tableModule === "src/platform/database/schema" && table.imported === "serviceMembers") {
+          const creation=callee === "insert" && ((name === "src/modules/services/service.ts" && chain[0] === "createCardholderService") || (name === "src/modules/services/create-merchant.ts" && chain[0] === "createPrimaryMerchant"));
+          const access=name === "src/modules/access/service.ts" && ((callee === "insert" && chain[0] === "decideInvitation") || (callee === "update" && ["decideInvitation","updateMemberAccess","revokeMemberAccess"].includes(chain[0])));
+          if(!creation&&!access)emit(file,call,"SERVICE_MEMBERSHIP_OWNER","Membership comes from canonical primary enrollment or accepted service access lifecycle; merchant helpers use their assignments.");
+        }
+        if(tableModule === "src/modules/cases/schema") {
+          const customer=name === "src/modules/cases/service.ts" && ({supportCases:{insert:["createSupportCase"],update:["addSupportMessage","withdrawSupportCase"]},supportCaseMessages:{insert:["createSupportCase","addSupportMessage","withdrawSupportCase"]},supportCaseCommands:{insert:["execute"]}})[table.imported]?.[callee]?.includes(chain[0]);
+          const operator=name === "src/modules/operations/service.ts" && chain[0] === "respondToCase" && ((table.imported === "supportCases" && callee === "update") || (table.imported === "supportCaseMessages" && callee === "insert"));
+          if(!customer&&!operator)emit(file,call,"SUPPORT_WRITER_OWNERSHIP","Customer cases and explicit operator responses have finite owning commands; no separate financial authority is granted.");
+        }
+        if(tableModule === "src/modules/operations/schema" && !(name === "src/modules/operations/service.ts" && chain[0] === "respondToCase" && table.imported === "operatorCommands" && callee === "insert"))emit(file,call,"OPERATOR_WRITER_OWNERSHIP","Operator grants are explicit preparation only; the response owner may insert its immutable command receipt.");
+        if(tableModule === "src/modules/services/schema" && table.imported === "merchantServiceCommands" && !(name === "src/modules/services/create-merchant.ts" && callee === "insert" && chain[0] === "createPrimaryMerchant")) emit(file,call,"MERCHANT_CREATION_OWNERSHIP","Merchant service creation receipts belong to the one canonical creation command.");
+        if(tableModule === "src/modules/services/schema" && table.imported === "merchantSetupEligibility" && !(name === "src/modules/acquiring/fixtures.ts" && callee === "insert")) emit(file,call,"MERCHANT_PERSONA_OWNERSHIP","Fictional applicant eligibility is seeded explicitly and cannot be edited by an application command.");
+        if (table && sourceModule(file, table.specifier) === "src/platform/database/schema" && Object.hasOwn(writerOwners, table.imported)) {
+          counts.guardedWriters++;
+          const allowedFixture = name === fixtureOwner && callee === "insert" && chain[0] === "seedWorkspaceService";
+          const allowedCommand = name === workspaceOwner && writerOwners[table.imported][callee]?.includes(chain[0]);
+          if (!allowedFixture && !allowedCommand) emit(file, call, "WORKSPACE_WRITER_OWNERSHIP", `${table.imported}.${callee} is outside its permitted fixture or canonical command owner.`);
+          if (allowedCommand) {
+            const key = `${table.imported}.${callee}:${chain[0]}`;
+            writerSites.set(key, [...(writerSites.get(key) ?? []), { file, call }]);
+          }
+        }
+      }
+      // Inspect executable SQL argument nodes, not comments, display strings or entire-file text.
+      if (["execute", "query", "unsafe"].includes(callee)) {
+        const argument = call.arguments[0];
+        const expression = argument && ts.isTaggedTemplateExpression(argument) ? argument.template : argument;
+        const sqlTexts = stringValues(file, expression);
+        if (sqlTexts.some(value => /\b(?:from|join|into|update|table)\s+(?:"?\w+"?\.)?["']?(?:disputes|dispute_timeline|settlements|workspace_balance_snapshots)\b/i.test(value))) emit(file, call, "RETIRED_WORKSPACE_TABLE", "Retired illustrative and dispute tables cannot be read or recreated by runtime SQL.");
+        if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:services|service_members|cardholder_creation_commands|workspace_balance_snapshots|service_activity|settlements|cards|card_requests|disputes|dispute_timeline|notification_preferences|workspace_command_receipts)\b/i.test(value))) emit(file, call, "RAW_WORKSPACE_WRITE", "Workspace record writes must use the inspected typed canonical writers; raw SQL writes bypass ownership checks.");
+        if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:ledger_journals|ledger_entries|merchant_test_gateways|merchant_test_enrollments|merchant_channel_activations|merchant_test_payments|merchant_test_refunds|merchant_test_payouts|merchant_operation_commands)\b/i.test(value))) emit(file, call, "RAW_FINANCIAL_WRITE", "Ledger and operation writes must use their finite typed owners; migration SQL is reviewed separately.");
+        if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:support_cases|support_case_messages|support_case_commands|operator_service_access|operator_command_receipts)\b/i.test(value))) emit(file, call, "RAW_SUPPORT_WRITE", "Support writes use their typed customer or assigned-operator command; raw SQL cannot grant support authority.");
+      }
+      if(bound?.imported === "createCardholderService" && sourceModule(file,bound.specifier)==="src/modules/services/service" && (name !== "src/app/api/v1/cardholder-services/route.ts" || chain[0] !== "POST")) emit(file,call,"PARALLEL_CARDHOLDER_CREATION_ROUTE","Cardholder enrollment uses its one explicit service entry route.");
+      const merchantUnitRoutes={createOwnedSubmerchant:["submerchants","POST"],pauseMerchant:["pause","POST"],resumeMerchant:["resume","POST"]};
+      if(bound && sourceModule(file,bound.specifier)===channelOwner.slice(0,-3) && Object.hasOwn(merchantUnitRoutes,bound.imported) && name.startsWith("src/app/api/")) {
+        const [suffix,method]=merchantUnitRoutes[bound.imported];
+        if(name!==`src/app/api/v1/merchants/[merchantId]/${suffix}/route.ts`||chain[0]!==method)emit(file,call,"PARALLEL_MERCHANT_UNIT_ROUTE","Submerchant creation and pause/resume use exact unit commands and routes.");
+      }
+      if(bound && sourceModule(file,bound.specifier)==="src/modules/operations/service" && ["getOperatorQueue","getOperatorCase","respondToCase"].includes(bound.imported) && name.startsWith("src/app/api/")) {
+        const expected={getOperatorQueue:["src/app/api/v1/operations/cases/route.ts","GET"],getOperatorCase:["src/app/api/v1/operations/cases/[caseId]/route.ts","GET"],respondToCase:["src/app/api/v1/operations/cases/[caseId]/responses/route.ts","POST"]}[bound.imported];
+        if(name!==expected[0]||chain[0]!==expected[1])emit(file,call,"PARALLEL_OPERATOR_ROUTE","Assigned support reads and responses use their exact canonical routes.");
+      }
+      const importedCardCommand = bound && sourceModule(file, bound.specifier) === workspaceOwner.slice(0, -3) && [...cardRoutes.values()].some(([, command]) => command === bound.imported);
+      if(bound?.imported === "createPrimaryMerchant" && sourceModule(file,bound.specifier)==="src/modules/services/create-merchant" && (name !== "src/app/api/v1/merchants/route.ts" || chain[0] !== "POST")) emit(file,call,"PARALLEL_MERCHANT_CREATION_ROUTE","Merchant creation must use its single service entry route.");
+      if (importedCardCommand) {
+        const expected = [...cardRoutes].find(([, [, command]]) => command === bound.imported);
+        const expectedPath = `src/app/api/v1/cardholder-services/[serviceId]/${expected[0]}`;
+        if (name !== expectedPath || chain[0] !== expected[1][0]) emit(file, call, "PARALLEL_CARD_COMMAND_ROUTE", "Saved card-request commands may be invoked only by their one canonical HTTP route.");
+        else { counts.requestRouteCalls++; routeStages.set(bound.imported, (routeStages.get(bound.imported) ?? 0) + 1); }
+      }
+      const importedOperation = bound && sourceModule(file, bound.specifier) === operationsOwner.slice(0, -3) && [...operationRoutes.values()].some(([, command]) => command === bound.imported);
+      if (importedOperation && name.startsWith("src/app/api/")) {
+        const expected = [...operationRoutes].find(([, [, command]]) => command === bound.imported);
+        if (name !== expected[0] || chain[0] !== expected[1][0]) emit(file, call, "PARALLEL_OPERATION_ROUTE", "Each Merchant operation has one exact route and HTTP method.");
+        else { counts.operationRouteCalls++; operationStages.set(bound.imported, (operationStages.get(bound.imported) ?? 0) + 1); }
+      }
+      if (bound?.imported === "postJournal" && ["src/modules/ledger", "src/modules/ledger/index", "src/modules/ledger/service"].includes(sourceModule(file, bound.specifier))) {
+        const allowed = (name === workspaceOwner && ["submitCardRequest", "purchaseCard"].includes(chain[0])) || (name === operationsOwner && ["simulateMerchantPayment", "refundMerchantPayment", "createMerchantPayout"].includes(chain[0]));
+        if (!allowed) emit(file, call, "LEDGER_POSTING_BOUNDARY", "Only the reviewed card and Merchant economic commands post journals.");
+      }
+      if (bound && sourceModule(file, bound.specifier) === "src/modules/issuing/sandbox-adapter" && !(name === workspaceOwner && chain[0] === "submitCardRequest" && bound.imported === "issueSandboxCard")) emit(file, call, "ISSUING_ADAPTER_BOUNDARY", "Only canonical request submission invokes the sandbox issuer.");
+      if (bound && sourceModule(file, bound.specifier) === "src/modules/acquiring/adapters/sandbox") {
+        const owner = { testPayment: "simulateMerchantPayment", testRefund: "refundMerchantPayment", testPayout: "createMerchantPayout" }[bound.imported];
+        if (name !== operationsOwner || !owner || chain[0] !== owner) emit(file, call, "ACQUIRING_ADAPTER_BOUNDARY", "Only its canonical operation invokes each sandbox acquiring adapter.");
+      }
+      if (!isUi) continue;
+      const workspaceCall = bound?.imported === "workspaceCommand" && sourceModule(file, bound.specifier) === workspaceTransport.slice(0, -4);
+      const merchantCall = bound?.imported === "merchantCommand" && sourceModule(file, bound.specifier) === workspaceTransport.slice(0, -4);
+      const ownerWrapper = name === cardUiOwner && callee === "command";
+      const localCommandCall = callee === "command";
+      const fetchCall = callee === "fetch";
+      const accessCall = bound?.imported === "accessFetch" && sourceModule(file,bound.specifier)==="src/ui/workspace/access-client";
+      if (!workspaceCall && !merchantCall && !localCommandCall && !fetchCall && !accessCall) continue;
+      const target = call.arguments[workspaceCall || merchantCall ? 1 : 0];
+      const paths = stringValues(file, target);
+      const allowedGeneric = (name === workspaceTransport && ["workspaceCommand", "merchantCommand"].includes(chain.join("/")) && fetchCall)
+        || (name === cardUiOwner && chain.join("/") === "CardsWorkspace/command" && workspaceCall)
+        || (name === "src/ui/workspace/merchant-entry.tsx" && chain.join("/") === "MerchantBusinessDetails/command" && merchantCall)
+        || (name === "src/ui/workspace/merchant-channels.tsx" && chain.join("/") === "MerchantChannels/send" && merchantCall)
+        || (name === "src/ui/workspace/merchant-people.tsx" && chain.join("/") === "MerchantPeople/send" && merchantCall)
+        || (name === operationUiOwner && chain.join("/") === "MerchantOperations/send" && merchantCall)
+        || (name === "src/ui/workspace/access-client.ts" && chain.join("/") === "accessFetch" && fetchCall)
+        || (name === "src/ui/login-form.tsx" && chain.join("/") === "LoginForm/submit" && fetchCall);
+      if (allowedGeneric) {
+        if (name === workspaceTransport) {
+          const merchantTransport = chain.join("/") === "merchantCommand";
+          const spans = target && ts.isTemplateExpression(target) ? target.templateSpans : [];
+          const service = spans[0]?.expression;
+          const validService = service && ts.isCallExpression(service) && identifierIs(service.expression, "encodeURIComponent") && identifierIs(service.arguments[0], merchantTransport ? "merchantId" : "serviceId");
+          const validPath = spans[1] && ts.isIdentifier(spans[1].expression) && spans[1].expression.text === "path";
+          const options = call.arguments[1];
+          const method = options && ts.isObjectLiteralExpression(options) ? options.properties.find(property => property.name?.getText(file.tree) === "method") : null;
+          const forwardsMethod = method && ((ts.isShorthandPropertyAssignment(method) && method.name.text === "method") || (ts.isPropertyAssignment(method) && ts.isIdentifier(method.initializer) && method.initializer.text === "method"));
+          if (!target || !ts.isTemplateExpression(target) || target.head.text !== (merchantTransport ? "/api/v1/merchants/" : "/api/v1/cardholder-services/") || spans.length !== 2 || spans.some(span => span.literal.text !== "") || !validService || !validPath || !forwardsMethod) emit(file, call, "WORKSPACE_TRANSPORT_REWRITE", "The shared transport must forward the encoded selected service or merchant, requested path and method unchanged.");
+        } else if (name === cardUiOwner && (!identifierIs(call.arguments[1], "path") || !identifierIs(call.arguments[2], "method"))) emit(file, call, "CARD_COMMAND_FORWARDING", "The canonical card UI wrapper must forward the requested path and method to the shared transport.");
+        else if (name === operationUiOwner) {
+          const forward = (argument, field) => argument && ts.isPropertyAccessExpression(argument) && identifierIs(argument.expression, "command") && argument.name.text === field;
+          const resource = call.arguments[0];
+          const correctResource = merchantCall && resource && ts.isPropertyAccessExpression(resource) && identifierIs(resource.expression, "merchant") && resource.name.text === "id";
+          if (!correctResource || !forward(call.arguments[1], "path") || !forward(call.arguments[2], "method") || !forward(call.arguments[3], "body")) emit(file, call, "OPERATION_COMMAND_FORWARDING", "Forward the exact reviewed attempt to its merchant transport without rewriting merchant identity, path, method or body.");
+        }
+        else if (name === "src/ui/workspace/merchant-entry.tsx" && (!identifierIs(call.arguments[1],"path") || !identifierIs(call.arguments[2],"method"))) emit(file,call,"MERCHANT_COMMAND_FORWARDING","The merchant setup wrapper must forward its statically inspected caller paths and methods to the shared transport.");
+        else if (merchantCall && ["src/ui/workspace/merchant-channels.tsx", "src/ui/workspace/merchant-people.tsx"].includes(name)) {
+          const forwarded = (argument, field) => argument && ts.isPropertyAccessExpression(argument) && identifierIs(argument.expression, "command") && argument.name.text === field;
+          const methodValid = name.endsWith("merchant-people.tsx") ? stringValues(file, call.arguments[2]).every(value => value === "POST") : forwarded(call.arguments[2], "method");
+          if (!forwarded(call.arguments[1], "path") || !methodValid || !forwarded(call.arguments[3], "body")) emit(file, call, "MERCHANT_COMMAND_FORWARDING", "The canonical merchant form must forward the reviewed saved attempt unchanged.");
+        }
+        else if(name === "src/ui/workspace/access-client.ts" && !identifierIs(call.arguments[0],"path"))emit(file,call,"ACCESS_TRANSPORT_REWRITE","The reviewed access transport must forward the validated finite access path.");
+        continue;
+      }
+      const options = fetchCall ? call.arguments[1] : null;
+      const explicitMethod = options && ts.isObjectLiteralExpression(options) ? options.properties.find(property => property.name?.getText(file.tree) === "method") : null;
+      const readOnly = fetchCall && (!options || (ts.isObjectLiteralExpression(options) && (!explicitMethod || (ts.isPropertyAssignment(explicitMethod) && stringValues(file,explicitMethod.initializer).every(value=>value==="GET")))));
+      const reviewedQuery = readOnly && ["src/ui/workspace/reports.tsx", "src/ui/workspace/cases.tsx"].includes(name) && paths.every(value=>/^\/api\/v1\/cardholder-services\/:id\/(?:reports(?:\/export)?|cases)\?/.test(value));
+      if (paths.some(value => value.includes("?")) && !reviewedQuery) emit(file, call, "UNINSPECTABLE_UI_COMMAND_PATH", "The UI command path must resolve to a reviewed route; add an explicit inspected adapter for dynamic routing.");
+      for (const targetPath of paths) {
+        if (/\/cards\/[^/]+\/purchase$/.test(targetPath)) {
+          const methods = stringValues(file, call.arguments[ownerWrapper ? 1 : 2]);
+          if (!ownerWrapper || targetPath !== "/cards/:id/purchase" || chain.join("/") !== "CardPurchaseForm/purchase" || methods.length !== 1 || methods[0] !== "POST") emit(file, call, "PARALLEL_CARD_PURCHASE_UI", "Practice purchases use the one card purchase form and exact command route.");
+          else counts.purchaseUiCalls++;
+        }
+        if (/(?:^|\/)(?:gateway|test-gateway|test-enrollment|payouts)$|\/channels\/[^/]+\/(?:activation|test-payments)$|\/payments\/[^/]+\/refund$/.test(targetPath)) {
+          const methods = stringValues(file, call.arguments[2]);
+          if (name !== operationUiOwner || chain.join("/") !== "MerchantCheckout/pay" || !merchantCall || targetPath !== "/channels/:id/test-payments" || methods.length !== 1 || methods[0] !== "POST") emit(file, call, "PARALLEL_OPERATION_UI", "Merchant command routes belong to the reviewed operation attempt form or exact signed-in checkout.");
+          else operationUiStages.set("checkout", (operationUiStages.get("checkout") ?? 0) + 1);
+        }
+        if (!/(?:^|\/)card-requests(?:\/|$)/.test(targetPath)) continue;
+        counts.requestUiCalls++;
+        const stage = targetPath === "/card-requests" ? "start" : targetPath === "/card-requests/:id" ? "update" : targetPath === "/card-requests/:id/submit" ? "submit" : targetPath === "/card-requests/:id/cancel" ? "cancel" : null;
+        const expectedChain = stage === "start" ? "CardsWorkspace/startRequest" : stage === "update" ? "CardRequestForm/save" : "CardRequestForm/finish";
+        const method = stringValues(file, call.arguments[ownerWrapper ? 1 : 2]);
+        const expectedMethod = stage === "update" ? "PATCH" : "POST";
+        if (!stage || !ownerWrapper || chain.join("/") !== expectedChain || method.length !== 1 || method[0] !== expectedMethod) emit(file, call, "PARALLEL_CARD_REQUEST_UI", "Start, update, submit and cancel must use the one saved CardsWorkspace request component and canonical command routes.");
+        else uiStages.set(stage, (uiStages.get(stage) ?? 0) + 1);
+      }
+    }
+  }
+  for (const [key, sites] of writerSites) if (sites.length > 1 && !(key === "cardRequests.update:submitCardRequest" && isBlockedOrIssuedBranch(sites))) emit(sites[1].file, sites[1].call, "DUPLICATE_CANONICAL_WRITER", `${key} has ${sites.length} write sites; only the explicit early-return BLOCKED/ISSUED request branches may have alternative sites.`);
+  if (requirePresence) {
+    const ui = [...files.values()].find(file => relative(file.filename) === cardUiOwner);
+    const owner = [...files.values()].find(file => relative(file.filename) === workspaceOwner);
+    if (!ui || !owner) throw new Error("The current workspace ownership guards require the canonical UI and service files.");
+    const channelUi = [...files.values()].find(file => relative(file.filename) === channelUiOwner);
+    const channelService = [...files.values()].find(file => relative(file.filename) === channelOwner);
+    if (!channelUi || channelUi.declarations.filter(symbol => symbol === "MerchantChannels").length !== 1) emit(ui, null, "CHANNEL_FORM_OWNER_MISSING", "Expected one canonical MerchantChannels form.");
+    for (const command of ["createChannel", "updateChannel", "cancelChannel", "channelCommand"]) if (!channelService || channelService.declarations.filter(symbol => symbol === command).length !== 1) emit(owner,null,"CHANNEL_COMMAND_CARDINALITY", `Expected exactly one ${command} owner.`);
+    for (const name of ["CardsWorkspace", "CardRequestForm", "CardPurchaseForm"]) if (ui.declarations.filter(symbol => symbol === name).length !== 1) emit(ui, null, "CARD_FORM_OWNER_MISSING", `Expected exactly one ${name} declaration in the canonical card UI.`);
+    if (counts.purchaseUiCalls !== 1) emit(ui, null, "CARD_PURCHASE_UI_CARDINALITY", `Expected one canonical purchase UI command; found ${counts.purchaseUiCalls}.`);
+    for (const route of [...operationUiPaths.keys(), "checkout"]) if (operationUiStages.get(route) !== 1) emit(ui, null, "OPERATION_UI_CARDINALITY", `Expected one reviewed operation UI route ${route}; found ${operationUiStages.get(route) ?? 0}.`);
+    for (const stage of ["start", "update", "submit", "cancel"]) if (uiStages.get(stage) !== 1) emit(ui, null, "CARD_UI_STAGE_CARDINALITY", `Expected one canonical UI ${stage} command call; found ${uiStages.get(stage) ?? 0}.`);
+    for (const [, command] of cardRoutes.values()) if (routeStages.get(command) !== 1) emit(owner, null, "CARD_ROUTE_CARDINALITY", `Expected one canonical HTTP invocation of ${command}; found ${routeStages.get(command) ?? 0}.`);
+    for (const [, command] of operationRoutes.values()) if (operationStages.get(command) !== 1) emit(owner, null, "OPERATION_ROUTE_CARDINALITY", `Expected one canonical HTTP invocation of ${command}; found ${operationStages.get(command) ?? 0}.`);
+    for (const command of canonicalCommands) if (owner.declarations.filter(symbol => symbol === command).length !== 1) emit(owner, null, "WORKSPACE_COMMAND_CARDINALITY", `Expected exactly one ${command} owner.`);
+    for (const [table, operations] of Object.entries(writerOwners)) for (const [operation, owners] of Object.entries(operations)) for (const command of owners) {
+      const key = `${table}.${operation}:${command}`;
+      if (!writerSites.has(key)) emit(owner, null, "WORKSPACE_WRITER_MISSING", `The currently implemented ${key} writer is absent from the inspected owning command.`);
+    }
+    for (const definitions of [ledgerWriters, operationWriters]) for (const [table, operations] of Object.entries(definitions)) for (const [operation, commands] of Object.entries(operations)) for (const command of commands) {
+      const key = `${table}.${operation}:${command}`;
+      if (!writerSites.has(key)) emit(owner, null, "FINANCIAL_WRITER_MISSING", `The implemented ${key} writer is absent from its canonical owner.`);
+    }
+  }
+  return counts;
+}
+
+function selfTest() {
+  const code = inspectSource("component.tsx", '"use client"; import type { DTO } from "@/modules/services/types"; export { gateway } from "./bridge"; import("@/platform/database");');
+  assert.equal(code.client, true);
+  assert.deepEqual(code.imports.map((entry) => entry.specifier), ["./bridge", "@/platform/database"]);
+  assert.equal(isForbiddenClientDependency("pg"), true);
+  assert.equal(isForbiddenClientDependency("./bridge", "/project/src/platform/database.ts"), true);
+  assert.equal(isForbiddenClientDependency("react"), false);
+  assert.equal(inspectSource("a.ts", '// import "pg";\nconst text = "import pg";').imports.length, 0);
+  assert.equal(inspectSource("a.ts", "import(providerPath)").imports[0].specifier, null);
+  const probe = (filename, source) => {
+    const file = inspectSource(path.join(root, filename), source);
+    const findings = [];
+    inspectWorkspaceOwnership(new Map([[file.filename, file]]), (_file, _node, code) => findings.push(code), false);
+    return findings;
+  };
+  const canonicalUi = `"use client";
+    function CardsWorkspace() { async function startRequest() { await command("/card-requests", "POST"); } return <CardRequestForm/>; }
+    function CardRequestForm() { const path = \`/card-requests/\${encodeURIComponent(request.id)}\`;
+      async function save() { await command(path, "PATCH"); }
+      async function finish(action: "submit" | "cancel") { await command(\`\${path}/\${action}\`, "POST"); }
+    }`;
+  assert.deepEqual(probe(cardUiOwner, canonicalUi), []);
+  assert.ok(probe("src/ui/second-card-flow.tsx", canonicalUi).includes("PARALLEL_CARD_REQUEST_UI"), "A copied, mutated second Add card workflow must be rejected.");
+  assert.ok(probe(cardUiOwner, canonicalUi + '\nfunction SecondForm() { return <CardRequestForm/>; }').includes("PARALLEL_CARD_FORM"));
+  assert.ok(probe(cardUiOwner, canonicalUi + '\nfunction bypass() { fetch("/api/v1/cardholder-services/x/card-requests", {method:"POST"}); }').includes("PARALLEL_CARD_REQUEST_UI"));
+  assert.ok(probe("src/ui/second.tsx", '"use client"; function x(url:string) { fetch(url,{method:"POST"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
+  assert.deepEqual(probe("src/ui/workspace/reports.tsx", '"use client"; function report(id,query) { fetch(`/api/v1/cardholder-services/${encodeURIComponent(id)}/reports?${query}`,{cache:"no-store"}); }'), []);
+  assert.ok(probe("src/ui/workspace/reports.tsx", '"use client"; function report(id,query) { fetch(`/api/v1/cardholder-services/${encodeURIComponent(id)}/reports?${query}`,{method:"POST"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
+  assert.ok(probe("src/ui/workspace/reports.tsx", '"use client"; function report(id,path) { fetch(`/api/v1/cardholder-services/${encodeURIComponent(id)}/${path}`,{method:"GET"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
+  assert.deepEqual(probe("src/ui/workspace/merchant-entry.tsx", '"use client"; function reload(id){fetch(`/api/v1/merchants/${encodeURIComponent(id)}/business-details`,{cache:"no-store"});}'),[]);
+  assert.ok(probe("src/ui/workspace/merchant-entry.tsx", '"use client"; function reload(id,query){fetch(`/api/v1/cardholder-services/${encodeURIComponent(id)}/acquiring?${query}`,{method:"POST"});}').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
+  assert.ok(probe("src/ui/workspace/merchant-entry.tsx", '"use client"; import {merchantCommand} from "./primitives"; function MerchantBusinessDetails(){function command(path,method){return merchantCommand(id,"/bypass",method,{});}}').includes("MERCHANT_COMMAND_FORWARDING"));
+  assert.ok(probe(workspaceTransport, '"use client"; function workspaceCommand(serviceId,path,method) { return fetch(`/api/v1/cardholder-services/${encodeURIComponent(serviceId)}/legacy-create`,{method}); }').includes("WORKSPACE_TRANSPORT_REWRITE"));
+  assert.ok(probe(cardUiOwner, '"use client"; import {workspaceCommand} from "./primitives"; function CardsWorkspace() { function command(path,method) { return workspaceCommand(id,"/legacy-create",method,{}); } }').includes("CARD_COMMAND_FORWARDING"));
+  assert.deepEqual(probe("src/ui/comment.tsx", '"use client"; // tx.update(workspaceBalances);\nconst description="/card-requests";'), []);
+  const writerImport = 'import {cardRequests as drafts} from "@/platform/database/schema";';
+  assert.ok(probe("src/modules/other/service.ts", 'import {services} from "@/platform/database/schema"; function bypass(){tx.update(services).set({primaryPersonId:"other"});}').includes("SERVICE_RESPONSIBILITY_OWNER"));
+  const validWriter = writerImport + 'export async function startCardRequest() { await tx.insert(drafts).values({}); }';
+  assert.deepEqual(probe(workspaceOwner, validWriter), []);
+  assert.ok(probe(workspaceOwner, validWriter.replace('await tx.insert(drafts).values({});', 'await tx.insert(drafts).values({}); await tx.insert(drafts).values({});')).includes("DUPLICATE_CANONICAL_WRITER"), "A duplicate write inserted into the actual canonical owner shape must be rejected.");
+  assert.ok(probe("src/modules/other/service.ts", validWriter).includes("WORKSPACE_WRITER_OWNERSHIP"));
+  assert.ok(probe("src/app/api/alternate/route.ts", 'import {workspaceBalances as balances} from "@/platform/database/schema"; function POST() { const copy=balances; return tx.update(copy).set({amountMinor:42n}); }').includes("WORKSPACE_WRITER_OWNERSHIP"));
+  assert.ok(probe("src/modules/provider/adapters/mock.ts", 'import * as schema from "@/platform/database/schema"; function post() { tx.insert(schema.settlements).values({}); }').includes("WORKSPACE_WRITER_OWNERSHIP"));
+  assert.ok(probe("src/modules/provider/adapters/mock.ts", 'import * as schema from "../../../platform/database/schema"; function post() { const {settlements:rows}=schema; tx.insert(rows).values({}); }').includes("WORKSPACE_WRITER_OWNERSHIP"));
+  assert.ok(probe(workspaceOwner, 'async function sideDoor() { await tx.execute(sql`UPDATE "public"."workspace_balance_snapshots" SET "amountMinor"=5`); }').includes("RAW_WORKSPACE_WRITE"));
+  const route = 'import {startCardRequest as begin} from "@/modules/workspace/service"; export async function POST() { return begin(); }';
+  assert.deepEqual(probe("src/app/api/v1/cardholder-services/[serviceId]/card-requests/route.ts", route), []);
+  assert.ok(probe("src/app/api/v1/cardholder-services/[serviceId]/legacy-create/route.ts", route).includes("PARALLEL_CARD_COMMAND_ROUTE"));
+  assert.ok(probe("src/app/api/v1/cardholder-services/[serviceId]/cards/create/route.ts", 'export const POST=()=>new Response("created");').includes("PARALLEL_CARD_MUTATION_ROUTE"));
+  assert.ok(probe("src/app/api/seed/route.ts", 'import {seedWorkspaceService} from "@/modules/workspace/fixtures";').includes("FIXTURE_RUNTIME_IMPORT"));
+  assert.ok(probe("src/modules/other/service.ts", 'import {merchantProfiles} from "@/modules/acquiring/schema"; function bypass(){tx.insert(merchantProfiles).values({});}').includes("ACQUIRING_WRITER_OWNERSHIP"));
+  assert.deepEqual(probe("src/modules/acquiring/service.ts", 'import {merchantProfiles} from "./schema"; function setup(){tx.insert(merchantProfiles).values({});}'),[]);
+  assert.ok(probe("src/app/api/approve/route.ts", 'import {seedAcquiringFixtures} from "@/modules/acquiring/fixtures";').includes("FIXTURE_RUNTIME_IMPORT"));
+  assert.ok(probe("src/modules/services/create-merchant.ts", 'import {merchantSetupEligibility as eligibility} from "./schema"; function bypass(){tx.update(eligibility).set({personaKind:"FICTIONAL_ADULT"});}').includes("MERCHANT_PERSONA_OWNERSHIP"));
+  const merchantRoute='import {createPrimaryMerchant as begin} from "@/modules/services/create-merchant"; export async function POST(){return begin();}';
+  assert.deepEqual(probe("src/app/api/v1/merchants/route.ts",merchantRoute),[]);
+  assert.ok(probe("src/app/api/quick-sell/route.ts",merchantRoute).includes("PARALLEL_MERCHANT_CREATION_ROUTE"));
+  assert.deepEqual(probe(workspaceTransport, '"use client"; function merchantCommand(merchantId,path,method) { return fetch(`/api/v1/merchants/${encodeURIComponent(merchantId)}${path}`,{method}); }'),[]);
+  assert.ok(probe(workspaceTransport, '"use client"; function merchantCommand(merchantId,path,method) { return fetch(`/api/v1/merchants/${encodeURIComponent(otherMerchant)}${path}`,{method}); }').includes("WORKSPACE_TRANSPORT_REWRITE"));
+  assert.ok(probe("src/ui/workspace/merchant-channels.tsx", '"use client"; import {merchantCommand} from "./primitives"; function MerchantChannels(){function send(command){return merchantCommand(id,"/bypass",command.method,command.body);}}').includes("MERCHANT_COMMAND_FORWARDING"));
+  assert.ok(probe("src/ui/qr-channel.tsx", '"use client"; export function MerchantChannels(){return <form/>;}').includes("DUPLICATE_CHANNEL_FORM"));
+  assert.ok(probe(channelOwner, 'import {paymentChannels} from "./schema"; function anotherCommand(){tx.update(paymentChannels).set({});}').includes("CHANNEL_WRITER_OWNERSHIP"));
+  assert.deepEqual(probe(channelOwner, 'import {paymentChannels} from "./schema"; function channelCommand(){tx.update(paymentChannels).set({});}'),[]);
+  assert.ok(probe("src/ui/workspace/merchant-directory.tsx", '"use client"; function reload(source){const query=source ? `?serviceId=${encodeURIComponent(source.id)}` : "";fetch(`/api/v1/merchants${query}`,{cache:"no-store"});}').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
+  assert.ok(probe("src/ui/workspace/merchant-directory.tsx", '"use client"; function reload(query){fetch(`/api/v1/merchants?${query}`,{method:"POST"});}').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
+  console.log("Architecture detector self-tests passed (dependency boundaries, finite template routes, aliased imports, duplicate Add card flow/writer mutations, raw SQL, fixture and API ownership).");
+}
+
+/** Pure detector entry point for mutation probes; it never scans or changes the repository. */
+export function inspectArchitectureSource(filename, source) {
+  const file = inspectSource(path.join(root, filename), source);
+  const findings = [];
+  inspectWorkspaceOwnership(new Map([[file.filename, file]]), (_file, _node, code) => findings.push(code), false);
+  return findings;
+}
+
+const runningAsCommand = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (runningAsCommand) selfTest();
+if (runningAsCommand && !process.argv.includes("--self-test")) {
+  const filenames = await walk(path.join(root, "src"));
+  const files = new Map(await Promise.all(filenames.map(async (filename) => [filename, inspectSource(filename, await fs.readFile(filename, "utf8"))])));
+  function resolveImport(from, specifier) {
+    const stem = specifier.startsWith("@/") ? path.join(root, "src", specifier.slice(2)) : specifier.startsWith(".") ? path.resolve(path.dirname(from), specifier) : null;
+    if (!stem) return null;
+    const withoutExtension = stem.replace(/\.(?:js|mjs|cjs)$/, "");
+    return [stem, ...[".ts", ".tsx", ".js", ".jsx", ".mjs"].map((ext) => withoutExtension + ext), ...[".ts", ".tsx", ".js"].map((ext) => path.join(stem, "index" + ext))].find((candidate) => files.has(candidate)) ?? null;
+  }
+  const clientRoots = [...files.values()].filter((file) => file.client || relative(file.filename).startsWith("src/ui/"));
+  const visited = new Set();
+  function inspectClient(file) {
+    if (visited.has(file.filename)) return;
+    visited.add(file.filename);
+    for (const dependency of file.imports) {
+      if (!dependency.specifier) {
+        report(file, dependency.node, "CLIENT_DYNAMIC_IMPORT", "Client code cannot select an uninspectable module at runtime.");
+        continue;
+      }
+      const resolved = resolveImport(file.filename, dependency.specifier);
+      if (isForbiddenClientDependency(dependency.specifier, resolved)) {
+        report(file, dependency.node, "CLIENT_SERVER_DEPENDENCY", "Client code must consume API projections and commands; server modules and providers are forbidden.");
+      } else if (resolved) inspectClient(files.get(resolved));
+      else if (/^(?:@\/|\.)/.test(dependency.specifier) && !/\.(?:css|svg|png|jpg|woff2?)$/.test(dependency.specifier)) {
+        report(file, dependency.node, "UNRESOLVED_CLIENT_DEPENDENCY", "A local client dependency could not be inspected.");
+      }
+    }
+    for (const call of file.calls) {
+      if (/\b(?:postJournal|postLedger|issueCard|evaluatePolicy|authorizeService)\b/.test(call.expression.getText(file.tree))) {
+        report(file, call, "CLIENT_BUSINESS_COMMAND", "Client code must invoke the HTTP command, not an owning-module writer or policy evaluator.");
+      }
+    }
+  }
+  clientRoots.forEach(inspectClient);
+
+  const routes = [];
+  let providerImports = 0;
+  for (const file of files.values()) {
+    const name = relative(file.filename);
+    const adapter = /\/adapters\//.test(name);
+    for (const dependency of file.imports) {
+      if (dependency.specifier === "@netlify/identity" || dependency.specifier?.startsWith("@netlify/identity/")) {
+        providerImports++;
+        if (!adapter) report(file, dependency.node, "IDENTITY_PROVIDER_BOUNDARY", "Only an Identity adapter may import the provider SDK at runtime.");
+      }
+      if (/^(?:gotrue-js|netlify-identity-widget)(?:\/|$)/.test(dependency.specifier ?? "")) {
+        report(file, dependency.node, "LEGACY_IDENTITY_SDK", "Application source must use the reviewed @netlify/identity adapter.");
+      }
+    }
+    if (!adapter) {
+      for (const call of file.calls) {
+        if (/(?:^|\.)(?:fetch|fetcher|request|post|get)$/.test(call.expression.getText(file.tree)) && (call.arguments[0]?.getText(file.tree).includes("/.netlify/identity") || file.text.includes("/.netlify/identity"))) {
+          report(file, call, "IDENTITY_NETWORK_BOUNDARY", "Identity HTTP requests belong only in the provider adapter.");
+        }
+      }
+    }
+    if (/^src\/app\/api\/.*\/route\.[tj]s$/.test(name)) {
+      routes.push(file);
+      const contextImports = file.imports.filter(({ specifier }) => specifier && /(?:platform\/http|platform\/.*context)/.test(specifier));
+      const wrappers = contextImports.flatMap(({ node }) => ts.isImportDeclaration(node) && node.importClause?.namedBindings && ts.isNamedImports(node.importClause.namedBindings)
+        ? node.importClause.namedBindings.elements.filter((entry) => (entry.propertyName?.text ?? entry.name.text) === "apiRoute").map((entry) => entry.name.text) : []);
+      if (!file.calls.some((call) => ts.isIdentifier(call.expression) && wrappers.includes(call.expression.text))) {
+        report(file, null, "ROUTE_CONTEXT_REQUIRED", "API routes must invoke the imported shared apiRoute wrapper.");
+      }
+      for (const dependency of file.imports) {
+        if (/(?:@netlify\/|^pg$|drizzle-orm|\/adapters\/|platform\/(?:database|db)(?:\/|$))/.test(dependency.specifier ?? "")) {
+          report(file, dependency.node, "ROUTE_IO_BOUNDARY", "Route handlers must invoke shared services rather than database/provider IO.");
+        }
+      }
+    }
+  }
+  const policy = files.get(path.join(root, "src/modules/policy/evaluate.ts"));
+  if (!policy?.declarations.includes("evaluate")) errors.push("src/modules/policy/evaluate.ts:1 POLICY_SCOPE_MISSING: The canonical M0 evaluator is absent.");
+  const servicePolicyConsumers = [...files.values()].filter((file) => relative(file.filename).startsWith("src/modules/services/") && file.imports.some(({ specifier }) => specifier && resolveImport(file.filename, specifier) === policy?.filename) && file.calls.some((call) => ts.isIdentifier(call.expression) && call.expression.text === "evaluate"));
+  if (!servicePolicyConsumers.length) errors.push("src/modules/services:1 POLICY_CONSUMER_MISSING: No service service invokes the canonical policy evaluator.");
+  if (!clientRoots.length) errors.push("src/ui:1 CLIENT_SCOPE_MISSING: No client/UI modules were available to inspect.");
+  if (!routes.length) errors.push("src/app/api:1 ROUTE_SCOPE_MISSING: No implemented API routes were available to inspect.");
+  if (!providerImports) errors.push("src/modules/identity:1 PROVIDER_SCOPE_MISSING: No actual Identity SDK adapter import was found.");
+
+  const workspaceScope = inspectWorkspaceOwnership(files, report);
+  console.log(`Architecture source scope: ${files.size} files, ${clientRoots.length} UI/client roots, ${visited.size} client dependency files, ${routes.length} API routes, ${providerImports} Identity SDK import(s), ${servicePolicyConsumers.length} service policy consumer(s).`);
+  console.log(`Local ownership scope: ${workspaceScope.requestUiCalls} saved-request UI stages, ${workspaceScope.purchaseUiCalls} purchase UI stage, ${workspaceScope.requestRouteCalls} canonical card routes, ${workspaceScope.operationRouteCalls} Merchant operation routes, ${workspaceScope.guardedWriters} typed fixture/command write sites.`);
+  console.log("Guards cover canonical card/channel/operation forms and routes, the sole ledger posting owner, finite typed writers, sandbox adapter boundaries and protected snapshots. They do not certify runtime authorization, retry behavior, financial correctness or production readiness; database and browser tests remain required.");
+  if (errors.length) {
+    errors.forEach((error) => console.error(error));
+    process.exitCode = 1;
+  } else console.log("Dependency and local workspace source ownership checks passed.");
+}

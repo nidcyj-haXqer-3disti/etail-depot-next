@@ -1,0 +1,57 @@
+{
+  "version": 2,
+  "source": "Latest user dashboard correction, 2026-09-09; docs/SERVICE_DASHBOARD_DESIGN.md",
+  "customer_services": [
+    "CARDHOLDER",
+    "MERCHANT"
+  ],
+  "cardholder": {
+    "responsibility": "Named primary person in cardholder_services; roles and card numbers do not substitute",
+    "primary_scope": "Cards and cardholder data in the exact named group, subject to explicit action permissions",
+    "secondary_scope": "Own held cards and linked activity only",
+    "read_boundaries": [
+      "list",
+      "detail",
+      "search",
+      "report",
+      "export",
+      "saved_report_rerun",
+      "linked_support_record",
+      "protected_retry_result"
+    ],
+    "secondary_delegation": false,
+    "access_lifecycle": "Independent card access role/state/version; card edits, revocation and reinvitation preserve shared merchant membership epochs and merchant grants",
+    "purchase_scope": "Actor's own held card only, including when actor is primary",
+    "missing_or_suspended_primary": "Deny card service access; never infer a replacement",
+    "customer_profile": "One cardholder_profiles row per named primary person; multiple preserved financial scopes appear in one direct card dashboard without unioning grants",
+    "new_card_destination": "Persisted own-scope default, reauthorized for each command; never first account, last-selected context or broadest available permissions",
+    "dashboard": "Direct cards, secondary cardholders, card-linked activity and unfinished requests; no customer account-type directory"
+  },
+  "merchant": {
+    "responsibility": "Existing immutable master relationship; primary remains responsible for sales, fees, refunds and chargebacks",
+    "primary_scope": "Exact primary and its submerchants only, with independently authorized merchant action grants",
+    "submerchant_scope": "Exact assigned unit only; no primary or sibling financial data",
+    "network_read": "Explicit primary authorization; never a widened submerchant query",
+    "paused_history": "Read-only primary oversight does not activate operating commands",
+    "presentations": [
+      "SMS",
+      "EMAIL",
+      "INVOICE",
+      "BILL",
+      "SOCIAL",
+      "QR",
+      "WEB"
+    ],
+    "dashboard": "Direct authorized payment totals, recent payments/transfers, setup steps and primary/submerchant hierarchy",
+    "creation": "Primary merchant setup grants no cardholder service or card permissions; named submerchants use the canonical relationship command with a server-resolved controller binding",
+    "uniqueness": "One primary unit per responsible merchant account; multiple independently named subunits may share its controller; immutable master per subunit"
+  },
+  "shared_invariants": [
+    "Cardholder access does not grant Merchant access, or vice versa",
+    "One policy evaluator, one card request lifecycle, one payment channel workflow, one invitation lifecycle, one financial ledger",
+    "Current resource authority is rechecked before protected reads, commands and retry results",
+    "Existing account enum values are preserved internal provenance, not customer feature tiers",
+    "ENABLE_REAL_MONEY remains false"
+  ],
+  "verification": "Executable tests and delivery evidence are recorded separately; this contract is not a passing test result"
+}

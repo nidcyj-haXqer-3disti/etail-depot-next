@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-09-08",
+  "scope": "Connected business review across issuing, account control and merchant operations",
+  "flow_meaning": "Proposed Etail business walkthroughs, informed by the cited Amex public evidence; not observed Amex private procedures or executed app tests.",
+  "evidence_status_meaning": {
+    "documented": "The central Amex business behavior has relevant public support; proposed Etail details still need specification and testing.",
+    "partial": "Sources cover parts of the business flow; important handoffs or program details remain unsettled.",
+    "gap": "No complete relevant Amex public procedure established; may be an Etail-specific requirement."
+  },
+  "checks": [
+    {
+      "id": "X360-01",
+      "journey": "Employee leaves while purchases are pending",
+      "actors": [
+        "Employer or responsible owner",
+        "Employee/cardholder",
+        "Program administrator",
+        "Merchant",
+        "Support"
+      ],
+      "normal_flow": "Remove the person's administrative and reporting access, separately review every assigned card and recurring commitment, then finish outstanding purchase and repayment work under the responsible account.",
+      "exceptions": "A charge or refund arrives after removal; a scheduled report still targets the former employee; an additional account remains reachable.",
+      "completion": "Access ends without losing the company's evidence or transferring responsibility to another person.",
+      "source_ids": [
+        "I02",
+        "A04",
+        "M25",
+        "C06",
+        "C08",
+        "C09"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-05",
+        "AX-ISSUING-18"
+      ],
+      "evidence_status": "partial",
+      "etail_gap": "The earlier revoke/cancel tasks need one complete exit review covering cards, reports, communications and outstanding obligations.",
+      "acceptance_scenario": "Remove a fictional employee who has a pending purchase, a recurring charge and a scheduled report. Verify the employee cannot access the account or receive future reports; an authorized successor can complete the pending work and explain every card decision.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-02",
+      "journey": "Company approves a card but issuance cannot finish",
+      "actors": [
+        "Requester",
+        "Approver",
+        "Intended cardholder",
+        "Issuer support"
+      ],
+      "normal_flow": "Show company approval, issuer decision, missing applicant information and card availability as separate steps. Give the next required action to the correct person while keeping the original request visible.",
+      "exceptions": "Missing information, declined issuer decision, expired applicant invitation, changed request or delayed delivery.",
+      "completion": "The applicant knows what remains to do; an approver is not told that a card exists merely because they approved it.",
+      "source_ids": [
+        "I05",
+        "I06",
+        "I19",
+        "I20"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-08",
+        "AX-ISSUING-09",
+        "AX-ISSUING-10",
+        "AX-ISSUING-11"
+      ],
+      "evidence_status": "documented",
+      "etail_gap": "Existing steps are listed but need a single coherent requester/approver/holder experience.",
+      "acceptance_scenario": "Approve a fictional employee request at company level while applicant information remains missing. The employee sees the missing-information task, the approver sees the waiting stage, and neither sees an active card.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-03",
+      "journey": "Replace or freeze a card used for a subscription",
+      "actors": [
+        "Cardholder",
+        "Responsible owner",
+        "Merchant subscription team",
+        "Support"
+      ],
+      "normal_flow": "Explain separately whether new purchases are stopped, whether recurring billing can continue, whether replacement is needed and how the customer cancels the merchant service.",
+      "exceptions": "Recurring charge continues after a freeze; a replacement does not end the service contract; a refund arrives for the old card.",
+      "completion": "The customer sees which action affects the card and which affects the subscription; unresolved charges stay traceable.",
+      "source_ids": [
+        "I08",
+        "I09",
+        "B01"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-11",
+        "AX-ISSUING-16"
+      ],
+      "evidence_status": "partial",
+      "etail_gap": "A freeze control alone does not cover merchant cancellation and replacement continuity.",
+      "acceptance_scenario": "Freeze a fictional card used for a monthly service, then request replacement. Review recurring-billing consequences and merchant cancellation separately; a later credit remains linked to the earlier purchase.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-04",
+      "journey": "Purchase succeeds but the merchant has not received funds",
+      "actors": [
+        "Cardholder",
+        "Merchant owner",
+        "Merchant bookkeeper",
+        "Funding provider",
+        "Support"
+      ],
+      "normal_flow": "Show the customer purchase result, merchant submission, expected settlement, deductions and bank deposit separately. Let the merchant trace an amount through each stage.",
+      "exceptions": "Delayed submission, adjustment, reserve, failed bank deposit or unmatched settlement.",
+      "completion": "A receipt does not promise bank availability; the missing stage and responsible service team are visible.",
+      "source_ids": [
+        "M02",
+        "M03",
+        "M05",
+        "M07"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-07",
+        "AX-MERCHANT-08",
+        "AX-MERCHANT-09",
+        "AX-MERCHANT-10"
+      ],
+      "evidence_status": "partial",
+      "etail_gap": "Existing drill-down needs an explicit missing-deposit investigation and ownership.",
+      "acceptance_scenario": "Complete a fictional $100 purchase and withhold its merchant bank deposit. The buyer sees the purchase outcome; the merchant sees where the $100 is in the payment process, each applicable deduction and the person responsible for the missing deposit.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-05",
+      "journey": "Partial delivery followed by a partial refund",
+      "actors": [
+        "Buyer",
+        "Merchant fulfillment team",
+        "Merchant refund approver",
+        "Card account support"
+      ],
+      "normal_flow": "Link the original order and charge to fulfilled, unfulfilled and refunded amounts. Give the customer proof of what was returned and what remains unresolved.",
+      "exceptions": "Split shipments, cancellation before remaining fulfillment, wrong refund amount, refund still pending or dispute on only the remainder.",
+      "completion": "Both parties can explain the remaining charge and the exact refund; no one is told the whole purchase was reversed.",
+      "source_ids": [
+        "B01",
+        "M14",
+        "M15"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-15",
+        "AX-MERCHANT-16"
+      ],
+      "evidence_status": "partial",
+      "etail_gap": "The old dispute rows do not fully specify fulfillment-driven partial outcomes.",
+      "acceptance_scenario": "Order $100 of goods, fulfill $70 and cancel the rest. Trace a $30 refund and explain the remaining $70 charge to both the customer and merchant; a full $100 refund must not be implied.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-06",
+      "journey": "Merchant refunds while a dispute is already open",
+      "actors": [
+        "Cardholder",
+        "Merchant dispute handler",
+        "Merchant refund approver",
+        "Issuer case team"
+      ],
+      "normal_flow": "Show the prior refund, dispute claim and any disputed-account adjustment together. Ask for existing refund evidence before deciding another credit.",
+      "exceptions": "Partial prior refund, refund not yet visible, multiple claims about one charge or later reversal of an adjustment.",
+      "completion": "One economic refund is explained consistently to both sides; the case outcome and money outcome can be different stages.",
+      "source_ids": [
+        "M13",
+        "M14",
+        "M15",
+        "M17",
+        "B07"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-15",
+        "AX-MERCHANT-16",
+        "AX-MERCHANT-18",
+        "AX-CONSUMER-14"
+      ],
+      "evidence_status": "documented",
+      "etail_gap": "Needs one coordinated buyer/merchant case journey rather than two independent refund screens.",
+      "acceptance_scenario": "Open a $100 dispute after a merchant has already refunded $30. Both sides can see the prior credit, provide its evidence and resolve only the applicable remaining amount; the case must not create a second $30 benefit.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-07",
+      "journey": "Change the receiving bank while money is on the way",
+      "actors": [
+        "Merchant owner",
+        "Authorized bank-information manager",
+        "Bookkeeper",
+        "Funding support"
+      ],
+      "normal_flow": "Review who can change the receiving details, identify the affected merchant locations, show pending versus effective change and let the bookkeeper trace each deposit.",
+      "exceptions": "Change rejected, old destination still applies to a payment, bank rejects funds or someone can view reports but not change receiving details.",
+      "completion": "No deposit silently disappears during a change; the merchant knows the relevant destination and next contact.",
+      "source_ids": [
+        "M20",
+        "M23",
+        "M25"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-05",
+        "AX-MANAGEMENT-17"
+      ],
+      "evidence_status": "partial",
+      "etail_gap": "Effective-time and in-flight-payment behavior require a specific operating rule.",
+      "acceptance_scenario": "Change a fictional merchant receiving bank while one deposit is already processing. Confirm the affected locations, effective change status, destination associated with that deposit and the support route if the bank rejects it.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-08",
+      "journey": "Bill repayment is returned after looking successful",
+      "actors": [
+        "Responsible payer",
+        "Cardholder",
+        "Bank",
+        "Account servicing"
+      ],
+      "normal_flow": "Distinguish payment instruction, applied payment and returned payment. Explain the remaining obligation and any proposed next attempt; provide a help route if the payer cannot recover normally.",
+      "exceptions": "Bank prohibits another attempt, payer makes a manual payment during recovery, disputed charge changes the amount due or assistance affects use.",
+      "completion": "The payer understands the current amount owed and next step without an invented fee or automatic second payment.",
+      "source_ids": [
+        "B04",
+        "B05",
+        "B06"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-07",
+        "AX-CONSUMER-11",
+        "AX-MANAGEMENT-04"
+      ],
+      "evidence_status": "documented",
+      "etail_gap": "Return recovery, customer notice and assistance escalation need fuller business rules than payment status alone.",
+      "acceptance_scenario": "Apply a fictional $100 bill payment and then return it unpaid. The payer can see the changed obligation and any permitted next action; an intervening manual payment must be considered before any further collection attempt.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-09",
+      "journey": "Credit balance remains when an account is closing",
+      "actors": [
+        "Responsible account owner",
+        "Original payer or funder",
+        "Account servicing"
+      ],
+      "normal_flow": "Keep card closure, outstanding obligations and a request to return an eligible credit balance distinct. Verify who is entitled to receive any refund and give a traceable support route.",
+      "exceptions": "Several people funded the account, merchant refund arrives late, original payment is returned or recipient details changed.",
+      "completion": "A closed card does not make the remaining credit disappear or redirect it to the wrong person.",
+      "source_ids": [
+        "B02",
+        "I02"
+      ],
+      "comparison_ids": [],
+      "evidence_status": "gap",
+      "etail_gap": "The public US overpayment FAQ does not establish the closed-account or multi-funder procedure; Etail must specify it.",
+      "acceptance_scenario": "Close new card activity while a fictional $30 credit and an unresolved earlier payment remain. A support owner identifies entitlement and what prevents returning the credit, without promising that card cancellation settles the refund.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-10",
+      "journey": "A purchase looks unfamiliar: mistake or fraud",
+      "actors": [
+        "Cardholder",
+        "Additional cardholder where applicable",
+        "Merchant service team",
+        "Amex security or dispute team"
+      ],
+      "normal_flow": "Offer merchant name, recognizable receipt and transaction details. Route an ordinary billing question to appropriate merchant/dispute help; provide direct security help for suspected fraud.",
+      "exceptions": "Pending versus posted charge, another permitted holder's purchase, unrecognized descriptor or inaccessible merchant support.",
+      "completion": "The customer can seek protection immediately and is not required to complete a merchant negotiation before reporting suspected fraud.",
+      "source_ids": [
+        "B01",
+        "B03",
+        "B07",
+        "I16"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-12",
+        "AX-CONSUMER-13"
+      ],
+      "evidence_status": "documented",
+      "etail_gap": "Fraud, recognition help and a billing dispute need separate entry choices with shared transaction context.",
+      "acceptance_scenario": "Present the same unfamiliar transaction as a receipt-recognition question and as suspected fraud. Verify direct protective help remains available for the latter and each route preserves the relevant transaction context.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-11",
+      "journey": "Supervised household participant becomes an adult",
+      "actors": [
+        "Guardian",
+        "Participant",
+        "Responsible funder",
+        "Account support"
+      ],
+      "normal_flow": "Review permission, privacy and funding relationships explicitly. Keep the former supervised activity accessible only to the permitted people, and require separate approval for any new financial product.",
+      "exceptions": "Participant leaves the household, asks for private Personal activity or wants to continue a card with different responsibility.",
+      "completion": "Age or a role change never silently creates borrowing, transfers funds or exposes another person's history.",
+      "source_ids": [],
+      "comparison_ids": [],
+      "evidence_status": "gap",
+      "etail_gap": "This is a required Etail-specific operating decision; no one-to-one Amex Household lifecycle was established.",
+      "acceptance_scenario": "Move a fictional supervised participant into an adult review. Confirm no new borrowing, money transfer, merchant authority or access to another adult’s history occurs merely because of age or a changed role.",
+      "implementation_status": "not_tested"
+    },
+    {
+      "id": "X360-12",
+      "journey": "Merchant closes with open refunds and disputes",
+      "actors": [
+        "Merchant owner",
+        "Dispute handler",
+        "Bookkeeper",
+        "Funding provider",
+        "Support"
+      ],
+      "normal_flow": "Stop new sales as appropriate, identify open refunds, disputes and expected funding, retain the people who must complete them and show what prevents final closure.",
+      "exceptions": "Late dispute, held reserve, failed deposit, staff exit or remaining amount due to or from the merchant.",
+      "completion": "Closure has a clear outstanding-work list and a support owner; it does not delete financial responsibilities.",
+      "source_ids": [
+        "M17",
+        "M23",
+        "M27"
+      ],
+      "comparison_ids": [],
+      "evidence_status": "gap",
+      "etail_gap": "Complete US closure-tail and reserve-release terms were not established by the public portal guides.",
+      "acceptance_scenario": "Request merchant closure with one open dispute, one pending refund and withheld funds. The owner sees a complete outstanding-work list and responsible contacts; former staff are removed without abandoning those cases.",
+      "implementation_status": "not_tested"
+    }
+  ]
+}

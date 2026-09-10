@@ -1,0 +1,1575 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-09-08",
+  "benchmark_version": "amex-public-v2",
+  "status": "proposed_comparison_inventory",
+  "target_percent": 100,
+  "minimum_domain_percent": 100,
+  "scoring": "Equal task weight. A task earns one point only after all five evidence dimensions pass: outcome, role/data scope, interaction/navigation, status/recovery, desktop/mobile/accessibility. Unsupported or unverified tasks earn no verified point. No implementation score is asserted by this research.",
+  "scope": "Documented public workflows relevant to Etail; not 90% of all Amex products, private internals or brand pixels. Architecture uses separate mandatory gates.",
+  "domains": [
+    "controls",
+    "issuing",
+    "consumer",
+    "merchant",
+    "management"
+  ],
+  "workflows": [
+    {
+      "id": "AX-CONTROLS-01",
+      "domain": "controls",
+      "journey": "Select the intended account or card",
+      "source_ids": [
+        "I10"
+      ],
+      "issue_ids": [
+        "EDN-005"
+      ],
+      "critical": true,
+      "acceptance": "Selection persists through reload and is visible in every action review; revoked selection asks for a new choice.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-02",
+      "domain": "controls",
+      "journey": "Give an additional holder an individual login",
+      "source_ids": [
+        "I01"
+      ],
+      "issue_ids": [
+        "EDN-007"
+      ],
+      "critical": true,
+      "acceptance": "The invited holder uses their own identity and sees only authorized activity; sponsorship does not create another fee.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-03",
+      "domain": "controls",
+      "journey": "Inspect a person's exact access",
+      "source_ids": [
+        "A02"
+      ],
+      "issue_ids": [
+        "EDN-006"
+      ],
+      "critical": true,
+      "acceptance": "A role summary lists action and resource grants; administrative status does not imply spending or payout authority.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-04",
+      "domain": "controls",
+      "journey": "Delegate account management",
+      "source_ids": [
+        "A02"
+      ],
+      "issue_ids": [
+        "EDN-007"
+      ],
+      "critical": true,
+      "acceptance": "The invitation previews exact permitted actions and resources; the grant cannot exceed the sender's delegable ceiling.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-05",
+      "domain": "controls",
+      "journey": "Revoke a delegated manager",
+      "source_ids": [
+        "A02"
+      ],
+      "issue_ids": [
+        "EDN-007"
+      ],
+      "critical": true,
+      "acceptance": "Subsequent reads, exports and commands deny revoked scope while retaining auditable historical actions.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-06",
+      "domain": "controls",
+      "journey": "Assign a card to an authorized participant",
+      "source_ids": [
+        "A04"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": true,
+      "acceptance": "The assignment names the holder and resource; adding visibility cannot issue a new card or create backing.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-07",
+      "domain": "controls",
+      "journey": "Inspect a commercial reporting hierarchy",
+      "source_ids": [
+        "A03"
+      ],
+      "issue_ids": [
+        "EDN-020"
+      ],
+      "critical": false,
+      "acceptance": "The hierarchy shows only approved Seller relationships; a reporting group is not a new account type or liability.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-08",
+      "domain": "controls",
+      "journey": "Assign location visibility",
+      "source_ids": [
+        "M25"
+      ],
+      "issue_ids": [
+        "EDN-020"
+      ],
+      "critical": true,
+      "acceptance": "Authorized location access is explicit and adding a location cannot confer merchant ownership.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-09",
+      "domain": "controls",
+      "journey": "Distinguish responsibility from cardholder access",
+      "source_ids": [
+        "I01",
+        "A03"
+      ],
+      "issue_ids": [
+        "EDN-005"
+      ],
+      "critical": true,
+      "acceptance": "The product names the responsible party and holder separately without exposing unrelated Personal balances.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-10",
+      "domain": "controls",
+      "journey": "Set or change a spending limit",
+      "source_ids": [
+        "I03"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": true,
+      "acceptance": "The review shows ceiling, usage and effective period; changing a limit cannot restore consumed capacity.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-11",
+      "domain": "controls",
+      "journey": "Pause and resume permitted card activity",
+      "source_ids": [
+        "I03",
+        "I08"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": true,
+      "acceptance": "Effective versus pending restriction is visible; a child unfreeze never overrides a parent restriction.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-12",
+      "domain": "controls",
+      "journey": "Configure a category alert",
+      "source_ids": [
+        "I03"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": false,
+      "acceptance": "The UI explains merchant classification and labels alert-only behavior; it never promises basket-level blocking.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-13",
+      "domain": "controls",
+      "journey": "Configure spend-threshold notifications",
+      "source_ids": [
+        "I03"
+      ],
+      "issue_ids": [
+        "EDN-025"
+      ],
+      "critical": false,
+      "acceptance": "The chosen threshold/channel persists; delivery retries do not create financial effects or leak revoked scope.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-14",
+      "domain": "controls",
+      "journey": "Verify a sensitive setting change",
+      "source_ids": [
+        "M20"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "A fresh purpose-bound step-up is checked on submit; stale verification cannot authorize a changed payload.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-15",
+      "domain": "controls",
+      "journey": "Delegate payment execution",
+      "source_ids": [
+        "A03"
+      ],
+      "issue_ids": [
+        "EDN-015"
+      ],
+      "critical": true,
+      "acceptance": "Only an explicit payer grant can schedule a permitted obligation payment; generic Manager status is insufficient.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-16",
+      "domain": "controls",
+      "journey": "Separate bank-setting authority from payer authority",
+      "source_ids": [
+        "A03"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Destination changes and execution use independent capabilities; in-flight instructions retain their reviewed destination.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-17",
+      "domain": "controls",
+      "journey": "Manage operational and marketing contacts",
+      "source_ids": [
+        "M24"
+      ],
+      "issue_ids": [
+        "EDN-025"
+      ],
+      "critical": true,
+      "acceptance": "Authentication, operational notifications and marketing consent are distinguished; verified change status is visible.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONTROLS-18",
+      "domain": "controls",
+      "journey": "Review people with access to a merchant",
+      "source_ids": [
+        "M25"
+      ],
+      "issue_ids": [
+        "EDN-020"
+      ],
+      "critical": true,
+      "acceptance": "The audit lists current authorized grants and location scope; export enforces the same scope as the screen.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-01",
+      "domain": "issuing",
+      "journey": "Start a card application in context",
+      "source_ids": [
+        "I06"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "All entry points open one saved request with selected account and server-provided prerequisites.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-02",
+      "domain": "issuing",
+      "journey": "Select an eligible additional cardholder",
+      "source_ids": [
+        "I01"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "Server checks person, accepted relationship, product and funding assignment; tampered identifiers fail.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-03",
+      "domain": "issuing",
+      "journey": "Save and resume an application",
+      "source_ids": [
+        "I06"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "Draft and request identity survive refresh/session recovery; a stale version reports a recoverable conflict.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-04",
+      "domain": "issuing",
+      "journey": "Ask an applicant to complete their part",
+      "source_ids": [
+        "I05"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "A scoped applicant task exposes only required fields; expiry or revocation leaves the original request intact.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-05",
+      "domain": "issuing",
+      "journey": "Verify prefilled application details",
+      "source_ids": [
+        "I04"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": false,
+      "acceptance": "Existing relationship data is reviewed and versioned; edits cannot mutate someone else's identity record.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-06",
+      "domain": "issuing",
+      "journey": "Review product terms and consent",
+      "source_ids": [
+        "I06"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "Consent references the exact terms version and person; missing required consent blocks submission.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-07",
+      "domain": "issuing",
+      "journey": "Review the final card request",
+      "source_ids": [
+        "I06"
+      ],
+      "issue_ids": [
+        "EDN-011"
+      ],
+      "critical": true,
+      "acceptance": "Holder, account, backing and controls are shown together; submit binds the reviewed version.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-08",
+      "domain": "issuing",
+      "journey": "Track application stage and next actor",
+      "source_ids": [
+        "I05"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "A pending screen names the missing information or responsible reviewer and preserves a safe status reference.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-09",
+      "domain": "issuing",
+      "journey": "Record company or guardian approval",
+      "source_ids": [
+        "I05"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "Required approval binds the payload; editing it invalidates approval and approval alone cannot issue the card.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-10",
+      "domain": "issuing",
+      "journey": "Show the issuing decision separately",
+      "source_ids": [
+        "I05"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "Submitted, simulated approval and issued remain distinct; timeout triggers reconciliation with the same operation.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-11",
+      "domain": "issuing",
+      "journey": "Explain a declined application",
+      "source_ids": [
+        "I19"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "Show a safe simulated reason and next step; never present fictional checks as real underwriting.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-12",
+      "domain": "issuing",
+      "journey": "Request review of a decision",
+      "source_ids": [
+        "I20"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": false,
+      "acceptance": "A linked case preserves the original decision and evidence; request-for-review is not a changed outcome.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-13",
+      "domain": "issuing",
+      "journey": "Configure amount and date controls for virtual use",
+      "source_ids": [
+        "I07"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": true,
+      "acceptance": "Optional controls remain in the canonical request; unsupported restrictions are explicitly unavailable.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-14",
+      "domain": "issuing",
+      "journey": "Create a transaction-specific virtual card",
+      "source_ids": [
+        "I07",
+        "A11"
+      ],
+      "issue_ids": [
+        "EDN-010"
+      ],
+      "critical": true,
+      "acceptance": "The request correlates its intended payment and produces at most one card despite repeated submission.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-15",
+      "domain": "issuing",
+      "journey": "Activate an issued card",
+      "source_ids": [
+        "I10"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": true,
+      "acceptance": "Only an actor authorized by the applicable holder/guardian/product policy can perform supported mock activation; issuance and activation remain separate.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-16",
+      "domain": "issuing",
+      "journey": "Replace a card with an explicit reason",
+      "source_ids": [
+        "I09"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": true,
+      "acceptance": "Replacement uses the same command family, links its predecessor and preserves obligations, usage and reward history.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-17",
+      "domain": "issuing",
+      "journey": "Track card fulfillment separately from approval",
+      "source_ids": [
+        "I06",
+        "I09"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": false,
+      "acceptance": "Delivery pending/failed is explicit; a shipment or acknowledgment cannot silently activate the card.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-ISSUING-18",
+      "domain": "issuing",
+      "journey": "Cancel an additional card",
+      "source_ids": [
+        "I02"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": true,
+      "acceptance": "Card closure blocks new authorizations while existing holds, clearing and disputes remain reconcilable.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-01",
+      "domain": "consumer",
+      "journey": "Understand the selected account overview",
+      "source_ids": [
+        "I10",
+        "I11"
+      ],
+      "issue_ids": [
+        "EDN-011"
+      ],
+      "critical": true,
+      "acceptance": "Amounts use distinct labels for backing, pending purchases, obligations and availability; role scope is apparent.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-02",
+      "domain": "consumer",
+      "journey": "Inspect a pending versus posted purchase",
+      "source_ids": [
+        "I11",
+        "I15"
+      ],
+      "issue_ids": [
+        "EDN-013"
+      ],
+      "critical": true,
+      "acceptance": "Status, dates and amount are consistent with durable events; pending activity is not final expense or reward.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-03",
+      "domain": "consumer",
+      "journey": "Find activity using filters",
+      "source_ids": [
+        "I11"
+      ],
+      "issue_ids": [
+        "EDN-013"
+      ],
+      "critical": false,
+      "acceptance": "Search/date/card filters retain context, enforce scope and distinguish no results from unavailable data.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-04",
+      "domain": "consumer",
+      "journey": "Export selected activity",
+      "source_ids": [
+        "I11"
+      ],
+      "issue_ids": [
+        "EDN-025"
+      ],
+      "critical": true,
+      "acceptance": "Export preserves authorized scope, exact amounts and chosen filters; formula-like text is inert.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-05",
+      "domain": "consumer",
+      "journey": "Read a period statement",
+      "source_ids": [
+        "I11"
+      ],
+      "issue_ids": [
+        "EDN-015"
+      ],
+      "critical": true,
+      "acceptance": "The statement reconciles to posted activity and identifies period, due obligations and corrections.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-06",
+      "domain": "consumer",
+      "journey": "Request an archived statement",
+      "source_ids": [
+        "I11"
+      ],
+      "issue_ids": [
+        "EDN-025"
+      ],
+      "critical": false,
+      "acceptance": "Requested/ready/failed states survive reload and give a safe retry without leaking private documents.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-07",
+      "domain": "consumer",
+      "journey": "Review and make a repayment",
+      "source_ids": [
+        "I13"
+      ],
+      "issue_ids": [
+        "EDN-015"
+      ],
+      "critical": true,
+      "acceptance": "Show the actual obligation and authorized fictional source; durable confirmation distinguishes processing from applied.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-08",
+      "domain": "consumer",
+      "journey": "Schedule a future repayment",
+      "source_ids": [
+        "I13"
+      ],
+      "issue_ids": [
+        "EDN-015"
+      ],
+      "critical": true,
+      "acceptance": "Amount meaning, date and obligation are reviewed; execution rechecks live policy and follows a defined race policy.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-09",
+      "domain": "consumer",
+      "journey": "Enroll in automatic repayment",
+      "source_ids": [
+        "I12"
+      ],
+      "issue_ids": [
+        "EDN-015"
+      ],
+      "critical": true,
+      "acceptance": "Effective date and first execution are explicit; any current amount still due remains visible.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-10",
+      "domain": "consumer",
+      "journey": "Cancel an eligible scheduled payment",
+      "source_ids": [
+        "I14"
+      ],
+      "issue_ids": [
+        "EDN-015"
+      ],
+      "critical": true,
+      "acceptance": "Server determines cancelability; a completion race returns the actual recorded outcome.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-11",
+      "domain": "consumer",
+      "journey": "Track repayment status and history",
+      "source_ids": [
+        "A03",
+        "I13"
+      ],
+      "issue_ids": [
+        "EDN-015"
+      ],
+      "critical": true,
+      "acceptance": "Scheduled, applied, failed and returned are distinct; returns use linked corrections.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-12",
+      "domain": "consumer",
+      "journey": "Report suspected fraud promptly",
+      "source_ids": [
+        "I16"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "A suspicious pending event can start a safety/support case without inventing a posted chargeback.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-13",
+      "domain": "consumer",
+      "journey": "Open and follow a transaction dispute",
+      "source_ids": [
+        "I15"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "One linked case shows reason, evidence and next step; status does not promise reimbursement.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-14",
+      "domain": "consumer",
+      "journey": "Withdraw a dispute with a reason",
+      "source_ids": [
+        "I15"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": false,
+      "acceptance": "Withdrawal is capability- and state-dependent, auditable, and does not erase existing financial effects.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-15",
+      "domain": "consumer",
+      "journey": "Understand rewards by stage and source",
+      "source_ids": [
+        "I18"
+      ],
+      "issue_ids": [
+        "EDN-016"
+      ],
+      "critical": true,
+      "acceptance": "Use Etail accrual/posting rules and one membership-year cap; reversals link to original accrual.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-16",
+      "domain": "consumer",
+      "journey": "Inspect and enroll in an eligible benefit",
+      "source_ids": [
+        "I17"
+      ],
+      "issue_ids": [
+        "EDN-025"
+      ],
+      "critical": false,
+      "acceptance": "Only an actually specified Etail benefit can be enrolled; absent product support remains a scored gap.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-17",
+      "domain": "consumer",
+      "journey": "Manage devices and authentication methods",
+      "source_ids": [
+        "I16",
+        "A09"
+      ],
+      "issue_ids": [
+        "EDN-004"
+      ],
+      "critical": true,
+      "acceptance": "Recovery and revocation work through the one Identity integration; unverified passkey support remains visible as a gap.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-CONSUMER-18",
+      "domain": "consumer",
+      "journey": "Read accessible statements and obtain help",
+      "source_ids": [
+        "I21"
+      ],
+      "issue_ids": [
+        "EDN-025"
+      ],
+      "critical": true,
+      "acceptance": "Keyboard and assistive reading can reach statement details and support; automated accessibility checks alone do not pass.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-01",
+      "domain": "merchant",
+      "journey": "Save and submit a merchant application",
+      "source_ids": [
+        "M21"
+      ],
+      "issue_ids": [
+        "EDN-017"
+      ],
+      "critical": true,
+      "acceptance": "One named Seller request retains draft/version; received status does not imply merchant approval.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-02",
+      "domain": "merchant",
+      "journey": "Add a location within an approved relationship",
+      "source_ids": [
+        "M21"
+      ],
+      "issue_ids": [
+        "EDN-017"
+      ],
+      "critical": true,
+      "acceptance": "Location, submitter and payee identities are explicit and cannot create an unrelated legal merchant.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-03",
+      "domain": "merchant",
+      "journey": "Review a batch of location requests",
+      "source_ids": [
+        "M22"
+      ],
+      "issue_ids": [
+        "EDN-020"
+      ],
+      "critical": false,
+      "acceptance": "Each item uses the same scoped command, has its own outcome and retries without duplicating successful items.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-04",
+      "domain": "merchant",
+      "journey": "Inspect and update merchant information",
+      "source_ids": [
+        "M19"
+      ],
+      "issue_ids": [
+        "EDN-017"
+      ],
+      "critical": true,
+      "acceptance": "Material legal information uses a dedicated review path; submitted values stay separate from effective values.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-05",
+      "domain": "merchant",
+      "journey": "Change a permitted settlement destination",
+      "source_ids": [
+        "M20"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Review names exact scope and destination; step-up and approval checks precede a tracked change operation.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-06",
+      "domain": "merchant",
+      "journey": "View merchant transaction activity",
+      "source_ids": [
+        "M06"
+      ],
+      "issue_ids": [
+        "EDN-018"
+      ],
+      "critical": true,
+      "acceptance": "Payments retain safe payer/request references and exact money; list queries enforce Seller/location scope.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-07",
+      "domain": "merchant",
+      "journey": "Inspect submitted batches",
+      "source_ids": [
+        "M03"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Batch totals reconcile to included payments and retain both submitting and payee relationships.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-08",
+      "domain": "merchant",
+      "journey": "Inspect pending and posted settlements",
+      "source_ids": [
+        "M02"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Expected components and confirmed payout are distinct; unsettled amounts cannot be withdrawn or pledged.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-09",
+      "domain": "merchant",
+      "journey": "Understand deductions and adjustments",
+      "source_ids": [
+        "M07"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Each fee/reserve/refund/adjustment has a source and status; unknown costs are never confirmed zero.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-10",
+      "domain": "merchant",
+      "journey": "Drill from settlement to an individual payment",
+      "source_ids": [
+        "M02",
+        "M05"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "A stable correlation chain explains all included effects without exposing private issuer information.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-11",
+      "domain": "merchant",
+      "journey": "Search submissions by amount, date and location",
+      "source_ids": [
+        "M04"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": false,
+      "acceptance": "The date basis and filters are explicit; unauthorized location queries disclose no data.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-12",
+      "domain": "merchant",
+      "journey": "Read a merchant period statement",
+      "source_ids": [
+        "M09"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Issued statements reconcile by period and currency; not-yet-issued differs from a zero-activity statement.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-13",
+      "domain": "merchant",
+      "journey": "Investigate an adjustment reference",
+      "source_ids": [
+        "M08"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Lookup finds the linked financial effect within scope using safe references; case access is separately authorized.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-14",
+      "domain": "merchant",
+      "journey": "Inspect a dispute and reply deadline",
+      "source_ids": [
+        "M13"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Transaction amount, disputed amount, case type and deadline source are distinct fields.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-15",
+      "domain": "merchant",
+      "journey": "Contest a claim with permitted evidence",
+      "source_ids": [
+        "M14"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Response choices follow case/provider capability; stale deadlines and unsupported partial refund actions are checked.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-16",
+      "domain": "merchant",
+      "journey": "Accept a claim or reconcile a prior refund",
+      "source_ids": [
+        "M13",
+        "M15"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Before any credit, account for existing refunds/debits and refundable remainder to prevent duplicate reimbursement.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-17",
+      "domain": "merchant",
+      "journey": "Add evidence after an initial response",
+      "source_ids": [
+        "M16"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Upload, validated, submitted and provider-accepted states are separate; failed processing is repairable.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MERCHANT-18",
+      "domain": "merchant",
+      "journey": "Review a closed dispute and financial outcome",
+      "source_ids": [
+        "M17"
+      ],
+      "issue_ids": [
+        "EDN-019"
+      ],
+      "critical": true,
+      "acceptance": "Case result and reconciled money remain distinguishable; unmatched effects stay in an exception queue.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-01",
+      "domain": "management",
+      "journey": "Review cardholder spending reports",
+      "source_ids": [
+        "A05"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": false,
+      "acceptance": "Reports identify authorized scope, period, freshness and missing enrichment, with drill-down to source activity.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-02",
+      "domain": "management",
+      "journey": "Review virtual-card exposure and overages",
+      "source_ids": [
+        "A05"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "Unused/partly used allocations and genuine overages remain visible without creating new available capacity.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-03",
+      "domain": "management",
+      "journey": "Find participants approaching limits",
+      "source_ids": [
+        "A05"
+      ],
+      "issue_ids": [
+        "EDN-012"
+      ],
+      "critical": false,
+      "acceptance": "The report uses effective controls and committed usage, and links to a permitted control review.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-04",
+      "domain": "management",
+      "journey": "Review aging repayment obligations",
+      "source_ids": [
+        "A05",
+        "A03"
+      ],
+      "issue_ids": [
+        "EDN-015"
+      ],
+      "critical": true,
+      "acceptance": "Age is computed under the product calendar; a case assignment does not authorize debt or fee changes.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-05",
+      "domain": "management",
+      "journey": "Review consolidated commercial exposure",
+      "source_ids": [
+        "A03"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "Only authorized accounts aggregate; separate currencies and pending/posted obligations remain identifiable.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-06",
+      "domain": "management",
+      "journey": "Allocate expenses to accounting categories",
+      "source_ids": [
+        "A12"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": false,
+      "acceptance": "Allocation totals match the source expense; recoding never edits posted financial journals.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-07",
+      "domain": "management",
+      "journey": "Attach and review receipts",
+      "source_ids": [
+        "A12"
+      ],
+      "issue_ids": [
+        "EDN-025"
+      ],
+      "critical": true,
+      "acceptance": "Evidence is private, scoped and versioned; malformed or rejected files leave a recoverable task.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-08",
+      "domain": "management",
+      "journey": "Approve accounting exceptions",
+      "source_ids": [
+        "A12"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "An independent eligible reviewer approves the exact allocation version; self-approval and stale payloads fail.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-09",
+      "domain": "management",
+      "journey": "Validate accounting values and combinations",
+      "source_ids": [
+        "A04"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": false,
+      "acceptance": "Versioned values and valid combinations are checked before export; historical classifications remain traceable.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-10",
+      "domain": "management",
+      "journey": "Inspect import job outcomes",
+      "source_ids": [
+        "A04"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "The job reports accepted/rejected counts, actor and timing; failed/retried jobs cannot silently replace source history.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-11",
+      "domain": "management",
+      "journey": "Generate an accounting-system extract",
+      "source_ids": [
+        "A12",
+        "A04"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "A private artifact records definition/version, source cutoff and row count, with totals reconciled to its scope.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-12",
+      "domain": "management",
+      "journey": "Save and rerun a report definition",
+      "source_ids": [
+        "M10"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": false,
+      "acceptance": "Saved filters and columns are versioned preferences; permissions are rechecked on every run and download.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-13",
+      "domain": "management",
+      "journey": "Find a scheduled or generated report",
+      "source_ids": [
+        "M11"
+      ],
+      "issue_ids": [
+        "EDN-025"
+      ],
+      "critical": false,
+      "acceptance": "Queued/generating/ready/failed/expired states are visible and a lost permission blocks old artifact access.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-14",
+      "domain": "management",
+      "journey": "Work a dispute response queue",
+      "source_ids": [
+        "M12"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "Priority uses actual reply deadlines; case type and current financial debit do not collapse into one status.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-15",
+      "domain": "management",
+      "journey": "Review case history and the next action",
+      "source_ids": [
+        "M13"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "Customer/internal/provider records have separate visibility and safe correlation; actions use owning domain commands.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-16",
+      "domain": "management",
+      "journey": "Repair rejected evidence",
+      "source_ids": [
+        "M16"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "An operator sees the safe failure reason, can request replacement and cannot fabricate provider acceptance.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-17",
+      "domain": "management",
+      "journey": "Audit pending and failed account changes",
+      "source_ids": [
+        "M23"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": true,
+      "acceptance": "Before/proposed/effective values and actor/status are distinguishable; a receipt alone cannot imply applied change.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AX-MANAGEMENT-18",
+      "domain": "management",
+      "journey": "Continue contextual support across channels",
+      "source_ids": [
+        "M30"
+      ],
+      "issue_ids": [
+        "EDN-021"
+      ],
+      "critical": false,
+      "acceptance": "Help retains authorized account/case context and actual service availability; support access does not grant money movement.",
+      "design_status": "proposed",
+      "comparison_status": "not_assessed",
+      "evidence": []
+    }
+  ],
+  "mandatory_gates": [
+    {
+      "id": "AG01",
+      "requirement": "One issuing command, saved request and Add card form; replacement and virtual formats use the same ownership.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG02",
+      "requirement": "One financial ledger; balanced immutable postings with exact minor units and currency.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG03",
+      "requirement": "One server policy; scoped reads/commands/files/exports and immediate revocation.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG04",
+      "requirement": "Atomic shared backing across cards/accounts, payouts, refunds and pledges.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG05",
+      "requirement": "Stable business identities and unique effects despite retries, duplicate or out-of-order events.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG06",
+      "requirement": "Genuine late clearing reconciles after freeze/revocation without authorizing new activity.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG07",
+      "requirement": "PERSONAL, HOUSEHOLD, SELLER only; liability, sponsor, role and card format stay distinct.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG08",
+      "requirement": "Guardian-funded supervised spending creates no independent borrowing or child repayment bill.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG09",
+      "requirement": "Household sharing never exposes unrelated Personal/Seller totals or history.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG10",
+      "requirement": "Etail rates, membership years, rewards and one Premier cap retain source provenance; D14\u2013D17 resolved for affected writes.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG11",
+      "requirement": "No secrets or real PAN/CVV/bank/KYB data in the sandbox; provider credentials remain behind adapters.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG12",
+      "requirement": "Money controls, task order, navigation and status are understandable on desktop/mobile with keyboard and assistive access.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG13",
+      "requirement": "Mock provider uses the same commands/events; real money is enforced off.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG14",
+      "requirement": "Practice purchase completes through durable events; no customer manual-clearing button or fabricated client success.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG15",
+      "requirement": "Account/card offboarding blocks new activity, explains outstanding obligations and preserves in-flight reconciliation/history.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG16",
+      "requirement": "Guest payments, QR/links, partial invoices and recurring mock collection remain retained Etail scope even outside Amex portal comparisons.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG17",
+      "requirement": "Sensitive adjustments/destination changes require explicit scope, current approval and payload binding.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG18",
+      "requirement": "Operations, economics and partner API/portal scope remains in backlog; no second generic CRUD/financial engine.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG19",
+      "requirement": "Meaningful PostgreSQL, provider replay, concurrency, contract, accessibility, browser, security and build checks pass for release SHA.",
+      "status": "not_assessed_in_this_research"
+    },
+    {
+      "id": "AG20",
+      "requirement": "Fresh hosted resources, real hosted acceptance, feature review and public-release approval remain independent gates.",
+      "status": "not_assessed_in_this_research"
+    }
+  ],
+  "target_updated_date": "2026-09-09",
+  "target_update_reason": "User requested 100% and a better Etail experience. The existing 90 tasks and independent mandatory gates are preserved; target change does not award points."
+}

@@ -1,0 +1,147 @@
+{
+  "files": [
+    {
+      "path": "sources/original/Account_First_Redesign_Reference.md",
+      "bytes": 40495,
+      "sha256": "be1ba9a3d1a485de0c9ea9fe4200b785742390a2f0c68ff42ac8976d2e465e9a"
+    },
+    {
+      "path": "sources/original/Master_AI_Agent_Prompt_Netlify_Member_Commerce_Platform.md",
+      "bytes": 59609,
+      "sha256": "cf5ce3fa2d8673aba2145ffd2b81986244263b797a149b63a1ad694509f985fc"
+    },
+    {
+      "path": "sources/original/Select_Premier_Customer_Service_Lifecycle.xlsx",
+      "bytes": 29289,
+      "sha256": "642b0fbe9e7ae2ceab83a45060a7590d393a6d171dd6263797a3f53b1302fdb9",
+      "sheets": [
+        {
+          "name": "Member Home",
+          "range": null,
+          "nonemptyCells": 29
+        },
+        {
+          "name": "Memberships",
+          "range": null,
+          "nonemptyCells": 56
+        },
+        {
+          "name": "What you can do",
+          "range": null,
+          "nonemptyCells": 75
+        },
+        {
+          "name": "Your lifecycle",
+          "range": null,
+          "nonemptyCells": 68
+        },
+        {
+          "name": "Value calculator",
+          "range": null,
+          "nonemptyCells": 87
+        },
+        {
+          "name": "Terms",
+          "range": null,
+          "nonemptyCells": 33
+        }
+      ]
+    },
+    {
+      "path": "sources/original/Select_Premier_Management_Enterprise_Cost_Model.xlsx",
+      "bytes": 125005,
+      "sha256": "f9b8b2b1578f74c15806513ee2a27b3bc827eb8c282fdd150cc0a7bc1e22237a",
+      "sheets": [
+        {
+          "name": "Command Center",
+          "range": null,
+          "nonemptyCells": 110
+        },
+        {
+          "name": "Value Streams",
+          "range": null,
+          "nonemptyCells": 128
+        },
+        {
+          "name": "Customer Lifecycle",
+          "range": null,
+          "nonemptyCells": 81
+        },
+        {
+          "name": "Service Portfolio",
+          "range": null,
+          "nonemptyCells": 159
+        },
+        {
+          "name": "Operations",
+          "range": null,
+          "nonemptyCells": 79
+        },
+        {
+          "name": "Economics",
+          "range": null,
+          "nonemptyCells": 108
+        },
+        {
+          "name": "PayFac Detail",
+          "range": null,
+          "nonemptyCells": 88
+        },
+        {
+          "name": "Issuing Detail",
+          "range": null,
+          "nonemptyCells": 163
+        },
+        {
+          "name": "Data Model",
+          "range": null,
+          "nonemptyCells": 116
+        },
+        {
+          "name": "Inputs",
+          "range": null,
+          "nonemptyCells": 114
+        },
+        {
+          "name": "Model Engine",
+          "range": null,
+          "nonemptyCells": 125
+        },
+        {
+          "name": "Research Basis",
+          "range": null,
+          "nonemptyCells": 115
+        },
+        {
+          "name": "Cost Drivers",
+          "range": null,
+          "nonemptyCells": 534
+        },
+        {
+          "name": "Rate Cards",
+          "range": null,
+          "nonemptyCells": 1630
+        },
+        {
+          "name": "Cost Center",
+          "range": null,
+          "nonemptyCells": 223
+        }
+      ]
+    },
+    {
+      "path": "assets/brand/logo.png",
+      "original_filename": "logo(20260907-140705).png",
+      "bytes": 12814,
+      "sha256": "ffe24b1b4b5b32b0eafb827a70596ab1186910ffe327f4173125034d732ec13f"
+    },
+    {
+      "path": "assets/brand/symbol.png",
+      "original_filename": "symbol(20260907-140655).png",
+      "bytes": 13185,
+      "sha256": "57e55c1ca83664eca556cd1c39b0c03b955e85ede51713d5b37a2f50822f7530"
+    }
+  ],
+  "source_extraction_date": "2026-09-08",
+  "original_files_modified": false
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "N01",
+    "title": "American Express Merchant Policies and Procedures — U.S.",
+    "url": "https://www.americanexpress.com/us/merchant/merchant-regulations.html",
+    "accessed": "2026-09-08",
+    "publication": "Undated public page; no current private regulation version inspected.",
+    "scope": "U.S. direct merchant relationship; policy-access boundary.",
+    "evidence": "Describes the documents governing acceptance and points to login for complete terms/regulations.",
+    "locator": "Terms and Conditions for American Express Card Acceptance and Merchant Regulations – U.S.",
+    "limitations": "Does not disclose complete reserve, shortfall, closure or complaint procedures. Those remain evidence gaps.",
+    "evidence_status": "documented",
+    "substantive_use": true
+  },
+  {
+    "id": "N02",
+    "title": "How to Manage and Help Prevent Disputes — 2024TPP",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/merchant/pdf/tpp/manage-disputes/Amex-TPP-Disputes-Reference-Guide.pdf",
+    "accessed": "2026-09-08",
+    "publication": "Version 2024TPP printed on cover; exact publication date unstated.",
+    "scope": "Guide for merchants contracted with a Merchant Services Provider to accept Amex; linked from U.S. TPP learning hub.",
+    "evidence": "Operating examples and reason-specific responses, including payment/submission/fulfillment/credit errors.",
+    "locator": "Relevant portions read: PDF pp. 2–8, 27–32, 35 and 58–62; not a complete reading of every page.",
+    "limitations": "Dated guide, not a current individual agreement. No universal response deadline, reserve policy or funding SLA inferred. No confidentiality marker found in extracted text.",
+    "evidence_status": "documented",
+    "substantive_use": true
+  },
+  {
+    "id": "N03",
+    "title": "Former U.S. Merchant Reference Guide link — unavailable",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/merchant/new-merchant-regulations/Reference-Guide_EN_US.pdf",
+    "accessed": "2026-09-08",
+    "publication": "Not accepted from search-index metadata.",
+    "scope": "Excluded U.S. reference-guide lead.",
+    "evidence": "Opening returned 404; related regulation/reference search snippets carried confidentiality notices.",
+    "locator": "Retrieval result only.",
+    "limitations": "No substantive extraction. Current public landing requires login for full rules; no private access attempted.",
+    "evidence_status": "gap",
+    "substantive_use": false
+  },
+  {
+    "id": "N04",
+    "title": "Prevent Disputes on Recurring Transactions — excluded",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/merchant/pdf/tpp/manage-disputes/Preventing_Disputes_on_Recurring_Transactions.pdf",
+    "accessed": "2026-09-08",
+    "publication": "2022 copyright visible with confidentiality notice.",
+    "scope": "One-page item linked publicly from U.S. TPP hub; excluded after inspecting marking.",
+    "evidence": "The returned page carries a confidentiality/proprietary-use notice.",
+    "locator": "First-page notice.",
+    "limitations": "No substantive use; N02 supplies the accepted public recurring-billing context.",
+    "evidence_status": "gap",
+    "substantive_use": false
+  },
+  {
+    "id": "N05",
+    "title": "Guide for Online Merchants — excluded",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/merchant/pdf/tpp/manage-disputes/Guide_For_Online_Merchants.pdf",
+    "accessed": "2026-09-08",
+    "publication": "2022 copyright visible with confidentiality notice.",
+    "scope": "One-page item linked publicly from U.S. TPP hub; excluded after inspecting marking.",
+    "evidence": "The returned page carries a confidentiality/proprietary-use notice.",
+    "locator": "First-page notice.",
+    "limitations": "No substantive use; public HTML/B01 and N02 provide accepted business context.",
+    "evidence_status": "gap",
+    "substantive_use": false
+  },
+  {
+    "id": "N06",
+    "title": "Authorization on Credit — excluded factsheet",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/merchant/pdf/tpp/manage-disputes/Authorization_on_Credit.pdf",
+    "accessed": "2026-09-08",
+    "publication": "2022 copyright visible with confidentiality notice.",
+    "scope": "One-page item linked publicly from U.S. TPP hub; excluded after inspecting marking.",
+    "evidence": "The returned page carries a confidentiality/proprietary-use notice.",
+    "locator": "First-page notice.",
+    "limitations": "No substantive use. B01 public HTML supports its separately recorded pending-refund observation without this factsheet.",
+    "evidence_status": "gap",
+    "substantive_use": false
+  }
+]

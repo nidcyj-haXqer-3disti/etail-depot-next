@@ -1,0 +1,509 @@
+{
+  "status": "normative requirements only",
+  "cases": [
+    {
+      "id": "NEW-01",
+      "title": "New-resource isolation",
+      "required_result": "New repository/site/database/Identity/secrets have distinct verified IDs; denied targets never receive writes.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "NEW-02",
+      "title": "Fresh database",
+      "required_result": "All migrations apply to empty new PostgreSQL; no old data/compiled code imported.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "NEW-03",
+      "title": "Target collision",
+      "required_result": "Provisioner stops on wrong owner, old site ID, non-private repo or unrelated name collision.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "NEW-04",
+      "title": "Source provenance",
+      "required_result": "Original workbooks remain byte-identical; imports carry source hash, cell and policy/version references.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACC-01",
+      "title": "Three types and explicit selection",
+      "required_result": "Exactly PERSONAL/HOUSEHOLD/MERCHANT. The selected account persists across reload; no first-row fallback.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACC-02",
+      "title": "Roles differ by account",
+      "required_result": "One actor can own A and view B; modifying path/body/client state cannot grant B write access.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACC-03",
+      "title": "Capabilities and stale state",
+      "required_result": "Server denies/reasons/remediation agree with command policy; stale capability is not authorization.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACC-04",
+      "title": "Invitations",
+      "required_result": "One-use intended-recipient acceptance; expired/revoked/other-recipient tokens fail; no unintended membership charge.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACC-05",
+      "title": "Privacy across contexts",
+      "required_result": "Household access exposes no unrelated Personal/Merchant history, files, exports or totals.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACC-06",
+      "title": "Independent adults",
+      "required_result": "Adult participants can keep private Personal account history and scoped Household allocations.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACC-07",
+      "title": "Minor restrictions",
+      "required_result": "Guardian-funded participant cannot activate credit/Merchant or raise own limits through role/API edits.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACC-08",
+      "title": "Revocation",
+      "required_result": "Accepted access can be revoked; the next protected read/write is denied; own-history retention follows explicit policy.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-01",
+      "title": "One workflow",
+      "required_result": "Home/Cards/onboarding reach the same card-request route/component/command; no old/new choice or embedded legacy app.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-02",
+      "title": "Saved prerequisites",
+      "required_result": "Draft account/holder/settings survive missing verification/funding, session renewal and reload.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-03",
+      "title": "Issuance permission",
+      "required_result": "Spend alone cannot issue cards; manager alone cannot spend; responsible-party/product checks still apply to owner.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-04",
+      "title": "Request uniqueness",
+      "required_result": "Concurrent same-request submits under same/different HTTP keys create one card and stable provider operation.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-05",
+      "title": "Intent conflict",
+      "required_result": "Changed payload/version cannot replay a submitted request as a different card; return conflict.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-06",
+      "title": "Distinct requests",
+      "required_result": "Two deliberate eligible requests can create two cards without creating extra backing/cap.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-07",
+      "title": "Provider timeout",
+      "required_result": "Unknown remote outcome remains processing/reconciliation; no new provider operation ID on retry.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-08",
+      "title": "Scoped funding",
+      "required_result": "Holder and backing assignment are authorized; arbitrary cross-account facility IDs fail.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-09",
+      "title": "Freeze/replace",
+      "required_result": "Parent freeze cannot be undone on child card; replacement retains history and does not reset usage/cap.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "CARD-10",
+      "title": "Format/controls",
+      "required_result": "Virtual/physical/single-use/merchant options use one form and supported policy; no real PAN/CVV is stored.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-01",
+      "title": "Journal integrity",
+      "required_result": "Every posted entry balances by currency; direct update/delete is rejected; reversals are append-only.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-02",
+      "title": "Exact values",
+      "required_result": "All money/rates use exact representations; overflow/malformed/currency mismatch inputs fail.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-03",
+      "title": "Backing example",
+      "required_result": "$100 collateral + $10 settled purchase => $100 collateral, $10 obligation, $90 available.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-04",
+      "title": "Concurrent auth",
+      "required_result": "Separate database clients/barrier: $80 and $30 cannot both approve against $100 shared backing.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-05",
+      "title": "Payout versus pledge",
+      "required_result": "Concurrent commercial pledge/payout/refund cannot consume identical settled available funds twice.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-06",
+      "title": "Limit composition",
+      "required_result": "Account/person/card constraints compose; limit edits preserve usage and new cards do not increase capacity.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-07",
+      "title": "Holds and capture",
+      "required_result": "Approve/capture/partial capture/expire/reverse retain exact backed exposure; duplicates do not double subtract.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-08",
+      "title": "Late events",
+      "required_result": "Genuine clearing after freeze/revocation is recorded/reconciled without granting new authorization.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-09",
+      "title": "Repayment policies",
+      "required_result": "Consumer statement vs Merchant daily full repayment preserved; supervised funded users have no credit bill.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "MONEY-10",
+      "title": "Reconciliation",
+      "required_result": "Ledger, facility exposure, Merchant payable/reserves/payouts and reward liability reconcile to exact currency totals.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "SIM-01",
+      "title": "One practice purchase",
+      "required_result": "Visible member action completes via durable provider events; no manual clear is required.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "SIM-02",
+      "title": "Worker restart",
+      "required_result": "Crash after intent/event ack recovers without duplicate effects; Pending remains truthful.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "SIM-03",
+      "title": "Replay/reordering",
+      "required_result": "Duplicate business/event IDs and out-of-order events are safe; invalid signatures fail.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "SIM-04",
+      "title": "Narrow workers",
+      "required_result": "Only bounded mock event runner enabled; calendar schedules and real providers do not activate incidentally.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "SIM-05",
+      "title": "Readiness",
+      "required_result": "Disabled/missing simulator/runner returns safe capability unavailability before promising usable purchase.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACQ-01",
+      "title": "One merchant hierarchy and payment domain",
+      "required_result": "Merchant owns MASTER; Personal and Household have explicitly accepted SUB relationships under one named master each. One merchant domain and exact provider binding per order; assignment/verification, liability and payment readiness remain separate. No anonymous P2P or automatic issuing authority.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACQ-02",
+      "title": "Guest checkout",
+      "required_result": "Guest pays without login/membership; receipt/status reveals no member/Household/operator data.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACQ-03",
+      "title": "Channel, order and document semantics",
+      "required_result": "One channel configuration supports SMS/text, email, invoice, bill, social, QR and web. One-time channels cannot create duplicate obligations across presentations/revisions; reusable channels create independent orders; partial invoices enforce atomic remaining amount. Receipt follows confirmed payment; delivery does not mean paid.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACQ-04",
+      "title": "Settlement and reserve",
+      "required_result": "Pending/reserved/disputed amounts unavailable; itemized provider fee and brand cost accounted separately.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACQ-05",
+      "title": "Refund",
+      "required_result": "Partial/full refund ceiling and proportional reward/fee reversal cannot be exceeded/repeated.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACQ-06",
+      "title": "Payout lifecycle",
+      "required_result": "Request reserves eligible backing; paid/failure/retry restores or settles once; permissions/step-up apply.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACQ-07",
+      "title": "Disputes",
+      "required_result": "Opened/resolved/chargeback events link original payment and preserve evidence/accounting.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ACQ-08",
+      "title": "Scoped sub-MID delegation",
+      "required_result": "Household may delegate exact sub-MID/channel actions to accepted members or outside people without host-account membership or issuing visibility. Parent ceilings, live lineage, intended recipient, expiry and revocation enforced. Viewer/collector cannot refund, payout, reconfigure gateway or delegate without separate explicit authority.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ECO-01",
+      "title": "Pricing fixture",
+      "required_result": "Annual scenario equals Select $3200/Premier $2600/$600 saving; both base rates 0.50%.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ECO-02",
+      "title": "Shared bonus",
+      "required_result": "Spending/fee-only/mixed extras share one $300 membership-year cap across accounts/cards.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ECO-03",
+      "title": "Lifecycle rewards",
+      "required_result": "Monthly base, annual bonus, reversal, upgrade proration/no cap reset and earned credit without renewal.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ECO-04",
+      "title": "Cost imports",
+      "required_result": "Compute supplied Planning operating costs/contributions within $0.01 from source formulas; no residual plug.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ECO-05",
+      "title": "Cost completeness",
+      "required_result": "60 enabled/25 missing Planning lines/58.3333% completeness; missing vs zero vs disabled retained.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "ECO-06",
+      "title": "Basis and approvals",
+      "required_result": "Planning/Contracted/Actual never silently mix; locked approved versions unchanged; future rows off.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "OPS-01",
+      "title": "Cases and privacy",
+      "required_result": "Customer opens case; operator assigns/escalates/resolves/reopens; internal notes and attachments stay scoped.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "OPS-02",
+      "title": "Independent approval",
+      "required_result": "Requester cannot approve own protected action; payload edits/revocation invalidate approval.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "OPS-03",
+      "title": "Partner separation",
+      "required_result": "Direct/referral/wholesale/embedded models keep customer/partner/platform economics and access separate.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "OPS-04",
+      "title": "Partner API",
+      "required_result": "One-time scoped keys, revoke/expire, signed webhook retry/SSRF defense, reports and no cross-tenant access.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-01",
+      "title": "New Identity",
+      "required_result": "Issuer/subject binding from new provider only; no email-only relinking/first-user admin/hosted demo bypass.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-02",
+      "title": "Complete sign-in",
+      "required_result": "Signup/confirmation/login/expiry/reset/invite/logout work on actual hosted canonical origin.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-03",
+      "title": "CSRF",
+      "required_result": "Valid external HTTPS origin reaches login validation; foreign/missing/null/spoofed forwarding origins fail.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-04",
+      "title": "Session/MFA",
+      "required_result": "Secure/HttpOnly/host-only cookies where server-owned; logout/reset revoke; MFA/step-up and recovery replay limits.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-05",
+      "title": "Secret isolation",
+      "required_result": "No provider tokens, keys, connection strings or callback tokens in browser bundle/cache/logs/screenshots.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-06",
+      "title": "File controls",
+      "required_result": "Cross-account upload/read/export denied; allowed owner operation works; private Blob isolation across contexts.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "UX-01",
+      "title": "Clarity",
+      "required_result": "User completes card assignment, purchase and finds activity without old/new flow or internal provider vocabulary.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "UX-02",
+      "title": "Responsive accessible",
+      "required_result": "Desktop/mobile real browser; keyboard/dialog/focus/errors/contrast/zoom; no overflow at 320px.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "UX-03",
+      "title": "Error recovery",
+      "required_result": "Failed actions never show success; field values preserved; expired sessions/drafts resume safely.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "UX-04",
+      "title": "PWA privacy",
+      "required_result": "Installable public shell; never caches private APIs/account pages/documents or auth callbacks.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "REL-01",
+      "title": "Current dependencies",
+      "required_result": "Resolved versions/lockfile, real Next and Netlify builds; no guessed compatibility or fake stubs.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "REL-02",
+      "title": "CI exact revision",
+      "required_result": "Required suites execute (not skip) for reviewed SHA; detailed safe artifacts and release summary preserved.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "REL-03",
+      "title": "New deployment",
+      "required_result": "Ready actual new site/deploy ID/SHA/DB migrations observed; old projects unchanged.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "REL-04",
+      "title": "Preview isolation",
+      "required_result": "DB branch and auth/Blob/secret separation verified; protected previews do not mutate or expose main data.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "REL-05",
+      "title": "Hosted user journey",
+      "required_result": "Authorized new confirmed test account + card/funding/purchase + guest payment + reload/logout tested live.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "REL-06",
+      "title": "Public release review",
+      "required_result": "Owner approves public sandbox; Open registration with confirmation; mocks only; email caveat/operating costs disclosed.",
+      "status": "not-implemented",
+      "evidence": []
+    },
+    {
+      "id": "REL-07",
+      "title": "Restore and rollback",
+      "required_result": "Backup restore rehearsed in disposable new database; rollback preserves post-release financial events.",
+      "status": "not-implemented",
+      "evidence": []
+    }
+  ]
+}

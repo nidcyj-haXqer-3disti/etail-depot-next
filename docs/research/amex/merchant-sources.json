@@ -1,0 +1,272 @@
+[
+  {
+    "id": "M01",
+    "title": "Explore the Payments Default View",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/explore-payments-default-view.html",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Payments separates settlements, submissions, sales/credits, adjustments, statements and reports; additional options include authorizations. Newly enrolled users may wait four hours for payments data.",
+    "limitations": "Public description only; live enrollment and entitlement not tested. Four hours is not an Etail SLA."
+  },
+  {
+    "id": "M02",
+    "title": "Viewing Your Settlements",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/viewing-your-settlements.html?intlink=merchant-supportcenterhp-payments-viewingyoursettlements",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Pending/posted settlements expand into net amounts, deductions, paid-to-bank amounts and transaction details, with CSV/XLS/PDF exports.",
+    "limitations": "No internal accounting schema, bank confirmation protocol or settlement SLA is exposed."
+  },
+  {
+    "id": "M03",
+    "title": "Viewing Your Submissions",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/viewing-your-submissions.html?intlink=merchant-supportcenter-paymentshp-viewingyoursubmissions",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Submission rows include invoice/settlement references, charges, credits, deductions, amounts, transaction counts and separate payee/submitter merchant and location identifiers.",
+    "limitations": "Display fields do not prove one-to-one underlying relationships or an export/API schema."
+  },
+  {
+    "id": "M04",
+    "title": "Searching, Filtering, and Downloading Submissions",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/search-filter-download-submissions.html?intlink=merchant-supportcenter-paymentshp-searchfilterdownloadsubmissions",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Search by submission invoice, amount bounds/type, date type/range and location. Payee and submitter filters differ; download choices can adjust filters.",
+    "limitations": "Date/timezone boundary semantics and backend query authorization are not documented here."
+  },
+  {
+    "id": "M05",
+    "title": "Viewing Transaction Details of Submissions",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/view-transaction-details-submissions.html?intlink=merchant-supportcenter-paymentshp-viewtransactiondetailsofasubmission",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Submission expansion displays settlement/submission identifiers and amounts; additional detail includes activity, transaction counts, fees and credits.",
+    "limitations": "Progressive disclosure is documented; database or network event structure is not."
+  },
+  {
+    "id": "M06",
+    "title": "Viewing Transactions",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/view-transactions.html?intlink=merchant-supportcenter-paymentshp-viewtransactions",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Transactions can be filtered by location/date, displayed with configurable columns and downloaded as CSV/XLS/PDF.",
+    "limitations": "No complete transaction field dictionary, mobile behavior or API was validated."
+  },
+  {
+    "id": "M07",
+    "title": "Navigating Adjustments and Chargebacks",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/navigating-adjustments-and-chargeback-data.html?intlink=merchant-supportcenter-paymentshp-navigatingadjustmentsandchargebacks",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Adjustments and chargebacks use separate tables/settings. Related dispute information is linked for users enrolled in Disputes.",
+    "limitations": "Enrollment is not a complete account/role authorization specification."
+  },
+  {
+    "id": "M08",
+    "title": "Search, Filter, and Download Adjustments and Chargebacks",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/search-filter-download-adjustments-and-chargebacks.html?intlink=merchant-supportcenter-paymentshp-searchfilterdownloadadjustmentsandchargebacks",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Adjustment lookup supports references, amounts, dates and locations, including payee/submitter filters; downloadable results are available.",
+    "limitations": "The source also lists card-number lookup; Etail explicitly must not collect/store raw card details."
+  },
+  {
+    "id": "M09",
+    "title": "Downloading E-Statements",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/downloading-e-statements.html?intlink=merchant-supportcenter-paymentshp-downloadingestatements",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Merchant-specific statements support category, monthly/annual period and PDF/XLS format. New enrollment begins statement availability the following month.",
+    "limitations": "Availability behavior is not an Etail retention or statement-generation requirement."
+  },
+  {
+    "id": "M10",
+    "title": "Downloading Reports",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/downloading-reports.html?intlink=merchant-supportcenter-paymentshp-downloadingreports",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Reports configure grouping, detail, format, locations, range and settlement/transaction/Amex date basis; named templates can be saved and reused.",
+    "limitations": "Amex Date semantics, timezone and report internals are not defined on this page."
+  },
+  {
+    "id": "M11",
+    "title": "Report Library",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/payments/report-library.html",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "A report library shows scheduled and monthly scheduled downloads under Statements and Reports.",
+    "limitations": "Retry behavior, job status enum, retention and scheduling guarantees are not specified."
+  },
+  {
+    "id": "M12",
+    "title": "How to use the Disputes Summary Table",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/disputes/disputes-summary-table.html?intlink=merchant-supportcenter-disputeshp-howtousedisputessummarytable",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; Dispute Alert requires Accelerated Dispute Resolution enrollment; publication date unstated.",
+    "evidence": "Response Needed, Review in Progress and Closed views; expiration priority; inquiry and chargeback differ in debit timing. Bulk response partitions mixed case types. Downloads include columns beyond those displayed.",
+    "limitations": "Partial program coverage; not an internal case-state or security model. Export columns must still obey Etail authorization."
+  },
+  {
+    "id": "M13",
+    "title": "Managing a Dispute Case",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/disputes/managing-a-disputes-case.html?intlink=merchant-supportcenterhp-disputes-managingadisputecase",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Case detail shows response deadline, next action, reason/code, amounts and history; reply choices distinguish agreeing from disagreement or prior refund.",
+    "limitations": "Case-specific deadlines and outcome decision rules are not publicly enumerated here."
+  },
+  {
+    "id": "M14",
+    "title": "Disagreeing with a Card Member claim with an option for partial refund",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/disputes/disagreeing-with-cm-claim-partial-refund.html?intlink=merchant-supportcenter-disputeshp-disagreeingwithcmclaimpartialrefund",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website dispute response; partial refund option documented for inquiries; publication date unstated.",
+    "evidence": "Contest with reason, evidence, comments and attestation. The partial refund option supports a specified amount or percentage and applies to inquiries.",
+    "limitations": "Do not generalize this option to chargebacks, every refund API or every jurisdiction."
+  },
+  {
+    "id": "M15",
+    "title": "Agreeing with the Card Member claim and issuing a full refund",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/disputes/agreeing-with-cm-claim-full-refund.html?intlink=merchant-supportcenter-disputeshp-agreeingwithcmclaimfullrefund",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website dispute response; publication date unstated.",
+    "evidence": "The accepting response chooses Amex-issued chargeback or direct credit, with comments and initials before submission.",
+    "limitations": "The page does not establish financial completion on form submission or explain duplicate-refund reconciliation."
+  },
+  {
+    "id": "M16",
+    "title": "Adding Documents to a Case",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/disputes/adding-documents-to-a-case.html?intlink=merchant-supportcenter-disputeshp-addingdocumentstoacase",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; open cases after response; publication date unstated.",
+    "evidence": "Additional evidence can be submitted while a case remains open; published type/size/page limits apply and document-processing errors appear above the main queue.",
+    "limitations": "Limits are program behavior, not universal; virus-scanning and storage implementation remain unknown."
+  },
+  {
+    "id": "M17",
+    "title": "Reviewing Closed Disputes",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/disputes/reviewing-closed-disputes.html?intlink=merchant-supportcenter-disputeshp-reviewingcloseddisputes",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Closed cases remain filterable/exportable; win/loss reports use separate date selection and a limited report history.",
+    "limitations": "UI report-history limits are not proof of financial or legal record retention."
+  },
+  {
+    "id": "M18",
+    "title": "Searching for Disputes",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/disputes/searching-for-disputes.html?intlink=merchant-supportcenter-disputeshp-searchingfordisputes",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; public help page; publication date unstated.",
+    "evidence": "Search supports case and charge references or cardholder identifiers, then opens the selected case for status/action.",
+    "limitations": "Etail will use safe scoped identifiers; no permission for raw card details is inferred."
+  },
+  {
+    "id": "M19",
+    "title": "View and Update Your Account",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/view-and-update-account.html?intlink=merchant-supportcenter-accountserviceshp-viewandupdateaccount",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; single/multiple Merchant ID variants; publication date unstated.",
+    "evidence": "Primary merchant rows expand to linked locations while standalone IDs remain separate. Legal name and tax ID are view-only in the described editor.",
+    "limitations": "Not an authorization model or a complete legal-entity change workflow. No real sensitive information was accessed."
+  },
+  {
+    "id": "M20",
+    "title": "Edit Bank Information",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/edit-bank-information.html?intlink=merchant-supportcenter-accountserviceshp-editupdatebankinfo",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; single/multiple Merchant ID variants; publication date unstated.",
+    "evidence": "Select credit/debit accounts, complete one-time-code identity verification, enter new information and confirm the change.",
+    "limitations": "Bank ownership verification, effective time, approval conditions and in-flight payment routing are unspecified; sandbox accepts no real bank details."
+  },
+  {
+    "id": "M21",
+    "title": "Create a New Merchant ID",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/create-new-merchantid.html",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; existing accounts eligible for online merchant-ID creation; publication date unstated.",
+    "evidence": "Saved progress, relationship selection, business/ownership/financial review, central versus individual pay, and a final request acknowledgment. Franchise-related paths require support.",
+    "limitations": "Does not imply unrestricted new-merchant approval, permission to collect real KYB data or applicability to OptBlue. Private decision criteria unavailable."
+  },
+  {
+    "id": "M22",
+    "title": "Create Multiple New Merchant IDs",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/create-multiple-merchantid.html",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; headquarters batch creation; publication date unstated.",
+    "evidence": "Batch creation inherits headquarters information while allowing selected business, financial, contact, ownership and signer sections to be reviewed per location.",
+    "limitations": "Partial failure, duplicate handling, approval and transaction semantics are not published."
+  },
+  {
+    "id": "M23",
+    "title": "View Account Updates",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/view-account-updates.html",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website; single/multiple Merchant ID variants; publication date unstated.",
+    "evidence": "Chronological change attempts show merchant, date, change type/activity and success/failure/pending state; an attempt opens into more detail.",
+    "limitations": "No full approval, retry, audit immutability or internal event-state specification is exposed."
+  },
+  {
+    "id": "M24",
+    "title": "Online Account: View/Edit Contact Information and Alerts",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/online-account-contact-information-and-alerts.html?intlink=merchant-supportcenter-accountserviceshp-contactinfoalerts",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website user profile; enrollment-specific notifications; publication date unstated.",
+    "evidence": "Contact changes require identity checks; payment, dispute and marketing subscriptions are distinct, with alternate destinations supported for some alerts.",
+    "limitations": "Do not copy legacy security-code design or opt-in defaults into Etail without its own security/consent decisions."
+  },
+  {
+    "id": "M25",
+    "title": "Manage Locations",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/manage-locations.html?intlink=merchant-supportcenter-accountserviceshp-managelocations",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant website profile; public help page; publication date unstated.",
+    "evidence": "Locations display enrolled Payments/Disputes/Account Updates experiences; an existing accepting location can be added; a user-list report audits access to merchant IDs.",
+    "limitations": "Enrollment input requirements are not sufficient evidence of backend authorization or ownership verification."
+  },
+  {
+    "id": "M26",
+    "title": "Merchant Site Terms of Use, section 6 Access Levels",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/merchant/pdf/terms-and-conditions.pdf",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant Site; PDF dated 2025-10-31; sections 5-6 read for user/access behavior.",
+    "evidence": "Distinct user roles and access levels constrain feature access, with a dispute-only example; separate users are expected to have individual credentials.",
+    "limitations": "Terms are program-specific and mutable. This is product-reference research, not an interpretation of Etail legal obligations."
+  },
+  {
+    "id": "M27",
+    "title": "OptBlue merchant acceptance overview",
+    "url": "https://www.americanexpress.com/us/merchant/optblue.html",
+    "accessed": "2026-09-08",
+    "scope": "U.S. OptBlue public overview; current page read 2026-09-08; eligibility differs by market/category.",
+    "evidence": "Participating providers contract with eligible merchants, set rates and combine statement/deposit/servicing; certified channels can include PayFac relationships.",
+    "limitations": "No Etail approval or provider entitlement established. Current merchant-volume text differs from dated M28; figures are not imported."
+  },
+  {
+    "id": "M28",
+    "title": "Payment Facilitator Acceptance of American Express Cards",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/merchant/pdf/Payment-Facilitator-FactSheet.pdf",
+    "accessed": "2026-09-08",
+    "scope": "U.S. factsheet dated October 2024, with Puerto Rico/U.S. Virgin Islands qualifications; both pages read.",
+    "evidence": "PayFac is described as merchant of record receiving settlement for program merchants; registration and transaction-data specifications run through a certified OptBlue participant.",
+    "limitations": "Dated eligibility figures conflict with the current overview. A commercial factsheet is not an approved program/API implementation contract."
+  },
+  {
+    "id": "M29",
+    "title": "Integrated Payments Providers Program",
+    "url": "https://network.americanexpress.com/globalnetwork/v4/partners/integrated-payments-providers-program/",
+    "accessed": "2026-09-08",
+    "scope": "Global Network public program overview; publication date unstated; product/market availability requires verification.",
+    "evidence": "Provider program supports specification guidance and certification for POS, e-commerce and host functions; registration includes NDA and terms.",
+    "limitations": "No private specifications accessed, no agreement accepted, no certification or production entitlement established."
+  },
+  {
+    "id": "M30",
+    "title": "American Express Merchant Website Support Center",
+    "url": "https://www.americanexpress.com/us/merchant/support-center.html",
+    "accessed": "2026-09-08",
+    "scope": "U.S. Merchant support; public index and support availability read; publication date unstated.",
+    "evidence": "Help is organized by registration, account, payments and disputes. Authenticated chat and phone support are distinct channels with stated service hours.",
+    "limitations": "Support staff tooling, escalation rules, staffing and resolution SLAs are not publicly revealed or tested."
+  }
+]

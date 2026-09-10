@@ -1,0 +1,586 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-09-08",
+  "scope": "U.S. merchant business/product audit; direct merchant portal and merchant-services-provider/OptBlue routes distinguished. No technical/vendor architecture or implementation scoring.",
+  "field_semantics": {
+    "normal_flow": "Proposed Etail customer/business journey, not a claim that Amex exposes every step identically.",
+    "exceptions": "Business conditions Etail must resolve or explicitly leave unsupported.",
+    "issuing_handoff": "Proposed relationship to the payer/cardholder/issuer or Seller commercial spending; guests need no Etail account.",
+    "account_control_handoff": "Proposed permission/responsibility boundaries consistent with Etail PRODUCT and WORKFLOWS.",
+    "evidence_status": "Amex public business evidence: documented confirms the relevant task/observable behavior; partial leaves material program/exception detail unverified; gap lacks sufficient public U.S. evidence. Never an app-completion score.",
+    "source_ids": "Contextual evidence for the relevant business task, not proof of every proposed acceptance clause. M IDs resolve in merchant-sources.json; N IDs in merchant-360-sources.json; B01 resolves in business-360-sources.json.",
+    "comparison_ids": "Related rows of amex-public-v1, not an equivalence assertion. Empty means this business task is not a distinct existing comparison row.",
+    "etail_gap": "Business specification or review gap. Application implementation was not inspected in this audit.",
+    "acceptance_scenario": "Fictional proposed Etail acceptance scenario; amounts and outcomes are not Amex policies."
+  },
+  "checks": [
+    {
+      "id": "MER360-01",
+      "journey": "Choose the merchant program and responsible business",
+      "actors": [
+        "Seller owner",
+        "contracting merchant-services provider",
+        "funding party"
+      ],
+      "normal_flow": "Identify the legal Seller, operating country, permitted channels, fees, funding party and support route before offering acceptance.",
+      "exceptions": "Ineligible activity, unsupported country, a different business using the same login, or confusion between direct acceptance and OptBlue.",
+      "issuing_handoff": "A merchant approval does not open an issuing facility or guarantee a payer's card approval.",
+      "account_control_handoff": "An administrator cannot accept terms or change the responsible party without that authority.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "M27",
+        "M28",
+        "N01"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "The current product needs an explicit program/responsibility explanation; real provider and negotiated terms remain unselected.",
+      "acceptance_scenario": "Given a fictional provider that only forwards transactions, the Seller sees the separate funder and dispute contact and cannot assume the forwarding provider pays it."
+    },
+    {
+      "id": "MER360-02",
+      "journey": "Apply, supply missing information and receive an activation outcome",
+      "actors": [
+        "Seller owner",
+        "authorized representative",
+        "merchant reviewer"
+      ],
+      "normal_flow": "Start or resume the named Seller request, complete requirements, review responsibility, submit and receive pending, needs-information, approved or declined status.",
+      "exceptions": "Abandoned draft, missing requirement, repeated submission, unapproved representative or later restriction.",
+      "issuing_handoff": "Merchant activation and commercial spending approval remain separate customer decisions.",
+      "account_control_handoff": "Only the named representative may submit; a helper can assist only within delegated authority.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "M21"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-01"
+      ],
+      "etail_gap": "Requirements exist; the complete business review and recovery journey has not been assessed in the application.",
+      "acceptance_scenario": "An applicant returns after a missing-information request, finishes the same application and receives one recorded outcome; the pending Seller cannot collect."
+    },
+    {
+      "id": "MER360-03",
+      "journey": "Set up locations and who receives their money",
+      "actors": [
+        "Seller owner",
+        "location manager",
+        "central finance"
+      ],
+      "normal_flow": "Add approved locations; identify which location submits sales and whether funds go to a central or local payee.",
+      "exceptions": "Wrong parent, closed location, duplicate setup, one rejected item in several requests or a changed payee.",
+      "issuing_handoff": "The payer's receipt identifies the actual seller/location without revealing internal ownership details.",
+      "account_control_handoff": "Location oversight does not automatically give the manager access to another legal Seller.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M19",
+        "M21",
+        "M22"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-02",
+        "AX-MERCHANT-03"
+      ],
+      "etail_gap": "Multi-location business rules and per-item outcomes need a customer walkthrough; existing comparison rows cover only part of that journey.",
+      "acceptance_scenario": "One headquarters requests two locations; one succeeds and one requires correction. Central finance can distinguish the two and their separate destinations."
+    },
+    {
+      "id": "MER360-04",
+      "journey": "Give, review and remove merchant team access",
+      "actors": [
+        "Seller owner",
+        "merchant team administrator",
+        "bookkeeper",
+        "dispute responder"
+      ],
+      "normal_flow": "Give each person the required location and service access, show its scope, review users and remove access when duties end.",
+      "exceptions": "Departed staff, wrong location, bookkeeper attempting a refund, dispute responder attempting a bank change or old export access.",
+      "issuing_handoff": "Merchant staff receive only purchase/case information needed to service the sale, not the payer's unrelated card activity.",
+      "account_control_handoff": "Merchant administration, financial action, dispute response and reporting are separate permissions.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M25",
+        "M26"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-03",
+        "AX-CONTROLS-04",
+        "AX-CONTROLS-05"
+      ],
+      "etail_gap": "The role model exists; end-to-end merchant role exercises and handoffs remain unassessed.",
+      "acceptance_scenario": "Remove a location manager while a dispute draft is open; another authorized responder can finish it, but the removed manager cannot read or submit it."
+    },
+    {
+      "id": "MER360-05",
+      "journey": "Make the seller, sale terms and receipt understandable",
+      "actors": [
+        "Buyer",
+        "checkout operator",
+        "Seller service team"
+      ],
+      "normal_flow": "Show who is selling, price/currency, cancellation/return conditions and a receipt/reference that lets buyer and Seller recognize the same sale.",
+      "exceptions": "Unrecognizable descriptor, wrong location, unclear fee, missing receipt or a buyer contacting the wrong business.",
+      "issuing_handoff": "The cardholder can connect the statement charge with the purchase and its service contact.",
+      "account_control_handoff": "Only authorized staff change customer-facing business details; changes are reviewed in the proper Seller.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "B01",
+        "N02"
+      ],
+      "comparison_ids": [
+        "AX-MANAGEMENT-07"
+      ],
+      "etail_gap": "Receipt and public checkout requirements exist; consistent merchant identity from checkout to cardholder support needs a specific business review.",
+      "acceptance_scenario": "A buyer queries a fictional statement descriptor; the receipt identifies the seller and purchase without requiring access to a private merchant account."
+    },
+    {
+      "id": "MER360-06",
+      "journey": "Accept a payment and handle approval, decline or uncertainty",
+      "actors": [
+        "Buyer",
+        "Seller checkout operator",
+        "merchant-services provider",
+        "card issuer"
+      ],
+      "normal_flow": "Present the intended amount, obtain the supported payment decision and tell both sides whether payment is approved, declined, cancelled or still unknown.",
+      "exceptions": "Expired approval, attempted amount above approval, partial approval, buyer abandonment or an interrupted response.",
+      "issuing_handoff": "Issuer approval/rejection and the buyer's hold must match the merchant's payment status; neither side infers settlement from approval.",
+      "account_control_handoff": "A cashier cannot override a restriction or raise a spending limit; unsupported channels are disclosed.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "N02"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Acquiring is specified, but channel-specific customer recovery, partial-approval policy and responsibility for uncertain payments need explicit decisions.",
+      "acceptance_scenario": "The buyer sees a connection failure after approval; the Seller checks the existing payment before asking for another payment and the buyer is not charged twice."
+    },
+    {
+      "id": "MER360-07",
+      "journey": "Manage fulfillment, partial delivery and cancellation",
+      "actors": [
+        "Buyer",
+        "fulfillment team",
+        "Seller service team"
+      ],
+      "normal_flow": "Record what was promised and delivered, keep the buyer informed, and collect or refund only the amount justified by the agreed sale and approved payment arrangement.",
+      "exceptions": "Delayed shipment, partial delivery, cancelled service, unfulfilled deposit or goods refused on delivery.",
+      "issuing_handoff": "Cardholder purchase/credit history reflects the fulfilled and cancelled portions separately.",
+      "account_control_handoff": "Staff can record fulfillment without gaining permission to change price, issue a refund or alter the underlying sale terms.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "N02"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Etail offers deposits and invoices; it still needs explicit advance-payment, partial-fulfillment and cancellation policies before those affected flows.",
+      "acceptance_scenario": "For a fictional 100-dollar order,60 dollars is fulfilled and 40 cancelled. The buyer, Seller and support team can explain the remaining collection or refund without charging the full order twice."
+    },
+    {
+      "id": "MER360-08",
+      "journey": "Operate recurring billing and stop it on cancellation",
+      "actors": [
+        "Buyer",
+        "Seller billing administrator",
+        "Seller service team"
+      ],
+      "normal_flow": "Show the recurring agreement and next collection, notify the buyer of changes, and give a clear stop/cancellation result.",
+      "exceptions": "Cancellation near the next collection, failed collection, disputed consent, a changed price or recurring charges continuing after cancellation.",
+      "issuing_handoff": "The buyer's card activity distinguishes a prior valid charge from a later charge requiring correction; card replacement is not proof of renewed consent.",
+      "account_control_handoff": "Only authorized billing staff change an agreement; a helper cannot enroll someone without consent.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "N02"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Recurring mock schedules exist in product scope; consent, customer cancellation and post-cancellation service recovery are absent from the old merchant comparison rows.",
+      "acceptance_scenario": "Cancel before the next fictional billing date; no later collection starts. If a prior attempt was already completed, explain its status and assess any credit separately."
+    },
+    {
+      "id": "MER360-09",
+      "journey": "Submit sales and resolve late, duplicate or failed submissions",
+      "actors": [
+        "Seller finance",
+        "submitting location",
+        "merchant-services provider"
+      ],
+      "normal_flow": "Review which sales/credits were sent, distinguish accepted from unresolved items, and correct a submission through the responsible provider.",
+      "exceptions": "Late presentment, duplicate sales, amount/currency mismatch, one failed item in a batch or uncertain receipt of a file.",
+      "issuing_handoff": "The payer must not receive duplicate charges or an unexplained second charge used to repair a merchant submission error.",
+      "account_control_handoff": "A submitter can handle only its authorized locations; a payee's visibility does not automatically allow submission.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M03",
+        "M04",
+        "N02"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-07",
+        "AX-MERCHANT-11"
+      ],
+      "etail_gap": "Batch inspection exists in the catalog; explicit business handling of late, uncertain and partly failed submissions needs expansion.",
+      "acceptance_scenario": "A submitted batch is mistakenly sent again. Finance identifies the original sales and resolves the duplicate rather than treating the repeated batch as new revenue."
+    },
+    {
+      "id": "MER360-10",
+      "journey": "Understand pending and completed settlement",
+      "actors": [
+        "Seller finance",
+        "contracting provider",
+        "funding party"
+      ],
+      "normal_flow": "Separate sales awaiting settlement from settled amounts and explain which sales and credits belong to each settlement.",
+      "exceptions": "Delayed provider confirmation, omitted sale, partial settlement or a completed checkout with no settlement yet.",
+      "issuing_handoff": "Cardholder payment history and merchant settlement are related but can reach their next stages at different times.",
+      "account_control_handoff": "Pending funds cannot be paid out or used as backing for Seller spending.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M02",
+        "M05"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-08",
+        "AX-MERCHANT-10"
+      ],
+      "etail_gap": "The comparison covers stage visibility; the Seller still needs an understandable explanation of delays and next action.",
+      "acceptance_scenario": "A sale is approved but the settlement is pending. The Seller can find the sale and expected settlement while available funds and spending backing remain unchanged."
+    },
+    {
+      "id": "MER360-11",
+      "journey": "Explain fees, credits and other settlement deductions",
+      "actors": [
+        "Seller finance",
+        "merchant-services provider",
+        "support specialist"
+      ],
+      "normal_flow": "Show the amounts deducted or added, their reason, applicable price basis and the related sale or case where relevant.",
+      "exceptions": "Unrecognized fee, missing cost input, wrong plan, unexpected adjustment or deductions larger than current sales.",
+      "issuing_handoff": "A merchant fee does not appear as an unexplained buyer charge; a buyer credit is traceable separately.",
+      "account_control_handoff": "A bookkeeper can question a deduction without editing the balance or commercial pricing.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M02",
+        "M07",
+        "M08"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-09",
+        "AX-MERCHANT-13"
+      ],
+      "etail_gap": "Etail's Select/Premier economics remain normative; missing rate inputs and contested charges need a business resolution path.",
+      "acceptance_scenario": "A settlement includes an unexplained deduction. Finance opens a referenced question, sees its status and never sees an unknown fee represented as zero."
+    },
+    {
+      "id": "MER360-12",
+      "journey": "Understand and challenge a reserve or withholding",
+      "actors": [
+        "Seller owner",
+        "funding party",
+        "risk/merchant support"
+      ],
+      "normal_flow": "Explain the withheld amount, business reason, affected funds, review route and any known release conditions; show later release or continued hold truthfully.",
+      "exceptions": "Unexpected increase, disputed reason, missed review date, reserve insufficient for an obligation or attempted withdrawal of held funds.",
+      "issuing_handoff": "A reserve is not a refund to a cardholder and does not remove an issuing obligation.",
+      "account_control_handoff": "Reserve administration and reserve release require appropriate authority; held funds cannot be pledged or paid out.",
+      "evidence_status": "gap",
+      "source_ids": [
+        "N01"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Etail requires reserves, but reviewed public U.S. material does not establish a universal Amex reserve formula, notice, appeal or release schedule. Etail must specify its own mock policy.",
+      "acceptance_scenario": "A 100-dollar reserve remains held during a requested payout; the Seller can request review and see who must respond. No invented release date or cardholder credit is shown."
+    },
+    {
+      "id": "MER360-13",
+      "journey": "Resolve a merchant shortfall or negative balance",
+      "actors": [
+        "Seller owner",
+        "funding party",
+        "collections/support"
+      ],
+      "normal_flow": "Explain the shortfall, responsible party, permitted repayment or offset arrangement, and what remains restricted until resolved.",
+      "exceptions": "Refunds/chargebacks exceed receipts, insufficient bank funds, failed recovery, disputed debt or a shortfall after business closure.",
+      "issuing_handoff": "The buyer's legitimate credit and the merchant's recovery obligation are separate outcomes; do not delay explanation of one while collecting the other.",
+      "account_control_handoff": "No silent use of an unrelated Personal/Household account or another Seller's funds.",
+      "evidence_status": "gap",
+      "source_ids": [
+        "N01"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "The product names responsible merchant parties, but the precise recovery, notice and restriction policy for a merchant shortfall needs a business decision.",
+      "acceptance_scenario": "A Seller owes 30 dollars after refunds exceed receipts. Its own history shows the reason and allowed resolution; another Household member's funds are not taken."
+    },
+    {
+      "id": "MER360-14",
+      "journey": "Trace payout to the bank and resolve missing or returned funds",
+      "actors": [
+        "Seller finance",
+        "funding party",
+        "destination bank",
+        "merchant support"
+      ],
+      "normal_flow": "Show the expected payout, submitted delivery and final bank-related outcome; help trace a missing deposit using the responsible party and reference.",
+      "exceptions": "Bank holiday/cutoff, wrong or closed destination, rejected or returned payment, partial delivery or Seller reporting no deposit.",
+      "issuing_handoff": "A merchant payout problem must not create another charge to the original cardholder.",
+      "account_control_handoff": "Only eligible available funds may be paid; a viewer cannot redirect delivery or reuse money already committed elsewhere.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "M02",
+        "M20",
+        "M27"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-08",
+        "AX-MERCHANT-10"
+      ],
+      "etail_gap": "Amex paid-to-bank reporting is documented; bank confirmation, failure/return handling and promised timing are not fully covered by these public pages.",
+      "acceptance_scenario": "The provider shows paid but the Seller reports no deposit. Support opens a trace with the right funder; the app does not mark a second payout paid without resolving the first."
+    },
+    {
+      "id": "MER360-15",
+      "journey": "Change bank, contact or material business information",
+      "actors": [
+        "Seller owner",
+        "authorized account administrator",
+        "merchant reviewer"
+      ],
+      "normal_flow": "Identify the exact account/location, verify authority, submit the proposed change and distinguish pending, failed and effective information.",
+      "exceptions": "Failed identity check, incorrect destination, change during an in-flight payout, changed legal ownership or disconnected alerts.",
+      "issuing_handoff": "A change to Seller details does not alter cardholder responsibility or unrelated issuing accounts.",
+      "account_control_handoff": "Financial destination, legal-party and notification changes have different authority and review needs.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "M19",
+        "M20",
+        "M23",
+        "M24"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-04",
+        "AX-MERCHANT-05",
+        "AX-MANAGEMENT-17"
+      ],
+      "etail_gap": "The current/effective change distinction is covered; ownership changes and the destination of in-flight payouts still require explicit business treatment.",
+      "acceptance_scenario": "A bank change is pending while a payout is already being delivered; the Seller is told which destination applies and a failed change does not silently replace the old one."
+    },
+    {
+      "id": "MER360-16",
+      "journey": "Refund all or part of an ordinary sale",
+      "actors": [
+        "Buyer",
+        "authorized refund operator",
+        "merchant-services provider"
+      ],
+      "normal_flow": "Locate the original sale, explain the requested credit and refundable remainder, submit an authorized full/partial refund and provide its progress to the buyer.",
+      "exceptions": "Repeated request, refund exceeds sale remainder, restricted Seller, insufficient eligible funds, failed credit or refund requested after a dispute began.",
+      "issuing_handoff": "The cardholder can distinguish a refund requested, pending and posted; spending/rewards adjustments follow the actual credit outcome.",
+      "account_control_handoff": "Refund authority is separate from viewing payments; the original merchant scope stays intact.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "B01",
+        "N02"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "The product specifies refunds, but a standalone refund journey is not a distinct old merchant comparison row. Exact timing, funding and recovery choices need a business specification.",
+      "acceptance_scenario": "After a 100-dollar sale and 30-dollar refund, a second 80-dollar request is not silently paid. Staff see the 70-dollar remainder and explain the available resolution."
+    },
+    {
+      "id": "MER360-17",
+      "journey": "Receive an inquiry and gather the right response",
+      "actors": [
+        "Cardholder",
+        "issuer service team",
+        "merchant-services provider",
+        "Seller dispute responder"
+      ],
+      "normal_flow": "Identify the challenged sale, reason, amount, required reply and deadline owner; gather the specific evidence and respond through the correct service route.",
+      "exceptions": "Payer does not recognize the seller, wrong location, missing documents, overlapping merchant/issuer conversations or no assigned responder.",
+      "issuing_handoff": "The issuer's initial cardholder question may be resolved before merchant contact; merchant response is not automatic case success.",
+      "account_control_handoff": "Only the relevant Seller/location responder can see the case and its buyer information.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "B01",
+        "M12",
+        "M13"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-14",
+        "AX-MANAGEMENT-14",
+        "AX-MANAGEMENT-15"
+      ],
+      "etail_gap": "Existing dispute rows need an explicit cross-party owner and next-response explanation.",
+      "acceptance_scenario": "An inquiry reaches a multi-location Seller. The correct responder sees the requested information and reply-by source; another location's viewer cannot answer it."
+    },
+    {
+      "id": "MER360-18",
+      "journey": "Handle an upfront chargeback and decide whether to contest",
+      "actors": [
+        "Seller dispute responder",
+        "merchant-services provider",
+        "issuer dispute team"
+      ],
+      "normal_flow": "Tell the Seller whether money has already been taken, what evidence is requested and whether contesting remains available.",
+      "exceptions": "Chargeback arrives before a merchant inquiry, disputed amount differs from sale, late notice or Seller cannot support its position.",
+      "issuing_handoff": "A chargeback response and a later cardholder outcome must not be confused with a new merchant refund.",
+      "account_control_handoff": "Case-response permission does not grant payout or bank-setting authority.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M12",
+        "M13",
+        "B01"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-14",
+        "AX-MERCHANT-15"
+      ],
+      "etail_gap": "The underlying case types are covered; the debited amount and dispute work need a joint business walkthrough.",
+      "acceptance_scenario": "An upfront 20-dollar chargeback arrives on a 100-dollar sale. The Seller sees 20 debited and an open response opportunity without the entire sale becoming refunded."
+    },
+    {
+      "id": "MER360-19",
+      "journey": "Submit evidence and handle rejected, late or insufficient replies",
+      "actors": [
+        "Seller dispute responder",
+        "merchant-services provider",
+        "reviewer"
+      ],
+      "normal_flow": "Prepare relevant documents/explanation, submit before the displayed deadline and show whether the response and documents were accepted for review.",
+      "exceptions": "Unreadable attachment, rejected format, document-processing failure, insufficient reply, missed deadline or one failed case in a bulk response.",
+      "issuing_handoff": "An uploaded file is not proof the issuer received usable evidence or reversed the buyer's credit.",
+      "account_control_handoff": "Evidence and bulk actions remain limited to authorized cases; removal of access transfers work to another responder.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M14",
+        "M16",
+        "N02"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-15",
+        "AX-MERCHANT-17",
+        "AX-MANAGEMENT-16"
+      ],
+      "etail_gap": "Failure handling is in the catalog; distinguish merchant preparation, provider receipt and review in customer language.",
+      "acceptance_scenario": "A response is sent but its evidence fails processing before the deadline; staff see the actionable failure and repair it without submitting a second financial resolution."
+    },
+    {
+      "id": "MER360-20",
+      "journey": "Resolve a claim with a prior or partial refund",
+      "actors": [
+        "Seller dispute responder",
+        "refund operator",
+        "merchant-services provider"
+      ],
+      "normal_flow": "Review existing credits/debits before agreeing, contesting or offering a permitted partial resolution; explain which route will return any remaining amount.",
+      "exceptions": "A refund and chargeback overlap, credit is still pending, only part of the claim is accepted or the case type disallows the offered option.",
+      "issuing_handoff": "The buyer receives the supported total resolution once; the Seller can explain prior credit versus new money.",
+      "account_control_handoff": "Case responders cannot silently exceed their refund approval authority.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M13",
+        "M14",
+        "M15"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-16"
+      ],
+      "etail_gap": "The prior-refund safeguard is covered; partial-resolution options need precise case eligibility and buyer communication.",
+      "acceptance_scenario": "A 100-dollar dispute overlaps a 40-dollar pending refund. Staff first account for the existing credit and cannot promise another 100 dollars as an automatic outcome."
+    },
+    {
+      "id": "MER360-21",
+      "journey": "Close a dispute and verify the resulting money",
+      "actors": [
+        "Seller finance",
+        "dispute responder",
+        "merchant-services provider",
+        "issuer"
+      ],
+      "normal_flow": "Record the case result, explain its business meaning and reconcile any debit, reversal or credit before treating the financial question as finished.",
+      "exceptions": "Case closed while an adjustment is missing, loss after a promised refund, partial win, reopened question or unfamiliar outcome wording.",
+      "issuing_handoff": "Merchant case result and the cardholder's final bill/credit must be explainable without exposing private issuer information.",
+      "account_control_handoff": "Closing a case does not grant authority to alter an account balance.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "M07",
+        "M17"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-18"
+      ],
+      "etail_gap": "Closed-case history exists in the benchmark; final money confirmation and any reopened customer question remain separate checks.",
+      "acceptance_scenario": "A case is won but no reversal is visible. The case records the win while finance has an open money-tracing task; available funds do not increase on the label alone."
+    },
+    {
+      "id": "MER360-22",
+      "journey": "Reconcile a period and produce useful statements/reports",
+      "actors": [
+        "Seller bookkeeper",
+        "central finance",
+        "accountant"
+      ],
+      "normal_flow": "Compare sales, credits, deductions, settlement and bank receipts for a chosen period/currency/location; save and retrieve the needed statement or report.",
+      "exceptions": "Unmatched sale/deposit, timing boundary, revised filters, late adjustment, unavailable period, failed report or revoked report access.",
+      "issuing_handoff": "Merchant reports must not reveal the cardholder's other purchases or private issuing-account data.",
+      "account_control_handoff": "Report/export scope follows current grants; a saved report is not permanent access to a removed location.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "M03",
+        "M09",
+        "M10",
+        "M11"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-07",
+        "AX-MERCHANT-12",
+        "AX-MANAGEMENT-12",
+        "AX-MANAGEMENT-13"
+      ],
+      "etail_gap": "Existing rows cover report actions; a complete business reconciliation needs an explicit unresolved-difference owner and period explanation.",
+      "acceptance_scenario": "A refund posts after the sale's statement period. The next report explains the timing difference and both periods remain traceable without rewriting the older statement."
+    },
+    {
+      "id": "MER360-23",
+      "journey": "Restrict or close merchant activity while finishing obligations",
+      "actors": [
+        "Seller owner",
+        "merchant-services provider",
+        "funding party",
+        "case/support teams"
+      ],
+      "normal_flow": "Explain which new activity stops, what remains open, how outstanding orders/refunds/disputes are serviced and when closure is complete.",
+      "exceptions": "Unfulfilled advance payment, recurring agreement, pending bank change, reserve, unresolved payout/refund/dispute or later chargeback.",
+      "issuing_handoff": "Stopping merchant acceptance does not erase the buyer's service/credit rights or the Seller's separate issuing debt.",
+      "account_control_handoff": "History and necessary servicing remain available only to authorized people after new-money activity stops.",
+      "evidence_status": "gap",
+      "source_ids": [
+        "N01",
+        "M30"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Etail specifies closure prerequisites, but a complete merchant exit/appeal and post-closure servicing policy is not established by the public U.S. pages reviewed.",
+      "acceptance_scenario": "A Seller requests closure with an open refund and dispute. New collection stops as policy permits; the outstanding work has named owners and closure is not falsely complete."
+    },
+    {
+      "id": "MER360-24",
+      "journey": "Get help, escalate a complaint and retain responsibility",
+      "actors": [
+        "Seller contact",
+        "merchant support",
+        "funding/provider support",
+        "complaint owner"
+      ],
+      "normal_flow": "Start help from the relevant payment/case/change, receive a reference and next step, and escalate a complaint without losing the original issue.",
+      "exceptions": "Wrong service organization, closed support hours, missed response, dispute deadline approaching or unresolved complaint after account closure.",
+      "issuing_handoff": "A buyer's charge dispute and a Seller's service complaint can coexist; neither automatically closes the other.",
+      "account_control_handoff": "Staff share only needed case information; the complaint follows the affected business, not everyone using the login.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "M30",
+        "M27",
+        "N01"
+      ],
+      "comparison_ids": [
+        "AX-MANAGEMENT-18"
+      ],
+      "etail_gap": "Public routes exist, but U.S. merchant complaint categories, escalation stages and promised resolution times remain unverified. Define Etail's service policy.",
+      "acceptance_scenario": "A missing-payout complaint is raised with the wrong provider; it receives a reference, responsible funder and next action while any dispute deadline remains visible."
+    }
+  ]
+}

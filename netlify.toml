@@ -1,0 +1,18 @@
+[build]
+  # Keep automatic publication off until the hosted slice has been reviewed.
+  # Netlify build hooks bypass ignore; do not configure hooks for this foundation.
+  ignore = "exit 0"
+command = "pnpm build"
+publish = ".next"
+
+[build.environment]
+NODE_VERSION = "24.19.0"
+PNPM_VERSION = "11.19.0"
+
+[functions]
+node_bundler = "esbuild"
+
+# Modern OpenNext adapter, resolved and pinned in the application lockfile.
+# This also makes local packaging independent of Netlify's plugin auto-installer.
+[[plugins]]
+package = "@netlify/plugin-nextjs"

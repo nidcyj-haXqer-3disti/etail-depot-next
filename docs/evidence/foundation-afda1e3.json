@@ -1,0 +1,95 @@
+{
+  "checkedAt": "2026-09-08T09:59:59.613Z",
+  "commit": "afda1e3f6b16183074dcb2522912969c2df4bc0e",
+  "tree": "4ffd58ae29be090993181cd287936cfcc6d6d8d7",
+  "branch": "feature/EDN-003-foundation",
+  "node": "v24.19.0",
+  "pnpm": "11.19.0",
+  "os": "25.6.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "lockfileSha256": "0b20c8948e626426e3c27bbb6b681f647b5def72918f210ed47765155c0d5884",
+  "migrations": [
+    {
+      "file": "netlify/database/migrations/20260908094202_graceful_lester/migration.sql",
+      "sha256": "f91483ed7f82fdb56faa2ebc23dc555680cf9036b33e338fcff8a28bf474d36c"
+    },
+    {
+      "file": "netlify/database/migrations/20260908095513_bouncy_terrax/migration.sql",
+      "sha256": "8d9f73e326e03eafa3e8ee47f4ffbe66a85782fc001c05b54210a8ca7b0b5532"
+    }
+  ],
+  "database": {
+    "engine": "PostgreSQL 18.6",
+    "name": "etail_depot_next_test",
+    "mode": "native isolated fictional tests"
+  },
+  "hosted": "not verified",
+  "realMoney": false,
+  "commands": [
+    {
+      "name": "frozen-install",
+      "command": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "startedAt": "2026-09-08T09:59:59.836Z",
+      "finishedAt": "2026-09-08T10:00:00.092Z",
+      "exitCode": 0,
+      "logSha256": "beafaaef3a73a6cb8d22e052918768880ad508199cc2d4c0a6352e108d466d4b"
+    },
+    {
+      "name": "application",
+      "command": [
+        "pnpm",
+        "verify"
+      ],
+      "startedAt": "2026-09-08T10:00:00.092Z",
+      "finishedAt": "2026-09-08T10:00:52.234Z",
+      "exitCode": 0,
+      "logSha256": "65382324b5050aed026dd5e1ce8ab7cc0cc1397b24ae355ed4f726c515dab7ad"
+    },
+    {
+      "name": "handoff",
+      "command": [
+        "pnpm",
+        "test:handoff"
+      ],
+      "startedAt": "2026-09-08T10:00:52.234Z",
+      "finishedAt": "2026-09-08T10:00:53.297Z",
+      "exitCode": 0,
+      "logSha256": "827e76878ee14142cd60c8aa3fbb397c09b6ad7fca51f8047a824ef421d9753b"
+    },
+    {
+      "name": "peers",
+      "command": [
+        "pnpm",
+        "peers",
+        "check"
+      ],
+      "startedAt": "2026-09-08T10:00:53.298Z",
+      "finishedAt": "2026-09-08T10:00:53.890Z",
+      "exitCode": 0,
+      "logSha256": "5ecf82a3fc1f9007eeea79ce3bf0d9c587150219ef245bb5a5a23609cdb562fb"
+    },
+    {
+      "name": "netlify-packaging",
+      "command": [
+        "/Users/yu/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "node_modules/netlify-cli/bin/run.js",
+        "build",
+        "--offline",
+        "--context",
+        "production"
+      ],
+      "startedAt": "2026-09-08T10:00:53.891Z",
+      "finishedAt": "2026-09-08T10:01:08.497Z",
+      "exitCode": 0,
+      "logSha256": "bbc5e5f6b7d17ec5e738c45c7f2950ba81d96381012598d99d035285035e1f28"
+    }
+  ],
+  "finishedAt": "2026-09-08T10:01:08.497Z",
+  "workingTreeClean": true,
+  "allChecksPassed": true
+}

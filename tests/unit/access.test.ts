@@ -1,0 +1,18 @@
+import { randomUUID } from "node:crypto";
+import { describe,expect,it } from "vitest";
+import { evaluate,type PolicyScope } from "../../src/modules/policy/evaluate";
+import { createInvitationSchema,updateAccessSchema } from "../../src/modules/access/contracts";
+const scope:PolicyScope={actorPersonId:"recipient",serviceId:"a",resourceServiceId:"a",membershipPersonId:"recipient",membershipServiceId:"a",membershipState:"INVITED",role:"SECONDARY",serviceKind:"CARDHOLDER",status:"ACTIVE",primaryPersonId:"primary",primaryMembershipState:"ACCEPTED",invitation:{recipientPersonId:"recipient",status:"PENDING",expiresAt:new Date("2026-01-02Z"),now:new Date("2026-01-01Z")}};
+describe("central invitation policy",()=>{
+ it("permits only the named intended recipient before membership exists",()=>{expect(evaluate(scope,"invitation.accept").allowed).toBe(true);expect(evaluate({...scope,actorPersonId:"other"},"invitation.accept").allowed).toBe(false);expect(evaluate(scope,"service.read").allowed).toBe(false);});
+ it("expires at the exact deadline and rejects resolved invitations",()=>{expect(evaluate({...scope,invitation:{...scope.invitation!,now:scope.invitation!.expiresAt}},"invitation.accept").allowed).toBe(false);for(const status of ["ACCEPTED","DECLINED","REVOKED","EXPIRED"])expect(evaluate({...scope,invitation:{...scope.invitation!,status}},"invitation.decline").allowed).toBe(false);});
+ it("rejects closed groups and mismatched resources",()=>{for(const patch of [{status:"CLOSED"},{resourceServiceId:"other"}])expect(evaluate({...scope,...patch},"invitation.accept").allowed).toBe(false);});
+ it("a Manager needs named primary responsibility as well as explicit administration",()=>{const member={...scope,membershipState:"ACCEPTED",role:"SECONDARY" as const,primaryPersonId:"recipient"};expect(evaluate(member,"people.invite").allowed).toBe(false);expect(evaluate({...member,grants:["people.invite"]},"people.invite").allowed).toBe(true);expect(evaluate({...member,grants:["people.invite","people.read"]},"people.invite").allowed).toBe(true);expect(evaluate({...member,primaryPersonId:"other",role:"SECONDARY",grants:["people.invite","people.read"]},"people.invite").allowed).toBe(false);});
+ it("does not turn membership or administration into financial authority",()=>{for(const role of ["PRIMARY","SECONDARY"] as const)for(const action of ["cards.create","spend.authorize"])expect(evaluate({...scope,membershipState:"ACCEPTED",role,grants:[action,"people.invite"]},action).allowed).toBe(false);});
+});
+describe("strict invitation inputs",()=>{
+ const valid={commandId:randomUUID(),recipientId:randomUUID(),role:"SECONDARY",permissions:["activity.read"],delegablePermissions:[],expiresInDays:3};
+ it("rejects unknown authority, owner promotion, duplicate grants and extra fields",()=>{for(const patch of [{role:"PRIMARY"},{permissions:["spend.authorize"]},{permissions:["activity.read","activity.read"]},{admin:true},{recipientEmail:"someone@example.test"},{expiresInDays:30}])expect(createInvitationSchema.safeParse({...valid,...patch}).success).toBe(false);expect(createInvitationSchema.safeParse(valid).success).toBe(true);});
+ it("parses the explicit card permissions without inventing role authority",()=>{for(const permission of ["cards.hold","cards.request","cards.create","cards.purchase","cards.freeze","cards.unfreeze","cards.manageMembers"])expect(createInvitationSchema.safeParse({...valid,role:"SECONDARY",permissions:[permission]}).success).toBe(true);});
+ it("requires positive expected versions for access changes",()=>{expect(updateAccessSchema.safeParse({commandId:randomUUID(),role:"SECONDARY",permissions:[],delegablePermissions:[],expectedVersion:0}).success).toBe(false);});
+});
