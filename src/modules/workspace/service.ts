@@ -2,15 +2,13 @@ import { createHash, randomUUID } from "node:crypto";
 import { and, desc, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { getDb } from "../../platform/database/client";
-import { serviceMembers, identityBindings, people, permissionGrants, cards, cardRequests, serviceActivity, notificationPreferences, workspaceCommands } from "../../platform/database/schema";
-import { getRuntimeConfig } from "../../platform/config";
+import { serviceMembers, people, permissionGrants, cards, cardRequests, serviceActivity, notificationPreferences, workspaceCommands } from "../../platform/database/schema";
 import { SecurityError } from "../../platform/security/origin";
-import { assertFixtureIdentityAllowed } from "../identity";
 import { ACTIONS, evaluate, type PolicyScope } from "../policy/evaluate";
 import { cardholderRole, canReadCardholderData, isCardholderPermission } from "../policy/cardholder-scope";
 import { loadServiceScope } from "../access/scope";
 import { requireServiceReader } from "../services/service-reader";
-import { merchantSetupEligibility } from "../services/schema";
+import { requireSandboxAdult, requireSandboxParticipant, sandboxPersona } from "../sandbox/service";
 import { getBalance, postJournal } from "../ledger";
 import { ledgerJournals } from "../ledger/schema";
 import { issueSandboxCard } from "../issuing/sandbox-adapter";
@@ -26,17 +24,10 @@ export function formatMoney(minor: bigint): Money {
   return { minor: minor.toString(), currency: "USD", formatted: `${minor < 0n ? "-" : ""}$${dollars}.${(magnitude % 100n).toString().padStart(2, "0")}` };
 }
 
-function fixtureRuntime() {
-  const config = getRuntimeConfig();
-  try { assertFixtureIdentityAllowed({ ...config, fixtureIdentityEnabled: config.localFixtureIdentity }); }
-  catch { throw new SecurityError("WORKSPACE_UNAVAILABLE", 404); }
-}
-
 export async function loadCardholderWorkspaceScope(tx: Transaction, personId: string, serviceId: string, mutation = false): Promise<Scope> {
   if (mutation) {
-    fixtureRuntime();
-    const identity = await tx.select({ id: identityBindings.id }).from(identityBindings).where(and(eq(identityBindings.personId, personId), eq(identityBindings.issuer, "urn:etail:isolated-fixture")));
-    if (!identity.length) throw new SecurityError("WORKSPACE_UNAVAILABLE", 404);
+    try { await requireSandboxParticipant(tx, personId); }
+    catch (error) { if (error instanceof SecurityError) throw new SecurityError("WORKSPACE_UNAVAILABLE", 404); throw error; }
   } else await requireServiceReader(tx, personId);
   const scope = await loadServiceScope(tx, personId, serviceId, mutation);
   const [actor] = await tx.select().from(people).where(eq(people.id, personId));
@@ -64,25 +55,23 @@ function requireManageHolder(scope: Scope, holderId: string) {
 async function holderReadiness(tx: Transaction, serviceId: string, holderId: string, lock = false) {
   const membershipQuery = tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId, serviceId), eq(serviceMembers.personId, holderId)));
   const grantQuery = tx.select().from(permissionGrants).where(and(eq(permissionGrants.serviceId, serviceId), eq(permissionGrants.personId, holderId), eq(permissionGrants.action, "cards.hold"), eq(permissionGrants.state, "ACCEPTED")));
-  const eligibilityQuery = tx.select().from(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId, holderId));
   const [membership] = lock ? await membershipQuery.for("share") : await membershipQuery;
   const [grant] = lock ? await grantQuery.for("share") : await grantQuery;
-  const [eligibility] = lock ? await eligibilityQuery.for("share") : await eligibilityQuery;
-  return { allowed: membership?.state === "ACCEPTED" && Boolean(grant), persona: eligibility?.personaKind };
+  const persona = await sandboxPersona(tx, holderId);
+  return { allowed: membership?.state === "ACCEPTED" && Boolean(grant), persona };
 }
 async function requireAdultCreator(tx: Transaction, scope: Scope) {
-  const [eligibility] = await tx.select().from(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId, scope.actor.id)).for("share");
-  if (eligibility?.personaKind !== "FICTIONAL_ADULT") throw new SecurityError("CARD_APPLICANT_REQUIRED", 403);
+  if (await sandboxPersona(tx, scope.actor.id) !== "FICTIONAL_ADULT") throw new SecurityError("CARD_APPLICANT_REQUIRED", 403);
+  await requireSandboxAdult(tx, scope.actor.id);
 }
 async function requestPrerequisites(tx: Transaction, scope: Scope, row: typeof cardRequests.$inferSelect) {
   const result: CardRequestProjection["prerequisites"] = [];
   if (!permits(scope, "cards.create")) result.push({ code: "CARD_CREATE_PERMISSION_REQUIRED", title: "Card creation permission is required", detail: "You can save this request, but you need permission to create the card." });
-  const [creator] = await tx.select().from(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId, scope.actor.id));
-  if (creator?.personaKind !== "FICTIONAL_ADULT") result.push({ code: "ADULT_APPLICANT_REQUIRED", title: "An adult applicant is required", detail: "Only an eligible adult demo user can create a card." });
+  if (await sandboxPersona(tx, scope.actor.id) !== "FICTIONAL_ADULT") result.push({ code: "ADULT_APPLICANT_REQUIRED", title: "Sandbox setup is required", detail: "Complete sandbox setup before creating practice cards." });
   const holder = await holderReadiness(tx, row.serviceId, row.holderId);
   if (!holder.allowed) result.push({ code: "CARDHOLDER_UNAVAILABLE", title: "Cardholder access needs attention", detail: "The person named on this card needs active cardholder access and permission to use a card." });
   if (!canManageHolder(scope, row.holderId)) result.push({ code: "MEMBER_MANAGEMENT_REQUIRED", title: "Permission to manage secondary cards is required", detail: "The primary cardholder needs permission to manage secondary cards." });
-  if (holder.persona !== "FICTIONAL_ADULT") result.push(holder.persona === "FICTIONAL_SUPERVISED" ? { code: "GUARDIAN_REQUIRED", title: "Guardian setup is required", detail: "A supervised card needs a named guardian and funding arrangement. That setup is not available yet." } : { code: "HOLDER_ELIGIBILITY_REQUIRED", title: "Check the cardholder’s eligibility", detail: "The person named on this card must be an eligible adult demo user." });
+  if (holder.persona !== "FICTIONAL_ADULT") result.push(holder.persona === "FICTIONAL_SUPERVISED" ? { code: "GUARDIAN_REQUIRED", title: "Guardian setup is required", detail: "A supervised card needs a named guardian and funding arrangement. That setup is not available yet." } : { code: "HOLDER_ELIGIBILITY_REQUIRED", title: "Cardholder setup is required", detail: "The person named on this card needs to complete sandbox setup." });
   if (row.requestedLimitMinor <= 0n) result.push({ code: "PRACTICE_ALLOCATION_REQUIRED", title: "Choose a starting balance", detail: "Enter a starting balance greater than zero. This is demo money for purchases in the sandbox." });
   return result;
 }

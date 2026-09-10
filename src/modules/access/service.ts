@@ -1,11 +1,10 @@
+import { requireSandboxParticipant, sandboxFixturesAllowed } from "../sandbox/service";
 import { requireServiceReader } from "../services/service-reader";
 import { createHash,randomUUID } from "node:crypto";
 import { and,desc,eq,inArray,lte,or,sql } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
 import { services,serviceMembers,identityBindings,people,permissionGrants } from "../../platform/database/schema";
-import { getRuntimeConfig } from "../../platform/config";
 import { SecurityError } from "../../platform/security/origin";
-import { assertFixtureIdentityAllowed } from "../identity";
 import {CARDHOLDER_PERMISSION_ACTIONS,isCardholderPermission} from "../policy/cardholder-scope";
 import { ACTIONS,evaluate,type PolicyScope } from "../policy/evaluate";
 import { decideMerchantInvitation,merchantInvitationProjection } from "./merchant-service";
@@ -36,15 +35,9 @@ const permissionLabels:Record<AccessPermission,[string,string]>={
   "people.revoke":["Revoke access","Remove only permissions they are allowed to manage."],
   "notifications.manage":["Manage own notifications","Save preferences for their own card activity. Notifications are not sent yet."],
 };
-function localOnly() {
-  const config=getRuntimeConfig();
-  try { assertFixtureIdentityAllowed({...config,fixtureIdentityEnabled:config.localFixtureIdentity}); }
-  catch { throw new SecurityError("ACCESS_FEATURE_UNAVAILABLE",404); }
-}
-async function fixturePerson(tx:ScopedTransaction,personId:string) {
-  localOnly();
-  const [binding]=await tx.select({id:identityBindings.id}).from(identityBindings).where(and(eq(identityBindings.personId,personId),eq(identityBindings.issuer,"urn:etail:isolated-fixture")));
-  if(!binding) throw new SecurityError("RECIPIENT_UNAVAILABLE",404);
+async function sandboxPerson(tx:ScopedTransaction,personId:string) {
+  try {await requireSandboxParticipant(tx,personId);}
+  catch(error){if(error instanceof SecurityError&&error.code==="SERVICE_UNAVAILABLE")throw new SecurityError("RECIPIENT_UNAVAILABLE",404);throw error;}
 }
 async function now(tx:ScopedTransaction) { const result=await tx.execute(sql`select clock_timestamp() as now`);return new Date(result.rows[0]!.now as string|Date); }
 function requireAction(scope:Scope,action:string) { if(scope.service.kind!=="CARDHOLDER"||!evaluate(scope.policy,action).allowed) throw new SecurityError("ACTION_DENIED",403); }
@@ -104,7 +97,7 @@ async function invitationProjection(tx:ScopedTransaction,row:Invitation,viewerId
 
 export async function getAccessOverview(personId:string,serviceId:string):Promise<AccessOverview> {
   return getDb().transaction(async tx=>{
-    await fixturePerson(tx,personId);
+    await sandboxPerson(tx,personId);
     const scope=await loadServiceScope(tx,personId,serviceId);requireAction(scope,"people.read");
     const members=await tx.select().from(serviceMembers).where(eq(serviceMembers.serviceId,serviceId)).orderBy(serviceMembers.personId);
     const peopleRows:AccessPerson[]=[];for(const member of members) peopleRows.push(await personProjection(tx,scope,member));
@@ -112,11 +105,11 @@ export async function getAccessOverview(personId:string,serviceId:string):Promis
     const rows=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.serviceId,serviceId)).orderBy(desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
     const invitations:InvitationProjection[]=[];for(const row of rows)invitations.push(await invitationProjection(tx,row,personId,scope));
     const canInvite=evaluate(scope.policy,"people.invite").allowed;
-    const candidates=canInvite?await tx.select({id:people.id,displayName:people.displayName}).from(identityBindings).innerJoin(people,eq(people.id,identityBindings.personId)).where(and(eq(identityBindings.issuer,"urn:etail:isolated-fixture"),inArray(identityBindings.subject,["owner","viewer"]))):[];
+    const candidates=canInvite&&sandboxFixturesAllowed()?await tx.select({id:people.id,displayName:people.displayName}).from(identityBindings).innerJoin(people,eq(people.id,identityBindings.personId)).where(and(eq(identityBindings.issuer,"urn:etail:isolated-fixture"),inArray(identityBindings.subject,["owner","viewer"]))):[];
     const recipients=candidates.filter(candidate=>candidate.id!==personId&&!members.some(member=>member.personId===candidate.id&&member.state==="ACCEPTED")&&!invitations.some(invite=>invite.recipientId===candidate.id&&invite.status==="PENDING"));
     return {serviceId,serviceName:"Cardholder access",serviceKind:"CARDHOLDER",canInvite,canManage:evaluate(scope.policy,"people.changeRole").allowed,people:peopleRows,invitations,recipients,
       permissionOptions:ceiling(scope).filter(action=>(secondaryCardPermissions as readonly string[]).includes(action)).map(action=>({action,label:permissionLabels[action][0],description:permissionLabels[action][1],canDelegate:false,allowedRoles:(["SECONDARY"] as const).filter(role=>evaluate({...scope.policy,actorPersonId:"secondary-recipient",membershipPersonId:"secondary-recipient",role,grants:ceiling(scope)},action).allowed)})).filter(option=>option.allowedRoles.length>0),roleOptions:["SECONDARY"],
-      notice:"Invitations are saved for named existing fictional testers. No email is sent. Roles do not approve spending, issue cards or grant access to another service."};
+      notice:"Invitations are saved for named sandbox members. No email is sent. Roles do not approve spending, issue cards or grant access to another service."};
   });
 }
 export async function listInvitationsForPerson(personId:string):Promise<AnyInvitationProjection[]> {
@@ -149,7 +142,7 @@ async function writePermissions(tx:ScopedTransaction,serviceId:string,personId:s
 }
 async function serviceCommand(personId:string,serviceId:string,kind:string,action:string,input:{commandId:string},targetId:string|null,mutate:(tx:ScopedTransaction,scope:Scope)=>Promise<string>) {
   return getDb().transaction(async tx=>{
-    await fixturePerson(tx,personId);const scope=await loadServiceScope(tx,personId,serviceId,true);requireAction(scope,action);
+    await sandboxPerson(tx,personId);const scope=await loadServiceScope(tx,personId,serviceId,true);requireAction(scope,action);
     return receipt(tx,personId,serviceId,kind,input,targetId,()=>mutate(tx,scope));
   });
 }
@@ -159,7 +152,7 @@ async function serviceInvitation(personId:string,serviceId:string,invitationId:s
 export async function createInvitation(personId:string,serviceId:string,raw:CreateInvitationInput):Promise<InvitationProjection> {
   const input=parse(createInvitationSchema,raw);
   const invitationId=await serviceCommand(personId,serviceId,"invitation.create","people.invite",input,null,async(tx,scope)=>{
-    await fixturePerson(tx,input.recipientId);if(input.recipientId===personId)throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
+    await sandboxPerson(tx,input.recipientId);if(input.recipientId===personId)throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
     assertDelegation(scope,input.role,input.permissions,input.delegablePermissions);
     const [membership]=await tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,serviceId),eq(serviceMembers.personId,input.recipientId))).for("update");
     if(membership?.state==="ACCEPTED")throw new SecurityError("ALREADY_SERVICE_MEMBER",409);
@@ -177,7 +170,7 @@ export async function createInvitation(personId:string,serviceId:string,raw:Crea
 async function decideInvitation(personId:string,invitationId:string,raw:InvitationDecisionInput,decision:"accept"|"decline"):Promise<AnyInvitationProjection> {
   const input=parse(invitationDecisionSchema,raw);
   await getDb().transaction(async tx=>{
-    await fixturePerson(tx,personId);
+    await sandboxPerson(tx,personId);
     const [initial]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,invitationId),eq(serviceInvitations.recipientId,personId)));
     if(!initial)throw new SecurityError("INVITATION_UNAVAILABLE",404);
     if(initial.targetKind==="MERCHANT_UNIT")return decideMerchantInvitation(tx,personId,initial,input,decision);
@@ -208,7 +201,7 @@ async function decideInvitation(personId:string,invitationId:string,raw:Invitati
       await history(tx,invitation.serviceId,personId,personId,decision==="accept"?"INVITATION_ACCEPTED":"INVITATION_DECLINED",decision==="accept"?"Named recipient accepted the exact offered service access. No financial product was approved.":"Named recipient declined the invitation.",invitationId);return invitationId;
     });
   });
-  return getDb().transaction(async tx=>{await fixturePerson(tx,personId);const [row]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,invitationId),eq(serviceInvitations.recipientId,personId)));if(!row)throw new SecurityError("INVITATION_UNAVAILABLE",404);return row.targetKind==="MERCHANT_UNIT"?merchantInvitationProjection(tx,row,personId):invitationProjection(tx,row,personId);});
+  return getDb().transaction(async tx=>{await sandboxPerson(tx,personId);const [row]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,invitationId),eq(serviceInvitations.recipientId,personId)));if(!row)throw new SecurityError("INVITATION_UNAVAILABLE",404);return row.targetKind==="MERCHANT_UNIT"?merchantInvitationProjection(tx,row,personId):invitationProjection(tx,row,personId);});
 }
 export const acceptInvitation=(personId:string,id:string,input:InvitationDecisionInput)=>decideInvitation(personId,id,input,"accept");
 export const declineInvitation=(personId:string,id:string,input:InvitationDecisionInput)=>decideInvitation(personId,id,input,"decline");
@@ -216,7 +209,7 @@ export const declineInvitation=(personId:string,id:string,input:InvitationDecisi
 export async function revokeInvitation(personId:string,serviceId:string,invitationId:string,raw:InvitationDecisionInput):Promise<InvitationProjection> {
   const input=parse(invitationDecisionSchema,raw);
   await getDb().transaction(async tx=>{
-    await fixturePerson(tx,personId);const scope=await loadServiceScope(tx,personId,serviceId,true);requireAction(scope,"people.read");
+    await sandboxPerson(tx,personId);const scope=await loadServiceScope(tx,personId,serviceId,true);requireAction(scope,"people.read");
     const [invitation]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,invitationId),eq(serviceInvitations.serviceId,serviceId))).for("update");
     if(!invitation)throw new SecurityError("INVITATION_UNAVAILABLE",404);
     if(!canRevokeOffer(scope,invitation))throw new SecurityError("ACTION_DENIED",403);

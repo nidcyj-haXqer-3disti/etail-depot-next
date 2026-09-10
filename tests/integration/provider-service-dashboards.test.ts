@@ -111,8 +111,8 @@ describe("verified-provider service dashboard reads", () => {
     await expect(getCardholderDashboardDetail(member.personId, { card: issued.card.id })).rejects.toMatchObject({ status: 404 });
     await expect(getWorkspace(member.personId, primary.serviceId)).rejects.toMatchObject({ status: 404 });
     await expect(getMerchantWorkspace(member.personId, merchant.merchantId)).rejects.toMatchObject({ status: 404 });
-    await expect(createCardholderService(member.personId, { commandId: randomUUID() })).rejects.toMatchObject({ status: 404 });
-    await expect(createPrimaryMerchant(member.personId, { commandId: randomUUID(), displayName: "Forbidden synthetic enrollment" })).rejects.toMatchObject({ status: 404 });
+    await expect(createCardholderService(member.personId, { commandId: randomUUID() })).rejects.toMatchObject({ status: 403, code: "SANDBOX_START_REQUIRED" });
+    await expect(createPrimaryMerchant(member.personId, { commandId: randomUUID(), displayName: "Forbidden synthetic enrollment" })).rejects.toMatchObject({ status: 403, code: "SANDBOX_START_REQUIRED" });
     await expect(startCardRequest(member.personId, primary.serviceId, { commandId: randomUUID() })).rejects.toMatchObject({ status: 404 });
     await expectNoEnrollment(member.personId);
     expect(await protectedRecords()).toEqual(before);

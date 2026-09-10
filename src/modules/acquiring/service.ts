@@ -4,10 +4,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../../platform/database/client";
-import { services, serviceMembers, identityBindings, people } from "../../platform/database/schema";
-import { getRuntimeConfig } from "../../platform/config";
+import { services, serviceMembers, people } from "../../platform/database/schema";
 import { SecurityError } from "../../platform/security/origin";
-import { assertFixtureIdentityAllowed } from "../identity";
 import { requireServiceReader } from "../services/service-reader";
 import { requireMerchantApplicant } from "../services/merchant-eligibility";
 import { loadServiceScope, type ScopedTransaction } from "../access/scope";
@@ -28,25 +26,19 @@ type Profile=typeof merchantProfiles.$inferSelect;
 type Draft=typeof paymentChannels.$inferSelect;
 type MerchantScope=Awaited<ReturnType<typeof loadMerchantUnitScope>>;
 function parse<T>(schema:z.ZodType<T>,raw:unknown):T {const result=schema.safeParse(raw);if(!result.success)throw new SecurityError("INVALID_REQUEST",422);return result.data;}
-async function fixturePerson(tx:ScopedTransaction,personId:string) {
-  const config=getRuntimeConfig();
-  try {assertFixtureIdentityAllowed({...config,fixtureIdentityEnabled:config.localFixtureIdentity});}catch{throw new SecurityError("ACQUIRING_UNAVAILABLE",404);}
-  const [binding]=await tx.select({id:identityBindings.id}).from(identityBindings).where(and(eq(identityBindings.personId,personId),eq(identityBindings.issuer,"urn:etail:isolated-fixture")));
-  if(!binding)throw new SecurityError("ACQUIRING_UNAVAILABLE",404);
-}
 function requireAction(scope:Scope,action:string) {if(!evaluate(scope.policy,action).allowed)throw new SecurityError("ACTION_DENIED",403);}
 async function databaseNow(tx:ScopedTransaction) {const result=await tx.execute(sql`select clock_timestamp() as now`);return new Date(result.rows[0]!.now as Date|string);}
 async function applicantAllowed(tx:ScopedTransaction,personId:string) {
-  try {await requireMerchantApplicant(tx,personId);return true;}catch(error){if(error instanceof SecurityError&&error.code==="MERCHANT_APPLICANT_REQUIRED")return false;throw error;}
+  try {await requireMerchantApplicant(tx,personId);return true;}catch(error){if(error instanceof SecurityError&&["MERCHANT_APPLICANT_REQUIRED","SANDBOX_START_REQUIRED","SERVICE_UNAVAILABLE"].includes(error.code))return false;throw error;}
 }
 function requirements(row:Application):SetupRequirement[] {
   return [
     {code:"ENTITY_TYPE",label:"Merchant type",status:row.legalEntityType?"COMPLETE":"REQUIRED",detail:"Choose individual, sole proprietor or business. This choice is not an approval."},
-    {code:"SELLING_NAME",label:"Selling name",status:row.sellingName?"COMPLETE":"REQUIRED",detail:"Use a fictional selling name for this local setup."},
+    {code:"SELLING_NAME",label:"Selling name",status:row.sellingName?"COMPLETE":"REQUIRED",detail:"Use a fictional selling name for this sandbox setup."},
     {code:"LEGAL_NAME",label:"Fictional legal name",status:row.legalName?"COMPLETE":"REQUIRED",detail:"Name the unverified fictional legal party separately from its selling name and human applicant."},
     {code:"ACTIVITY",label:"What you sell",status:row.activityDescription?"COMPLETE":"REQUIRED",detail:"Describe the fictional goods or services."},
     {code:"FICTIONAL_CONFIRMATION",label:"Fictional details confirmed",status:row.fictionalDetailsConfirmed?"COMPLETE":"REQUIRED",detail:"Do not enter real identity, tax, card or bank details."},
-    {code:"MERCHANT_REVIEW",label:"Merchant review",status:"UNAVAILABLE",detail:"No verification or merchant decision provider is connected. Submission records local pending review only."},
+    {code:"MERCHANT_REVIEW",label:"Merchant review",status:"UNAVAILABLE",detail:"No verification or merchant decision provider is connected. Your details can be saved for review; no live verification is performed."},
   ];
 }
 async function applicationProjection(tx:ScopedTransaction,row:Application,canManage:boolean):Promise<MerchantSetupProjection> {
@@ -59,7 +51,7 @@ async function applicationProjection(tx:ScopedTransaction,row:Application,canMan
   }
   const items:SetupRequirement[]=[...requirements(row),{code:"RESPONSIBLE_APPLICANT",label:"Named responsible applicant",status:responsibleAllowed?"COMPLETE":"REQUIRED",detail:row.status==="PENDING_LOCAL_REVIEW"?"The application preserves its named fictional applicant at submission; it does not assert current access or verified legal authority.":responsibleAllowed?"The named fictional applicant is eligible and has explicit setup permission; no real identity or legal authority has been verified.":"The named applicant must retain accepted Merchant access, explicit setup permission and fictional adult eligibility before submission."}];
   const canEdit=canManage&&row.status==="DRAFT";
-  return {id:row.id,serviceId:row.serviceId,responsiblePersonId:row.responsiblePersonId,responsiblePersonName:person!.displayName,status:row.status,version:row.version,legalEntityType:row.legalEntityType,sellingName:row.sellingName,legalName:row.legalName,activityDescription:row.activityDescription,country:"US",fictionalDetailsConfirmed:row.fictionalDetailsConfirmed,createdAt:row.createdAt.toISOString(),updatedAt:row.updatedAt.toISOString(),submittedAt:row.submittedAt?.toISOString()??null,canEdit,canSubmit:canEdit&&!items.some(item=>item.status==="REQUIRED"),requirements:items,timelineHasMore:events.length>100,timeline:events.slice(0,100).reverse().map(event=>({id:event.id,at:event.createdAt.toISOString(),label:{CREATED:"Setup draft created",SAVED:"Setup draft saved",SUBMITTED_LOCAL:"Submitted for local review; no merchant decision made"}[event.kind]}))};
+  return {id:row.id,serviceId:row.serviceId,responsiblePersonId:row.responsiblePersonId,responsiblePersonName:person!.displayName,status:row.status,version:row.version,legalEntityType:row.legalEntityType,sellingName:row.sellingName,legalName:row.legalName,activityDescription:row.activityDescription,country:"US",fictionalDetailsConfirmed:row.fictionalDetailsConfirmed,createdAt:row.createdAt.toISOString(),updatedAt:row.updatedAt.toISOString(),submittedAt:row.submittedAt?.toISOString()??null,canEdit,canSubmit:canEdit&&!items.some(item=>item.status==="REQUIRED"),requirements:items,timelineHasMore:events.length>100,timeline:events.slice(0,100).reverse().map(event=>({id:event.id,at:event.createdAt.toISOString(),label:{CREATED:"Setup draft created",SAVED:"Setup draft saved",SUBMITTED_LOCAL:"Details saved for review; no live verification performed"}[event.kind]}))};
 }
 function profileMutable(profile:Profile|undefined) {return !profile||!["RESTRICTED","DECLINED","CLOSED"].includes(profile.status);}
 
@@ -96,7 +88,6 @@ export async function getMerchantBusinessDetails(personId:string,merchantId:stri
 
 async function applicationCommand(personId:string,merchantId:string,applicationId:string|null,kind:"START"|"SAVE"|"SUBMIT",input:StartMerchantSetupInput|UpdateMerchantSetupInput|SubmitMerchantSetupInput):Promise<MerchantSetupProjection> {
   return getDb().transaction(async tx=>{
-    await fixturePerson(tx,personId);
     const merchant=await loadMerchantUnitScope(tx,personId,merchantId,true);
     if(merchant.unit.kind!=="MASTER")throw new SecurityError("MERCHANT_UNAVAILABLE",404);
     const serviceId=merchant.masterService.id,scope=await loadServiceScope(tx,personId,serviceId,true);requireAction(scope,"acquiring.setup");await requireMerchantApplicant(tx,personId);
@@ -183,14 +174,14 @@ function channelProjection(row:Draft,scope:MerchantScope,personId:string,now:Dat
 }
 
 export async function getMerchantDirectory(personId:string):Promise<MerchantDirectoryProjection> {
-  return getDb().transaction(async tx=>({units:(await listMerchantScopes(tx,personId)).map(scope=>merchantSummary(scope)),hasMore:false}));
+  return getDb().transaction(async tx=>{const scopes=await listMerchantScopes(tx,personId),eligible=await applicantAllowed(tx,personId);return {units:scopes.map(scope=>merchantSummary(scope,eligible)),hasMore:false};});
 }
 
 export async function getMerchantWorkspace(personId:string,merchantUnitId:string):Promise<MerchantWorkspaceProjection> {
   if(!z.uuid().safeParse(merchantUnitId).success)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
   merchantUnitId=merchantUnitId.toLowerCase();
   return getDb().transaction(async tx=>{
-    await fixturePerson(tx,personId);const scope=await readMerchantScope(tx,personId,merchantUnitId);const eligible=await applicantAllowed(tx,personId);
+    const scope=await readMerchantScope(tx,personId,merchantUnitId);const eligible=await applicantAllowed(tx,personId);
     const canRead=evaluate(scope.policy,"channels.read").allowed;
     const rows=canRead?await tx.select().from(paymentChannels).where(and(eq(paymentChannels.merchantUnitId,merchantUnitId),scope.primaryAccess?undefined:or(eq(paymentChannels.creatorId,personId),eq(paymentChannels.visibility,"ASSIGNED")))).orderBy(desc(paymentChannels.updatedAt),paymentChannels.id):[];
     const events=await tx.select().from(merchantUnitEvents).where(eq(merchantUnitEvents.merchantUnitId,merchantUnitId)).orderBy(merchantUnitEvents.createdAt,merchantUnitEvents.id);
@@ -251,7 +242,7 @@ export async function resumeMerchant(personId:string,merchantUnitId:string,raw:P
 /** Sole channel mutation owner, . */
 async function channelCommand(personId:string,merchantUnitId:string,channelId:string|null,kind:"CREATE"|"UPDATE"|"CANCEL",input:CreateChannelInput|UpdateChannelInput|CancelChannelInput):Promise<PaymentChannel> {
   return getDb().transaction(async tx=>{
-    await fixturePerson(tx,personId);const scope=await loadMerchantUnitScope(tx,personId,merchantUnitId,true);await requireMerchantApplicant(tx,personId);
+    const scope=await loadMerchantUnitScope(tx,personId,merchantUnitId,true);await requireMerchantApplicant(tx,personId);
     const action=kind==="CREATE"?"channels.create":kind==="UPDATE"?"channels.update":"channels.close";
     if(!evaluate(scope.policy,action).allowed||!evaluate(scope.policy,"channels.read").allowed)throw new SecurityError("ACTION_DENIED",403);
     const [profile]=await tx.select().from(merchantProfiles).where(eq(merchantProfiles.serviceId,scope.masterService.id)).for("share");

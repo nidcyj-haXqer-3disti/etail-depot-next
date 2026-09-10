@@ -1,5 +1,9 @@
 # Source precedence and explicit overrides
 
+## Hosted sandbox availability — 2026-09-10
+
+The latest explicit request authorizes the full implemented customer sandbox for verified email members. [Hosted sandbox product](HOSTED_SANDBOX_PRODUCT.md) and D60 supersede D59’s prohibition on provider-member setup and mutations. Deliberate sandbox opt-in enables simulated product participation; financial services and permissions still require the existing explicit commands. Hosted fixture login, real money and automatic operator grants remain forbidden.
+
 ## Latest approved fresh rebuild — 2026-09-10
 
 [D52 — Fresh two-service application](FRESH_TWO_SERVICE_BUILD.md) supersedes the internal three-kind provenance and compatibility-retention provisions below for the active implementation. Exactly CARDHOLDER and MERCHANT services, explicit service memberships, direct primary/submerchant ownership and fresh databases are now approved. Prior source and databases are recovery artifacts, not active runtime branches.

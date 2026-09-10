@@ -319,6 +319,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
           const access=name === "src/modules/access/service.ts" && ((callee === "insert" && chain[0] === "decideInvitation") || (callee === "update" && ["decideInvitation","updateMemberAccess","revokeMemberAccess"].includes(chain[0])));
           if(!creation&&!access)emit(file,call,"SERVICE_MEMBERSHIP_OWNER","Membership comes from canonical primary enrollment or accepted service access lifecycle; merchant helpers use their assignments.");
         }
+        if(tableModule === "src/modules/sandbox/schema" && !(name === "src/modules/sandbox/service.ts" && table.imported === "sandboxParticipants" && callee === "insert" && chain[0] === "startSandbox"))emit(file,call,"SANDBOX_ENROLLMENT_OWNER","Explicit sandbox participation is written only by startSandbox; login, reads and fixtures do not enroll provider members.");
         if(tableModule === "src/modules/cases/schema") {
           const customer=name === "src/modules/cases/service.ts" && ({supportCases:{insert:["createSupportCase"],update:["addSupportMessage","withdrawSupportCase"]},supportCaseMessages:{insert:["createSupportCase","addSupportMessage","withdrawSupportCase"]},supportCaseCommands:{insert:["execute"]}})[table.imported]?.[callee]?.includes(chain[0]);
           const operator=name === "src/modules/operations/service.ts" && chain[0] === "respondToCase" && ((table.imported === "supportCases" && callee === "update") || (table.imported === "supportCaseMessages" && callee === "insert"));
@@ -429,7 +430,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       const options = fetchCall ? call.arguments[1] : null;
       const explicitMethod = options && ts.isObjectLiteralExpression(options) ? options.properties.find(property => property.name?.getText(file.tree) === "method") : null;
       const readOnly = fetchCall && (!options || (ts.isObjectLiteralExpression(options) && (!explicitMethod || (ts.isPropertyAssignment(explicitMethod) && stringValues(file,explicitMethod.initializer).every(value=>value==="GET")))));
-      const reviewedQuery = readOnly && ["src/ui/workspace/reports.tsx", "src/ui/workspace/cases.tsx"].includes(name) && paths.every(value=>/^\/api\/v1\/cardholder-services\/:id\/(?:reports(?:\/export)?|cases)\?/.test(value));
+      const reviewedQuery = readOnly && ((["src/ui/workspace/reports.tsx", "src/ui/workspace/cases.tsx"].includes(name) && paths.every(value=>/^\/api\/v1\/cardholder-services\/:id\/(?:reports(?:\/export)?|cases)\?/.test(value))) || (name === "src/ui/workspace/member-code-picker.tsx" && paths.every(value=>value === "/api/v1/sandbox/recipient?code=:id")));
       if (paths.some(value => value.includes("?")) && !reviewedQuery) emit(file, call, "UNINSPECTABLE_UI_COMMAND_PATH", "The UI command path must resolve to a reviewed route; add an explicit inspected adapter for dynamic routing.");
       for (const targetPath of paths) {
         if (/\/cards\/[^/]+\/purchase$/.test(targetPath)) {
@@ -506,6 +507,9 @@ function selfTest() {
   assert.ok(probe("src/ui/second-card-flow.tsx", canonicalUi).includes("PARALLEL_CARD_REQUEST_UI"), "A copied, mutated second Add card workflow must be rejected.");
   assert.ok(probe(cardUiOwner, canonicalUi + '\nfunction SecondForm() { return <CardRequestForm/>; }').includes("PARALLEL_CARD_FORM"));
   assert.ok(probe(cardUiOwner, canonicalUi + '\nfunction bypass() { fetch("/api/v1/cardholder-services/x/card-requests", {method:"POST"}); }').includes("PARALLEL_CARD_REQUEST_UI"));
+  assert.deepEqual(probe("src/ui/workspace/member-code-picker.tsx", '"use client"; function find(code) { fetch(`/api/v1/sandbox/recipient?code=${encodeURIComponent(code)}`,{cache:"no-store"}); }'), []);
+  assert.ok(probe("src/ui/workspace/member-code-picker.tsx", '"use client"; function find(code) { fetch(`/api/v1/sandbox/recipient?code=${encodeURIComponent(code)}`,{method:"POST"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
+  assert.ok(probe("src/modules/other/service.ts", 'import {sandboxParticipants} from "@/modules/sandbox/schema"; function grant(){tx.insert(sandboxParticipants).values({});}').includes("SANDBOX_ENROLLMENT_OWNER"));
   assert.ok(probe("src/ui/second.tsx", '"use client"; function x(url:string) { fetch(url,{method:"POST"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
   assert.deepEqual(probe("src/ui/workspace/reports.tsx", '"use client"; function report(id,query) { fetch(`/api/v1/cardholder-services/${encodeURIComponent(id)}/reports?${query}`,{cache:"no-store"}); }'), []);
   assert.ok(probe("src/ui/workspace/reports.tsx", '"use client"; function report(id,query) { fetch(`/api/v1/cardholder-services/${encodeURIComponent(id)}/reports?${query}`,{method:"POST"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));

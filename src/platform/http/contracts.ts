@@ -1,3 +1,4 @@
+import { sandboxOperations } from "../../modules/sandbox/contracts";
 import { z } from "zod";
 import { workspaceOperations } from "../../modules/workspace/api-contracts";
 import { securityOperations } from "../../modules/identity/security-contracts";
@@ -24,6 +25,7 @@ export const errorSchema=z.object({error:z.object({code:z.string(),requestId:z.u
 
 /** Executable foundation inventory. The larger planned inventory remains unimplemented. */
 export const foundationOperations=[
+  ...sandboxOperations,
   {path:"/api/v1/cardholder-services",method:"post",request:createCardholderServiceSchema,response:z.object({serviceId:z.uuid(),kind:z.literal("CARDHOLDER"),nextHref:z.literal("/cardholder-services")}).strict(),status:200,authenticated:true},
   {path:"/api/v1/services",method:"get",response:serviceDirectorySchema,status:200,authenticated:true},
   {path:"/api/v1/cardholder-services/{serviceId}",method:"get",response:serviceProjectionSchema,status:200,authenticated:true},

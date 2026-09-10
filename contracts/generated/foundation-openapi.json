@@ -5,6 +5,273 @@
     "version": "1.0.0-sandbox"
   },
   "paths": {
+    "/api/v1/sandbox": {
+      "get": {
+        "operationId": "get_api_v1_sandbox",
+        "description": "Foundation service/session endpoint.",
+        "security": [
+          {
+            "appSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "joined": {
+                      "type": "boolean"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "memberCode": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "joined",
+                    "displayName",
+                    "memberCode"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "post_api_v1_sandbox",
+        "description": "Foundation service/session endpoint.",
+        "security": [
+          {
+            "appSession": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commandId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80,
+                    "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+                  },
+                  "acknowledged": {
+                    "type": "boolean",
+                    "enum": [
+                      true
+                    ]
+                  }
+                },
+                "required": [
+                  "commandId",
+                  "displayName",
+                  "acknowledged"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "joined": {
+                      "type": "boolean"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "memberCode": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "joined",
+                    "displayName",
+                    "memberCode"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sandbox/recipient": {
+      "get": {
+        "operationId": "get_api_v1_sandbox_recipient",
+        "description": "Foundation service/session endpoint.",
+        "security": [
+          {
+            "appSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^ED-[A-F0-9]{20}$"
+            },
+            "description": "Unknown or duplicate parameters are rejected."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "displayName"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/cardholder-services": {
       "post": {
         "operationId": "post_api_v1_cardholder_services",

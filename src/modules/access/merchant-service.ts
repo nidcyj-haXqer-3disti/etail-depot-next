@@ -1,3 +1,4 @@
+import { sandboxFixturesAllowed } from "../sandbox/service";
 import { createHash,randomUUID } from "node:crypto";
 import { and,desc,eq,inArray,sql } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
@@ -6,7 +7,7 @@ import { SecurityError } from "../../platform/security/origin";
 import { merchantUnits } from "../acquiring/schema";
 import { evaluate,type MerchantPolicyScope } from "../policy/evaluate";
 import { serviceInvitations,invitationPermissions,accessCommands,accessHistory,merchantAssignments,merchantPermissionGrants,merchantInvitationTerms } from "./schema";
-import { loadMerchantUnitScope,merchantNow,requireMerchantFixturePerson } from "./merchant-scope";
+import { loadMerchantUnitScope,merchantNow,requireMerchantParticipant } from "./merchant-scope";
 import { createMerchantInvitationSchema,MERCHANT_PERMISSIONS,type CreateMerchantInvitationInput,type MerchantAccessOverview,type MerchantAccessPerson,type MerchantInvitationProjection,type MerchantPermission } from "./merchant-contracts";
 import { invitationDecisionSchema,type InvitationDecisionInput } from "./contracts";
 import type { ScopedTransaction } from "./scope";
@@ -64,15 +65,15 @@ export async function getMerchantAccessOverview(personId:string,unitId:string):P
   const rows=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.merchantUnitId,unitId)).orderBy(desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
   const invitations:MerchantInvitationProjection[]=[];for(const row of rows)invitations.push(await merchantInvitationProjection(tx,row,personId,scope));
   const canInvite=evaluate(scope.policy,"merchant.people.invite").allowed;
-  const candidates=canInvite?await tx.select({id:people.id,displayName:people.displayName}).from(identityBindings).innerJoin(people,eq(people.id,identityBindings.personId)).where(and(eq(identityBindings.issuer,"urn:etail:isolated-fixture"),inArray(identityBindings.subject,["owner","viewer"]))):[];
+  const candidates=canInvite&&sandboxFixturesAllowed()?await tx.select({id:people.id,displayName:people.displayName}).from(identityBindings).innerJoin(people,eq(people.id,identityBindings.personId)).where(and(eq(identityBindings.issuer,"urn:etail:isolated-fixture"),inArray(identityBindings.subject,["owner","viewer"]))):[];
   const controllers:MerchantAccessOverview["controllers"]=[];
   for(const id of [scope.masterService.primaryPersonId]){const [person]=await tx.select().from(people).where(eq(people.id,id));controllers.push({personId:id,displayName:person!.displayName,basis:"PRIMARY_MEMBER"});}
-  return {merchantUnitId:unitId,merchantName:scope.unit.displayName,masterName:scope.master.displayName,canInvite,controllers,people:persons,invitations,recipients:candidates.filter(row=>row.id!==personId&&!scope.liveAssignments.some(item=>item.personId===row.id)&&!invitations.some(item=>item.recipientId===row.id&&item.status==="PENDING")),permissionOptions:ceiling(scope).map(name=>({action:name,label:({"merchant.read":"View merchant unit","merchant.people.read":"View merchant people","merchant.people.invite":"Invite merchant helpers","merchant.people.revoke":"Revoke delegated merchant access","channels.read":"View channel drafts","channels.create":"Create channel drafts","channels.update":"Edit permitted channel drafts","channels.close":"Cancel permitted channel drafts","channels.share":"Share channels","payments.read":"View payments","payments.simulate":"Try a sandbox payment"} satisfies Record<MerchantPermission,string>)[name],description:"Applies only to this merchant unit. Cardholder access and transfer permission are separate.",canDelegate:true})),notice:"Named fictional helpers accept merchant-only access. Only the reviewed merchant permissions are granted. Access expires and stops when its delegation source is withdrawn."};
+  return {merchantUnitId:unitId,merchantName:scope.unit.displayName,masterName:scope.master.displayName,canInvite,controllers,people:persons,invitations,recipients:candidates.filter(row=>row.id!==personId&&!scope.liveAssignments.some(item=>item.personId===row.id)&&!invitations.some(item=>item.recipientId===row.id&&item.status==="PENDING")),permissionOptions:ceiling(scope).map(name=>({action:name,label:({"merchant.read":"View merchant unit","merchant.people.read":"View merchant people","merchant.people.invite":"Invite merchant helpers","merchant.people.revoke":"Revoke delegated merchant access","channels.read":"View channel drafts","channels.create":"Create channel drafts","channels.update":"Edit permitted channel drafts","channels.close":"Cancel permitted channel drafts","channels.share":"Share channels","payments.read":"View payments","payments.simulate":"Try a sandbox payment"} satisfies Record<MerchantPermission,string>)[name],description:"Applies only to this merchant unit. Cardholder access and transfer permission are separate.",canDelegate:true})),notice:"Named sandbox members accept merchant-only access. Only the reviewed merchant permissions are granted. Access expires and stops when its delegation source is withdrawn."};
 });}
 export async function createMerchantInvitation(personId:string,unitId:string,raw:CreateMerchantInvitationInput):Promise<MerchantInvitationProjection>{const input=parse(createMerchantInvitationSchema,raw);return getDb().transaction(async tx=>{
   const scope=await loadMerchantUnitScope(tx,personId,unitId,true);action(scope,"merchant.people.invite");delegation(scope,input.permissions,input.delegablePermissions);
   const id=await receipt(tx,personId,unitId,"merchant.invitation.create",input,null,async()=>{
-    await requireMerchantFixturePerson(tx,input.recipientId);if(input.recipientId===personId||scope.masterService.primaryPersonId===input.recipientId)throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
+    await requireMerchantParticipant(tx,input.recipientId);if(input.recipientId===personId||scope.masterService.primaryPersonId===input.recipientId)throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
     if(scope.liveAssignments.some(row=>row.personId===input.recipientId))throw new SecurityError("ALREADY_MERCHANT_MEMBER",409);
     const timestamp=await merchantNow(tx),expiresAt=new Date(timestamp.getTime()+input.expiresInDays*86400000),accessExpiresAt=new Date(timestamp.getTime()+input.accessExpiresInDays*86400000);
     if(scope.assignment&&accessExpiresAt>scope.assignment.expiresAt)throw new SecurityError("DELEGATION_EXPIRY_EXCEEDED",422);
