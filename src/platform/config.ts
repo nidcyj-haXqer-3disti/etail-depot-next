@@ -18,8 +18,6 @@ export function getRuntimeConfig(env: Readonly<Record<string,string|undefined>> 
   return {
     appEnv: appEnv as AppEnvironment, publicOrigin, netlifyRuntime,
     localFixtureIdentity: isolated && !netlifyRuntime && env.ENABLE_LOCAL_FIXTURE_IDENTITY === "true",
-    // A flag cannot enable an incomplete hosted authentication lifecycle.
-    hostedIdentityReady: false as const,
     realMoney: ENABLE_REAL_MONEY,
   };
 }

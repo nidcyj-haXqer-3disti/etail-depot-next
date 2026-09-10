@@ -1,4 +1,10 @@
-# People-focused marketing and first-time email access — local verification complete
+# Hosted email and authorized deployment — preparation
+
+D56 follows the user's explicit “push and deploy” instruction. The previous PR2 is merged and its final GitHub checks passed; remote main `fb64fa7c986f7bdce6b1060c71a6392c23b4c9d9` matches the preserved local tree. The new `feature/hosted-email-deploy` enables the existing email flow only on the exact canonical production site, with real money and fixture identity off. It also gives hosted confirmation/recovery links direct callback instructions. All507 unit/database/concurrency/contract tests and all62 browser cases pass, along with production Next/offline Netlify packaging, lint/types, source architecture/security, dependency audit and35 source-only handoff tests. Live deployment acceptance follows. No additional migration, demo-data import or user creation is part of this change.
+
+# People-focused marketing and first-time email access — D54–D55 history
+
+**D55 email enablement follow-up (10 September 2026):** the live local server already allowed email sign-in, but an older sign-in tab remained open and the provider had reverted to automatic email confirmation, disabling first-time registration. Restored required confirmation on the exact owned new site, retaining Open registration. Independent provider and local-page reads now show email enabled, `autoconfirm:false`, `disable_signup:false`, and both sign-in and registration available. Refreshed stale local browser pages. No app source, database records, credentials, user accounts or deployment changed; mailbox delivery still requires the user's registration attempt.
 
 D54 implements the user's first-time email clarification and a stronger people-led landing page informed by current Amex Additional/Employee Card marketing and delegated-payment references. The two services now explain cards for adult family and teams, permission to collect for a merchant, and seven channel examples. Original imagery, product guides, help, mobile layouts and search descriptions share that proposition. [Design, research and verification](../docs/MARKETING_REFRESH.md) record scope and evidence.
 

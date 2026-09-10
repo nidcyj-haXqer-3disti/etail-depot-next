@@ -23,5 +23,5 @@ describe("runtime gates",()=>{
   it("cannot enable real money",()=>expect(()=>getRuntimeConfig({APP_ENV:"local",ENABLE_REAL_MONEY:"true"})).toThrow("REAL_MONEY_DISABLED"));
   it("cannot enable local fixtures on a deployment",()=>expect(()=>getRuntimeConfig({APP_ENV:"local",NETLIFY:"true",ENABLE_LOCAL_FIXTURE_IDENTITY:"true"})).toThrow("HOSTED_ENVIRONMENT_REQUIRED"));
   it("requires stable new site binding for hosted operation",()=>expect(()=>getRuntimeConfig({APP_ENV:"production",ETAIL_PUBLIC_ORIGIN:"https://new.example"})).toThrow("NEW_SITE_BINDING_REQUIRED"));
-  it("hosted login cannot be enabled by flag",()=>expect(getRuntimeConfig({HOSTED_IDENTITY_READY:"true"}).hostedIdentityReady).toBe(false));
+  it("does not expose an environment-controlled authentication readiness flag",()=>expect(getRuntimeConfig({HOSTED_IDENTITY_READY:"true"})).not.toHaveProperty("hostedIdentityReady"));
 });

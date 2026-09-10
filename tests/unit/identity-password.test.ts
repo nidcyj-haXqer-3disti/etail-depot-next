@@ -25,10 +25,24 @@ function dependencies() {
   };
 }
 
-describe("explicit local password configuration", () => {
+describe("explicit password configuration", () => {
   it("binds the local browser application to the recorded owned provider, independently of sample identity", () => {
     expect(getPasswordIdentityConfiguration(local)).toMatchObject({ appEnv: "local", publicOrigin: local.ETAIL_PUBLIC_ORIGIN, providerOrigin: targets.netlify.canonical_origin, expectedSiteId: targets.netlify.site_id, runtimeSiteId: null, localRemoteProvider: true });
     expect(getPasswordIdentityConfiguration({ ...local, ENABLE_LOCAL_FIXTURE_IDENTITY: "false" })).toEqual(getPasswordIdentityConfiguration(local));
+  });
+  const production = { APP_ENV: "production", ETAIL_PUBLIC_ORIGIN: targets.netlify.canonical_origin, NETLIFY: "true", CONTEXT: "production", SITE_ID: targets.netlify.site_id, ENABLE_REAL_MONEY: "false", ENABLE_LOCAL_FIXTURE_IDENTITY: "false" };
+  it("enables only the recorded production deployment with explicit sandbox and fixture controls", () => {
+    expect(getPasswordIdentityConfiguration(production)).toEqual({ appEnv: "production", publicOrigin: targets.netlify.canonical_origin, identityEndpoint: verified.issuer, expectedSiteId: targets.netlify.site_id, runtimeSiteId: targets.netlify.site_id, providerOrigin: targets.netlify.canonical_origin, localRemoteProvider: false });
+  });
+  it.each([
+    { APP_ENV: "preview" }, { APP_ENV: "local" }, { APP_ENV: "test" }, { APP_ENV: undefined },
+    { NETLIFY: undefined }, { NETLIFY: "false" }, { CONTEXT: "deploy-preview" }, { CONTEXT: "branch-deploy" }, { CONTEXT: undefined },
+    { SITE_ID: "unrelated-site" }, { SITE_ID: targets.denied.netlify_site_ids[0] }, { SITE_ID: undefined },
+    { ETAIL_PUBLIC_ORIGIN: "https://branch--etail-depot-next.netlify.app" }, { ETAIL_PUBLIC_ORIGIN: "https://unrelated.example.test" }, { ETAIL_PUBLIC_ORIGIN: undefined },
+    { ENABLE_REAL_MONEY: undefined }, { ENABLE_REAL_MONEY: "true" }, { ENABLE_LOCAL_FIXTURE_IDENTITY: undefined }, { ENABLE_LOCAL_FIXTURE_IDENTITY: "true" },
+    { CI: "true" }, { CI: "1" },
+  ])("does not let a production-like environment bypass its site, context or sandbox boundary %#", change => {
+    expect(() => getPasswordIdentityConfiguration({ ...production, ...change })).toThrow(SecurityError);
   });
   it.each([
     {}, { ...local, APP_ENV: undefined }, { ...local, ETAIL_PUBLIC_ORIGIN: undefined },

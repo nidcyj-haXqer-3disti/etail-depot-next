@@ -12,12 +12,14 @@ export const metadata: Metadata = { title: "Sign in", referrer: "no-referrer" };
 
 export default async function LoginPage() {
   let localFixtureIdentity = false;
+  let localEmailLinkBridge = false;
   let validConfiguration = false;
   try {
     const config = getRuntimeConfig();
     localFixtureIdentity = config.localFixtureIdentity;
+    localEmailLinkBridge = config.appEnv === "local";
     validConfiguration = true;
   } catch { /* Invalid runtime configuration leaves every sign-in option unavailable. */ }
   const emailSignIn = validConfiguration ? await getPasswordLoginAvailability() : { available: false, reason: "NOT_CONFIGURED" as const, registrationAvailable: false };
-  return <Shell><div className="login-layout page-container"><section className="login-introduction"><p className="eyebrow">Welcome to Etail Depot</p><h1>A place for<br /><span>your next step.</span></h1><p>Sign in, then choose Cardholder services or Merchant services.</p><div className="login-reassurance"><Icon name="lock" /><div><h2>Access is personal to you.</h2><p>See your cards and the merchant tools you’ve been given access to.</p></div></div></section><section className="login-panel" aria-labelledby="sign-in-title"><p className="overline">Your services</p><h2 id="sign-in-title">Sign in or create a login</h2><p className="muted">Continue to your services.</p><LoginForm localFixtureIdentity={localFixtureIdentity} emailSignIn={emailSignIn} providerOrigin={targets.netlify.canonical_origin} /></section></div></Shell>;
+  return <Shell><div className="login-layout page-container"><section className="login-introduction"><p className="eyebrow">Welcome to Etail Depot</p><h1>A place for<br /><span>your next step.</span></h1><p>Sign in, then choose Cardholder services or Merchant services.</p><div className="login-reassurance"><Icon name="lock" /><div><h2>Access is personal to you.</h2><p>See your cards and the merchant tools you’ve been given access to.</p></div></div></section><section className="login-panel" aria-labelledby="sign-in-title"><p className="overline">Your services</p><h2 id="sign-in-title">Sign in or create a login</h2><p className="muted">Continue to your services.</p><LoginForm localFixtureIdentity={localFixtureIdentity} localEmailLinkBridge={localEmailLinkBridge} emailSignIn={emailSignIn} providerOrigin={targets.netlify.canonical_origin} /></section></div></Shell>;
 }
