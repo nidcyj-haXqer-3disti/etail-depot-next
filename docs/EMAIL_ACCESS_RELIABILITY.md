@@ -28,4 +28,10 @@ The first two email runs exposed test-observation mistakes: Chromium discards a 
 
 The dedicated email suite is explicitly local-only; the standard GitHub CI uses a different guarded database identity and does not run it. Its provider transport is synthetic, while application commands and session persistence are real. No successful hosted password or mailbox roundtrip is claimed.
 
-Publication is pending the exact tested feature-tree upload and owned sandbox deploy.
+## Publication
+
+Published GitHub `fc73b1db463a253e35ee1ca4b4736d55eaee19b2` exactly matches local application candidate `d3f560edd9d1aee407c793033993a8605b88b4e9`, tree `9503c90204ab41fa6e1976e2aef46e82695ee68c`. [PR9](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/9) is a draft for review; no agent merge.
+
+[Netlify deployment](https://app.netlify.com/projects/etail-depot-next/deploys/6aa29be9ee24a9e6e0a8a484) is ready in production context on the dedicated sandbox site, published at `2026-09-10T12:01:29.471Z`. The exact feature branch was temporarily selected for the authorized sandbox deployment and verified restored to `main` afterward. Visitor access, normal branch/preview settings, sender configuration and database records remain unchanged. Local preview3100 was restarted without migrations or seeds.
+
+Post-publication acceptance at `2026-09-10T12:02:48.763Z` passed: canonical provider email enabled, registration open, required confirmation still enabled, and both actual browser forms enabled. The check blocks browser mutations and sends no mail. Sanitized receipts and command logs are in `artifacts/auth-entry-repair/`. GitHub workflow34474140503 was still in progress at the last observation; local completion is not a claim of remote CI completion. The customer was asked to verify their own accepted-password sign-in without sharing credentials; that result remains pending.
