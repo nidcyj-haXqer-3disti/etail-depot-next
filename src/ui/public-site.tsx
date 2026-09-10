@@ -13,8 +13,9 @@ export function ProductPreview({ variant = "cards" }: { variant?: "cards" | "pay
 }
 
 const commonQuestions = [
-  { question: "What can I do with Etail Depot?", answer: "Use Cardholder services to manage cards and follow spending. Use Merchant services to organize customer payments, stores and team access. You can explore both in the demo." },
-  { question: "Who can see my cards and payments?", answer: "The primary cardholder manages their card group. Each additional cardholder sees only their own cards and activity. A primary merchant can oversee its stores; invited team members see only the merchants they have access to. Authorized support staff can read questions assigned to them." },
+  { question: "What can I do with Etail Depot?", answer: "Give trusted adults their own cards through Cardholder services, or share payment tools through Merchant services. You choose permissions and keep the overview. Explore both with sample profiles in the sandbox." },
+  { question: "Who can see my cards and payments?", answer: "The primary cardholder manages their card group. Each additional cardholder sees only their own cards and activity. A primary merchant oversees its submerchants. Invited people see the merchant records their permissions allow; people assigned to the same merchant may share its payment view. Authorized support staff can read questions assigned to them." },
+  { question: "Can I give someone both a card and payment tools?", answer: "Yes, with separate invitations and permissions for each service. Giving someone a card does not give them access to merchant payments, and payment access does not reveal private card activity. Cards for children and teenagers are not available in this sandbox." },
   { question: "Does the demo use real money?", answer: "No. This is a sandbox with fictional people, cards and payments. You can try the experience without entering real bank details. Live card issuance and payment processing are not available here." },
   { question: "Can I use Etail Depot on my phone?", answer: "Yes. Open this website in your phone’s browser to use the same card and payment tools. You do not need to install an app." },
 ];
@@ -22,7 +23,7 @@ export function PublicQuestions() {
   return <div className="public-questions">{commonQuestions.map(item => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}</p></details>)}</div>;
 }
 export function StartExploring() {
-  return <section className="page-container public-final-section"><div className="public-final"><div><p className="eyebrow">YOUR NEXT STEP</p><h2>See how simple it can feel.</h2><p>Take a look around with demo cards and payments.</p></div><Link href="/login" className="button primary">Explore the demo <Icon name="arrow" /></Link></div></section>;
+  return <section className="page-container public-final-section"><div className="public-final"><div><p className="eyebrow">YOUR NEXT STEP</p><h2>Picture what you could do together.</h2><p>Try the view for you and the people you invite. No real money moves.</p></div><Link href="/login" className="button primary">Explore the demo <Icon name="arrow" /></Link></div></section>;
 }
 export function ServiceSteps({ items }: { items: { title: string; text: string }[] }) {
   return <ol className="public-steps">{items.map((item, index) => <li key={item.title}><span className="everyday-number">0{index + 1}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></li>)}</ol>;

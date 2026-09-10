@@ -26,7 +26,7 @@ describe("Netlify Identity server adapter", () => {
       Response.json({ ...verifiedUser, app_metadata: { roles: ["admin"] }, user_metadata: { personId: "victim" } }),
     ]);
     const identity = await adapter.verifyPassword("member@example.test", "  valid password  ");
-    expect(identity).toEqual({ issuer: endpoint, subject: verifiedUser.id, emailVerified: true });
+    expect(identity).toEqual({ issuer: endpoint, subject: verifiedUser.id, providerConfirmed: true });
     expect(fetcher).toHaveBeenCalledTimes(2);
     const [tokenUrl, tokenRequest] = fetcher.mock.calls[0]!;
     expect(tokenUrl).toBe(`${endpoint}/token`);
@@ -87,9 +87,45 @@ describe("Netlify Identity server adapter", () => {
     await expect(invalid.adapter.verifyPassword("member@example.test", "valid password")).rejects.toThrow("IDENTITY_UNAVAILABLE");
   });
 
-  it("rejects short passwords without trimming or attempting login", async () => {
+  it.each(["", "a".repeat(1025)])("rejects empty or oversized passwords before attempting login", async (password) => {
     const { adapter, fetcher } = setup();
-    await expect(adapter.verifyPassword("member@example.test", "short")).rejects.toThrow("INVALID_CREDENTIALS");
+    await expect(adapter.verifyPassword("member@example.test", password)).rejects.toThrow("INVALID_CREDENTIALS");
     expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it("lets the provider verify existing shorter passwords instead of imposing enrollment rules", async () => {
+    const { adapter } = setup([Response.json({ access_token: "test-token" }), Response.json(verifiedUser)]);
+    await expect(adapter.verifyPassword(verifiedUser.email, "short")).resolves.toMatchObject({ subject: verifiedUser.id });
+  });
+
+  it("uses the one bound remote provider from an explicit local application without browser provider cookies", async () => {
+    const { fetcher } = setup([Response.json({ access_token: "test-token" }), Response.json(verifiedUser)]);
+    const local = new NetlifyIdentityAdapter(() => ({ ...configuration, appEnv: "local", publicOrigin: "http://127.0.0.1:3100", providerOrigin: configuration.publicOrigin, runtimeSiteId: null, localRemoteProvider: true }), fetcher, () => null);
+    expect(local.configurationStatus().configured).toBe(true);
+    await expect(local.verifyPassword(verifiedUser.email, "short")).resolves.toEqual({ issuer: endpoint, subject: verifiedUser.id, providerConfirmed: true });
+    expect(fetcher.mock.calls[0]?.[0]).toBe(`${endpoint}/token`);
+  });
+
+  it.each(["test", "preview", "production"] as const)("does not turn %s into local email mode", (appEnv) => {
+    const local = new NetlifyIdentityAdapter(() => ({ ...configuration, appEnv, providerOrigin: configuration.publicOrigin, runtimeSiteId: null, localRemoteProvider: true }), fetch, () => null);
+    expect(local.configurationStatus().configured).toBe(false);
+  });
+
+  it("checks email login availability from actual settings, independently of signup configuration", async () => {
+    const { adapter } = setup([Response.json({ external: { email: true }, disable_signup: true, autoconfirm: false })]);
+    expect(await adapter.passwordLoginAvailability()).toEqual({ available: true, reason: "AVAILABLE" });
+    expect(await setup([Response.json({ external: { email: false } })]).adapter.passwordLoginAvailability()).toEqual({ available: false, reason: "NOT_CONFIGURED" });
+    expect(await setup([new Response(null, { status: 404 })]).adapter.passwordLoginAvailability()).toEqual({ available: false, reason: "UNAVAILABLE" });
+  });
+
+  it("distinguishes unavailable providers and upstream rate limiting from rejected credentials", async () => {
+    await expect(setup([new Response(null, { status: 404 })]).adapter.verifyPassword(verifiedUser.email, "short")).rejects.toMatchObject({ code: "IDENTITY_UNAVAILABLE", status: 503 });
+    await expect(setup([new Response(null, { status: 429 })]).adapter.verifyPassword(verifiedUser.email, "short")).rejects.toMatchObject({ code: "SIGN_IN_RATE_LIMITED", status: 429 });
+  });
+
+  it("rejects unbounded or invalid upstream responses without exposing their content", async () => {
+    for (const response of [Response.json({ access_token: "x".repeat(66_000) }), Response.json(["private"]), new Response("private malformed body")]) {
+      await expect(setup([response]).adapter.verifyPassword(verifiedUser.email, "short")).rejects.toMatchObject({ code: "IDENTITY_INVALID_RESPONSE", status: 503 });
+    }
   });
 });

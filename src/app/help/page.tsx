@@ -17,7 +17,8 @@ const topics = [
     {q:"Can a store see another store’s payments?",a:"Only the primary merchant can oversee all its submerchants. A person invited to a store sees that store’s permitted records. Merchant access does not give anyone access to your private card activity."}]},
   {id:"access",label:"Sign-in & access",title:"A sign-in of your own.",link:"/login",action:"Go to sign in",questions:[
     {q:"How do I try the demo?",a:"Go to Sign in and choose one of the demo people. Try the primary view for group and business management, or the additional cardholder view for private cards and assigned store access. No bank details are needed."},
-    {q:"What if I cannot sign in?",a:"Check your connection and try again. Email sign-in is available only where it has been enabled. New registration and password recovery are not available in this demo. You can still explore the public service guides here."},
+    {q:"How do I create a login with my email?",a:"In the local preview, open Sign in and choose Create a login. Use an email address you control and a password of at least 12 characters. Open the confirmation email, then paste the final Etail Depot page address into Confirmation link. Confirm your email, then sign in. Your login stays separate from the sample profiles and does not automatically open cards or merchant services."},
+    {q:"What if I cannot sign in?",a:"If this is your first visit, choose Create a login and confirm your email before signing in. If you already registered, check your email and password or choose Forgot your password? An expired link needs a new email. If the page says a password change needs review, contact the site owner; repeated sign-in attempts will not resolve it."},
     {q:"Where can I ask about my card?",a:"Sign in, open Cardholder services and choose Help & support. You can send a private question about your card and return to the same conversation for replies."}]},
 ];
 export default function HelpPage() {
