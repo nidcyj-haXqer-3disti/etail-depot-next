@@ -1,0 +1,44 @@
+{
+  "status": "state contract to implement and test",
+  "card_request": [
+    "DRAFT",
+    "BLOCKED",
+    "READY",
+    "SUBMITTED",
+    "PROCESSING",
+    "ISSUED",
+    "DECLINED",
+    "NEEDS_REVIEW",
+    "CANCELED"
+  ],
+  "card": [
+    "PENDING",
+    "ACTIVE",
+    "FROZEN",
+    "CANCELED",
+    "REPLACED"
+  ],
+  "practice_purchase": [
+    "REQUESTED",
+    "PENDING",
+    "COMPLETED",
+    "DECLINED",
+    "FAILED",
+    "NEEDS_REVIEW"
+  ],
+  "provider_operation": [
+    "QUEUED",
+    "IN_FLIGHT",
+    "ACKNOWLEDGED",
+    "RECONCILING",
+    "SUCCEEDED",
+    "REJECTED",
+    "NEEDS_REVIEW"
+  ],
+  "rules": [
+    "No transient network timeout creates a fresh operation identity",
+    "No customer-managed manual clearing in normal practice purchase",
+    "State transitions must specify authorized actor, financial effects, replay identity and allowed predecessors",
+    "Genuine late financial events remain reconcilable even after account access revocation"
+  ]
+}

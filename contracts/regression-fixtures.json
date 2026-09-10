@@ -1,0 +1,73 @@
+{
+  "status": "requirements fixtures, not application test evidence",
+  "annual_pricing": {
+    "sales_usd": "100000",
+    "payments": 1000,
+    "eligible_purchases_usd": "24000",
+    "brand_cost_rate": "0.019",
+    "expected": {
+      "select_processing_usd": "3200",
+      "premier_provider_fee_usd": "800",
+      "premier_brand_cost_usd": "1900",
+      "premier_processing_usd": "2700",
+      "base_cashback_usd": "120",
+      "premier_extra_spending_usd": "120",
+      "premier_fee_bonus_usd": "160",
+      "premier_combined_bonus_usd": "280",
+      "select_net_usd": "3200",
+      "premier_net_usd": "2600",
+      "premier_saving_usd": "600"
+    }
+  },
+  "bonus_cap": [
+    {
+      "name": "spending-only",
+      "eligible_purchases_usd": "100000",
+      "eligible_provider_fee_usd": "0",
+      "expected_extra_bonus_usd": "300"
+    },
+    {
+      "name": "fee-only",
+      "eligible_purchases_usd": "0",
+      "eligible_provider_fee_usd": "2000",
+      "expected_extra_bonus_usd": "300"
+    },
+    {
+      "name": "mixed",
+      "eligible_purchases_usd": "24000",
+      "eligible_provider_fee_usd": "2000",
+      "expected_extra_bonus_usd": "300"
+    }
+  ],
+  "collateral_purchase": {
+    "deposit_minor": "10000",
+    "settled_purchase_minor": "1000",
+    "expected": {
+      "collateral_minor": "10000",
+      "obligation_minor": "1000",
+      "holds_minor": "0",
+      "available_minor": "9000"
+    }
+  },
+  "concurrent_authorizations": {
+    "backing_minor": "10000",
+    "attempts_minor": [
+      "8000",
+      "3000"
+    ],
+    "max_total_approved_minor": "10000",
+    "both_may_approve": false
+  },
+  "management_planning": {
+    "operating_cost_select_usd": "968.8336866137948",
+    "operating_cost_premier_usd": "982.6970199471282",
+    "contribution_select_usd": "667.1663133862053",
+    "contribution_premier_usd": "53.30298005287182",
+    "contribution_delta_usd": "-613.8633333333335",
+    "enabled_lines": 60,
+    "missing_rates": 25,
+    "completeness_percent": "58.33333333333333",
+    "money_tolerance_usd": "0.01",
+    "warning": "These costs require imported driver/rate calculations; the handoff check does not recompute them."
+  }
+}

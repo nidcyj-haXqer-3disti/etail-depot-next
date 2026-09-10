@@ -1,0 +1,666 @@
+{
+  "id": "merchant-channel-v1",
+  "date": "2026-09-09",
+  "status": "LOCAL_DRAFT_SLICE_IMPLEMENTED_WITH_FUTURE_PROCESSING_TARGET",
+  "authority": "Latest user direction and explicit follow-up answers: Merchant MASTER responsibility; Personal/HOUSEHOLD delegated SUB units, multiple Merchant associations and Household delegation accepted. Detailed implementation presets remain subject to current explicit grants.",
+  "architecture_document": "docs/MERCHANT_HIERARCHY_AND_CHANNELS.md",
+  "verification_register": "planning/merchant-channel-verification.json",
+  "account_types": [
+    "PERSONAL",
+    "HOUSEHOLD",
+    "MERCHANT"
+  ],
+  "merchant_kinds": {
+    "MASTER": {
+      "host_account_types": [
+        "MERCHANT"
+      ],
+      "parent": null
+    },
+    "SUB": {
+      "host_account_types": [
+        "PERSONAL",
+        "HOUSEHOLD"
+      ],
+      "parent": "one immutable MASTER merchant unit"
+    }
+  },
+  "responsibility_fields": [
+    "merchant_of_record",
+    "contractual_loss_liable_party",
+    "fee_payer",
+    "settlement_beneficiary",
+    "payout_control_authority",
+    "responsible_representative",
+    "provider_program",
+    "charge_flow",
+    "refund_debit_resource",
+    "dispute_debit_resource",
+    "policy_and_evidence_version"
+  ],
+  "access": {
+    "evaluator_count": 1,
+    "target_union": {
+      "ACCOUNT": [
+        "accountId"
+      ],
+      "MERCHANT_UNIT": [
+        "merchantUnitId"
+      ]
+    },
+    "target_constraint": "Exactly one target with concrete foreign keys; merchant permissions cannot grant account access.",
+    "loaders": {
+      "ACCOUNT": "Implemented loadAccountScope",
+      "MERCHANT_UNIT": "Implemented loadMerchantUnitScope; both feed canonical evaluate"
+    },
+    "actions": {
+      "merchant.read": "Minimum identity/readiness of the assigned unit; no host financial data.",
+      "merchant.children.read": "Explicitly approved descendant merchant oversight; never private drafts or host account access.",
+      "merchant.relationship.request": "Propose a named master/host sponsorship without attaching or activating it.",
+      "merchant.relationship.accept": "Accept the reviewed relationship for the authorized side; both sides are required.",
+      "merchant.relationship.suspend": "Suspend new operations under the named relationship within current authority.",
+      "merchant.relationship.close": "Close only after outstanding operation and obligation checks.",
+      "merchant.verification.read": "Read minimized requirements and status within assigned scope.",
+      "merchant.verification.submit": "Submit exact current application data to the configured mock provider; no self-approval.",
+      "merchant.gateway.read": "Read sanitized gateway readiness, never credentials.",
+      "merchant.gateway.manage": "Elevated routing change with current approval and immutable historical bindings.",
+      "merchant.responsibility.manage": "Elevated proposal of responsibility configuration; no default from parent ID.",
+      "merchant.controls.manage": "Narrow controls inside live parent ceilings; no reset of consumed usage.",
+      "merchant.people.read": "Read allowed merchant assignments only; not the Household member directory.",
+      "merchant.people.invite": "Use the shared invitation lifecycle inside exact delegable resource/action ceilings.",
+      "merchant.people.change": "Change accepted assignment with expected version, current grant lineage and audit.",
+      "merchant.people.revoke": "Revoke merchant assignment and descendants; replacement grants do not revive lineage.",
+      "channels.read": "Read creator-private or explicitly assigned shared configurations.",
+      "channels.create": "Save one canonical draft channel under the authorized unit.",
+      "channels.update": "Version-check editable configuration; preserve order snapshots and consumed one-time use.",
+      "channels.activate": "Publish a reviewed revision only when all server readiness gates pass.",
+      "channels.pause": "Stop new checkout/payment through all distributed representations.",
+      "channels.close": "Close configuration without deleting requests, payments or history.",
+      "channels.share": "Explicitly change creator-private visibility within permitted scope.",
+      "payments.request": "Create/resume a payable order through an assigned channel and bounded request inputs.",
+      "payments.read": "Read own/assigned/shared merchant payments according to explicit row scope.",
+      "payments.refund": "Separate financial grant, original route and responsibility, remaining principal and approval.",
+      "payouts.read": "Read explicitly permitted payout records without exposing unrelated backing.",
+      "payouts.request": "Separate financial grant, configured beneficiary and common atomic backing reservation.",
+      "documents.read": "Read specifically permitted invoice/bill/receipt evidence; private files remain scoped.",
+      "deliveries.create": "Review and request an allowed transport for a canonical channel/order/document.",
+      "deliveries.read": "Read scoped delivery evidence separately from payment state.",
+      "reports.read": "Read permitted merchant projections only.",
+      "reports.export": "Export the same current row scope with no formula injection or private-data leakage.",
+      "merchant.relationship.read": "Named master/host may read only their pending offer; no preexisting child assignment required."
+    },
+    "role_presets_status": "Proposed templates; explicit reviewed assignments required; no new blanket account role powers.",
+    "presets": {
+      "MASTER_OPERATOR": {
+        "suggested_actions": [
+          "merchant.read",
+          "merchant.children.read",
+          "merchant.verification.read",
+          "merchant.gateway.read",
+          "channels.read",
+          "channels.create",
+          "channels.update",
+          "payments.request",
+          "payments.read",
+          "deliveries.create",
+          "deliveries.read",
+          "reports.read"
+        ],
+        "scope": "Master and explicitly accepted merchant oversight scope; child-private drafts excluded."
+      },
+      "SUB_MANAGER": {
+        "suggested_actions": [
+          "merchant.read",
+          "merchant.verification.read",
+          "channels.read",
+          "channels.create",
+          "channels.update",
+          "payments.request",
+          "payments.read",
+          "deliveries.create",
+          "deliveries.read",
+          "merchant.people.read"
+        ],
+        "scope": "One Household sub-MID within current parent ceiling; invitation, activation and financial powers separately granted."
+      },
+      "COLLECTOR": {
+        "suggested_actions": [
+          "merchant.read",
+          "channels.read",
+          "payments.request",
+          "payments.read",
+          "deliveries.create",
+          "deliveries.read",
+          "documents.read"
+        ],
+        "scope": "Assigned active channels, request ceilings and own/assigned payments only; no creation, routing, delegation or financial servicing."
+      },
+      "MERCHANT_VIEWER": {
+        "suggested_actions": [
+          "merchant.read",
+          "payments.read",
+          "reports.read"
+        ],
+        "scope": "Explicitly assigned read projections only."
+      }
+    },
+    "household_member_dependency": "Explicit continued-membership dependency OR separately accepted direct merchant appointment; review and record which.",
+    "outside_operator": "Direct merchant assignment through shared invitation lifecycle; never insert account_memberships.",
+    "personal_merchant_default": "Owner access only within accepted merchant authority; no helper template automatically granted.",
+    "supervised_collection": "Unavailable until explicit guardian/age/provider policy exists; no independent merchant, payout, routing, delegation or borrowing.",
+    "invitations": {
+      "lifecycle_count": 1,
+      "states": [
+        "PENDING",
+        "ACCEPTED",
+        "DECLINED",
+        "REVOKED",
+        "EXPIRED"
+      ],
+      "review_fields": [
+        "intendedPerson",
+        "targetKind",
+        "merchantUnit",
+        "masterMerchant",
+        "actions",
+        "allowedChannelIdsAndTypes",
+        "amountCurrencyCeilings",
+        "invitationExpiry",
+        "accessExpiry",
+        "authorityLineage",
+        "membershipDependency",
+        "version"
+      ],
+      "review_fields_status": "Target superset. allowedChannelIdsAndTypes and amountCurrencyCeilings are future; current request fields below are authoritative for the local slice.",
+      "local_request_fields": [
+        "commandId",
+        "recipientId",
+        "permissions",
+        "delegablePermissions",
+        "expiresInDays: 1|3|7",
+        "accessExpiresInDays: 1|7|30",
+        "membershipDependent"
+      ],
+      "local_access_expiry": "Fixed when invitation is saved, not on acceptance; exact accessExpiresAt is shown and can precede invitation expiry."
+    },
+    "operating_effective_intersection": [
+      "authenticated identity",
+      "accepted unexpired merchant assignment",
+      "live immutable grant lineage",
+      "accepted sponsorship for SUB; no parent prerequisite for MASTER",
+      "host and master operating state",
+      "master ceiling",
+      "sub-MID controls",
+      "allowed action/channel/type/amount/currency",
+      "row visibility",
+      "action-specific readiness"
+    ],
+    "authorization_contexts": {
+      "ACCOUNT": "Existing account loader and privacy guard.",
+      "MERCHANT_OPERATION": "Current accepted operating access; action-specific prerequisites, parent relation only for SUB.",
+      "RELATIONSHIP_OFFER": "Named host controller/master authority can review/accept exact pending offer with zero child grants; no operating access.",
+      "INVITATION_DECISION": "Intended recipient may decide exact pending invitation with zero merchant assignments; no operating access before acceptance.",
+      "PUBLIC_GUEST": "Scoped guest token and current operational restrictions; no private management/account access."
+    },
+    "actions_status": "Mixed target vocabulary. Only local_grant_actions and local_relationship_actions below are implemented; financial, distribution, activation and guest actions remain unavailable.",
+    "local_grant_actions": [
+      "merchant.read",
+      "merchant.people.read",
+      "merchant.people.invite",
+      "merchant.people.revoke",
+      "channels.read",
+      "channels.create",
+      "channels.update",
+      "channels.close",
+      "channels.share"
+    ],
+    "local_relationship_actions": {
+      "account_scope": [
+        "merchant.relationship.request"
+      ],
+      "merchant_review_scope": [
+        "merchant.relationship.acceptHost",
+        "merchant.relationship.acceptMaster",
+        "merchant.relationship.suspend"
+      ],
+      "api_side": "accept body uses side HOST or MASTER"
+    },
+    "local_invitation_boundary": "Only accepted Household SUB units support merchant invitations/revocation. Named existing fictional recipient; exact resource scope; selected grants and delegable grants within live lineage. Personal and MASTER helper invitations remain unavailable.",
+    "authorization_contexts_status": "ACCOUNT, merchant operation/review and invitation decision exist locally. PUBLIC_GUEST is target-only and currently denied; no public token or checkout exists."
+  },
+  "channels": {
+    "canonical_form_count": 1,
+    "presentation_types": [
+      "SMS",
+      "EMAIL",
+      "INVOICE",
+      "BILL",
+      "SOCIAL",
+      "QR",
+      "WEB"
+    ],
+    "aliases": {
+      "TEXT": "SMS",
+      "WEBSITE": "WEB",
+      "ONLINE_LINK": "WEB"
+    },
+    "receipt": {
+      "stage": "AFTER_CONFIRMED_PAYMENT",
+      "not_a_payable_channel_type": true,
+      "corrections": "Immutable versions tied to original payment/refund facts.",
+      "implementation_status": "FUTURE; UI explanation only, no receipt generation"
+    },
+    "modes": [
+      "ONE_TIME",
+      "REUSABLE"
+    ],
+    "states": [
+      "DRAFT",
+      "READY",
+      "ACTIVE",
+      "PAUSED",
+      "EXPIRED",
+      "CLOSED"
+    ],
+    "ready": "Server-derived; cannot be asserted by the browser.",
+    "default_visibility": "CREATOR_PRIVATE",
+    "one_time_uniqueness": "One payable order per one-time channel across revisions/presentations; atomic reservation; edits do not reset consumed use.",
+    "reusable_uniqueness": "Independent order per deliberate purchase; stable identity for retries of that purchase.",
+    "invoice_allocation": "Reserve/allocate against remaining principal atomically; no duplicate or excess capture.",
+    "publication_gates": [
+      "current accepted assignment",
+      "accepted sponsorship",
+      "configured responsibility",
+      "provider program compatibility",
+      "valid MID/resource assignment",
+      "exact active gateway binding",
+      "required acceptance capability",
+      "allowed currency/method/channel",
+      "current privacy/publication review",
+      "no master/sub/host restriction",
+      "sandbox-only provider"
+    ],
+    "public_tokens": {
+      "storage": "hashed opaque tokens",
+      "presentation_scope": "channel+audience+expiry+guest actions; reusable resolution chooses current active revision",
+      "order_scope": "exact order with immutable merchant/responsibility/gateway snapshot",
+      "revocation": "Block new checkout/payment on pause, expiry or relationship/master restriction; reconcile accepted effects.",
+      "private_api_authority": false
+    },
+    "delivery_states": [
+      "QUEUED",
+      "DISPATCHING",
+      "SENT",
+      "DELIVERED",
+      "FAILED",
+      "CANCELED",
+      "UNKNOWN"
+    ],
+    "prepared_links": "Generated/prepared is separate from transport delivery or payment success.",
+    "states_status": "Future full lifecycle. Only local_state_mapping is available in this slice.",
+    "local_state_mapping": {
+      "physical_table": "payment_request_drafts",
+      "stored_states": [
+        "DRAFT",
+        "CANCELED"
+      ],
+      "api_states": [
+        "DRAFT",
+        "EXPIRED",
+        "CANCELED"
+      ],
+      "derived_expiry": "EXPIRED is projected from current time; it does not require a stored EXPIRED row",
+      "display_labels": {
+        "DRAFT": "Draft",
+        "EXPIRED": "Expired",
+        "CANCELED": "Closed"
+      },
+      "close_command": "POST /api/v1/merchants/{merchantId}/channels/{channelId}/close",
+      "closure_reason_column": false,
+      "reopen": false
+    },
+    "presentation_behavior_status": "All seven values persist on drafts; distribution, documents, QR/URL generation and payment behaviors are future.",
+    "payment_delivery_sections_status": "one_time_uniqueness, reusable_uniqueness, invoice_allocation, publication_gates, public_tokens, delivery_states and prepared_links describe future processing requirements; no execution is implemented or claimed."
+  },
+  "gateway": {
+    "internal_id": "merchantUnitId UUID",
+    "external_id": "Typed actual adapter assignment; mock values labeled MOCK; absent is not assigned.",
+    "provider_resource_uniqueness": [
+      "provider",
+      "environment",
+      "documented namespace/connection",
+      "external_type",
+      "external_id"
+    ],
+    "bindings": "One exact compatible version chosen and pinned per order; no default-MID fallback; supported shared processing resources require explicit mappings.",
+    "credentials": "Server-held authorized secret references only; never given to operators or included in business records.",
+    "rebind": "New orders may use a newly approved version; historical payment/refund/dispute/settlement uses original binding.",
+    "implementation_status": "FUTURE_NOT_CONFIGURED"
+  },
+  "verification_dimensions": [
+    "identity binding",
+    "merchant relationship consent",
+    "legal party and representative requirements",
+    "sub-unit use and responsibility model",
+    "provider MID assignment",
+    "payment acceptance capability",
+    "payout capability",
+    "channel/transport readiness",
+    "operator authority",
+    "ongoing restrictions and expiry"
+  ],
+  "table_families": [
+    "merchant_units",
+    "merchant_relationships_and_history",
+    "merchant_responsibility_versions",
+    "merchant_profiles_and_applications",
+    "verification_subjects_requirements_and_observations",
+    "gateway_connections",
+    "merchant_gateway_bindings_and_provider_resources",
+    "merchant_access_and_grant_dependencies",
+    "existing_typed_invitations_permissions_receipts_history",
+    "payment_channels_and_revisions",
+    "channel_presentations_and_public_tokens",
+    "payment_requests_orders_attempts",
+    "delivery_attempts",
+    "invoice_bill_receipt_documents_and_allocations",
+    "existing_ledger_provider_operations_inbox_outbox"
+  ],
+  "migration": {
+    "previous_migrations": 6,
+    "existing_migrations": 7,
+    "status": "APPLIED_LOCAL_TEST_AND_PREVIEW_PRESERVATION_RECORDED",
+    "path": "netlify/database/migrations/20260909041111_glossy_black_panther/migration.sql",
+    "sha256": "72df07b30912a75bafbc734e014447a8d2d04584ef938bdfd6fe76c8f1805cc4",
+    "immutable": true,
+    "seller_profiles": "Backfilled one MASTER per existing Merchant profile; no automatic Personal/Household SUB or delegated access.",
+    "invitations": "Preserved IDs and original history as ACCOUNT targets; extended the same invitation lifecycle with a merchant branch.",
+    "payment_drafts": "Retained physical tables/IDs/command receipts and original amounts, currency, usage, expiry, versions, private visibility and creator provenance on the original Merchant MASTER. New presentation defaults WEB. Stored CANCELED is unchanged; Closed is UI-only. No closure_reason or physical CLOSED state.",
+    "authorship": "Person and merchant-unit provenance with legacy/controller/assignment basis; no revoked authority is restored.",
+    "cutover": "Local source uses one canonical merchant channel form/command owner. Old account payment-request-draft routes/UI removed; existing account Merchant creation/setup retained.",
+    "evidence": [
+      "artifacts/merchant-channels/test-upgrade-before.json",
+      "artifacts/merchant-channels/test-upgrade-after.json",
+      "artifacts/merchant-channels/preview-upgrade-before.json",
+      "artifacts/merchant-channels/preview-upgrade-after.json"
+    ],
+    "evidence_limits": "Observed six-to-seven fictional-data upgrades and preservation on two local databases only. No restore rehearsal, repeated upgrade application, hosted deployment, provider or financial operation inferred.",
+    "recovery": "Applied migration is immutable. Future corrections require forward migration; after new writes, preserve data through a compatible forward fix or separately reviewed restoration. Restoration rehearsal NOT_RUN."
+  },
+  "financial_invariants": [
+    "ENABLE_REAL_MONEY=false",
+    "one ledger",
+    "exact minor units plus currency; API amounts are strings",
+    "immutable business-effect identity and posted journals",
+    "current authorization rechecked on retry",
+    "accepted financial events reconcile after access revocation",
+    "fees and shared Premier membership-year cap do not multiply with sub-MIDs",
+    "merchant permission never implies issuing authority"
+  ],
+  "implementation_slices": [
+    {
+      "id": "A",
+      "work": "Typed merchant units and reviewed sponsorship drafts",
+      "issue_ids": [
+        "EDN-006",
+        "EDN-017"
+      ],
+      "local_status": "BOUNDED_LOCAL_SOURCE_IMPLEMENTED",
+      "completion_note": "Typed units, request, separate acceptance and suspension implemented; provider identity/activation and complete closure are future."
+    },
+    {
+      "id": "B",
+      "work": "Merchant scope, canonical invitation acceptance and outside-helper journey",
+      "issue_ids": [
+        "EDN-008",
+        "EDN-017",
+        "EDN-020"
+      ],
+      "local_status": "BOUNDED_LOCAL_SOURCE_IMPLEMENTED",
+      "completion_note": "Household SUB named-helper invitation/acceptance/revocation and merchant-only shell implemented; active-channel collector/guest flows are future."
+    },
+    {
+      "id": "C",
+      "work": "Preserved draft migration and one channel form",
+      "issue_ids": [
+        "EDN-017",
+        "EDN-018"
+      ],
+      "local_status": "BOUNDED_LOCAL_SOURCE_IMPLEMENTED",
+      "completion_note": "Preserved draft storage and one seven-presentation form implemented; modes are saved intent, no orders/publication/delivery."
+    },
+    {
+      "id": "D",
+      "work": "Mock gateway/readiness, guest orders, delivery and documents",
+      "issue_ids": [
+        "EDN-014",
+        "EDN-018"
+      ],
+      "local_status": "FUTURE_NOT_IMPLEMENTED",
+      "completion_note": "Readiness explains missing services; no configured gateway, guest orders, delivery or documents."
+    },
+    {
+      "id": "E",
+      "work": "Common ledger, settlement, refund, dispute and payout servicing",
+      "issue_ids": [
+        "EDN-009",
+        "EDN-019"
+      ],
+      "local_status": "FUTURE_NOT_IMPLEMENTED",
+      "completion_note": "No channel financial effects; common financial lifecycle remains future work."
+    }
+  ],
+  "verification_storage": [
+    "typed subject/party",
+    "representative relationship",
+    "provider/program/country/legal form",
+    "requirement code/state/errors",
+    "restricted evidence reference",
+    "nullable provider-supplied deadline; null does not remove restrictions",
+    "requested/allowed/enabled capabilities or exact provider equivalent",
+    "observation time and source event/version"
+  ],
+  "verification_rule": "Use effective provider capability flags plus current local policy and explicit freshness rules. Re-review can retain some capability; missing/stale evidence requires reconciliation. No generic verified flag or mock-to-live approval. Block affected new dispatch while required evidence is missing or stale; reconciliation is not permission to send.",
+  "decisions": [
+    {
+      "id": "MC-D01",
+      "status": "ACCEPTED_BY_USER",
+      "question": "Who is responsible for sub-MID sales and settlement?",
+      "alternative": "Separately responsible sub-merchants with supported independent onboarding.",
+      "chosen": "Master Merchant responsible; sub-MIDs are attributed collection units.",
+      "alternative_status": "NOT_SELECTED"
+    },
+    {
+      "id": "MC-D02",
+      "status": "ACCEPTED_BY_USER",
+      "question": "May one Personal/Household host have separate sub-MIDs under multiple Merchants?",
+      "alternative": "One live Merchant sponsorship per host.",
+      "chosen": "Multiple explicit relationships, each sub-MID with exactly one master.",
+      "alternative_status": "NOT_SELECTED"
+    }
+  ],
+  "scope_note": "Local source implements hierarchy, merchant-only access and seven-presentation drafts. Fields below marked target are architecture requirements, not deployed provider/financial capabilities. Execution evidence is maintained separately; implementation does not mean full scenario completion.",
+  "local_implementation": {
+    "source_scope": "Local fictional data only; ENABLE_REAL_MONEY=false",
+    "merchant_model": {
+      "responsibility": "MASTER_RESPONSIBLE for sales, fees, refunds and chargebacks",
+      "host_cardinality": "Multiple Merchant associations allowed; exactly one immutable master per SUB and one unit per master/host pair",
+      "states_with_commands": [
+        "REQUESTED",
+        "ACCEPTED",
+        "SUSPENDED"
+      ],
+      "closed_relationship": "Stored target value; no local relationship close command",
+      "consent": "Separate HOST and MASTER acceptance even when the actor controls both sides; read/review does not accept"
+    },
+    "source_owners": {
+      "hierarchy_channels": "src/modules/acquiring/service.ts",
+      "merchant_scope": "src/modules/access/merchant-scope.ts",
+      "policy": "src/modules/policy/evaluate.ts",
+      "merchant_invitations": "src/modules/access/merchant-service.ts, dispatched through src/modules/access/service.ts",
+      "ui": "src/ui/workspace/merchant-directory.tsx, merchant-channels.tsx, merchant-people.tsx, merchant-workspace.tsx"
+    },
+    "account_entries": [
+      "PERSONAL Get paid",
+      "HOUSEHOLD Get paid",
+      "MERCHANT Merchant services / Connected accounts"
+    ],
+    "management_route": "/accounts/{accountId}/get-paid?merchant={merchantId}&merchantTab=channels|people|verification",
+    "management_tabs": [
+      "Payment channels",
+      "People & permissions (capability-filtered)",
+      "Verification & gateway"
+    ],
+    "outside_helper": "Shared intended-recipient invitation accepts access to one Household SUB only; Shared selling access names its responsible Merchant and exposes no financial account sidebar or account membership",
+    "channel_storage": "Existing payment_request_drafts and payment_draft_commands are the only physical channel/receipt tables. Their names remain for preserved IDs/history; old account draft routes and UI are removed.",
+    "channel_operations": [
+      "Create private or explicitly assigned draft",
+      "Edit with expectedVersion",
+      "Close without deleting history",
+      "Replay same command under current authority",
+      "Reload and review exact merchant responsibility/readiness"
+    ],
+    "channel_scope": "One immutable merchantUnitId; creator-private default; ASSIGNED requires channels.share and current row authority. USD exact positive minor-unit strings, one-time/reusable intent, expiry, seven presentation choices. No payable order is created.",
+    "readiness": {
+      "verification": "NOT_VERIFIED",
+      "gateway": "NOT_CONNECTED",
+      "externalMid": null,
+      "paymentAcceptance": false,
+      "payouts": false,
+      "commercialSpending": "NOT_ASSESSED",
+      "canPublish": false,
+      "requirements": "Server-derived local consent/authority requirements vary by MASTER, Personal SUB or Household SUB. These do not replace unavailable provider/gateway/financial prerequisites."
+    },
+    "not_implemented": [
+      "Provider verification subjects/requirements/evidence storage",
+      "External MID assignment",
+      "Gateway binding/versioning",
+      "Responsibility-version storage for financial records",
+      "Channel publication/activation/pause",
+      "Public tokens and guest checkout",
+      "Payable orders and payment attempts",
+      "SMS/email delivery or other distribution",
+      "Generated QR codes/public payment links",
+      "Issued invoices, bills or receipts",
+      "Refund, payout, settlement or ledger effects from channels",
+      "Collector use of active channels",
+      "Per-channel invitation assignments or invitation amount/type ceilings"
+    ],
+    "list_boundary": "Current merchant directory and channel projections return the complete authorized local set with hasMore:false; no pagination is claimed",
+    "api": [
+      {
+        "method": "GET",
+        "path": "/api/v1/merchants",
+        "query": "optional accountId"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/merchants/{merchantId}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/accounts/{accountId}/merchant-relationships",
+        "input": [
+          "commandId",
+          "masterId",
+          "displayName"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/merchants/{merchantId}/relationship/accept",
+        "input": [
+          "commandId",
+          "expectedVersion",
+          "side: HOST|MASTER"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/merchants/{merchantId}/relationship/suspend",
+        "input": [
+          "commandId",
+          "expectedVersion",
+          "reason"
+        ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/merchants/{merchantId}/channels"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/merchants/{merchantId}/channels/{channelId}"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/merchants/{merchantId}/channels/{channelId}/close"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/merchants/{merchantId}/access"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/merchants/{merchantId}/invitations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/merchants/{merchantId}/invitations/{invitationId}/revoke"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/merchants/{merchantId}/people/{assignmentId}/revoke"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/invitations"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/invitations/{invitationId}/accept"
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/invitations/{invitationId}/decline"
+      }
+    ],
+    "executable_contract": "contracts/generated/foundation-openapi.json",
+    "management_ownership": "Merchant account owns and administers its master and permitted children; host collection views keep their own account context. Both accepted account access and current unit authority are required.",
+    "compatibility_route": "/merchants/{merchantId} resolves only the authorized exact responsible Merchant, then exact host, otherwise a limited shared-selling workspace; no financial-account access follows from a merchant grant."
+  },
+  "responsibility_fields_status": "Future provider/financial storage fields; current units retain named responsible master Merchant only. User liability choice is accepted, provider routing is unconfigured.",
+  "verification_storage_status": "FUTURE_NOT_IMPLEMENTED; existing fictional merchant applications persist declarations/local review only",
+  "verification_dimensions_status": "Target provider dimensions; local readiness shows missing provider evidence and separate current consent/authority",
+  "table_families_status": "Future logical family names, not an applied SQL inventory. See physical_tables for current storage.",
+  "physical_tables": {
+    "hierarchy": [
+      "merchant_units",
+      "merchant_relationship_events",
+      "merchant_relationship_commands"
+    ],
+    "relationship_state": "Stored on merchant_units; no separate physical merchant_relationships table",
+    "access": [
+      "merchant_assignments",
+      "merchant_permission_grants",
+      "merchant_invitation_terms"
+    ],
+    "extended_shared_invitation": [
+      "account_invitations",
+      "invitation_permissions",
+      "access_command_receipts",
+      "account_access_history"
+    ],
+    "channels": [
+      "payment_request_drafts",
+      "payment_draft_commands"
+    ],
+    "existing_setup": [
+      "merchant_profiles",
+      "merchant_applications",
+      "merchant_application_commands",
+      "merchant_application_events"
+    ],
+    "channel_provenance": "merchantUnitId plus creatorId, creatorBasis LEGACY_ACCOUNT_MEMBER|ACCOUNT_CONTROLLER|MERCHANT_ASSIGNMENT and optional creatorAssignmentId; legacy accountId remains responsible master Merchant provenance"
+  }
+}

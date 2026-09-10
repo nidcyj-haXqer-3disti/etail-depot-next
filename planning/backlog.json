@@ -1,0 +1,904 @@
+{
+  "schema_version": 1,
+  "project_key": "ETAIL_DEPOT_NEXT_GREENFIELD_2026",
+  "repository": "nidcyj-haXqer-3disti/etail-depot-next",
+  "milestones": [
+    {
+      "id": "M0",
+      "title": "Foundation and fresh project",
+      "description": "Target, source, stack and CI readiness."
+    },
+    {
+      "id": "M1",
+      "title": "Accounts, membership and access",
+      "description": "Explicit three-type context and central policy."
+    },
+    {
+      "id": "M2",
+      "title": "One Cards workflow",
+      "description": "One saved intent and one issuance implementation."
+    },
+    {
+      "id": "M3",
+      "title": "Issuing and durable simulation",
+      "description": "Ledger, atomic backing, repayments and mock completion."
+    },
+    {
+      "id": "M4",
+      "title": "Acquiring and delegation",
+      "description": "Named merchant, guest payments and money availability."
+    },
+    {
+      "id": "M5",
+      "title": "Operations, economics and partners",
+      "description": "Required operating and commercial outcomes."
+    },
+    {
+      "id": "M6",
+      "title": "Acceptance and security hardening",
+      "description": "Actual full-stack regression and usability evidence."
+    },
+    {
+      "id": "M7",
+      "title": "New Netlify sandbox release",
+      "description": "New-resource deployment and hosted acceptance."
+    }
+  ],
+  "labels": [
+    {
+      "name": "area:accounts",
+      "color": "185B63",
+      "description": "Etail Depot Next accounts work"
+    },
+    {
+      "name": "area:acquiring",
+      "color": "185B63",
+      "description": "Etail Depot Next acquiring work"
+    },
+    {
+      "name": "area:economics",
+      "color": "185B63",
+      "description": "Etail Depot Next economics work"
+    },
+    {
+      "name": "area:integrations",
+      "color": "185B63",
+      "description": "Etail Depot Next integrations work"
+    },
+    {
+      "name": "area:issuing",
+      "color": "185B63",
+      "description": "Etail Depot Next issuing work"
+    },
+    {
+      "name": "area:operations",
+      "color": "185B63",
+      "description": "Etail Depot Next operations work"
+    },
+    {
+      "name": "area:partners",
+      "color": "185B63",
+      "description": "Etail Depot Next partners work"
+    },
+    {
+      "name": "area:platform",
+      "color": "185B63",
+      "description": "Etail Depot Next platform work"
+    },
+    {
+      "name": "area:qa",
+      "color": "185B63",
+      "description": "Etail Depot Next qa work"
+    },
+    {
+      "name": "area:release",
+      "color": "185B63",
+      "description": "Etail Depot Next release work"
+    },
+    {
+      "name": "area:security",
+      "color": "185B63",
+      "description": "Etail Depot Next security work"
+    },
+    {
+      "name": "area:ux",
+      "color": "185B63",
+      "description": "Etail Depot Next ux work"
+    },
+    {
+      "name": "priority:P0",
+      "color": "B63A36",
+      "description": "Critical dependency or release gate"
+    },
+    {
+      "name": "priority:P1",
+      "color": "9B651A",
+      "description": "Required full-project feature"
+    },
+    {
+      "name": "status:blocked",
+      "color": "8B5E83",
+      "description": "Blocked on a named external prerequisite"
+    }
+  ],
+  "issues": [
+    {
+      "id": "EDN-001",
+      "milestone": "M0",
+      "title": "Verify new targets, source precedence and provenance",
+      "area": "platform",
+      "priority": "P0",
+      "depends_on": [],
+      "acceptance_ids": [
+        "NEW-01",
+        "NEW-02",
+        "NEW-03",
+        "NEW-04"
+      ],
+      "description": "Validate handoff; inspect workbooks; new target binding and source-to-feature mapping. Do not create or modify old resources.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-002",
+      "milestone": "M0",
+      "title": "Create new private repository and delivery planning",
+      "area": "platform",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-001"
+      ],
+      "acceptance_ids": [
+        "NEW-01",
+        "NEW-03"
+      ],
+      "description": "Create/verify new private repo, labels/milestones/issues and private board when permitted. Read back privacy and branch rules.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-003",
+      "milestone": "M0",
+      "title": "Scaffold supported stack and executable quality gates",
+      "area": "platform",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-001"
+      ],
+      "acceptance_ids": [
+        "REL-01",
+        "REL-02"
+      ],
+      "description": "Resolve actual versions/lockfile; one Next/TypeScript app, PostgreSQL dev service and CI. No static placeholder release.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-004",
+      "milestone": "M0",
+      "title": "Provision new Identity and secure session foundations",
+      "area": "security",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-002",
+        "EDN-003"
+      ],
+      "acceptance_ids": [
+        "AUTH-01",
+        "AUTH-02",
+        "AUTH-03",
+        "AUTH-04",
+        "AUTH-05"
+      ],
+      "description": "Separate new Identity, full confirmation/recovery/session lifecycle and contextual CSRF; isolated fixture adapter in CI only.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-005",
+      "milestone": "M1",
+      "title": "Implement three account types and explicit account directory",
+      "area": "accounts",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-003",
+        "EDN-004"
+      ],
+      "acceptance_ids": [
+        "ACC-01",
+        "ACC-02"
+      ],
+      "description": "Fresh account/type extensions, responsible-party/sponsor relations, account-scoped routes and validated selection.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-006",
+      "milestone": "M1",
+      "title": "Centralize role policy, capabilities and resource scope",
+      "area": "security",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-005"
+      ],
+      "acceptance_ids": [
+        "ACC-02",
+        "ACC-03",
+        "ACC-05",
+        "CARD-03"
+      ],
+      "description": "One policy evaluator and server capability/remediation projection. No browser eligibility engine.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-007",
+      "milestone": "M1",
+      "title": "Implement invitation, Household guardianship and access lifecycle",
+      "area": "accounts",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-006"
+      ],
+      "acceptance_ids": [
+        "ACC-04",
+        "ACC-05",
+        "ACC-06",
+        "ACC-07",
+        "ACC-08"
+      ],
+      "description": "Named accepted/revoked relationships, independent adult privacy, guardians and least-privilege delegation.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-008",
+      "milestone": "M1",
+      "title": "Implement membership and source-defined commercial configuration",
+      "area": "economics",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-005"
+      ],
+      "acceptance_ids": [
+        "ECO-01",
+        "ECO-02",
+        "ECO-03"
+      ],
+      "description": "Select/Premier, periods, sponsor attribution, proration/cancellation/refund terms and exact configuration tests.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-009",
+      "milestone": "M2",
+      "title": "Design ledger backing and explicit funding assignments",
+      "area": "issuing",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-006",
+        "EDN-007",
+        "EDN-008"
+      ],
+      "acceptance_ids": [
+        "MONEY-01",
+        "MONEY-02",
+        "MONEY-03",
+        "CARD-08"
+      ],
+      "description": "Fresh posting templates, facilities/allocations, exact monetary repositories and constraints. Preserve funded-vs-credit semantics.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-010",
+      "milestone": "M2",
+      "title": "Implement saved card requests and one issuance command",
+      "area": "issuing",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-009"
+      ],
+      "acceptance_ids": [
+        "CARD-02",
+        "CARD-03",
+        "CARD-04",
+        "CARD-05",
+        "CARD-06",
+        "CARD-07",
+        "CARD-08"
+      ],
+      "description": "One request state machine, version/digest, stable provider operation, reconciliation and business-level uniqueness.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-011",
+      "milestone": "M2",
+      "title": "Build account shell and one canonical Add card component",
+      "area": "ux",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-010"
+      ],
+      "acceptance_ids": [
+        "CARD-01",
+        "CARD-02",
+        "CARD-10",
+        "UX-01",
+        "UX-03"
+      ],
+      "description": "Account switcher, Cards route and one reusable form. Home links to same saved intent; no legacy inheritance or duplicates.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-012",
+      "milestone": "M2",
+      "title": "Implement card lifecycle, assignments and composed controls",
+      "area": "issuing",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-010",
+        "EDN-011"
+      ],
+      "acceptance_ids": [
+        "CARD-09",
+        "CARD-10",
+        "MONEY-06",
+        "ACC-08"
+      ],
+      "description": "Freeze/unfreeze/cancel/replace in same command architecture; limits and privacy by permitted holder.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-013",
+      "milestone": "M3",
+      "title": "Implement atomic holds, purchases, funding and reconciliation",
+      "area": "issuing",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-009",
+        "EDN-012"
+      ],
+      "acceptance_ids": [
+        "MONEY-03",
+        "MONEY-04",
+        "MONEY-05",
+        "MONEY-06",
+        "MONEY-07",
+        "MONEY-08",
+        "MONEY-10"
+      ],
+      "description": "Concurrent real PostgreSQL operations, partial/late events, exact ledgers and reconciled capacity.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-014",
+      "milestone": "M3",
+      "title": "Build durable mock event runner and one practice-purchase action",
+      "area": "integrations",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-013"
+      ],
+      "acceptance_ids": [
+        "SIM-01",
+        "SIM-02",
+        "SIM-03",
+        "SIM-04",
+        "SIM-05"
+      ],
+      "description": "Inbox/outbox, leases/retry/dead-letter, bounded worker auth; member does not manually clear.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-015",
+      "milestone": "M3",
+      "title": "Implement consumer/commercial repayment and supervised funding",
+      "area": "issuing",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-013",
+        "EDN-014"
+      ],
+      "acceptance_ids": [
+        "MONEY-09",
+        "ACC-07",
+        "SIM-04"
+      ],
+      "description": "Separate schedules; supervised funds/allowances non-credit; each calendar effect period-idempotent.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-016",
+      "milestone": "M3",
+      "title": "Implement reward accrual, reversals and membership-year posting",
+      "area": "economics",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-008",
+        "EDN-013",
+        "EDN-015"
+      ],
+      "acceptance_ids": [
+        "ECO-01",
+        "ECO-02",
+        "ECO-03",
+        "MONEY-10"
+      ],
+      "description": "Base monthly, shared annual extras, proration/reversal/cap attribution; no duplicated event credit.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-017",
+      "milestone": "M4",
+      "title": "Implement merchant hierarchy, onboarding and channel domain",
+      "area": "acquiring",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-006",
+        "EDN-008",
+        "EDN-009"
+      ],
+      "acceptance_ids": [
+        "ACQ-01",
+        "ACQ-08"
+      ],
+      "description": "Merchant MASTER and Personal/Household SUB with reviewed sponsorship, responsibility requirements, exact gateway mappings and one channel domain. Evolve existing drafts without auto-sharing/publication. Master Merchant responsibility and multiple separate Merchant associations are confirmed; verify provider prerequisites before financial activation.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md",
+        "Typed merchant units/relationships and versioned verification/gateway readiness",
+        "Data-preserving draft migration and one canonical channel command/form"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-018",
+      "milestone": "M4",
+      "title": "Build channel distribution, guest checkout and payment documents",
+      "area": "acquiring",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-017",
+        "EDN-014"
+      ],
+      "acceptance_ids": [
+        "ACQ-02",
+        "ACQ-03",
+        "SIM-03"
+      ],
+      "description": "One payment flow for SMS/text, email, invoice, bill, social, QR and web; receipt after confirmed payment. One-time channel uniqueness, reusable orders, atomic partial allocation and durable mock delivery. Preserve existing recurring mock schedule requirement.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md",
+        "Public token isolation, per-order pinned routing and actor-reviewed mock distribution",
+        "All presentation families and delivery/payment/document failure recovery"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-019",
+      "milestone": "M4",
+      "title": "Implement settlement, reserves, refunds, disputes and payouts",
+      "area": "acquiring",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-018",
+        "EDN-013",
+        "EDN-016"
+      ],
+      "acceptance_ids": [
+        "ACQ-04",
+        "ACQ-05",
+        "ACQ-06",
+        "ACQ-07",
+        "MONEY-05",
+        "MONEY-10"
+      ],
+      "description": "Common backing locks and provider effects; replay-safe refund/payout failure; immutable evidence.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-020",
+      "milestone": "M4",
+      "title": "Unify sub-MID delegation and Merchant merchant oversight UX",
+      "area": "accounts",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-007",
+        "EDN-012",
+        "EDN-019"
+      ],
+      "acceptance_ids": [
+        "ACC-05",
+        "ACC-07",
+        "ACQ-08",
+        "UX-01"
+      ],
+      "description": "One evaluator and target-typed invitation lifecycle. Household members and outside helpers get precise merchant access without host financial membership; master oversight is explicitly agreed. Issuing/privacy/guardian boundaries remain separate.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md",
+        "Outside-helper Use channel journey with own/assigned scope",
+        "Live delegation lineage, parent ceilings, revocation and current-authority concurrency tests"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-021",
+      "milestone": "M5",
+      "title": "Implement operational cases, queues and guarded adjustments",
+      "area": "operations",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-006",
+        "EDN-014",
+        "EDN-019"
+      ],
+      "acceptance_ids": [
+        "OPS-01",
+        "OPS-02"
+      ],
+      "description": "Customer/internal notes, SLAs, assignment/escalation/reopen, reasoned adjustment and independent approvals.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-022",
+      "milestone": "M5",
+      "title": "Import management cost model with basis/version completeness",
+      "area": "economics",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-008",
+        "EDN-016"
+      ],
+      "acceptance_ids": [
+        "ECO-04",
+        "ECO-05",
+        "ECO-06",
+        "NEW-04"
+      ],
+      "description": "Read original drivers/rates/formulas, preserve missingness; source regression without plugs; approved scenarios.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-023",
+      "milestone": "M5",
+      "title": "Implement partner programs and three-way economics",
+      "area": "partners",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-019",
+        "EDN-021",
+        "EDN-022"
+      ],
+      "acceptance_ids": [
+        "OPS-03",
+        "MONEY-10"
+      ],
+      "description": "Direct/referral/wholesale/embedded configurations; separated responsibilities and customer/partner/platform ledgers/views.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-024",
+      "milestone": "M5",
+      "title": "Implement partner portal, scoped API and signed webhooks",
+      "area": "partners",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-023"
+      ],
+      "acceptance_ids": [
+        "OPS-04",
+        "AUTH-05",
+        "AUTH-06"
+      ],
+      "description": "Keys shown once/hashed/scoped/revoked; signed webhook/SSRF controls; cases/statement/invoice/CSV.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-025",
+      "milestone": "M6",
+      "title": "Complete public experience, documents, notifications and PWA",
+      "area": "ux",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-011",
+        "EDN-018",
+        "EDN-021"
+      ],
+      "acceptance_ids": [
+        "AUTH-06",
+        "UX-02",
+        "UX-03",
+        "UX-04"
+      ],
+      "description": "Real public pricing/calculator/legal drafts/help, private document and notifications flows; public-only PWA caching.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-026",
+      "milestone": "M6",
+      "title": "Run full-stack concurrency, security and API contract suite",
+      "area": "security",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-012",
+        "EDN-014",
+        "EDN-015",
+        "EDN-016",
+        "EDN-019",
+        "EDN-020",
+        "EDN-024",
+        "EDN-025"
+      ],
+      "acceptance_ids": [
+        "REL-02",
+        "MONEY-04",
+        "MONEY-05",
+        "AUTH-01",
+        "AUTH-02",
+        "AUTH-03",
+        "AUTH-04",
+        "AUTH-05",
+        "AUTH-06"
+      ],
+      "description": "Adversarial role/ID/origin/replay/cache tests; generated OpenAPI matches real handlers; no green skips.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-027",
+      "milestone": "M6",
+      "title": "Run desktop/mobile task journeys and usability review",
+      "area": "ux",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-026"
+      ],
+      "acceptance_ids": [
+        "UX-01",
+        "UX-02",
+        "UX-03",
+        "UX-04",
+        "CARD-01"
+      ],
+      "description": "Visible fresh-user tasks and returning-user flows with real PostgreSQL; inspect safe screenshots and obtain user feedback.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-028",
+      "milestone": "M6",
+      "title": "Finalize feature coverage, reconciliation and recovery rehearsal",
+      "area": "operations",
+      "priority": "P1",
+      "depends_on": [
+        "EDN-026",
+        "EDN-027"
+      ],
+      "acceptance_ids": [
+        "MONEY-10",
+        "REL-07"
+      ],
+      "description": "Map all original required outcomes, run backup/restore in disposable new DB, no unreported incomplete module.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-029",
+      "milestone": "M7",
+      "title": "Create and bind new Netlify site, database and private previews",
+      "area": "platform",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-002",
+        "EDN-004",
+        "EDN-009"
+      ],
+      "acceptance_ids": [
+        "NEW-01",
+        "NEW-03",
+        "REL-03",
+        "REL-04"
+      ],
+      "description": "Provision NEW resource after plan check; native new-repo link; stable ID guard; separate DB/Identity/Blob/secrets.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-030",
+      "milestone": "M7",
+      "title": "Configure effective runtime and protected deployment readiness",
+      "area": "platform",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-029",
+        "EDN-014",
+        "EDN-025"
+      ],
+      "acceptance_ids": [
+        "SIM-04",
+        "SIM-05",
+        "AUTH-03",
+        "AUTH-05",
+        "REL-01"
+      ],
+      "description": "Current Netlify build, runtime origin/config preflight, simulator/bounded runner and no duplicate TOML/dashboard flags.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-031",
+      "milestone": "M7",
+      "title": "Execute actual hosted authenticated and guest acceptance",
+      "area": "qa",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-028",
+        "EDN-030"
+      ],
+      "acceptance_ids": [
+        "REL-03",
+        "REL-04",
+        "REL-05",
+        "AUTH-02",
+        "ACQ-02",
+        "SIM-01"
+      ],
+      "description": "Real authorized new test account, email callback/login/card/purchase/persistence/logout; guest settlement/payout; private files.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    },
+    {
+      "id": "EDN-032",
+      "milestone": "M7",
+      "title": "Review and publish new public sandbox with evidence receipt",
+      "area": "release",
+      "priority": "P0",
+      "depends_on": [
+        "EDN-031"
+      ],
+      "acceptance_ids": [
+        "REL-06",
+        "REL-07",
+        "NEW-01"
+      ],
+      "description": "User review before public access; Open signup with confirmation; real money/demo impersonation off; record actual URLs/IDs/SHA/limitations.",
+      "required_deliverables": [
+        "Working implementation for this slice",
+        "Relevant database/API/UI tests and source traceability",
+        "Exact command/SHA evidence and updated planning/STATUS.md"
+      ],
+      "status": "Backlog"
+    }
+  ]
+}

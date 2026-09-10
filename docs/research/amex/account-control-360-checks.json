@@ -1,0 +1,650 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-09-08",
+  "status": "proposed-business-review",
+  "scope": "Account control across consumer, Household and Seller journeys. Normal flows and acceptance scenarios are proposed Etail business checks, not observed Amex screen walkthroughs or completed Etail features.",
+  "evidence_status_definition": {
+    "documented": "Official Amex material supports the core business task in the stated program; edge coverage and Etail delivery still require review.",
+    "partial": "Related public evidence exists, but role, market, exception or end-to-end coverage remains incomplete.",
+    "gap": "No reviewed source establishes the equivalent complete journey; cited sources are adjacent context only."
+  },
+  "checks": [
+    {
+      "id": "CTL360-01",
+      "journey": "Confirm the responsible payer before granting access",
+      "actors": [
+        "Responsible adult/business",
+        "Applicant",
+        "Administrator"
+      ],
+      "normal_flow": "Choose the account and product; identify the responsible party, funder and person who may spend before presenting approval.",
+      "exceptions": "A payer, owner or manager may be a different person; a title change must not silently transfer existing obligations.",
+      "issuing_handoff": "The card request names the approved responsibility and funding arrangement.",
+      "merchant_handoff": "Seller acquiring responsibility remains distinct from commercial-card responsibility.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C01",
+        "C19"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-09"
+      ],
+      "etail_gap": "The existing row needs a responsibility-change and pre-existing-obligation review, not only a role label.",
+      "acceptance_scenario": "A manager is replaced; past spending remains assigned to its original responsible party until an expressly approved change."
+    },
+    {
+      "id": "CTL360-02",
+      "journey": "Delegate account management with an exact scope",
+      "actors": [
+        "Account owner",
+        "Prospective manager"
+      ],
+      "normal_flow": "Review permitted tasks and information, invite the person and show when access becomes active.",
+      "exceptions": "Wrong invitee, rejected invitation, unavailable access level or conflicting owner instructions must remain visible.",
+      "issuing_handoff": "Management alone gives no card-issuance or spending permission.",
+      "merchant_handoff": "Merchant refund and payout permissions require their own selection.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C02",
+        "C03"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-03",
+        "AX-CONTROLS-04"
+      ],
+      "etail_gap": "Define the complete invite/accept/revoke journey and resolve delegate-removal authority explicitly.",
+      "acceptance_scenario": "An invited reporting manager sees the selected account only and cannot add a card, pay out or extend their own powers."
+    },
+    {
+      "id": "CTL360-03",
+      "journey": "Separate holding a card from administering an account",
+      "actors": [
+        "Cardholder",
+        "Manager",
+        "Responsible payer"
+      ],
+      "normal_flow": "Assign the holder's permitted card activity independently of management tasks.",
+      "exceptions": "A manager without a holder assignment cannot spend; a holder cannot appoint managers.",
+      "issuing_handoff": "Cardholder selection and issuance approval are separate steps.",
+      "merchant_handoff": "A Seller employee's card assignment does not grant merchant administration.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C01",
+        "C04",
+        "C11"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-02",
+        "AX-CONTROLS-06",
+        "AX-CONTROLS-09"
+      ],
+      "etail_gap": "The comparison must exercise both directions of the distinction, including a person who holds both roles.",
+      "acceptance_scenario": "One person receives only management access, another only a spending assignment; each is denied the other's actions."
+    },
+    {
+      "id": "CTL360-04",
+      "journey": "Invite and enroll the right participant",
+      "actors": [
+        "Inviter",
+        "Invitee",
+        "Authorized approver"
+      ],
+      "normal_flow": "Choose the account and requested scope, send an invitation, verify the intended participant and record acceptance.",
+      "exceptions": "Wrong address, reused invitation, different sign-in and missing local approval require a safe correction path.",
+      "issuing_handoff": "The accepted person resumes the same card request.",
+      "merchant_handoff": "Merchant staff access must identify the approved Seller/location.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C07",
+        "C09"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-04",
+        "AX-CONTROLS-04"
+      ],
+      "etail_gap": "Corporate enrollment is documented; equivalent end-to-end Household and Seller invitation rules need explicit review.",
+      "acceptance_scenario": "A second person opens an invitation intended for the first and cannot accept or see the account."
+    },
+    {
+      "id": "CTL360-05",
+      "journey": "Handle unreceived, expired and withdrawn invitations",
+      "actors": [
+        "Invitee",
+        "Inviter",
+        "Support"
+      ],
+      "normal_flow": "Show invitation status; permit authorized resend or a fresh invitation while retaining the original history.",
+      "exceptions": "An expired, withdrawn or already accepted invitation cannot restore old rights.",
+      "issuing_handoff": "Resume a valid draft without creating another requested card.",
+      "merchant_handoff": "An obsolete merchant invitation cannot add a departed employee.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C09",
+        "C10"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-03",
+        "AX-ISSUING-04"
+      ],
+      "etail_gap": "Existing save/resume rows do not fully cover withdrawal, resend and wrong-recipient recovery.",
+      "acceptance_scenario": "Withdraw an invitation, resend a narrower one, then open both; only the current intended access can be accepted."
+    },
+    {
+      "id": "CTL360-06",
+      "journey": "Distinguish company approval from card approval",
+      "actors": [
+        "Requester",
+        "Independent approver",
+        "Administrator",
+        "Issuer"
+      ],
+      "normal_flow": "Complete requested details, obtain the applicable approval, submit and track the next responsible party.",
+      "exceptions": "Returned details, changed amount/holder, declined request and absent approver require a clear next action.",
+      "issuing_handoff": "Company or guardian permission is not an issued card or an issuer decision.",
+      "merchant_handoff": "A merchant manager cannot approve card liability merely by administering sales.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C09",
+        "C10"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-06",
+        "AX-ISSUING-07",
+        "AX-ISSUING-08",
+        "AX-ISSUING-09",
+        "AX-ISSUING-10"
+      ],
+      "etail_gap": "Make approval independence, changed-request review and alternate-approver continuity explicit.",
+      "acceptance_scenario": "After approval, change the holder or permitted amount; require fresh approval before proceeding."
+    },
+    {
+      "id": "CTL360-07",
+      "journey": "Delegate within the right business or location",
+      "actors": [
+        "Program owner",
+        "Lead administrator",
+        "Local administrator"
+      ],
+      "normal_flow": "Select the business/location, review the person's permitted tasks and appoint only within the grantor's authority.",
+      "exceptions": "A regional or local role cannot silently expand to other businesses, countries or private Personal activity.",
+      "issuing_handoff": "Card-management scope follows the selected relationship.",
+      "merchant_handoff": "Merchant access follows the assigned Seller and locations.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C06",
+        "C07",
+        "C12"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-03",
+        "AX-CONTROLS-07",
+        "AX-CONTROLS-08"
+      ],
+      "etail_gap": "A global role label must not conceal different scopes or allow over-delegation.",
+      "acceptance_scenario": "A location administrator grants a colleague access; neither person gains a sibling location or the owner's Personal records."
+    },
+    {
+      "id": "CTL360-08",
+      "journey": "Review everyone with access",
+      "actors": [
+        "Owner",
+        "Authorized access administrator",
+        "Reviewer"
+      ],
+      "normal_flow": "Review people, tasks, locations, effective dates and pending changes; investigate unexpected access.",
+      "exceptions": "The review can be stale or omit an unaccepted invitation; show its date and scope.",
+      "issuing_handoff": "Identify who may request, approve, issue, manage and spend.",
+      "merchant_handoff": "Include merchant reporting, dispute, bank-setting and payout permissions.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C06",
+        "C12"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-03",
+        "AX-CONTROLS-18",
+        "AX-MANAGEMENT-17"
+      ],
+      "etail_gap": "Expand the people list to include pending invitations and distinct sensitive authorities.",
+      "acceptance_scenario": "A review lists one person's reporting access and another's payout access accurately, including pending removals."
+    },
+    {
+      "id": "CTL360-09",
+      "journey": "Revoke a delegate completely",
+      "actors": [
+        "Owner",
+        "Authorized administrator",
+        "Departing delegate"
+      ],
+      "normal_flow": "Remove the specified authority, confirm its effective status and stop new access and future private deliveries.",
+      "exceptions": "Previously downloaded information cannot be recalled; unresolved work must be reassigned without restoring the delegate.",
+      "issuing_handoff": "Review outstanding drafts, approvals and card-management duties separately.",
+      "merchant_handoff": "Remove merchant permissions and scheduled report recipients.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C02",
+        "C03",
+        "C06"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-05",
+        "AX-MANAGEMENT-13"
+      ],
+      "etail_gap": "The broad revoke row does not prove removal from scheduled reports, exports, phone servicing or pending approvals.",
+      "acceptance_scenario": "Revoke a manager with a scheduled report and open old links; no new private content is delivered and another authorized person owns pending work."
+    },
+    {
+      "id": "CTL360-10",
+      "journey": "Complete an employee's exit",
+      "actors": [
+        "Employer",
+        "Administrator",
+        "Departing employee",
+        "Finance/support"
+      ],
+      "normal_flow": "Review roles, assigned cards, pending applications, approvals, alerts, reports and expenses; cancel or reassign each responsibility.",
+      "exceptions": "A cancelled login may leave an active card; cancelling a card may leave reporting access, expenses or repayment work.",
+      "issuing_handoff": "Confirm card cancellation and keep late charges, refunds and open cases attributable.",
+      "merchant_handoff": "Transfer dispute deadlines and remove bank/payout powers without losing settlement work.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C06",
+        "C08",
+        "C09"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-05",
+        "AX-ISSUING-18",
+        "AX-MANAGEMENT-13"
+      ],
+      "etail_gap": "The ninety-row catalog lacks one complete staff-exit checklist spanning cards, reports and remaining obligations.",
+      "acceptance_scenario": "An employee who is holder, approver and report recipient leaves; all three roles end while a later refund and existing dispute remain handled."
+    },
+    {
+      "id": "CTL360-11",
+      "journey": "Explain spending limits and changes",
+      "actors": [
+        "Responsible payer",
+        "Authorized controls manager",
+        "Cardholder"
+      ],
+      "normal_flow": "Review available funding and current use, set a permitted limit, explain its effective period and show the holder the result.",
+      "exceptions": "Existing use, tips/late charges, failed change and period boundaries need understandable handling.",
+      "issuing_handoff": "A limit does not create funding or guarantee every purchase is approved.",
+      "merchant_handoff": "Seller funds reserved for spending are not simultaneously available for payout.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C04",
+        "C05",
+        "C20"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-10",
+        "AX-MANAGEMENT-03"
+      ],
+      "etail_gap": "Explicitly depart from Amex's documented earlier-spend exclusion; Etail retains already-used amounts on edits.",
+      "acceptance_scenario": "After spending 80 of 100, changing the limit to 90 leaves 10 of that limit, without restoring the earlier 80."
+    },
+    {
+      "id": "CTL360-12",
+      "journey": "Pause, resume, cancel and replace the correct card",
+      "actors": [
+        "Cardholder",
+        "Authorized controls manager",
+        "Responsible payer"
+      ],
+      "normal_flow": "Identify the card and restriction, explain what changes, confirm the action and show remaining permitted activity.",
+      "exceptions": "A parent's/account restriction cannot be lifted by a holder; delayed activity and failed requests need a visible outcome.",
+      "issuing_handoff": "Cancellation differs from temporary restriction or replacement; history stays connected.",
+      "merchant_handoff": "Late merchant claims, refunds and settlements continue to be explained.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C04",
+        "C08",
+        "C16"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-11",
+        "AX-ISSUING-16",
+        "AX-ISSUING-18"
+      ],
+      "etail_gap": "Add scope, duration, failure and late-activity review; do not inherit automatic Amex unfreeze.",
+      "acceptance_scenario": "Freeze the account, then let a holder attempt to resume their card; spending stays blocked while a valid earlier purchase finishes."
+    },
+    {
+      "id": "CTL360-13",
+      "journey": "Route useful alerts without expanding visibility",
+      "actors": [
+        "Holder",
+        "Guardian/responsible payer",
+        "Manager",
+        "Merchant operator"
+      ],
+      "normal_flow": "Choose applicable events, recipients and channels; distinguish spending warnings, financial notices and security messages.",
+      "exceptions": "Wrong contact, failed delivery, revoked recipient and alert-only category controls must be handled explicitly.",
+      "issuing_handoff": "A category alert is not a purchase block or additional spending permission.",
+      "merchant_handoff": "A missed dispute alert cannot leave a case without an owner.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C04",
+        "C11",
+        "C14",
+        "C15",
+        "C20"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-12",
+        "AX-CONTROLS-13",
+        "AX-CONTROLS-17"
+      ],
+      "etail_gap": "Specify required versus optional messages, recipient scope and delivery-failure follow-up.",
+      "acceptance_scenario": "A category warning is delivered only to permitted recipients; an undelivered case alert still leaves the case in the responsible team's queue."
+    },
+    {
+      "id": "CTL360-14",
+      "journey": "Keep each person's activity private",
+      "actors": [
+        "Personal owner",
+        "Household participant",
+        "Cardholder",
+        "Viewer"
+      ],
+      "normal_flow": "Show the activity needed for the selected role and account, with clear holder attribution.",
+      "exceptions": "Shared membership or Household participation must not expose unrelated Personal or Seller history or funding totals.",
+      "issuing_handoff": "A holder sees their assignment and necessary remaining allocation.",
+      "merchant_handoff": "Merchant staff see only assigned Seller activity.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C01",
+        "C20",
+        "C11"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-01",
+        "AX-CONTROLS-02",
+        "AX-CONSUMER-01",
+        "AX-CONSUMER-03"
+      ],
+      "etail_gap": "Amex's account-total display is an explicit departure for Etail's narrower Household privacy.",
+      "acceptance_scenario": "An adult supplies a Household allowance; another participant sees that allowance but not the adult's Personal balance or unrelated purchases."
+    },
+    {
+      "id": "CTL360-15",
+      "journey": "Apply the same visibility to statements and reports",
+      "actors": [
+        "Holder",
+        "Authorized statement reader",
+        "Report recipient"
+      ],
+      "normal_flow": "Select a period and account, review the permitted information, download or request an accessible copy.",
+      "exceptions": "Old links, archived periods, changed permissions and scheduled delivery require the same scope review.",
+      "issuing_handoff": "Holder documents cannot include another holder's private activity.",
+      "merchant_handoff": "Location reports and merchant statements remain within assigned access.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C02",
+        "C06",
+        "C11",
+        "C20"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-04",
+        "AX-CONSUMER-05",
+        "AX-CONSUMER-06",
+        "AX-CONSUMER-18",
+        "AX-MANAGEMENT-13"
+      ],
+      "etail_gap": "Add post-revocation delivery and cross-location export review; existing download rows are broader.",
+      "acceptance_scenario": "A viewer's access ends before a scheduled statement is sent; no statement is delivered, and an authorized replacement recipient can obtain it."
+    },
+    {
+      "id": "CTL360-16",
+      "journey": "Separate bill payment from bank-setting authority",
+      "actors": [
+        "Responsible payer",
+        "Payment delegate",
+        "Bank-setting delegate"
+      ],
+      "normal_flow": "Review the obligation and payment source, confirm permitted payment, and treat adding/changing a source as a separate decision.",
+      "exceptions": "Wrong source, duplicate payment, returned payment or removed payer authority needs follow-up.",
+      "issuing_handoff": "Consumer, Seller and supervised products retain their distinct repayment meanings.",
+      "merchant_handoff": "Paying a card bill gives no right to change merchant settlement details or release payouts.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C02",
+        "C19",
+        "C20"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-15",
+        "AX-CONTROLS-16",
+        "AX-CONSUMER-07",
+        "AX-CONSUMER-08",
+        "AX-CONSUMER-11"
+      ],
+      "etail_gap": "Document exact delegation and payment-source consent; a minor must never acquire an independent Etail bill.",
+      "acceptance_scenario": "A payment delegate can make an approved repayment but cannot add a source, change a payout destination or move liability."
+    },
+    {
+      "id": "CTL360-17",
+      "journey": "Complete merchant access enrollment without implying approval",
+      "actors": [
+        "Merchant representative",
+        "Invited merchant staff"
+      ],
+      "normal_flow": "Identify the approved business and requested services, complete required verification and show available access.",
+      "exceptions": "Deferred verification and rejected information must show limited access and a next step.",
+      "issuing_handoff": "Merchant enrollment gives no commercial-card eligibility.",
+      "merchant_handoff": "Online access is distinct from merchant approval and settlement entitlement.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "C12",
+        "C21"
+      ],
+      "comparison_ids": [
+        "AX-MERCHANT-01",
+        "AX-CONTROLS-18"
+      ],
+      "etail_gap": "Separate access enrollment, merchant service approval and card-product approval in the experience.",
+      "acceptance_scenario": "A partly enrolled merchant user can finish permitted setup but cannot view financial records or request a payout."
+    },
+    {
+      "id": "CTL360-18",
+      "journey": "Assign location access and financial reporting",
+      "actors": [
+        "Merchant owner",
+        "Location manager",
+        "Reporting staff"
+      ],
+      "normal_flow": "Choose locations and permitted reports, confirm the scope and review it when staff duties change.",
+      "exceptions": "Adding/removing a profile location must not silently create or close a merchant relationship.",
+      "issuing_handoff": "Location reporting gives no authority to administer an owner's cards.",
+      "merchant_handoff": "Payments, statements, disputes and account settings are separate permissions.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C12"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-07",
+        "AX-CONTROLS-08",
+        "AX-CONTROLS-18",
+        "AX-MERCHANT-02",
+        "AX-MERCHANT-12"
+      ],
+      "etail_gap": "Expand location visibility into the complete permission review; avoid importing Flexible access as an Etail default.",
+      "acceptance_scenario": "A reporting user may download their location statement but cannot open another location or add dispute/bank-setting powers."
+    },
+    {
+      "id": "CTL360-19",
+      "journey": "Review merchant bank changes and payout authority separately",
+      "actors": [
+        "Merchant responsible party",
+        "Bank-setting delegate",
+        "Payout delegate",
+        "Approver"
+      ],
+      "normal_flow": "Select the affected business/destination, verify sensitive changes and obtain required approval before use.",
+      "exceptions": "Wrong location, stale approval, failed verification, changed destination or unavailable funds must stop the inappropriate action.",
+      "issuing_handoff": "Reserved backing for commercial cards remains unavailable for release.",
+      "merchant_handoff": "A destination change and a payout request have separate responsible actors and confirmations.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C12",
+        "C13"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-14",
+        "AX-CONTROLS-16",
+        "AX-MERCHANT-05"
+      ],
+      "etail_gap": "Public portal guides do not establish every payout role; Etail needs an explicit actor-by-action decision.",
+      "acceptance_scenario": "A bank-setting delegate changes a permitted destination but cannot release a payout; a payout delegate cannot substitute their own destination."
+    },
+    {
+      "id": "CTL360-20",
+      "journey": "Delegate disputes without granting every financial action",
+      "actors": [
+        "Cardholder",
+        "Dispute delegate",
+        "Merchant case worker",
+        "Refund approver"
+      ],
+      "normal_flow": "Identify the transaction and side of the case, collect permitted evidence, track deadlines and explain outcomes.",
+      "exceptions": "Pending activity, duplicate complaint, withdrawal, prior refund or staff departure require ownership and careful access.",
+      "issuing_handoff": "Cardholder complaints and delegated card-account servicing stay within assigned activity.",
+      "merchant_handoff": "Submitting evidence, accepting a claim and issuing a refund need separately defined authority.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C02",
+        "C11",
+        "C15",
+        "C22",
+        "C23"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-12",
+        "AX-CONSUMER-13",
+        "AX-CONSUMER-14",
+        "AX-MERCHANT-14",
+        "AX-MERCHANT-15",
+        "AX-MERCHANT-16",
+        "AX-MANAGEMENT-14"
+      ],
+      "etail_gap": "The ninety-row case journeys need an explicit role split and replacement owner when a delegate leaves.",
+      "acceptance_scenario": "A case worker can supply evidence but cannot refund or withdraw another party's case; the authorized decision maker can act with a recorded reason."
+    },
+    {
+      "id": "CTL360-21",
+      "journey": "Change contact details and preserve security communications",
+      "actors": [
+        "Person",
+        "Permitted account-contact manager",
+        "Merchant representative"
+      ],
+      "normal_flow": "Distinguish personal contact from business billing/operational contact; verify sensitive changes and show who receives which notices.",
+      "exceptions": "Lost contact, shared inbox, departed staff or an unauthorized change requires recovery and a retained accountable owner.",
+      "issuing_handoff": "Card alerts and application updates follow the right participant.",
+      "merchant_handoff": "Merchant dispute and bank-change messages must not be stranded in an old employee inbox.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C14",
+        "C09",
+        "C11"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-14",
+        "AX-CONTROLS-17",
+        "AX-CONSUMER-17"
+      ],
+      "etail_gap": "Add lost-contact and departure recovery, including mandatory communications; marketing preferences are insufficient.",
+      "acceptance_scenario": "An administrator leaves after changing job email; operational cases transfer without exposing private cardholder notices to their replacement."
+    },
+    {
+      "id": "CTL360-22",
+      "journey": "Handle a death notification and subsequent authority review",
+      "actors": [
+        "Notifier",
+        "Estate representative",
+        "Responsible business",
+        "Specialist support"
+      ],
+      "normal_flow": "Accept a notification, identify the affected relationship and route an authority-reviewed closure or continuity case.",
+      "exceptions": "Being a relative, cardholder or manager must not automatically disclose records or transfer responsibility.",
+      "issuing_handoff": "Review additional cards, pending requests, existing obligations and permitted continuity.",
+      "merchant_handoff": "Review a deceased business representative separately from the surviving merchant business.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C17"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "No explicit bereavement journey in the frozen catalog; Etail needs a product decision and specialist evidence process.",
+      "acceptance_scenario": "A relative reports a death and receives an acknowledgement, but private records and account control wait for verified appropriate authority."
+    },
+    {
+      "id": "CTL360-23",
+      "journey": "Support incapacity without automatic caretaker access",
+      "actors": [
+        "Account owner",
+        "Authorized representative",
+        "Specialist support"
+      ],
+      "normal_flow": "Offer an assistance route, establish the permitted representative and record the scope and duration of support.",
+      "exceptions": "Ordinary help, third-party discussion and legal representation must not be treated as equivalent.",
+      "issuing_handoff": "Card control and responsibility changes need their own decisions.",
+      "merchant_handoff": "Business continuity must identify the proper representative without granting unrelated personal access.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "C18"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "UK support is documented; a matching US and Etail authority/evidence journey remains undecided.",
+      "acceptance_scenario": "A caretaker asks for access; support can collect the request without granting spending, viewing history or changing bank details."
+    },
+    {
+      "id": "CTL360-24",
+      "journey": "Review supervised access as circumstances change",
+      "actors": [
+        "Guardian",
+        "Supervised participant",
+        "Other responsible adult"
+      ],
+      "normal_flow": "Explain funding, visibility and guardian authority; review access when guardianship or participant eligibility changes.",
+      "exceptions": "A birthday, invitation, new role or changed guardian must not automatically create borrowing, Seller ownership or private-history access.",
+      "issuing_handoff": "Existing cards and balances require an explicit permitted transition.",
+      "merchant_handoff": "Minor-associated commerce remains with the approved adult merchant.",
+      "evidence_status": "gap",
+      "source_ids": [
+        "C20"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "The Amex young-holder example does not establish Etail's guardian-funded product or adulthood/guardian-change transition; no exact frozen row covers this.",
+      "acceptance_scenario": "A supervised participant reaches a review milestone; they retain only permitted funded access until a separately approved adult product transition."
+    },
+    {
+      "id": "CTL360-25",
+      "journey": "Close an account while completing remaining work",
+      "actors": [
+        "Responsible party",
+        "Authorized administrator",
+        "Finance/support",
+        "Affected holders"
+      ],
+      "normal_flow": "Explain closure eligibility, stop new activity, resolve or retain remaining cases and confirm the resulting access to history.",
+      "exceptions": "Unpaid obligations, holds, pending refunds/payouts, disputes, disputed authority and earned benefits require an explicit plan.",
+      "issuing_handoff": "Card cancellation, account closure and membership cancellation are different outcomes.",
+      "merchant_handoff": "Merchant closure must preserve final settlement, dispute and statement responsibilities.",
+      "evidence_status": "gap",
+      "source_ids": [
+        "C08",
+        "C17"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-18",
+        "AX-MANAGEMENT-04",
+        "AX-MANAGEMENT-15"
+      ],
+      "etail_gap": "Card cancellation is only a partial mapping; the frozen catalog lacks full ordinary account closure and residual-work coverage.",
+      "acceptance_scenario": "Request closure with an unpaid obligation and pending refund; new spending stops, closure status stays truthful and authorized follow-up remains possible."
+    }
+  ]
+}

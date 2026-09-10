@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-09-08",
+  "scope": "Issuing business and product operations, US baseline; UK complaint variant explicitly marked.",
+  "method": "Public help and product materials only. Eighteen new pages were opened and read; J01 is limited to readable indexed public copy because direct extraction was empty. No application submission, authenticated portal inspection or account action.",
+  "source_word_budget": "Brief paraphrases only. Earlier I sources and root B sources are cross-references, not republished source records. Cross-party steps identified as Etail proposals are design judgments, not Amex observations.",
+  "sources": [
+    {
+      "id": "J01",
+      "title": "Personal charge and credit cards",
+      "url": "https://www.americanexpress.com/us/credit-cards/",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US Personal card shopping",
+      "evidence": "Indexed public copy shows filters, comparison, terms links and approval followed by card acceptance.",
+      "limitations": "Direct opens returned an empty extracted body. Indexed copy was read; current interactive selection and acceptance screens were not inspected. Offers vary and are not copied.",
+      "access_status": "limited_indexed_copy",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J02",
+      "title": "Information required for a card application",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.card-application-required-information.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US Personal applications",
+      "evidence": "Lists identity, contact and income information; separates application-status assistance from existing-account service.",
+      "limitations": "No application was started. Field validation, pending categories and document requests are not disclosed.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J03",
+      "title": "Create or add an online account",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.create-add-online-account.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US Basic and Additional Card Members",
+      "evidence": "Registration can create or link an account; an Additional Card Member receives access to their own card information.",
+      "limitations": "No authenticated registration attempted. Required real identity data must not be collected in the Etail sandbox.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J04",
+      "title": "When a new card will arrive",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.new-card-delivery-timing.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US new physical cards",
+      "evidence": "Provides a delivery expectation, receipt confirmation and a replacement/support route for nonreceipt.",
+      "limitations": "Undated general FAQ; its 7–10 day wording differs from the Instant Card Number page. Neither is a universal Etail delivery promise.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J05",
+      "title": "Confirm or activate a card",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.how-to-activate-your-amex-card.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US physical card activation",
+      "evidence": "Documents online and mobile confirmation, card details and security verification.",
+      "limitations": "Authentication failures, retry limits and the final authenticated screen were not observed.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J06",
+      "title": "Instant Card Number",
+      "url": "https://www.americanexpress.com/us/credit-cards/features-benefits/digital-wallets/instant-approval-credit-card/",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US eligible Personal and Business cards; listed Amazon Business exclusions",
+      "evidence": "Eligible applicants can obtain card details before physical delivery; identity authentication and possible initial spending restrictions apply.",
+      "limitations": "The same number is used by the physical card. FAQ says arrival in 5–7 business days; terms say mailing within that period. No guaranteed delivery inference.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J07",
+      "title": "Check spending power in advance",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.check-spending-power-advance-purchase.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US Card Members with available tool",
+      "evidence": "Prepurchase assessment uses account status at the time requested.",
+      "limitations": "Does not document a reserved amount, later approval guarantee or authenticated result/error categories.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J08",
+      "title": "Request a credit limit increase",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.increase-credit-limit.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US Personal and Small Business cards",
+      "evidence": "Provides an online request route.",
+      "limitations": "No public criteria, approval timing, decline stages or limit-allocation rules in this FAQ.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J09",
+      "title": "Lost, stolen or damaged card; replacement and renewal",
+      "url": "https://www.americanexpress.com/en-us/support/lost-or-stolen-card/",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US consumer and explicitly identified Corporate renewals",
+      "evidence": "Replacement reason affects old-card usability; shipment notification, renewal and merchant continuity are described.",
+      "limitations": "Public help only; delivery options depend on the request. Cancellation here concerns the instrument, not automatically the account.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J10",
+      "title": "Cancel an employee Corporate Card",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.cancel-employee-corporate-card.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US Corporate Program Administrators",
+      "evidence": "Administrator cancellation requires a reason, returns a tracking number and makes an individual cancellation effective immediately.",
+      "limitations": "Batch cancellation is mentioned, but its per-card outcomes and exception handling are not described.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J11",
+      "title": "Cancel a card account",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.cancel-card-account.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US Card Members; Corporate routing caveat",
+      "evidence": "Account cancellation routes through customer service; Corporate members may need their Program Administrator.",
+      "limitations": "No complete settlement, residual-credit, final-statement or closure-notification sequence is supplied.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J12",
+      "title": "Card inactivity",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.card-inactivity.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US card accounts",
+      "evidence": "Describes warning before possible inactivity closure and instructions for keeping the account open.",
+      "limitations": "No universal inactivity threshold or response deadline. Rewards consequences depend on separate terms.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J13",
+      "title": "Manage AutoPay settings",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.manage-autopay-settings.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US AutoPay customers",
+      "evidence": "Online servicing includes bank update, temporary pause/resume and stopping monthly AutoPay.",
+      "limitations": "Pause is described as up to three months. Execution cutoffs, already-processing payments and notification details are not specified.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J14",
+      "title": "Change payment due date",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.change-payment-due-date.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US; routing differs by card product",
+      "evidence": "Credit-card due-date changes have an online route; other listed products use customer-care chat.",
+      "limitations": "Eligibility is conditional; effective cycle, blackout periods and interaction with scheduled payments are not public here.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J15",
+      "title": "Additional documentation for a billing inquiry",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.billing-inquiry-dispute-documentation.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US billing inquiries and disputes",
+      "evidence": "Supports document upload, fax and mail for existing cases.",
+      "limitations": "Does not expose upload constraints, receipt confirmation or evidence-review timing.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J16",
+      "title": "Close a dispute",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.close-a-dispute.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US ongoing disputes",
+      "evidence": "Documents locating an open dispute and using its close action.",
+      "limitations": "Financial consequences, reopening eligibility and cancellation races are not explained.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J17",
+      "title": "Amex Offers US terms",
+      "url": "https://www.americanexpress.com/en-us/benefits/offers/partner-terms/",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US eligible Offers cards; other countries have separate terms",
+      "evidence": "A move to an ineligible card product can end an enrolled offer's eligibility; refunds can reverse offer rewards.",
+      "limitations": "This proves a product-change consequence, not a general upgrade/downgrade application journey or Etail reward policy.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J18",
+      "title": "Contact American Express",
+      "url": "https://www.americanexpress.com/en-us/support/contacts/",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "US Personal, Small Business, Corporate and AP service routes",
+      "evidence": "Separates applicant, cardholder, administrator and supplier support; includes accessible relay assistance.",
+      "limitations": "A contact directory does not establish a formal US complaint process, service-case status model or response promise.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    },
+    {
+      "id": "J19",
+      "title": "Complaints procedures",
+      "url": "https://www.americanexpress.com/uk/legal/complaints-procedures.html",
+      "accessed": "2026-09-08",
+      "published_or_updated": "Not stated on the inspected page",
+      "scope": "UK consumer, Corporate and merchant complaints; separate insurance handling",
+      "evidence": "Provides complaint intake, acknowledgement/reference, progress updates, written determination and conditional ombudsman escalation.",
+      "limitations": "UK-only and undated. Do not transfer its complaint periods, insurance exceptions or external-review eligibility to US/Etail.",
+      "access_status": "opened_and_read",
+      "provenance": "Official American Express public page"
+    }
+  ],
+  "external_registers": {
+    "I": "issuing-sources.json",
+    "B": "business-360-sources.json"
+  },
+  "excluded_or_unresolved": [
+    {
+      "topic": "Current product comparison and Apply With Confidence interaction",
+      "url": "https://www.americanexpress.com/us/credit-cards/",
+      "reason": "The indexed first-party copy is readable but direct extraction returns no body. J01 remains partial; current application acceptance screens and all eligible channels are unverified."
+    },
+    {
+      "topic": "General US upgrade/downgrade journey",
+      "url": "https://www.americanexpress.com/en-us/credit-cards/credit-intel/credit-card-upgrade/",
+      "reason": "Search found general educational advice rather than an Amex-specific servicing procedure. Not used to assert current product-change availability, timing or rules."
+    },
+    {
+      "topic": "2022 Apply With Confidence pilot announcement",
+      "url": "https://www.businesswire.com/news/home/20221121005235/en/",
+      "reason": "Direct release open failed; third-party reproduction was discovery only. Historic pilot restrictions are not asserted as current."
+    }
+  ]
+}

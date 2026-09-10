@@ -1,0 +1,62 @@
+import {randomUUID} from "node:crypto";
+import {afterAll,expect,it} from "vitest";
+import {and,eq} from "drizzle-orm";
+import {closeDatabase,getDb} from "../../src/platform/database/client";
+import {permissionGrants,cards} from "../../src/platform/database/schema";
+import {merchantApplications,merchantApplicationEvents,merchantApplicationCommands,paymentChannels,paymentChannelCommands} from "../../src/modules/acquiring/schema";
+import {getMerchantBusinessDetails,getMerchantWorkspace,startMerchantSetup,updateMerchantSetup,submitMerchantSetup,createChannel,updateChannel,cancelChannel} from "../../src/modules/acquiring/service";
+import {merchantBusinessDetailsProjectionSchema,merchantSetupProjectionSchema,paymentChannelSchema} from "../../src/modules/acquiring/api-contracts";
+import {acquiringFixture,acquiringPerson,completeSetup,paymentInput} from "../helpers/acquiring";
+afterAll(closeDatabase);
+const channelInput=()=>({...paymentInput(),presentations:["WEB"] as ["WEB"],visibility:"CREATOR_PRIVATE" as const});
+it("saves one named business application and stops honestly at local review",async()=>{
+ const f=await acquiringFixture(),start={commandId:randomUUID()};const first=await startMerchantSetup(f.personId,f.merchantId,start);
+ expect(first.id).toBe(f.setup.id);expect(await startMerchantSetup(f.personId,f.merchantId,start)).toEqual(first);
+ await expect(submitMerchantSetup(f.personId,f.merchantId,first.id,{commandId:randomUUID(),expectedVersion:1})).rejects.toMatchObject({code:"SETUP_REQUIREMENTS_REQUIRED"});
+ const input=completeSetup(1),saved=merchantSetupProjectionSchema.parse(await updateMerchantSetup(f.personId,f.merchantId,first.id,input));expect(saved.canSubmit).toBe(true);
+ expect(await updateMerchantSetup(f.personId,f.merchantId,first.id,input)).toEqual(saved);
+ await expect(updateMerchantSetup(f.personId,f.merchantId,first.id,{...input,sellingName:"Changed retry"})).rejects.toMatchObject({code:"IDEMPOTENCY_CONFLICT"});
+ await expect(updateMerchantSetup(f.personId,f.merchantId,first.id,{...input,commandId:randomUUID()})).rejects.toMatchObject({code:"STALE_VERSION"});
+ const submit={commandId:randomUUID(),expectedVersion:saved.version};const pending=await submitMerchantSetup(f.personId,f.merchantId,saved.id,submit);
+ expect(pending).toMatchObject({status:"PENDING_LOCAL_REVIEW",canEdit:false,canSubmit:false,version:3});expect(await submitMerchantSetup(f.personId,f.merchantId,saved.id,submit)).toEqual(pending);
+ expect(await startMerchantSetup(f.personId,f.merchantId,start)).toEqual(pending);
+ expect(merchantBusinessDetailsProjectionSchema.parse(await getMerchantBusinessDetails(f.personId,f.merchantId))).toMatchObject({merchantStatus:"PENDING_LOCAL_REVIEW"});
+ expect(await getDb().select().from(merchantApplications).where(eq(merchantApplications.serviceId,f.serviceId))).toHaveLength(1);
+ expect(await getDb().select().from(merchantApplicationEvents).where(eq(merchantApplicationEvents.serviceId,f.serviceId))).toHaveLength(3);
+ expect(await getDb().select().from(merchantApplicationCommands).where(eq(merchantApplicationCommands.serviceId,f.serviceId))).toHaveLength(3);
+ expect(await getDb().select().from(cards).where(eq(cards.serviceId,f.serviceId))).toEqual([]);
+});
+it("business details reject foreign units and permission loss without a substitute",async()=>{
+ const f=await acquiringFixture(),other=await acquiringFixture(),stranger=await acquiringPerson();
+ for(const id of [f.serviceId,other.merchantId,randomUUID(),"not-a-merchant"])await expect(getMerchantBusinessDetails(f.personId,id)).rejects.toMatchObject({status:404});
+ await expect(updateMerchantSetup(stranger.personId,f.merchantId,f.setup.id,completeSetup(1))).rejects.toMatchObject({status:404});
+ await expect(updateMerchantSetup(f.personId,f.merchantId,other.setup.id,completeSetup(1))).rejects.toMatchObject({status:404});
+ await expect(updateMerchantSetup(f.personId,f.merchantId,f.setup.id,{...completeSetup(1),status:"APPROVED"} as ReturnType<typeof completeSetup>)).rejects.toMatchObject({status:422});
+ await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,f.serviceId),eq(permissionGrants.action,"acquiring.setup")));
+ expect((await getMerchantBusinessDetails(f.personId,f.merchantId)).canManageSetup).toBe(false);
+ await expect(updateMerchantSetup(f.personId,f.merchantId,f.setup.id,completeSetup(1))).rejects.toMatchObject({code:"ACTION_DENIED"});
+});
+it("channel terms preserve exact money, one retry identity and current command permission",async()=>{
+ const f=await acquiringFixture(),input=channelInput();const first=paymentChannelSchema.parse(await createChannel(f.personId,f.merchantId,input));
+ expect(first.amount).toEqual({minor:"1250",currency:"USD",formatted:"$12.50"});expect(await createChannel(f.personId,f.merchantId,input)).toEqual(first);
+ const update={...input,commandId:randomUUID(),expectedVersion:1,amountMinor:"2345",usage:"REUSABLE" as const};const saved=await updateChannel(f.personId,f.merchantId,first.id,update);expect(saved.amount.minor).toBe("2345");
+ expect((await createChannel(f.personId,f.merchantId,input)).version).toBe(2);
+ await expect(updateChannel(f.personId,f.merchantId,first.id,{...update,commandId:randomUUID()})).rejects.toMatchObject({code:"STALE_VERSION"});
+ await expect(createChannel(f.personId,f.merchantId,{...input,description:"Changed retry"})).rejects.toMatchObject({code:"IDEMPOTENCY_CONFLICT"});
+ const cancel={commandId:randomUUID(),expectedVersion:2};expect((await cancelChannel(f.personId,f.merchantId,first.id,cancel)).status).toBe("CANCELED");expect((await cancelChannel(f.personId,f.merchantId,first.id,cancel)).version).toBe(3);
+ await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,f.serviceId),eq(permissionGrants.action,"channels.create")));
+ await expect(createChannel(f.personId,f.merchantId,input)).rejects.toMatchObject({code:"ACTION_DENIED"});
+ expect(await getDb().select().from(paymentChannelCommands).where(eq(paymentChannelCommands.serviceId,f.serviceId))).toHaveLength(3);
+});
+it("expiry uses database time and an expired channel may close without a payment effect",async()=>{
+ const f=await acquiringFixture();for(const expiresAt of ["2000-01-01T00:00:00.000Z",new Date(Date.now()+367*86400000).toISOString()])await expect(createChannel(f.personId,f.merchantId,{...channelInput(),expiresAt})).rejects.toMatchObject({code:"INVALID_EXPIRY"});
+ const channel=await createChannel(f.personId,f.merchantId,channelInput());await getDb().update(paymentChannels).set({expiresAt:new Date("2000-01-01Z")}).where(eq(paymentChannels.id,channel.id));
+ expect((await getMerchantWorkspace(f.personId,f.merchantId)).channels[0]).toMatchObject({status:"EXPIRED",canEdit:false,canCancel:true});
+ await expect(updateChannel(f.personId,f.merchantId,channel.id,{...channelInput(),expectedVersion:1})).rejects.toMatchObject({code:"DRAFT_EXPIRED"});
+ expect((await cancelChannel(f.personId,f.merchantId,channel.id,{commandId:randomUUID(),expectedVersion:1})).status).toBe("CANCELED");
+});
+it("complete authorized channel lists are separate from the bounded business timeline",async()=>{
+ const f=await acquiringFixture();await getDb().insert(paymentChannels).values(Array.from({length:101},(_,i)=>({serviceId:f.serviceId,merchantUnitId:f.merchantId,creatorId:f.personId,description:`Channel ${i}`,amountMinor:100n,usage:"ONE_TIME" as const,expiresAt:new Date(Date.now()+86400000)})));
+ await getDb().insert(merchantApplicationEvents).values(Array.from({length:101},()=>({applicationId:f.setup.id,serviceId:f.serviceId,actorId:f.personId,kind:"SAVED" as const})));
+ expect((await getMerchantWorkspace(f.personId,f.merchantId)).channels).toHaveLength(101);expect((await getMerchantBusinessDetails(f.personId,f.merchantId)).setup).toMatchObject({timelineHasMore:true});
+});

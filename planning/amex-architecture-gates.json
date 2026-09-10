@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "version": "amex-architecture-proposals-v1",
+  "research_date": "2026-09-08",
+  "status": "proposed",
+  "purpose": "Etail review refinements informed by publicly disclosed Amex architecture. Separate from the frozen 90-task product comparison; not an implementation or private-architecture similarity score.",
+  "source_registers": [
+    "../docs/research/amex/platform-sources.json"
+  ],
+  "gates": [
+    {
+      "id": "AAG-01",
+      "title": "Command identity and scope",
+      "issue_ids": [
+        "EDN-006",
+        "EDN-010",
+        "EDN-013"
+      ],
+      "source_ids": [
+        "P01",
+        "P02"
+      ],
+      "acceptance": "Use stable business-command identity bound to account, resource, command type and payload. Duplicate identical submissions return the same result; an identity reused with different scope or payload is rejected. Concurrent requests produce one authorized business effect.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-02",
+      "title": "Uncertain provider outcome",
+      "issue_ids": [
+        "EDN-010",
+        "EDN-014",
+        "EDN-021"
+      ],
+      "source_ids": [
+        "P02"
+      ],
+      "acceptance": "A mock provider accepts an issuance then loses its response. Retrying and reconciling produces one card and the same provider correlation. UI and operator queue retain a truthful pending/uncertain state until an authoritative result; no invented completion.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-03",
+      "title": "Effect and acknowledgement crash",
+      "issue_ids": [
+        "EDN-009",
+        "EDN-013",
+        "EDN-014"
+      ],
+      "source_ids": [
+        "P02"
+      ],
+      "acceptance": "Kill the worker after a durable effect but before acknowledgement. Recovery reuses the business identity, records the received result once and never posts a second journal. Faults before dispatch, during dispatch and after confirmation have separate expected outcomes.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-04",
+      "title": "Atomic money and control authority",
+      "issue_ids": [
+        "EDN-006",
+        "EDN-009",
+        "EDN-013"
+      ],
+      "source_ids": [
+        "P02"
+      ],
+      "acceptance": "Concurrent spend, backing change and limit revision obey one committed order; no overspending or unsupported capacity. All amounts remain exact and currency-qualified. Delayed analytics/CRM projections cannot authorize a financial effect.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-05",
+      "title": "Audit versus diagnostics",
+      "issue_ids": [
+        "EDN-013",
+        "EDN-021",
+        "EDN-026"
+      ],
+      "source_ids": [
+        "P03",
+        "P08"
+      ],
+      "acceptance": "A diagnostic-sink outage does not duplicate or incorrectly reject a valid mock effect and is operationally visible. Failure to persist mandatory financial/audit evidence prevents success. Diagnostic buffering never substitutes for the immutable journal or required audit trail.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-06",
+      "title": "Reference-data effective versions",
+      "issue_ids": [
+        "EDN-008",
+        "EDN-013",
+        "EDN-022"
+      ],
+      "source_ids": [
+        "P02"
+      ],
+      "acceptance": "A calculation records the applicable reference/rule version and effective time. Replaying under that version reproduces the result. Stale or absent required data produces an explicit defined outcome; it never silently guesses a rate or cost.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-07",
+      "title": "Side-effect-disabled replay",
+      "issue_ids": [
+        "EDN-014",
+        "EDN-026",
+        "EDN-028"
+      ],
+      "source_ids": [
+        "P01"
+      ],
+      "acceptance": "Replay fictional scenarios through the same policy/handlers to compare a candidate change. Assert no provider call, posted money, email or other external effect escapes the harness. Replays do not use legacy source, databases or customer traffic.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-08",
+      "title": "Failure and load regression",
+      "issue_ids": [
+        "EDN-014",
+        "EDN-026",
+        "EDN-028"
+      ],
+      "source_ids": [
+        "P07",
+        "P08"
+      ],
+      "acceptance": "For the exact implementation SHA, exercise bounded bursts, duplicate/out-of-order events, dependency timeout and recovery. Record correctness plus p95/p99 latency, backlog age and resource usage. Thresholds require an explicit Etail baseline; no Amex benchmark is reused as an Etail SLA.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-09",
+      "title": "Reconciliation chain",
+      "issue_ids": [
+        "EDN-013",
+        "EDN-019",
+        "EDN-021"
+      ],
+      "source_ids": [
+        "P01",
+        "P02"
+      ],
+      "acceptance": "Trace one fictional purchase across command, provider event, hold/capture, journal, account projection and merchant settlement. Exercise partial clearing, reversal, refund and duplicate events. Operator corrections use scoped common commands with an attributable audit.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-10",
+      "title": "Recovery authority and user visibility",
+      "issue_ids": [
+        "EDN-006",
+        "EDN-010",
+        "EDN-019",
+        "EDN-021",
+        "EDN-027"
+      ],
+      "source_ids": [
+        "P02"
+      ],
+      "acceptance": "Every unresolved financial state has a responsible queue and next permitted action. A viewer cannot retry or adjust; authorized recovery cannot bypass account scope. Consumer/merchant views explain status and permitted next steps without exposing private operator data.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-11",
+      "title": "Rollout and restoration proof",
+      "issue_ids": [
+        "EDN-028",
+        "EDN-030",
+        "EDN-031"
+      ],
+      "source_ids": [
+        "P01"
+      ],
+      "acceptance": "Before hosted release, rehearse restoration and rollback with exact schema/config/application versions and persisted financial fixtures. Code rollback must not reverse completed external effects or edit posted journals. Record data compatibility and unresolved-result reconciliation.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    },
+    {
+      "id": "AAG-12",
+      "title": "Evidence and component boundaries",
+      "issue_ids": [
+        "EDN-001",
+        "EDN-003",
+        "EDN-028"
+      ],
+      "source_ids": [
+        "P04",
+        "P06",
+        "P09",
+        "P10"
+      ],
+      "acceptance": "Any architecture/dependency proposal identifies the actual Amex subsystem, source date, evidence class and Etail need. A historical approval, conference logo, job posting, patent or repository is not upgraded to current deployment proof. No second policy, issuance or ledger owner is introduced.",
+      "design_status": "proposed",
+      "implementation_status": "not_assessed",
+      "evidence": []
+    }
+  ]
+}

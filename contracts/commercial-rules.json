@@ -1,0 +1,58 @@
+{
+  "authority": "sources/original/Master_AI_Agent_Prompt_Netlify_Member_Commerce_Platform.md sections 3 and 10.5",
+  "currency": "USD",
+  "amount_representation": "integer minor units, API strings",
+  "rate_representation": "exact decimal strings",
+  "plans": {
+    "SELECT": {
+      "annual_fee_minor": "12000",
+      "processing_rate": "0.029",
+      "processing_fixed_minor": "30",
+      "base_cashback_rate": "0.005",
+      "same_essential_access": true
+    },
+    "PREMIER": {
+      "annual_fee_minor": "30000",
+      "provider_fee_rate": "0.005",
+      "provider_fixed_minor": "30",
+      "brand_cost": "actual itemized passthrough",
+      "base_cashback_rate": "0.005",
+      "additional_spending_bonus_rate": "0.005",
+      "provider_fee_bonus_rate": "0.20",
+      "combined_bonus_cap_minor": "30000",
+      "same_essential_access": true
+    }
+  },
+  "bonus_scope": "one sponsoring membership and membership year, across all attributed accounts/cards and both extra sources",
+  "initial_membership_fee_refund_window_days": 60,
+  "base_posting": "monthly",
+  "annual_bonus_credit_within_days_after_year_end": 30,
+  "renewal_required_for_earned_bonus": false,
+  "upgrade_cap": "prorate to remaining current membership year; repeated transitions cannot reset consumption",
+  "downgrade": "normally effective at renewal",
+  "consumer_repayment": "statement pay-in-full",
+  "seller_repayment": "daily full repayment",
+  "supervised_product": "guardian-funded non-credit",
+  "excluded_reward_sources": [
+    "transfers",
+    "collateral_deposits",
+    "repayments",
+    "cash_like",
+    "fees",
+    "refunded_or_reversed_principal",
+    "self_payments",
+    "circular_household_transfers",
+    "provider_ineligible_categories"
+  ],
+  "unresolved_before_posting": [
+    "document currency rounding boundary/mode",
+    "document original refund/upgrade timestamp boundary semantics",
+    "define deterministic sponsor attribution where several eligible memberships exist"
+  ],
+  "cost_basis": [
+    "PLANNING",
+    "CONTRACTED",
+    "ACTUAL"
+  ],
+  "missing_cost_is_zero": false
+}

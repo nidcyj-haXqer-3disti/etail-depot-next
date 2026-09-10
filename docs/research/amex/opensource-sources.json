@@ -1,0 +1,994 @@
+[
+  {
+    "id": "G01",
+    "title": "American Express Technology: official GitHub provenance",
+    "url": "https://americanexpress.io/",
+    "accessed": "2026-09-08",
+    "scope": "Official organization provenance",
+    "evidence": [
+      "The technology homepage links its GitHub resource to https://github.com/americanexpress."
+    ],
+    "limitations": [
+      "Does not publish the internal issuer architecture or confer access to production APIs."
+    ]
+  },
+  {
+    "id": "G02",
+    "title": "American Express public GitHub organization",
+    "url": "https://github.com/americanexpress",
+    "accessed": "2026-09-08",
+    "scope": "Public repository discovery",
+    "evidence": [
+      "Observed public repository list; followed the official technology site's organization link. The organization page reports One App archived and lists image-testing, React and other development tools."
+    ],
+    "limitations": [
+      "Repository inventory is discovery only; no claim every public or private Amex repository was audited. Stars and update timestamps are not security evidence."
+    ]
+  },
+  {
+    "id": "G03",
+    "title": "formancehq/ledger README at f43a7078e7e1b9f6a354307ef994431593bf57e0",
+    "url": "https://github.com/formancehq/ledger/blob/f43a7078e7e1b9f6a354307ef994431593bf57e0/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Go ledger service with atomic multi-posting transactions, Numscript and PostgreSQL. README supports production only through its Kubernetes operator.",
+      "Inspected commit f43a7078e7e1b9f6a354307ef994431593bf57e0 (resolved from observed release v2.4.12)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G04",
+    "title": "formancehq/ledger LICENSE at f43a7078e7e1b9f6a354307ef994431593bf57e0",
+    "url": "https://github.com/formancehq/ledger/blob/f43a7078e7e1b9f6a354307ef994431593bf57e0/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "MIT",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G05",
+    "title": "formancehq/ledger v2.4.12",
+    "url": "https://github.com/formancehq/ledger/releases/tag/v2.4.12",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v2.4.12 published 2026-07-24T11:16:18Z. Resolved tag commit: f43a7078e7e1b9f6a354307ef994431593bf57e0.",
+      "v2.4.12 includes idempotency/business-error HTTP mapping fixes and dependency updates."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G06",
+    "title": "tigerbeetle/tigerbeetle README at cc1c06a924e49b11089c521b2209d34c92caaf18",
+    "url": "https://github.com/tigerbeetle/tigerbeetle/blob/cc1c06a924e49b11089c521b2209d34c92caaf18/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Separate financial transaction database with account/transfer primitives and its own replicas; README includes security-reporting contact.",
+      "Inspected commit cc1c06a924e49b11089c521b2209d34c92caaf18 (resolved from observed release 0.17.9)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G07",
+    "title": "tigerbeetle/tigerbeetle LICENSE at cc1c06a924e49b11089c521b2209d34c92caaf18",
+    "url": "https://github.com/tigerbeetle/tigerbeetle/blob/cc1c06a924e49b11089c521b2209d34c92caaf18/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G08",
+    "title": "tigerbeetle/tigerbeetle 0.17.9",
+    "url": "https://github.com/tigerbeetle/tigerbeetle/releases/tag/0.17.9",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "0.17.9 published 2026-07-06T17:24:50Z. Resolved tag commit: cc1c06a924e49b11089c521b2209d34c92caaf18.",
+      "0.17.9 states supported upgrade/client ranges and reverts a unique-keys change for compatibility."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G09",
+    "title": "apache/fineract README at d5636847ac556c30b437254c353f05526d172b97",
+    "url": "https://github.com/apache/fineract/blob/d5636847ac556c30b437254c353f05526d172b97/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Core banking API with Java >=21 and PostgreSQL >=18 requirements; README explicitly warns sample containers are not production-ready.",
+      "Inspected commit d5636847ac556c30b437254c353f05526d172b97 (resolved from observed release 1.15.0)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G10",
+    "title": "apache/fineract LICENSE_SOURCE at d5636847ac556c30b437254c353f05526d172b97",
+    "url": "https://github.com/apache/fineract/blob/d5636847ac556c30b437254c353f05526d172b97/LICENSE_SOURCE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G11",
+    "title": "apache/fineract 1.15.0",
+    "url": "https://github.com/apache/fineract/releases/tag/1.15.0",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "1.15.0 published 2026-07-14T15:42:09Z. Resolved tag commit: d5636847ac556c30b437254c353f05526d172b97.",
+      "1.15.0 warns its revenue-based working-capital loan product is incomplete and not ready for production."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G12",
+    "title": "juspay/hyperswitch README at 83cc4876dd067ff16bcac51ce2737ee0fe0bf8b1",
+    "url": "https://github.com/juspay/hyperswitch/blob/83cc4876dd067ff16bcac51ce2737ee0fe0bf8b1/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Rust payments orchestration platform with connector abstractions, payment routing and separate runtime components. README advertises reconciliation modules.",
+      "Inspected commit 83cc4876dd067ff16bcac51ce2737ee0fe0bf8b1 (resolved from observed release v1.126.0)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G13",
+    "title": "juspay/hyperswitch LICENSE at 83cc4876dd067ff16bcac51ce2737ee0fe0bf8b1",
+    "url": "https://github.com/juspay/hyperswitch/blob/83cc4876dd067ff16bcac51ce2737ee0fe0bf8b1/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G14",
+    "title": "juspay/hyperswitch v1.126.0",
+    "url": "https://github.com/juspay/hyperswitch/releases/tag/v1.126.0",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v1.126.0 published 2026-08-24T06:20:00Z. Resolved tag commit: 83cc4876dd067ff16bcac51ce2737ee0fe0bf8b1.",
+      "v1.126.0 contains payment-connector and webhook changes; release listing is maintenance evidence, not a financial/security audit."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G15",
+    "title": "mojaloop/central-ledger README at c3ea56feca0342a8c5046e8b30e9b26e34f9cd52",
+    "url": "https://github.com/mojaloop/central-ledger/blob/c3ea56feca0342a8c5046e8b30e9b26e34f9cd52/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Services for clearing transfers between digital financial service providers and maintaining net settlement positions. README also contains historical setup material.",
+      "Inspected commit c3ea56feca0342a8c5046e8b30e9b26e34f9cd52 (resolved from observed release v19.14.0)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G16",
+    "title": "mojaloop/central-ledger LICENSE.md at c3ea56feca0342a8c5046e8b30e9b26e34f9cd52",
+    "url": "https://github.com/mojaloop/central-ledger/blob/c3ea56feca0342a8c5046e8b30e9b26e34f9cd52/LICENSE.md",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "LICENSE.md explicitly states Apache License 2.0 although GitHub metadata returned NOASSERTION."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G17",
+    "title": "mojaloop/central-ledger v19.14.0",
+    "url": "https://github.com/mojaloop/central-ledger/releases/tag/v19.14.0",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v19.14.0 published 2026-03-19T17:15:23Z. Resolved tag commit: c3ea56feca0342a8c5046e8b30e9b26e34f9cd52.",
+      "v19.14.0 includes fulfilment-validation and condition fixes, and an SBOM update."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G18",
+    "title": "killbill/killbill README at 5da9650de60b2fa83dea556d7e95c70b79dabd39",
+    "url": "https://github.com/killbill/killbill/blob/5da9650de60b2fa83dea556d7e95c70b79dabd39/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Subscription billing and payment platform with modular catalog, invoice, subscription and payment components.",
+      "Inspected commit 5da9650de60b2fa83dea556d7e95c70b79dabd39 (resolved from observed release killbill-0.24.21)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G19",
+    "title": "killbill/killbill LICENSE at 5da9650de60b2fa83dea556d7e95c70b79dabd39",
+    "url": "https://github.com/killbill/killbill/blob/5da9650de60b2fa83dea556d7e95c70b79dabd39/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G20",
+    "title": "killbill/killbill killbill-0.24.21",
+    "url": "https://github.com/killbill/killbill/releases/tag/killbill-0.24.21",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "killbill-0.24.21 published 2026-08-12T06:47:08Z. Resolved tag commit: 5da9650de60b2fa83dea556d7e95c70b79dabd39.",
+      "killbill-0.24.21 records reverting a template branding key; no security attestation is provided."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G21",
+    "title": "openfga/openfga README at 130c30aea5e73543e63b173dadfbd1ee519aa97a",
+    "url": "https://github.com/openfga/openfga/blob/130c30aea5e73543e63b173dadfbd1ee519aa97a/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Go authorization engine exposed through HTTP/gRPC with relationship tuples and optional PostgreSQL storage; not an in-process TypeScript library.",
+      "Inspected commit 130c30aea5e73543e63b173dadfbd1ee519aa97a (resolved from observed release v1.19.0)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G22",
+    "title": "openfga/openfga LICENSE at 130c30aea5e73543e63b173dadfbd1ee519aa97a",
+    "url": "https://github.com/openfga/openfga/blob/130c30aea5e73543e63b173dadfbd1ee519aa97a/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G23",
+    "title": "openfga/openfga v1.19.0",
+    "url": "https://github.com/openfga/openfga/releases/tag/v1.19.0",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v1.19.0 published 2026-08-25T15:08:37Z. Resolved tag commit: 130c30aea5e73543e63b173dadfbd1ee519aa97a.",
+      "v1.19.0 fixes malformed-model validation panic and saturated-connection-pool deadlock; invalid persisted models can now return ErrInvalidModel."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G24",
+    "title": "apache/casbin-node-casbin README at 2d90c7d8c3b522415605cf3d25481e763e73381e",
+    "url": "https://github.com/apache/casbin-node-casbin/blob/2d90c7d8c3b522415605cf3d25481e763e73381e/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Node access-control library with an enforcer, policy model and policy persistence adapters. Old casbin/node-casbin URL redirects to this repository.",
+      "Inspected commit 2d90c7d8c3b522415605cf3d25481e763e73381e (resolved from observed release v5.51.1)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G25",
+    "title": "apache/casbin-node-casbin LICENSE at 2d90c7d8c3b522415605cf3d25481e763e73381e",
+    "url": "https://github.com/apache/casbin-node-casbin/blob/2d90c7d8c3b522415605cf3d25481e763e73381e/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G26",
+    "title": "apache/casbin-node-casbin v5.51.1",
+    "url": "https://github.com/apache/casbin-node-casbin/releases/tag/v5.51.1",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v5.51.1 published 2026-06-25T15:58:12Z. Resolved tag commit: 2d90c7d8c3b522415605cf3d25481e763e73381e.",
+      "v5.51.1 is the observed latest GitHub release. Release recency does not prove security or correctness of an Etail policy model."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G27",
+    "title": "temporalio/sdk-typescript README at 2453adf91b5287bbd81fb24e04ebd43f1b4cf42f",
+    "url": "https://github.com/temporalio/sdk-typescript/blob/2453adf91b5287bbd81fb24e04ebd43f1b4cf42f/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "TypeScript SDK for a durable orchestration service. Worker packages use native Node modules, worker_threads and vm; all SDK package versions must match.",
+      "Inspected commit 2453adf91b5287bbd81fb24e04ebd43f1b4cf42f (resolved from observed release v1.23.0)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G28",
+    "title": "temporalio/sdk-typescript LICENSE at 2453adf91b5287bbd81fb24e04ebd43f1b4cf42f",
+    "url": "https://github.com/temporalio/sdk-typescript/blob/2453adf91b5287bbd81fb24e04ebd43f1b4cf42f/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "MIT",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G29",
+    "title": "temporalio/sdk-typescript v1.23.0",
+    "url": "https://github.com/temporalio/sdk-typescript/releases/tag/v1.23.0",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v1.23.0 published 2026-08-26T03:31:59Z. Resolved tag commit: 2453adf91b5287bbd81fb24e04ebd43f1b4cf42f.",
+      "v1.23.0 updates protobufjs to v8 and describes type/API compatibility changes."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G30",
+    "title": "timgit/pg-boss README at 180a54b65ce492bf990e524cda2d38b19f0df3f4",
+    "url": "https://github.com/timgit/pg-boss/blob/180a54b65ce492bf990e524cda2d38b19f0df3f4/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "PostgreSQL-backed Node job queue with transaction adapters and manual fetch/complete/fail APIs; README states one-person maintenance.",
+      "Inspected commit 180a54b65ce492bf990e524cda2d38b19f0df3f4 (resolved from observed release 12.30.0)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G31",
+    "title": "timgit/pg-boss LICENSE at 180a54b65ce492bf990e524cda2d38b19f0df3f4",
+    "url": "https://github.com/timgit/pg-boss/blob/180a54b65ce492bf990e524cda2d38b19f0df3f4/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "MIT",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G32",
+    "title": "timgit/pg-boss 12.30.0",
+    "url": "https://github.com/timgit/pg-boss/releases/tag/12.30.0",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "12.30.0 published 2026-09-03T15:56:18Z. Resolved tag commit: 180a54b65ce492bf990e524cda2d38b19f0df3f4.",
+      "12.30.0 uses schema version 40 and requires migration; changes fetch indexing and deprecates sort options."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G33",
+    "title": "medusajs/medusa README at 0ed927bdb7a396a8fd5f6447ed69b7b354b150d3",
+    "url": "https://github.com/medusajs/medusa/blob/0ed927bdb7a396a8fd5f6447ed69b7b354b150d3/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Commerce framework and modules with an admin application and own workflow/data model; README describes an open-core licensing model.",
+      "Inspected commit 0ed927bdb7a396a8fd5f6447ed69b7b354b150d3 (resolved from observed release v2.20.1)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G34",
+    "title": "medusajs/medusa LICENSE at 0ed927bdb7a396a8fd5f6447ed69b7b354b150d3",
+    "url": "https://github.com/medusajs/medusa/blob/0ed927bdb7a396a8fd5f6447ed69b7b354b150d3/LICENSE",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "MIT for core; proprietary Enterprise exclusions",
+      "Root LICENSE excludes paths identified in ENTERPRISE-LICENSE.md."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G35",
+    "title": "medusajs/medusa v2.20.1",
+    "url": "https://github.com/medusajs/medusa/releases/tag/v2.20.1",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v2.20.1 published 2026-09-03T09:41:28Z. Resolved tag commit: 0ed927bdb7a396a8fd5f6447ed69b7b354b150d3.",
+      "v2.20.1 fixes field restrictions not applied unless an RBAC flag was enabled; release recommends updating."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G36",
+    "title": "americanexpress/jest-image-snapshot README at d8e6b552447549188993d4fa193fed34b632368f",
+    "url": "https://github.com/americanexpress/jest-image-snapshot/blob/d8e6b552447549188993d4fa193fed34b632368f/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Jest PNG comparison matcher using image baselines/diffs; a testing package, not issuer/card processing code.",
+      "Inspected commit d8e6b552447549188993d4fa193fed34b632368f (resolved from observed release v6.5.2)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G37",
+    "title": "americanexpress/jest-image-snapshot LICENSE.txt at d8e6b552447549188993d4fa193fed34b632368f",
+    "url": "https://github.com/americanexpress/jest-image-snapshot/blob/d8e6b552447549188993d4fa193fed34b632368f/LICENSE.txt",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G38",
+    "title": "americanexpress/jest-image-snapshot v6.5.2",
+    "url": "https://github.com/americanexpress/jest-image-snapshot/releases/tag/v6.5.2",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v6.5.2 published 2026-03-09T10:06:35Z. Resolved tag commit: d8e6b552447549188993d4fa193fed34b632368f.",
+      "v6.5.2 is the observed latest release; its release note is a README update."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G39",
+    "title": "americanexpress/one-app README at 7a8181ddb3893ababd8bd26c76b4f1773931149c",
+    "url": "https://github.com/americanexpress/one-app/blob/7a8181ddb3893ababd8bd26c76b4f1773931149c/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Purpose and integration model",
+    "evidence": [
+      "Node/React application framework with independently deployed Holocron modules, server rendering and routing.",
+      "Inspected commit 7a8181ddb3893ababd8bd26c76b4f1773931149c (resolved from observed release v6.12.1)."
+    ],
+    "limitations": [
+      "README statements are upstream claims. No upstream code executed or deployment/compatibility proved."
+    ]
+  },
+  {
+    "id": "G40",
+    "title": "americanexpress/one-app LICENSE.txt at 7a8181ddb3893ababd8bd26c76b4f1773931149c",
+    "url": "https://github.com/americanexpress/one-app/blob/7a8181ddb3893ababd8bd26c76b4f1773931149c/LICENSE.txt",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Apache-2.0",
+      "Inspected root license text at the recorded commit."
+    ],
+    "limitations": [
+      "License identification only, not legal advice or a conclusion about all transitive dependencies, notices, assets or package contents."
+    ]
+  },
+  {
+    "id": "G41",
+    "title": "americanexpress/one-app v6.12.1",
+    "url": "https://github.com/americanexpress/one-app/releases/tag/v6.12.1",
+    "accessed": "2026-09-08",
+    "scope": "Observed release and maintenance",
+    "evidence": [
+      "v6.12.1 published 2024-04-12T15:28:25Z. Resolved tag commit: 7a8181ddb3893ababd8bd26c76b4f1773931149c.",
+      "v6.12.1 is dated April 2024; live repository metadata is archived."
+    ],
+    "limitations": [
+      "Snapshot of GitHub's latest-release endpoint on access date; tags/releases can change. No signature, package provenance, CI execution, dependency or security audit performed."
+    ]
+  },
+  {
+    "id": "G42",
+    "title": "formancehq/ledger test/e2e/api_idempotency_test.go",
+    "url": "https://github.com/formancehq/ledger/blob/f43a7078e7e1b9f6a354307ef994431593bf57e0/test/e2e/api_idempotency_test.go",
+    "accessed": "2026-09-08",
+    "scope": "Idempotency regression design",
+    "evidence": [
+      "Tests first call and repeat returning the same transaction ID, and rejection when a reused key carries changed posting data."
+    ],
+    "limitations": [
+      "Tests inspected, not run; no Etail acceptance is established."
+    ]
+  },
+  {
+    "id": "G43",
+    "title": "formancehq/ledger internal/storage/ledger/transactions.go",
+    "url": "https://github.com/formancehq/ledger/blob/f43a7078e7e1b9f6a354307ef994431593bf57e0/internal/storage/ledger/transactions.go",
+    "accessed": "2026-09-08",
+    "scope": "Ledger storage implementation",
+    "evidence": [
+      "CommitTransaction updates volumes, inserts transaction and conditionally records per-account movement history using big integers."
+    ],
+    "limitations": [
+      "Selective read; transaction boundary/security/correctness of the complete service was not audited."
+    ]
+  },
+  {
+    "id": "G44",
+    "title": "tigerbeetle/tigerbeetle docs/coding/two-phase-transfers.md",
+    "url": "https://github.com/tigerbeetle/tigerbeetle/blob/cc1c06a924e49b11089c521b2209d34c92caaf18/docs/coding/two-phase-transfers.md",
+    "accessed": "2026-09-08",
+    "scope": "Authorization hold analogy",
+    "evidence": [
+      "Pending transfers reserve funds and can post, void or expire; posting above the reserved amount is rejected."
+    ],
+    "limitations": [
+      "Transfer primitives are not the full rules of any card network. Etail must separately model late/multiple/adjusted clearing as required."
+    ]
+  },
+  {
+    "id": "G45",
+    "title": "tigerbeetle/tigerbeetle docs/concepts/safety.md",
+    "url": "https://github.com/tigerbeetle/tigerbeetle/blob/cc1c06a924e49b11089c521b2209d34c92caaf18/docs/concepts/safety.md",
+    "accessed": "2026-09-08",
+    "scope": "Reliability design",
+    "evidence": [
+      "Describes strict serializability, unique transfer IDs, deterministic simulation and fault-oriented testing."
+    ],
+    "limitations": [
+      "Upstream engineering claims, not an independent safety guarantee; no simulator executed."
+    ]
+  },
+  {
+    "id": "G46",
+    "title": "apache/fineract SECURITY.md",
+    "url": "https://github.com/apache/fineract/blob/d5636847ac556c30b437254c353f05526d172b97/SECURITY.md",
+    "accessed": "2026-09-08",
+    "scope": "Threat model and deployment fit",
+    "evidence": [
+      "Documents back-office API users, Java server deployment and separate self-service/web UI. Explicitly says Fineract is not designed as an embedded library."
+    ],
+    "limitations": [
+      "Not a complete vulnerability audit or validation of a deployment."
+    ]
+  },
+  {
+    "id": "G47",
+    "title": "juspay/hyperswitch crates/hyperswitch_connectors/src/connectors/dummyconnector.rs",
+    "url": "https://github.com/juspay/hyperswitch/blob/83cc4876dd067ff16bcac51ce2737ee0fe0bf8b1/crates/hyperswitch_connectors/src/connectors/dummyconnector.rs",
+    "accessed": "2026-09-08",
+    "scope": "Mock connector capability inspection",
+    "evidence": [
+      "Uses shared authorize/capture/refund/sync interfaces and HTTP request construction; some methods return NotImplemented. Incoming webhook reference/resource methods return WebhooksNotImplemented and event type is EventNotSupported."
+    ],
+    "limitations": [
+      "A dummy acquiring connector is not a complete issuer simulator. This selected file does not prove all connector or reconciliation modules are open source or complete."
+    ]
+  },
+  {
+    "id": "G48",
+    "title": "juspay/hyperswitch docker-compose.yml",
+    "url": "https://github.com/juspay/hyperswitch/blob/83cc4876dd067ff16bcac51ce2737ee0fe0bf8b1/docker-compose.yml",
+    "accessed": "2026-09-08",
+    "scope": "Runtime dependencies",
+    "evidence": [
+      "Inspected Compose declares PostgreSQL, Redis and application/migration components."
+    ],
+    "limitations": [
+      "Development Compose is not a recommended production deployment; no containers or scripts were run."
+    ]
+  },
+  {
+    "id": "G49",
+    "title": "mojaloop/central-ledger docker-compose.yml",
+    "url": "https://github.com/mojaloop/central-ledger/blob/c3ea56feca0342a8c5046e8b30e9b26e34f9cd52/docker-compose.yml",
+    "accessed": "2026-09-08",
+    "scope": "Runtime dependencies and documentation inconsistency",
+    "evidence": [
+      "Compose declares MySQL, Kafka, Redis cluster and other services, whereas a README configuration row says Postgres-only."
+    ],
+    "limitations": [
+      "Inconsistent repository material; supported production database/topology not resolved by this review. No quickstart config adopted."
+    ]
+  },
+  {
+    "id": "G50",
+    "title": "mojaloop/central-ledger TransferGuide.md",
+    "url": "https://github.com/mojaloop/central-ledger/blob/c3ea56feca0342a8c5046e8b30e9b26e34f9cd52/TransferGuide.md",
+    "accessed": "2026-09-08",
+    "scope": "Prepare/fulfil transfer reference",
+    "evidence": [
+      "Describes prepare then fulfil/cancel with expiry. Contains 2017 sample dates and request/response amount mismatch (100 versus 50)."
+    ],
+    "limitations": [
+      "Treat as historical conceptual material, not a current contract or copyable test oracle."
+    ]
+  },
+  {
+    "id": "G51",
+    "title": "killbill/killbill payment/src/main/resources/org/killbill/billing/payment/PaymentStates.xml",
+    "url": "https://github.com/killbill/killbill/blob/5da9650de60b2fa83dea556d7e95c70b79dabd39/payment/src/main/resources/org/killbill/billing/payment/PaymentStates.xml",
+    "accessed": "2026-09-08",
+    "scope": "Explicit payment state transitions",
+    "evidence": [
+      "State-machine definitions distinguish authorization pending, success, failure and error, and separate capture/payment operations."
+    ],
+    "limitations": [
+      "Reference for unknown/error handling; does not supply Etail issuance, Household policy or membership formulas."
+    ]
+  },
+  {
+    "id": "G52",
+    "title": "apache/casbin-node-casbin examples/rbac_with_domains_model.conf",
+    "url": "https://github.com/apache/casbin-node-casbin/blob/2d90c7d8c3b522415605cf3d25481e763e73381e/examples/rbac_with_domains_model.conf",
+    "accessed": "2026-09-08",
+    "scope": "Account-scoped access rule",
+    "evidence": [
+      "Example request includes subject, domain, object and action; matcher checks domain equality and domain-specific role association."
+    ],
+    "limitations": [
+      "Small example only; no Etail policy correctness, concurrent revocation or browser trust boundary is proved."
+    ]
+  },
+  {
+    "id": "G53",
+    "title": "timgit/pg-boss docs/api/adapters.md",
+    "url": "https://github.com/timgit/pg-boss/blob/180a54b65ce492bf990e524cda2d38b19f0df3f4/docs/api/adapters.md",
+    "accessed": "2026-09-08",
+    "scope": "Same-database transaction integration",
+    "evidence": [
+      "Documents db option for send/insert/fetch/complete and rollback with application transaction. Drizzle support is explicitly described for node-postgres and postgres-js."
+    ],
+    "limitations": [
+      "Netlify/Drizzle adapter compatibility remains untested here; existing ordinary-query compatibility does not prove queue SQL/result shape compatibility."
+    ]
+  },
+  {
+    "id": "G54",
+    "title": "timgit/pg-boss src/adapters/drizzle.ts",
+    "url": "https://github.com/timgit/pg-boss/blob/180a54b65ce492bf990e524cda2d38b19f0df3f4/src/adapters/drizzle.ts",
+    "accessed": "2026-09-08",
+    "scope": "Transaction adapter source",
+    "evidence": [
+      "Wraps supplied transaction.execute, parameterizes through Drizzle sql.param and normalizes SQL result shapes."
+    ],
+    "limitations": [
+      "Inspected implementation, not run against Etail's exact installed ORM/database adapter."
+    ]
+  },
+  {
+    "id": "G55",
+    "title": "timgit/pg-boss docs/api/constructor.md",
+    "url": "https://github.com/timgit/pg-boss/blob/180a54b65ce492bf990e524cda2d38b19f0df3f4/docs/api/constructor.md",
+    "accessed": "2026-09-08",
+    "scope": "Worker startup and migration ownership",
+    "evidence": [
+      "migrate, supervise and schedule default true; supervise false skips flows/maintenance/monitoring; migrate false checks schema compatibility instead of applying migrations."
+    ],
+    "limitations": [
+      "Disabling background work also disables recovery responsibilities, so an explicit bounded maintenance schedule must be proved."
+    ]
+  },
+  {
+    "id": "G56",
+    "title": "timgit/pg-boss docs/api/jobs.md",
+    "url": "https://github.com/timgit/pg-boss/blob/180a54b65ce492bf990e524cda2d38b19f0df3f4/docs/api/jobs.md",
+    "accessed": "2026-09-08",
+    "scope": "Bounded execution and retry behavior",
+    "evidence": [
+      "Manual fetch/complete/fail APIs are documented. Active jobs expire for retry/failure; redrive may recreate jobs with new IDs."
+    ],
+    "limitations": [
+      "Queue identity is not a permanent business-operation identity or an external provider exactly-once guarantee."
+    ]
+  },
+  {
+    "id": "G57",
+    "title": "timgit/pg-boss docs/api/workers.md",
+    "url": "https://github.com/timgit/pg-boss/blob/180a54b65ce492bf990e524cda2d38b19f0df3f4/docs/api/workers.md",
+    "accessed": "2026-09-08",
+    "scope": "Polling behavior",
+    "evidence": [
+      "work adds a polling worker; offWork stops workers; batch callback completion/failure behavior is explicit."
+    ],
+    "limitations": [
+      "No function-runtime duration/cleanup or recovery integration tested."
+    ]
+  },
+  {
+    "id": "G58",
+    "title": "medusajs/medusa ENTERPRISE-LICENSE.md",
+    "url": "https://github.com/medusajs/medusa/blob/0ed927bdb7a396a8fd5f6447ed69b7b354b150d3/ENTERPRISE-LICENSE.md",
+    "accessed": "2026-09-08",
+    "scope": "License scope exceptions",
+    "evidence": [
+      "Identifies RBAC and SSO enterprise materials, including modules/rbac, framework policies and specified permission/UI files as proprietary, subject to a commercial agreement."
+    ],
+    "limitations": [
+      "Recorded terms only; no legal interpretation, license purchase or enterprise source reuse."
+    ]
+  },
+  {
+    "id": "G59",
+    "title": "medusajs/medusa SECURITY.md",
+    "url": "https://github.com/medusajs/medusa/blob/0ed927bdb7a396a8fd5f6447ed69b7b354b150d3/SECURITY.md",
+    "accessed": "2026-09-08",
+    "scope": "Vulnerability-reporting process",
+    "evidence": [
+      "Provides private security contact and an intended response process."
+    ],
+    "limitations": [
+      "A published process is not evidence of absence of vulnerabilities or proven response performance."
+    ]
+  },
+  {
+    "id": "G60",
+    "title": "americanexpress/jest-image-snapshot package.json",
+    "url": "https://github.com/americanexpress/jest-image-snapshot/blob/d8e6b552447549188993d4fa193fed34b632368f/package.json",
+    "accessed": "2026-09-08",
+    "scope": "Test runner compatibility",
+    "evidence": [
+      "Version 6.5.2 manifest declares Jest >=20 <31 peer range and Jest 30 development dependencies, while README text says <=29."
+    ],
+    "limitations": [
+      "Observed documentation drift. No compatibility with current Vitest setup is established; do not add another test runner solely for this matcher."
+    ]
+  },
+  {
+    "id": "G61",
+    "title": "OpenFGA model testing documentation",
+    "url": "https://openfga.dev/docs/modeling/testing",
+    "accessed": "2026-09-08",
+    "scope": "Access regression organization",
+    "evidence": [
+      "Shows models/tuples and separate expected results for Check, ListObjects and ListUsers, including time-bound grants."
+    ],
+    "limitations": [
+      "Live documentation; examples are not Etail's policy or tests."
+    ]
+  },
+  {
+    "id": "G62",
+    "title": "Temporal TypeScript developer guide",
+    "url": "https://docs.temporal.io/develop/typescript",
+    "accessed": "2026-09-08",
+    "scope": "Service/worker architecture",
+    "evidence": [
+      "Guide requires a Temporal Service and points to Worker processes, Activities and Workflows."
+    ],
+    "limitations": [
+      "Live documentation; Temporal Service hosting and SDK runtime fit were not deployed or benchmarked."
+    ]
+  },
+  {
+    "id": "G63",
+    "title": "Medusa general deployment guide",
+    "url": "https://docs.medusajs.com/learn/deployment/general",
+    "accessed": "2026-09-08",
+    "scope": "Admin application deployment fit",
+    "evidence": [
+      "Describes PostgreSQL, Redis, application server/admin and worker-mode processes."
+    ],
+    "limitations": [
+      "Live docs, not a verified deployed topology; no claim Medusa Admin can run independently against Etail APIs."
+    ]
+  },
+  {
+    "id": "G64",
+    "title": "americanexpress/one-app repository metadata",
+    "url": "https://api.github.com/repos/americanexpress/one-app",
+    "accessed": "2026-09-08",
+    "scope": "Observed activity and archival status",
+    "evidence": [
+      "archived=true; pushed_at=2024-05-03T20:35:10Z; default_branch=main.",
+      "Inspected revision 7a8181ddb3893ababd8bd26c76b4f1773931149c."
+    ],
+    "limitations": [
+      "Repository metadata can change and pushed_at can include non-code activity. No security or production fitness inference."
+    ]
+  },
+  {
+    "id": "G65",
+    "title": "americanexpress/express-checkout-tutorials repository metadata",
+    "url": "https://api.github.com/repos/americanexpress/express-checkout-tutorials",
+    "accessed": "2026-09-08",
+    "scope": "Observed activity and archival status",
+    "evidence": [
+      "archived=true; pushed_at=2018-01-19T14:34:51Z; default_branch=master.",
+      "Inspected revision 8258787701c214ca907913c6b745db54b9977f0c."
+    ],
+    "limitations": [
+      "Repository metadata can change and pushed_at can include non-code activity. No security or production fitness inference."
+    ]
+  },
+  {
+    "id": "G66",
+    "title": "americanexpress/express-checkout-tutorials README.md",
+    "url": "https://github.com/americanexpress/express-checkout-tutorials/blob/8258787701c214ca907913c6b745db54b9977f0c/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Amex public package purpose",
+    "evidence": [
+      "Samples for merchant Express Checkout using Java/Stripe; old developer-portal references and prerequisites."
+    ],
+    "limitations": [
+      "Selected public repository only; no assurance its referenced provider APIs remain available or licensed for Etail, and no issuer core is provided by this inspected material."
+    ]
+  },
+  {
+    "id": "G67",
+    "title": "americanexpress/express-checkout-tutorials LICENSE.txt",
+    "url": "https://github.com/americanexpress/express-checkout-tutorials/blob/8258787701c214ca907913c6b745db54b9977f0c/LICENSE.txt",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Inspected Apache License 2.0 text (SPDX Apache-2.0)."
+    ],
+    "limitations": [
+      "License text identification only; transitive terms and production/API access not reviewed."
+    ]
+  },
+  {
+    "id": "G68",
+    "title": "americanexpress/amex-api-java-client-core repository metadata",
+    "url": "https://api.github.com/repos/americanexpress/amex-api-java-client-core",
+    "accessed": "2026-09-08",
+    "scope": "Observed activity and archival status",
+    "evidence": [
+      "archived=false; pushed_at=2022-11-16T10:47:16Z; default_branch=master.",
+      "Inspected revision e28b3c11d832c1779c3fc289b338030dcc5bd57a."
+    ],
+    "limitations": [
+      "Repository metadata can change and pushed_at can include non-code activity. No security or production fitness inference."
+    ]
+  },
+  {
+    "id": "G69",
+    "title": "americanexpress/amex-api-java-client-core README.md",
+    "url": "https://github.com/americanexpress/amex-api-java-client-core/blob/e28b3c11d832c1779c3fc289b338030dcc5bd57a/README.md",
+    "accessed": "2026-09-08",
+    "scope": "Amex public package purpose",
+    "evidence": [
+      "Java helper for authentication-header creation for Amex developer APIs; it is not the provider service or an issuer ledger."
+    ],
+    "limitations": [
+      "Selected public repository only; no assurance its referenced provider APIs remain available or licensed for Etail, and no issuer core is provided by this inspected material."
+    ]
+  },
+  {
+    "id": "G70",
+    "title": "americanexpress/amex-api-java-client-core LICENSE.txt",
+    "url": "https://github.com/americanexpress/amex-api-java-client-core/blob/e28b3c11d832c1779c3fc289b338030dcc5bd57a/LICENSE.txt",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Inspected Apache License 2.0 text (SPDX Apache-2.0)."
+    ],
+    "limitations": [
+      "License text identification only; transitive terms and production/API access not reviewed."
+    ]
+  },
+  {
+    "id": "G71",
+    "title": "americanexpress/unify-flowret repository metadata",
+    "url": "https://api.github.com/repos/americanexpress/unify-flowret",
+    "accessed": "2026-09-08",
+    "scope": "Observed activity and archival status",
+    "evidence": [
+      "archived=false; pushed_at=2026-04-22T20:56:21Z; default_branch=main.",
+      "Inspected revision 1449bebe1051dd09a268735a982aad350e1280cb."
+    ],
+    "limitations": [
+      "Repository metadata can change and pushed_at can include non-code activity. No security or production fitness inference."
+    ]
+  },
+  {
+    "id": "G72",
+    "title": "americanexpress/unify-flowret readme.md",
+    "url": "https://github.com/americanexpress/unify-flowret/blob/1449bebe1051dd09a268735a982aad350e1280cb/readme.md",
+    "accessed": "2026-09-08",
+    "scope": "Amex public package purpose",
+    "evidence": [
+      "Embedded Java orchestration engine with JSON process definitions, resume/persist steps and per-case definition snapshots; README references version 2.0.1."
+    ],
+    "limitations": [
+      "Selected public repository only; no assurance its referenced provider APIs remain available or licensed for Etail, and no issuer core is provided by this inspected material."
+    ]
+  },
+  {
+    "id": "G73",
+    "title": "americanexpress/unify-flowret LICENSE.txt",
+    "url": "https://github.com/americanexpress/unify-flowret/blob/1449bebe1051dd09a268735a982aad350e1280cb/LICENSE.txt",
+    "accessed": "2026-09-08",
+    "scope": "Observed license",
+    "evidence": [
+      "Inspected Apache License 2.0 text (SPDX Apache-2.0)."
+    ],
+    "limitations": [
+      "License text identification only; transitive terms and production/API access not reviewed."
+    ]
+  }
+]

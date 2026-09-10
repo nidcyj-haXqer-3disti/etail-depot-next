@@ -1,0 +1,92 @@
+{
+  "status": "template-not-executed",
+  "project_key": "ETAIL_DEPOT_NEXT_GREENFIELD_2026",
+  "source_commit": null,
+  "source_tree": null,
+  "lockfile_sha256": null,
+  "github_repository_id": null,
+  "github_full_name": null,
+  "netlify_site_id": null,
+  "netlify_deploy_id": null,
+  "netlify_context": null,
+  "canonical_origin": null,
+  "database_branch_id": null,
+  "identity_issuer": null,
+  "new_resource_ids_verified": false,
+  "old_resources_modified": false,
+  "real_money_enabled": false,
+  "public_release_approved": false,
+  "checks": [
+    {
+      "name": "protected-deploy",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "migrations",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "source-match",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "registration-confirmation",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "signin-profile-logout",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "password-recovery",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "same-origin-negative-controls",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "private-files",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "preview-isolation",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "simulation-completion",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "concurrency-ledger",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "worker-scope",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "user-usability",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "name": "public-release-review",
+      "status": "not_run",
+      "evidence": null
+    }
+  ],
+  "manual_or_blocked": []
+}

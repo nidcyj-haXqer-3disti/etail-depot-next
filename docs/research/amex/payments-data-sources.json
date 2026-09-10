@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "researchDate": "2026-09-08",
+  "method": "Public official engineering publications, named firsthand interviews, vendor publications and author-linked research repositories. Opened and read relevant text; no private access, contact, installations or production probes. Source count is not a count of independently verified deployments. Summaries paraphrase bounded claims; no long quotations.",
+  "usableSourceCount": 10,
+  "sources": [
+    {
+      "id": "T01",
+      "title": "American Express adopts NVIDIA AI for fraud prevention — official Japanese edition",
+      "url": "https://blogs.nvidia.co.jp/blog/american-express-nvidia-ai/",
+      "accessed": "2026-09-08",
+      "publicationDate": "2020-10-08",
+      "scope": "Amex global card-transaction fraud; Japanese translation of vendor case, not Japan-only product availability",
+      "confidence": "named Amex-speaker vendor",
+      "status": "reported deployed in 2020",
+      "evidence": "Names Manish Gupta. Describes TensorFlow/DGX training and TensorRT/Triton/T4 serving with recurrent LSTM plus GBM; subsystem latency requirement and segment-specific improvement claims.",
+      "limitations": "T02 names GRU instead. Exact variant unresolved; historical vendor claims, no independent benchmark or current topology. Japanese currency translation is unreliable and not reused.",
+      "access": "Full relevant Japanese text opened. English original redirects to a tag archive; Taiwan official translation also opened."
+    },
+    {
+      "id": "T02",
+      "title": "Simplifying and Scaling Inference Serving with NVIDIA Triton 2.3",
+      "url": "https://developer.nvidia.com/blog/simplifying-and-scaling-inference-serving-with-triton-2-3/",
+      "accessed": "2026-09-08",
+      "publicationDate": "2020-10-05",
+      "scope": "Amex-specific customer subsection of a general NVIDIA technical article",
+      "confidence": "vendor-only",
+      "status": "reported deployed in 2020",
+      "evidence": "Amex subsection specifies a TensorRT-optimized GRU served by Triton on T4-equipped servers within a 2 ms fraud budget.",
+      "limitations": "Model label conflicts with T01. General product architecture, Kubernetes and Azure sections do not establish Amex deployment; no end-to-end authorization SLA.",
+      "access": "Full customer subsection read; AI-generated page summary was not used as evidence."
+    },
+    {
+      "id": "T03",
+      "title": "Available Now: NVIDIA AI Accelerated DGL and PyG Containers for GNNs",
+      "url": "https://developer.nvidia.com/blog/?p=74698",
+      "accessed": "2026-09-08",
+      "publicationDate": "2023-12-08",
+      "scope": "Amex AI Labs graph-based fraud research",
+      "confidence": "named Amex-speaker vendor",
+      "status": "research experimentation",
+      "evidence": "Coauthor Alireza Zaheri identified as Amex AI Labs director. Amex section describes DGL experiments using multi-node/multi-GPU infrastructure with millions of nodes and billions of edges.",
+      "limitations": "No Amex production GNN deployment or graph database is named. Other benchmarks and PyG customer results must not be attributed to Amex.",
+      "access": "Full Amex subsection and author bio read; ignored generated summary."
+    },
+    {
+      "id": "T04",
+      "title": "A New Method for Enhancing Neural Network Training",
+      "url": "https://americanexpress.io/a-new-method-for-enhancing-neural-network-training/",
+      "accessed": "2026-09-08",
+      "publicationDate": "2025-06-13",
+      "scope": "Amex Global Decision Science researchers and Imperial College collaboration",
+      "confidence": "Amex self-disclosure",
+      "status": "published research, future extensions discussed",
+      "evidence": "Authors Leonie Goldmann and Marcus September describe adaptive preprocessing of irregular financial series and four sequential sublayers, linking the EDAIN paper.",
+      "limitations": "No live deployment stated. Missing-value handling and broader risk applications remain research directions. Not evidence of underwriting rules.",
+      "access": "Full text and figure captions read; direct diagram image fetch failed."
+    },
+    {
+      "id": "T05",
+      "title": "Extended Deep Adaptive Input Normalization for Preprocessing Time Series Data for Neural Networks",
+      "url": "https://arxiv.org/html/2310.14720v2",
+      "accessed": "2026-09-08",
+      "publicationDate": "2024-02-29",
+      "scope": "AISTATS 2024 paper; Imperial and Amex Decision Science coauthors",
+      "confidence": "Amex self-disclosure",
+      "status": "research evaluation",
+      "evidence": "Defines EDAIN/EDAIN-KL, global/local variants, evaluation methods and experimental configurations; links author implementation.",
+      "limitations": "First submission 2023-10-23. Algorithm and benchmark disclosures do not expose live card authorization architecture, customer policies or production risk weights. Paper CC-BY does not license every code/data asset.",
+      "access": "Abstract, full HTML method, affiliations and relevant experimental/reference sections read."
+    },
+    {
+      "id": "T06",
+      "title": "marcusGH/edain_paper research implementation",
+      "url": "https://github.com/marcusGH/edain_paper",
+      "accessed": "2026-09-08",
+      "publicationDate": null,
+      "scope": "Author-owned research repository linked by T05; not an Amex-organization repository",
+      "confidence": "Amex self-disclosure",
+      "status": "public implementation, not installed or evaluated",
+      "evidence": "README provides PyTorch implementation/reproduction guidance and documents possible NaN gradients. License section identifies differing third-party asset terms and specific research dataset permission.",
+      "limitations": "Amex connection is paper lineage, not company repository ownership. No blanket license verified from inspected root/README. No dataset downloaded; this research does not authorize its use.",
+      "access": "Repository root, README, known issues and license-information section read. Source execution and dependency audit not performed."
+    },
+    {
+      "id": "T07",
+      "title": "americanexpress/rate-limiting-scheduled-executor",
+      "url": "https://github.com/americanexpress/rate-limiting-scheduled-executor",
+      "accessed": "2026-09-08",
+      "publicationDate": null,
+      "scope": "Amex organization Java scheduler library",
+      "confidence": "Amex self-disclosure",
+      "status": "public implementation, production workload not named",
+      "evidence": "Per-executor throughput controls, Redis peer discovery, interval/overflow buckets, timeout filtering and caller-provided executor described; Apache-2.0 declared.",
+      "limitations": "Timing may precede or exceed scheduled time. No durable financial-workflow guarantee, current support assurance or payment-system adoption claim. Not a TypeScript drop-in.",
+      "access": "README architecture steps and limitations read. Linked diagram image fetch failed; no code execution or benchmark replication."
+    },
+    {
+      "id": "T08",
+      "title": "Big Data Management at American Express: interview with Sastry Durvasula and Kevin Murray",
+      "url": "https://www.odbms.org/blog/2014/10/big-data-management-american-express-interview-sastry-durvasula-kevin-murray/",
+      "accessed": "2026-09-08",
+      "publicationDate": "2014-10-12",
+      "scope": "Firsthand interview of named Amex Technology VPs about enterprise data platform",
+      "confidence": "Amex self-disclosure",
+      "status": "historical deployed platform plus strategy",
+      "evidence": "Hadoop integrated with analytics/operations; controlled data access, self-service Labs/APIs/algorithm libraries, incremental expansion and retained relational workloads described.",
+      "limitations": "2014 state only; no complete component/version inventory or current infrastructure. Conference-session link could not be opened. Historical Sync naming is not current API-program identity proof.",
+      "access": "Complete Q&A read; secondary conference reporting not used for quantitative claims."
+    },
+    {
+      "id": "T09",
+      "title": "Couchbase Creates On-Ramp from SQL to NoSQL with Latest Release",
+      "url": "https://www.globenewswire.com/news-release/2019/09/18/1917583/0/en/Couchbase-Creates-On-Ramp-from-SQL-to-NoSQL-with-Latest-Release.html",
+      "accessed": "2026-09-08",
+      "publicationDate": "2019-09-18",
+      "scope": "Couchbase-issued press release, named Amex engineer supporting quote",
+      "confidence": "named Amex-speaker vendor",
+      "status": "developer adoption testimony; 6.5 improvements anticipated",
+      "evidence": "Buddhika Rathnayaka describes familiar SQL-for-JSON transition and planned query enhancements.",
+      "limitations": "No named production application or deployed 6.5 version. Does not prove Couchbase is an Amex ledger, authorization store or merchant database.",
+      "access": "Issuer-origin release read on distributor. Couchbase-hosted original timed out twice."
+    },
+    {
+      "id": "T10",
+      "title": "Hortonworks chooses AtScale as its standard for BI-on-Hadoop",
+      "url": "https://www.atscale.com/blog/hortonworks-chooses-atscale-as-its-standard-for-bi-on-hadoop/",
+      "accessed": "2026-09-08",
+      "publicationDate": "2019-03-04",
+      "scope": "AtScale vendor partnership discussion; Amex shared customer with MapR",
+      "confidence": "vendor-only",
+      "status": "limited historical customer relationship evidence",
+      "evidence": "Amex named in MapR shared-customer context.",
+      "limitations": "Displayed date may be republication. No Amex workload or current deployment; general platform features cannot be transferred to Amex.",
+      "access": "Relevant page and partner section read. Separate 2016 growth-release page returned 403."
+    }
+  ],
+  "limitedOrExcluded": [
+    {
+      "id": "TX01",
+      "title": "Aerospike tactical edge solution brief",
+      "url": "https://aerospike.com/files/solution-briefs/gaining-a-real-time-decision-advantage-at-the-tactical-edge-sb.pdf",
+      "accessed": "2026-09-08",
+      "publicationDate": "2024",
+      "access": "PDF opened; footer read on page 4",
+      "reason": "Amex appears in vendor organization list only. No Amex workload or fraud-store design."
+    },
+    {
+      "id": "TX02",
+      "title": "BioCatch customer story",
+      "url": "https://aerospike.com/resources/customer-stories/biocatch/",
+      "accessed": "2026-09-08",
+      "publicationDate": null,
+      "access": "Full relevant case read",
+      "reason": "Architecture and performance belong to BioCatch. Amex customer innovation board membership is not direct Amex deployment evidence."
+    },
+    {
+      "id": "TX03",
+      "title": "WSO2 American Express Global Business Travel integration case",
+      "url": "https://wso2.com/blogs/thesource/2019/01/using-open-source-technology-to-solve-complex-integration-needs-at-american-express-global-business-travel/",
+      "accessed": "2026-09-08",
+      "publicationDate": "2019-01",
+      "access": "Indexed result only; opening redirects to generic WSO2 Integrator page",
+      "reason": "Different entity/workload: GBT. Cannot establish Amex card-business Kafka, OpenShift or integration topology."
+    },
+    {
+      "id": "TX04",
+      "title": "Neo4j graph technology news item",
+      "url": "https://neo4j.com/news/making-big-data-meaningful-graph-technology/",
+      "accessed": "2026-09-08",
+      "publicationDate": null,
+      "access": "Indexed excerpt; open redirects to news index",
+      "reason": "Generic graph-technology association does not prove Amex uses Neo4j."
+    },
+    {
+      "id": "TX05",
+      "title": "Databricks Financial Services Outlook 2026",
+      "url": "https://www.databricks.com/fr/sites/default/files/2026-03/2026-01-eb-2026-outlook-for-finser-final.pdf",
+      "accessed": "2026-09-08",
+      "publicationDate": "2026",
+      "access": "PDF opened; relevant customer-view statement read",
+      "reason": "Amex used as industry example; no assertion that its initiative runs on Databricks."
+    },
+    {
+      "id": "TX06",
+      "title": "NVIDIA GTC Fraud Prevention in Real Time Using Recurrent Neural Networks",
+      "url": "https://www.nvidia.com/en-us/on-demand/session/gtcfall20-a21671/",
+      "accessed": "2026-09-08",
+      "publicationDate": "2020-10",
+      "access": "Session page yielded JavaScript/registration shell; playlist indexed Gupta and Khanna but opened content lacked technical talk",
+      "reason": "Recording/slides not inspected. Not counted as a consumed primary technical source or used to resolve GRU/LSTM discrepancy."
+    },
+    {
+      "id": "TX07",
+      "title": "Amex 2022-2023 ESG report",
+      "url": "https://www.americanexpress.com/content/dam/amex/en-us/newsroom/pdfs/AXP_2022-2023_ESG_Report_Low.pdf",
+      "accessed": "2026-09-08",
+      "publicationDate": "2023",
+      "access": "Indexed text only; direct PDF returned 404; alternate full-size URL failed",
+      "reason": "Potential firsthand account-takeover ML evidence, but current source not successfully opened. Not counted as read."
+    },
+    {
+      "id": "TX08",
+      "title": "How Amex Helps You Protect Yourself Against Credit Card Fraud",
+      "url": "https://www.americanexpress.com/en-us/credit-cards/credit-intel/fraud-alerts/",
+      "accessed": "2026-09-08",
+      "publicationDate": "2026-08-26",
+      "access": "Full educational article opened and read",
+      "reason": "Paid freelance educational content carries generic-product qualification and broad simplifications. Useful discovery but not primary engineering proof; no new infrastructure claim taken from it."
+    }
+  ]
+}

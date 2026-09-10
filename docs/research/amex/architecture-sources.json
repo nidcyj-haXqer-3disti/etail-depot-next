@@ -1,0 +1,150 @@
+{
+  "researchDate": "2026-09-08",
+  "usableSourceCount": 13,
+  "sources": [
+    {
+      "id": "A01",
+      "title": "American Express 2025 Annual Report",
+      "url": "https://s26.q4cdn.com/747928648/files/doc_financials/2025/ar/American-Express-Annual-Report-2025.pdf",
+      "accessed": "2026-09-08",
+      "scope": "Global business model; report year 2025, printed pp. 2–4",
+      "evidence": "Issuing, acquiring and network businesses include direct and contractual partner relationships.",
+      "limitations": "Business topology only; no internal software schema. SEC HTML exceeded tool size; issuer-hosted PDF read instead."
+    },
+    {
+      "id": "A02",
+      "title": "Terms and Conditions for Account Managers",
+      "url": "https://www.americanexpress.com/content/dam/amex/us/customer-service/account-management/account-managers/terms-conditions.pdf",
+      "accessed": "2026-09-08",
+      "scope": "US; modified 2023-12-01; pp. 3–4 visually checked",
+      "evidence": "Access varies by product and channel; Limited Access permits payment scheduling.",
+      "limitations": "Dated permissions; do not equate names with Etail roles. Same source as I02."
+    },
+    {
+      "id": "A03",
+      "title": "US Corporate Company Profile User Guide",
+      "url": "https://www.americanexpress.com/en-us/business/resource-center/statements-payments/articles/company-profile-guide/index.html",
+      "accessed": "2026-09-08",
+      "scope": "US Corporate Online Payment; undated",
+      "evidence": "Hierarchy/exposure views, separate banking officer and payer, reviewed payments and tracking.",
+      "limitations": "Does not define Etail delegation defaults, numbers of permitted banks or payment timing."
+    },
+    {
+      "id": "A04",
+      "title": "@ Work Reconciliation Program Administrator Reference Guide",
+      "url": "https://www.americanexpress.com/content/dam/amex/en-gb/business/resource-centre/atwork-reconciliation/AT_Work_Recon_Prog-Admin-User-Guide_Final.pdf",
+      "accessed": "2026-09-08",
+      "scope": "UK-hosted guide; July 2022 version 1; pp. 4–5, 8–12, 16–21, 25",
+      "evidence": "Role/resource assignments, validated accounting data and import-task results.",
+      "limitations": "Historic reference; p.21 rendered and visually inspected. Private tool not used; no reuse of deletion periods or import defaults."
+    },
+    {
+      "id": "A05",
+      "title": "@ Work Reporting Global Guide",
+      "url": "https://www.americanexpress.com/content/dam/amex/it/business/resource-centre/work-reporting/Work-Reporting-Global-Guide-English.pdf",
+      "accessed": "2026-09-08",
+      "scope": "Global/program-dependent; Italy-hosted English guide; undated",
+      "evidence": "Program reporting covers activity, limits, delinquencies, allocations and exposure.",
+      "limitations": "Product and country availability varies; line-item data can be absent. p.13 visually inspected; not a complete live report audit."
+    },
+    {
+      "id": "A06",
+      "title": "American Express Certification",
+      "url": "https://network.americanexpress.com/globalnetwork/certification/",
+      "accessed": "2026-09-08",
+      "scope": "Global network partners; undated",
+      "evidence": "Host certification and product/POS certification have distinct requirements.",
+      "limitations": "Detailed specifications are access-controlled; no certification or protocol compatibility established."
+    },
+    {
+      "id": "A07",
+      "title": "American Express SafeKey",
+      "url": "https://network.americanexpress.com/globalnetwork/v4/products/safekey",
+      "accessed": "2026-09-08",
+      "scope": "Global network; market/version-specific; undated",
+      "evidence": "EMV 3DS authentication supports challenges and frictionless flows; merchant enablement is through provider.",
+      "limitations": "No liability conclusion, protocol implementation or provider entitlement inferred."
+    },
+    {
+      "id": "A08",
+      "title": "American Express Tokenization Services",
+      "url": "https://network.americanexpress.com/globalnetwork/v4/products/card-on-file-tokenization/tokenization-services.html",
+      "accessed": "2026-09-08",
+      "scope": "Global network; availability by country/use case; undated",
+      "evidence": "Stored-card, wallet and checkout token use cases have domain controls and enrollment.",
+      "limitations": "Etail payment-link QR is not evidence of network-token QR support; no credentials handled."
+    },
+    {
+      "id": "A09",
+      "title": "What are passkeys and how do they work?",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.passkeys.html",
+      "accessed": "2026-09-08",
+      "scope": "US consumer online account; undated",
+      "evidence": "Passkeys can be managed; password access remains.",
+      "limitations": "Current Etail Identity passkey compatibility is unverified; no alternate authentication engine authorized."
+    },
+    {
+      "id": "A10",
+      "title": "US Security Center",
+      "url": "https://www.americanexpress.com/en-us/security/",
+      "accessed": "2026-09-08",
+      "scope": "US; undated",
+      "evidence": "Saved devices, two-step verification and fraud notifications are customer controls.",
+      "limitations": "Same source as I16; provider/session implementations and full UI not inspected."
+    },
+    {
+      "id": "A11",
+      "title": "Amex Sync Commercial Partner Program",
+      "url": "https://www.americanexpress.com/en-us/business/sync/",
+      "accessed": "2026-09-08",
+      "scope": "US operations currently required for partners; eligible US Business/Corporate card accounts; undated",
+      "evidence": "Selected partners embed virtual cards and integrated transaction data after approval.",
+      "limitations": "No application made. Does not establish consumer/Household origination or acquiring; developer endpoint retrieval failed."
+    },
+    {
+      "id": "A12",
+      "title": "Corporate Account Reconciliation Fact Sheet",
+      "url": "https://www.americanexpress.com/en-us/business/resource-center/reconciliation/articles/reconciliation-fact-sheet/",
+      "accessed": "2026-09-08",
+      "scope": "US; specified corporate products; undated",
+      "evidence": "Accounting allocation, exception review, approvals, receipts and ERP extracts.",
+      "limitations": "Features vary with enrollment/product; Etail journals remain immutable regardless of editable accounting metadata."
+    },
+    {
+      "id": "A13",
+      "title": "American Express Japan Merchant Home",
+      "url": "https://www.americanexpress.com/ja-jp/business/merchant/",
+      "accessed": "2026-09-08",
+      "scope": "Japan; undated",
+      "evidence": "Merchant information includes transactions, transfers, billing and profile procedures.",
+      "limitations": "Used for regional boundary check, not proof of full Japanese workflow parity."
+    }
+  ],
+  "excluded": [
+    {
+      "id": "AX01",
+      "url": "https://www.sec.gov/Archives/edgar/data/4962/000000496226000080/axp-20251231.htm",
+      "reason": "HTML exceeded tool content-size limit; used official annual-report PDF."
+    },
+    {
+      "id": "AX02",
+      "url": "https://developer.americanexpress.com/products/at-work-apis-public/overview",
+      "reason": "Public retrieval failed; no endpoint behavior inferred."
+    },
+    {
+      "id": "AX03",
+      "url": "https://developer.americanexpress.com/products/nextgen-card-on-demand/resources",
+      "reason": "Public retrieval failed; rely only on Amex Sync public program description."
+    },
+    {
+      "id": "AX04",
+      "url": "https://gateway-japa.americanexpress.com/api/documentation/mso/apiDocumentation/rest-json/version/47/operation/Merchant%3A%20%20Update%20Payment%20Details.html?locale=en_US",
+      "reason": "Legacy versioned documentation discovered in search; exact page retrieval failed. Not used as current API evidence."
+    },
+    {
+      "id": "AX05",
+      "url": "https://www.americanexpress.com/content/dam/amex/jp/merchant/pdfs/payments-userguide-jp.pdf",
+      "reason": "Search indicated old guide; not promoted to current Japanese UI evidence."
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+import { randomUUID } from "node:crypto";
+import { and, eq } from "drizzle-orm";
+import { expect, test } from "@playwright/test";
+import { closeDatabase, getDb } from "../../src/platform/database/client";
+import { identityBindings } from "../../src/platform/database/schema";
+import { operatorServiceAccess } from "../../src/modules/operations/schema";
+import { createSupportCase, getSupportCase } from "../../src/modules/cases/service";
+import { cardPrimary } from "../helpers/cardholder";
+
+const origin = "http://127.0.0.1:3100";
+test.afterAll(closeDatabase);
+test("an uncertain operator reply keeps its identity through denied retries and refreshed access", async ({ page }) => {
+  const primary = await cardPrimary("Operator browser customer");
+  const [operator] = await getDb().select().from(identityBindings).where(and(eq(identityBindings.issuer, "urn:etail:isolated-fixture"), eq(identityBindings.subject, "operator")));
+  expect(operator).toBeTruthy();
+  await getDb().insert(operatorServiceAccess).values({ serviceId: primary.serviceId, personId: operator!.personId, state: "ACCEPTED", canRespond: true });
+  const ticket = await createSupportCase(primary.personId, primary.serviceId, { commandId: randomUUID(), topic: "CARD", subject: `Retry proof ${randomUUID()}`, message: "A fictional customer question", transactionId: null });
+  const login = await page.request.post("/api/v1/auth/local-fixture", { headers: { Origin: origin, "Content-Type": "application/json" }, data: { persona: "operator" } });
+  expect(login.status()).toBe(200);
+  await page.goto(`/operations?case=${ticket.id}`);
+  await expect(page.getByRole("heading", { name: ticket.subject })).toBeVisible();
+  const message = "This reply must appear exactly once.";
+  const commands: unknown[] = [];
+  let count = 0;
+  await page.route(`**/api/v1/operations/cases/${ticket.id}/responses`, async route => {
+    commands.push(route.request().postDataJSON()); count += 1;
+    if (count === 1) { const response = await route.fetch(); expect(response.status()).toBe(200); await route.abort("failed"); }
+    else if (count === 2) await route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ error: { code: "ACTION_DENIED" } }) });
+    else await route.continue();
+  });
+  await page.getByRole("textbox", { name: "Reply to customer" }).fill(message);
+  await page.getByRole("button", { name: "Save reply", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Retry saved reply" })).toBeEnabled();
+  await page.getByRole("button", { name: "Retry saved reply" }).click();
+  await expect(page.getByRole("alert").filter({hasText:"Your access to this case changed"})).toBeVisible();
+  const assignment = and(eq(operatorServiceAccess.serviceId, primary.serviceId), eq(operatorServiceAccess.personId, operator!.personId));
+  await getDb().update(operatorServiceAccess).set({ canRespond: false }).where(assignment);
+  await page.getByRole("button", { name: "Reload case" }).click();
+  await expect(page.getByText("You can view this case, but you don’t have permission to reply.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Reply to customer" })).toHaveCount(0);
+  await getDb().update(operatorServiceAccess).set({ canRespond: true }).where(assignment);
+  await page.getByRole("button", { name: "Reload case" }).click();
+  await expect(page.getByRole("button", { name: "Retry saved reply" })).toBeEnabled();
+  await expect(page.getByRole("textbox", { name: "Reply to customer" })).toHaveValue(message);
+  await expect(page.getByRole("textbox", { name: "Reply to customer" })).toBeDisabled();
+  await page.getByRole("button", { name: "Retry saved reply" }).click();
+  await expect(page.getByRole("button", { name: "Save reply", exact: true })).toBeVisible();
+  expect(commands).toHaveLength(3);
+  expect(commands[1]).toEqual(commands[0]); expect(commands[2]).toEqual(commands[0]);
+  const detail = await getSupportCase(primary.personId, primary.serviceId, ticket.id);
+  expect(detail.messages.filter(row => row.body === message)).toHaveLength(1);
+  expect(detail.version).toBe(2);
+});

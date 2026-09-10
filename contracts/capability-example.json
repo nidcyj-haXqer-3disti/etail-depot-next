@@ -1,0 +1,22 @@
+{
+  "example_only": true,
+  "account": {
+    "id": "example-account-id",
+    "type": "HOUSEHOLD",
+    "name": "Example household"
+  },
+  "policyVersion": "example-v3",
+  "capabilities": {
+    "cards.create": {
+      "allowed": false,
+      "reasonCode": "FUNDING_ASSIGNMENT_REQUIRED",
+      "message": "Choose the funded balance or approved allocation for this card.",
+      "remediation": {
+        "action": "SELECT_FUNDING_ASSIGNMENT",
+        "href": "/app/accounts/example-account-id/cards/requests/example-request-id",
+        "requestId": "example-request-id"
+      }
+    }
+  },
+  "security_note": "Example IDs do not confer permission. Re-evaluate account/resource/actor eligibility on every write; no secret or unrelated owner financial information in projection."
+}

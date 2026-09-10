@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 1,
+  "researchDate": "2026-09-08",
+  "method": "Official American Express public sources opened and read using web retrieval; no authenticated portal or live financial operation.",
+  "usableSourceCount": 21,
+  "sources": [
+    {
+      "id": "I01",
+      "title": "Additional Card Member FAQs",
+      "url": "https://www.americanexpress.com/en-us/support/additional-card-member/faqs/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. consumer additional cards",
+      "evidence": "Separate holder login and card number; Basic Card Member responsibility; own-purchase visibility with account total.",
+      "limitations": "Undated FAQ; private screens not inspected. Etail must not inherit Amex eligibility ages or account-total disclosure.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I02",
+      "title": "Terms and Conditions for Account Managers",
+      "url": "https://www.americanexpress.com/content/dam/amex/us/customer-service/account-management/account-managers/terms-conditions.pdf",
+      "accessed": "2026-09-08",
+      "scope": "U.S. consumer/business/corporate delegated access; modified 2023-12-01",
+      "evidence": "Delegated manager access has distinct levels, responsibility and revocation provisions.",
+      "limitations": "Dated terms; no universal role inference. Channel-specific table marks were not independently visually checked in this sub-study.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I03",
+      "title": "American Express Employee Credit Cards",
+      "url": "https://www.americanexpress.com/en-us/business/employee-credit-cards/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. business employee cards",
+      "evidence": "Limits, pause/resume, merchant-category alerts and employee activity; usable purchasing remains constrained by overall account capacity.",
+      "limitations": "Undated product page. Limit exceptions and category semantics matter; merchant category is not item-level classification.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I04",
+      "title": "Online Card Management and Applications",
+      "url": "https://www.americanexpress.com/en-us/business/resource-center/card-management/index.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. @ Work overview of Global Apply for Card",
+      "evidence": "Centralized administrator-initiated and assisted applications with prefilling, tooltips and multi-country support.",
+      "limitations": "Undated overview; product availability varies. Linked confidential-marked material excluded from substantive reuse.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I05",
+      "title": "Global Apply for Card Program Administrator FAQs",
+      "url": "https://www.americanexpress.com/en-us/business/resource-center/card-management/faq-program-administrator/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. corporate with explicit market differences",
+      "evidence": "Pre-approval and post-approval settings; application tracking scoped to authorized control accounts; expired, company-declined and issuer-decided states; shared administrator To Do list.",
+      "limitations": "Undated FAQ. Quick Send approval requirements vary by market. No private queue or database implementation was observed.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I06",
+      "title": "Global Apply for Card Applicant FAQs",
+      "url": "https://www.americanexpress.com/en-us/business/resource-center/card-management/faq-card-applicant/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. corporate applicant experience",
+      "evidence": "Resume by application identity; labeled required fields and errors; review/terms/submission; no post-submit edits; notifications identify company review versus issuer submission; constrained delivery options.",
+      "limitations": "Undated FAQ. Expiration windows and delivery estimates are Amex-specific; not Etail defaults.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I07",
+      "title": "vPayment",
+      "url": "https://www.americanexpress.com/en-us/business/payments/vpayment/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. corporate virtual payment offering",
+      "evidence": "Transaction-linked virtual number with amount/date/expense details; charge verification followed by matching and reconciliation.",
+      "limitations": "Subject to application approval and potentially enrollment/technical implementation. No API entitlement or Amex internal source established.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I08",
+      "title": "What happens when I freeze my Card?",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.what-happens-when-i-freeze-my-card.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. cardholder freeze behavior",
+      "evidence": "Freeze has recurring, wallet, stored-card, offline and delayed authorization exceptions; FAQ describes automatic unfreeze after seven days.",
+      "limitations": "Undated public description; product/provider differences possible. Etail intentionally retains hierarchical manual removal rather than auto-unfreeze.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I09",
+      "title": "Order Replacement Card",
+      "url": "https://www.americanexpress.com/en-us/business/resource-center/card-management/support-category-articles/request-replacement-card/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. @ Work corporate replacement tutorial",
+      "evidence": "Select card, invoke replacement, choose reason/type, consider permitted number retention and delivery option.",
+      "limitations": "Undated guide. Number retention cannot be generalized to compromised cards; no physical fulfillment was tested.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I10",
+      "title": "Amex App — Canadian tutorial",
+      "url": "https://www.americanexpress.com/ca/en/customer-service/digital/amex-mobile-app.htm",
+      "accessed": "2026-09-08",
+      "scope": "Canada eligible consumer/business cards",
+      "evidence": "Documents selected-card freeze with visible indicator, activation, PIN controls, transaction search, statements, messaging and paperless preference verification.",
+      "limitations": "Country-specific tutorial, not U.S. portal observation; screenshots were not copied. App feature availability depends on product.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I11",
+      "title": "Transaction History and Billing Statements",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.transaction-billing-statements-history.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. card online account",
+      "evidence": "History can be sorted, filtered and downloaded; archived statement retrieval may take time.",
+      "limitations": "Undated FAQ. Published retention/retrieval windows describe Amex service, not Etail retention policy.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I12",
+      "title": "How do I enroll in AutoPay?",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.autopay.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. primary cardholder and eligible corporate accounts",
+      "evidence": "Enrollment selects a card; only Basic Card Members enroll; first execution might not cover current billing cycle and due date stays unchanged.",
+      "limitations": "Undated FAQ; banking rails and eligibility are product-specific. No real repayment authorization inferred.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I13",
+      "title": "Guide to Making American Express Payments",
+      "url": "https://www.americanexpress.com/en-us/resources/how-to-make-a-payment/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. card repayment and statement preferences",
+      "evidence": "Explains due dates, paperless enrollment, scheduled amount choices and changes effective before a cutoff.",
+      "limitations": "Undated page includes legacy enrollment exceptions. Etail statement/daily repayment rules remain separate.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I14",
+      "title": "Can I cancel a payment?",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.cancel-payment.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. online card payment cancellation",
+      "evidence": "Processing payments may have a cancel action; absence of action indicates cancellation is unavailable.",
+      "limitations": "Undated FAQ. Processing alone does not guarantee cancelability; no processor cutoff or race semantics disclosed.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I15",
+      "title": "Dispute a Charge — @ Work Resource Center",
+      "url": "https://www.americanexpress.com/en-us/business/resource-center/program-management/support-category-articles/dispute-fee/index.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. @ Work/card dispute guidance",
+      "evidence": "Pending-charge monitoring precedes posted disputes; transaction detail starts inquiry; status and withdrawal are available; disputed payment treatment and outcome are separate.",
+      "limitations": "Undated guide. Liability, time estimates and temporary payment treatment are Amex-specific; no legal entitlement imported.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I16",
+      "title": "Security Center",
+      "url": "https://www.americanexpress.com/en-us/security/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. Amex login, device and checkout security",
+      "evidence": "Documents passkeys, device management, two-step checks, notification/code fallback and different verification contact purposes.",
+      "limitations": "Undated public guidance. Does not reveal fraud thresholds, session model or internal security implementation.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I17",
+      "title": "How to Find and Add Amex Offers",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.find-add-amex-offers.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. eligible-card offers discovery",
+      "evidence": "Offers have explicit selected-card enrollment actions on mobile and web.",
+      "limitations": "Undated page lists multiple channels; exact current eligible products and offer rules need governing terms.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I18",
+      "title": "Membership Rewards Points FAQs",
+      "url": "https://www.americanexpress.com/us/rewards/membership-rewards/faq/index.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. enrolled cards and Membership Rewards",
+      "evidence": "Point summary distinguishes pending, available-on-payment and usable points; statement credit is distinct from required payment; redemption has eligibility checks.",
+      "limitations": "Page still includes COVID-era content and lacks reliable revision date. Vocabulary reference only; current commercial rules not assumed.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I19",
+      "title": "Application Declined — Reason",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.application-declined-reason.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. card applicants",
+      "evidence": "Declined applicants receive a reason notice and can seek further information; bureau-derived issues have a separate correction route.",
+      "limitations": "Undated FAQ; no private underwriting criteria or actual Etail credit decision.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I20",
+      "title": "Declined Application — Review or Reapply",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.application-declined-appeal-re-apply.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. card applicants",
+      "evidence": "A declined applicant can request decision review; changed outcome is not guaranteed and reapplication has separate guidance.",
+      "limitations": "Undated FAQ. Amex reapplication waiting period is not adopted.",
+      "access": "opened-and-read-public-source"
+    },
+    {
+      "id": "I21",
+      "title": "Accessibility for Billing Statements",
+      "url": "https://www.americanexpress.com/en-us/company/about-us/disclosures/accessibility/billing-statements/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. Personal, Business and International Dollar Card statement support",
+      "evidence": "Screen-reader optimized PDF statements, large-print/Braille options and relay/chat support are publicly documented.",
+      "limitations": "Screen-reader statement availability references dates after 2024-10-01; no accessibility certification or private PDF tested.",
+      "access": "opened-and-read-public-source"
+    }
+  ],
+  "excluded": [
+    {
+      "id": "IX01",
+      "title": "GAFC administrator on behalf of employees PDF",
+      "url": "https://www.americanexpress.com/content/dam/amex/en-us/business/resource-center/card-management/forms/global-apply-for-card-pa-behalf-of-information-frc.pdf",
+      "accessed": "2026-09-08",
+      "scope": "U.S. corporate",
+      "evidence": "Public overview linked a retrievable PDF bearing explicit proprietary/confidential restrictions.",
+      "limitations": "Excluded from substantive reuse; not counted among usable primary sources.",
+      "access": "opened-excluded"
+    },
+    {
+      "id": "IX02",
+      "title": "UK activation FAQ",
+      "url": "https://www.americanexpress.com/uk/customer-service/faq.how-do-i-activate-my-card.html",
+      "accessed": "2026-09-08",
+      "scope": "UK",
+      "evidence": "Search result found; direct open failed.",
+      "limitations": "Not counted as opened-and-read evidence; Canada tutorial supports activation concept instead.",
+      "access": "open-failed"
+    },
+    {
+      "id": "IX03",
+      "title": "Card offers FAQs",
+      "url": "https://global.americanexpress.com/card-offers/faqs.html",
+      "accessed": "2026-09-08",
+      "scope": "U.S. offers",
+      "evidence": "Open returned a JavaScript application shell without readable body.",
+      "limitations": "Search excerpts not promoted to verified page evidence; not counted.",
+      "access": "javascript-shell"
+    },
+    {
+      "id": "IX04",
+      "title": "Attempted Membership Rewards terms URL",
+      "url": "https://www.americanexpress.com/en-us/rewards/membership-rewards/terms",
+      "accessed": "2026-09-08",
+      "scope": "U.S. rewards",
+      "evidence": "Direct open failed.",
+      "limitations": "No current terms inferred; rewards FAQ is explicitly dated/limited evidence.",
+      "access": "open-failed"
+    },
+    {
+      "id": "IX05",
+      "title": "Attempted U.S. mobile overview URL",
+      "url": "https://www.americanexpress.com/en-us/benefits/mobile/",
+      "accessed": "2026-09-08",
+      "scope": "U.S. mobile",
+      "evidence": "Direct open failed.",
+      "limitations": "Not counted; Canadian tutorial is labeled separately.",
+      "access": "open-failed"
+    }
+  ]
+}

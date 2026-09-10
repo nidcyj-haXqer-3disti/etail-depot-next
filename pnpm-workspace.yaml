@@ -1,0 +1,22 @@
+packages:
+  - .
+storeDir: .local/pnpm-store
+strictPeerDependencies: true
+overrides:
+  # CLI permits ^1.8.0; its build/telemetry peers require ~1.8.0.
+  netlify-cli@27.5.0>@opentelemetry/api: 1.8.0
+  # Security fixes; verified against the Netlify consumers' used APIs.
+  ipx@3.1.1>sharp: 0.35.4
+  netlify-cli@27.5.0>toml: 4.2.0
+  '@netlify/zip-it-and-ship-it@15.5.0>toml': 4.2.0
+packageExtensions:
+  # Keep the optional unstorage adapter on its declared supported Blobs major.
+  ipx@3.1.1:
+    dependencies:
+      '@netlify/blobs': 10.7.13
+allowBuilds:
+  esbuild: true
+  netlify-cli: false
+  sharp: true
+  unix-dgram: false
+  unrs-resolver: true

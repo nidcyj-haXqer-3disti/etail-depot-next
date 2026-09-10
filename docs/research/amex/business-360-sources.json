@@ -1,0 +1,108 @@
+{
+  "research_date": "2026-09-08",
+  "scope": "Cross-party business operations only",
+  "sources": [
+    {
+      "id": "B01",
+      "title": "Disputes Learning Hub for merchants using a Merchant Services Provider",
+      "url": "https://www.americanexpress.com/us/merchant/tpp/manage-disputes.html",
+      "accessed": "2026-09-08",
+      "scope": "US; TPP merchant support; page includes 2025 data and older embedded-video transcripts",
+      "evidence": "Public guidance distinguishes inquiry and upfront chargeback routes, merchant-provider responses, recognizable receipts and pending refund visibility.",
+      "limitations": "Program-specific public education; not the complete merchant agreement. Different statistics refer to different years; no performance percentages reused. Video transcripts read, videos not watched.",
+      "evidence_type": "official_amex_business_guidance",
+      "read_status": "relevant_public_text_read"
+    },
+    {
+      "id": "B02",
+      "title": "Request a refund of a credit balance",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.credit-balance-refund.html",
+      "accessed": "2026-09-08",
+      "scope": "US online account; undated FAQ",
+      "evidence": "Account selection and an overpayment/credit-balance request are distinct from disputing a merchant purchase.",
+      "limitations": "Does not establish closed-account routing, third-party-funded refunds, eligibility decisions or a turnaround promise.",
+      "evidence_type": "official_amex_business_guidance",
+      "read_status": "relevant_public_text_read"
+    },
+    {
+      "id": "B03",
+      "title": "How can I dispute a charge?",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.dispute-a-charge.html",
+      "accessed": "2026-09-08",
+      "scope": "US cardmember billing help; undated FAQ",
+      "evidence": "Links a dispute request to a selected transaction and recommends contacting the merchant first.",
+      "limitations": "Not a requirement to delay reporting suspected fraud. Does not disclose complete reason-specific rights, role eligibility or outcomes.",
+      "evidence_type": "official_amex_business_guidance",
+      "read_status": "relevant_public_text_read"
+    },
+    {
+      "id": "B04",
+      "title": "Payment returned for insufficient or uncollected funds",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.returned-payment-insufficient-funds.html",
+      "accessed": "2026-09-08",
+      "scope": "US; terms depend on Cardmember Agreement; undated FAQ",
+      "evidence": "Returned payment can involve contractual fees and conditional re-presentation.",
+      "limitations": "No Etail fee or retry count is adopted; bank restrictions affect whether a payment can be re-presented.",
+      "evidence_type": "official_amex_business_guidance",
+      "read_status": "relevant_public_text_read"
+    },
+    {
+      "id": "B05",
+      "title": "Differences between balances shown online",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.balance-details.html",
+      "accessed": "2026-09-08",
+      "scope": "US Basic Card Member; undated FAQ",
+      "evidence": "Distinguishes statement, remaining statement and total balance, including how credits, disputes and returned payments affect them.",
+      "limitations": "Amex product definitions and minimum-payment wording do not override Etail pay-in-full or guardian-funded products; not a live screen audit.",
+      "evidence_type": "official_amex_business_guidance",
+      "read_status": "relevant_public_text_read"
+    },
+    {
+      "id": "B06",
+      "title": "Financial struggles and payment accommodation",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.financial-struggles-payment-accommodation.html",
+      "accessed": "2026-09-08",
+      "scope": "US; eligible account/program terms; undated FAQ",
+      "evidence": "Payment assistance may be available and enrollment affects card use.",
+      "limitations": "Not an entitlement to relief or an Etail lending/fee policy. Exact eligibility and servicing actions are not fully public here.",
+      "evidence_type": "official_amex_business_guidance",
+      "read_status": "relevant_public_text_read"
+    },
+    {
+      "id": "B07",
+      "title": "Check dispute status",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.dispute-status.html",
+      "accessed": "2026-09-08",
+      "scope": "US online dispute overview; undated FAQ",
+      "evidence": "Describes dispute status, supporting documents, draft editing and closure actions.",
+      "limitations": "Permitted actions still depend on live case and authority; no authenticated walkthrough performed.",
+      "evidence_type": "official_amex_business_guidance",
+      "read_status": "relevant_public_text_read"
+    },
+    {
+      "id": "B08",
+      "title": "Time to resolve a dispute case",
+      "url": "https://www.americanexpress.com/us/customer-service/faq.resolve-dispute-case.html",
+      "accessed": "2026-09-08",
+      "scope": "US; undated FAQ",
+      "evidence": "Provides typical and complex-case timing plus a status-check route.",
+      "limitations": "General expectation, not every case's deadline, legal filing period, merchant response deadline or Etail service promise.",
+      "evidence_type": "official_amex_business_guidance",
+      "read_status": "relevant_public_text_read"
+    }
+  ],
+  "excluded": [
+    {
+      "topic": "US merchant reference/regulation PDFs and network operational manuals",
+      "reason": "Explicit confidentiality markings or login-gated complete terms. Public operating/help sources used instead; missing terms remain gaps."
+    },
+    {
+      "topic": "Non-US credit balance rules",
+      "reason": "Not imported as US operating rules; source was a search lead only."
+    },
+    {
+      "topic": "Third-party chargeback summaries and forum anecdotes",
+      "reason": "Not used as Amex policy authority."
+    }
+  ]
+}

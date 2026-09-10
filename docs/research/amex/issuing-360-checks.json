@@ -1,0 +1,730 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-09-08",
+  "scope": "Issuing business/product operations; US baseline with explicit UK complaint comparison.",
+  "status": "research_and_proposed_business_review_only",
+  "evidence_status_definition": {
+    "documented": "The bounded public Amex behavior described in normal_flow is documented; this does not imply every exception or authenticated screen was observed.",
+    "partial": "Only part of the business journey is established, a regional comparison is required, or current interactive evidence is limited.",
+    "gap": "No sufficient public evidence for the specified Amex business behavior."
+  },
+  "field_interpretation": {
+    "normal_flow": "Short public-evidence summary. Earlier sources are referenced without reproducing their full study.",
+    "exceptions": "Observed limitations, unresolved details and business distinctions to review.",
+    "account_control_handoff": "Proposed Etail responsibility and visibility review unless explicitly stated otherwise.",
+    "merchant_handoff": "Proposed Etail cross-party review unless explicitly stated otherwise.",
+    "etail_gap": "Design/inventory gap or deliberate difference; not a code audit or implementation score.",
+    "acceptance_scenario": "Proposed fictional business walkthrough, not an executed test.",
+    "comparison_ids": "Related rows in the unchanged 90-task comparison inventory. A link is not a full-coverage or pass claim; [] means a distinct journey is absent."
+  },
+  "checks": [
+    {
+      "id": "ISS360-01",
+      "journey": "Choose a product and understand the offer",
+      "actors": [
+        "Prospective member",
+        "Product/service adviser"
+      ],
+      "normal_flow": [
+        "Indexed US shopping copy presents product filters, comparison, benefits and terms.",
+        "The prospect chooses a card before applying; displayed offers can vary."
+      ],
+      "exceptions": [
+        "Current interactive comparison and personalized offer presentation were not inspected.",
+        "A recommendation or displayed maximum offer does not establish applicant eligibility."
+      ],
+      "account_control_handoff": "Etail proposal: show PERSONAL, HOUSEHOLD or SELLER context, membership plan, service eligibility and card format as separate choices before requesting a card.",
+      "merchant_handoff": "Etail proposal: card shopping creates no merchant acceptance agreement or Seller payout entitlement.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J01"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "The 90-task inventory starts at a card request. It lacks a product-selection decision and an explicit comparison of obligations, restrictions and usable benefits under Etail's own economics.",
+      "acceptance_scenario": "A prospect compares two permitted plans, sees exact fictional costs and repayment obligations, changes account context, and receives an updated explanation before any request exists."
+    },
+    {
+      "id": "ISS360-02",
+      "journey": "Provide application information, review terms and accept a decision",
+      "actors": [
+        "Applicant",
+        "Issuing reviewer"
+      ],
+      "normal_flow": [
+        "US application help lists identity, contact and income information.",
+        "Indexed Personal-card copy distinguishes approval from choosing to accept the card."
+      ],
+      "exceptions": [
+        "Required-field, consent, pending-information and acceptance-expiry screens were not inspected.",
+        "The researched Personal process cannot be assumed to apply identically to Small Business or Corporate programs."
+      ],
+      "account_control_handoff": "Etail proposal: identify the applicant, responsible adult and account; consent belongs to the appropriate person. An invitation, eligibility result or company approval does not grant spending.",
+      "merchant_handoff": "Etail proposal: no merchant can rely on application approval as a usable payment instrument.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J01",
+        "J02"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-01",
+        "AX-ISSUING-05",
+        "AX-ISSUING-06",
+        "AX-ISSUING-07",
+        "AX-ISSUING-10"
+      ],
+      "etail_gap": "Specify product acceptance and its expiry/withdrawal policy separately from application consent. Keep all identity and decision demonstrations fictional; no real SSNs or credit checks.",
+      "acceptance_scenario": "An adult reviews a saved request, receives a simulated approval, leaves without accepting, and later sees whether the original offer is still valid. No card is represented as usable before all required steps complete."
+    },
+    {
+      "id": "ISS360-03",
+      "journey": "Follow a pending application, decline and requested review",
+      "actors": [
+        "Applicant",
+        "Application-status adviser",
+        "Decision reviewer"
+      ],
+      "normal_flow": [
+        "US support provides an application-status route distinct from existing-card service.",
+        "Earlier I19/I20 document decline explanations and review contact."
+      ],
+      "exceptions": [
+        "Public sources do not expose a complete US pending taxonomy, missing-document deadline or guaranteed reconsideration outcome.",
+        "A request for review does not erase the original decision."
+      ],
+      "account_control_handoff": "Etail proposal: only the applicant and explicitly authorized sponsor/reviewer see the appropriate reasons and requested information.",
+      "merchant_handoff": "Etail proposal: pending or declined requests create no merchant-facing payment claim.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J18",
+        "I19",
+        "I20"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-08",
+        "AX-ISSUING-11",
+        "AX-ISSUING-12"
+      ],
+      "etail_gap": "Existing rows cover the headline tasks; complete the operational ownership, response deadline policy, abandoned-review handling and resolution notice without inventing Amex underwriting criteria.",
+      "acceptance_scenario": "A pending applicant learns who needs what information; a subsequent simulated decline remains visible when they request review, and the review ends with an explained unchanged or changed outcome."
+    },
+    {
+      "id": "ISS360-04",
+      "journey": "Complete an employee application and company approval handoff",
+      "actors": [
+        "Program Administrator",
+        "Employee applicant",
+        "Company approver",
+        "Issuing reviewer"
+      ],
+      "normal_flow": [
+        "The earlier Corporate study documents separate applicant, company and issuer stages; see I05/I06 for market-specific routes."
+      ],
+      "exceptions": [
+        "A company approval is not an issuer decision.",
+        "Current authenticated screens and every program's invitation expiry or resubmission rules remain unverified."
+      ],
+      "account_control_handoff": "Etail proposal: name the person responsible for the next step; preserve the selected Seller relationship and invalidate approval when material request details change.",
+      "merchant_handoff": "Etail proposal: an employer's internal approval cannot authorize a supplier charge before issuance and card-use eligibility.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "I05",
+        "I06"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-03",
+        "AX-ISSUING-04",
+        "AX-ISSUING-06",
+        "AX-ISSUING-08",
+        "AX-ISSUING-09",
+        "AX-ISSUING-10"
+      ],
+      "etail_gap": "Retain the existing request journey and add operational handling for unavailable approvers, employee departure during review and corrected details. Guardian approval is an Etail adaptation, not a claim about Amex Corporate practice.",
+      "acceptance_scenario": "An employee completes their part, an approver changes, and the replacement approver sees the same current request. A later change of holder returns the request to review rather than issuing under stale approval."
+    },
+    {
+      "id": "ISS360-05",
+      "journey": "Onboard the cardholder with their own access",
+      "actors": [
+        "Basic member or responsible party",
+        "Additional/employee holder",
+        "Support adviser"
+      ],
+      "normal_flow": [
+        "US registration can create an online account or link a card to an existing one.",
+        "Additional-holder registration exposes that holder's card information."
+      ],
+      "exceptions": [
+        "The public FAQ does not demonstrate failed linking, duplicate identities or recovery.",
+        "Do not infer Household-wide access from having a card."
+      ],
+      "account_control_handoff": "Etail proposal: invitation acceptance, person identity, card assignment, financial responsibility and management permission remain separately understandable.",
+      "merchant_handoff": "Etail proposal: the holder can see their transaction evidence; the merchant does not receive household relationships or unrelated account information.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "J03"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-02",
+        "AX-CONTROLS-06",
+        "AX-CONTROLS-09",
+        "AX-ISSUING-02"
+      ],
+      "etail_gap": "Review the complete first-login experience and mismatched invitation recovery. Explain who pays and who can change the card's controls before the holder's first purchase.",
+      "acceptance_scenario": "An invited holder signs in with their own identity, links only the intended fictional card and sees their purchases. A mismatched invitation gives a correction route without showing another person's information."
+    },
+    {
+      "id": "ISS360-06",
+      "journey": "Deliver a new physical card and recover nonreceipt",
+      "actors": [
+        "Cardholder",
+        "Fulfillment/support team"
+      ],
+      "normal_flow": [
+        "The US general FAQ gives a 7–10 day expectation.",
+        "After receipt, the member confirms the card; if it has not arrived, replacement or phone help is available."
+      ],
+      "exceptions": [
+        "This general timing differs from the Instant Card Number page and is not a universal guarantee.",
+        "The public FAQ does not describe every address correction, return-to-sender or shipment-loss stage."
+      ],
+      "account_control_handoff": "Etail proposal: distinguish approved, issued, delivery pending, receipt confirmed and eligible for use; address changes require the appropriate person's authority.",
+      "merchant_handoff": "Etail proposal: physical nonreceipt does not establish whether an independently supported digital method is available.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "J04"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-17"
+      ],
+      "etail_gap": "Specify the service team's next action for simulated nonreceipt, invalid address and duplicate replacement requests. A sandbox shipping label must never imply real dispatch.",
+      "acceptance_scenario": "A fictional shipment passes its displayed estimate; the member sees a nonreceipt action and one linked replacement case, with the original request and delivery history preserved."
+    },
+    {
+      "id": "ISS360-07",
+      "journey": "Confirm receipt, activate and attempt first use",
+      "actors": [
+        "Cardholder",
+        "Authorized guardian where applicable",
+        "Activation support"
+      ],
+      "normal_flow": [
+        "US help documents confirmation online or in the mobile app with card details and security checks.",
+        "Mobile confirmation can use card proximity or manual entry."
+      ],
+      "exceptions": [
+        "Public help does not disclose lockout limits or every failed-verification path.",
+        "Successful receipt confirmation does not establish that every future purchase will be approved."
+      ],
+      "account_control_handoff": "Etail proposal: explain which person can activate this product and whether a guardian must act; an administrator must not acquire cardholder spending authority by activating it.",
+      "merchant_handoff": "Etail proposal: first-use eligibility depends on active controls and available backing at purchase time.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "J05"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-15"
+      ],
+      "etail_gap": "Replace the older Canada-only activation reference for the US benchmark. Include failed fictional verification, already-confirmed card and cancelled predecessor outcomes.",
+      "acceptance_scenario": "A permitted holder confirms a fictional card, repeats the action and sees the existing result. The first purchase separately explains approval or a current control restriction."
+    },
+    {
+      "id": "ISS360-08",
+      "journey": "Use eligible digital details before the physical card arrives",
+      "actors": [
+        "Approved applicant/cardholder",
+        "Issuing service",
+        "Merchant"
+      ],
+      "normal_flow": [
+        "Eligible US applicants retrieve Instant Card Number details after approval, online or from a welcome email.",
+        "The number matches the eventual physical card; digital-wallet use can begin before delivery."
+      ],
+      "exceptions": [
+        "Eligibility depends on authentication; listed product exclusions apply.",
+        "Some merchants require the physical card, and full spending capacity may be unavailable before receipt confirmation."
+      ],
+      "account_control_handoff": "Etail proposal: display digital availability, physical fulfillment and activation distinctly; no fabricated usable payment number or unverified wallet support.",
+      "merchant_handoff": "Etail proposal: checkout must explain when the selected method requires physical presentation or cannot support the purchase.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "J06"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "The existing catalog's transaction-specific virtual card is a different journey. Decide whether early digital availability is in Etail scope; otherwise retain it as an explicit comparison gap.",
+      "acceptance_scenario": "An eligible simulated card is digitally available while delivery remains pending. A physical-card-only checkout explains the restriction; receipt confirmation changes only the supported permissions."
+    },
+    {
+      "id": "ISS360-09",
+      "journey": "Request a virtual payment and help the supplier use it",
+      "actors": [
+        "Business requester",
+        "Approver",
+        "Payment operator",
+        "Supplier",
+        "Card-program support"
+      ],
+      "normal_flow": [
+        "Earlier I07 documents transaction-bound virtual payments.",
+        "US support distinguishes buyer program help from supplier virtual-card inquiries."
+      ],
+      "exceptions": [
+        "Public materials do not disclose every expired-number, partial-use, supplier rejection or cancellation procedure.",
+        "Do not treat Instant Card Number as a transaction-specific virtual card."
+      ],
+      "account_control_handoff": "Etail proposal: show the business purpose, intended payee, amount/date restrictions and people permitted to approve or obtain payment details.",
+      "merchant_handoff": "Etail proposal: supplier instructions and support must cover acceptance problems and payment matching, with a clear owner for unused or partially used payments.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "I07",
+        "J18"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-13",
+        "AX-ISSUING-14"
+      ],
+      "etail_gap": "The catalog covers creation and controls; it lacks the supplier's receipt, rejection, unclaimed-payment and reconciliation handoff as a complete business journey.",
+      "acceptance_scenario": "A supplier cannot use an expired fictional virtual payment. The requester sees why, the support owner can choose a permitted correction, and no second payment is silently presented as successful."
+    },
+    {
+      "id": "ISS360-10",
+      "journey": "Check planned spending and request changed capacity",
+      "actors": [
+        "Cardholder",
+        "Responsible account party",
+        "Issuing reviewer"
+      ],
+      "normal_flow": [
+        "US Check Spending Power assesses a planned purchase using account status at the request time.",
+        "A separate online route accepts Personal or Small Business limit-increase requests."
+      ],
+      "exceptions": [
+        "No public promise reserves the checked amount for later.",
+        "The increase FAQ does not expose eligibility criteria, decision timing or decline categories."
+      ],
+      "account_control_handoff": "Etail proposal: distinguish account capacity from a holder's assigned spending limit and from actual available backing. Only the appropriate authority requests an increase.",
+      "merchant_handoff": "Etail proposal: a planning result is informational; the actual purchase receives its own current decision.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J07",
+        "J08"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-10"
+      ],
+      "etail_gap": "Add a planning/check result and increase-request lifecycle if desired. A limit-change screen alone does not cover request, review, effective time and explanation.",
+      "acceptance_scenario": "A planned purchase looks possible, then another purchase consumes availability. The later checkout gives the current result; a pending increase request has not already raised the holder's usable amount."
+    },
+    {
+      "id": "ISS360-11",
+      "journey": "Change holder controls, pause use and resume safely",
+      "actors": [
+        "Responsible member or administrator",
+        "Holder",
+        "Servicing support"
+      ],
+      "normal_flow": [
+        "Earlier I03/I08 document employee controls and consumer freeze behavior, including differences between products."
+      ],
+      "exceptions": [
+        "A merchant-category alert is not proof of a purchase block.",
+        "Existing activity and permitted exceptions need separate explanation; no full private decision rule set was observed."
+      ],
+      "account_control_handoff": "Etail proposal: preview affected people, cards, period and remaining allowance; show who imposed each restriction and who can release it.",
+      "merchant_handoff": "Etail proposal: communicate the effective restriction without promising that every recurring or previously initiated transaction disappears.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "I03",
+        "I08"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-10",
+        "AX-CONTROLS-11",
+        "AX-CONTROLS-12",
+        "AX-CONTROLS-13"
+      ],
+      "etail_gap": "Complete the operational impact explanation and failure recovery. Etail's manual hierarchical freeze is an intentional deviation from Amex's documented consumer timing, not failed parity.",
+      "acceptance_scenario": "A guardian pauses a supervised card while a prior purchase is pending. The child cannot remove that restriction, the earlier purchase remains visible, and a later permitted refund is still handled."
+    },
+    {
+      "id": "ISS360-12",
+      "journey": "Change the card product or plan without losing the history",
+      "actors": [
+        "Account owner",
+        "Product-servicing adviser",
+        "Rewards support"
+      ],
+      "normal_flow": [
+        "US Offers terms document a consequence of moving to an ineligible card product: an existing offer may cease to qualify."
+      ],
+      "exceptions": [
+        "A general US upgrade/downgrade request, decision, effective-date and fulfillment journey was not established from a current servicing guide.",
+        "Generic educational advice is not treated as Amex's operational procedure."
+      ],
+      "account_control_handoff": "Etail proposal: separately review membership plan changes, card format changes, new obligations and permissions; keep an owner for benefits questions.",
+      "merchant_handoff": "Etail proposal: explain any changed payment credentials or reward eligibility relevant to subsequent merchant purchases.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J17"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Missing comparison journey. Define which Etail changes are allowed, their effective date, required consent and consequences; preserve membership-year cap and earned history.",
+      "acceptance_scenario": "An owner requests a permitted plan change and sees the exact effective date, benefits affected and unchanged historical obligations. The change does not restart the annual reward cap."
+    },
+    {
+      "id": "ISS360-13",
+      "journey": "Replace a lost, stolen or damaged card and maintain continuity",
+      "actors": [
+        "Holder",
+        "Responsible member",
+        "Replacement support",
+        "Merchant"
+      ],
+      "normal_flow": [
+        "US help invalidates a lost/stolen card immediately; a damaged card can remain usable pending replacement.",
+        "The account remains open. Shipment notification and existing merchant/wallet continuity are described."
+      ],
+      "exceptions": [
+        "Without possession or online access, phone help may be required.",
+        "A merchant may request updated details; replacement is not cancellation of the merchant's subscription."
+      ],
+      "account_control_handoff": "Etail proposal: identify the reason, affected instrument, holder and authorized delivery address; preserve account responsibilities.",
+      "merchant_handoff": "Etail proposal: tell the member which saved methods require attention, while routing suspected fraud separately from a normal replacement.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "J09"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-16",
+        "AX-CONSUMER-12"
+      ],
+      "etail_gap": "Expand the current replacement row with reason-specific old-card behavior, no-card/no-login support and merchant continuity. Do not imply real wallet updater support in the sandbox.",
+      "acceptance_scenario": "A lost fictional card is replaced once; its account and history remain. A recurring merchant request and a late refund can still be explained without restoring the old card for new ordinary purchases."
+    },
+    {
+      "id": "ISS360-14",
+      "journey": "Renew an expiring card",
+      "actors": [
+        "Cardholder",
+        "Renewal/fulfillment team"
+      ],
+      "normal_flow": [
+        "US help describes automatic renewal to the address on file.",
+        "Consumer and Corporate renewal delivery expectations differ within the expiration month."
+      ],
+      "exceptions": [
+        "Nonrenewal decisions and all delivery failures are not explained by this source.",
+        "Expiration is not the same request as user-reported loss or account closure."
+      ],
+      "account_control_handoff": "Etail proposal: give the right person a pre-expiry reminder and address-review opportunity; preserve controls, responsibility and membership history.",
+      "merchant_handoff": "Etail proposal: review continuity of stored payment methods and explain any action needed by the holder.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J09"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Missing comparison journey. Define simulated expiring, renewal pending, renewed, nonrenewed and undelivered outcomes and their owners without promising automatic real issuance.",
+      "acceptance_scenario": "A fictional card approaches expiry while the mailing address is outdated. The holder sees the next step; expiry cannot erase outstanding purchases or falsely report that a replacement was delivered."
+    },
+    {
+      "id": "ISS360-15",
+      "journey": "Offboard an employee and confirm card cancellation",
+      "actors": [
+        "Program Administrator",
+        "Departing holder",
+        "Business finance team"
+      ],
+      "normal_flow": [
+        "A US Corporate administrator selects a card, supplies a cancellation reason and receives a tracking number.",
+        "The FAQ says individual cancellation is immediate."
+      ],
+      "exceptions": [
+        "The published batch limit does not establish batch completion or partial-failure semantics.",
+        "The FAQ does not settle remaining expense, refund or repayment treatment."
+      ],
+      "account_control_handoff": "Etail proposal: revoke the departing person's access and card use as distinct operations; transfer unresolved business work to an authorized owner.",
+      "merchant_handoff": "Etail proposal: identify subscriptions, unsettled purchases and expected refunds that need business follow-up.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "J10"
+      ],
+      "comparison_ids": [
+        "AX-ISSUING-18",
+        "AX-CONTROLS-05"
+      ],
+      "etail_gap": "The additional-card cancellation row needs employment offboarding context, responsible successor and evidence of completion. Household relationship changes require their own permitted authority.",
+      "acceptance_scenario": "An administrator offboards an employee with a pending purchase and unresolved expense. New use stops, the former employee's access ends, and finance retains a scoped record and next action."
+    },
+    {
+      "id": "ISS360-16",
+      "journey": "Close an account or respond to an inactivity warning",
+      "actors": [
+        "Account owner",
+        "Cardholder",
+        "Corporate administrator if required",
+        "Closure support"
+      ],
+      "normal_flow": [
+        "US account closure is an assisted-service request; Corporate members may need the administrator.",
+        "Inactivity help promises warning and a way to keep the account open before possible closure."
+      ],
+      "exceptions": [
+        "The public FAQs do not provide a complete final-statement, residual-balance or postclosure servicing sequence.",
+        "No fixed inactivity period is published here."
+      ],
+      "account_control_handoff": "Etail proposal: distinguish closing one card, one account and membership; preview affected holders and assign an owner to every remaining obligation or case.",
+      "merchant_handoff": "Etail proposal: settle or retain a clear route for delayed refunds, disputes and recurring-service follow-up.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J11",
+        "J12"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "The catalog lacks full account closure and inactivity intervention. Local WORKFLOWS requires unresolved obligations, holds, refunds and cases to be handled; document the customer-facing consequences.",
+      "acceptance_scenario": "An owner requests closure with an outstanding refund and amount to repay. The screen explains what stops now, what remains open, who follows up and how statements/support remain accessible."
+    },
+    {
+      "id": "ISS360-17",
+      "journey": "Understand billing balances and obtain the right statement",
+      "actors": [
+        "Responsible payer",
+        "Cardholder",
+        "Statement support"
+      ],
+      "normal_flow": [
+        "B05 distinguishes statement-related and current balances; I11 covers activity and statement access."
+      ],
+      "exceptions": [
+        "A current balance is not a newly issued statement.",
+        "Recent activity, disputes and returned payments can require explanation; source-specific refresh wording is not a universal freshness promise."
+      ],
+      "account_control_handoff": "Etail proposal: show period, responsible party, amount due, pending purchases and authorized holder scope using Etail's own repayment rules.",
+      "merchant_handoff": "Etail proposal: transaction details provide the reference needed for a merchant return or billing inquiry without confusing it with the merchant's payout balance.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "B05",
+        "I11"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-01",
+        "AX-CONSUMER-02",
+        "AX-CONSUMER-03",
+        "AX-CONSUMER-04",
+        "AX-CONSUMER-05",
+        "AX-CONSUMER-06"
+      ],
+      "etail_gap": "The existing rows need a single explanation for why the statement and current total differ. Commercial daily full repayment and supervised funded spending are intentional Etail differences.",
+      "acceptance_scenario": "A payer sees a new purchase, a refund and a returned repayment after statement close and can explain the remaining obligation without interpreting pending purchases as a second debt."
+    },
+    {
+      "id": "ISS360-18",
+      "journey": "Make, schedule, manage and stop repayment instructions",
+      "actors": [
+        "Authorized payer",
+        "Funding-source owner where distinct",
+        "Payment support"
+      ],
+      "normal_flow": [
+        "Earlier I12–I14 cover repayment, enrollment and eligible cancellation.",
+        "US AutoPay servicing additionally supports bank changes, pause/resume and stop."
+      ],
+      "exceptions": [
+        "Stopping the recurring arrangement and cancelling one payment are different actions.",
+        "The settings FAQ does not establish the cutoff for instructions already processing."
+      ],
+      "account_control_handoff": "Etail proposal: show who may change a source versus execute a payment, the effective date and the obligation that remains due.",
+      "merchant_handoff": "Etail proposal: this is card-account repayment; it is not a merchant refund or a Seller payout.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "I12",
+        "I13",
+        "I14",
+        "J13"
+      ],
+      "comparison_ids": [
+        "AX-CONTROLS-15",
+        "AX-CONTROLS-16",
+        "AX-CONSUMER-07",
+        "AX-CONSUMER-08",
+        "AX-CONSUMER-09",
+        "AX-CONSUMER-10"
+      ],
+      "etail_gap": "Enrollment is covered, but servicing an arrangement over time needs pause, resume, stop, source-change and in-progress instruction outcomes. Etail must define its own permitted schedule choices.",
+      "acceptance_scenario": "A payer pauses a fictional recurring instruction while today's payment is processing. The result states whether today's payment continues, what future instruction changed and what amount still needs attention."
+    },
+    {
+      "id": "ISS360-19",
+      "journey": "Change the payment due date or statement cycle",
+      "actors": [
+        "Responsible payer",
+        "Customer-care adviser"
+      ],
+      "normal_flow": [
+        "The US FAQ offers an online due-date route for Credit Cards and chat for other listed products.",
+        "A change is conditional on eligibility."
+      ],
+      "exceptions": [
+        "The effective cycle, effect on an existing scheduled payment and unavailable dates are not disclosed.",
+        "A due-date request is not already an approved extension."
+      ],
+      "account_control_handoff": "Etail proposal: route the request to the permitted payer/owner and display old date, proposed date and confirmed effective cycle.",
+      "merchant_handoff": "Etail proposal: changing a repayment schedule does not alter when a merchant's sale was completed.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J14"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Missing comparison journey. Decide whether consumer schedules can change under Etail rules; commercial daily repayment cannot be replaced with Amex's product schedule.",
+      "acceptance_scenario": "A permitted payer requests a change after a statement is issued. They continue seeing the existing due date until a confirmed effective date explains which cycle and instruction are affected."
+    },
+    {
+      "id": "ISS360-20",
+      "journey": "Recover a repayment returned by the funding institution",
+      "actors": [
+        "Payer",
+        "Funding institution",
+        "Payment-support team"
+      ],
+      "normal_flow": [
+        "B04 documents returned-payment handling and conditional re-presentation."
+      ],
+      "exceptions": [
+        "A previously applied payment is not proof that a later return cannot occur.",
+        "No Amex fee amount or retry policy is adopted for Etail."
+      ],
+      "account_control_handoff": "Etail proposal: explain the returned amount, resulting obligation, permitted next step and whether another collection attempt is expected.",
+      "merchant_handoff": "Etail proposal: a failed cardholder repayment is distinct from a merchant charge reversal; do not silently change an unrelated merchant sale.",
+      "evidence_status": "documented",
+      "source_ids": [
+        "B04"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-11"
+      ],
+      "etail_gap": "The existing returned status needs a complete recovery journey: assigned owner, member notice, corrected amount due, retry communication and hardship route.",
+      "acceptance_scenario": "A fictional repayment first appears applied, then is returned. The payer sees the linked correction and current amount due; choosing a replacement payment cannot create two unannounced attempts."
+    },
+    {
+      "id": "ISS360-21",
+      "journey": "Follow a merchant return and request an issuer credit-balance refund",
+      "actors": [
+        "Cardholder",
+        "Merchant service team",
+        "Issuing customer service",
+        "Responsible payer"
+      ],
+      "normal_flow": [
+        "B03 supplies the billing-inquiry merchant contact route; B02 separately covers requesting return of an issuer credit balance."
+      ],
+      "exceptions": [
+        "Merchant acknowledgement, posted purchase credit and cash returned by the issuer are different outcomes.",
+        "A merchant credit arriving during a dispute needs coordination; exact US postclosure refund handling was not established here."
+      ],
+      "account_control_handoff": "Etail proposal: identify whose money is being returned and any repayment amount still due; retain the original purchase and funding relationship.",
+      "merchant_handoff": "Etail proposal: the merchant owns the return decision and submission; issuer support owns an eligible account credit-balance refund request.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "B02",
+        "B03"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-02",
+        "AX-CONSUMER-13"
+      ],
+      "etail_gap": "A generic refund or dispute row does not cover negative/credit balances and postclosure return support. Define the consumer-facing separation and late-credit owner.",
+      "acceptance_scenario": "A merchant promises a refund before it posts, then the resulting credit exceeds the amount owed. The member sees each stage and a separate supported action for the excess, without claiming cash has already arrived."
+    },
+    {
+      "id": "ISS360-22",
+      "journey": "Open a billing dispute, add evidence, follow progress and withdraw",
+      "actors": [
+        "Cardholder",
+        "Dispute team",
+        "Merchant",
+        "Authorized representative"
+      ],
+      "normal_flow": [
+        "B03/B07/B08 cover billing disputes and progress.",
+        "US help separately provides evidence submission and an action to close an ongoing dispute."
+      ],
+      "exceptions": [
+        "Suspicious fraud uses the security route; merchant-first billing guidance must not delay a fraud report.",
+        "A closed case does not itself explain every financial adjustment, reopening right or final deadline."
+      ],
+      "account_control_handoff": "Etail proposal: show the permitted claimant, case reference, next actor, requested evidence and current obligation treatment without implying guaranteed reimbursement.",
+      "merchant_handoff": "Etail proposal: match merchant responses or credits to the original purchase and existing case; handle a late credit after withdrawal.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "B03",
+        "B07",
+        "B08",
+        "J15",
+        "J16"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-12",
+        "AX-CONSUMER-13",
+        "AX-CONSUMER-14"
+      ],
+      "etail_gap": "Existing tasks need evidence receipt, awaiting-member/merchant work, missed-request handling, withdrawal consequences and final-resolution communication. These must be reviewed as one continuous case.",
+      "acceptance_scenario": "A member disputes a posted purchase, supplies requested fictional evidence, then receives a merchant credit and asks to withdraw. The case explains its actual status and linked financial outcome without duplicate reimbursement."
+    },
+    {
+      "id": "ISS360-23",
+      "journey": "Seek hardship help and accessible servicing",
+      "actors": [
+        "Payer or cardholder",
+        "Financial-relief adviser",
+        "Accessibility/support adviser"
+      ],
+      "normal_flow": [
+        "B06 describes payment assistance and possible effects on card use.",
+        "US contacts offer cardholder assistance and relay support; I21 covers accessible statements."
+      ],
+      "exceptions": [
+        "A request for help does not guarantee enrollment or terms.",
+        "The public FAQ does not disclose full eligibility decisions, plan-break consequences or reinstatement criteria."
+      ],
+      "account_control_handoff": "Etail proposal: explain the effect on the payer, additional holders and future use; offer an accessible assisted route without granting a helper unrelated account authority.",
+      "merchant_handoff": "Etail proposal: existing merchant claims and expected returns still need an assigned servicing owner.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "B06",
+        "J18",
+        "I21"
+      ],
+      "comparison_ids": [
+        "AX-CONSUMER-18"
+      ],
+      "etail_gap": "Hardship is not represented by ordinary repayment scheduling. Define scope and escalation for Etail; do not introduce Amex interest, lending or fee-relief products.",
+      "acceptance_scenario": "A payer reports difficulty and receives a safe support case with an accessible contact choice. Any simulated accommodation clearly states obligations and card-use effects before acceptance."
+    },
+    {
+      "id": "ISS360-24",
+      "journey": "Raise a formal service complaint and receive a final response",
+      "actors": [
+        "Complainant",
+        "Frontline support",
+        "Complaint owner",
+        "External reviewer if eligible"
+      ],
+      "normal_flow": [
+        "UK procedures document a complaint reference, acknowledgement, progress communication, written determination and conditional external escalation.",
+        "The US directory establishes service contacts but not the same complete complaint process."
+      ],
+      "exceptions": [
+        "UK insurance and other complaint routes differ; country-specific periods are not Etail promises.",
+        "US formal stages and response deadlines remain a research gap."
+      ],
+      "account_control_handoff": "Etail proposal: accept complaints from the affected person or properly authorized representative, name the owner and preserve communication preferences.",
+      "merchant_handoff": "Etail proposal: route merchant acceptance complaints to the merchant-service owner; a service complaint may link to, but must not replace, a transaction dispute.",
+      "evidence_status": "partial",
+      "source_ids": [
+        "J19",
+        "J18"
+      ],
+      "comparison_ids": [],
+      "etail_gap": "Missing comparison journey. Define receipt, triage, investigation, updates, decision, remedy and further-review options under Etail's actual operating scope.",
+      "acceptance_scenario": "A member complains about a mishandled replacement and also has a billing dispute. They receive one complaint reference and owner, can follow updates, and see a final response while the transaction case keeps its own outcome."
+    }
+  ]
+}

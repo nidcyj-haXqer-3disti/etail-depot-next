@@ -1,0 +1,17 @@
+# TEMPLATE ONLY. Copy to netlify.toml after the actual Next/pnpm app exists.
+# This file does not activate a deployment from the handoff.
+[build]
+  command = "pnpm build"
+  publish = ".next"
+[build.environment]
+  NEXT_TELEMETRY_DISABLED = "1"
+  # Set NODE_VERSION to the exact supported runtime resolved in M0.
+  # Pin packageManager in package.json and commit pnpm-lock.yaml.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+# Verify current automatic Next.js adapter support. No legacy plugin by default.
+# Runtime feature flags, identity endpoints and secrets live only in the new
+# site's scoped environment configuration. Do not duplicate them here.
+# Migrations: netlify/database/migrations/<sequence>_<slug>/migration.sql.
+# Netlify's native migration runner is the sole hosted runner.

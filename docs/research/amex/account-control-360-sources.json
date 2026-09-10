@@ -1,0 +1,276 @@
+[
+  {
+    "id": "C01",
+    "title": "Additional Card Member FAQs",
+    "url": "https://www.americanexpress.com/en-us/support/additional-card-member/faqs/",
+    "accessed": "2026-09-08",
+    "scope": "US consumer additional cards; undated",
+    "evidence": "Own purchases and total balance are visible; other account access requires separate manager authority.",
+    "limitations": "Rechecked I01. Not a Household privacy rule or repayment-policy recommendation.",
+    "prior_source_ids": [
+      "I01"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C02",
+    "title": "Terms and Conditions for Account Managers",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/customer-service/account-management/account-managers/terms-conditions.pdf",
+    "accessed": "2026-09-08",
+    "scope": "US; modified 2023-12-01; role tables pp.1–5, duration p.6",
+    "evidence": "Full and Limited roles have different actions and channels; Full is consumer/business, Limited also corporate.",
+    "limitations": "Rechecked I02. Table text and search-rendered marks read; no claim of visual table verification. Removal wording differs from C03.",
+    "prior_source_ids": [
+      "I02"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C03",
+    "title": "Add or remove Account Managers",
+    "url": "https://www.americanexpress.com/us/customer-service/faq.add-remove-account-manager.html",
+    "accessed": "2026-09-08",
+    "scope": "US help FAQ; undated",
+    "evidence": "The online removal answer says only the Basic Card Member can remove a manager.",
+    "limitations": "Narrow FAQ wording differs from the more detailed C02 Full/Limited table.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C04",
+    "title": "Employee Cards",
+    "url": "https://www.americanexpress.com/en-us/business/employee-credit-cards/",
+    "accessed": "2026-09-08",
+    "scope": "US small-business employee cards; undated",
+    "evidence": "Employee limits, category alerts, pause/resume and activity are separate controls.",
+    "limitations": "Rechecked I03. Product/category exceptions remain; no universal corporate-role matrix.",
+    "prior_source_ids": [
+      "I03"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C05",
+    "title": "Employee Card Spending Limits terms",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/customer-service/account-management/emp-controls-spending-limits-terms-and-conditions.pdf",
+    "accessed": "2026-09-08",
+    "scope": "US employee-card limit terms; undated one-page document",
+    "evidence": "Limit edits can exclude earlier period spending; refresh can lag, and credits do not restore this limit.",
+    "limitations": "Descriptive Amex behavior, deliberately not Etail's required retained-usage rule; not an immutable promise across products.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C06",
+    "title": "@ Work Access Center",
+    "url": "https://www.americanexpress.com/en-us/business/resource-center/atwork-access-center/index.html",
+    "accessed": "2026-09-08",
+    "scope": "US-hosted global corporate guide; undated",
+    "evidence": "Designated MPAs manage PA scope. Cancellation stops portal/phone access immediately; Reporting may take 10–14 days.",
+    "limitations": "No private screens inspected. Scheduled-report delivery is expressly a separate exit consideration.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C07",
+    "title": "Enroll and manage Program Administrator access",
+    "url": "https://www.americanexpress.com/en-us/business/resource-center/program-management/support-category-articles/enroll-manage-pa-access/",
+    "accessed": "2026-09-08",
+    "scope": "US page with non-US local approvals; copyright 2021, revision unknown",
+    "evidence": "New access requests require enrollment and authorized signatures, including local signatories for relevant non-US markets.",
+    "limitations": "Not a general consumer invitation process or evidence all countries share identical permissions.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C08",
+    "title": "Cancel an employee's Corporate Card",
+    "url": "https://www.americanexpress.com/us/customer-service/faq.cancel-employee-corporate-card.html",
+    "accessed": "2026-09-08",
+    "scope": "US corporate; undated",
+    "evidence": "PA cancellation requires a reason and returns tracking; the FAQ describes immediate individual-card cancellation.",
+    "limitations": "Cancelling a card does not establish closure of company obligations or all user access.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C09",
+    "title": "Global Apply for Card: administrator FAQ",
+    "url": "https://www.americanexpress.com/en-us/business/resource-center/card-management/faq-program-administrator/",
+    "accessed": "2026-09-08",
+    "scope": "US corporate with market variants; undated",
+    "evidence": "PA exit requires updating application notifications and maintaining authorized coverage.",
+    "limitations": "Rechecked I05. Existing approval-flow findings remain in the earlier study; Quick Send and post-approval vary by market.",
+    "prior_source_ids": [
+      "I05"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C10",
+    "title": "Global Apply for Card: applicant FAQ",
+    "url": "https://www.americanexpress.com/en-us/business/resource-center/card-management/faq-card-applicant/",
+    "accessed": "2026-09-08",
+    "scope": "US corporate applicant; undated",
+    "evidence": "The published application has expiry and save/resume rules, plus reminders.",
+    "limitations": "Rechecked I06. Exact Amex expiry rules are not Etail defaults; completed acceptance was not exercised.",
+    "prior_source_ids": [
+      "I06"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C11",
+    "title": "Set up your Corporate Card",
+    "url": "https://www.americanexpress.com/en-us/business/card-member/activate-my-card/",
+    "accessed": "2026-09-08",
+    "scope": "US corporate cardholder; undated",
+    "evidence": "Enrolled holders can view statements, pay bills, submit expenses, receive alerts and dispute charges.",
+    "limitations": "Own-card servicing does not grant program administration or establish who is liable.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C12",
+    "title": "Merchant Site Terms of Use",
+    "url": "https://www.americanexpress.com/content/dam/amex/us/merchant/pdf/terms-and-conditions.pdf",
+    "accessed": "2026-09-08",
+    "scope": "US merchant portal; observed footer 10/31/25; sections 4–6",
+    "evidence": "Email/Merchant/Bank user roles and Limited/Flexible access levels are different dimensions.",
+    "limitations": "Rechecked M26. Bank User names a portal role, not a bank or unconditional payout authority.",
+    "prior_source_ids": [
+      "M26"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C13",
+    "title": "Edit Bank Information",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/edit-bank-information.html",
+    "accessed": "2026-09-08",
+    "scope": "US merchant portal; undated",
+    "evidence": "Selected merchant credit/debit destinations are changed after an identity check.",
+    "limitations": "Rechecked M20. The guide does not establish a complete role matrix or payout-release entitlement.",
+    "prior_source_ids": [
+      "M20"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C14",
+    "title": "Online contact information and alerts",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/account-services/online-account-contact-information-and-alerts.html",
+    "accessed": "2026-09-08",
+    "scope": "US merchant online profile; undated",
+    "evidence": "Contact changes and alert preferences are profile-specific; sensitive contact edits require verification.",
+    "limitations": "Rechecked M24. A User Role edit label is not evidence of unrestricted permission escalation.",
+    "prior_source_ids": [
+      "M24"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C15",
+    "title": "Logging in and enrolling in Disputes",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/disputes/logging-in-and-enrolling.html",
+    "accessed": "2026-09-08",
+    "scope": "US merchant portal; undated",
+    "evidence": "Online dispute enrollment changes the notification route from mailed letters to online cases; email alerts are optional.",
+    "limitations": "Enrollment does not establish who may accept a claim, issue a refund or release funds.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C16",
+    "title": "Freeze my Card FAQ",
+    "url": "https://www.americanexpress.com/us/customer-service/faq.what-happens-when-i-freeze-my-card.html",
+    "accessed": "2026-09-08",
+    "scope": "US cardholder; undated",
+    "evidence": "Freeze includes exceptions and automatic unfreeze after seven days.",
+    "limitations": "Rechecked I08; Etail intentionally uses its existing persistent hierarchical freeze rule.",
+    "prior_source_ids": [
+      "I08"
+    ],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C17",
+    "title": "Managing deceased Card Member accounts",
+    "url": "https://www.americanexpress.com/us/help/deceased-cardmembers.html",
+    "accessed": "2026-09-08",
+    "scope": "US personal/small business, with separate corporate contacts; undated",
+    "evidence": "Anyone may report a death; discussion, cancellation and possible takeover require different authority/eligibility.",
+    "limitations": "No automatic inheritance. Amex responsibility and takeover terms are not imported into Etail.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C18",
+    "title": "Life events: assisting someone and bereavement",
+    "url": "https://www.americanexpress.com/en-gb/customer-service/challenging-times/life-events/",
+    "accessed": "2026-09-08",
+    "scope": "UK card accounts; undated",
+    "evidence": "Third-party disclosure, power-of-attorney support and bereavement are separate assistance routes.",
+    "limitations": "UK evidence only; it does not establish a US incapacity checklist or automatic caretaker authority.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C19",
+    "title": "How Amex Corporate helps organizations navigate growing financial complexity",
+    "url": "https://www.americanexpress.com/en-us/business/trends-and-insights/articles/how-amex-corporate-helps-organizations-navigate-growing-financial-complexity/",
+    "accessed": "2026-09-08",
+    "scope": "US corporate; published 2026-07-24; liability section and footnotes",
+    "evidence": "Corporate and combined liability options differ and require approval.",
+    "limitations": "Product description, not an Etail liability agreement; administrator title does not resolve responsibility.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C20",
+    "title": "Beginner's guide to Additional Card Members",
+    "url": "https://www.americanexpress.com/us/explore/additional-card-member-guide.html",
+    "accessed": "2026-09-08",
+    "scope": "US consumer, young additional holders; undated",
+    "evidence": "The guide describes holder payments, own-history access and spending alerts.",
+    "limitations": "Educational card-account example, not Etail guardian-funded balances or an independent minor repayment obligation.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C21",
+    "title": "Merchant registration: I'll do this later",
+    "url": "https://www.americanexpress.com/us/merchant/support-center/registration/do-later.html",
+    "accessed": "2026-09-08",
+    "scope": "US merchant portal registration; undated",
+    "evidence": "Deferred verification leaves a limited registration experience.",
+    "limitations": "This onboarding limitation is distinct from the formal Limited/Flexible access levels in C12.",
+    "prior_source_ids": [],
+    "access": "opened-and-read-public-source"
+  },
+  {
+    "id": "C22",
+    "title": "Dispute a charge: @ Work resource guide",
+    "url": "https://www.americanexpress.com/en-us/business/resource-center/program-management/support-category-articles/dispute-fee/index.html",
+    "accessed": "2026-09-08",
+    "scope": "US card dispute guide; undated",
+    "evidence": "Pending monitoring, posted-charge disputes, status and withdrawal are distinct stages.",
+    "limitations": "Rechecked I15. It does not establish every PA's dispute authority; no Amex payment-relief term imported.",
+    "prior_source_ids": [
+      "I15"
+    ],
+    "access": "opened-and-read-public-source"
+  }
+,
+{
+  "id": "C23",
+  "title": "Blue Cash Preferred Additional Card Member benefits",
+  "url": "https://www.americanexpress.com/en-us/account/get-started/additional-card-member//bcp",
+  "accessed": "2026-09-08",
+  "scope": "US Blue Cash Preferred additional holder; undated",
+  "evidence": "The page offers additional holders dispute assistance and fraud/payment/purchase notifications.",
+  "limitations": "Specific card product; it does not establish every additional holder's authority to withdraw disputes or change accounts.",
+  "prior_source_ids": [],
+  "access": "opened-and-read-public-source"
+}
+]

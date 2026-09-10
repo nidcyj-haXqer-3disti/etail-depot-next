@@ -1,0 +1,25 @@
+name: Delivery task
+description: A scoped Etail Depot Next implementation task
+title: "[EDN-XXX] "
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome and source
+      description: Requirement, original source section/cell, selected account/service boundary.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance IDs and dependencies
+      description: Existing backlog IDs; permitted/denied paths; money/privacy impact.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence needed
+      description: Real tests, exact SHA, migration/policy and hosted checks where applicable.
+    validations:
+      required: true
