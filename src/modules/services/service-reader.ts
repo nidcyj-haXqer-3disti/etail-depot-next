@@ -6,6 +6,7 @@ import { SecurityError } from "../../platform/security/origin";
 import type { ScopedTransaction } from "../access/scope";
 import { assertFixtureIdentityAllowed } from "../identity";
 import { requireMerchantApplicant } from "./merchant-eligibility";
+import { isSandboxParticipant } from "../sandbox/service";
 
 /** Reading a signed-in service entrance never enrolls a person or grants demo eligibility. */
 export async function requireServiceReader(tx: ScopedTransaction, personId: string) {
@@ -25,7 +26,7 @@ export async function requireServiceReader(tx: ScopedTransaction, personId: stri
   const person = rows[0];
   if (!person) throw new SecurityError("SERVICE_UNAVAILABLE", 404);
   let canCreatePrimary = false;
-  if (fixturesAllowed && rows.some(row => row.issuer === fixtureIssuer)) {
+  if (await isSandboxParticipant(tx, personId)) {
     try { await requireMerchantApplicant(tx, personId); canCreatePrimary = true; }
     catch (error) { if (!(error instanceof SecurityError && error.code === "MERCHANT_APPLICANT_REQUIRED")) throw error; }
   }

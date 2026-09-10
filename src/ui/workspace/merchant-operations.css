@@ -8,6 +8,8 @@
 .mop-panel p,.mop-muted { color:#526661; line-height:1.55; }
 .mop-notice { padding:14px 17px; background:#edf4ef; border:1px solid #d3e3d8; border-radius:10px; line-height:1.55; color:#33554c; }
 .mop-setup-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+/* Setup commands change button variants; swap text and background together. */
+.mop-setup-grid .consumer-button { transition:none; }
 .mop-actions { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:18px; }
 .mop-channel-list,.mop-payment-list,.mop-transfer-list { list-style:none; margin:18px 0 0; padding:0; }
 .mop-channel-list li { padding:20px 0; border-top:1px solid #e0e8e2; display:flex; justify-content:space-between; gap:18px; align-items:center; }

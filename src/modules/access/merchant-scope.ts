@@ -1,20 +1,16 @@
 import { and,eq,inArray,sql } from "drizzle-orm";
 import { z } from "zod";
-import { services,serviceMembers,identityBindings,permissionGrants } from "../../platform/database/schema";
-import { getRuntimeConfig } from "../../platform/config";
+import { services,serviceMembers,permissionGrants } from "../../platform/database/schema";
 import { SecurityError } from "../../platform/security/origin";
-import { assertFixtureIdentityAllowed } from "../identity";
+import { requireSandboxParticipant } from "../sandbox/service";
 import { merchantProfiles,merchantUnits } from "../acquiring/schema";
 import { MERCHANT_ACTIONS,evaluate,type MerchantPolicyScope } from "../policy/evaluate";
 import { merchantAssignments,merchantPermissionGrants } from "./schema";
 import { requireServiceReader } from "../services/service-reader";
 import type { ScopedTransaction } from "./scope";
 
-export async function requireMerchantFixturePerson(tx:ScopedTransaction,personId:string) {
-  const config=getRuntimeConfig();
-  try {assertFixtureIdentityAllowed({...config,fixtureIdentityEnabled:config.localFixtureIdentity});} catch {throw new SecurityError("MERCHANT_UNAVAILABLE",404);}
-  const [binding]=await tx.select({id:identityBindings.id}).from(identityBindings).where(and(eq(identityBindings.personId,personId),eq(identityBindings.issuer,"urn:etail:isolated-fixture")));
-  if(!binding)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+export async function requireMerchantParticipant(tx:ScopedTransaction,personId:string) {
+  await requireSandboxParticipant(tx,personId);
 }
 export async function merchantNow(tx:ScopedTransaction) {const result=await tx.execute(sql`select clock_timestamp() as now`);return new Date(result.rows[0]!.now as string|Date);}
 export async function listMerchantAssignmentUnitIds(tx:ScopedTransaction,personId:string) {
@@ -26,7 +22,7 @@ export async function listMerchantAssignmentUnitIds(tx:ScopedTransaction,personI
 export async function loadMerchantUnitScope(tx:ScopedTransaction,personId:string,unitId:string,forWrite=false,options:{mode?:"OPERATING"|"OVERSIGHT";read?:boolean}={}) {
   if(!z.uuid().safeParse(unitId).success)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
   unitId=unitId.toLowerCase();
-  if(forWrite)await requireMerchantFixturePerson(tx,personId);else await requireServiceReader(tx,personId);
+  if(forWrite)await requireMerchantParticipant(tx,personId);else await requireServiceReader(tx,personId);
   const [hint]=await tx.select().from(merchantUnits).where(eq(merchantUnits.id,unitId));
   if(!hint)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
   if(forWrite)await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+hint.masterServiceId},0))`);

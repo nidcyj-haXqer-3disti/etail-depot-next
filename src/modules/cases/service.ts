@@ -2,9 +2,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { getDb } from "../../platform/database/client";
-import { serviceActivity, cards, identityBindings } from "../../platform/database/schema";
-import { getRuntimeConfig } from "../../platform/config";
-import { assertFixtureIdentityAllowed } from "../identity/fixture";
+import { serviceActivity, cards } from "../../platform/database/schema";
+import { requireSandboxParticipant } from "../sandbox/service";
 import { SecurityError } from "../../platform/security/origin";
 import { loadServiceScope, type ScopedTransaction } from "../access/scope";
 import { evaluate } from "../policy/evaluate";
@@ -15,10 +14,7 @@ import { createSupportCaseSchema, addSupportMessageSchema, withdrawSupportCaseSc
 type Scope = Awaited<ReturnType<typeof loadServiceScope>>;
 type CaseRow = typeof supportCases.$inferSelect;
 async function supportScope(tx:ScopedTransaction,personId:string,serviceId:string,write=false) {
-  const config=getRuntimeConfig();
-  try {assertFixtureIdentityAllowed({...config,fixtureIdentityEnabled:config.localFixtureIdentity});}catch{throw new SecurityError("SUPPORT_UNAVAILABLE",404);}
-  const [identity]=await tx.select({id:identityBindings.id}).from(identityBindings).where(and(eq(identityBindings.personId,personId),eq(identityBindings.issuer,"urn:etail:isolated-fixture")));
-  if(!identity)throw new SecurityError("SUPPORT_UNAVAILABLE",404);
+  try {await requireSandboxParticipant(tx,personId);}catch(error){if(error instanceof SecurityError)throw new SecurityError("SUPPORT_UNAVAILABLE",404);throw error;}
   const scope=await loadServiceScope(tx,personId,serviceId,write);
   if(scope.service.kind!=="CARDHOLDER")throw new SecurityError("SUPPORT_UNAVAILABLE",404);
   return scope;

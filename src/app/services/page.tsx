@@ -1,3 +1,5 @@
+import {getSandboxOverview} from "@/modules/sandbox/service";
+import {SandboxEntry} from "@/ui/sandbox-entry";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getRequestSession } from "@/platform/http/context";
@@ -14,7 +16,8 @@ export default async function Page(){
  const session=await getRequestSession().catch(()=>undefined);
  if(session===undefined)return <PageNotice title="We couldn’t load your session"><p>Please try signing in again.</p></PageNotice>;
  if(!session)redirect("/login");
+ const sandbox=await getSandboxOverview(session.personId);
  const operator=await hasOperatorAccess(session.personId).catch(()=>false);
  const invitations=await listInvitationsForPerson(session.personId).catch(()=>null);
- return <Shell authenticated><section className="page-container services-page"><div className="page-heading"><p className="eyebrow">YOUR ETAIL DEPOT</p><h1>What would you like to manage?</h1><p>Your cards and your business, in one place.</p></div><ServiceChoices/>{operator&&<p><Link className="consumer-button consumer-button-secondary" href="/operations">Open customer care</Link></p>}<p><Link className="consumer-button consumer-button-secondary" href="/security">Sign-in &amp; security</Link></p>{invitations?<InvitationsInbox invitations={invitations}/>:<p role="status">Your invitation inbox couldn’t load. Refresh to try again.</p>}</section></Shell>;
+ return <Shell authenticated><section className="page-container services-page"><div className="page-heading"><p className="eyebrow">YOUR ETAIL DEPOT</p><h1>What would you like to manage?</h1><p>Your cards and your business, in one place.</p></div><SandboxEntry initial={sandbox}/><ServiceChoices/>{operator&&<p><Link className="consumer-button consumer-button-secondary" href="/operations">Open customer care</Link></p>}<p><Link className="consumer-button consumer-button-secondary" href="/security">Sign-in &amp; security</Link></p>{invitations?<InvitationsInbox invitations={invitations}/>:<p role="status">Your invitation inbox couldn’t load. Refresh to try again.</p>}</section></Shell>;
 }

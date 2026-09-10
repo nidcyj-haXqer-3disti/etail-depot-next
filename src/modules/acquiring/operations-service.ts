@@ -6,7 +6,7 @@ import { getDb } from "../../platform/database/client";
 import { getRuntimeConfig } from "../../platform/config";
 import { SecurityError } from "../../platform/security/origin";
 import { loadServiceScope, type ScopedTransaction } from "../access/scope";
-import { loadMerchantUnitScope, requireMerchantFixturePerson, merchantNow } from "../access/merchant-scope";
+import { loadMerchantUnitScope, requireMerchantParticipant, merchantNow } from "../access/merchant-scope";
 import { requireMerchantApplicant } from "../services/merchant-eligibility";
 import { evaluate } from "../policy/evaluate";
 import { getBalance, postJournal } from "../ledger/service";
@@ -28,7 +28,7 @@ type Kind=typeof merchantOperationCommands.$inferSelect.kind;
 function parse<T>(schema:z.ZodType<T>,raw:unknown):T {const r=schema.safeParse(raw);if(!r.success)throw new SecurityError("INVALID_REQUEST",422);return r.data;}
 function uuid(value:string):string {if(!z.uuid().safeParse(value).success)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return value.toLowerCase();}
 function requireAction(scope:UnitScope|ServiceScope,action:string) {if(!evaluate(scope.policy,action).allowed)throw new SecurityError("ACTION_DENIED",403);}
-async function adult(tx:ScopedTransaction,personId:string) {try {await requireMerchantApplicant(tx,personId);return true;}catch(error){if(error instanceof SecurityError&&error.code==="MERCHANT_APPLICANT_REQUIRED")return false;throw error;}}
+async function adult(tx:ScopedTransaction,personId:string) {try {await requireMerchantApplicant(tx,personId);return true;}catch(error){if(error instanceof SecurityError&&["MERCHANT_APPLICANT_REQUIRED","SANDBOX_START_REQUIRED","SERVICE_UNAVAILABLE"].includes(error.code))return false;throw error;}}
 async function responsible(tx:ScopedTransaction,personId:string,serviceId:string,forWrite=false) {
   const scope=await loadServiceScope(tx,personId,serviceId,forWrite);
   if(scope.service.kind!=="MERCHANT"||scope.service.primaryPersonId!==personId)throw new SecurityError("ACTION_DENIED",403);
@@ -110,7 +110,7 @@ export async function getMerchantNetwork(personId:string,primaryUnitId:string):P
 export async function getMerchantCheckout(personId:string,channelId:string):Promise<MerchantCheckoutProjection> {
   channelId=uuid(channelId);
   const merchantUnitId=await getDb().transaction(async tx=>{
-    await requireMerchantFixturePerson(tx,personId);
+    await requireMerchantParticipant(tx,personId);
     const [hint]=await tx.select({merchantUnitId:paymentChannels.merchantUnitId}).from(paymentChannels).where(eq(paymentChannels.id,channelId));
     if(!hint)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
     const scope=await loadMerchantUnitScope(tx,personId,hint.merchantUnitId);
