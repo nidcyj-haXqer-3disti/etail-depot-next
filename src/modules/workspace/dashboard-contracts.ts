@@ -22,6 +22,7 @@ export interface DashboardActivity extends WorkspaceActivity {
 }
 export interface CardholderDashboardProjection {
  person:{id:string;displayName:string};
+ canCreatePrimary:boolean;
  profiles:CardholderServiceProfile[];
  primaryService:CardholderServiceProfile|null;
  cards:DashboardCard[];

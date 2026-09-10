@@ -9,6 +9,7 @@ import { assertFixtureIdentityAllowed } from "../identity";
 import { ACTIONS, evaluate, type PolicyScope } from "../policy/evaluate";
 import { cardholderRole, canReadCardholderData, isCardholderPermission } from "../policy/cardholder-scope";
 import { loadServiceScope } from "../access/scope";
+import { requireServiceReader } from "../services/service-reader";
 import { merchantSetupEligibility } from "../services/schema";
 import { getBalance, postJournal } from "../ledger";
 import { ledgerJournals } from "../ledger/schema";
@@ -32,9 +33,11 @@ function fixtureRuntime() {
 }
 
 export async function loadCardholderWorkspaceScope(tx: Transaction, personId: string, serviceId: string, mutation = false): Promise<Scope> {
-  fixtureRuntime();
-  const identity = await tx.select({ id: identityBindings.id }).from(identityBindings).where(and(eq(identityBindings.personId, personId), eq(identityBindings.issuer, "urn:etail:isolated-fixture")));
-  if (!identity.length) throw new SecurityError("WORKSPACE_UNAVAILABLE", 404);
+  if (mutation) {
+    fixtureRuntime();
+    const identity = await tx.select({ id: identityBindings.id }).from(identityBindings).where(and(eq(identityBindings.personId, personId), eq(identityBindings.issuer, "urn:etail:isolated-fixture")));
+    if (!identity.length) throw new SecurityError("WORKSPACE_UNAVAILABLE", 404);
+  } else await requireServiceReader(tx, personId);
   const scope = await loadServiceScope(tx, personId, serviceId, mutation);
   const [actor] = await tx.select().from(people).where(eq(people.id, personId));
   if (!actor) throw new SecurityError("SERVICE_UNAVAILABLE", 404);

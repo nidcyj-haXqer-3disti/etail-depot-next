@@ -1,3 +1,4 @@
+import { requireServiceReader } from "../services/service-reader";
 import { createHash,randomUUID } from "node:crypto";
 import { and,desc,eq,inArray,lte,or,sql } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
@@ -120,7 +121,7 @@ export async function getAccessOverview(personId:string,serviceId:string):Promis
 }
 export async function listInvitationsForPerson(personId:string):Promise<AnyInvitationProjection[]> {
   return getDb().transaction(async tx=>{
-    await fixturePerson(tx,personId);
+    await requireServiceReader(tx,personId);
     const rows=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.recipientId,personId)).orderBy(desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
     const result:AnyInvitationProjection[]=[];for(const row of rows){
       if(row.targetKind==="MERCHANT_UNIT")result.push(await merchantInvitationProjection(tx,row,personId));
