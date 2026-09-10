@@ -51,3 +51,9 @@ The earlier browser candidate passed 60/62: two invalid-callback assertions matc
 ## Publication boundary
 
 During this work the remote platform was found to have advanced independently: PR1 was merged at `8601ccd269fabc29b2adb2c06890e41d6e1d9d31`, and Netlify reported a production deploy. This task did not perform that merge or deployment. Its new work must use a new feature PR and preserve the remote main revision. A code push does not authorize deployment or Google indexing.
+
+## GitHub delivery
+
+Published to verified private repository1361184741, branch `feature/people-and-email`, [draft PR2](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/2). Remote application commit `80b23ba0951fceb5a834288bbdeb05f56630fb3e` preserves the existing main as its parent. Its full tree `67d41e95a06115913cdbdd0c02486e9baa87ae48` exactly matches tested local commit `c9cda58e4e1725550b1c0205d8cace889448a063`, including the hero's native Git blob hash. The application changes53 files; no ignored local data or credential files were uploaded. Local history remains unchanged. The subsequent closeout changes this record and status documentation only.
+
+Initial PR workflow34437041301 was in progress at the first check. This is not a CI pass; later exact-revision observations are retained in the local delivery receipt. The existing automatic Netlify publication hold remains in configuration. No deployment, merge, DNS, Google indexing or real-money operation was performed by this task.
