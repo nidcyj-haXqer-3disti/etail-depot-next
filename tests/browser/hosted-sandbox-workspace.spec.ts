@@ -95,6 +95,7 @@ test("email member starts a sandbox and uses cards, support, reports and a named
     await purchase.getByRole("button", { name: "Make purchase", exact: true }).click();
     await expect(purchase).toContainText("$5.25 purchase recorded");
     await expect(purchase).toContainText("$19.75");
+    await dialog.getByRole("button", { name: "Card controls", exact: true }).click();
     for (const action of ["Freeze", "Unfreeze"] as const) {
       await dialog.getByRole("button", { name: action, exact: true }).click();
       await dialog.getByRole("button", { name: `${action} card`, exact: true }).click();
@@ -133,7 +134,8 @@ test("email member starts a sandbox and uses cards, support, reports and a named
     await invite.getByRole("textbox", { name: "Member code", exact: true }).fill(joined.memberCode!);
     await invite.getByRole("button", { name: "Find member", exact: true }).click();
     await expect(invite).toContainText(`Selected: ${secondName}`);
-    await invite.getByRole("radio", {name: /^Use their own card/}).check();
+    await expect(invite).toContainText("Purchases allowed on their own cards");
+    await expect(invite.getByRole("radio")).toHaveCount(0);
     await invite.getByRole("button", { name: "Review access", exact: true }).click();
     await page.getByRole("dialog", { name: "Review cardholder access", exact: true }).getByRole("button", { name: "Save invitation", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -141,7 +143,8 @@ test("email member starts a sandbox and uses cards, support, reports and a named
     await secondaryPage.goto("/cardholder-services");
     const waiting=secondaryPage.getByRole("region",{name:"Your primary is preparing your card",exact:true});
     await expect(waiting).toContainText(`Cards with ${name}`);
-    await expect(waiting).toContainText("Your invitation is accepted");
+    await expect(waiting).toContainText("INVITATION ACCEPTED");
+    await expect(waiting).toContainText("Your card will appear here when your primary cardholder creates it");
     await expect(secondaryPage.getByRole("button",{name:"Create your first card",exact:true})).toBeHidden();
     await secondaryPage.getByText("Optional: start your own card group",{exact:true}).click();
     await expect(secondaryPage.getByRole("button",{name:"Create your first card",exact:true})).toBeVisible();
@@ -152,9 +155,9 @@ test("email member starts a sandbox and uses cards, support, reports and a named
     await accessible(secondaryPage);
     await page.goto(`/cardholder-services?view=cardholders&focus=${card.id}`);
     await page.locator("button.ws-person-row").filter({hasText:secondName}).click();
-    await expect(page.getByRole("region",{name:`Cards for ${secondName}`,exact:true})).toContainText("Their access is ready");
+    await expect(page.getByRole("region",{name:`Cards for ${secondName}`,exact:true})).toContainText("Ready for their first card");
     await capture(page, "cardholder-accepted-before-card");
-    await page.getByRole("link", {name: `Add card for ${secondName}`, exact: true}).click();
+    await page.getByRole("region",{name:`Cards for ${secondName}`,exact:true}).getByRole("link", {name: "Add their first card →", exact: true}).click();
     await expect(page.getByRole("dialog").getByRole("radio", {name: new RegExp(secondName)})).toBeChecked();
     const secondaryCard = await addCard(page, "Invited hosted card", secondName);
     await secondaryPage.goto(`/cardholder-services?focus=${secondaryCard.id}`);

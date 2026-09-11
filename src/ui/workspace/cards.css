@@ -18,3 +18,7 @@
  .consumer-card-form>.consumer-form-footer{flex:0 0 auto;margin:0;padding:14px 20px max(14px,env(safe-area-inset-bottom));background:#fff;box-shadow:0 -7px 18px #163b2c06}
  .consumer-card-form>.consumer-form-footer .consumer-button{min-height:44px}
 }
+
+/* Card use and oversight share one detail surface with distinct tasks. */
+.consumer-card-availability{padding:16px 18px;margin:20px 0;border:1px solid #d2e0d8;border-radius:11px;background:#f0f6f1;color:#244b3f}.consumer-card-availability>strong{font-size:14px;line-height:1.5}.consumer-card-availability>p{font-size:13px;line-height:1.7;margin:7px 0 0;color:#4a6556}.consumer-card-tasks{display:flex;gap:9px;flex-wrap:wrap;border-bottom:1px solid #d9e3db;padding:0 0 20px;margin:24px 0}.consumer-card-tasks .consumer-button{min-height:44px;font-size:12px}.consumer-card-controls-panel[hidden]{display:none}.consumer-card-controls-panel>h3{font-size:20px;font-weight:600;letter-spacing:-.025em;margin:24px 0 10px}.consumer-card-controls-panel .consumer-control-list{margin:18px 0}.consumer-card-controls-panel .consumer-card-more{margin-bottom:24px}.consumer-card-availability+ .consumer-card-controls-panel{margin-top:24px}
+@media(max-width:540px){.consumer-card-summary dd{font-size:29px}.consumer-card-tasks>.consumer-button{flex:1;justify-content:center}.consumer-card-availability{padding:15px}.consumer-card-availability>strong{font-size:13px}.consumer-card-availability>p{font-size:12px}.consumer-card-detail-grid{gap:20px}}

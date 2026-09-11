@@ -22,16 +22,16 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   if (!sandbox.joined) return <Shell authenticated><div className="page-container services-page"><div className="page-heading"><p className="eyebrow">CARDHOLDER SERVICES</p><h1>Cards for you and your people</h1><p>A clear view of spending, with you in control.</p></div><SandboxEntry initial={sandbox} service="cardholder"/></div></Shell>;
   const query = await searchParams;
   const pageValue = query.page ?? "0";
-  if (typeof pageValue !== "string" || !/^\d{1,5}$/.test(pageValue)) return <PageNotice title="This card page is unavailable" authenticated><p>Return to your cards to continue.</p><Link href="/cardholder-services">Your cards</Link></PageNotice>;
-  const filters=cardholderDashboardQuerySchema.safeParse(Object.fromEntries(["requestPage","requestStatus","requestSearch"].flatMap(key=>query[key]===undefined?[]:[[key,query[key]]])));
-  if(!filters.success)return <PageNotice title="These request filters are unavailable" authenticated><p>Return to your requests and choose the filters again.</p><Link href="/cardholder-services?view=requests">Your requests</Link></PageNotice>;
+  if (typeof pageValue !== "string" || !/^(0|[1-9][0-9]{0,4})$/.test(pageValue)) return <PageNotice title="This card page is unavailable" authenticated><p>Return to your cards to continue.</p><Link href="/cardholder-services">Your cards</Link></PageNotice>;
+  const filters=cardholderDashboardQuerySchema.safeParse(Object.fromEntries(["cardScope","cardSearch","requestPage","requestStatus","requestSearch"].flatMap(key=>query[key]===undefined?[]:[[key,query[key]]])));
+  if(!filters.success)return <PageNotice title="These cardholder filters are unavailable" authenticated><p>Return to your cards and choose the filters again.</p><Link href="/cardholder-services">Your cards</Link></PageNotice>;
   const keys = ["card", "request", "new", "manage", "transaction"] as const;
   const selectionRequested = keys.some(key => query[key] !== undefined);
   const selectionInvalid = keys.some(key => query[key] !== undefined && typeof query[key] !== "string");
   const selection = Object.fromEntries(keys.flatMap(key => typeof query[key] === "string" ? [[key, query[key]]] : []));
   const result = await (async () => { try {
     const [dashboard, detail] = await Promise.all([
-      getCardholderDashboard(session.personId, Number(pageValue),{requestPage:Number(filters.data.requestPage??"0"),requestStatus:filters.data.requestStatus,requestSearch:filters.data.requestSearch}),
+      getCardholderDashboard(session.personId, Number(pageValue),{cardScope:filters.data.cardScope,cardSearch:filters.data.cardSearch,requestPage:Number(filters.data.requestPage??"0"),requestStatus:filters.data.requestStatus,requestSearch:filters.data.requestSearch}),
       selectionInvalid ? Promise.resolve(null) : getCardholderDashboardDetail(session.personId, selection).catch(error => {
         if (error instanceof SecurityError && [403, 404, 422].includes(error.status)) return null;
         throw error;
@@ -43,7 +43,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     const focusRequested = focusValue !== undefined;
     const ownCards = dashboard.cards.filter(card => card.holderId === session.personId);
     const completeList = dashboard.cardsPage === 0 && !dashboard.cardsHasMore;
-    const defaultCard = completeList ? (ownCards.length === 1 ? ownCards[0] : dashboard.cards.length === 1 ? dashboard.cards[0] : undefined) : undefined;
+    const defaultCard = completeList && dashboard.ownCardCount === 1 && ownCards.length === 1 ? ownCards[0] : undefined;
     const focusId = focusRequested ? (typeof focusValue === "string" ? focusValue.toLowerCase() : undefined) : defaultCard?.id;
     const focused = focusId ? await getCardholderDashboardFocus(session.personId, focusId).catch(error => {
       if (error instanceof SecurityError && [403, 404, 422].includes(error.status)) return null;
@@ -59,7 +59,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     return null;
   } })();
   if (!result) return <PageNotice title="Your cardholder dashboard couldn’t load" authenticated><p>Please retry. Your cards, requests and permissions have not changed.</p><Link href="/cardholder-services">Reload cardholder services</Link></PageNotice>;
-  if (query.view === "activity") {
+  // Older selected-card links omitted the view. Route them through the same
+  // exact-card loader, including its duplicate and unavailable-resource checks.
+  if (query.view === "activity" || (query.view === undefined && query.activityCard !== undefined)) {
     const target = new URLSearchParams();
     const rawFocus = query.focus !== undefined ? query.focus : query.activityCard;
     if (rawFocus !== undefined) for (const value of Array.isArray(rawFocus) ? rawFocus : [rawFocus]) target.append("focus", value.toLowerCase());

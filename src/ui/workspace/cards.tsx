@@ -39,6 +39,10 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
   const requests = Array.from(requestMap.values());
   const selected = cards.find((card) => card.id === selectedId);
   const request = requests.find((item) => item.id === requestId);
+  const ownCard = selected?.holderId === workspace.member.id;
+  const pendingPurchase = selected ? purchaseAttempts[selected.id] : undefined;
+  const cardNavigationBlocked = Boolean(busy || controlAttempt || pendingPurchase);
+  const purchaseView = Boolean(selected && ownCard && (params.get("cardTask") === "purchase" || pendingPurchase));
   const requestCapability = capability(workspace, "cards.request");
 
   useEffect(() => {
@@ -50,16 +54,27 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
   function navigateDialog(kind: "card" | "request" | "new" | null, value = "", push = false) {
     const query = new URLSearchParams(params.toString());
     // A route has one active card surface. Other page query state survives opening and closing it.
-    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review"]) query.delete(key);
+    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review", "cardTask"]) query.delete(key);
     if (kind) query.set(kind, kind === "new" ? "1" : value);
     const suffix = query.toString();
     const url = `${cardRoute}${suffix ? `?${suffix}` : ""}`;
     startNavigation(() => { if (push) router.push(url, { scroll: false }); else router.replace(url, { scroll: false }); });
   }
+  function chooseCardTask(task: "purchase" | "controls") {
+    if (!selected || cardNavigationBlocked) return;
+    const query = new URLSearchParams(params.toString());
+    query.set("cardTask", task);
+    router.replace(`${cardRoute}?${query}`, { scroll: false });
+  }
   function closeCard() {
-    if (busy||controlAttempt) return;
+    // An uncertain purchase retains its command identity until the same attempt
+    // is confirmed. Closing the modal would otherwise discard that recovery state.
+    if (cardNavigationBlocked) return;
     onClose?.();
     setConfirmControl(null); setError(""); setNotice(""); navigateDialog(null);
+  }
+  function relatedService(task: "reports" | "settings" | "help", label: string) {
+    return cardNavigationBlocked ? <Button variant="secondary" disabled>{label}</Button> : <Link className="consumer-button consumer-button-secondary" href={cardholderTaskHref(task, {cardId:selected?.id})}>{label}</Link>;
   }
 
   async function command<T>(path: string, method: "POST" | "PATCH", input: Record<string, unknown> = {}) {
@@ -97,14 +112,18 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
     {selected && <WorkspaceDialog open onClose={closeCard} title={confirmControl ? `${confirmControl === "unfreeze" ? selected.freeze.unfreezeLabel : selected.freeze.freezeLabel}?` : selected.nickname} serviceName={serviceName} wide>
       <Feedback kind="error" message={error} /><Feedback kind="success" message={notice} />
       {confirmControl ? <><div className="consumer-review-highlight"><strong>{selected.nickname} · •••• {selected.lastFour}</strong><span>{selected.holderName}</span><span>{serviceName}</span></div><p>{confirmControl==="unfreeze"?selected.freeze.unfreezeDescription:"Your freeze will stop new purchases. Past activity and available funds stay visible."}</p><p className="consumer-muted">{selected.freeze.description}</p>{!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)&&!controlAttempt&&<p className="consumer-muted">This change is no longer available. Return to the card to review its current restrictions.</p>}{controlAttempt&&!busy&&<p role="status">We haven’t confirmed this change. Retry the same change before taking another action.</p>}<div className="consumer-action-row"><Button variant="secondary" disabled={Boolean(busy)||Boolean(controlAttempt)} onClick={()=>setConfirmControl(null)}>Back to card</Button><Button busy={busy==="control"} disabled={!controlAttempt&&!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)} onClick={()=>void controlCard()}>{controlAttempt?"Retry same change":confirmControl==="unfreeze"?selected.freeze.unfreezeLabel:selected.freeze.freezeLabel}</Button></div></> : <>
-        <div className="consumer-card-detail-grid"><div><CardPreview card={selected} /></div><div className="consumer-card-summary"><StatusBadge status={selected.status}/><p>{selected.holderName} · Ending {selected.lastFour}</p><p>{selected.relationship === "PRIMARY" ? "Primary card" : "Secondary card"}</p><dl><dt>Available to spend</dt><dd>{formatMoney(selected.available)}</dd></dl></div></div>
-        <h3>Card controls</h3><p className="consumer-restriction-status" role="status">{selected.freeze.description}</p><div className="consumer-control-list">{selected.canFreeze&&<div><span><strong>{selected.freeze.freezeLabel}</strong><small>Stop new purchases without removing card access or past activity.</small></span><Button variant="secondary" onClick={()=>setConfirmControl("freeze")}>{selected.status==="ACTIVE"?"Freeze":selected.freeze.freezeLabel}</Button></div>}{selected.canUnfreeze&&<div><span><strong>{selected.freeze.unfreezeLabel}</strong><small>{selected.freeze.unfreezeDescription}</small></span><Button variant="secondary" onClick={()=>setConfirmControl("unfreeze")}>{selected.freeze.unfreezeLabel==="Unfreeze card"?"Unfreeze":selected.freeze.unfreezeLabel}</Button></div>}</div>
+        <div className="consumer-card-detail-grid"><div><CardPreview card={selected} /></div><div className="consumer-card-summary"><StatusBadge status={selected.status}/><p>{selected.holderName} · Ending {selected.lastFour}</p><p>{ownCard ? "Your card" : "Managed by you"} · {selected.relationship === "PRIMARY" ? "Primary card" : "Secondary card"}</p><dl><dt>{ownCard ? "Available to spend" : "Cardholder’s available balance"}</dt><dd>{formatMoney(selected.available)}</dd></dl></div></div>
+        {(!ownCard || !selected.canPurchase) && <div className="consumer-card-availability" role="status"><strong>{selected.purchaseAvailability.title}</strong><p>{selected.purchaseAvailability.description}</p></div>}
+        {ownCard && <nav className="consumer-card-tasks" aria-label="Card actions"><Button variant={purchaseView?"secondary":"primary"} disabled={cardNavigationBlocked} onClick={()=>chooseCardTask("controls")} aria-pressed={!purchaseView}>Card controls</Button>{(selected.canPurchase || pendingPurchase || purchaseView) && <Button variant={purchaseView?"primary":"secondary"} disabled={cardNavigationBlocked} onClick={()=>chooseCardTask("purchase")} aria-pressed={purchaseView}>Try a purchase</Button>}</nav>}
+        <section hidden={purchaseView} className="consumer-card-controls-panel">
+        <h3>Card controls</h3><p className="consumer-restriction-status" role="status">{selected.status === "FROZEN" ? selected.freeze.description : "Manage new purchases while keeping past activity and balances visible."}</p><div className="consumer-control-list">{selected.canFreeze&&<div><span><strong>{selected.freeze.freezeLabel}</strong><small>Stop new purchases without removing card access or past activity.</small></span><Button variant="secondary" onClick={()=>setConfirmControl("freeze")}>{selected.status==="ACTIVE"?"Freeze":selected.freeze.freezeLabel}</Button></div>}{selected.canUnfreeze&&<div><span><strong>{selected.freeze.unfreezeLabel}</strong><small>{selected.freeze.unfreezeDescription}</small></span><Button variant="secondary" onClick={()=>setConfirmControl("unfreeze")}>{selected.freeze.unfreezeLabel==="Unfreeze card"?"Unfreeze":selected.freeze.unfreezeLabel}</Button></div>}</div>
         {!(selected.canFreeze||selected.canUnfreeze)&&<p className="consumer-muted">Your access allows you to view this card. Ask the primary cardholder about changes.</p>}
         {cardHistory&&<details className="consumer-request-history"><summary>Card control history</summary>{cardHistory.events.length?<ol>{cardHistory.events.map(event=><li key={event.id}><span><strong>{event.label}</strong><small> · {event.actorName}</small></span><time dateTime={event.occurredAt}>{formatDate(event.occurredAt)}</time></li>)}</ol>:<p>No freeze changes are recorded for this card.</p>}<p>Recorded actions are shown here. The current restrictions above determine whether the card can be used.</p>{cardHistory.hasEarlierEvents&&<p>Showing the latest 100 recorded actions.</p>}</details>}
         <Link className="consumer-text-link" href={cardholderTaskHref("activity", {cardId:selected.id})}>View this card’s activity <span aria-hidden="true">↗</span></Link>
         <details className="consumer-card-more"><summary>Card details and other services</summary><dl className="consumer-detail-list"><div><dt>Cardholder service</dt><dd>{serviceName}</dd></div><div><dt>Card format</dt><dd>{selected.format === "VIRTUAL" ? "Virtual" : "Physical"}</dd></div><div><dt>Starting balance</dt><dd>{formatMoney(selected.limit)}</dd></div></dl><p className="consumer-muted">Adding funds and requesting a replacement are not available yet.</p></details>
-        <CardPurchaseForm key={selected.id} card={selected} pending={purchaseAttempts[selected.id]} onPending={(attempt) => setPurchaseAttempts(current => ({ ...current, [selected.id]: attempt }))} command={command} onBusy={(value) => setBusy(value ? "purchase" : "")} onRefresh={() => router.refresh()} onSuccess={(result) => { setCardUpdates(current => ({ ...current, [result.card.id]: result.card })); router.refresh(); }} />
-        <div className="consumer-action-row" aria-label="Related cardholder services">{capability(workspace,"activity.read")?.allowed && <Link className="consumer-button consumer-button-secondary" href={cardholderTaskHref("reports", {cardId:selected.id})}>Statements & reports</Link>}<Link className="consumer-button consumer-button-secondary" href={cardholderTaskHref("settings", {cardId:selected.id})}>Notification preferences</Link><Link className="consumer-button consumer-button-secondary" href={cardholderTaskHref("help", {cardId:selected.id})}>Help with this card</Link></div>
+        </section>
+        {purchaseView && ownCard && <CardPurchaseForm key={selected.id} card={selected} pending={purchaseAttempts[selected.id]} onPending={(attempt) => setPurchaseAttempts(current => ({ ...current, [selected.id]: attempt }))} command={command} onBusy={(value) => setBusy(value ? "purchase" : "")} onRefresh={() => router.refresh()} onSuccess={(result) => { setCardUpdates(current => ({ ...current, [result.card.id]: result.card })); router.refresh(); }} />}
+        <div className="consumer-action-row" aria-label="Related cardholder services">{capability(workspace,"activity.read")?.allowed && relatedService("reports","Statements & reports")}{relatedService("settings","Notification preferences")}{relatedService("help","Help with this card")}</div>
       </>}
     </WorkspaceDialog>}
     {(showNew || request) && <WorkspaceDialog open onClose={closeRequest} title={request?.status==="ISSUED"||request?.status==="CANCELED"?"Card request":"Add card"} serviceName={serviceName} wide><CardRequestForm key={request?.id ?? "new"} request={request ?? null} history={requestHistory} workspace={workspace} canEdit={requestCapability?.allowed === true} command={command} routeBase={cardRoute} onUpdate={updateRequest} onBusy={requestBusy} onClose={closeRequest} /></WorkspaceDialog>}
@@ -157,7 +176,7 @@ function CardRequestForm({ request: initialRequest, history, workspace, canEdit,
   function update(next: CardRequestProjection) { setRequest(next); onUpdate(next); }
   function navigate(next: CardRequestProjection, closeAfter = false) {
     const query = new URLSearchParams(params.toString());
-    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review"]) query.delete(key);
+    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review", "cardTask"]) query.delete(key);
     if (next.status === "ISSUED" && next.issuedCardId) {
       for (const key of ["view", "page", "activityCard"]) query.delete(key);
       query.set("focus", next.issuedCardId);
@@ -257,8 +276,8 @@ function CardPurchaseForm({ card, pending, onPending, command, onBusy, onRefresh
     <h3>Try a purchase</h3><p className="consumer-muted">Enter a purchase to see it in your activity.</p>
     <Feedback kind="error" message={error} /><Feedback kind="success" message={message} />{error && !pending && <Button variant="secondary" disabled={busy} onClick={() => { onRefresh(); setError(""); }}>Refresh card</Button>}
     <>
-      {!card.canPurchase && !pending && <p>{card.status === "FROZEN" ? "Unfreeze this card before trying a purchase." : card.available.minor === "0" ? "This card has no balance remaining." : "Only the person named on this card can make a purchase."}</p>}
-      {pending && !busy && <p role="status">We haven’t confirmed this purchase yet. Retry it before entering another purchase.</p>}
+      {!card.canPurchase && !pending && <p>{card.purchaseAvailability.description}</p>}
+      {pending && !busy && <p role="status">We haven’t confirmed this purchase yet. Retry the same purchase before closing this card, opening another service or entering a new purchase.</p>}
       <form onSubmit={(event) => { event.preventDefault(); void purchase(); }}>
         <div className="consumer-form-fields"><label>Purchase description<input value={description} maxLength={120} autoComplete="off" disabled={busy || Boolean(pending) || !card.canPurchase} onChange={event => setDescription(event.target.value)} placeholder="For example, Groceries" /></label>
           <label>Purchase amount (USD)<input value={amount} inputMode="decimal" autoComplete="off" disabled={busy || Boolean(pending) || !card.canPurchase} onChange={event => setAmount(event.target.value)} placeholder="0.00" /></label></div>

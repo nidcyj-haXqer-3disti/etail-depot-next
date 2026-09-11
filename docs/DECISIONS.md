@@ -1,5 +1,13 @@
 # Decision register
 
+## D66 — Redesign Cardholder services around named card ownership (2026-09-11)
+
+The user requested a total Cardholder redesign after management-only actions made an ordinary card look like a non-purchasing product. [The experience contract](CARDHOLDER_EXPERIENCE_REDESIGN.md) separates Your cards and Cards you manage as ownership views of the same card model. A selected own card brings balance, activity and permitted spending controls together; another person's card shows named oversight and never a purchase form. Restrictions come from the existing server policy and card projection.
+
+One ordinary invitation replaces competing use/view presets, with optional restrictions, actual permission review and explicit acceptance before card creation. The existing people, request, access and issuance owners remain. Server search and ownership filters run before pagination, and exact context follows selected cards into controls, activity and support. No schema migration, card type, automatic permission expansion, financial reset or live provider effect is introduced. Uncertain purchase navigation keeps the same command available until its result is confirmed.
+
+This is an implementation choice within P3, supported by published Amex guidance and verified locally as recorded in [the redesign evidence](CARDHOLDER_REDESIGN_EVIDENCE.md). The broader delivery scope and hosted acceptance remain visible; no 100% benchmark claim or new deployment approval is inferred. D65's release-setting rejection and pending explicit approval remain unchanged.
+
 This register separates supplied requirements from design choices. `Accepted in brief` means the handoff specifies it; it does not mean implemented or approved for public release. Codex must expand each implementation decision with evidence, consequences and owner approval where required.
 
 | ID | Decision | Status | Consequence |
@@ -255,3 +263,5 @@ D65 also implements the bounded guest-payment extension in P5. Publication requi
 Final acceptance review corrects the accepted-secondary no-card state, preserves directory filters in the existing URL owner and discloses invitation counts/subset bounds. Pending invitations sort first and command receipts read the exact authorized record independently of a displayed page. Opening an email recovery link in an already-mounted login document now consumes and removes its fragment; an in-flight authentication operation cannot be silently replaced. The user reports that their deployed sign-in reaches Your services; mailbox recovery and this release's hosted authenticated acceptance remain separate observations.
 
 D65 final local acceptance passed 360 unit/contracts, 173 PostgreSQL integration, 35 concurrency, 98 API/browser/accessibility and 16 production email journeys, plus development/repeated callback checks. The final 39 responsive states preserve all authorized projections. Three additive migrations preserved original preview values and a separate native backup/restore matched schema and data. The exact feature-tree publication, sandbox deploy and remaining hosted acceptance are recorded in `docs/CONNECTED_SANDBOX_EVIDENCE.md`; no merge or broad product-completion claim follows from these local results.
+
+D65 publication checkpoint: the exact tested tree is pushed in draft PR10; no merge is performed. Automatic approval review rejected the temporary Netlify production-source switch. Source remains main, and explicit approval for that narrow configuration action is pending. Keep the application candidate frozen; local receipt updates are separate documentation until publication is resolved. Existing hosted email availability passed again, while remote CI is still running.

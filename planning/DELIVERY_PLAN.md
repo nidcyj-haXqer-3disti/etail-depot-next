@@ -1,6 +1,6 @@
 # Etail Depot — active delivery plan
 
-11 September 2026 · D63–D65 · **Current stage: connected sandbox implementation complete for the selected slices; integrated local verification passed; publication in progress.** Cardholder/request management and freeze ownership, merchant activity/support and bounded guest checkout are implemented.
+11 September 2026 · D63–D66 · **Current stage: Cardholder experience redesign and final local acceptance.** D65's connected slices remain implemented and pushed for review; deployment is pending a specific release-setting approval. D66 applies the [Cardholder experience contract](../docs/CARDHOLDER_EXPERIENCE_REDESIGN.md) to the existing owners, with clear own-card spending, named management, one ordinary invitation and server-scoped search. It adds no card type or schema migration.
 
 One source of product/technical truth: [PRODUCT_TECHNICAL_DESIGN.md](../docs/PRODUCT_TECHNICAL_DESIGN.md). One working prompt: [02_MASTER_BUILD_PROMPT.md](../02_MASTER_BUILD_PROMPT.md). [STATUS.md](STATUS.md) records evidence, not a substitute scope definition. This is the active sequence; [M0–M7 backlog](backlog.json) remains the original requirement inventory with stable ticket IDs, not the current implementation model.
 

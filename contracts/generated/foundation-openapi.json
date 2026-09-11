@@ -393,6 +393,30 @@
         "parameters": [
           {
             "in": "query",
+            "name": "cardScope",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "OWN",
+                "MANAGED"
+              ]
+            },
+            "description": "Unknown or duplicate parameters are rejected."
+          },
+          {
+            "in": "query",
+            "name": "cardSearch",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "description": "Unknown or duplicate parameters are rejected."
+          },
+          {
+            "in": "query",
             "name": "page",
             "required": false,
             "schema": {
@@ -667,6 +691,34 @@
                           "canPurchase": {
                             "type": "boolean"
                           },
+                          "purchaseAvailability": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string",
+                                "enum": [
+                                  "READY",
+                                  "OTHER_CARDHOLDER",
+                                  "ACCESS_RESTRICTED",
+                                  "SETUP_REQUIRED",
+                                  "FROZEN",
+                                  "NO_FUNDS"
+                                ]
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "title",
+                              "description"
+                            ],
+                            "additionalProperties": false
+                          },
                           "canFreeze": {
                             "type": "boolean"
                           },
@@ -743,6 +795,7 @@
                           "limit",
                           "available",
                           "canPurchase",
+                          "purchaseAvailability",
                           "canFreeze",
                           "canUnfreeze",
                           "freeze",
@@ -758,6 +811,32 @@
                       "type": "integer",
                       "minimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "ownCardCount": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "managedCardCount": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "cardMatchCount": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "cardScope": {
+                      "type": "string",
+                      "enum": [
+                        "ALL",
+                        "OWN",
+                        "MANAGED"
+                      ]
+                    },
+                    "cardSearch": {
+                      "type": "string"
                     },
                     "cardsPage": {
                       "type": "integer",
@@ -1077,6 +1156,11 @@
                     "primaryService",
                     "cards",
                     "cardCount",
+                    "ownCardCount",
+                    "managedCardCount",
+                    "cardMatchCount",
+                    "cardScope",
+                    "cardSearch",
                     "cardsPage",
                     "cardsHasMore",
                     "cardholders",
@@ -2431,6 +2515,34 @@
                           "canPurchase": {
                             "type": "boolean"
                           },
+                          "purchaseAvailability": {
+                            "type": "object",
+                            "properties": {
+                              "code": {
+                                "type": "string",
+                                "enum": [
+                                  "READY",
+                                  "OTHER_CARDHOLDER",
+                                  "ACCESS_RESTRICTED",
+                                  "SETUP_REQUIRED",
+                                  "FROZEN",
+                                  "NO_FUNDS"
+                                ]
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "title",
+                              "description"
+                            ],
+                            "additionalProperties": false
+                          },
                           "canFreeze": {
                             "type": "boolean"
                           },
@@ -2494,6 +2606,7 @@
                           "limit",
                           "available",
                           "canPurchase",
+                          "purchaseAvailability",
                           "canFreeze",
                           "canUnfreeze",
                           "freeze",
@@ -3051,6 +3164,34 @@
                     "canPurchase": {
                       "type": "boolean"
                     },
+                    "purchaseAvailability": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "READY",
+                            "OTHER_CARDHOLDER",
+                            "ACCESS_RESTRICTED",
+                            "SETUP_REQUIRED",
+                            "FROZEN",
+                            "NO_FUNDS"
+                          ]
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "title",
+                        "description"
+                      ],
+                      "additionalProperties": false
+                    },
                     "canFreeze": {
                       "type": "boolean"
                     },
@@ -3114,6 +3255,7 @@
                     "limit",
                     "available",
                     "canPurchase",
+                    "purchaseAvailability",
                     "canFreeze",
                     "canUnfreeze",
                     "freeze",
@@ -3343,6 +3485,34 @@
                         "canPurchase": {
                           "type": "boolean"
                         },
+                        "purchaseAvailability": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "enum": [
+                                "READY",
+                                "OTHER_CARDHOLDER",
+                                "ACCESS_RESTRICTED",
+                                "SETUP_REQUIRED",
+                                "FROZEN",
+                                "NO_FUNDS"
+                              ]
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "title",
+                            "description"
+                          ],
+                          "additionalProperties": false
+                        },
                         "canFreeze": {
                           "type": "boolean"
                         },
@@ -3406,6 +3576,7 @@
                         "limit",
                         "available",
                         "canPurchase",
+                        "purchaseAvailability",
                         "canFreeze",
                         "canUnfreeze",
                         "freeze",

@@ -22,6 +22,8 @@ export interface DashboardActivity extends WorkspaceActivity {
 }
 export type RequestStatusFilter = "ALL" | "DRAFT" | "BLOCKED" | "ISSUED" | "CANCELED";
 export interface CardholderRequestFilters { requestPage?: number; requestStatus?: RequestStatusFilter; requestSearch?: string }
+export type CardScopeFilter = "ALL" | "OWN" | "MANAGED";
+export interface CardholderDashboardFilters extends CardholderRequestFilters { cardScope?: CardScopeFilter; cardSearch?: string }
 export interface CardRequestHistory {
  createdAt:string;
  events:{id:string;label:string;occurredAt:string}[];
@@ -35,6 +37,11 @@ export interface CardholderDashboardProjection {
  primaryService:CardholderServiceProfile|null;
  cards:DashboardCard[];
  cardCount:number;
+ ownCardCount:number;
+ managedCardCount:number;
+ cardMatchCount:number;
+ cardScope:CardScopeFilter;
+ cardSearch:string;
  cardsPage:number;
  cardsHasMore:boolean;
  cardholders:{id:string;displayName:string;serviceId:string;cardCount:number|null;canAddCard:boolean}[];

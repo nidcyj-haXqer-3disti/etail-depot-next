@@ -19,7 +19,7 @@ async function signIn(context: BrowserContext, personId: string) {
 }
 
 test.afterAll(closeDatabase);
-test("cardholder task choices respect the current permission ceiling and require an explicit reviewed invitation", async ({page}) => {
+test("ordinary cardholder access respects the current permission ceiling and requires a reviewed invitation", async ({page}) => {
   const primary = await cardPrimary(`Limited UI primary ${randomUUID().slice(0, 8)}`);
   await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),inArray(permissionGrants.action,["cards.purchase","cards.freeze","cards.unfreeze"])));
   await signIn(page.context(),primary.personId);
@@ -27,14 +27,18 @@ test("cardholder task choices respect the current permission ceiling and require
   await page.goto(`${origin}/cardholder-services?manage=${primary.serviceId}`);
   await page.getByRole("button",{name:"Invite a person",exact:true}).click();
   const dialog=page.getByRole("dialog",{name:"Invite a person",exact:true});
-  await dialog.getByRole("combobox",{name:"Named recipient",exact:true}).selectOption(recipient.id);
-  await expect(dialog.getByRole("radio",{name:/^Use their own card/})).toBeDisabled();
   await expect(dialog.getByRole("button",{name:"Review access",exact:true})).toBeDisabled();
-  await dialog.getByRole("radio",{name:/^View their own card/}).check();
+  await dialog.getByRole("combobox",{name:"Named recipient",exact:true}).selectOption(recipient.id);
+  await expect(dialog.getByRole("radio")).toHaveCount(0);
+  await expect(dialog).toContainText("Purchasing is turned off");
+  await dialog.getByText("Customize access",{exact:true}).click();
+  await expect(dialog.getByRole("checkbox",{name:/^Make purchases/})).toHaveCount(0);
+  await expect(dialog.getByRole("checkbox",{name:/^Freeze their own cards/})).toHaveCount(0);
+  await expect(dialog.getByRole("checkbox",{name:/^Unfreeze their own cards/})).toHaveCount(0);
   await dialog.getByRole("button",{name:"Review access",exact:true}).click();
   expect((await getAccessOverview(primary.personId,primary.serviceId)).invitations).toEqual([]);
   const review=page.getByRole("dialog",{name:"Review cardholder access",exact:true});
-  await expect(review).toContainText("without making purchases");
+  await expect(review).toContainText("Purchasing is turned off");
   await review.getByRole("button",{name:"Save invitation",exact:true}).click();
   await expect(review).toHaveCount(0);
   const result=await getAccessOverview(primary.personId,primary.serviceId), invitation=result.invitations[0]!;
@@ -72,7 +76,8 @@ test("primary invitation, intended acceptance, permission changes and revocation
     await page.getByRole("button", { name: "Invite a person", exact: true }).click();
     const invite = page.getByRole("dialog", { name: "Invite a person", exact: true });
     await invite.getByRole("combobox", { name: "Named recipient" }).selectOption(recipient.id);
-    await invite.getByRole("radio", {name: /^Use their own card/}).check();
+    await expect(invite).toContainText("Purchases allowed on their own cards");
+    await expect(invite.getByRole("radio")).toHaveCount(0);
     await invite.getByRole("button", { name: "Review access", exact: true }).click();
     const review = page.getByRole("dialog", { name: "Review cardholder access", exact: true });
     await expect(review.getByRole("heading", { name: recipient.name, exact: true })).toBeVisible();
@@ -110,7 +115,7 @@ test("primary invitation, intended acceptance, permission changes and revocation
     await page.getByRole("button", { name: "Change access", exact: true }).click();
     const edit = page.getByRole("dialog", { name: "Change cardholder access", exact: true });
     await expect(page).toHaveURL(new RegExp(`person=${recipient.id}`));
-    await edit.getByRole("radio", {name: /^View their own card/}).check();
+    await edit.getByRole("checkbox", {name: /^Make purchases/}).uncheck();
     await edit.getByRole("button", { name: "Review access", exact: true }).click();
     const editReview = page.getByRole("dialog", { name: "Review cardholder access", exact: true });
     await editReview.getByRole("button", { name: "Save these permissions", exact: true }).click();

@@ -4,12 +4,18 @@ import type { ServiceSummary } from "../services/service";
 /** Server projections of explicitly fictional, local-only records; no live financial service. */
 export interface Money { minor: string; currency: "USD"; formatted: string }
 export interface WorkspaceCapability { action: string; allowed: boolean; reason: string; reasonCode: string }
+export interface CardPurchaseAvailability {
+  code: "READY" | "OTHER_CARDHOLDER" | "ACCESS_RESTRICTED" | "SETUP_REQUIRED" | "FROZEN" | "NO_FUNDS";
+  title: string;
+  description: string;
+}
 export interface WorkspaceCard {
   id: string; serviceId: string; holderId: string; holderName: string; nickname: string;
   relationship: "PRIMARY" | "SECONDARY";
   lastFour: string; format: "VIRTUAL" | "PHYSICAL"; status: "ACTIVE" | "FROZEN";
   version: number; limit: Money; available: Money;
   canFreeze: boolean; canUnfreeze: boolean; canPurchase: boolean; fictional: true;
+  purchaseAvailability: CardPurchaseAvailability;
   freeze:{primary:boolean;holder:boolean;reviewRequired:boolean;description:string;freezeLabel:string;unfreezeLabel:string;unfreezeDescription:string};
 }
 export interface WorkspaceActivity {

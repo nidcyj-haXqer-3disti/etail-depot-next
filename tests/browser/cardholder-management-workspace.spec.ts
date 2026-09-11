@@ -129,13 +129,15 @@ test("a primary opens a person's complete card profile while secondary managemen
  await expect(page.getByRole("combobox",{name:"Invitation status",exact:true})).toHaveValue("ACCEPTED");
  await expect(page.locator(".access-invitation-card")).toHaveCount(1);
  await page.getByRole("button",{name:"View cardholder",exact:true}).click();
- await expect(profile.getByRole("article")).toHaveCount(2);
- await profile.getByRole("link",{name:"Open Jordan travel",exact:true}).click();
- await expect(page.getByRole("dialog")).toContainText("Only the person named on this card can make a purchase");
+  await expect(profile.getByRole("article")).toHaveCount(2);
+ await profile.getByRole("link",{name:"Manage Jordan travel",exact:true}).click();
+  await expect(page.getByRole("dialog")).toContainText("Jordan Sample’s card");
+  await expect(page.getByRole("dialog")).toContainText("Jordan Sample makes purchases when signed in to their own login");
+  await expect(page.getByRole("dialog").getByRole("textbox",{name:"Purchase description",exact:true})).toHaveCount(0);
  await page.keyboard.press("Escape");
  await expect(profile.getByRole("article")).toHaveCount(2);
  await page.getByRole("button",{name:"Change access",exact:true}).click();
- await page.getByRole("dialog").getByRole("radio",{name:/^View their own card/}).check();
+  await page.getByRole("dialog").getByRole("checkbox",{name:/^Make purchases/}).uncheck();
  await page.getByRole("dialog").getByRole("button",{name:"Review access",exact:true}).click();
  await page.getByRole("dialog").getByRole("button",{name:"Save these permissions",exact:true}).click();
  await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -193,9 +195,9 @@ test("a secondary can remove their own freeze while the primary's restriction st
   await primaryDialog.getByRole("button",{name:"Unfreeze",exact:true}).click();
   await expect(primaryDialog).toContainText("all current freezes");
   await primaryDialog.getByRole("button",{name:"Unfreeze card",exact:true}).click();
-  await expect(primaryDialog.locator(".consumer-restriction-status")).toHaveText("Ready for permitted sandbox purchases.");
+  await expect(primaryDialog.locator(".consumer-restriction-status")).toHaveText("Manage new purchases while keeping past activity and balances visible.");
   await secondaryPage.reload();
-  await expect(dialog.locator(".consumer-restriction-status")).toHaveText("Ready for permitted sandbox purchases.");
+  await expect(dialog.locator(".consumer-restriction-status")).toHaveText("Manage new purchases while keeping past activity and balances visible.");
   expect((await getWorkspace(holder,primary.serviceId)).cards[0]).toMatchObject({status:"ACTIVE",canPurchase:true,available:{minor:"2400"}});
  }finally{await secondaryContext.close();}
 });

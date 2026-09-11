@@ -57,7 +57,7 @@ flowchart TD
 |---|---|---|
 | Public | Cards · Accept payments · Pricing · Help · Sign in | Explain use cases before registration; accurate sandbox availability beside calls to action. |
 | Your services | Cardholder services · Merchant services · Invitations | Enrollment is deliberate. Accepted secondary access opens that participation, not a new primary setup. |
-| Cardholder | Overview · Activity · Cardholders · Requests | Primary sees group views. Secondary gets own-card views and relevant invitations/help; no empty management tabs. |
+| Cardholder | Overview · Cards · Activity · Cardholders · Requests | Primary sees group views. Secondary gets own-card views and relevant invitations/help; no empty management tabs. Cards separates named ownership from oversight using server-scoped search and filters. |
 | Merchant | Overview · Payments · Payment channels · People · Settings | Primary chooses All my merchants or one named unit. A delegate gets exact authorized units only. |
 | Shared | Help · Sign-in security · Profile | Support carries authorized resource context. Security does not depend on a financial service. |
 | Operator | Assigned cases · Case detail | Separate entrance and assignments. Customer primary roles do not expose this console. |
@@ -67,7 +67,7 @@ Selected card, service, merchant, dates and filters remain in validated route/qu
 
 ### Annotated layout specifications
 
-**Cardholder overview — desktop:** service/person name and selector at top; selected-card panel with holder and safe identifier; adjacent available practice funds and direct Freeze control; recent activity immediately below; context actions for controls and help. Primary-only group summary, cardholder management and unfinished requests follow. Separate card money from group totals so a secondary never sees another holder's balance.
+**Cardholder overview — desktop:** service/person name and selector at top; selected-card panel with holder and safe identifier; adjacent available practice funds and direct Freeze control; recent activity immediately below; context actions for controls and help. Primary-only group summary, cardholder management and unfinished requests follow. Separate card money from group totals so a secondary never sees another holder's balance. D66's [experience contract](CARDHOLDER_EXPERIENCE_REDESIGN.md) distinguishes Your cards from Cards you manage, keeps managed cards out of implicit selection and purchasing, and gives own-card restrictions truthful server reasons. One ordinary invitation offers optional access restrictions; it never creates a separate non-purchasing card product.
 
 **Cardholder overview — mobile:** selected holder/card, available funds and Freeze appear before decorative content. Activity follows; less frequent actions are labelled in a compact menu. The same task and state vocabulary apply on desktop and mobile. Do not expose PAN/CVV or fabricate a card number for realism.
 

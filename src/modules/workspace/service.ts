@@ -87,12 +87,26 @@ export async function getCardProjection(tx: Transaction, scope: Scope, row: type
   const primary=scope.actor.id===scope.policy.primaryPersonId;
   const primaryRestriction=row.primaryFrozen||row.freezeReviewRequired;
   const reasons=[row.primaryFrozen?"Paused by the primary cardholder.":"",row.holderFrozen?"Paused by the person named on the card.":"",row.freezeReviewRequired?"An earlier freeze needs review by the primary cardholder.":""].filter(Boolean);
+  const canUnfreeze=manageable && (primary?row.status === "FROZEN":row.holderFrozen) && permits(scope, "cards.unfreeze");
+  // Explain the same current gates that permit a purchase. Management authority
+  // never substitutes for being the person named on the card.
+  const purchaseAvailability:WorkspaceCard["purchaseAvailability"]=row.holderId!==scope.actor.id
+    ?{code:"OTHER_CARDHOLDER",title:`${holder!.displayName}’s card`,description:`${holder!.displayName} makes purchases when signed in to their own login. You can review this card and use the controls available to you.`}
+    :!readiness.allowed||!permits(scope,"cards.purchase")
+      ?{code:"ACCESS_RESTRICTED",title:"Purchases are not enabled for your access",description:primary?"Review your card access or contact support before making a purchase.":"Ask your primary cardholder to review your card access before making a purchase."}
+      :readiness.persona!=="FICTIONAL_ADULT"
+        ?{code:"SETUP_REQUIRED",title:"Cardholder setup needs attention",description:readiness.persona==="FICTIONAL_SUPERVISED"?"This card needs guardian funding before purchases can be enabled. That setup is not available in this sandbox yet.":"Complete your sandbox setup before making a purchase."}
+        :row.status==="FROZEN"
+          ?{code:"FROZEN",title:"This card is frozen",description:!primary&&primaryRestriction?"Ask your primary cardholder to review the freeze before making a purchase.":canUnfreeze?"Unfreeze this card when you are ready to use it again.":"Ask your primary cardholder or support to review the freeze before making a purchase."}
+          :available<=0n
+            ?{code:"NO_FUNDS",title:"No funds available on this card",description:"Choose another card with available funds to make a sandbox purchase."}
+            :{code:"READY",title:"Ready to use",description:"Make a sandbox purchase using this card’s available funds. No real money moves."};
   return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder!.displayName, nickname: row.nickname,
     relationship: row.holderId === scope.policy.primaryPersonId ? "PRIMARY" : "SECONDARY",
     lastFour: row.lastFour, format: row.format, status: row.status, version: row.version, limit: formatMoney(row.limitMinor), available: formatMoney(available),
     freeze:{primary:row.primaryFrozen,holder:row.holderFrozen,reviewRequired:row.freezeReviewRequired,description:reasons.join(" ")||"Ready for permitted sandbox purchases.",freezeLabel:row.status==="ACTIVE"?"Freeze card":primary?"Keep card frozen":"Add your freeze",unfreezeLabel:!primary&&primaryRestriction?"Remove your freeze":"Unfreeze card",unfreezeDescription:primary?"This removes all current freezes on this card. New purchases will be available to the named cardholder, within their permissions and available funds.":primaryRestriction?"Your own freeze will be removed. The card will stay frozen until the primary cardholder removes the remaining restriction.":"Your freeze will be removed. New purchases will be available within your permissions and available funds."},
-    canFreeze: manageable && !(primary?row.primaryFrozen:row.holderFrozen) && permits(scope, "cards.freeze"), canUnfreeze: manageable && (primary?row.status === "FROZEN":row.holderFrozen) && permits(scope, "cards.unfreeze"),
-    canPurchase: row.holderId === scope.actor.id && readiness.allowed && readiness.persona === "FICTIONAL_ADULT" && row.status === "ACTIVE" && available > 0n && permits(scope, "cards.purchase"), fictional: true };
+    canFreeze: manageable && !(primary?row.primaryFrozen:row.holderFrozen) && permits(scope, "cards.freeze"), canUnfreeze,
+    canPurchase: purchaseAvailability.code==="READY", purchaseAvailability, fictional: true };
 }
 
 export function activityProjection(row: typeof serviceActivity.$inferSelect): WorkspaceActivity {
