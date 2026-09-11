@@ -1,6 +1,6 @@
 # Etail Depot — active delivery plan
 
-12 September 2026 · D63–D68 · **Current stage: sign-in and both service journeys locally verified; draft review publication.** D65–D67 are implemented and pushed as draft reviews. D68 rechecks the implemented journeys and repairs confirmed interruption, permission-change and record-navigation defects through existing owners. It adds no migration or financial writer. [Audit evidence](../docs/SERVICE_JOURNEY_AUDIT.md) separates local candidate verification from hosted entry and the earlier deployed revision. Deployment still requires the previously requested narrow release-setting approval.
+12 September 2026 · D63–D68 · **Current stage: sign-in and both service journeys locally verified and pushed in draft PR13.** D65–D67 are implemented and pushed as draft reviews. D68 rechecks the implemented journeys and repairs confirmed interruption, permission-change and record-navigation defects through existing owners. It adds no migration or financial writer. [Audit evidence](../docs/SERVICE_JOURNEY_AUDIT.md) separates local candidate verification from hosted entry and the earlier deployed revision. Deployment still requires the previously requested narrow release-setting approval.
 
 One source of product/technical truth: [PRODUCT_TECHNICAL_DESIGN.md](../docs/PRODUCT_TECHNICAL_DESIGN.md). One working prompt: [02_MASTER_BUILD_PROMPT.md](../02_MASTER_BUILD_PROMPT.md). [STATUS.md](STATUS.md) records evidence, not a substitute scope definition. This is the active sequence; [M0–M7 backlog](backlog.json) remains the original requirement inventory with stable ticket IDs, not the current implementation model.
 
@@ -29,7 +29,7 @@ A smaller sandbox release may happen at an accepted P3/P4 slice, with accurately
 
 ## Current work and next steps
 
-1. Publish the exact verified D68 audit tree in a draft review stacked on D67. Final regression, packaging and all150 preserved-preview visual states pass. D65–D67 remain pushed; no merge or release-setting change while the earlier explicit approval remains pending.
+1. Review [draft PR13](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/13), containing the exact verified D68 audit tree stacked on D67. Final regression, packaging and all150 preserved-preview visual states pass. D65–D67 remain pushed; no merge or release-setting change while the earlier explicit approval remains pending.
 2. Verify the exact deployed revision, additive migrations and hosted service pages. Retain the user's successful sign-in report; full current-release mailbox/recovery and customer task acceptance remain separately recorded.
 3. Demonstrate the finished Cardholder, Merchant and guest sandbox journeys. Preserve every failed-run record and distinguish local provider harnesses from hosted evidence.
 4. Continue P5 delivery, asynchronous provider processing and payment exceptions, followed by P6 issuing/commercial scope. Publishing/copying a payment link does not send SMS or email. Do not reintroduce account types or restart settled responsibility decisions.
