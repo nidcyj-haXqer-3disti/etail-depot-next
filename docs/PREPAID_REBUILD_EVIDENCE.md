@@ -1,6 +1,6 @@
 # D69 prepaid services — reviewer evidence
 
-12 September 2026. This record covers the local D69 working candidate and the saved verification logs listed below. It does not certify a hosted deployment, a real-money product or American Express parity. Add the final source/tree and publication receipts before attaching this record to a release.
+12 September 2026. This record covers the local D69 working candidate and the saved verification logs listed below. It does not certify a hosted deployment, a real-money product or American Express parity. The application publication receipt below identifies the exact tested tree; hosted release acceptance remains separate.
 
 ## Result and scope
 
@@ -63,4 +63,12 @@ The original `python3 tools/verify_handoff.py` and whole-tree `unittest` command
 
 External channel delivery, live funding/card/bank rails, real identity/merchant verification, automatic provider reconciliation, partial refunds, production disputes/reserves and the wider commercial/rewards scope are not established by this slice. The reviewed public American Express material informs navigation and workflow; it is not private architecture evidence or a 100% parity certification.
 
-No D69 hosted acceptance, deployment or release is asserted in this record. Offline Netlify packaging does not upload the application. Final source/tree identity, review/publication receipts and hosted verification must be recorded separately when verified; D68 results remain historical evidence.
+No D69 hosted acceptance, deployment or release is asserted in this record. Offline Netlify packaging does not upload the application. The publication receipt below identifies the exact application tree; hosted verification remains separate. D68 results remain historical evidence.
+
+## GitHub publication receipt
+
+The private repository was verified as `nidcyj-haXqer-3disti/etail-depot-next`, ID `1361184741`. The local application commit `a0d34d285beda81ace3798c15d13a9aa35a46953` and GitHub application commit `a97c8105ce8abcec2cfb84eb08bdfafe6413493c` have the identical root tree `b97e10d314e0fd2836da9e1471ad7a309eb201ce` across 658 tracked files. Individual large blob SHAs and the assembled complete tree were checked before publishing the branch. One tree-create acknowledgement was unavailable; repeating the identical object creation returned the expected SHA. No branch pointed at an unverified tree.
+
+[Draft PR14](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/14) publishes `codex/fresh-funding-experience` against `main`, observed at `7a7f954558f257997cbe64a95fac4719a5231531`. It is a consolidated replacement candidate, including the earlier unmerged service work. The root source remains local-only for acceptance; no merge, deployment, hosted reset or visitor-access change occurred. This final receipt update changes documentation only. GitHub workflow status is separate from the local passing evidence and must be read for its exact commit.
+
+Both user-visible local tabs were refreshed to the D69 build and verified through the actual sample sign-in UI: Your services contains two service choices, the Cardholder dashboard shows $464.00 shared group funds with a $284.00 remaining primary allowance, and the Merchant overview shows $234.00 received, $48.00 refunded, $138.00 awaiting settlement and $48.00 deposited. These are fictional baseline examples, not customer balances.
