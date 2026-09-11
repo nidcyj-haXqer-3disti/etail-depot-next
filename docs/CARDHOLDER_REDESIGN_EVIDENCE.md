@@ -37,4 +37,6 @@ Application changes were frozen for the final 110-case browser acceptance and 87
 
 ## Release boundary
 
+The tested application is local `2d16c7010a22a68b3032160547fcb6a1d3555190`, published as GitHub `5493da9f471038a1638a838c84238014c5295033`; both have exact tree `91caaad696e3a67ea3a92b69ad660bf6e34e3de8`. All 30 uploaded blobs were verified against local Git object hashes before publishing branch `codex/cardholder-experience` and [draft PR11](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/11). This review is stacked on PR10 and changes only D66 plus the preserved D65 publication receipts. The local preview was reloaded and its rendered Your cards / Cards you manage grouping verified. The receipt-only follow-up changes documentation; no D66 CI completion was available at the initial publication check.
+
 D65's pushed application `3deb0d85269c84792b0f10538bff5c01a197eaa4` remains in draft PR10. Automatic approval review previously rejected changing Netlify's production source from `main` to that feature branch. The requested explicit approval has not arrived. D66 does not change production source, visitor access, hosted schema or data, merge a PR, or claim a new deployment. The local redesign can be reviewed independently.
