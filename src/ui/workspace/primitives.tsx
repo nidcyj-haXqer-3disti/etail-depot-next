@@ -107,12 +107,18 @@ export class WorkspaceCommandError extends Error {
 }
 
 export async function workspaceCommand<T>(serviceId: string, path: string, method: "POST" | "PATCH" | "PUT", body: Record<string, unknown>): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+  try {
   let response: Response;
   try {
-    response = await fetch(`/api/v1/cardholder-services/${encodeURIComponent(serviceId)}${path}`, { method, credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    response = await fetch(`/api/v1/cardholder-services/${encodeURIComponent(serviceId)}${path}`, { method, credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: controller.signal });
   } catch { throw new WorkspaceCommandError("We couldn’t confirm the result. Check your connection and retry this action; your saved request will be reused.", null); }
   if (!response.ok) {
-    const body = await response.json().catch(() => null) as { error?: { code?: unknown } } | null;
+    const body = await response.json().catch(() => {
+      if (controller.signal.aborted) throw new WorkspaceCommandError("We couldn’t confirm the saved result. Retry this action to retrieve the same request.", null);
+      return null;
+    }) as { error?: { code?: unknown } } | null;
     const code = typeof body?.error?.code === "string" && /^[A-Z_]+$/.test(body.error.code) ? body.error.code : null;
     if (response.status === 409) throw new WorkspaceCommandError("This record changed while you were working. Reload its latest saved state before making another change.", response.status, code);
     if (response.status === 422 || response.status === 400) throw new WorkspaceCommandError("We couldn’t save these details. Review the fields and try again.", response.status, code);
@@ -120,20 +126,28 @@ export async function workspaceCommand<T>(serviceId: string, path: string, metho
   }
   try { return await response.json() as T; }
   catch { throw new WorkspaceCommandError("We couldn’t confirm the saved result. Retry this action to retrieve the same request.", null); }
+  } finally { clearTimeout(timeout); }
 }
 
 /** Merchant-resource commands never acquire financial-service authority. */
 export async function merchantCommand<T>(merchantId: string, path: string, method: "POST" | "PATCH" | "PUT", body: Record<string, unknown>): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+  try {
   let response: Response;
   try {
-    response = await fetch(`/api/v1/merchants/${encodeURIComponent(merchantId)}${path}`, { method, credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    response = await fetch(`/api/v1/merchants/${encodeURIComponent(merchantId)}${path}`, { method, credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: controller.signal });
   } catch { throw new WorkspaceCommandError("We couldn’t confirm the result. Retry the same request to recover its saved outcome.", null); }
   if (!response.ok) {
-    const body = await response.json().catch(() => null) as { error?: { code?: unknown } } | null;
+    const body = await response.json().catch(() => {
+      if (controller.signal.aborted) throw new WorkspaceCommandError("We couldn’t confirm the saved result. Retry the same request to recover it.", null);
+      return null;
+    }) as { error?: { code?: unknown } } | null;
     const code = typeof body?.error?.code === "string" && /^[A-Z_]+$/.test(body.error.code) ? body.error.code : null;
     const message = response.status === 408 || response.status >= 500 ? "We couldn’t confirm the result. Retry the same request to recover its saved outcome." : response.status === 409 ? "This merchant record or your access changed. Reload the latest state before making another change." : response.status === 400 || response.status === 422 ? "Review these details and the merchant requirements, then try again." : requestFailure(response.status, "We couldn’t complete this merchant action. Your saved details remain available. Please retry.");
     throw new WorkspaceCommandError(message, response.status, code);
   }
   try { return await response.json() as T; }
   catch { throw new WorkspaceCommandError("We couldn’t confirm the saved result. Retry the same request to recover it.", null); }
+  } finally { clearTimeout(timeout); }
 }
