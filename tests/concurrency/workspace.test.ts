@@ -7,14 +7,16 @@ import { controlCard, getWorkspace, startCardRequest, updateCardRequest, submitC
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { cardRequests, workspaceCommands, cards, serviceActivity } from "../../src/platform/database/schema";
 import { getBalance } from "../../src/modules/ledger";
-import { ledgerJournals } from "../../src/modules/ledger/schema";
-import { cardPrimary, issuePracticeCard } from "../helpers/cardholder";
+import { ledgerEntries, ledgerJournals } from "../../src/modules/ledger/schema";
+import { cardPrimary, cardPerson, enrollCardholder, fundCardGroup, setPersonLimit, issuePracticeCard } from "../helpers/cardholder";
 afterAll(closeDatabase);
 
-async function fixture() {
+async function fixture(funds = "100", monthlyLimit = funds) {
   const owner=await cardPrimary("Concurrent card user");
   const serviceId=owner.serviceId;
-  const {card}=await issuePracticeCard(owner.personId,serviceId,owner.personId,"Control practice card","100");
+  await fundCardGroup(owner.personId,serviceId,funds);
+  await setPersonLimit(owner.personId,serviceId,owner.personId,monthlyLimit);
+  const {card}=await issuePracticeCard(owner.personId,serviceId,owner.personId,"Control practice card");
   return {owner,serviceId,card};
 }
 async function blockedBy(observer:pg.Client,pid:number) {
@@ -79,21 +81,26 @@ it("an in-flight grant revocation is rechecked after its row lock releases",asyn
 });
 
 async function fundedFixture() {
-  const base = await fixture();
+  const base = await fixture("10000", "20000");
   const draft = await startCardRequest(base.owner.personId,base.serviceId,{commandId:randomUUID()});
-  const saved = await updateCardRequest(base.owner.personId,base.serviceId,draft.id,{commandId:randomUUID(),expectedVersion:1,holderId:base.owner.personId,nickname:"Concurrent practice",format:"VIRTUAL",requestedLimitMinor:"10000"});
+  const saved = await updateCardRequest(base.owner.personId,base.serviceId,draft.id,{commandId:randomUUID(),expectedVersion:1,holderId:base.owner.personId,nickname:"Concurrent practice",format:"VIRTUAL"});
   return {...base,draft:saved};
 }
-it("concurrent issuance retries produce one card and one exact funding journal",async()=>{
+it("concurrent issuance retries produce one card and no new money or limit",async()=>{
   const {owner,serviceId,draft}=await fundedFixture();const input={commandId:randomUUID(),expectedVersion:draft.version};
+  const before = await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,serviceId)).orderBy(ledgerEntries.journalId,ledgerEntries.lineNumber);
   const replies=await Promise.all(Array.from({length:6},()=>submitCardRequest(owner.personId,serviceId,draft.id,input)));
   expect(new Set(replies.map(reply=>reply.issuedCardId)).size).toBe(1);
   expect(replies.every(reply=>reply.status==="ISSUED")).toBe(true);
   expect(await getDb().select().from(cards).where(eq(cards.requestId,draft.id))).toHaveLength(1);
-  expect(await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.businessKey,`card-funding:${draft.id}`))).toHaveLength(1);
-  expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,bucket:"CARD_AVAILABLE",cardId:replies[0]!.issuedCardId!}))).toBe(10000n);
+  expect(await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.businessKey,`card-funding:${draft.id}`))).toHaveLength(0);
+  expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,serviceId)).orderBy(ledgerEntries.journalId,ledgerEntries.lineNumber)).toEqual(before);
+  expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,bucket:"GROUP_AVAILABLE"}))).toBe(10000n);
+  const card=(await getWorkspace(owner.personId,serviceId)).cards.find(row=>row.id===replies[0]!.issuedCardId);
+  expect(card).toMatchObject({available:{minor:"10000"},spending:{monthlyLimit:{minor:"20000"}}});
+  expect(await getDb().select().from(workspaceCommands).where(eq(workspaceCommands.commandId,input.commandId))).toHaveLength(1);
 });
-it("genuinely overlapping purchases cannot overspend one card, and refreshed over-budget retries remain denied",async()=>{
+it("overlapping purchases retain card-version checks and refreshed attempts cannot overspend group funds",async()=>{
   const {owner,serviceId,draft}=await fundedFixture();
   const issued=await submitCardRequest(owner.personId,serviceId,draft.id,{commandId:randomUUID(),expectedVersion:draft.version});const cardId=issued.issuedCardId!;
   const locker=new pg.Client({connectionString:process.env.DATABASE_URL,application_name:"etail-purchase-backing-barrier"});
@@ -113,7 +120,66 @@ it("genuinely overlapping purchases cannot overspend one card, and refreshed ove
     expect(new Set(replays.map(reply=>reply.activity.id)).size).toBe(1);
     await expect(purchaseCard(owner.personId,serviceId,cardId,{...input,commandId:randomUUID(),expectedVersion:2})).rejects.toThrow("INSUFFICIENT_PRACTICE_FUNDS");
     expect(await getDb().select().from(serviceActivity).where(eq(serviceActivity.cardId,cardId))).toHaveLength(1);
-    expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,bucket:"CARD_AVAILABLE",cardId}))).toBe(4000n);
+    expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,bucket:"GROUP_AVAILABLE"}))).toBe(4000n);
     expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,bucket:"CARD_SPENT",cardId}))).toBe(6000n);
   } finally {if(open)await locker.query("ROLLBACK");await Promise.allSettled(pending);await Promise.all([locker.end(),observer.end()]);}
 });
+
+it("overlapping purchases by different holders cannot spend the same shared group funds",async()=>{
+  const {owner,serviceId,card}=await fixture("10000","10000");
+  const secondId=await cardPerson("Concurrent secondary payer");
+  await enrollCardholder(owner.personId,serviceId,secondId);
+  await setPersonLimit(owner.personId,serviceId,secondId,"10000");
+  const secondCard=(await issuePracticeCard(owner.personId,serviceId,secondId,"Secondary shared-funds card")).card;
+  const locker=new pg.Client({connectionString:process.env.DATABASE_URL,application_name:"etail-group-funds-barrier"});
+  const observer=new pg.Client({connectionString:process.env.DATABASE_URL,application_name:"etail-group-funds-observer"});
+  const pending:Promise<unknown>[]=[];let open=false;
+  const firstInput={commandId:randomUUID(),expectedVersion:card.version,amountMinor:"6000",description:"Primary shared-funds purchase"};
+  const secondInput={commandId:randomUUID(),expectedVersion:secondCard.version,amountMinor:"6000",description:"Secondary shared-funds purchase"};
+  try {
+    await locker.connect();await observer.connect();await locker.query("BEGIN");open=true;
+    const {rows:[row]}=await locker.query<{pid:number}>("SELECT pg_backend_pid() AS pid");
+    await locker.query('SELECT id FROM cards WHERE id=$1 FOR UPDATE',[card.id]);
+    const first=purchaseCard(owner.personId,serviceId,card.id,firstInput);pending.push(first);void first.catch(()=>undefined);
+    const firstPid=await blockedBy(observer,row!.pid);
+    const second=purchaseCard(secondId,serviceId,secondCard.id,secondInput);pending.push(second);void second.catch(()=>undefined);
+    const secondPid=await blockedBy(observer,firstPid);expect(secondPid).not.toBe(firstPid);
+    await locker.query("COMMIT");open=false;
+    expect((await first).card.available.minor).toBe("4000");
+    await expect(second).rejects.toThrow("INSUFFICIENT_PRACTICE_FUNDS");
+    expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,bucket:"GROUP_AVAILABLE"}))).toBe(4000n);
+    expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,cardId:card.id,bucket:"CARD_SPENT"}))).toBe(6000n);
+    expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,cardId:secondCard.id,bucket:"CARD_SPENT"}))).toBe(0n);
+    expect(await getDb().select().from(serviceActivity).where(eq(serviceActivity.cardId,secondCard.id))).toEqual([]);
+    expect(await getDb().select().from(workspaceCommands).where(eq(workspaceCommands.commandId,secondInput.commandId))).toEqual([]);
+    const secondView=(await getWorkspace(secondId,serviceId)).cards.find(row=>row.id===secondCard.id)!;
+    expect(secondView).toMatchObject({version:secondCard.version,available:{minor:"4000"},spending:{spentThisMonth:{minor:"0"},remainingThisMonth:{minor:"10000"}}});
+  } finally {if(open)await locker.query("ROLLBACK");await Promise.allSettled(pending);await Promise.all([locker.end(),observer.end()]);}
+},30_000);
+
+it("overlapping purchases on different cards share one person's monthly limit even with enough group funds",async()=>{
+  const {owner,serviceId,card}=await fixture("20000","10000");
+  const secondCard=(await issuePracticeCard(owner.personId,serviceId,owner.personId,"Second card same person")).card;
+  const locker=new pg.Client({connectionString:process.env.DATABASE_URL,application_name:"etail-person-limit-barrier"});
+  const observer=new pg.Client({connectionString:process.env.DATABASE_URL,application_name:"etail-person-limit-observer"});
+  const pending:Promise<unknown>[]=[];let open=false;
+  const firstInput={commandId:randomUUID(),expectedVersion:card.version,amountMinor:"6000",description:"First card monthly spend"};
+  const secondInput={commandId:randomUUID(),expectedVersion:secondCard.version,amountMinor:"6000",description:"Second card monthly spend"};
+  try {
+    await locker.connect();await observer.connect();await locker.query("BEGIN");open=true;
+    const {rows:[row]}=await locker.query<{pid:number}>("SELECT pg_backend_pid() AS pid");
+    await locker.query('SELECT id FROM cards WHERE id=$1 FOR UPDATE',[card.id]);
+    const first=purchaseCard(owner.personId,serviceId,card.id,firstInput);pending.push(first);void first.catch(()=>undefined);
+    const firstPid=await blockedBy(observer,row!.pid);
+    const second=purchaseCard(owner.personId,serviceId,secondCard.id,secondInput);pending.push(second);void second.catch(()=>undefined);
+    await blockedBy(observer,firstPid);await locker.query("COMMIT");open=false;
+    expect((await first).card.available.minor).toBe("4000");
+    await expect(second).rejects.toThrow("SPENDING_LIMIT_EXCEEDED");
+    expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,bucket:"GROUP_AVAILABLE"}))).toBe(14000n);
+    expect(await getDb().transaction(tx=>getBalance(tx,{serviceId,cardId:secondCard.id,bucket:"CARD_SPENT"}))).toBe(0n);
+    expect(await getDb().select().from(serviceActivity).where(eq(serviceActivity.cardId,secondCard.id))).toEqual([]);
+    expect(await getDb().select().from(workspaceCommands).where(eq(workspaceCommands.commandId,secondInput.commandId))).toEqual([]);
+    const view=await getWorkspace(owner.personId,serviceId);
+    for(const row of view.cards)expect(row).toMatchObject({available:{minor:"4000"},spending:{monthlyLimit:{minor:"10000"},spentThisMonth:{minor:"6000"},remainingThisMonth:{minor:"4000"}}});
+  } finally {if(open)await locker.query("ROLLBACK");await Promise.allSettled(pending);await Promise.all([locker.end(),observer.end()]);}
+},30_000);

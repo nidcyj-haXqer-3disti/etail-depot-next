@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import type { CardPurchaseResult, CardRequestProjection, WorkspaceCard, WorkspaceProjection } from "@/modules/workspace/contracts";
+import type { CardRequestProjection, WorkspaceCard, WorkspaceProjection } from "@/modules/workspace/contracts";
 import type { CardRequestHistory, CardControlHistory } from "@/modules/workspace/dashboard-contracts";
 import { Button, EmptyState, Feedback, StatusBadge, WorkspaceCommandError, WorkspaceDialog, capability, formatDate, formatMoney, workspaceCommand } from "./primitives";
 import { useServerProjection } from "./use-server-projection";
@@ -31,7 +31,6 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
   const params = useSearchParams();
   const [, startNavigation] = useTransition();
   const [cardUpdates, setCardUpdates] = useState<Record<string, WorkspaceCard>>({});
-  const [purchaseAttempts, setPurchaseAttempts] = useState<Record<string, PurchaseAttempt | undefined>>({});
   const [requestUpdates, setRequestUpdates] = useState<Record<string, CardRequestProjection>>({});
   const requestId = params.get("request")?.toLowerCase();
   const showNew = !requestId && params.get("new") === "1";
@@ -53,9 +52,7 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
   const selected = cards.find((card) => card.id === selectedId);
   const request = requests.find((item) => item.id === requestId);
   const ownCard = selected?.holderId === workspace.member.id;
-  const pendingPurchase = selected ? purchaseAttempts[selected.id] : undefined;
-  const cardNavigationBlocked = Boolean(busy || controlAttempt || pendingPurchase);
-  const purchaseView = Boolean(selected && ownCard && (params.get("cardTask") === "purchase" || pendingPurchase));
+  const cardNavigationBlocked = Boolean(busy || controlAttempt);
   const requestCapability = capability(workspace, "cards.request");
 
   useEffect(() => {
@@ -73,15 +70,8 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
     const url = `${cardRoute}${suffix ? `?${suffix}` : ""}`;
     startNavigation(() => { if (push) router.push(url, { scroll: false }); else router.replace(url, { scroll: false }); });
   }
-  function chooseCardTask(task: "purchase" | "controls") {
-    if (!selected || cardNavigationBlocked) return;
-    const query = new URLSearchParams(params.toString());
-    query.set("cardTask", task);
-    router.replace(`${cardRoute}?${query}`, { scroll: false });
-  }
   function closeCard() {
-    // An uncertain purchase retains its command identity until the same attempt
-    // is confirmed. Closing the modal would otherwise discard that recovery state.
+    // Keep a pending control command until its saved result is confirmed.
     if (cardNavigationBlocked) return;
     onClose?.();
     setConfirmControl(null); setError(""); setNotice(""); navigateDialog(null);
@@ -134,25 +124,22 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
     finally{setBusy("");}
   }
   const leaveUnconfirmed=()=>router.push("/cardholder-services");
-  const purchaseForm=selected&&ownCard&&<CardPurchaseForm key={selected.id} card={selected} pending={purchaseAttempts[selected.id]} contextUnavailable={cardUnavailable} onPending={(attempt)=>setPurchaseAttempts(current=>({...current,[selected.id]:attempt}))} command={command} onBusy={(value)=>setBusy(value?"purchase":"")} onRefresh={()=>router.refresh()} onSuccess={(result)=>{setCardUnavailable(false);setCardUpdates(current=>({...current,[result.card.id]:result.card}));router.refresh();}}/>;
-  const cardRecovery=(controlAttempt||pendingPurchase)&&<div className="consumer-action-row"><Button variant="secondary" busy={busy==="reload"} disabled={!!busy} onClick={()=>void reloadCardAccess()}>Reload card access</Button>{cardUnavailable&&<Button variant="quiet" disabled={!!busy} onClick={leaveUnconfirmed}>Leave unconfirmed request</Button>}</div>;
+  const cardRecovery=controlAttempt&&<div className="consumer-action-row"><Button variant="secondary" busy={busy==="reload"} disabled={!!busy} onClick={()=>void reloadCardAccess()}>Reload card access</Button>{cardUnavailable&&<Button variant="quiet" disabled={!!busy} onClick={leaveUnconfirmed}>Leave unconfirmed request</Button>}</div>;
 
   return <section className="consumer-workspace">
     {selectedId && !selected && <Feedback kind="error" message="This card is no longer available. Return to your cards and refresh." />}
     {selected && <WorkspaceDialog open onClose={closeCard} title={cardUnavailable?"Card access unavailable":confirmControl ? `${confirmControl === "unfreeze" ? selected.freeze.unfreezeLabel : selected.freeze.freezeLabel}?` : selected.nickname} serviceName={cardUnavailable?"Cardholder services":serviceName} wide>
       <Feedback kind="error" message={error} />{!cardUnavailable&&<Feedback kind="success" message={notice} />}{cardRecovery}
-      {cardUnavailable?<><p>Current access no longer allows this card action. {unconfirmedExitCopy}</p>{controlAttempt?<Button busy={busy==="control"} disabled={!!busy} onClick={()=>void controlCard()}>Retry same change</Button>:purchaseForm}</>:confirmControl ? <><div className="consumer-review-highlight"><strong>{selected.nickname} · •••• {selected.lastFour}</strong><span>{selected.holderName}</span><span>{serviceName}</span></div><p>{confirmControl==="unfreeze"?selected.freeze.unfreezeDescription:"Your freeze will stop new purchases. Past activity and available funds stay visible."}</p><p className="consumer-muted">{selected.freeze.description}</p>{!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)&&!controlAttempt&&<p className="consumer-muted">This change is no longer available. Return to the card to review its current restrictions.</p>}{controlAttempt&&!busy&&<p role="status">We haven’t confirmed this change. Retry the same change before taking another action.</p>}<div className="consumer-action-row"><Button variant="secondary" disabled={Boolean(busy)||Boolean(controlAttempt)} onClick={()=>setConfirmControl(null)}>Back to card</Button><Button busy={busy==="control"} disabled={!controlAttempt&&!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)} onClick={()=>void controlCard()}>{controlAttempt?"Retry same change":confirmControl==="unfreeze"?selected.freeze.unfreezeLabel:selected.freeze.freezeLabel}</Button></div></> : <>
-        <div className="consumer-card-detail-grid"><div><CardPreview card={selected} /></div><div className="consumer-card-summary"><StatusBadge status={selected.status}/><p>{selected.holderName} · Ending {selected.lastFour}</p><p>{ownCard ? "Your card" : "Managed by you"} · {selected.relationship === "PRIMARY" ? "Primary card" : "Secondary card"}</p><dl><dt>{ownCard ? "Available to spend" : "Cardholder’s available balance"}</dt><dd>{formatMoney(selected.available)}</dd></dl></div></div>
+      {cardUnavailable?<><p>Current access no longer allows this card action. {unconfirmedExitCopy}</p>{controlAttempt?<Button busy={busy==="control"} disabled={!!busy} onClick={()=>void controlCard()}>Retry same change</Button>:null}</>:confirmControl ? <><div className="consumer-review-highlight"><strong>{selected.nickname} · •••• {selected.lastFour}</strong><span>{selected.holderName}</span><span>{serviceName}</span></div><p>{confirmControl==="unfreeze"?selected.freeze.unfreezeDescription:"Your freeze will stop new purchases. Past activity and available funds stay visible."}</p><p className="consumer-muted">{selected.freeze.description}</p>{!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)&&!controlAttempt&&<p className="consumer-muted">This change is no longer available. Return to the card to review its current restrictions.</p>}{controlAttempt&&!busy&&<p role="status">We haven’t confirmed this change. Retry the same change before taking another action.</p>}<div className="consumer-action-row"><Button variant="secondary" disabled={Boolean(busy)||Boolean(controlAttempt)} onClick={()=>setConfirmControl(null)}>Back to card</Button><Button busy={busy==="control"} disabled={!controlAttempt&&!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)} onClick={()=>void controlCard()}>{controlAttempt?"Retry same change":confirmControl==="unfreeze"?selected.freeze.unfreezeLabel:selected.freeze.freezeLabel}</Button></div></> : <>
+        <div className="consumer-card-detail-grid"><div><CardPreview card={selected} /></div><div className="consumer-card-summary"><StatusBadge status={selected.status}/><p>{selected.holderName} · Ending {selected.lastFour}</p><p>{ownCard ? "Your card" : "Managed by you"} · {selected.relationship === "PRIMARY" ? "Primary card" : "Secondary card"}</p><dl><dt>{ownCard ? "Available to spend" : "Cardholder’s available to spend"}</dt><dd>{formatMoney(selected.available)}</dd></dl></div></div>
         {(!ownCard || !selected.canPurchase) && <div className="consumer-card-availability" role="status"><strong>{selected.purchaseAvailability.title}</strong><p>{selected.purchaseAvailability.description}</p></div>}
-        {ownCard && <nav className="consumer-card-tasks" aria-label="Card actions"><Button variant={purchaseView?"secondary":"primary"} disabled={cardNavigationBlocked} onClick={()=>chooseCardTask("controls")} aria-pressed={!purchaseView}>Card controls</Button>{(selected.canPurchase || pendingPurchase || purchaseView) && <Button variant={purchaseView?"primary":"secondary"} disabled={cardNavigationBlocked} onClick={()=>chooseCardTask("purchase")} aria-pressed={purchaseView}>Try a purchase</Button>}</nav>}
-        <section hidden={purchaseView} className="consumer-card-controls-panel">
+        <section className="consumer-card-controls-panel">
         <h3>Card controls</h3><p className="consumer-restriction-status" role="status">{selected.status === "FROZEN" ? selected.freeze.description : "Manage new purchases while keeping past activity and balances visible."}</p><div className="consumer-control-list">{selected.canFreeze&&<div><span><strong>{selected.freeze.freezeLabel}</strong><small>Stop new purchases without removing card access or past activity.</small></span><Button variant="secondary" onClick={()=>setConfirmControl("freeze")}>{selected.status==="ACTIVE"?"Freeze":selected.freeze.freezeLabel}</Button></div>}{selected.canUnfreeze&&<div><span><strong>{selected.freeze.unfreezeLabel}</strong><small>{selected.freeze.unfreezeDescription}</small></span><Button variant="secondary" onClick={()=>setConfirmControl("unfreeze")}>{selected.freeze.unfreezeLabel==="Unfreeze card"?"Unfreeze":selected.freeze.unfreezeLabel}</Button></div>}</div>
         {!(selected.canFreeze||selected.canUnfreeze)&&<p className="consumer-muted">Your access allows you to view this card. Ask the primary cardholder about changes.</p>}
         {cardHistory&&<details className="consumer-request-history"><summary>Card control history</summary>{cardHistory.events.length?<ol>{cardHistory.events.map(event=><li key={event.id}><span><strong>{event.label}</strong><small> · {event.actorName}</small></span><time dateTime={event.occurredAt}>{formatDate(event.occurredAt)}</time></li>)}</ol>:<p>No freeze changes are recorded for this card.</p>}<p>Recorded actions are shown here. The current restrictions above determine whether the card can be used.</p>{cardHistory.hasEarlierEvents&&<p>Showing the latest 100 recorded actions.</p>}</details>}
         <Link className="consumer-text-link" href={cardholderTaskHref("activity", {cardId:selected.id})}>View this card’s activity <span aria-hidden="true">↗</span></Link>
-        <details className="consumer-card-more"><summary>Card details and other services</summary><dl className="consumer-detail-list"><div><dt>Cardholder service</dt><dd>{serviceName}</dd></div><div><dt>Card format</dt><dd>{selected.format === "VIRTUAL" ? "Virtual" : "Physical"}</dd></div><div><dt>Starting balance</dt><dd>{formatMoney(selected.limit)}</dd></div></dl><p className="consumer-muted">Adding funds and requesting a replacement are not available yet.</p></details>
+        <details className="consumer-card-more"><summary>Card details and other services</summary><dl className="consumer-detail-list"><div><dt>Cardholder service</dt><dd>{serviceName}</dd></div><div><dt>Card format</dt><dd>{selected.format === "VIRTUAL" ? "Virtual" : "Physical"}</dd></div><div><dt>Monthly spending limit</dt><dd>{selected.spending.monthlyLimit.formatted}</dd></div><div><dt>Spent this month</dt><dd>{selected.spending.spentThisMonth.formatted}</dd></div></dl><p className="consumer-muted">All of this cardholder’s cards share one monthly limit. Spending uses the card group’s available funds.</p></details>
         </section>
-        {purchaseView&&purchaseForm}
         <div className="consumer-action-row" aria-label="Related cardholder services">{capability(workspace,"activity.read")?.allowed && relatedService("reports","Statements & reports")}{relatedService("settings","Notification preferences")}{relatedService("help","Help with this card")}</div>
       </>}
     </WorkspaceDialog>}
@@ -172,17 +159,8 @@ interface CardRequestFormProps {
   onClose: () => void;
   onUnavailable:(unavailable:boolean)=>void;onLeave:()=>void;
 }
-function limitInput(minor: string) {
-  const padded = minor.padStart(3, "0");
-  return `${padded.slice(0, -2)}.${padded.slice(-2)}`;
-}
-function limitWire(input: string) {
-  if (!/^\d{1,7}(\.\d{1,2})?$/.test(input)) return null;
-  const [whole, fraction = ""] = input.split(".");
-  return `${whole}${fraction.padEnd(2, "0")}`.replace(/^0+(?=\d)/, "");
-}
 type CardFormAttempt =
-  | { kind: "save"; fields: {holderId: string; nickname: string; format: "VIRTUAL" | "PHYSICAL"; requestedLimitMinor: string}; request: CardRequestProjection | null; closeAfter: boolean }
+  | { kind: "save"; fields: {holderId: string; nickname: string; format: "VIRTUAL" | "PHYSICAL"}; request: CardRequestProjection | null; closeAfter: boolean }
   | { kind: "submit" | "cancel"; request: CardRequestProjection };
 
 function CardRequestForm({ request: initialRequest, history, workspace:initialWorkspace, canEdit:initialCanEdit, command, onUpdate, onBusy, onClose, onUnavailable, onLeave, routeBase }: CardRequestFormProps) {
@@ -199,7 +177,6 @@ function CardRequestForm({ request: initialRequest, history, workspace:initialWo
   const [holderId, setHolderId] = useState(initialRequest?.holderId ?? preferredHolder?.id ?? defaultHolder?.id ?? "");
   const [nickname, setNickname] = useState(initialRequest?.nickname || "");
   const [format, setFormat] = useState<"VIRTUAL" | "PHYSICAL">(initialRequest?.format ?? "VIRTUAL");
-  const [limit, setLimit] = useState(initialRequest ? limitInput(initialRequest.requestedLimitMinor) : "");
   const [busy, setBusy] = useState(false), [error, setError] = useState(!initialRequest && params.has("holder") && !preferredHolder ? "That cardholder isn’t available. Choose a person below to continue." : ""), [uncertain, setUncertain] = useState(false);
   const [confirmCancel,setConfirmCancel]=useState(false);
   const pending = useRef<CardFormAttempt | null>(null), inFlight = useRef(false);
@@ -251,11 +228,9 @@ function CardRequestForm({ request: initialRequest, history, workspace:initialWo
   }
   function save(closeAfter = false) {
     if (working || uncertain) return;
-    const minor = limitWire(limit.trim());
     if (!holder) { setError("Choose an available cardholder before continuing."); return; }
     if (!nickname.trim()) { setError("Enter a name for this card."); return; }
-    if (minor === null || (!closeAfter && minor === "0")) { setError("Enter a starting balance greater than zero, using no more than two decimal places."); return; }
-    void execute({kind: "save", fields: {holderId, nickname: nickname.trim(), format, requestedLimitMinor: minor}, request, closeAfter});
+    void execute({kind: "save", fields: {holderId, nickname: nickname.trim(), format}, request, closeAfter});
   }
   async function reloadRequestAccess(){
     if(working)return;setBusy(true);setError("");
@@ -277,12 +252,11 @@ function CardRequestForm({ request: initialRequest, history, workspace:initialWo
     {step === 0 && <><h3>Who is this card for?</h3>{workspace.cardholderOptions.length === 1 && holder ? <div className="consumer-cardholder-selected"><span className="consumer-avatar" aria-hidden="true">{holder?.displayName.slice(0, 1)}</span><span><strong>{holder?.displayName}</strong><small>{holder?.id === workspace.member.id ? "You · Primary cardholder" : "Invited cardholder"}</small></span></div> : <div className="consumer-holder-options">{workspace.cardholderOptions.map(person => <label key={person.id} className={`consumer-holder-option ${holderId === person.id ? "is-selected" : ""}`}><input type="radio" name="cardholder" checked={holderId === person.id} disabled={disabled} onChange={() => setHolderId(person.id)}/><span><strong>{person.displayName}</strong><small>{person.id === workspace.member.id ? "You" : "Invited cardholder"}</small></span></label>)}</div>}
       {!workspace.cardholderOptions.length && <EmptyState title="No cardholders available" description="Invite a cardholder and allow them to use a card before completing these details."/>}
       <div className="consumer-form-fields consumer-card-details-fields"><label>Card name<input name="nickname" value={nickname} maxLength={60} disabled={disabled} onChange={event => setNickname(event.target.value)} autoComplete="off" placeholder="For example, Everyday purchases"/></label>
-        <div className="consumer-funds-field"><label htmlFor="card-starting-balance">Starting balance (USD)</label><div className="consumer-money-input"><span aria-hidden="true">$</span><input id="card-starting-balance" name="requested-limit" value={limit} inputMode="decimal" disabled={disabled} onChange={event => setLimit(event.target.value)} aria-describedby="limit-explanation" placeholder="0.00"/></div><small id="limit-explanation">Practice money for trying purchases. No bank account or real funds are needed.</small></div>
-        <details className="consumer-format-details"><summary>{format === "VIRTUAL" ? "Virtual card" : "Physical card preview"} <span>Change format</span></summary><fieldset disabled={disabled}><legend>Card format</legend><div className="consumer-format-options">{(["VIRTUAL", "PHYSICAL"] as const).map(value => <label key={value}><input type="radio" name="format" checked={format === value} onChange={() => setFormat(value)}/><span><strong>{value === "VIRTUAL" ? "Virtual card" : "Physical card"}</strong><small>{value === "VIRTUAL" ? "Ready to try online" : "Preview only · No delivery"}</small></span></label>)}</div></fieldset></details>
+        <details className="consumer-format-details"><summary>{format === "VIRTUAL" ? "Virtual card" : "Physical card preview"} <span>Change format</span></summary><fieldset disabled={disabled}><legend>Card format</legend><div className="consumer-format-options">{(["VIRTUAL", "PHYSICAL"] as const).map(value => <label key={value}><input type="radio" name="format" checked={format === value} onChange={() => setFormat(value)}/><span><strong>{value === "VIRTUAL" ? "Virtual card" : "Physical card"}</strong><small>{value === "VIRTUAL" ? "Use at online checkout" : "Preview only · No delivery"}</small></span></label>)}</div></fieldset></details>
       </div></>}
     {step === 1 && request && <><div className="consumer-section-heading"><h3>{request.status === "ISSUED" ? "Your card is ready" : request.status === "CANCELED" ? "Request canceled" : request.status === "BLOCKED" ? "Your card needs attention" : "Review your card"}</h3>{["BLOCKED", "CANCELED", "ISSUED"].includes(request.status) && <StatusBadge status={request.status} label={request.status === "BLOCKED" ? "Needs attention" : undefined}/>}</div>
-      <dl className="consumer-detail-list consumer-review-list"><div><dt>Cardholder</dt><dd>{holder?.displayName ?? request.holderName}</dd></div><div><dt>Card name</dt><dd>{request.nickname}</dd></div><div><dt>Format</dt><dd>{request.format === "VIRTUAL" ? "Virtual" : "Physical · Preview only"}</dd></div><div><dt>Starting balance</dt><dd>{formatMoney(request.requestedLimitMinor, request.currency)}</dd></div></dl>
-      {request.status !== "CANCELED" && request.status !== "ISSUED" && <div className="consumer-prerequisites">{request.prerequisites.length ? <><h4>Before you create this card</h4><ul>{request.prerequisites.map(item => <li key={item.code}><strong>{item.title}</strong><p>{item.detail}</p></li>)}</ul></> : <p>Your card will be ready to try with the practice balance above. No real money is used.</p>}</div>}
+      <dl className="consumer-detail-list consumer-review-list"><div><dt>Cardholder</dt><dd>{holder?.displayName ?? request.holderName}</dd></div><div><dt>Card name</dt><dd>{request.nickname}</dd></div><div><dt>Format</dt><dd>{request.format === "VIRTUAL" ? "Virtual" : "Physical · Preview only"}</dd></div></dl>
+      {request.status !== "CANCELED" && request.status !== "ISSUED" && <div className="consumer-prerequisites">{request.prerequisites.length ? <><h4>Before you create this card</h4><ul>{request.prerequisites.map(item => <li key={item.code}><strong>{item.title}</strong><p>{item.detail}</p></li>)}</ul></> : <p>This card uses the group’s existing funds and its cardholder’s monthly spending limit. Creating a card does not add money.</p>}</div>}
       {request.status === "ISSUED" && request.issuedCardId && <Button onClick={() => navigate(request)}>View your card</Button>}
     </>}
 
@@ -290,49 +264,6 @@ function CardRequestForm({ request: initialRequest, history, workspace:initialWo
     {request?.status === "CANCELED" && <p className="consumer-form-footnote">This request remains in your history. No card was created.</p>}
     {request&&history&&<details className="consumer-request-history"><summary>Request history</summary><p>Started {formatDate(history.createdAt)}. Current status: {request.status==="BLOCKED"?"Needs attention":request.status==="ISSUED"?"Card created":request.status==="CANCELED"?"Canceled":"Draft"}.</p>{history.events.length?<ol>{history.events.map(event=><li key={event.id}><strong>{event.label}</strong><time dateTime={event.occurredAt}>{formatDate(event.occurredAt)}</time></li>)}</ol>:<p>No earlier actions are recorded for this request.</p>}<p>Creation checks can leave a request needing attention. The current status above confirms whether a card was created.</p>{history.hasEarlierEvents&&<p>Showing the latest 100 recorded actions.</p>}</details>}
     </div>
-    <div className="consumer-form-footer">{step === 1 && !frozen && <Button variant="quiet" disabled={working || uncertain} onClick={() => setStep(0)}>Edit details</Button>}<div>{frozen || !request && !nickname && !limit ? <Button variant="secondary" disabled={working || uncertain} onClick={onClose}>Close</Button> : <Button variant="secondary" disabled={working || uncertain} onClick={() => step === 0 ? save(true) : request && navigate(request, true)}>Save for later</Button>}{!frozen && (step === 0 ? <Button busy={working} disabled={uncertain || !workspace.cardholderOptions.length} onClick={() => save()}>Review card</Button> : request && <Button busy={working} disabled={uncertain || confirmCancel || !request.canSubmit} onClick={() => void execute({kind: "submit", request})}>Create card</Button>)}</div></div>
+    <div className="consumer-form-footer">{step === 1 && !frozen && <Button variant="quiet" disabled={working || uncertain} onClick={() => setStep(0)}>Edit details</Button>}<div>{frozen || !request && !nickname ? <Button variant="secondary" disabled={working || uncertain} onClick={onClose}>Close</Button> : <Button variant="secondary" disabled={working || uncertain} onClick={() => step === 0 ? save(true) : request && navigate(request, true)}>Save for later</Button>}{!frozen && (step === 0 ? <Button busy={working} disabled={uncertain || !workspace.cardholderOptions.length} onClick={() => save()}>Review card</Button> : request && <Button busy={working} disabled={uncertain || confirmCancel || !request.canSubmit} onClick={() => void execute({kind: "submit", request})}>Create card</Button>)}</div></div>
   </div>;
-}
-
-interface PurchaseAttempt { expectedVersion: number; amountMinor: string; description: string }
-function CardPurchaseForm({ card, pending, contextUnavailable=false, onPending, command, onBusy, onRefresh, onSuccess }: {
-  card: WorkspaceCard; pending?: PurchaseAttempt;contextUnavailable?:boolean;
-  onPending: (attempt: PurchaseAttempt | undefined) => void;
-  command: CardRequestFormProps["command"]; onBusy: (busy: boolean) => void; onRefresh: () => void;
-  onSuccess: (result: CardPurchaseResult) => void;
-}) {
-  const [amount, setAmount] = useState(pending ? limitInput(pending.amountMinor) : "");
-  const [description, setDescription] = useState(pending?.description ?? "");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  async function purchase() {
-    const minor = limitWire(amount.trim());
-    if (!pending && (!minor || minor === "0" || !description.trim())) { setError("Enter a purchase description and an amount greater than zero, with at most two decimal places."); return; }
-    const attempt = pending ?? { expectedVersion: card.version, amountMinor: minor!, description: description.trim() };
-    onPending(attempt); setBusy(true); onBusy(true); setError(""); setMessage("");
-    try {
-      const result = await command<CardPurchaseResult>(`/cards/${encodeURIComponent(card.id)}/purchase`, "POST", { ...attempt });
-      onSuccess(result); onPending(undefined); setAmount(""); setDescription("");
-      setMessage(`${result.activity.amount.formatted} purchase recorded on ${card.nickname}. Available to spend: ${result.card.available.formatted}.`);
-    } catch (failure) {
-      if (!pending&&!(failure instanceof WorkspaceCommandError && failure.uncertain)) onPending(undefined);
-      const code = failure instanceof WorkspaceCommandError ? failure.code : null;
-      setError(code === "INSUFFICIENT_PRACTICE_FUNDS" ? "This purchase exceeds the card’s available balance. Enter a smaller amount." : code === "CARD_FROZEN" ? "This card is frozen. Unfreeze it before trying a purchase." : failure instanceof Error ? failure.message : "We couldn’t confirm this purchase. Retry the same purchase.");
-    } finally { setBusy(false); onBusy(false); }
-  }
-  if(contextUnavailable)return <section className="consumer-panel consumer-purchase" aria-label="Card purchase"><Feedback kind="error" message={error}/>{pending&&<Button busy={busy} onClick={()=>void purchase()}>Retry same purchase</Button>}</section>;
-  return <section className="consumer-panel consumer-purchase" aria-label="Card purchase">
-    <h3>Try a purchase</h3><p className="consumer-muted">Enter a purchase to see it in your activity.</p>
-    <Feedback kind="error" message={error} /><Feedback kind="success" message={message} />{error && !pending && <Button variant="secondary" disabled={busy} onClick={() => { onRefresh(); setError(""); }}>Refresh card</Button>}
-    <>
-      {!card.canPurchase && !pending && <p>{card.purchaseAvailability.description}</p>}
-      {pending && !busy && <p role="status">We haven’t confirmed this purchase yet. Retry the same purchase before closing this card, opening another service or entering a new purchase.</p>}
-      <form onSubmit={(event) => { event.preventDefault(); void purchase(); }}>
-        <div className="consumer-form-fields"><label>Purchase description<input value={description} maxLength={120} autoComplete="off" disabled={busy || Boolean(pending) || !card.canPurchase} onChange={event => setDescription(event.target.value)} placeholder="For example, Groceries" /></label>
-          <label>Purchase amount (USD)<input value={amount} inputMode="decimal" autoComplete="off" disabled={busy || Boolean(pending) || !card.canPurchase} onChange={event => setAmount(event.target.value)} placeholder="0.00" /></label></div>
-        <div className="consumer-action-row"><Button type="submit" busy={busy} disabled={!pending && !card.canPurchase}>{pending ? "Retry same purchase" : "Make purchase"}</Button></div>
-      </form>
-    </>
-  </section>;
 }

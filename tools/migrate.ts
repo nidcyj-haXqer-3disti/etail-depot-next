@@ -87,7 +87,7 @@ async function migrate(): Promise<void> {
     if (!allowedAddress || actual.current_database !== new URL(connectionString).pathname.slice(1) || actual.current_user !== (process.env.CI === 'true' ? 'etail_ci' : 'etail_local')) {
       throw new Error('PostgreSQL did not confirm the expected local database connection.');
     }
-    const expectedMarker = `ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-v1:${actual.current_database.endsWith('_preview') ? 'preview' : 'test'}`;
+    const expectedMarker = `ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-d69:${actual.current_database.endsWith('_preview') ? 'preview' : 'test'}`;
     const owned = await client.query("SELECT pg_get_userbyid(datdba) AS owner, shobj_description(oid, 'pg_database') AS marker FROM pg_database WHERE datname = current_database()");
     if (owned.rows[0]?.owner !== actual.current_user || owned.rows[0]?.marker !== expectedMarker) throw new Error('Fresh database ownership/generation was not confirmed; prepare it explicitly first.');
     await client.query('SET lock_timeout = \'20s\'');

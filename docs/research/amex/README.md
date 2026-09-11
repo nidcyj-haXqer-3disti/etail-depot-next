@@ -2,6 +2,8 @@
 
 > **Research archive and comparison reference — active design superseded on 11 September 2026.** Use [Product and technical design](../../PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../../../planning/DELIVERY_PLAN.md) for current product decisions, scope and acceptance. Dated observations and proposals below preserve their original evidence limits; old account models and historical implementation instructions do not govern new work. The current ambition is **100% of the retained public-workflow inventory**, recorded as `amex-public-v2`, not the original 90% threshold. No parity or completion score is awarded here.
 
+Latest D69 screen/workflow refresh (12 September 2026): [Prepaid replacement reference findings](../../FRESH_PREPAID_REBUILD.md#reference-findings), including current official cardholder/merchant guides, the historical Amex UK merchant walkthrough and MagnifiedMoney cardholder video. The record distinguishes complete available transcripts from inspected player moments, market/date limitations and Etail's explicit prepaid adaptation. It does not claim private portal access or parity.
+
 Latest marketing refresh (10 September 2026): [Amex people and card positioning](MARKETING_POSITIONING_2026_09_10.md) and [delegated collection research](MERCHANT_MARKETING_FIT_2026_09_10.md). These support [the redesigned landing page](../../MARKETING_REFRESH.md); proposed audience jobs remain hypotheses for customer testing.
 
 Latest dashboard/role refresh: [Cardholder dashboards](CARDHOLDER_DASHBOARD_ROLES.md) and [Merchant dashboards](MERCHANT_DASHBOARD_ROLES.md), with official sources, observed illustrations, historical video and evidence limits. These inform [the implemented service design](../../SERVICE_DASHBOARD_DESIGN.md).

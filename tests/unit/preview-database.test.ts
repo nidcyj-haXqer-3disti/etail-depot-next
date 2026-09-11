@@ -19,7 +19,7 @@ describe("fixed fresh preview and test targets", () => {
   it("rejects mode mismatches and every prior recovery database", () => {
     expect(()=>databaseConnectionSettings({preview:true,env:isolated})).toThrow("exactly match");
     expect(()=>databaseConnectionSettings({env:{...isolated,DATABASE_URL:clean}})).toThrow("exactly match");
-    for(const name of ["etail_depot_next","etail_depot_next_test","etail_depot_next_preview_v2"]) {
+    for(const name of ["etail_depot_next","etail_depot_next_test","etail_depot_next_preview_v2","etail_depot_next_services_preview_retired_d69","etail_depot_next_services_test_retired_d69"]) {
       expect(()=>databaseConnectionSettings({env:{...isolated,DATABASE_URL:`postgres://etail_local@127.0.0.1:55439/${name}`}})).toThrow("recovery-only");
     }
   });
@@ -45,19 +45,21 @@ const {verifyPreviewDatabase,previewDatabaseComment}=await import(new URL("../..
 
 describe("clean preview database ownership and preparation barrier",()=>{
   const confirmed={version:"PostgreSQL 18.6",current_database:"etail_depot_next_services_preview",current_user:"etail_local",owner:"etail_local",address:"127.0.0.1/32",marker:previewDatabaseComment};
-  function database(identity:Record<string,unknown>=confirmed,state:string|null="COMPLETE",table=true) {
+  function database(identity:Record<string,unknown>=confirmed,state:string|null="COMPLETE",table=true,seedKey="fresh-services-d69") {
     const calls:string[]=[];
     return {calls,query:async(query:string)=>{
       calls.push(query);
       if(query.includes("FROM pg_database"))return {rows:[identity]};
+      if(query.includes("prepaid_cutover")&&query.includes("to_regclass"))return {rows:[{name:"prepaid_cutover"}]};
+      if(query.includes("FROM public.prepaid_cutover AS cutover")||query.includes("FROM information_schema.columns"))return {rows:[{valid:true}]};
       if(query.includes("to_regclass"))return {rows:[{name:table?"_etail_preview_seed":null}]};
-      if(query.startsWith("SELECT state"))return {rows:state?[{state}]:[]};
+      if(query.startsWith("SELECT key,state"))return {rows:state?[{key:seedKey,state}]:[]};
       throw new Error("Unexpected query; preview startup must remain read-only");
     }};
   }
   it("accepts only the marked completed generation without writing or seeding",async()=>{
     const db=database();await verifyPreviewDatabase(db);
-    expect(db.calls).toHaveLength(3);expect(db.calls.every(query=>query.trimStart().startsWith("SELECT"))).toBe(true);
+    expect(db.calls).toHaveLength(6);expect(db.calls.every(query=>query.trimStart().startsWith("SELECT"))).toBe(true);
   });
   it.each([
     {current_database:"etail_depot_next"},{current_database:"etail_depot_next_test"},{current_user:"another_role"},
@@ -67,6 +69,27 @@ describe("clean preview database ownership and preparation barrier",()=>{
   });
   it.each(["PREPARING",null])("fails closed for incomplete preparation %s",async state=>{
     await expect(verifyPreviewDatabase(database(confirmed,state))).rejects.toThrow("incomplete");
+  });
+  it("rejects an old completed seed marker without writing",async()=>{
+    const db=database(confirmed,"COMPLETE",true,"fresh-services-v1");
+    await expect(verifyPreviewDatabase(db)).rejects.toThrow("another generation");
+    expect(db.calls.every(query=>query.trimStart().startsWith("SELECT"))).toBe(true);
+  });
+  it("rejects duplicate generation markers without inspecting application data",async()=>{
+    const calls:string[]=[];
+    const db={query:async(query:string)=>{
+      calls.push(query);
+      if(query.includes("FROM pg_database"))return {rows:[confirmed]};
+      if(query.includes("to_regclass"))return {rows:[{name:"_etail_preview_seed"}]};
+      if(query.startsWith("SELECT key,state"))return {rows:[
+        {key:"fresh-services-d69",state:"COMPLETE"},
+        {key:"fresh-services-v1",state:"COMPLETE"},
+      ]};
+      throw new Error("Unexpected startup query");
+    }};
+    await expect(verifyPreviewDatabase(db)).rejects.toThrow("another generation");
+    expect(calls).toHaveLength(3);
+    expect(calls.every(query=>query.trimStart().startsWith("SELECT"))).toBe(true);
   });
   it("does not manufacture a missing seed marker",async()=>{
     const db=database(confirmed,null,false);

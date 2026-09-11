@@ -74,11 +74,11 @@ async function merchantContext(tx:ScopedTransaction,personId:string,merchantId:s
  const [activation]=await tx.select().from(channelActivations).where(eq(channelActivations.channelId,channelId));
  const [used]=channel.usage==="ONE_TIME"?await tx.select({id:merchantTestPayments.id}).from(merchantTestPayments).where(and(eq(merchantTestPayments.channelId,channelId),eq(merchantTestPayments.outcome,"APPROVED"))).limit(1):[];
  let adult=true;try{await requireMerchantApplicant(tx,personId);}catch(error){if(error instanceof SecurityError&&[403,404].includes(error.status))adult=false;else throw error;}
- const now=await merchantNow(tx),canShare=adult&&evaluate(scope.policy,"channels.share").allowed&&evaluate(scope.policy,"payments.simulate").allowed;
+ const now=await merchantNow(tx),canShare=adult&&evaluate(scope.policy,"channels.share").allowed;
  const ready=canShare&&channel.status==="DRAFT"&&channel.expiresAt>now&&!Boolean(used)&&gateway?.mode==="TEST_READY"&&enrollment?.status==="ENROLLED"&&activation?.status==="ACTIVE";
  return {scope,channel,gateway,enrollment,activation,ready,canShare,now};
 }
-async function publicationContext(tx:ScopedTransaction,row:Publication,forWrite=false){
+export async function publicationContext(tx:ScopedTransaction,row:Publication,forWrite=false){
  try{
   const current=await merchantContext(tx,row.publisherId,row.merchantUnitId,row.channelId,forWrite);
   if(forWrite){const [latest]=await tx.select().from(guestPublications).where(eq(guestPublications.id,row.id)).for("share");if(!latest)return null;row=latest;}

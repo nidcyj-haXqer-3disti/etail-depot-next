@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
@@ -95,7 +96,7 @@ describe("verified-provider service dashboard reads", () => {
 
   it("keeps another person's cards, merchants and commands unavailable to the new provider member", async () => {
     const primary = await cardPrimary("Protected synthetic cardholder");
-    const issued = await issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Protected synthetic card", "1000");
+    const issued = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"1000");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"1000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Protected synthetic card");})();
     const merchant = await acquiringFixture();
     const member = await bindIdentity(issuer, randomUUID());
     const serviceIds = [primary.serviceId, merchant.serviceId];

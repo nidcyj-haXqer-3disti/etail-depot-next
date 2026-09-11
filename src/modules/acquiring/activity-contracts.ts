@@ -22,7 +22,7 @@ export function parseMerchantActivityApiQuery(input: URLSearchParams) {
 }
 export interface MerchantActivityRow {
   id: string; kind: "payment" | "refund" | "transfer"; merchantId: string; merchantName: string;
-  description: string; amount: Money; status: "APPROVED" | "DECLINED" | "REFUNDED" | "COMPLETED";
+  description: string; amount: Money; status: "APPROVED" | "DECLINED" | "REFUNDED" | "COMPLETED"|"PENDING"|"FAILED";
   reference: string; at: string; paymentId: string | null; paymentReference: string | null; href: string;
 }
 export interface MerchantActivityProjection {
@@ -33,7 +33,7 @@ export interface MerchantActivityProjection {
 const money = z.object({minor:z.string(),currency:z.literal("USD"),formatted:z.string()}).strict();
 export const merchantActivityProjectionSchema = z.object({
   query:merchantActivityQuerySchema,range:z.object({from:z.string(),to:z.string()}).strict(),asOf:z.iso.datetime(),available:z.boolean(),completeScope:z.boolean(),
-  rows:z.array(z.object({id:z.uuid(),kind:z.enum(["payment","refund","transfer"]),merchantId:z.uuid(),merchantName:z.string(),description:z.string(),amount:money,status:z.enum(["APPROVED","DECLINED","REFUNDED","COMPLETED"]),reference:z.string(),at:z.iso.datetime(),paymentId:z.uuid().nullable(),paymentReference:z.string().nullable(),href:z.string()}).strict()),
+  rows:z.array(z.object({id:z.uuid(),kind:z.enum(["payment","refund","transfer"]),merchantId:z.uuid(),merchantName:z.string(),description:z.string(),amount:money,status:z.enum(["APPROVED","DECLINED","REFUNDED","COMPLETED","PENDING","FAILED"]),reference:z.string(),at:z.iso.datetime(),paymentId:z.uuid().nullable(),paymentReference:z.string().nullable(),href:z.string()}).strict()),
   totalCount:z.int().nonnegative(),pageCount:z.int().positive(),pageSize:z.int().positive(),
   periodTotals:z.object({collected:money.nullable(),refunded:money.nullable(),transferred:money.nullable()}).strict(),
 }).strict();

@@ -67,7 +67,7 @@ it("keeps read-only and restricted collection access separate from usable paymen
   const shared=await createChannel(f.operator.personId,f.unit.id,{...paymentInput(),presentations:["WEB"],visibility:"ASSIGNED"});
   await setChannelActivation(f.operator.personId,f.unit.id,shared.id,{commandId:randomUUID(),expectedVersion:0,expectedChannelVersion:shared.version,active:true});
   expect(await unit()).toMatchObject({canCreateChannel:false,collectionAvailability:{code:"READY",action:{label:"View payment channels"}}});
-  expect(await getMerchantOperations(f.helper.personId,f.unit.id)).toMatchObject({canConfigureGateway:false,canEnroll:false,canPayout:false,canReadPayments:false,channels:[{canSimulate:false,canActivate:false}]});
+  expect(await getMerchantOperations(f.helper.personId,f.unit.id)).toMatchObject({canConfigureGateway:false,canEnroll:false,canPayout:false,canReadPayments:false,channels:[{canActivate:false}]});
   await expect(simulateMerchantPayment(f.helper.personId,f.unit.id,shared.id,{commandId:randomUUID(),expectedChannelVersion:shared.version,outcome:"APPROVED"})).rejects.toMatchObject({status:403});
   await getDb().update(merchantSetupEligibility).set({personaKind:"FICTIONAL_SUPERVISED"}).where(eq(merchantSetupEligibility.personId,f.operator.personId));
   expect(await unit(f.operator.personId)).toMatchObject({canCreateChannel:false,collectionAvailability:{code:"ACCESS_RESTRICTED"}});

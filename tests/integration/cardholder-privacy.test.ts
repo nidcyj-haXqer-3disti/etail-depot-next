@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
@@ -16,9 +17,9 @@ const filters: ReportFilters = { source: "ACTIVITY", status: "ALL", from: "2020-
 async function fixture() {
   const p = await cardPrimary("Named primary holder"), secondary = await cardPerson("Own secondary holder"), other = await cardPerson("Other secondary holder");
   for (const holder of [secondary, other]) await enrollCardholder(p.personId, p.serviceId, holder);
-  const primaryCard = await issuePracticeCard(p.personId, p.serviceId, p.personId, "Private primary card", "10000", "701");
-  const ownCard = await issuePracticeCard(p.personId, p.serviceId, secondary, "Secondary own card", "10000", "123");
-  const otherCard = await issuePracticeCard(p.personId, p.serviceId, other, "Other person's card", "10000", "999");
+  const primaryCard = await (async()=>{await fundCardGroup(p.personId,p.serviceId,"30000");await setPersonLimit(p.personId,p.serviceId,p.personId,"10000");return issuePracticeCard(p.personId,p.serviceId,p.personId,"Private primary card","701");})();
+  const ownCard = await (async()=>{await setPersonLimit(p.personId,p.serviceId,secondary,"10000");return issuePracticeCard(p.personId,p.serviceId,secondary,"Secondary own card","123");})();
+  const otherCard = await (async()=>{await setPersonLimit(p.personId,p.serviceId,other,"10000");return issuePracticeCard(p.personId,p.serviceId,other,"Other person's card","999");})();
   const [unassigned] = await getDb().insert(serviceActivity).values({ serviceId: p.serviceId, title: "Unattributed service row", category: "Service", occurredAt: new Date(), status: "POSTED", direction: "CREDIT", amountMinor: 111n, description: "Not linked to any card" }).returning();
   return { serviceId: p.serviceId, primary: p.personId, secondary, other, primaryCard, ownCard, otherCard, unassigned: unassigned! };
 }
@@ -87,7 +88,7 @@ describe("primary oversight and secondary own-card privacy", () => {
     await getDb().update(serviceMembers).set({ state: "REVOKED", version: 2 }).where(and(eq(serviceMembers.serviceId, f.serviceId), eq(serviceMembers.personId, f.secondary)));
     expect((await getDb().select().from(permissionGrants).where(and(eq(permissionGrants.serviceId, f.serviceId), eq(permissionGrants.personId, f.secondary), eq(permissionGrants.action, "cards.hold"))))[0]!.state).toBe("ACCEPTED");
     expect((await getWorkspace(f.primary, f.serviceId)).cardholderOptions.map(row => row.id)).not.toContain(f.secondary);
-    await expect(updateCardRequest(f.primary, f.serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId: f.secondary, nickname: "Unavailable holder", format: "VIRTUAL", requestedLimitMinor: "100" })).rejects.toMatchObject({ status: 422 });
+    await expect(updateCardRequest(f.primary, f.serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId: f.secondary, nickname: "Unavailable holder", format: "VIRTUAL" })).rejects.toMatchObject({ status: 422 });
     await expect(purchaseCard(f.secondary, f.serviceId, f.ownCard.card.id, { commandId: randomUUID(), expectedVersion: f.ownCard.card.version, amountMinor: "1", description: "Revoked purchase" })).rejects.toMatchObject({ status: 404 });
   });
 

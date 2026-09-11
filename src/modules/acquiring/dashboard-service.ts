@@ -7,7 +7,8 @@ import { getBalance } from "../ledger/service";
 import { formatMoney } from "../workspace/service";
 import { listMerchantScopes, merchantChannelVisible } from "./service";
 import { paymentChannels } from "./schema";
-import { channelActivations, merchantTestPayments, merchantTestRefunds, merchantTestPayouts, testGateways, testMerchantEnrollments } from "./operations-schema";
+import {merchantDeposits,merchantDepositEvents} from "./settlement-schema";
+import { channelActivations, merchantTestPayments, merchantTestRefunds, testGateways, testMerchantEnrollments } from "./operations-schema";
 import type { MerchantCollectionAvailability, MerchantDashboardProjection, MerchantDashboardTotals, MerchantDashboardUnit, MerchantDashboardView, MerchantDashboardPayment, MerchantDashboardTransfer } from "./dashboard-contracts";
 import {parseMerchantActivityQuery,type MerchantActivityQueryInput,type MerchantActivityRow} from "./activity-contracts";
 import {projectMerchantActivity} from "./activity-service";
@@ -24,7 +25,8 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
   const primaryServiceIds=[...new Set(scopes.map(scope=>scope.masterService.id))],unitIds=scopes.map(scope=>scope.unit.id);
   const payments=paymentIds.length?await tx.select().from(merchantTestPayments).where(inArray(merchantTestPayments.merchantUnitId,paymentIds)).orderBy(desc(merchantTestPayments.createdAt),merchantTestPayments.id):[];
   const refunds=paymentIds.length?await tx.select().from(merchantTestRefunds).where(inArray(merchantTestRefunds.merchantUnitId,paymentIds)):[];
-  const payouts=paymentIds.length?await tx.select().from(merchantTestPayouts).where(inArray(merchantTestPayouts.merchantUnitId,paymentIds)).orderBy(desc(merchantTestPayouts.createdAt),merchantTestPayouts.id):[];
+  const deposits=paymentIds.length?await tx.select({deposit:merchantDeposits,event:merchantDepositEvents}).from(merchantDeposits).leftJoin(merchantDepositEvents,eq(merchantDepositEvents.depositId,merchantDeposits.id)).where(inArray(merchantDeposits.merchantUnitId,paymentIds)).orderBy(desc(merchantDeposits.createdAt),merchantDeposits.id):[];
+  const payouts=deposits.map(({deposit,event})=>({...deposit,status:event?.outcome??"PENDING" as const,activityAt:event?.createdAt??deposit.createdAt,testReference:`DEP-${deposit.id.slice(0,8).toUpperCase()}`}));
   const channels=channelIds.length?await tx.select().from(paymentChannels).where(inArray(paymentChannels.merchantUnitId,channelIds)):[];
   const activations=channelIds.length?await tx.select().from(channelActivations).where(inArray(channelActivations.merchantUnitId,channelIds)):[];
   const gateways=primaryServiceIds.length?await tx.select().from(testGateways).where(inArray(testGateways.serviceId,primaryServiceIds)):[];
@@ -45,7 +47,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
    const setupAction={label:"Review payment setup",href:`/merchants/${unit.id}?tab=verification`};
    const channelAction={label:"View payment channels",href:`/merchants/${unit.id}?tab=channels`};
    // This suggests an existing scoped page, never supplies command authority.
-   // Payment setup alone is not a ready channel, or a published guest checkout.
+   // Payment setup alone is not a ready channel, or a published customer checkout.
    const collectionAvailability:MerchantCollectionAvailability=!scope.policy.operating
     ?{code:"PAUSED",title:"Payments are unavailable",description:"Review this merchant’s status and payment setup. Existing records remain available within your access.",action:setupAction}
     :setupState!=="READY"
@@ -53,7 +55,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
         ?{code:"SETUP_REQUIRED",title:"Payment setup needs attention",description:"Review payment setup before using a channel to receive sandbox payments.",action:setupAction}
         :{code:"PRIMARY_ACTION_REQUIRED",title:"Your primary merchant needs to finish setup",description:`Ask ${scope.master.displayName} to review payment setup for this merchant. Your access does not let you enable payments.`,action:helpAction}
       :!eligible
-        ?{code:"ACCESS_RESTRICTED",title:"Payment access needs attention",description:"Creating and trying sandbox payments is not available for this setup. Open Help to review your access.",action:helpAction}
+        ?{code:"ACCESS_RESTRICTED",title:"Payment access needs attention",description:"Creating payment channels is not available for this setup. Open Help to review your access.",action:helpAction}
         :!canReadChannels
           ?{code:"ACCESS_RESTRICTED",title:"Payment channels are not shared with you",description:scope.primaryAccess?"Your current access does not include payment channels. Open Help to review your access.":`Ask ${scope.master.displayName} to review your payment channel access. You can still use the records shared with you.`,action:helpAction}
           :!visibleChannels.length
@@ -67,8 +69,11 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
    units.push({id:unit.id,name:unit.displayName,kind:unit.kind,primaryId:scope.master.id,primaryName:scope.master.displayName,primaryAccess:scope.primaryAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddSubmerchant:unit.kind==="MASTER"&&evaluate(scope.policy,"merchant.units.create").allowed&&scope.policy.operating&&eligible,canCreateChannel,canReadPeople:evaluate(scope.policy,"merchant.people.read").allowed,setupState,collectionAvailability,totals:{
     collected:canReadPayments?total(payments.filter(row=>row.merchantUnitId===unit.id&&row.outcome==="APPROVED")):null,
     refunded:canReadPayments?total(refunds.filter(row=>row.merchantUnitId===unit.id)):null,
-    transferred:canReadPayments?total(payouts.filter(row=>row.merchantUnitId===unit.id)):null,
+    transferred:canReadPayments?total(payouts.filter(row=>row.merchantUnitId===unit.id&&row.status==="COMPLETED")):null,
     available:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId:unit.id,bucket:"MERCHANT_AVAILABLE"})):null,
+    settled:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId:unit.id,bucket:"MERCHANT_SETTLED"})):null,
+    pending:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId:unit.id,bucket:"MERCHANT_PAYOUT_PENDING"})):null,
+    bank:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId:unit.id,bucket:"PAYOUT_CLEARING"})):null,
     channelCount:canReadChannels?visibleChannels.length:null,
     activeChannelCount:canReadChannels?activeChannelCount:null,
    }});
@@ -77,12 +82,12 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
   const ownedRoots=new Set(primaryNetworks.map(row=>row.primaryId));
   const delegatedUnitIds=units.filter(unit=>!ownedRoots.has(unit.primaryId)).map(unit=>unit.id);
   const paymentRows:MerchantDashboardPayment[]=payments.map(row=>({id:row.id,merchantId:row.merchantUnitId,merchantName:units.find(unit=>unit.id===row.merchantUnitId)!.name,description:row.description,amount:formatMoney(row.amountMinor),status:refunds.some(refund=>refund.paymentId===row.id)?"REFUNDED":row.outcome,reference:row.testReference,at:row.createdAt.toISOString()}));
-  const transferRows:MerchantDashboardTransfer[]=payouts.map(row=>({id:row.id,merchantId:row.merchantUnitId,merchantName:units.find(unit=>unit.id===row.merchantUnitId)!.name,amount:formatMoney(row.amountMinor),reference:row.testReference,at:row.createdAt.toISOString()}));
+  const transferRows:MerchantDashboardTransfer[]=payouts.map(row=>({id:row.id,merchantId:row.merchantUnitId,merchantName:units.find(unit=>unit.id===row.merchantUnitId)!.name,amount:formatMoney(row.amountMinor),reference:row.testReference,at:row.activityAt.toISOString(),status:row.status}));
   function view(id:string,name:string,description:string,ids:string[]):MerchantDashboardView {
    const selected=units.filter(unit=>ids.includes(unit.id));
-   const amount=(key:"collected"|"refunded"|"transferred"|"available")=>selected.every(unit=>unit.totals[key]!==null)?formatMoney(selected.reduce((sum,unit)=>sum+BigInt(unit.totals[key]!.minor),0n)):null;
+   const amount=(key:"collected"|"refunded"|"transferred"|"available"|"settled"|"pending"|"bank")=>selected.every(unit=>unit.totals[key]!==null)?formatMoney(selected.reduce((sum,unit)=>sum+BigInt(unit.totals[key]!.minor),0n)):null;
    const count=(key:"channelCount"|"activeChannelCount")=>selected.every(unit=>unit.totals[key]!==null)?selected.reduce((sum,unit)=>sum+unit.totals[key]!,0):null;
-   const totals:MerchantDashboardTotals={collected:amount("collected"),refunded:amount("refunded"),transferred:amount("transferred"),available:amount("available"),channelCount:count("channelCount"),activeChannelCount:count("activeChannelCount")};
+   const totals:MerchantDashboardTotals={collected:amount("collected"),refunded:amount("refunded"),transferred:amount("transferred"),available:amount("available"),settled:amount("settled"),pending:amount("pending"),bank:amount("bank"),channelCount:count("channelCount"),activeChannelCount:count("activeChannelCount")};
    const recentPayments=paymentRows.filter(row=>ids.includes(row.merchantId)),recentTransfers=transferRows.filter(row=>ids.includes(row.merchantId));
    return {id,name,description,unitIds:ids,totals,payments:recentPayments.slice(0,12),transfers:recentTransfers.slice(0,6),paymentsHasMore:recentPayments.length>12,transfersHasMore:recentTransfers.length>6};
   }
@@ -90,7 +95,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
   const activityRecords:Omit<MerchantActivityRow,"href">[]=[
    ...paymentRows.map(row=>({...row,kind:"payment" as const,paymentId:row.id,paymentReference:row.reference})),
    ...refunds.map(row=>({id:row.id,kind:"refund" as const,merchantId:row.merchantUnitId,merchantName:units.find(unit=>unit.id===row.merchantUnitId)!.name,description:payments.find(payment=>payment.id===row.paymentId)!.description,amount:formatMoney(row.amountMinor),status:"COMPLETED" as const,reference:row.testReference,at:row.createdAt.toISOString(),paymentId:row.paymentId,paymentReference:payments.find(payment=>payment.id===row.paymentId)!.testReference})),
-   ...transferRows.map(row=>({...row,kind:"transfer" as const,description:"Transfer to sandbox destination",status:"COMPLETED" as const,paymentId:null,paymentReference:null})),
+   ...transferRows.map(row=>({...row,kind:"transfer" as const,description:"Deposit to Sandbox bank",status:row.status,paymentId:null,paymentReference:null})),
   ];
   return {mode:"TEST",canCreatePrimary,primaryNetworks,delegatedUnitIds,units,views,activity:projectMerchantActivity(query,views.find(view=>view.id===query.view),activityRecords,now,options.exportRows)};
  },{isolationLevel:"repeatable read"});

@@ -13,7 +13,7 @@ export interface WorkspaceCard {
   id: string; serviceId: string; holderId: string; holderName: string; nickname: string;
   relationship: "PRIMARY" | "SECONDARY";
   lastFour: string; format: "VIRTUAL" | "PHYSICAL"; status: "ACTIVE" | "FROZEN";
-  version: number; limit: Money; available: Money;
+  version: number; spending: import("./funding-contracts").PersonSpending; available: Money;
   canFreeze: boolean; canUnfreeze: boolean; canPurchase: boolean; fictional: true;
   purchaseAvailability: CardPurchaseAvailability;
   freeze:{primary:boolean;holder:boolean;reviewRequired:boolean;description:string;freezeLabel:string;unfreezeLabel:string;unfreezeDescription:string};
@@ -30,7 +30,7 @@ export interface WorkspacePerson {
 }
 export interface CardRequestProjection {
   id: string; serviceId: string; holderId: string; holderName: string; nickname: string;
-  format: "VIRTUAL" | "PHYSICAL"; requestedLimitMinor: string; currency: "USD";
+  format: "VIRTUAL" | "PHYSICAL"; currency: "USD";
   status: "DRAFT" | "BLOCKED" | "CANCELED" | "ISSUED"; version: number; updatedAt: string;
   issuedCardId: string | null; canSubmit: boolean;
   prerequisites: { code: string; title: string; detail: string }[];
@@ -52,13 +52,12 @@ export interface WorkspaceProjection {
 
 export const versionSchema = z.int().positive();
 export const cardControlCommandSchema = z.object({ commandId: z.uuid(), expectedVersion: versionSchema, action: z.enum(["freeze", "unfreeze"]) }).strict();
-export const cardPurchaseCommandSchema = z.object({ commandId: z.uuid(), expectedVersion: versionSchema, amountMinor: z.string().regex(/^[1-9][0-9]{0,8}$/), description: z.string().trim().min(1).max(120) }).strict();
+export const cardPurchaseCommandSchema = z.object({ commandId: z.uuid(), expectedVersion: versionSchema, amountMinor: z.string().regex(/^[1-9][0-9]{0,11}$/), description: z.string().trim().min(1).max(120) }).strict();
 export type CardPurchaseCommand = z.infer<typeof cardPurchaseCommandSchema>;
 export const startCardRequestSchema = z.object({ commandId: z.uuid() }).strict();
 export const cardDraftCommandSchema = z.object({
   commandId: z.uuid(), expectedVersion: versionSchema, holderId: z.uuid(),
   nickname: z.string().trim().min(1).max(60), format: z.enum(["VIRTUAL", "PHYSICAL"]),
-  requestedLimitMinor: z.string().regex(/^(0|[1-9][0-9]{0,8})$/),
 }).strict();
 export const versionedCommandSchema = z.object({ commandId: z.uuid(), expectedVersion: versionSchema }).strict();
 export const notificationCommandSchema = z.object({

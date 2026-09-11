@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import {randomUUID} from "node:crypto";
 import {and,eq} from "drizzle-orm";
 import {afterAll,expect,it} from "vitest";
@@ -14,7 +15,7 @@ afterAll(closeDatabase);
 it("explains the current purchase gate without allowing a primary to spend as another cardholder",async()=>{
   const primary=await cardPrimary("Primary manager"),secondary=await cardPerson("Named spender");
   await enrollCardholder(primary.personId,primary.serviceId,secondary);
-  const issued=await issuePracticeCard(primary.personId,primary.serviceId,secondary,"Everyday","100");
+  const issued=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"100");await setPersonLimit(primary.personId,primary.serviceId,secondary,"100");return issuePracticeCard(primary.personId,primary.serviceId,secondary,"Everyday");})();
   const focus=async(personId=secondary)=>(await getCardholderDashboardFocus(personId,issued.card.id)).card;
   const beforeRead=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId));
   expect(await focus()).toMatchObject({canPurchase:true,purchaseAvailability:{code:"READY"}});
@@ -35,11 +36,11 @@ it("explains the current purchase gate without allowing a primary to spend as an
   const spent=await purchaseCard(secondary,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:active.version,amountMinor:"100",description:"Spend exact available funds"});
   expect(spent.card).toMatchObject({canPurchase:false,available:{minor:"0"},purchaseAvailability:{code:"NO_FUNDS"}});
   expect(await focus(primary.personId)).toMatchObject({canPurchase:false,purchaseAvailability:{code:"OTHER_CARDHOLDER"}});
-  await expect(purchaseCard(secondary,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:spent.card.version,amountMinor:"1",description:"No funds remains denied"})).rejects.toMatchObject({code:"INSUFFICIENT_PRACTICE_FUNDS"});
+  await expect(purchaseCard(secondary,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:spent.card.version,amountMinor:"1",description:"No funds remains denied"})).rejects.toMatchObject({code:"SPENDING_LIMIT_EXCEEDED"});
 });
 
 it("keeps holder setup and card-holding permission explicit without creating guardian funding or changing cards",async()=>{
-  const primary=await cardPrimary(),issued=await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Setup card","100");
+  const primary=await cardPrimary(),issued=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"100");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"100");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Setup card");})();
   const focus=async()=>(await getCardholderDashboardFocus(primary.personId,issued.card.id)).card;
   const before=await getDb().select().from(cards).where(eq(cards.id,issued.card.id));
   await getDb().update(merchantSetupEligibility).set({personaKind:"FICTIONAL_SUPERVISED"}).where(eq(merchantSetupEligibility.personId,primary.personId));

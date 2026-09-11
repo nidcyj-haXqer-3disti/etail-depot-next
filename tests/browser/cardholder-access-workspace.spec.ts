@@ -1,3 +1,6 @@
+import {freshPublishedPayment} from "./helpers/prepaid";
+import {cardCheckoutReviewSchema} from "../../src/modules/acquiring/card-checkout-contracts";
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import { expect, test, type BrowserContext } from "@playwright/test";
@@ -65,7 +68,7 @@ test("primary invitation, intended acceptance, permission changes and revocation
     grants: await getDb().select().from(permissionGrants).where(inArray(permissionGrants.serviceId, preservedIds)).orderBy(permissionGrants.serviceId, permissionGrants.personId, permissionGrants.action),
   });
   const before = await preserved();
-  const primaryCard = await issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Private primary UI card", "1000", "99");
+  const primaryCard = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2000");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"1000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Private primary UI card","99");})();
   const recipientContext = await browser.newContext({ viewport: page.viewportSize() ?? { width: 1280, height: 720 } });
   const recipientPage = await recipientContext.newPage();
   await signIn(page.context(), primary.personId); await signIn(recipientContext, recipient.id);
@@ -90,13 +93,13 @@ test("primary invitation, intended acceptance, permission changes and revocation
     expect((await page.request.post(`${origin}/api/v1/invitations/${pending.id}/accept`, { headers, data: { commandId: randomUUID(), expectedVersion: pending.version } })).status()).toBe(404);
     expect((await recipientPage.request.get(`${origin}/api/v1/cardholder-services/${primary.serviceId}/workspace`)).status()).toBe(404);
 
-    await recipientPage.goto(`${origin}/services`);
+    await recipientPage.goto(`${origin}/shared-access`);
     const invitationRow = recipientPage.locator(".ws-person-row").filter({ hasText: `Reference ${pending.id.slice(0, 8).toUpperCase()}` });
     await invitationRow.getByRole("button", { name: "Review invitation", exact: true }).click();
     const acceptance = recipientPage.getByRole("dialog", { name: "Review cardholder invitation", exact: true });
     await acceptance.getByRole("button", { name: "Accept this access", exact: true }).click();
     await expect(acceptance).toBeHidden();
-    const secondaryCard = await issuePracticeCard(primary.personId, primary.serviceId, recipient.id, "My secondary UI card", "1000", "25");
+    const secondaryCard = await (async()=>{await setPersonLimit(primary.personId,primary.serviceId,recipient.id,"1000");return issuePracticeCard(primary.personId,primary.serviceId,recipient.id,"My secondary UI card","25");})();
     await recipientPage.goto(`${origin}/cardholder-services?focus=${secondaryCard.card.id}`);
     await expect(recipientPage.getByRole("region", { name: "Selected card overview" })).toContainText(secondaryCard.card.nickname);
     await recipientPage.goto(`${origin}/cardholder-services/activity?focus=${secondaryCard.card.id}`);
@@ -107,6 +110,18 @@ test("primary invitation, intended acceptance, permission changes and revocation
     expect(ownWorkspace.activity.map(item => item.id)).toEqual([secondaryCard.activity!.id]);
     await recipientPage.goto(`${origin}/cardholder-services?focus=${primaryCard.card.id}`);
     await expect(recipientPage.getByRole("heading", { name: "This card is unavailable", exact: true })).toBeVisible();
+
+    // Prepare an actual customer checkout while purchases are allowed. Revoking that
+    // action must also block confirmation of a review that was already saved.
+    const checkout=await freshPublishedPayment("1","Denied after permission change");
+    const checkoutPath=`${origin}/api/v1/checkout/${checkout.publication.id}/card`;
+    const prepared=await recipientPage.request.post(checkoutPath,{headers,data:{
+      commandId:randomUUID(),cardServiceId:primary.serviceId,cardId:secondaryCard.card.id,
+      expectedCardVersion:secondaryCard.card.version,
+    }});
+    expect(prepared.status()).toBe(200);
+    const checkoutReview=cardCheckoutReviewSchema.parse(await prepared.json());
+    expect(checkoutReview.receipt).toBeNull();
 
     await page.goto(accessUrl);
     await page.locator("button.ws-person-row").filter({ hasText: recipient.name }).click();
@@ -120,7 +135,15 @@ test("primary invitation, intended acceptance, permission changes and revocation
     const editReview = page.getByRole("dialog", { name: "Review cardholder access", exact: true });
     await editReview.getByRole("button", { name: "Save these permissions", exact: true }).click();
     await expect(editReview).toBeHidden();
-    expect((await recipientPage.request.post(`${origin}/api/v1/cardholder-services/${primary.serviceId}/cards/${secondaryCard.card.id}/purchase`, { headers, data: { commandId: randomUUID(), expectedVersion: secondaryCard.card.version, amountMinor: "1", description: "Denied after permission change" } })).status()).toBe(403);
+    const denied=await recipientPage.request.post(`${checkoutPath}/${checkoutReview.id}`,{headers,data:{}});
+    expect(denied.status()).toBe(403);
+    expect(await denied.json()).toMatchObject({error:{code:"ACTION_DENIED"}});
+    const stillUnpaid=await recipientPage.request.get(`${checkoutPath}/${checkoutReview.id}`);
+    expect(stillUnpaid.status()).toBe(200);
+    expect(cardCheckoutReviewSchema.parse(await stillUnpaid.json()).receipt).toBeNull();
+    const restricted=await (await recipientPage.request.get(`${origin}/api/v1/cardholder-services/${primary.serviceId}/workspace`)).json() as WorkspaceProjection;
+    expect(restricted.cards.find(card=>card.id===secondaryCard.card.id)).toMatchObject({canPurchase:false,purchaseAvailability:{code:"ACCESS_RESTRICTED"}});
+    expect(restricted.activity.map(row=>row.id)).toEqual(ownWorkspace.activity.map(row=>row.id));
 
     await page.goto(accessUrl);
     await page.locator("button.ws-person-row").filter({ hasText: recipient.name }).click();

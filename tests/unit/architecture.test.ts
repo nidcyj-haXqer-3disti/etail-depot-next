@@ -22,11 +22,11 @@ describe("fresh service enrollment and support boundaries",()=>{
     expect(probe(guest,'import {guestOrders} from "./guest-schema"; function createGuestOrder(){tx.update(guestOrders).set({});}')).toContain("GUEST_WRITER_OWNERSHIP");
     expect(probe(guest,'function bypass(){tx.execute(sql`UPDATE merchant_guest_orders SET amount=1`);}')).toContain("RAW_GUEST_WRITE");
     const route='import {confirmGuestAttempt} from "@/modules/acquiring/guest-service"; export async function POST(){return confirmGuestAttempt();}';
-    expect(probe("src/app/api/v1/guest/orders/[orderId]/attempts/[attemptId]/confirm/route.ts",route)).toEqual([]);
-    expect(probe("src/app/api/v1/guest/pay/route.ts",route)).toContain("PARALLEL_GUEST_ROUTE");
+    expect(probe("src/app/api/v1/guest/orders/[orderId]/attempts/[attemptId]/confirm/route.ts",route)).toContain("RETIRED_SIMULATOR_ROUTE");
+    expect(probe("src/app/api/v1/guest/pay/route.ts",route)).toContain("RETIRED_SIMULATOR_COMMAND");
     const ui='"use client"; async function guestRequest(){return fetch("/api/v1/guest/session",{method:"POST"});}';
-    expect(probe("src/ui/guest-checkout.tsx",ui)).toEqual([]);
-    expect(probe("src/ui/other.tsx",ui)).toContain("PARALLEL_GUEST_UI");
+    expect(probe("src/ui/guest-checkout.tsx",ui)).toContain("RETIRED_GUEST_SIMULATOR_UI");
+    expect(probe("src/ui/other.tsx",ui)).toContain("RETIRED_GUEST_SIMULATOR_UI");
   });
   it("keeps the shared case engine's writes and both exact list routes finite",()=>{
     const owner="src/modules/cases/service.ts";
@@ -83,11 +83,11 @@ describe("retired dispute and illustrative data boundaries",()=>{
 });
 
 describe("financial source ownership mutation probes", () => {
-  it("pins purchase to its one route and permits only canonical card writers", () => {
+  it("retires direct purchase routes and permits only canonical transactional card writers", () => {
     const route = 'import {purchaseCard as buy} from "@/modules/workspace/service"; export async function POST(){return buy();}';
-    expect(probe("src/app/api/v1/cardholder-services/[serviceId]/cards/[cardId]/purchase/route.ts", route)).toEqual([]);
-    expect(probe("src/app/api/v1/cardholder-services/[serviceId]/cards/[cardId]/spend/route.ts", route)).toContain("PARALLEL_CARD_COMMAND_ROUTE");
-    const write = 'import {cards,serviceActivity} from "@/platform/database/schema"; export async function purchaseCard(){tx.update(cards).set({version:2});tx.insert(serviceActivity).values({});}';
+    expect(probe("src/app/api/v1/cardholder-services/[serviceId]/cards/[cardId]/purchase/route.ts", route)).toContain("RETIRED_SIMULATOR_ROUTE");
+    expect(probe("src/app/api/v1/cardholder-services/[serviceId]/cards/[cardId]/spend/route.ts", route)).toContain("RETIRED_SIMULATOR_COMMAND");
+    const write = 'import {cards,serviceActivity} from "@/platform/database/schema"; export async function purchaseCardInTransaction(){tx.update(cards).set({version:2});tx.insert(serviceActivity).values({});}';
     expect(probe(workspace, write)).toEqual([]);
     expect(probe("src/modules/issuing/another.ts", write)).toContain("WORKSPACE_WRITER_OWNERSHIP");
   });
@@ -109,7 +109,7 @@ describe("financial source ownership mutation probes", () => {
   });
 
   it("allows only reviewed commands to post and rejects adapter callers outside domain owners", () => {
-    expect(probe(workspace, 'import {postJournal} from "../ledger"; export async function purchaseCard(){return postJournal(tx,input);}')).toEqual([]);
+    expect(probe(workspace, 'import {postJournal} from "../ledger"; export async function purchaseCardInTransaction(){return postJournal(tx,input);}')).toEqual([]);
     expect(probe("src/app/api/money/route.ts", 'import {postJournal as post} from "@/modules/ledger/service"; export async function POST(){return post(tx,input);}')).toContain("LEDGER_POSTING_BOUNDARY");
     expect(probe("src/modules/other/service.ts", 'import {issueSandboxCard} from "@/modules/issuing/sandbox-adapter"; function bypass(){return issueSandboxCard(id);}')).toContain("ISSUING_ADAPTER_BOUNDARY");
     expect(probe("src/app/api/pay/route.ts", 'import {testPayment} from "@/modules/acquiring/adapters/sandbox"; function POST(){return testPayment(id,"APPROVED");}')).toContain("ACQUIRING_ADAPTER_BOUNDARY");
@@ -131,7 +131,7 @@ describe("financial source ownership mutation probes", () => {
       ["merchants/[merchantId]/gateway", "PUT", "configureTestGateway"],
       ["merchants/[merchantId]/test-enrollment", "PUT", "enrollTestMerchant"],
       ["merchants/[merchantId]/channels/[channelId]/activation", "PUT", "setChannelActivation"],
-      ["merchants/[merchantId]/channels/[channelId]/test-payments", "POST", "simulateMerchantPayment"],
+      ["operations/deposits/[depositId]", "POST", "processMerchantDeposit"],
       ["merchants/[merchantId]/payments/[paymentId]/refund", "POST", "refundMerchantPayment"],
       ["merchants/[merchantId]/payouts", "POST", "createMerchantPayout"],
       ["merchants/[merchantId]/operations", "GET", "getMerchantOperations"],
@@ -164,11 +164,39 @@ describe("finite operation and purchase UI mutation probes", () => {
 
   it("pins checkout and card purchase to their original form and exact route", () => {
     const checkout = '"use client"; import {merchantCommand} from "./primitives"; export function MerchantCheckout(){async function pay(input){return merchantCommand(workspace.merchant.id,`/channels/${channel.id}/test-payments`,"POST",input);}}';
-    expect(probe(ui, checkout)).toEqual([]);
+    expect(probe(ui, checkout)).toContain("RETIRED_SIMULATOR_UI");
     expect(probe("src/ui/workspace/another-checkout.tsx", checkout)).toContain("PARALLEL_OPERATION_UI");
     expect(probe(ui, checkout.replace('"POST"', '"PUT"'))).toContain("PARALLEL_OPERATION_UI");
     const card = '"use client"; function CardPurchaseForm(){async function purchase(){return command(`/cards/${card.id}/purchase`,"POST",{});}}';
-    expect(probe("src/ui/workspace/cards.tsx", card)).toEqual([]);
+    expect(probe("src/ui/workspace/cards.tsx", card)).toContain("RETIRED_SIMULATOR_UI");
     expect(probe("src/ui/another-purchase.tsx", card)).toContain("PARALLEL_CARD_PURCHASE_UI");
   });
+});
+
+
+describe("prepaid review, funding and settlement ownership",()=>{
+ it("binds every connected checkout route to its exact method and owner",()=>{
+  for(const [command,suffix,method] of [["prepareCardCheckout","card","POST"],["getCardCheckoutReview","card/[attemptId]","GET"],["confirmCardCheckout","card/[attemptId]","POST"]]){
+   const source=`import {${command}} from "@/modules/acquiring/card-checkout-service";export async function ${method}(){return ${command}();}`;
+   expect(probe(`src/app/api/v1/checkout/[publicationId]/${suffix}/route.ts`,source)).toEqual([]);
+   expect(probe("src/app/api/v1/bypass/route.ts",source)).toContain("PARALLEL_CONNECTED_ROUTE");
+   expect(probe(`src/app/api/v1/checkout/[publicationId]/${suffix}/route.ts`,source.replace(`function ${method}`,"function DELETE"))).toContain("PARALLEL_CONNECTED_ROUTE");
+  }
+ });
+ it("allows one explicit funding owner and rejects issuance funding or a direct HTTP top-up",()=>{
+  const funding='import {cardholderTopups} from "./funding-schema";export async function addCardholderFunds(){tx.insert(cardholderTopups).values({});}';
+  expect(probe(workspace,funding)).toEqual([]);
+  expect(probe(workspace,funding.replace("addCardholderFunds","submitCardRequest"))).toContain("FUNDING_WRITER_OWNERSHIP");
+  expect(probe(workspace,'import {postJournal} from "../ledger";function submitCardRequest(){postJournal(tx,input);}')).toContain("LEDGER_POSTING_BOUNDARY");
+  const direct='import {addCardholderFunds} from "@/modules/workspace/service";export async function POST(){addCardholderFunds();}';
+  expect(probe("src/app/api/v1/add-money/route.ts",direct)).toContain("FUNDING_CONFIRMATION_BOUNDARY");
+ });
+ it("makes exact deposit snapshots and event writes exclusive and immutable",()=>{
+  for(const [table,owner] of [["merchantDeposits","createMerchantPayout"],["merchantDepositItems","createMerchantPayout"],["merchantDepositEvents","processMerchantDeposit"]]){
+   const source=`import {${table}} from "./settlement-schema";export async function ${owner}(){tx.insert(${table}).values({});}`;
+   expect(probe(operations,source)).toEqual([]);
+   expect(probe(operations,source.replace('tx.insert','tx.update'))).toContain("SETTLEMENT_WRITER_OWNERSHIP");
+   expect(probe("src/modules/other/service.ts",source.replace('./settlement-schema','@/modules/acquiring/settlement-schema'))).toContain("SETTLEMENT_WRITER_OWNERSHIP");
+  }
+ });
 });

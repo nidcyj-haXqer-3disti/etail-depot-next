@@ -1,8 +1,20 @@
 import AxeBuilder from "@axe-core/playwright";
 import {expect,test,type Page} from "@playwright/test";
-import {publishedGuestChannel} from "./helpers/guest";
+import {closeDatabase} from "../../src/platform/database/client";
+import {controlCard} from "../../src/modules/workspace/service";
+import {randomUUID} from "node:crypto";
+import {freshPrepaidCard,freshPublishedPayment,signInPerson,openSavedCardReview} from "./helpers/prepaid";
+test.afterAll(closeDatabase);
 async function accessible(page:Page){const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa","wcag22aa"]).analyze();expect(result.violations.map(({id,nodes})=>({id,nodes:nodes.map(node=>node.target)}))).toEqual([]);expect(await page.evaluate(()=>Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)-window.innerWidth)).toBeLessThanOrEqual(1);}
-for(const width of [1440,320])test(`guest offer, order, review and declined attempt are accessible at ${width}px`,async({page,browser})=>{
- test.setTimeout(90_000);const {publication}=await publishedGuestChannel(page.request);const context=await browser.newContext({baseURL:"http://127.0.0.1:3100",viewport:{width,height:900}});const guest=await context.newPage();
- try{await guest.goto(publication.publicHref);await expect(guest.getByRole("button",{name:"Continue to order",exact:true})).toBeVisible();await accessible(guest);await guest.getByRole("button",{name:"Continue to order",exact:true}).click();await guest.waitForURL(/\/checkout\/orders\/[a-f0-9-]+$/);await expect(guest.getByRole("heading",{name:"Your order",exact:true})).toBeFocused();await accessible(guest);await guest.getByRole("radio",{name:"Declined payment",exact:true}).check();await guest.getByRole("button",{name:"Review practice payment",exact:true}).click();await expect(guest.getByRole("heading",{name:"Review practice payment",exact:true})).toBeFocused();await accessible(guest);await guest.getByRole("button",{name:"Confirm practice payment",exact:true}).click();await expect(guest.getByRole("heading",{name:"Practice payment declined",exact:true})).toBeFocused();await expect(guest.getByRole("region",{name:"Attempt details",exact:true})).toBeVisible();await accessible(guest);await guest.reload();await expect(guest.getByRole("heading",{name:"Practice payment declined",exact:true})).toBeVisible();}finally{await context.close();}
+for(const width of [1440,320])test(`offer, real card review, freeze refusal and saved receipt are accessible at ${width}px`,async({page})=>{
+ test.setTimeout(90_000);await page.setViewportSize({width,height:900});
+ const merchant=await freshPublishedPayment("500"),payer=await freshPrepaidCard("1000");await signInPerson(page,payer.primary.personId);
+ await page.goto(merchant.publication.publicHref);await expect(page.getByRole("link",{name:"Continue to payment",exact:true})).toBeVisible();await accessible(page);
+ await openSavedCardReview(page,merchant.publication.id,payer.card.id);await accessible(page);
+ await controlCard(payer.primary.personId,payer.primary.serviceId,payer.card.id,{commandId:randomUUID(),expectedVersion:payer.card.version,action:"freeze"});
+ await page.getByRole("button",{name:"Pay $5.00",exact:true}).click();await expect(page.getByRole("alert")).toBeVisible();await accessible(page);
+ // The declined command created no debit; a fresh review uses the restored current version.
+ await controlCard(payer.primary.personId,payer.primary.serviceId,payer.card.id,{commandId:randomUUID(),expectedVersion:payer.card.version+1,action:"unfreeze"});
+ await openSavedCardReview(page,merchant.publication.id,payer.card.id);await page.getByRole("button",{name:"Pay $5.00",exact:true}).click();await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();await accessible(page);
+ await page.reload();await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();await accessible(page);
 });

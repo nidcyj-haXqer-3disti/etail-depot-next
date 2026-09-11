@@ -114,3 +114,23 @@ it("shares one-time uniqueness between the existing signed-in command and a gues
  expect(await getDb().select().from(merchantTestPayments).where(and(eq(merchantTestPayments.channelId,f.channel.id),eq(merchantTestPayments.outcome,"APPROVED")))).toHaveLength(1);
  expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,f.merchant.serviceId))).toHaveLength(2);
 });
+
+// Append to tests/integration/guest-checkout.test.ts. Its existing imports and
+// ready()/merchantOffer helpers suffice. This tests the retained publication
+// command; it does not restore guest customer mutation routes.
+it("lets an invited channel helper publish a customer checkout without retired simulator access", async () => {
+  const f=await ready();
+  const permissions=(["merchant.read","channels.read","channels.create","channels.update","channels.share","payments.read"] as const);
+  const invite=await createMerchantInvitation(f.merchant.personId,f.unit.id,merchantOffer(f.helper.personId,[...permissions]));
+  await acceptInvitation(f.helper.personId,invite.id,{commandId:randomUUID(),expectedVersion:invite.version});
+  const channel=await createChannel(f.helper.personId,f.unit.id,{...paymentInput(),usage:"REUSABLE",presentations:["WEB"],visibility:"CREATOR_PRIVATE",description:"Fictional helper payment request"});
+  await setChannelActivation(f.helper.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedVersion:0,expectedChannelVersion:channel.version,active:true});
+  const controls=await getGuestPublicationManagement(f.helper.personId,f.unit.id,channel.id);
+  expect(controls.canPublish).toBe(true);
+  const published=await publishGuestChannel(f.helper.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedChannelVersion:channel.version});
+  expect(published.publication).toMatchObject({state:"AVAILABLE",amount:{minor:"1250"}});
+  expect(await getPublicGuestRequest(published.publication!.id)).toMatchObject({canStart:true});
+  // Publication is scoped channel sharing; it grants no simulator or payer authority.
+  await expect(simulateMerchantPayment(f.helper.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"APPROVED"})).rejects.toMatchObject({code:"ACTION_DENIED"});
+  expect(await getDb().select().from(merchantTestPayments).where(eq(merchantTestPayments.channelId,channel.id))).toEqual([]);
+});

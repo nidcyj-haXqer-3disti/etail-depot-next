@@ -14,8 +14,8 @@ describe("fresh database catalog identity and collision guards",()=>{
   expect(()=>runner.assertDatabaseServer({...identity,...patch},local)).toThrow();
  });
  it("accepts only exact marked ownership and refuses adoption on same-name collisions",()=>{
-  const marker="ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-v1:test";
+  const marker="ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-d69:test";
   expect(()=>runner.assertFreshDatabaseOwnership({owner:"etail_local",marker},local)).not.toThrow();
-  for(const row of [{owner:"etail_local",marker:null},{owner:"someone_else",marker},{owner:"etail_local",marker:marker.replace(":test",":preview")}]) expect(()=>runner.assertFreshDatabaseOwnership(row,local)).toThrow("collision");
+  for(const row of [{owner:"etail_local",marker:null},{owner:"someone_else",marker},{owner:"etail_local",marker:"ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-v1:test"},{owner:"etail_local",marker:marker.replace(":test",":preview")}]) expect(()=>runner.assertFreshDatabaseOwnership(row,local)).toThrow("collision");
  });
 });

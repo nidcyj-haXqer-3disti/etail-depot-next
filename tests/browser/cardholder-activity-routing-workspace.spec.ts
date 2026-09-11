@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import {and,eq} from "drizzle-orm";
 import {expect,test,type Page} from "@playwright/test";
 import {closeDatabase,getDb} from "../../src/platform/database/client";
@@ -11,8 +12,8 @@ test.afterAll(closeDatabase);
 async function fixture(page:Page){
   const primary=await cardPrimary("Activity route primary"),holder=await cardPerson("Activity route secondary");
   await enrollCardholder(primary.personId,primary.serviceId,holder);
-  const own=await issuePracticeCard(primary.personId,primary.serviceId,holder,"Shared activity card","1000","100");
-  const foreign=await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Private activity card","1000","200");
+  const own=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2000");await setPersonLimit(primary.personId,primary.serviceId,holder,"1000");return issuePracticeCard(primary.personId,primary.serviceId,holder,"Shared activity card","100");})();
+  const foreign=await (async()=>{await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"1000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Private activity card","200");})();
   const [identity]=await getDb().select().from(identityBindings).where(and(eq(identityBindings.personId,holder),eq(identityBindings.issuer,"urn:etail:isolated-fixture")));
   if(!identity)throw new Error("Expected an isolated fictional identity");
   const session=await new SessionService(sessionRepository,{appEnv:"test",publicOrigin:"http://127.0.0.1:3100"}).issue({personId:holder,identityId:identity.id});

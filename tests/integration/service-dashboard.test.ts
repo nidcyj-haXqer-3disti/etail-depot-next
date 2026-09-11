@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
@@ -15,12 +16,12 @@ async function fixture() {
   await enrollCardholder(actor.personId, actor.serviceId, additional);
   await enrollCardholder(otherPrimary.personId, otherPrimary.serviceId, actor.personId);
   await enrollCardholder(otherPrimary.personId, otherPrimary.serviceId, additional);
-  const ownPrimary = await issuePracticeCard(actor.personId, actor.serviceId, actor.personId, "Own primary card", "10000", "123");
-  const managedAdditional = await issuePracticeCard(actor.personId, actor.serviceId, additional, "Managed secondary card", "10000", "222");
-  const ownSecondary = await issuePracticeCard(otherPrimary.personId, otherPrimary.serviceId, actor.personId, "Own secondary card", "10000", "111");
-  const hiddenPrimary = await issuePracticeCard(otherPrimary.personId, otherPrimary.serviceId, otherPrimary.personId, "Hidden primary card", "10000", "333");
-  const hiddenAdditional = await issuePracticeCard(otherPrimary.personId, otherPrimary.serviceId, additional, "Hidden secondary card", "10000", "444");
-  const foreignCard = await issuePracticeCard(foreign.personId, foreign.serviceId, foreign.personId, "Unrelated card", "10000", "55");
+  const ownPrimary = await (async()=>{await fundCardGroup(actor.personId,actor.serviceId,"20000");await setPersonLimit(actor.personId,actor.serviceId,actor.personId,"10000");return issuePracticeCard(actor.personId,actor.serviceId,actor.personId,"Own primary card","123");})();
+  const managedAdditional = await (async()=>{await setPersonLimit(actor.personId,actor.serviceId,additional,"10000");return issuePracticeCard(actor.personId,actor.serviceId,additional,"Managed secondary card","222");})();
+  const ownSecondary = await (async()=>{await fundCardGroup(otherPrimary.personId,otherPrimary.serviceId,"30000");await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,actor.personId,"10000");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,actor.personId,"Own secondary card","111");})();
+  const hiddenPrimary = await (async()=>{await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,otherPrimary.personId,"10000");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,otherPrimary.personId,"Hidden primary card","333");})();
+  const hiddenAdditional = await (async()=>{await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,additional,"10000");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,additional,"Hidden secondary card","444");})();
+  const foreignCard = await (async()=>{await fundCardGroup(foreign.personId,foreign.serviceId,"10000");await setPersonLimit(foreign.personId,foreign.serviceId,foreign.personId,"10000");return issuePracticeCard(foreign.personId,foreign.serviceId,foreign.personId,"Unrelated card","55");})();
   const pendingOwned = await startCardRequest(actor.personId, actor.serviceId, { commandId: randomUUID() });
   const pendingOther = await startCardRequest(otherPrimary.personId, otherPrimary.serviceId, { commandId: randomUUID() });
   const pendingForeign = await startCardRequest(foreign.personId, foreign.serviceId, { commandId: randomUUID() });
@@ -140,8 +141,8 @@ describe("service-first Cardholder dashboard", () => {
   it("paginates the authorized card set without duplicates or hidden-holder counts", async () => {
     const primary = await cardPrimary(), secondary = await cardPerson("Paginated secondary");
     await enrollCardholder(primary.personId, primary.serviceId, secondary);
-    for (let n = 0; n < 31; n++) await issuePracticeCard(primary.personId, primary.serviceId, primary.personId, `Primary card ${String(n).padStart(2, "0")}${n===30?" %_":""}`, "1");
-    const own = await issuePracticeCard(primary.personId, primary.serviceId, secondary, "Secondary card", "1");
+    for (let n = 0; n < 31; n++) await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,`Primary card ${String(n).padStart(2, "0")}${n===30?" %_":""}`);
+    const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"1");await setPersonLimit(primary.personId,primary.serviceId,secondary,"1");return issuePracticeCard(primary.personId,primary.serviceId,secondary,"Secondary card");})();
     const first = await getCardholderDashboard(primary.personId), second = await getCardholderDashboard(primary.personId, 1);
     expect(first).toMatchObject({ cardCount: 32, cardsPage: 0, cardsHasMore: true });
     expect(first.cards).toHaveLength(30); expect(second.cards).toHaveLength(2); expect(second.cardsHasMore).toBe(false);

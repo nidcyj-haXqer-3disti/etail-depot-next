@@ -3,10 +3,12 @@ import pg from "pg";
 import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
-import { services, serviceMembers, cards, cardRequests, people } from "../../src/platform/database/schema";
+import { services, serviceMembers, cards, cardRequests, people, serviceActivity, workspaceCommands } from "../../src/platform/database/schema";
 import { merchantUnits } from "../../src/modules/acquiring/schema";
 import { getBalance, postJournal, type LedgerPosition, type PostJournalInput } from "../../src/modules/ledger/service";
 import { ledgerEntries, ledgerJournals } from "../../src/modules/ledger/schema";
+import { cardPrimary, fundCardGroup, setPersonLimit, issuePracticeCard } from "../helpers/cardholder";
+import { purchaseCardInTransaction } from "../../src/modules/workspace/service";
 
 const raw = new pg.Client({ connectionString: process.env.DATABASE_URL, application_name: "etail-ledger-integrity-tests" });
 beforeAll(() => raw.connect());
@@ -16,10 +18,10 @@ async function fixture() {
     const [person] = await tx.insert(people).values({ displayName: "Fictional ledger tester" }).returning();
     const [service] = await tx.insert(services).values({ kind: "CARDHOLDER", primaryPersonId: person!.id, displayName: "Fictional ledger practice" }).returning();
     await tx.insert(serviceMembers).values({ serviceId: service!.id, personId: person!.id, state: "ACCEPTED" });
-    // Structural ledger fixture: explicit request/card provenance without a pre-funded position.
-    // These rows isolate ledger invariants; the product issuance command is covered separately.
-    const [request] = await tx.insert(cardRequests).values({ serviceId: service!.id, creatorId: person!.id, holderId: person!.id, nickname: "Ledger fixture request", format: "VIRTUAL", requestedLimitMinor: 10000n, status: "ISSUED" }).returning();
-    const [card] = await tx.insert(cards).values({ serviceId: service!.id, requestId: request!.id, holderId: person!.id, nickname: "Fictional ledger card", lastFour: "0000", format: "VIRTUAL", limitMinor: 10000n }).returning();
+    // Structural legacy-ledger fixture: explicit request/card provenance with zero limits and no funds.
+    // CARD_FUNDING below is a legacy primitive fixture only; product issuance never calls it.
+    const [request] = await tx.insert(cardRequests).values({ serviceId: service!.id, creatorId: person!.id, holderId: person!.id, nickname: "Ledger fixture request", format: "VIRTUAL", requestedLimitMinor: 0n, status: "ISSUED" }).returning();
+    const [card] = await tx.insert(cards).values({ serviceId: service!.id, requestId: request!.id, holderId: person!.id, nickname: "Fictional ledger card", lastFour: "0000", format: "VIRTUAL", limitMinor: 0n }).returning();
     const [merchant] = await tx.insert(services).values({ kind: "MERCHANT", primaryPersonId: person!.id, displayName: "Fictional ledger merchant" }).returning();
     const [unit] = await tx.insert(merchantUnits).values({ kind: "MASTER", masterServiceId: merchant!.id, displayName: "Fictional ledger master", status: "ACTIVE" }).returning();
     return { serviceId: service!.id, cardId: card!.id, merchantServiceId: merchant!.id, merchantUnitId: unit!.id };
@@ -56,9 +58,18 @@ describe("single immutable practice USD ledger", () => {
     await post(funding(f, amount));
     expect(await balance({ serviceId: f.serviceId, bucket: "CARD_AVAILABLE", cardId: f.cardId })).toBe(amount);
     expect(await balance({ serviceId: f.serviceId, bucket: "PRACTICE_SOURCE" })).toBe(-amount);
-    const spent = purchase(f, 101n); await post(spent);
-    const referenceId = randomUUID();
-    await post({ ...spent, businessKey: `ledger-refund:${referenceId}`, kind: "CARD_REFUND", referenceId, lines: spent.lines.map(line => ({ ...line, deltaMinor: -line.deltaMinor })) });
+    // Check primitive inverse arithmetic inside a transaction that is explicitly
+    // rolled back. An orphan purchase/refund must never be committed as a fixture.
+    const spent = purchase(f, 101n), referenceId = randomUUID();
+    await expect(getDb().transaction(async tx => {
+      await postJournal(tx, spent);
+      expect(await getBalance(tx, { serviceId: f.serviceId, bucket: "CARD_AVAILABLE", cardId: f.cardId })).toBe(amount - 101n);
+      await postJournal(tx, { ...spent, businessKey: `ledger-refund:${referenceId}`, kind: "CARD_REFUND", referenceId, lines: spent.lines.map(line => ({ ...line, deltaMinor: -line.deltaMinor })) });
+      expect(await getBalance(tx, { serviceId: f.serviceId, bucket: "CARD_AVAILABLE", cardId: f.cardId })).toBe(amount);
+      expect(await getBalance(tx, { serviceId: f.serviceId, bucket: "CARD_SPENT", cardId: f.cardId })).toBe(0n);
+      throw new Error("Rollback primitive inverse probe");
+    })).rejects.toThrow("Rollback primitive inverse probe");
+    expect(await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.businessKey, spent.businessKey))).toEqual([]);
     expect(await balance({ serviceId: f.serviceId, bucket: "CARD_AVAILABLE", cardId: f.cardId })).toBe(amount);
     expect(await balance({ serviceId: f.serviceId, bucket: "CARD_SPENT", cardId: f.cardId })).toBe(0n);
   });
@@ -91,11 +102,17 @@ describe("single immutable practice USD ledger", () => {
     await expect(post(purchase(f, 1n))).rejects.toMatchObject({ code: "INSUFFICIENT_LEDGER_FUNDS" });
     const referenceId = randomUUID(), position = { serviceId: f.merchantServiceId, merchantUnitId: f.merchantUnitId };
     const payment: PostJournalInput = { businessKey: `ledger-payment:${referenceId}`, kind: "MERCHANT_PAYMENT", referenceId, lines: [{ ...position, bucket: "GATEWAY_CLEARING", deltaMinor: -500n }, { ...position, bucket: "MERCHANT_AVAILABLE", deltaMinor: 500n }] };
-    await post(payment);
-    expect(await balance({ ...position, bucket: "GATEWAY_CLEARING" })).toBe(-500n);
-    const payoutId = randomUUID();
-    await expect(post({ businessKey: `ledger-payout:${payoutId}`, kind: "MERCHANT_PAYOUT", referenceId: payoutId, lines: [{ ...position, bucket: "MERCHANT_AVAILABLE", deltaMinor: -501n }, { ...position, bucket: "PAYOUT_CLEARING", deltaMinor: 501n }] })).rejects.toMatchObject({ code: "INSUFFICIENT_LEDGER_FUNDS" });
-    expect(await balance({ ...position, bucket: "MERCHANT_AVAILABLE" })).toBe(500n);
+    await expect(getDb().transaction(async tx => {
+      await postJournal(tx, payment);
+      expect(await getBalance(tx, { ...position, bucket: "GATEWAY_CLEARING" })).toBe(-500n);
+      const payoutId = randomUUID();
+      await expect(postJournal(tx, { businessKey: `ledger-payout:${payoutId}`, kind: "MERCHANT_PAYOUT", referenceId: payoutId, lines: [{ ...position, bucket: "MERCHANT_AVAILABLE", deltaMinor: -501n }, { ...position, bucket: "PAYOUT_CLEARING", deltaMinor: 501n }] })).rejects.toMatchObject({ code: "INSUFFICIENT_LEDGER_FUNDS" });
+      expect(await getBalance(tx, { ...position, bucket: "MERCHANT_AVAILABLE" })).toBe(500n);
+      throw new Error("Rollback primitive clearing probe");
+    })).rejects.toThrow("Rollback primitive clearing probe");
+    expect(await balance({ ...position, bucket: "MERCHANT_AVAILABLE" })).toBe(0n);
+    expect(await balance({ ...position, bucket: "GATEWAY_CLEARING" })).toBe(0n);
+    expect(await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.businessKey, payment.businessKey))).toEqual([]);
   });
 
   it("rejects cross-service card and master merchant substitution in service and composite foreign keys", async () => {
@@ -115,6 +132,25 @@ describe("single immutable practice USD ledger", () => {
     expect(await balance({ serviceId: f.serviceId, bucket: "CARD_AVAILABLE", cardId: f.cardId })).toBe(0n);
   });
 
+  it("rolls a canonical prepaid purchase and its activity, receipt and card version back with its caller", async () => {
+    const owner = await cardPrimary("Canonical ledger rollback primary");
+    await fundCardGroup(owner.personId, owner.serviceId, "10000");
+    await setPersonLimit(owner.personId, owner.serviceId, owner.personId, "20000");
+    const { card } = await issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "Rollback purchase card");
+    const input = { commandId: randomUUID(), expectedVersion: card.version, amountMinor: "101", description: "Purchase rolled back by owner" };
+    await expect(getDb().transaction(async tx => {
+      await purchaseCardInTransaction(tx, owner.personId, owner.serviceId, card.id, input);
+      expect(await getBalance(tx, { serviceId: owner.serviceId, bucket: "GROUP_AVAILABLE" })).toBe(9899n);
+      throw new Error("Canonical owning command failed");
+    })).rejects.toThrow("Canonical owning command failed");
+    expect(await balance({ serviceId: owner.serviceId, bucket: "GROUP_AVAILABLE" })).toBe(10000n);
+    expect(await balance({ serviceId: owner.serviceId, cardId: card.id, bucket: "CARD_SPENT" })).toBe(0n);
+    expect(await getDb().select().from(serviceActivity).where(eq(serviceActivity.cardId, card.id))).toEqual([]);
+    expect(await getDb().select().from(workspaceCommands).where(eq(workspaceCommands.commandId, input.commandId))).toEqual([]);
+    expect(await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.businessKey, `card-purchase:${input.commandId}`))).toEqual([]);
+    expect((await getDb().select().from(cards).where(eq(cards.id, card.id)))[0]!.version).toBe(card.version);
+  });
+
   it("rejects empty and unbalanced raw journals at commit", async () => {
     const f = await fixture();
     await expect(rawTransaction(rawJournal)).rejects.toMatchObject({ code: "23514", message: "Ledger journal must have 2 to 64 balanced USD entries" });
@@ -124,7 +160,7 @@ describe("single immutable practice USD ledger", () => {
 
   it("rejects balanced direct-SQL overspending at commit", async () => {
     const f = await fixture();
-    await expect(rawTransaction(async () => { const id = await rawJournal(); await rawLine(id, 1, f.serviceId, "CARD_AVAILABLE", "-100", f.cardId); await rawLine(id, 2, f.serviceId, "CARD_SPENT", "100", f.cardId); })).rejects.toMatchObject({ code: "23514", message: "Ledger available funds cannot be negative" });
+    await expect(rawTransaction(async () => { const id = await rawJournal(); await rawLine(id, 1, f.serviceId, "CARD_AVAILABLE", "-100", f.cardId); await rawLine(id, 2, f.serviceId, "CARD_SPENT", "100", f.cardId); })).rejects.toMatchObject({ code: "23514", message: "Available money cannot be negative" });
   });
 
   it("makes journals and entries immutable and prevents later balanced append", async () => {

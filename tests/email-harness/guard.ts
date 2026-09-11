@@ -30,6 +30,6 @@ export async function verifyEmailHarnessDatabase(): Promise<void> {
       pg_get_userbyid(datdba) AS owner, shobj_description(oid, 'pg_database') AS marker
       FROM pg_database WHERE datname = current_database()`);
     if (actual?.database !== "etail_depot_next_services_test" || actual.role !== "etail_local" || actual.owner !== "etail_local" ||
-        actual.marker !== "ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-v1:test") throw new Error("Email harness database ownership mismatch.");
+        actual.marker !== "ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-d69:test") throw new Error("Email harness database ownership mismatch.");
   } finally { await client.end(); }
 }

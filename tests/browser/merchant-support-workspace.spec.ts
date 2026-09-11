@@ -53,7 +53,7 @@ test("a payment question carries exact refund dates through assigned support and
   const financialContext=operator.getByRole("region",{name:"Related payment"});
   await expect(financialContext).toContainText(payment.testReference);await expect(financialContext).toContainText(payment.refund!.testReference);
   await expect(financialContext).toContainText(payment.amount.formatted);await expect(financialContext).toContainText(formatDate(payment.createdAt));await expect(financialContext).toContainText(formatDate(payment.refund!.createdAt));
-  await expect(operator.getByRole("button",{name:/Refund payment|Transfer out/})).toHaveCount(0);
+  await expect(operator.getByRole("button",{name:/Refund payment|Request deposit/})).toHaveCount(0);
   const reply="The refund is shown on its completion date, separately from the original payment date.";
   await operator.getByRole("textbox",{name:"Reply to customer",exact:true}).fill(reply);await operator.getByRole("button",{name:"Save reply",exact:true}).click();await expect(operator).toContainText(reply);
   await signIn(page.request,"owner");await page.goto(`/merchants/${unit.id}?tab=help&case=${ticket.id}`);

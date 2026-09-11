@@ -1,10 +1,13 @@
+import {freshPrepaidCard,signInPerson} from "./helpers/prepaid";
+import {closeDatabase} from "../../src/platform/database/client";
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
-import { cardDashboard, openCardholder } from "./helpers/fresh";
+import { cardDashboard } from "./helpers/fresh";
 
+test.afterAll(closeDatabase);
 test("one card form starts only on review and safely retries lost start, save and creation responses", async ({ page }) => {
   test.setTimeout(120_000);
-  const { data } = await openCardholder(page), serviceId = data.primaryService!.id;
+  const fixture=await freshPrepaidCard("1600");await signInPerson(page,fixture.primary.personId);const data=await cardDashboard(page.request),serviceId=fixture.primary.serviceId;
   const name = `Retry card ${randomUUID().slice(0, 8)}`;
   const workspace = async () => (await page.request.get(`/api/v1/cardholder-services/${serviceId}/workspace`)).json();
   const before = await workspace();
@@ -43,9 +46,10 @@ test("one card form starts only on review and safely retries lost start, save an
   const self = dialog.getByRole("radio", { name: new RegExp(data.person.displayName) });
   await expect(dialog).toContainText("That cardholder isn’t available");
   await expect(self).not.toBeChecked();
-  await self.check();
+  // Choosing the only permitted holder replaces the picker with its selected summary.
+  await self.click();
+  await expect(dialog.locator(".consumer-cardholder-selected")).toContainText(data.person.displayName);
   await cardName.fill(name);
-  await dialog.getByRole("textbox", { name: "Starting balance (USD)", exact: true }).fill("16.00");
   await initialReview.click();
   const retry = dialog.getByRole("button", { name: "Retry the same request", exact: true });
   await expect(retry).toBeEnabled();
@@ -58,7 +62,7 @@ test("one card form starts only on review and safely retries lost start, save an
   await expect(cardName).toBeDisabled();
   await retry.click();
   await expect(dialog.getByRole("heading", { name: "Review your card", exact: true })).toBeVisible();
-  await expect(dialog).toContainText("$16.00");
+  await expect(dialog).toContainText("Creating a card does not add money.");
   expect(attempts.start).toHaveLength(2);
   expect(attempts.start![0]).toEqual(attempts.start![1]);
   expect(attempts.save).toHaveLength(2);

@@ -1,9 +1,12 @@
+import {closeDatabase} from "../../src/platform/database/client";
+import {freshPrepaidCard,payPublishedWithCard} from "./helpers/prepaid";
 import {randomUUID} from "node:crypto";
 import {expect,test} from "@playwright/test";
 import {headers,signIn} from "./helpers/fresh";
 import {createMerchantViaApi} from "../helpers/merchant-api";
 import {merchantDashboardProjectionSchema} from "../../src/modules/acquiring/dashboard-contracts";
 
+test.afterAll(closeDatabase);
 test("merchant network activity keeps scope, dates and pages through exact records, exports and current funds",async({page})=>{
  test.setTimeout(120000);await signIn(page.request);
  const name=`Activity network ${randomUUID().slice(0,8)}`,primary=await createMerchantViaApi(page.request,name);
@@ -11,7 +14,8 @@ test("merchant network activity keeps scope, dates and pages through exact recor
  for(const [id,path] of [[primary.merchantId,"gateway"],[sub.id,"test-enrollment"]])expect((await page.request.put(`/api/v1/merchants/${id}/${path}`,{headers,data:{commandId:randomUUID(),expectedVersion:0,enabled:true}})).status()).toBe(200);
  const saved=await page.request.post(`/api/v1/merchants/${sub.id}/channels`,{headers,data:{commandId:randomUUID(),description:name,amountMinor:"750",currency:"USD",usage:"REUSABLE",expiresAt:new Date(Date.now()+86400000).toISOString(),presentations:["WEB"],visibility:"CREATOR_PRIVATE"}});expect(saved.status()).toBe(200);const channel=await saved.json() as {id:string;version:number};
  expect((await page.request.put(`/api/v1/merchants/${sub.id}/channels/${channel.id}/activation`,{headers,data:{commandId:randomUUID(),expectedVersion:0,expectedChannelVersion:channel.version,active:true}})).status()).toBe(200);
- for(let i=0;i<26;i++)expect((await page.request.post(`/api/v1/merchants/${sub.id}/channels/${channel.id}/test-payments`,{headers,data:{commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"APPROVED"}})).status()).toBe(200);
+ const published=await page.request.post(`/api/v1/merchants/${sub.id}/channels/${channel.id}/publication`,{headers,data:{commandId:randomUUID(),expectedChannelVersion:channel.version}});expect(published.status()).toBe(200);const publication=(await published.json()).publication;
+ const payer=await freshPrepaidCard("19500");for(let i=0;i<26;i++)expect((await payPublishedWithCard(publication.id,payer)).receipt).not.toBeNull();
  const today=new Date().toISOString().slice(0,10),query=new URLSearchParams({view:`network:${primary.merchantId}`,period:"custom",from:today,to:today,q:name,status:"COLLECTED",activity:"payments"});
  await page.goto(`/merchant-services?${query}`);
  await expect(page.getByRole("heading",{name:"Merchant overview",exact:true})).toBeVisible();
@@ -32,15 +36,16 @@ test("merchant network activity keeps scope, dates and pages through exact recor
  expect(new URL(page.url()).searchParams.get("payment")).toBe(receiptId);
  expect(new URL(page.url()).searchParams.get("returnTo")).toBe(activityReturn);
  await detail.getByRole("link",{name:"View payment channel",exact:true}).click();
- await page.getByRole("link",{name:"Try a practice payment",exact:true}).click();
- await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();
- expect(new URL(page.url()).searchParams.get("returnTo")).toBe(activityReturn);
- await page.getByRole("link",{name:"← Back to merchant payments",exact:true}).click();
+ await expect(page.getByRole("link",{name:"Open customer checkout",exact:true})).toHaveAttribute("href",publication.publicHref);
+ const channelDetails=page.getByRole("dialog",{name:"Payment channel details",exact:true});
+ await channelDetails.getByRole("button",{name:"Close details",exact:true}).click();
+ await expect(channelDetails).toBeHidden();
+ expect(new URL(page.url()).searchParams.has("channel")).toBe(false);
  expect(new URL(page.url()).searchParams.get("returnTo")).toBe(activityReturn);
  await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Overview",exact:true}).click();
  await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&[...query].every(([key,value])=>url.searchParams.get(key)===value)&&url.searchParams.get("page")==="2");
  const exportLink=page.getByRole("link",{name:"Download payments CSV",exact:true});const csv=await page.request.get((await exportLink.getAttribute("href"))!);expect(csv.status()).toBe(200);expect(csv.headers()["cache-control"]).toContain("no-store");expect((await csv.text()).split("\r\n")).toHaveLength(28);
- await page.getByRole("navigation",{name:"Merchant workspace views"}).getByRole("link",{name:"Available funds",exact:true}).click();await expect(page.getByRole("heading",{name:"Available practice funds",exact:true})).toBeVisible();await expect(page.locator(".md-funds-total")).toHaveText("$195.00");
+ await page.getByRole("navigation",{name:"Merchant workspace views"}).getByRole("link",{name:"Funds & deposits",exact:true}).click();await expect(page.getByRole("heading",{name:"Funds & deposits",exact:true})).toBeVisible();await expect(page.locator(".md-balance-grid>div").filter({has:page.getByText("Awaiting settlement",{exact:true})})).toContainText("$195.00");
  await page.getByRole("link",{name:"Back to payment activity",exact:true}).click();await expect(page.getByRole("searchbox",{name:"Search payments",exact:true})).toHaveValue(name);
  await page.getByRole("searchbox",{name:"Search payments",exact:true}).fill(`${name} no match`);
  await page.getByRole("button",{name:"Apply filters",exact:true}).click();await expect(page.getByRole("heading",{name:"No matching records",exact:true})).toBeVisible();
@@ -58,5 +63,5 @@ test("merchant network activity keeps scope, dates and pages through exact recor
  await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Overview",exact:true}).click();await expect(page).toHaveURL(directoryUrl);
  await page.getByRole("navigation",{name:"Merchant workspace views"}).getByRole("link",{name:"Overview",exact:true}).click();
  await expect(page.getByRole("searchbox",{name:"Search payments",exact:true})).toHaveValue(name);
- await page.getByRole("navigation",{name:"Payment activity views"}).getByRole("link",{name:"Transfers",exact:true}).click();await expect(page.getByRole("heading",{name:"No matching records",exact:true})).toBeVisible();
+ await page.getByRole("navigation",{name:"Payment activity views"}).getByRole("link",{name:"Deposits",exact:true}).click();await expect(page.getByRole("heading",{name:"No matching records",exact:true})).toBeVisible();
 });

@@ -1,3 +1,5 @@
+> Historical D65 build record. The active funding, checkout, deposit and local-generation design is [D69](FRESH_PREPAID_REBUILD.md); current acceptance is in [status](../planning/STATUS.md).
+
 # Active sandbox build — D65
 
 11 September 2026. The user identified missing capabilities in Cardholders/Requests and Merchant services, then explicitly asked to finish the actual build. This supersedes D63–D64's design-only pause. Continue the [delivery plan](../planning/DELIVERY_PLAN.md) using real application owners and persistent records. The prior prototype omitted existing features and is not a source implementation.

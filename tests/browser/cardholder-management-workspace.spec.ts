@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and,eq } from "drizzle-orm";
 import AxeBuilder from "@axe-core/playwright";
@@ -20,7 +21,6 @@ async function signIn(page:Page,personId:string){
 async function fillCard(page:Page,name:string){
  const dialog=page.getByRole("dialog");
  await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);
- await dialog.getByRole("textbox",{name:"Starting balance (USD)",exact:true}).fill("24.00");
  return dialog;
 }
 async function accessible(page:Page){
@@ -162,7 +162,7 @@ test("a secondary can remove their own freeze while the primary's restriction st
  test.setTimeout(120_000);
  const primary=await cardPrimary(`Freeze UI ${randomUUID().slice(0,8)}`),holder=await cardPerson("Taylor Sample");
  await enrollCardholder(primary.personId,primary.serviceId,holder);
- const {card}=await issuePracticeCard(primary.personId,primary.serviceId,holder,"Taylor daily card","2400");
+ const {card}=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2400");await setPersonLimit(primary.personId,primary.serviceId,holder,"2400");return issuePracticeCard(primary.personId,primary.serviceId,holder,"Taylor daily card");})();
  const cardUrl=`${origin}/cardholder-services?card=${card.id}`;
  await signIn(page,primary.personId);
  await page.goto(cardUrl);

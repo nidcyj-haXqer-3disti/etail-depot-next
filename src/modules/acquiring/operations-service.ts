@@ -1,29 +1,32 @@
 import { createHash, randomUUID } from "node:crypto";
-import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import QRCode from "qrcode";
+import {serviceActivity} from "../../platform/database/schema";
+import {merchantSettlements,merchantSettlementItems,merchantDeposits,merchantDepositEvents,merchantDepositItems} from "./settlement-schema";
+import {operatorServiceAccess} from "../operations/schema";
+import {services} from "../../platform/database/schema";
+import {cardCheckoutAttempts} from "./card-checkout-schema";
 import { getDb } from "../../platform/database/client";
-import { getRuntimeConfig } from "../../platform/config";
 import { SecurityError } from "../../platform/security/origin";
 import { loadServiceScope, type ScopedTransaction } from "../access/scope";
-import { loadMerchantUnitScope, requireMerchantParticipant, merchantNow } from "../access/merchant-scope";
+import { loadMerchantUnitScope, merchantNow } from "../access/merchant-scope";
 import { requireMerchantApplicant } from "../services/merchant-eligibility";
 import { evaluate } from "../policy/evaluate";
 import { getBalance, postJournal } from "../ledger/service";
 import { formatMoney } from "../workspace/service";
 import { merchantProfiles, merchantUnits, paymentChannels } from "./schema";
 import { getMerchantWorkspace, merchantChannelVisible } from "./service";
-import { channelActivations, merchantOperationCommands, merchantTestPayments, merchantTestPayouts, merchantTestRefunds, testGateways, testMerchantEnrollments } from "./operations-schema";
-import { testPayment, testPayout, testRefund } from "./adapters/sandbox";
+import { channelActivations, merchantOperationCommands, merchantTestPayments, merchantTestRefunds, testGateways, testMerchantEnrollments } from "./operations-schema";
+import { testPayment, testRefund } from "./adapters/sandbox";
 import { channelActivationSchema, configureTestGatewaySchema, enrollTestMerchantSchema, merchantPayoutSchema, refundMerchantPaymentSchema, simulateMerchantPaymentSchema,
-  type ChannelActivation, type ChannelActivationInput, type ConfigureTestGatewayInput, type EnrollTestMerchantInput, type MerchantCheckoutProjection, type MerchantNetworkProjection, type MerchantOperationsProjection, type MerchantPayoutInput, type MerchantTestPayment, type MerchantTestPayout, type RefundMerchantPaymentInput, type SimulateMerchantPaymentInput, type TestGateway, type TestMerchantEnrollment } from "./operations-contracts";
+  type ChannelActivation, type ChannelActivationInput, type ConfigureTestGatewayInput, type EnrollTestMerchantInput, type MerchantNetworkProjection, type MerchantOperationsProjection, type MerchantPayoutInput, type MerchantTestPayment, type MerchantTestPayout, type RefundMerchantPaymentInput, type SimulateMerchantPaymentInput, type TestGateway, type TestMerchantEnrollment } from "./operations-contracts";
 
 type UnitScope=Awaited<ReturnType<typeof loadMerchantUnitScope>>;
 type ServiceScope=Awaited<ReturnType<typeof loadServiceScope>>;
 type Channel=typeof paymentChannels.$inferSelect;
 type Payment=typeof merchantTestPayments.$inferSelect;
 type Refund=typeof merchantTestRefunds.$inferSelect;
-type Payout=typeof merchantTestPayouts.$inferSelect;
+
 type Kind=typeof merchantOperationCommands.$inferSelect.kind;
 function parse<T>(schema:z.ZodType<T>,raw:unknown):T {const r=schema.safeParse(raw);if(!r.success)throw new SecurityError("INVALID_REQUEST",422);return r.data;}
 function uuid(value:string):string {if(!z.uuid().safeParse(value).success)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return value.toLowerCase();}
@@ -64,11 +67,35 @@ async function activationProjection(tx:ScopedTransaction,scope:UnitScope,row:Cha
   const [used]=row.usage==="ONE_TIME"?await tx.select({id:merchantTestPayments.id}).from(merchantTestPayments).where(and(eq(merchantTestPayments.channelId,row.id),eq(merchantTestPayments.outcome,"APPROVED"))).limit(1):[];
   const state:ChannelActivation["state"]=row.status==="CANCELED"?"DISABLED":used?"USED":row.expiresAt<=now?"EXPIRED":!ready?"NOT_READY":activation?.status==="ACTIVE"?"ACTIVE":"DISABLED";
   const editable=eligible&&evaluate(scope.policy,"channels.update").allowed;
-  const canSimulate=eligible&&state==="ACTIVE"&&evaluate(scope.policy,"payments.simulate").allowed;
-  return {channelId:row.id,merchantUnitId:row.merchantUnitId,version:activation?.version??0,state,canActivate:editable&&ready&&row.status==="DRAFT"&&!used&&row.expiresAt>now&&activation?.status!=="ACTIVE",canDisable:editable&&activation?.status==="ACTIVE",canSimulate,previewHref:canSimulate?`/pay/${row.id}`:null};
+  return {channelId:row.id,merchantUnitId:row.merchantUnitId,version:activation?.version??0,state,canActivate:editable&&ready&&row.status==="DRAFT"&&!used&&row.expiresAt>now&&activation?.status!=="ACTIVE",canDisable:editable&&activation?.status==="ACTIVE"};
 }
-function paymentProjection(row:Payment,refund:Refund|undefined,canRefund:boolean):MerchantTestPayment {return {id:row.id,merchantUnitId:row.merchantUnitId,channelId:row.channelId,description:row.description,amount:formatMoney(row.amountMinor),status:refund?"REFUNDED":row.outcome,version:refund?2:1,testReference:row.testReference,createdAt:row.createdAt.toISOString(),feeStatus:"NOT_APPLIED",canRefund:canRefund&&row.outcome==="APPROVED"&&!refund,refund:refund?{id:refund.id,amount:formatMoney(refund.amountMinor),reason:refund.reason,testReference:refund.testReference,createdAt:refund.createdAt.toISOString()}:null};}
-function payoutProjection(row:Payout):MerchantTestPayout {return {id:row.id,merchantUnitId:row.merchantUnitId,amount:formatMoney(row.amountMinor),status:"COMPLETED",testReference:row.testReference,destination:"TEST_DESTINATION",createdAt:row.createdAt.toISOString()};}
+function paymentProjection(row:Payment,refund:Refund|undefined,canRefund:boolean):MerchantTestPayment {return {id:row.id,merchantUnitId:row.merchantUnitId,channelId:row.channelId,description:row.description,amount:formatMoney(row.amountMinor),status:refund?"REFUNDED":row.outcome,version:refund?2:1,testReference:row.testReference,createdAt:row.createdAt.toISOString(),feeStatus:"NOT_APPLIED",canRefund:canRefund&&row.outcome==="APPROVED"&&!refund,refundSource:canRefund&&row.outcome==="APPROVED"&&!refund?"COLLECTION_BALANCE":null,refundUnavailableReason:null,refund:refund?{id:refund.id,amount:formatMoney(refund.amountMinor),reason:refund.reason,testReference:refund.testReference,createdAt:refund.createdAt.toISOString()}:null};}
+async function batchReview(tx:ScopedTransaction,settlementId:string){
+ const items=await tx.select({item:merchantSettlementItems,refund:merchantTestRefunds}).from(merchantSettlementItems).leftJoin(merchantTestRefunds,eq(merchantTestRefunds.paymentId,merchantSettlementItems.paymentId)).where(eq(merchantSettlementItems.settlementId,settlementId)).orderBy(merchantSettlementItems.paymentId);
+ const history=await tx.select({deposit:merchantDeposits,event:merchantDepositEvents}).from(merchantDeposits).leftJoin(merchantDepositEvents,eq(merchantDepositEvents.depositId,merchantDeposits.id)).where(eq(merchantDeposits.settlementId,settlementId)).orderBy(merchantDeposits.id);
+ const available=items.filter(row=>!row.refund),amountMinor=available.reduce((sum,row)=>sum+row.item.amountMinor,0n);
+ const token=createHash("sha256").update(JSON.stringify({settlementId,items:items.map(({item,refund})=>({paymentId:item.paymentId,amount:item.amountMinor.toString(),refundId:refund?.id??null})),history:history.map(({deposit,event})=>({depositId:deposit.id,outcome:event?.outcome??"PENDING",commandId:event?.commandId??null}))})).digest("hex");
+ return {items:available.map(({item})=>({paymentId:item.paymentId,amountMinor:item.amountMinor})),amountMinor,token,canRetry:history.length>0&&history.every(row=>row.event?.outcome==="FAILED")&&amountMinor>0n};
+}
+async function refundPosition(tx:ScopedTransaction,paymentId:string){
+ const [item]=await tx.select().from(merchantSettlementItems).where(eq(merchantSettlementItems.paymentId,paymentId));
+ if(!item)return "MERCHANT_AVAILABLE" as const;
+ const deposits=await tx.select({event:merchantDepositEvents}).from(merchantDeposits).leftJoin(merchantDepositEvents,eq(merchantDepositEvents.depositId,merchantDeposits.id)).where(eq(merchantDeposits.settlementId,item.settlementId));
+ if(deposits.some(row=>!row.event))return null;
+ return deposits.some(row=>row.event?.outcome==="COMPLETED")?"PAYOUT_CLEARING" as const:"MERCHANT_SETTLED" as const;
+}
+async function currentPaymentProjection(tx:ScopedTransaction,row:Payment,refund:Refund|undefined,canRefund:boolean):Promise<MerchantTestPayment>{
+ const result=paymentProjection(row,refund,canRefund);if(!result.canRefund)return result;
+ const position=await refundPosition(tx,row.id);
+ return {...result,canRefund:position!==null,refundSource:position===null?null:position==="PAYOUT_CLEARING"?"SANDBOX_BANK":"COLLECTION_BALANCE",refundUnavailableReason:position===null?"This payment is in a deposit that is processing. You can refund it after the deposit completes or is returned.":null};
+}
+async function payoutProjection(tx:ScopedTransaction,row:typeof merchantDeposits.$inferSelect,allowRetry=false):Promise<MerchantTestPayout>{
+ const [event]=await tx.select().from(merchantDepositEvents).where(eq(merchantDepositEvents.depositId,row.id));
+ const items=await tx.select({payment:merchantTestPayments,item:merchantDepositItems,refund:merchantTestRefunds}).from(merchantDepositItems).innerJoin(merchantTestPayments,eq(merchantTestPayments.id,merchantDepositItems.paymentId)).leftJoin(merchantTestRefunds,eq(merchantTestRefunds.paymentId,merchantTestPayments.id)).where(eq(merchantDepositItems.depositId,row.id)).orderBy(merchantTestPayments.createdAt,merchantTestPayments.id);
+ const retry=allowRetry&&event?.outcome==="FAILED"?await batchReview(tx,row.settlementId):null;
+ return {id:row.id,merchantUnitId:row.merchantUnitId,amount:formatMoney(row.amountMinor),status:event?.outcome??"PENDING",testReference:`DEP-${row.id.slice(0,8).toUpperCase()}`,destination:"TEST_DESTINATION",createdAt:row.createdAt.toISOString(),settlementId:row.settlementId,processedAt:event?.createdAt.toISOString()??null,retryReview:retry?.canRetry?{amount:formatMoney(retry.amountMinor),token:retry.token,paymentCount:retry.items.length}:null,payments:items.map(({payment,item,refund})=>({id:payment.id,description:payment.description,reference:payment.testReference,amount:formatMoney(item.amountMinor),refundedAmount:formatMoney(refund?.amountMinor??0n)}))};
+}
+
 async function refundAuthority(tx:ScopedTransaction,scope:UnitScope,personId:string) {try {await responsible(tx,personId,scope.masterService.id);return evaluate(scope.policy,"payments.refund").allowed&&await adult(tx,personId);}catch(error){if(error instanceof SecurityError&&[403,404].includes(error.status))return false;throw error;}}
 async function readPayment(tx:ScopedTransaction,scope:UnitScope,paymentId:string) {uuid(paymentId);const [row]=await tx.select().from(merchantTestPayments).where(and(eq(merchantTestPayments.id,paymentId),eq(merchantTestPayments.merchantUnitId,scope.unit.id),eq(merchantTestPayments.serviceId,scope.masterService.id)));if(!row)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return row;}
 
@@ -81,11 +108,12 @@ export async function getMerchantOperations(personId:string,merchantUnitId:strin
     const channels=evaluate(scope.policy,"channels.read").allowed?await tx.select().from(paymentChannels).where(and(eq(paymentChannels.merchantUnitId,merchantUnitId),scope.primaryAccess?undefined:or(eq(paymentChannels.creatorId,personId),eq(paymentChannels.visibility,"ASSIGNED")))).orderBy(desc(paymentChannels.updatedAt),paymentChannels.id):[];
     const payments=canReadPayments?await tx.select().from(merchantTestPayments).where(eq(merchantTestPayments.merchantUnitId,merchantUnitId)).orderBy(desc(merchantTestPayments.createdAt),merchantTestPayments.id):[];
     const refunds=payments.length?await tx.select().from(merchantTestRefunds).where(inArray(merchantTestRefunds.paymentId,payments.map(row=>row.id))):[];
-    const payouts=canReadPayments?await tx.select().from(merchantTestPayouts).where(eq(merchantTestPayouts.merchantUnitId,merchantUnitId)).orderBy(desc(merchantTestPayouts.createdAt),merchantTestPayouts.id):[];
+    const payouts=canReadPayments?await tx.select().from(merchantDeposits).where(eq(merchantDeposits.merchantUnitId,merchantUnitId)).orderBy(desc(merchantDeposits.createdAt),merchantDeposits.id):[];
+    const depositReview=canPayout?await depositCandidates(tx,merchantUnitId,scope.masterService.id):null;
     const projectedChannels:ChannelActivation[]=[];
     for(const row of channels)projectedChannels.push(await activationProjection(tx,scope,row,eligible,config.ready,now));
-    return {merchantUnitId,serviceId:scope.masterService.id,mode:"TEST",liveEnabled:false,feeStatus:"NOT_APPLIED",gateway:gatewayProjection(scope.masterService.id,config.gateway),enrollment:enrollmentProjection(scope,config.enrollment),channels:projectedChannels,payments:payments.map(row=>paymentProjection(row,refunds.find(item=>item.paymentId===row.id),canRefund)),payouts:payouts.map(payoutProjection),availableFunds:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_AVAILABLE"})):null,canConfigureGateway,canEnroll:canConfigureGateway,canReadPayments,canPayout};
-  });
+    return {merchantUnitId,serviceId:scope.masterService.id,mode:"TEST",liveEnabled:false,feeStatus:"NOT_APPLIED",gateway:gatewayProjection(scope.masterService.id,config.gateway),enrollment:enrollmentProjection(scope,config.enrollment),channels:projectedChannels,payments:await Promise.all(payments.map(row=>currentPaymentProjection(tx,row,refunds.find(item=>item.paymentId===row.id),canRefund))),payouts:await Promise.all(payouts.map(row=>payoutProjection(tx,row,canPayout))),bankFunds:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId,bucket:"PAYOUT_CLEARING"})):null,settledFunds:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_SETTLED"})):null,pendingDeposits:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_PAYOUT_PENDING"})):null,availableFunds:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_AVAILABLE"})):null,canConfigureGateway,canEnroll:canConfigureGateway,canReadPayments,canPayout,depositReview:depositReview&&depositReview.amountMinor>0n?{amount:formatMoney(depositReview.amountMinor),token:depositReview.token,paymentCount:depositReview.payments.length}:null};
+  },{isolationLevel:"repeatable read"});
 }
 /** An aggregate is a primary-service permission, never a consequence of a shared unit ID. */
 export async function getMerchantNetwork(personId:string,primaryUnitId:string):Promise<MerchantNetworkProjection> {
@@ -105,24 +133,6 @@ export async function getMerchantNetwork(personId:string,primaryUnitId:string):P
   const canReadPayments=evaluate(current.policy,"payments.read").allowed;
   const balances=canReadPayments?operations.flatMap(operation=>operation.availableFunds?[{merchantUnitId:operation.merchantUnitId,availableFunds:operation.availableFunds}]:[]):[];
   return {primary:{id:primaryUnitId,serviceId:root.masterService.id,displayName:root.masterService.displayName},units:workspaces.map(workspace=>workspace.merchant),channels:workspaces.flatMap(workspace=>workspace.channels),payments:canReadPayments?operations.flatMap(operation=>operation.payments).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||a.id.localeCompare(b.id)):[],payouts:canReadPayments?operations.flatMap(operation=>operation.payouts).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||a.id.localeCompare(b.id)):[],availableFunds:canReadPayments?formatMoney(balances.reduce((sum,balance)=>sum+BigInt(balance.availableFunds.minor),0n)):null,balances,canReadPayments};
-}
-/** A signed-in preview resolves no public payer or financial-service authority. */
-export async function getMerchantCheckout(personId:string,channelId:string):Promise<MerchantCheckoutProjection> {
-  channelId=uuid(channelId);
-  const merchantUnitId=await getDb().transaction(async tx=>{
-    await requireMerchantParticipant(tx,personId);
-    const [hint]=await tx.select({merchantUnitId:paymentChannels.merchantUnitId}).from(paymentChannels).where(eq(paymentChannels.id,channelId));
-    if(!hint)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-    const scope=await loadMerchantUnitScope(tx,personId,hint.merchantUnitId);
-    await channel(tx,scope,personId,channelId);
-    return scope.unit.id;
-  });
-  const workspace=await getMerchantWorkspace(personId,merchantUnitId),operations=await getMerchantOperations(personId,merchantUnitId);
-  const row=workspace.channels.find(item=>item.id===channelId),activation=operations.channels.find(item=>item.channelId===channelId);
-  if(!row||!activation)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-  const previewUrl=new URL(`/pay/${row.id}`,getRuntimeConfig().publicOrigin).href;
-  const qrDataUrl=row.presentations.includes("QR")?await QRCode.toDataURL(previewUrl,{width:256,margin:4,errorCorrectionLevel:"M",color:{dark:"#073b3f",light:"#ffffff"}}):null;
-  return {workspace,channel:row,activation,previewUrl,qrDataUrl};
 }
 export async function configureTestGateway(personId:string,merchantUnitId:string,raw:ConfigureTestGatewayInput):Promise<TestGateway> {
   merchantUnitId=uuid(merchantUnitId);const input=parse(configureTestGatewaySchema,raw);
@@ -171,10 +181,10 @@ export async function setChannelActivation(personId:string,merchantUnitId:string
 }
 /** Sole merchant payment persistence owner. Callers supply an already locked, currently authorized channel.
  * Guest authority is an exact persisted order, never an impersonated merchant person. */
-export async function recordMerchantSandboxPayment(tx:ScopedTransaction,row:Channel,authority:{kind:"MERCHANT";actorId:string;guestOrderId:null}|{kind:"GUEST_ORDER";actorId:null;guestOrderId:string},outcome:"APPROVED"|"DECLINED",gatewayVersion:number,enrollmentVersion:number,now:Date):Promise<Payment>{
+export async function recordMerchantSandboxPayment(tx:ScopedTransaction,row:Channel,authority:{kind:"MERCHANT";actorId:string;guestOrderId:null}|{kind:"GUEST_ORDER";actorId:null;guestOrderId:string}|{kind:"CARDHOLDER";actorId:null;guestOrderId:null;cardCheckoutId:string;cardActivityId:string},outcome:"APPROVED"|"DECLINED",gatewayVersion:number,enrollmentVersion:number,now:Date):Promise<Payment>{
   const id=randomUUID(),result=testPayment(id,outcome);
-  const journalId=result.outcome==="APPROVED"?await postJournal(tx,{businessKey:`merchant-payment:${id}`,kind:"MERCHANT_PAYMENT",referenceId:id,lines:[{serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,bucket:"GATEWAY_CLEARING",deltaMinor:-row.amountMinor},{serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,bucket:"MERCHANT_AVAILABLE",deltaMinor:row.amountMinor}]}):null;
-  const [saved]=await tx.insert(merchantTestPayments).values({id,serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,channelId:row.id,actorId:authority.actorId,guestOrderId:authority.guestOrderId,channelVersion:row.version,channelUsage:row.usage,description:row.description,amountMinor:row.amountMinor,currency:"USD",outcome:result.outcome,testReference:result.testReference,gatewayVersion,enrollmentVersion,journalId,createdAt:now}).returning();
+  const journalId=result.outcome==="APPROVED"?await postJournal(tx,{businessKey:`merchant-payment:${id}`,kind:"MERCHANT_PAYMENT",referenceId:id,occurredAt:now,lines:[{serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,bucket:"GATEWAY_CLEARING",deltaMinor:-row.amountMinor},{serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,bucket:"MERCHANT_AVAILABLE",deltaMinor:row.amountMinor}]}):null;
+  const [saved]=await tx.insert(merchantTestPayments).values({id,serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,channelId:row.id,actorId:authority.actorId,guestOrderId:authority.guestOrderId,cardCheckoutId:authority.kind==="CARDHOLDER"?authority.cardCheckoutId:null,cardActivityId:authority.kind==="CARDHOLDER"?authority.cardActivityId:null,channelVersion:row.version,channelUsage:row.usage,description:row.description,amountMinor:row.amountMinor,currency:"USD",outcome:result.outcome,testReference:result.testReference,gatewayVersion,enrollmentVersion,journalId,createdAt:now}).returning();
   return saved!;
 }
 export async function simulateMerchantPayment(personId:string,merchantUnitId:string,channelId:string,raw:SimulateMerchantPaymentInput):Promise<MerchantTestPayment> {
@@ -182,10 +192,10 @@ export async function simulateMerchantPayment(personId:string,merchantUnitId:str
   return getDb().transaction(async tx=>{
     const scope=await loadMerchantUnitScope(tx,personId,merchantUnitId,true);requireAction(scope,"payments.simulate");await requireMerchantApplicant(tx,personId);
     const row=await channel(tx,scope,personId,channelId,true),receipt=await begin(tx,personId,scopeKey,"PAYMENT",input),canRefund=await refundAuthority(tx,scope,personId);
-    if(receipt.old) {const old=await readPayment(tx,scope,receipt.old.resultId),[refund]=await tx.select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId,old.id));return paymentProjection(old,refund,canRefund);}
+    if(receipt.old) {const old=await readPayment(tx,scope,receipt.old.resultId),[refund]=await tx.select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId,old.id));return currentPaymentProjection(tx,old,refund,canRefund);}
     checkVersion(row.version,input.expectedChannelVersion);
     const config=await configuration(tx,scope),now=await merchantNow(tx),activation=await activationProjection(tx,scope,row,true,config.ready,now);
-    if(!activation.canSimulate)throw new SecurityError(activation.state==="USED"?"CHANNEL_ALREADY_USED":"CHANNEL_NOT_READY",409);
+    if(activation.state!=="ACTIVE")throw new SecurityError(activation.state==="USED"?"CHANNEL_ALREADY_USED":"CHANNEL_NOT_READY",409);
     const saved=await recordMerchantSandboxPayment(tx,row,{kind:"MERCHANT",actorId:personId,guestOrderId:null},input.outcome,config.gateway!.version,config.enrollment!.version,now);
     const id=saved.id;
     await finish(tx,personId,scopeKey,"PAYMENT",input,receipt.digest,id);return paymentProjection(saved!,undefined,canRefund);
@@ -194,27 +204,70 @@ export async function simulateMerchantPayment(personId:string,merchantUnitId:str
 export async function refundMerchantPayment(personId:string,merchantUnitId:string,paymentId:string,raw:RefundMerchantPaymentInput):Promise<MerchantTestPayment> {
   merchantUnitId=uuid(merchantUnitId);paymentId=uuid(paymentId);const input=parse(refundMerchantPaymentSchema,raw),scopeKey=`payment:${paymentId}`;
   return getDb().transaction(async tx=>{
+    const [hint]=await tx.select().from(merchantTestPayments).where(and(eq(merchantTestPayments.id,paymentId),eq(merchantTestPayments.merchantUnitId,merchantUnitId)));
+    const [cardPayment]=hint?.cardCheckoutId?await tx.select().from(cardCheckoutAttempts).where(eq(cardCheckoutAttempts.id,hint.cardCheckoutId)):[];
+    for(const serviceId of [...new Set([hint?.serviceId,cardPayment?.cardServiceId].filter((id):id is string=>!!id))].sort())await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+serviceId},0))`);
     const scope=await loadMerchantUnitScope(tx,personId,merchantUnitId,true);requireAction(scope,"payments.refund");await responsible(tx,personId,scope.masterService.id,true);await requireMerchantApplicant(tx,personId);
     const payment=await readPayment(tx,scope,paymentId),receipt=await begin(tx,personId,scopeKey,"REFUND",input),[current]=await tx.select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId,paymentId));
     if(receipt.old)return paymentProjection(payment,current,true);
     checkVersion(current?2:1,input.expectedVersion);
     if(payment.outcome!=="APPROVED"||current)throw new SecurityError("PAYMENT_NOT_REFUNDABLE",409);
     const id=randomUUID(),result=testRefund(id),now=await merchantNow(tx);
-    const journalId=await postJournal(tx,{businessKey:`merchant-refund:${paymentId}`,kind:"MERCHANT_REFUND",referenceId:id,lines:[{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_AVAILABLE",deltaMinor:-payment.amountMinor},{serviceId:scope.masterService.id,merchantUnitId,bucket:"GATEWAY_CLEARING",deltaMinor:payment.amountMinor}]});
+    const position=await refundPosition(tx,paymentId);if(position===null)throw new SecurityError("REFUND_DEPOSIT_RESERVED",409);
+    const journalId=await postJournal(tx,{businessKey:`merchant-refund:${paymentId}`,kind:"MERCHANT_REFUND",referenceId:id,occurredAt:now,lines:[{serviceId:scope.masterService.id,merchantUnitId,bucket:position,deltaMinor:-payment.amountMinor},{serviceId:scope.masterService.id,merchantUnitId,bucket:"GATEWAY_CLEARING",deltaMinor:payment.amountMinor}]});
     const [saved]=await tx.insert(merchantTestRefunds).values({id,paymentId,merchantUnitId,serviceId:scope.masterService.id,actorId:personId,amountMinor:payment.amountMinor,currency:"USD",reason:input.reason,testReference:result.testReference,journalId,createdAt:now}).returning();
+    if(cardPayment){
+      await postJournal(tx,{businessKey:`card-refund:${paymentId}`,kind:"CARD_REFUND",referenceId:id,occurredAt:now,lines:[{serviceId:cardPayment.cardServiceId,cardId:cardPayment.cardId,bucket:"CARD_SPENT",deltaMinor:-payment.amountMinor},{serviceId:cardPayment.cardServiceId,bucket:"GROUP_AVAILABLE",deltaMinor:payment.amountMinor}]});
+      await tx.insert(serviceActivity).values({id,serviceId:cardPayment.cardServiceId,cardId:cardPayment.cardId,title:payment.description,category:"Card refund",occurredAt:now,status:"POSTED",direction:"CREDIT",amountMinor:payment.amountMinor,description:"Refund returned to your card group’s prepaid balance."});
+    }
     await finish(tx,personId,scopeKey,"REFUND",input,receipt.digest,id);return paymentProjection(payment,saved,true);
   });
 }
-export async function createMerchantPayout(personId:string,merchantUnitId:string,raw:MerchantPayoutInput):Promise<MerchantTestPayout> {
-  merchantUnitId=uuid(merchantUnitId);const input=parse(merchantPayoutSchema,raw),scopeKey=`unit:${merchantUnitId}`;
-  return getDb().transaction(async tx=>{
-    const scope=await loadMerchantUnitScope(tx,personId,merchantUnitId,true);requireAction(scope,"payouts.manage");await responsible(tx,personId,scope.masterService.id,true);await requireMerchantApplicant(tx,personId);
-    const receipt=await begin(tx,personId,scopeKey,"PAYOUT",input);
-    if(receipt.old) {const [old]=await tx.select().from(merchantTestPayouts).where(and(eq(merchantTestPayouts.id,receipt.old.resultId),eq(merchantTestPayouts.merchantUnitId,merchantUnitId)));if(!old)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return payoutProjection(old);}
-    const config=await configuration(tx,scope);if(!config.ready)throw new SecurityError("TEST_GATEWAY_NOT_READY",409);
-    const id=randomUUID(),amountMinor=BigInt(input.amountMinor),result=testPayout(id),now=await merchantNow(tx);
-    const journalId=await postJournal(tx,{businessKey:`merchant-payout:${id}`,kind:"MERCHANT_PAYOUT",referenceId:id,lines:[{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_AVAILABLE",deltaMinor:-amountMinor},{serviceId:scope.masterService.id,merchantUnitId,bucket:"PAYOUT_CLEARING",deltaMinor:amountMinor}]});
-    const [saved]=await tx.insert(merchantTestPayouts).values({id,serviceId:scope.masterService.id,merchantUnitId,actorId:personId,amountMinor,currency:"USD",testReference:result.testReference,journalId,createdAt:now}).returning();
-    await finish(tx,personId,scopeKey,"PAYOUT",input,receipt.digest,id);return payoutProjection(saved!);
-  });
+async function depositCandidates(tx:ScopedTransaction,merchantUnitId:string,serviceId:string){
+ const payments=await tx.select({payment:merchantTestPayments}).from(merchantTestPayments).leftJoin(merchantSettlementItems,eq(merchantSettlementItems.paymentId,merchantTestPayments.id)).leftJoin(merchantTestRefunds,eq(merchantTestRefunds.paymentId,merchantTestPayments.id)).where(and(eq(merchantTestPayments.merchantUnitId,merchantUnitId),eq(merchantTestPayments.serviceId,serviceId),eq(merchantTestPayments.outcome,"APPROVED"),isNull(merchantSettlementItems.paymentId),isNull(merchantTestRefunds.id),sql`${merchantTestPayments.createdAt}>=(select "activatedAt" from prepaid_cutover where id='D69')`)).orderBy(merchantTestPayments.createdAt,merchantTestPayments.id);
+ const amountMinor=payments.reduce((sum,row)=>sum+row.payment.amountMinor,0n),token=createHash("sha256").update(JSON.stringify({serviceId,merchantUnitId,payments:payments.map(({payment})=>({id:payment.id,amount:payment.amountMinor.toString()}))})).digest("hex");
+ return {payments,amountMinor,token};
+}
+export async function createMerchantPayout(personId:string,merchantUnitId:string,raw:MerchantPayoutInput):Promise<MerchantTestPayout>{
+ merchantUnitId=uuid(merchantUnitId);const input=parse(merchantPayoutSchema,raw),scopeKey=`unit:${merchantUnitId}`;
+ return getDb().transaction(async tx=>{
+  const [unit]=await tx.select().from(merchantUnits).where(eq(merchantUnits.id,merchantUnitId));if(!unit)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+  await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+unit.masterServiceId},0))`);
+  const scope=await loadMerchantUnitScope(tx,personId,merchantUnitId,true);requireAction(scope,"payouts.manage");await responsible(tx,personId,scope.masterService.id,true);await requireMerchantApplicant(tx,personId);
+  const receipt=await begin(tx,personId,scopeKey,"PAYOUT",input);
+  if(receipt.old){const [old]=await tx.select().from(merchantDeposits).where(and(eq(merchantDeposits.id,receipt.old.resultId),eq(merchantDeposits.merchantUnitId,merchantUnitId)));if(!old)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return payoutProjection(tx,old,true);}
+  const config=await configuration(tx,scope);if(!config.ready)throw new SecurityError("TEST_GATEWAY_NOT_READY",409);
+  const now=await merchantNow(tx);let batch:typeof merchantSettlements.$inferSelect;let included:{paymentId:string;amountMinor:bigint}[];let principal:bigint;
+  if(input.settlementId){
+   const [saved]=await tx.select().from(merchantSettlements).where(and(eq(merchantSettlements.id,input.settlementId),eq(merchantSettlements.merchantUnitId,merchantUnitId),eq(merchantSettlements.serviceId,scope.masterService.id)));
+   if(!saved)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+   const reviewed=await batchReview(tx,saved.id);
+   if(!reviewed.canRetry)throw new SecurityError(reviewed.amountMinor===0n?"NO_PAYMENTS_TO_DEPOSIT":"DEPOSIT_ALREADY_REQUESTED",409);
+   if(input.reviewToken!==reviewed.token)throw new SecurityError("DEPOSIT_REVIEW_CHANGED",409);
+   batch=saved;included=reviewed.items;principal=reviewed.amountMinor;
+
+  }else{
+   const {payments,amountMinor,token}=await depositCandidates(tx,merchantUnitId,scope.masterService.id);if(amountMinor<=0n)throw new SecurityError("NO_PAYMENTS_TO_DEPOSIT",409);if(input.reviewToken!==token)throw new SecurityError("DEPOSIT_REVIEW_CHANGED",409);
+   const id=randomUUID(),journalId=await postJournal(tx,{businessKey:`settlement:${id}`,kind:"MERCHANT_SETTLEMENT",referenceId:id,occurredAt:now,lines:[{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_AVAILABLE",deltaMinor:-amountMinor},{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_SETTLED",deltaMinor:amountMinor}]});
+   const [saved]=await tx.insert(merchantSettlements).values({id,serviceId:scope.masterService.id,merchantUnitId,amountMinor,actorId:personId,journalId,createdAt:now}).returning();batch=saved!;principal=amountMinor;included=payments.map(({payment})=>({paymentId:payment.id,amountMinor:payment.amountMinor}));
+   await tx.insert(merchantSettlementItems).values(payments.map(({payment})=>({paymentId:payment.id,settlementId:id,serviceId:scope.masterService.id,merchantUnitId,amountMinor:payment.amountMinor})));
+  }
+  const id=randomUUID(),journalId=await postJournal(tx,{businessKey:`deposit:${id}`,kind:"DEPOSIT_RESERVE",referenceId:id,occurredAt:now,lines:[{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_SETTLED",deltaMinor:-principal},{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_PAYOUT_PENDING",deltaMinor:principal}]});
+  const [saved]=await tx.insert(merchantDeposits).values({id,settlementId:batch.id,serviceId:scope.masterService.id,merchantUnitId,actorId:personId,amountMinor:principal,reviewToken:input.reviewToken!,journalId,createdAt:now}).returning();await tx.insert(merchantDepositItems).values(included.map(item=>({...item,depositId:id})));await finish(tx,personId,scopeKey,"PAYOUT",input,receipt.digest,id);return payoutProjection(tx,saved!,true);
+ });
+}
+async function depositOperator(tx:ScopedTransaction,personId:string,serviceId:string){
+ const [row]=await tx.select({assignment:operatorServiceAccess,service:services}).from(operatorServiceAccess).innerJoin(services,eq(services.id,operatorServiceAccess.serviceId)).where(and(eq(operatorServiceAccess.personId,personId),eq(operatorServiceAccess.serviceId,serviceId))).for("share");
+ const grants=row?.assignment.canProcessDeposits?["support.operator.read","payments.operator.process"]:[];
+ if(!row||!evaluate({targetKind:"OPERATOR_SERVICE",actorPersonId:personId,assignmentPersonId:row.assignment.personId,serviceId,resourceServiceId:serviceId,state:row.assignment.state,serviceStatus:row.service.status,grants},"payments.operator.process").allowed)throw new SecurityError("ACTION_DENIED",403);
+}
+export async function getDepositProcessingQueue(personId:string){return getDb().transaction(async tx=>{
+ const assignments=await tx.select().from(operatorServiceAccess).where(and(eq(operatorServiceAccess.personId,personId),eq(operatorServiceAccess.state,"ACCEPTED"),eq(operatorServiceAccess.canProcessDeposits,true)));const result=[];
+ for(const assignment of assignments){await depositOperator(tx,personId,assignment.serviceId);const rows=await tx.select({deposit:merchantDeposits,name:merchantUnits.displayName}).from(merchantDeposits).innerJoin(merchantUnits,eq(merchantUnits.id,merchantDeposits.merchantUnitId)).leftJoin(merchantDepositEvents,eq(merchantDepositEvents.depositId,merchantDeposits.id)).where(and(eq(merchantDeposits.serviceId,assignment.serviceId),isNull(merchantDepositEvents.depositId))).orderBy(merchantDeposits.createdAt).limit(100);for(const row of rows)result.push({...await payoutProjection(tx,row.deposit),merchantName:row.name});}return result;
+ },{isolationLevel:"repeatable read"});}
+export async function processMerchantDeposit(personId:string,depositId:string,raw:{commandId:string;outcome:"COMPLETED"|"FAILED"}):Promise<MerchantTestPayout>{
+ depositId=uuid(depositId);const parsed=parse(z.object({commandId:z.uuid(),outcome:z.enum(["COMPLETED","FAILED"])}).strict(),raw),input={...parsed,commandId:uuid(parsed.commandId)};
+ return getDb().transaction(async tx=>{const [deposit]=await tx.select().from(merchantDeposits).where(eq(merchantDeposits.id,depositId));if(!deposit)throw new SecurityError("RESOURCE_UNAVAILABLE",404);await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+deposit.serviceId},0))`);await depositOperator(tx,personId,deposit.serviceId);await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${input.commandId},0))`);const [old]=await tx.select().from(merchantDepositEvents).where(or(eq(merchantDepositEvents.depositId,depositId),eq(merchantDepositEvents.commandId,input.commandId)));if(old){if(old.depositId!==depositId||old.commandId!==input.commandId||old.actorId!==personId||old.outcome!==input.outcome)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return payoutProjection(tx,deposit);}
+ const now=await merchantNow(tx),journalId=await postJournal(tx,{businessKey:`deposit-result:${depositId}`,kind:input.outcome==="COMPLETED"?"MERCHANT_PAYOUT":"DEPOSIT_RELEASE",referenceId:depositId,occurredAt:now,lines:[{serviceId:deposit.serviceId,merchantUnitId:deposit.merchantUnitId,bucket:"MERCHANT_PAYOUT_PENDING",deltaMinor:-deposit.amountMinor},{serviceId:deposit.serviceId,merchantUnitId:deposit.merchantUnitId,bucket:input.outcome==="COMPLETED"?"PAYOUT_CLEARING":"MERCHANT_SETTLED",deltaMinor:deposit.amountMinor}]});await tx.insert(merchantDepositEvents).values({depositId,commandId:input.commandId,actorId:personId,outcome:input.outcome,journalId,createdAt:now});return payoutProjection(tx,deposit);
+ });
 }

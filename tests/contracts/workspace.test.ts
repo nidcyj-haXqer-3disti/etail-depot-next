@@ -5,7 +5,7 @@ import { generateFoundationOpenApi } from "../../src/platform/http/contracts";
 
 it("declares every implemented local workspace operation, path identifier and request schema",()=>{
   const api=generateFoundationOpenApi();
-  expect(workspaceOperations).toHaveLength(11);
+  expect(workspaceOperations).toHaveLength(20);
   for(const operation of workspaceOperations) {
     const sourcePath=`src/app${operation.path.replaceAll(/\{([^}]+)\}/g,"[$1]")}/route.ts`;
     const source=readFileSync(sourcePath,"utf8");

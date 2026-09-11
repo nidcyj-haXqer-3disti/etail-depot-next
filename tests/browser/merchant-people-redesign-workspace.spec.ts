@@ -62,10 +62,12 @@ test("ordinary merchant collection access is reviewed, recovers one invitation, 
   await review.getByRole("button",{name:"Retry same access request",exact:true}).click();
   await expect(review).toBeHidden();expect(bodies).toHaveLength(2);expect(bodies[0]).toBe(bodies[1]);
   const saved=await getMerchantAccessOverview(f.merchant.personId,f.unit.id),offer=saved.invitations.find(item=>item.recipientId===f.helper.personId)!;
-  expect(saved.pendingInvitationCount).toBe(1);expect(offer.permissions).toEqual(expect.arrayContaining(["merchant.read","channels.read","channels.create","channels.update","channels.share","payments.read","payments.simulate"]));expect(offer.delegablePermissions).toEqual([]);
+  expect(saved.pendingInvitationCount).toBe(1);expect(offer.permissions).toEqual(expect.arrayContaining(["merchant.read","channels.read","channels.create","channels.update","channels.share","payments.read"]));expect(offer.delegablePermissions).toEqual([]);
   expect(saved.people.some(person=>person.personId===f.helper.personId)).toBe(false);
   expect((await recipientPage.request.get(`/api/v1/merchants/${f.unit.id}`)).status()).toBe(404);
-  await recipientPage.goto("/services");
+  await recipientPage.goto("/shared-access");
+  await expect(recipientPage).toHaveURL(/\/shared-access$/);
+  await expect(recipientPage.getByRole("heading",{name:"Shared access",level:1,exact:true})).toBeVisible();
   await recipientPage.locator(".ws-person-row").filter({hasText:offer.id.slice(0,8).toUpperCase()}).getByRole("button",{name:"Review invitation",exact:true}).click();
   await recipientPage.getByRole("dialog",{name:"Review merchant invitation",exact:true}).getByRole("button",{name:"Accept this access",exact:true}).click();
   await recipientPage.getByRole("link",{name:"Continue to merchant",exact:true}).click();

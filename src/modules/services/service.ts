@@ -23,7 +23,7 @@ export async function bindIdentity(issuer:string,subject:string,displayName="New
   return {identityId:identity!.id,personId:person!.id};
  });
 }
-export const PRIMARY_CARDHOLDER_PERMISSIONS=["cards.read","cards.hold","cards.request","cards.create","cards.purchase","cards.freeze","cards.unfreeze","cards.manageMembers","activity.read","people.read","people.invite","people.changeRole","people.revoke","notifications.manage"] as const;
+export const PRIMARY_CARDHOLDER_PERMISSIONS=["cardholder.funds.read","cardholder.funds.add","cardholder.limits.manage","cards.read","cards.hold","cards.request","cards.create","cards.purchase","cards.freeze","cards.unfreeze","cards.manageMembers","activity.read","people.read","people.invite","people.changeRole","people.revoke","notifications.manage"] as const;
 /** Sole enrollment writer for a primary Cardholder service. No card or money is created here. */
 export async function createCardholderService(personId:string,raw:CreateCardholderServiceInput):Promise<CreatedCardholderService> {
  const parsed=createCardholderServiceSchema.safeParse(raw);if(!parsed.success)throw new SecurityError("INVALID_REQUEST",422);const input=parsed.data;

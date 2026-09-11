@@ -13,7 +13,7 @@ export function ProductPreview({ variant = "cards" }: { variant?: "cards" | "pay
 }
 
 const commonQuestions = [
-  { question: "What can I do with Etail Depot?", answer: "Give trusted adults their own cards through Cardholder services, or share payment tools through Merchant services. You choose permissions and keep the overview. Explore both with sample profiles in the sandbox." },
+  { question: "What can I do with Etail Depot?", answer: "Fund one prepaid card group and set a monthly spending limit for each adult cardholder, or share payment tools through Merchant services. Customers pay through published links with their own Etail cards. You choose permissions and keep the overview. Explore both in the sandbox." },
   { question: "Who can see my cards and payments?", answer: "The primary cardholder manages their card group. Each additional cardholder sees only their own cards and activity. A primary merchant oversees its submerchants. Invited people see the merchant records their permissions allow; people assigned to the same merchant may share its payment view. Authorized support staff can read questions assigned to them." },
   { question: "Can I give someone both a card and payment tools?", answer: "Yes, with separate invitations and permissions for each service. Giving someone a card does not give them access to merchant payments, and payment access does not reveal private card activity. Cards for children and teenagers are not available in this sandbox." },
   { question: "Does the demo use real money?", answer: "No. This is a sandbox with fictional people, cards and payments. You can try the experience without entering real bank details. Live card issuance and payment processing are not available here." },

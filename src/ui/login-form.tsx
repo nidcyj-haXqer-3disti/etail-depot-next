@@ -25,7 +25,7 @@ function failureCode(failure: unknown): string | null {
   return typeof failure.error.code === "string" ? failure.error.code : null;
 }
 
-export function LoginForm({ localFixtureIdentity, localEmailLinkBridge, emailSignIn, providerOrigin }: { localFixtureIdentity: boolean; localEmailLinkBridge: boolean; emailSignIn: EmailAuthenticationAvailability; providerOrigin: string }) {
+export function LoginForm({ nextPath="/services",localFixtureIdentity, localEmailLinkBridge, emailSignIn, providerOrigin }: { nextPath?:string;localFixtureIdentity: boolean; localEmailLinkBridge: boolean; emailSignIn: EmailAuthenticationAvailability; providerOrigin: string }) {
   const router = useRouter();
   const [checking, startChecking] = useTransition();
   const [pending, setPending] = useState<string | null>(null);
@@ -123,7 +123,7 @@ export function LoginForm({ localFixtureIdentity, localEmailLinkBridge, emailSig
       if (field === "authenticated") {
         navigationStarted.current = true; setSignedIn(true);
         // The new document reads the HttpOnly session set by this response.
-        window.location.replace("/services"); return;
+        window.location.replace(nextPath); return;
       }
       emailLink.current = null; setLinkReady(false);
       if (operation === "register") { setMode("confirm"); setNotice("Your request was received. For a new login, check your inbox and spam folder for a confirmation email. If you already have a login, use your existing password or reset it. Registering again does not change your password."); }
@@ -156,7 +156,7 @@ export function LoginForm({ localFixtureIdentity, localEmailLinkBridge, emailSig
     if (mode === "reset") void submit("/api/v1/auth/reset-password", { token: link!.token, password }, mode);
   }
 
-  if (signedIn) return <div className="login-forms"><p className="form-note" role="status">You’re signed in. Opening your services…</p><a className="button primary full-width" href="/services">Continue to your services<Icon name="arrow" /></a></div>;
+  if (signedIn) return <div className="login-forms"><p className="form-note" role="status">You’re signed in. Opening your services…</p><a className="button primary full-width" href={nextPath}>Continue<Icon name="arrow" /></a></div>;
 
   const busy = pending !== null || checking;
   const disabled = busy || !emailSignIn.available || (mode === "register" && !emailSignIn.registrationAvailable);

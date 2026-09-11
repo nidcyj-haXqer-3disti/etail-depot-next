@@ -8,7 +8,7 @@ export function projectMerchantActivity(query:MerchantActivityQuery, view:Mercha
   const range=activityRange(query,now), completeScope=!!view&&view.totals.collected!==null;
   const scoped=records.filter(row=>view?.unitIds.includes(row.merchantId));
   const inPeriod=scoped.filter(row=>(!range.from||row.at.slice(0,10)>=range.from)&&(!range.to||row.at.slice(0,10)<=range.to));
-  const total=(kind:MerchantActivityRow["kind"])=>completeScope?formatMoney(inPeriod.filter(row=>row.kind===kind&&row.status!=="DECLINED").reduce((amount,row)=>amount+BigInt(row.amount.minor),0n)):null;
+  const total=(kind:MerchantActivityRow["kind"])=>completeScope?formatMoney(inPeriod.filter(row=>row.kind===kind&&(kind!=="transfer"||row.status==="COMPLETED")&&row.status!=="DECLINED").reduce((amount,row)=>amount+BigInt(row.amount.minor),0n)):null;
   const search=query.q.toLocaleLowerCase("en-US");
   const matching=inPeriod.filter(row=>`${row.kind}s`===query.activity&&(query.status==="ALL"||query.status==="COLLECTED"?query.status!=="COLLECTED"||row.status!=="DECLINED":row.status===query.status)&&(!search||[row.id,row.description,row.reference,row.paymentReference??"",row.merchantName].some(value=>value.toLocaleLowerCase("en-US").includes(search)))).sort((a,b)=>b.at.localeCompare(a.at)||a.id.localeCompare(b.id));
   if(exporting&&(!view||!completeScope))throw new SecurityError("MERCHANT_ACTIVITY_UNAVAILABLE",403);

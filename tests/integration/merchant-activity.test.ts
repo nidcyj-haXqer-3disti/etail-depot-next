@@ -1,3 +1,4 @@
+import {getMerchantOperations} from "../../src/modules/acquiring/operations-service";
 import {randomUUID} from "node:crypto";
 import {and,eq} from "drizzle-orm";
 import {afterAll,expect,it} from "vitest";
@@ -24,19 +25,22 @@ it("reads the complete authorized network, paginates/exports matching records an
  for(let i=0;i<27;i++)payments.push(await simulateMerchantPayment(f.operator.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"APPROVED"}));
  await simulateMerchantPayment(f.operator.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"DECLINED"});
  await refundMerchantPayment(f.merchant.personId,f.unit.id,payments[0].id,{commandId:randomUUID(),expectedVersion:1,reason:"Refund for test reconciliation"});
- const transfer=await createMerchantPayout(f.merchant.personId,f.unit.id,{commandId:randomUUID(),amountMinor:"100",currency:"USD"});
+ const transfer=await createMerchantPayout(f.merchant.personId,f.unit.id,{commandId:randomUUID(),reviewToken:(await getMerchantOperations(f.merchant.personId,f.unit.id)).depositReview?.token});
  const snapshot=()=>getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,f.merchant.serviceId)).orderBy(ledgerEntries.id);
  const before=await snapshot(),query={view:`network:${f.master.id}`,status:"COLLECTED",q:"Network activity order"};
  const first=merchantDashboardProjectionSchema.parse(await getMerchantDashboard(f.merchant.personId,query)),second=await getMerchantDashboard(f.merchant.personId,{...query,page:"2"});
- expect(first.activity).toMatchObject({totalCount:27,pageCount:2,periodTotals:{collected:{minor:"33750"},refunded:{minor:"1250"},transferred:{minor:"100"}}});
+ expect(first.activity).toMatchObject({totalCount:27,pageCount:2,periodTotals:{collected:{minor:"33750"},refunded:{minor:"1250"},transferred:{minor:"0"}}});
  expect(first.activity.rows).toHaveLength(25);expect(second.activity.rows).toHaveLength(2);
  expect(new Set([...first.activity.rows,...second.activity.rows].map(row=>row.id)).size).toBe(27);
- const view=first.views.find(view=>view.id===query.view)!;expect(view.totals.available?.minor).toBe("32400");
+ const expectedBalances={available:{minor:"0"},settled:{minor:"0"},pending:{minor:"32500"},bank:{minor:"0"}};
+ const view=first.views.find(view=>view.id===query.view)!;expect(view.totals).toMatchObject(expectedBalances);
+ expect(first.units.find(unit=>unit.id===f.unit.id)?.totals).toMatchObject(expectedBalances);
+ expect(first.units.find(unit=>unit.id===f.master.id)?.totals).toMatchObject({available:{minor:"0"},settled:{minor:"0"},pending:{minor:"0"},bank:{minor:"0"}});
  const none=await getMerchantDashboard(f.merchant.personId,{...query,period:"custom",from:"2099-01-01",to:"2099-01-02"});
- expect(none.activity.rows).toEqual([]);expect(none.views.find(view=>view.id===query.view)?.totals.available?.minor).toBe("32400");
+ expect(none.activity.rows).toEqual([]);expect(none.views.find(view=>view.id===query.view)?.totals).toMatchObject(expectedBalances);
  const exported=await getMerchantDashboard(f.merchant.personId,query,{exportRows:true});expect(exported.activity.rows).toHaveLength(27);expect(merchantActivityCsv(exported.activity)).toContain(payments[0].testReference);
  const refunds=await getMerchantDashboard(f.merchant.personId,{view:query.view,activity:"refunds"});expect(refunds.activity.rows).toHaveLength(1);expect(refunds.activity.rows[0].paymentId).toBe(payments[0].id);
- const transfers=await getMerchantDashboard(f.merchant.personId,{view:query.view,activity:"transfers"});expect(transfers.activity.rows[0].href).toContain(`transfer=${transfer.id}`);
+ const transfers=await getMerchantDashboard(f.merchant.personId,{view:query.view,activity:"transfers"});expect(transfers.activity.rows[0].status).toBe("PENDING");expect(transfers.activity.rows[0].amount.minor).toBe("32500");expect(transfers.activity.rows[0].href).toContain(`transfer=${transfer.id}`);
  expect(await snapshot()).toEqual(before);
 });
 
@@ -50,5 +54,6 @@ it("enforces exact delegate scope and rechecks revoked records and export permis
  await expect(getMerchantDashboard(f.operator.personId,{view:`unit:${f.unit.id}`},{exportRows:true})).rejects.toMatchObject({status:403});
  await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,f.merchant.serviceId),eq(permissionGrants.action,"payments.read")));
  const primary=await getMerchantDashboard(f.merchant.personId);expect(primary.activity).toMatchObject({completeScope:false,rows:[],periodTotals:{collected:null}});
+ for(const entry of [...primary.units,...primary.views])expect(entry.totals).toMatchObject({available:null,settled:null,pending:null,bank:null});
  await expect(getMerchantDashboard(f.merchant.personId,{}, {exportRows:true})).rejects.toMatchObject({status:403});
 });

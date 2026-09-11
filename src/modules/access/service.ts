@@ -5,7 +5,7 @@ import { and,desc,eq,inArray,lte,or,sql } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
 import { services,serviceMembers,identityBindings,people,permissionGrants } from "../../platform/database/schema";
 import { SecurityError } from "../../platform/security/origin";
-import {CARDHOLDER_PERMISSION_ACTIONS,isCardholderPermission} from "../policy/cardholder-scope";
+import {isCardholderPermission} from "../policy/cardholder-scope";
 import { ACTIONS,evaluate,type PolicyScope } from "../policy/evaluate";
 import { decideMerchantInvitation,merchantInvitationProjection } from "./merchant-service";
 import type {AnyInvitationProjection} from "./merchant-contracts";
@@ -17,7 +17,7 @@ type Scope=Awaited<ReturnType<typeof loadServiceScope>>;
 type Invitation=typeof serviceInvitations.$inferSelect;
 function serviceTarget(row:Invitation):asserts row is Invitation&{serviceId:string;role:InvitedRole} {if(row.targetKind!=="SERVICE"||!row.serviceId||!row.role)throw new SecurityError("INVITATION_UNAVAILABLE",404);}
 const secondaryCardPermissions=["cards.read","cards.hold","cards.purchase","cards.freeze","cards.unfreeze","activity.read","notifications.manage"] as const;
-const cardServicePermissions:readonly AccessPermission[]=CARDHOLDER_PERMISSION_ACTIONS;
+const cardServicePermissions:readonly AccessPermission[]=ACCESS_PERMISSIONS.filter(isCardholderPermission);
 const administration=["people.invite","people.changeRole","people.revoke"];
 const permissionLabels:Record<AccessPermission,[string,string]>={
   "cards.read":["View cards","View only cards assigned to this secondary cardholder."],

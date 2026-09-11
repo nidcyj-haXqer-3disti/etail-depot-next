@@ -61,16 +61,16 @@ for(const width of [1440,320]) {
    await dialogKeyboard(page,dialog);await expect(dialog).toContainText(payment.testReference);
    await accessible(page,"Exact payment receipt dialog");
    await page.keyboard.press("Escape");await expect(dialog).toBeHidden();await expect(opener).toBeFocused();
-   for(const view of ["Refunds","Transfers"]) {
+   for(const view of ["Refunds","Deposits"]) {
     await page.getByRole("navigation",{name:"Payment activity views"}).getByRole("button",{name:view,exact:true}).click();
     await expect(page.getByRole("searchbox",{name:`Search ${view.toLowerCase()}`,exact:true})).toBeVisible();
     await accessible(page,`Merchant ${view.toLowerCase()}`);
    }
-   await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Payment setup",exact:true}).click();
+   await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Account services",exact:true}).click();
    await expect(page.getByRole("heading",{name:"Your sandbox payments are ready",exact:true})).toBeVisible();
    await accessible(page,"Merchant payment setup");
    if(persona==="viewer") {
-    await expect(page.getByRole("button",{name:"Transfer out",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("button",{name:"Request deposit",exact:true})).toHaveCount(0);
     await expect(page.getByRole("button",{name:"Pause merchant",exact:true})).toHaveCount(0);
    }
   });

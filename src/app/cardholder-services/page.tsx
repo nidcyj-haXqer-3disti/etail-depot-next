@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getRequestSession } from "@/platform/http/context";
 import { SecurityError } from "@/platform/security/origin";
 import { getCardholderDashboard, getCardholderDashboardDetail, getCardholderDashboardFocus } from "@/modules/workspace/dashboard-service";
+import {getCardholderFunds} from "@/modules/workspace/service";
 import { getAccessOverview } from "@/modules/access/service";
 import { cardholderDashboardQuerySchema } from "@/modules/workspace/api-contracts";
 import { Shell, PageNotice } from "@/ui/shell";
@@ -53,7 +54,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     const access = management ? await getAccessOverview(session.personId, management.workspace.service.id) : undefined;
     const selectedPerson=typeof query.person==="string"?query.person.toLowerCase():undefined;
     const personUnavailable=query.person!==undefined&&(!selectedPerson||!access?.people.some(person=>person.id===selectedPerson));
-    return {dashboard,detail,access,managementWorkspace:management?.workspace,selectedPerson,personUnavailable,focusedCard:focused?.card??null,focusedWorkspace:focused?.workspace??null,focusUnavailable:focusRequested && !focused};
+    const funds=dashboard.primaryService?await getCardholderFunds(session.personId,dashboard.primaryService.id).catch(error=>{if(error instanceof SecurityError&&[403,404].includes(error.status))return null;throw error;}):null;
+    return {dashboard,detail,access,funds,managementWorkspace:management?.workspace,selectedPerson,personUnavailable,focusedCard:focused?.card??null,focusedWorkspace:focused?.workspace??null,focusUnavailable:focusRequested && !focused};
   } catch (error) {
     unstable_rethrow(error);
     return null;
@@ -69,5 +71,5 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     if (query.transaction !== undefined) for (const value of Array.isArray(query.transaction) ? query.transaction : [query.transaction]) target.append("transaction", value);
     redirect(`/cardholder-services/activity${target.size ? `?${target}` : ""}`);
   }
-  return <Shell authenticated><CardholderDashboard dashboard={result.dashboard} detail={result.detail} access={result.access} managementWorkspace={result.managementWorkspace} selectedPersonId={result.selectedPerson} personUnavailable={result.personUnavailable} selectionUnavailable={selectionRequested && !result.detail} focusedCard={result.focusedCard} focusedWorkspace={result.focusedWorkspace} focusUnavailable={result.focusUnavailable}/></Shell>;
+  return <Shell authenticated><CardholderDashboard funds={result.funds} dashboard={result.dashboard} detail={result.detail} access={result.access} managementWorkspace={result.managementWorkspace} selectedPersonId={result.selectedPerson} personUnavailable={result.personUnavailable} selectionUnavailable={selectionRequested && !result.detail} focusedCard={result.focusedCard} focusedWorkspace={result.focusedWorkspace} focusUnavailable={result.focusUnavailable}/></Shell>;
 }

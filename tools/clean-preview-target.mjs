@@ -2,12 +2,13 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {verifyPrepaidSeedConfig} from './prepaid-seed-config.mjs';
 
 export const testDatabase = 'etail_depot_next_services_test';
-export const testDatabaseComment = 'ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-v1:test';
+export const testDatabaseComment = 'ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-d69:test';
 export const previewDatabase = 'etail_depot_next_services_preview';
-export const previewDatabaseComment = 'ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-v1:preview';
-export const previewSeedKey = 'fresh-services-v1';
+export const previewDatabaseComment = 'ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-d69:preview';
+export const previewSeedKey = 'fresh-services-d69';
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export async function verifyPreviewRuntime() {
@@ -40,7 +41,8 @@ export async function verifyPreviewDatabase(client, { requireComplete = true } =
   if (requireComplete) {
     const table = await client.query("SELECT to_regclass('public._etail_preview_seed') AS name");
     if (!table.rows[0]?.name) throw new Error('Clean preview has not been explicitly prepared; startup never seeds data.');
-    const seed = await client.query('SELECT state FROM public._etail_preview_seed WHERE key = $1', [previewSeedKey]);
-    if (seed.rows[0]?.state !== 'COMPLETE') throw new Error('Clean preview preparation is incomplete; startup never resumes seeding.');
+    const seed = await client.query('SELECT key,state FROM public._etail_preview_seed');
+    if (seed.rows.length !== 1 || seed.rows[0]?.key !== previewSeedKey || seed.rows[0]?.state !== 'COMPLETE') throw new Error('Clean preview preparation is incomplete or belongs to another generation; startup never resumes seeding.');
+    await verifyPrepaidSeedConfig(client);
   }
 }

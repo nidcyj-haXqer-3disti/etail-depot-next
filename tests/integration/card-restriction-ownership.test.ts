@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { eq,sql } from "drizzle-orm";
@@ -13,7 +14,7 @@ afterAll(closeDatabase);
 async function setup(){
  const primary=await cardPrimary("Restriction primary"),holder=await cardPerson("Restriction holder");
  await enrollCardholder(primary.personId,primary.serviceId,holder);
- const {card}=await issuePracticeCard(primary.personId,primary.serviceId,holder,"Controlled card","3000");
+ const {card}=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"3000");await setPersonLimit(primary.personId,primary.serviceId,holder,"3000");return issuePracticeCard(primary.personId,primary.serviceId,holder,"Controlled card");})();
  const journal=()=>getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId)).orderBy(ledgerEntries.id);
  return {...primary,holder,card,journal};
 }

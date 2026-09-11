@@ -1,6 +1,9 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
-import { closeDatabase } from "../../src/platform/database/client";
+import {merchantSetupEligibility} from "../../src/modules/services/schema";
+import {eq} from "drizzle-orm";
+import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { getCardholderDashboard, getCardholderDashboardDetail } from "../../src/modules/workspace/dashboard-service";
 import { cancelCardRequest, startCardRequest, submitCardRequest, updateCardRequest } from "../../src/modules/workspace/service";
 import { createInvitation,getAccessOverview,revokeInvitation,revokeMemberAccess,updateMemberAccess } from "../../src/modules/access/service";
@@ -12,13 +15,16 @@ afterAll(closeDatabase);
 describe("complete Cardholder management projections", () => {
   it("retains drafts, blocked, issued and canceled requests with exact pagination and literal scoped search", async () => {
     const primary=await cardPrimary("Request history primary"),stranger=await cardPrimary("Unrelated request history");
-    const issued=await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Travel 100% card","2500");
+    const issued=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2500");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"2500");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Travel 100% card");})();
     const cancel=await startCardRequest(primary.personId,primary.serviceId,{commandId:randomUUID()});
     await cancelCardRequest(primary.personId,primary.serviceId,cancel.id,{commandId:randomUUID(),expectedVersion:cancel.version});
+    const incomplete=await cardPerson("Incomplete holder");await enrollCardholder(primary.personId,primary.serviceId,incomplete);
+    await getDb().delete(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId,incomplete));
     const blocked=await startCardRequest(primary.personId,primary.serviceId,{commandId:randomUUID()});
-    await submitCardRequest(primary.personId,primary.serviceId,blocked.id,{commandId:randomUUID(),expectedVersion:blocked.version});
+    const blockedDetails=await updateCardRequest(primary.personId,primary.serviceId,blocked.id,{commandId:randomUUID(),expectedVersion:blocked.version,holderId:incomplete,nickname:"Waiting for holder setup",format:"VIRTUAL"});
+    await submitCardRequest(primary.personId,primary.serviceId,blocked.id,{commandId:randomUUID(),expectedVersion:blockedDetails.version});
     for(let n=0;n<21;n++)await startCardRequest(primary.personId,primary.serviceId,{commandId:randomUUID()});
-    const foreign=await issuePracticeCard(stranger.personId,stranger.serviceId,stranger.personId,"Travel 100% private","900");
+    const foreign=await (async()=>{await fundCardGroup(stranger.personId,stranger.serviceId,"900");await setPersonLimit(stranger.personId,stranger.serviceId,stranger.personId,"900");return issuePracticeCard(stranger.personId,stranger.serviceId,stranger.personId,"Travel 100% private");})();
     const first=await getCardholderDashboard(primary.personId),second=await getCardholderDashboard(primary.personId,0,{requestPage:1});
     expect(cardholderDashboardSchema.parse(first)).toEqual(first);
     expect(first).toMatchObject({requestCount:24,unfinishedRequestCount:22,requestsHasMore:true,requestPage:0});
@@ -40,7 +46,7 @@ describe("complete Cardholder management projections", () => {
     const primary=await cardPrimary("Timeline primary"),secondary=await cardPerson("Timeline secondary");
     await enrollCardholder(primary.personId,primary.serviceId,secondary);
     const draft=await startCardRequest(primary.personId,primary.serviceId,{commandId:randomUUID()});
-    const saved=await updateCardRequest(primary.personId,primary.serviceId,draft.id,{commandId:randomUUID(),expectedVersion:draft.version,holderId:secondary,nickname:"Secondary timeline card",format:"VIRTUAL",requestedLimitMinor:"1500"});
+    const saved=await updateCardRequest(primary.personId,primary.serviceId,draft.id,{commandId:randomUUID(),expectedVersion:draft.version,holderId:secondary,nickname:"Secondary timeline card",format:"VIRTUAL"});
     const command={commandId:randomUUID(),expectedVersion:saved.version};
     await submitCardRequest(primary.personId,primary.serviceId,saved.id,command);
     await submitCardRequest(primary.personId,primary.serviceId,saved.id,command);
@@ -58,9 +64,9 @@ describe("complete Cardholder management projections", () => {
     const primary=await cardPrimary("Management primary"),secondary=await cardPerson("Several cards"),foreign=await cardPrimary("Private other primary");
     await enrollCardholder(primary.personId,primary.serviceId,secondary);
     await enrollCardholder(foreign.personId,foreign.serviceId,secondary);
-    const first=await issuePracticeCard(primary.personId,primary.serviceId,secondary,"Everyday","1000");
-    const second=await issuePracticeCard(primary.personId,primary.serviceId,secondary,"Travel","2500");
-    const privateCard=await issuePracticeCard(foreign.personId,foreign.serviceId,secondary,"Outside this group","9900");
+    const first=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2500");await setPersonLimit(primary.personId,primary.serviceId,secondary,"2500");return issuePracticeCard(primary.personId,primary.serviceId,secondary,"Everyday");})();
+    const second=await issuePracticeCard(primary.personId,primary.serviceId,secondary,"Travel");
+    const privateCard=await (async()=>{await fundCardGroup(foreign.personId,foreign.serviceId,"9900");await setPersonLimit(foreign.personId,foreign.serviceId,secondary,"9900");return issuePracticeCard(foreign.personId,foreign.serviceId,secondary,"Outside this group");})();
     const detail=await getCardholderDashboardDetail(primary.personId,{manage:primary.serviceId});
     expect(detail?.workspace.cards.filter(card=>card.holderId===secondary).map(card=>card.id).sort()).toEqual([first.card.id,second.card.id].sort());
     let access=await getAccessOverview(primary.personId,primary.serviceId);

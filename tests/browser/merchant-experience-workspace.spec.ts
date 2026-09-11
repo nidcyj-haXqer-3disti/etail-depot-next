@@ -1,9 +1,12 @@
 import {randomUUID} from "node:crypto";
 import AxeBuilder from "@axe-core/playwright";
 import {expect,test,type Page} from "@playwright/test";
-import {merchantOperationsProjectionSchema,merchantTestPaymentProjectionSchema} from "../../src/modules/acquiring/operations-api-contracts";
+import {merchantOperationsProjectionSchema} from "../../src/modules/acquiring/operations-api-contracts";
 import {activeGuestChannel} from "./helpers/guest";
 import {headers} from "./helpers/fresh";
+import {freshPrepaidCard,payPublishedWithCard} from "./helpers/prepaid";
+import {closeDatabase} from "../../src/platform/database/client";
+test.afterAll(closeDatabase);
 
 async function operations(page:Page,merchantId:string){
  const response=await page.request.get(`/api/v1/merchants/${merchantId}/operations`);
@@ -33,15 +36,26 @@ test("channel identity, collection filters and exact receipts survive close and 
  await expect(page.getByRole("searchbox",{name:"Search payment channels",exact:true})).toHaveValue(second.channel.description);
  await expect(page.getByRole("combobox",{name:"Channel status",exact:true})).toHaveValue("ACTIVE");
  await expect(page.locator(".mch-channel-list>li")).toHaveCount(1);
- const approved=await page.request.post(`/api/v1/merchants/${merchant.id}/channels/${channel.id}/test-payments`,{headers,data:{commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"APPROVED"}});
- expect(approved.status()).toBe(200);const payment=merchantTestPaymentProjectionSchema.parse(await approved.json());
+ const pub=await page.request.post(`/api/v1/merchants/${merchant.id}/channels/${channel.id}/publication`,{headers,data:{commandId:randomUUID(),expectedChannelVersion:channel.version}});expect(pub.status()).toBe(200);
+ const publication=(await pub.json()).publication;
+ const payer=await freshPrepaidCard("1840");const paid=await payPublishedWithCard(publication.id,payer);
+ const payment=(await operations(page,merchant.id)).payments.find(row=>row.id===paid.receipt!.paymentId)!;
  await page.goto(`/merchants/${merchant.id}?tab=channels&channelSearch=${encodeURIComponent(channel.description)}&channelStatus=USED`);
  await expect(page.locator(".mch-channel-list>li")).toHaveCount(1);
  await expect(page.locator(".mch-channel-list")).toContainText("Already paid");
  await page.getByRole("button",{name:`View payment channel ${channel.description}`,exact:true}).click();
  await expect(detail.getByRole("region",{name:"Payments for this channel",exact:true})).toContainText(payment.testReference);
  await expect(detail.getByRole("link",{name:"Try a practice payment",exact:true})).toHaveCount(0);
- await expect(detail.getByRole("region",{name:"Guest payment link",exact:true})).toContainText("This one-time channel has already been paid");
+ // A paid published link stays saved for its existing receipt but cannot take another payment.
+ await expect(detail.locator(".mch-channel-hero")).toContainText("Already paid");
+ const savedLink=detail.getByRole("region",{name:"Customer payment link",exact:true});
+ await expect(savedLink).toContainText("Link currently unavailable");
+ await expect(savedLink).toContainText("This saved link cannot take a new payment right now");
+ await expect(savedLink.getByRole("textbox",{name:"Customer payment URL",exact:true})).toHaveValue(publication.publicHref);
+ await expect(savedLink.getByRole("link",{name:"Open customer checkout",exact:true})).toHaveCount(0);
+ await expect(savedLink.getByRole("button",{name:"Copy payment link",exact:true})).toHaveCount(0);
+ await expect(savedLink.getByRole("button",{name:/^Publish (payment link|a new link)$/})).toHaveCount(0);
+ await expect(savedLink.getByRole("button",{name:"Revoke payment link",exact:true})).toBeEnabled();
  expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
  await detail.getByRole("link",{name:"View payment receipt",exact:true}).click();
@@ -76,40 +90,13 @@ test("uncertain channel activation keeps its command and the outer channel open 
  await expect(detail.getByRole("button",{name:"Close details",exact:true})).toBeDisabled();
  await review.getByRole("button",{name:"Retry same request",exact:true}).click();
  await expect(review).toBeHidden();await expect(detail.locator(".mch-channel-hero")).toContainText("Ready to collect");
- await expect(detail.getByRole("button",{name:"Publish guest payment link",exact:true})).toBeEnabled();
+ await expect(detail.getByRole("button",{name:"Publish payment link",exact:true})).toBeEnabled();
  expect(requests).toHaveLength(2);expect(requests[1]).toEqual(requests[0]);
  expect((await operations(page,merchant.id)).channels.find(row=>row.channelId===channel.id)?.version).toBe(savedVersion);
  await detail.getByRole("button",{name:"Close details",exact:true}).click();await expect(detail).toBeHidden();
 });
 
-test("a lost merchant practice payment cannot leave its original retry or create another payment",async({page})=>{
- test.setTimeout(90_000);
- const {merchant,channel}=await activeGuestChannel(page.request,"REUSABLE"),before=await operations(page,merchant.id);
- await page.goto(`/pay/${channel.id}`);
- const requests:unknown[]=[];let reference="";
- await page.route(`**/api/v1/merchants/${merchant.id}/channels/${channel.id}/test-payments`,async route=>{
-  requests.push(route.request().postDataJSON());const response=await route.fetch();expect(response.status()).toBe(200);
-  reference=merchantTestPaymentProjectionSchema.parse(await response.json()).testReference;
-  if(requests.length===1)await route.abort("failed");else await route.fulfill({response});
- });
- await page.getByRole("button",{name:"Pay $18.40 with test funds",exact:true}).click();
- const review=page.getByRole("dialog",{name:"Review sandbox payment",exact:true});
- await review.getByRole("button",{name:"Confirm sandbox payment",exact:true}).click();
- await expect(review.getByRole("button",{name:"Retry same payment",exact:true})).toBeVisible();
- await page.keyboard.press("Escape");await expect(review).toBeVisible();
- await review.getByRole("button",{name:"Close Review sandbox payment",exact:true}).click();await expect(review).toBeVisible();
- await expect(page.getByRole("button",{name:"← Back to merchant payments",exact:true})).toBeDisabled();
- // Modal background is inert for normal pointer/keyboard use. The shared boundary also rejects a bubbled link event.
- const routeBefore=page.url();await page.locator("header a[href]").first().dispatchEvent("click");expect(page.url()).toBe(routeBefore);
- await expect(page.locator(".mn-navigation-status")).toContainText("Finish or retry your current request");
- await review.getByRole("button",{name:"Retry same payment",exact:true}).click();
- await expect(review).toBeHidden();await expect(page.getByRole("region",{name:"Sandbox payment result",exact:true})).toContainText(reference);
- expect(requests).toHaveLength(2);expect(requests[1]).toEqual(requests[0]);
- const after=await operations(page,merchant.id);expect(after.payments.filter(payment=>payment.channelId===channel.id)).toHaveLength(1);
- expect(after.availableFunds!.minor).toBe((BigInt(before.availableFunds!.minor)+1840n).toString());
- await page.getByRole("link",{name:"View payment receipt",exact:true}).click();
- await expect(page.getByRole("dialog",{name:"Payment details",exact:true})).toContainText(reference);
-});
+
 
 test("an inaccessible saved channel request keeps its exact retry and offers an explained exit",async({page})=>{
  test.setTimeout(90_000);
@@ -170,39 +157,14 @@ test("an inaccessible activation preserves the unknown command without trapping 
  await expect(page).toHaveURL(/\/merchant-services$/);
 });
 
-test("a denied practice-payment retry permits an explained exit only after access is denied",async({page})=>{
- test.setTimeout(90_000);
- const {merchant,channel}=await activeGuestChannel(page.request,"REUSABLE"),before=await operations(page,merchant.id),requests:unknown[]=[];
- await page.goto(`/pay/${channel.id}`);
- await page.route(`**/api/v1/merchants/${merchant.id}/channels/${channel.id}/test-payments`,async route=>{
-  requests.push(route.request().postDataJSON());
-  if(requests.length===1){const response=await route.fetch();expect(response.status()).toBe(200);await route.abort("failed");}
-  else await route.fulfill({status:403,json:{error:{code:"ACTION_DENIED"}}});
- });
- await page.getByRole("button",{name:"Pay $18.40 with test funds",exact:true}).click();
- const review=page.getByRole("dialog",{name:"Review sandbox payment",exact:true});
- await review.getByRole("button",{name:"Confirm sandbox payment",exact:true}).click();
- await expect(review.getByRole("button",{name:"Retry same payment",exact:true})).toBeVisible();
- await expect(review.getByRole("button",{name:"Leave unconfirmed request",exact:true})).toHaveCount(0);
- await review.getByRole("button",{name:"Retry same payment",exact:true}).click();
- await expect(review.getByRole("button",{name:"Leave unconfirmed request",exact:true})).toBeEnabled();
- await expect(review.getByText("Leaving does not cancel or confirm the payment.",{exact:false})).toBeVisible();
- await review.getByRole("button",{name:"Retry same payment",exact:true}).click();
- await expect(review.getByRole("button",{name:"Leave unconfirmed request",exact:true})).toBeEnabled();
- expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
- const after=await operations(page,merchant.id);
- expect(after.payments.filter(payment=>payment.channelId===channel.id)).toHaveLength(1);
- expect(after.availableFunds!.minor).toBe((BigInt(before.availableFunds!.minor)+1840n).toString());
- await review.getByRole("button",{name:"Leave unconfirmed request",exact:true}).click();
- await expect(page).toHaveURL(/\/merchant-services$/);
-});
+
 
 test("a hidden publication recovers through the same link controls without exposing its details",async({page})=>{
  test.setTimeout(90_000);
  const {merchant,channel}=await activeGuestChannel(page.request,"REUSABLE"),requests:unknown[]=[];
  await page.goto(`/merchants/${merchant.id}?tab=channels&channel=${channel.id}`);
  const detail=page.getByRole("dialog",{name:"Payment channel details",exact:true});
- await detail.getByRole("button",{name:"Publish guest payment link",exact:true}).click();
+ await detail.getByRole("button",{name:"Publish payment link",exact:true}).click();
  await page.route(`**/api/v1/merchants/${merchant.id}/channels/${channel.id}/publication`,async route=>{
   if(route.request().method()!=="POST"){await route.continue();return;}
   requests.push(route.request().postDataJSON());
@@ -218,7 +180,7 @@ test("a hidden publication recovers through the same link controls without expos
  const recovery=page.getByRole("region",{name:"Saved link request",exact:true});
  await expect(recovery).toBeVisible();
  await expect(page.getByText(channel.description,{exact:true})).toHaveCount(0);
- await expect(page.getByRole("textbox",{name:"Guest payment URL",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("textbox",{name:"Customer payment URL",exact:true})).toHaveCount(0);
  await recovery.getByRole("button",{name:"Retry same link request",exact:true}).click();
  await expect(page.getByRole("button",{name:"Leave unconfirmed request",exact:true})).toBeEnabled();
  expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);

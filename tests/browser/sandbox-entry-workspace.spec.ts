@@ -42,6 +42,8 @@ test("first service choice survives an unknown setup result without opening fina
   expect(await getDb().select().from(services).where(eq(services.primaryPersonId,identity.personId))).toEqual([]);
   await expect(page.getByRole("complementary",{name:"Your sandbox member code",exact:true})).toHaveCount(0);
   await page.goto("/services");
-  await expect(page.getByRole("heading",{name:"Your member code",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Your services",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Your member code",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("heading",{name:"Invitations",exact:true})).toHaveCount(0);
  }finally{await sessions.logout(pair);}
 });
