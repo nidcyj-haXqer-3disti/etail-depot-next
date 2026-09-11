@@ -6,9 +6,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { CardPurchaseResult, CardRequestProjection, WorkspaceCard, WorkspaceProjection } from "@/modules/workspace/contracts";
 import type { CardRequestHistory, CardControlHistory } from "@/modules/workspace/dashboard-contracts";
 import { Button, EmptyState, Feedback, StatusBadge, WorkspaceCommandError, WorkspaceDialog, capability, formatDate, formatMoney, workspaceCommand } from "./primitives";
+import { useServerProjection } from "./use-server-projection";
 import { cardholderTaskHref } from "../cardholder-routing";
 import { CardPreview } from "./card-art";
 import "./cards.css";
+
+async function readCardholderContext(serviceId:string):Promise<WorkspaceProjection>{
+  let response:Response;
+  try{response=await fetch(`/api/v1/cardholder-services/${encodeURIComponent(serviceId)}/workspace`,{credentials:"same-origin",cache:"no-store",signal:AbortSignal.timeout(30_000)});}
+  catch{throw new WorkspaceCommandError("We couldn’t check your current access. Your original request is still held for retry.",null);}
+  if(!response.ok)throw new WorkspaceCommandError("Your current cardholder access could not be confirmed. Reload access or retry your original request.",response.status);
+  try{const next=await response.json() as WorkspaceProjection;if(next?.service?.id!==serviceId||![next.cards,next.cardRequests,next.capabilities,next.cardholderOptions].every(Array.isArray))throw new Error();return next;}
+  catch{throw new WorkspaceCommandError("We couldn’t verify the refreshed view. Your original request is still held for retry.",null);}
+}
+function deniedContext(error:unknown){return error instanceof WorkspaceCommandError&&[401,403,404].includes(error.status??0);}
+const unconfirmedExitCopy="Your original request is still held here. Leaving does not cancel it or confirm whether it was saved.";
 
 export interface CardsWorkspaceProps { workspace: WorkspaceProjection; requestHistory?: CardRequestHistory; cardHistory?: CardControlHistory; routeBase?: string; initialControlAction?: "freeze"|"unfreeze"; onClose?: () => void }
 
@@ -29,6 +41,7 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [cardUnavailable,setCardUnavailable]=useState(false),[requestUnavailable,setRequestUnavailable]=useState(false);
   const requestBusy = useCallback((value: boolean) => setBusy(value ? "request" : ""), []);
   const commandIds = useRef(new Map<string, string>());
   const cards = workspace.cards.map((card) => cardUpdates[card.id] && cardUpdates[card.id].version >= card.version ? cardUpdates[card.id] : card);
@@ -93,25 +106,42 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
   }
   async function controlCard() {
     if (!selected||!confirmControl||busy) return;
+    const retrying=!!controlAttempt;
     const attempt=controlAttempt??{action:confirmControl,expectedVersion:selected.version};
     setControlAttempt(attempt);setBusy("control");setError("");
     try {
       const next=await command<WorkspaceCard>(`/cards/${encodeURIComponent(selected.id)}/control`,"POST",attempt);
-      setCardUpdates(current=>({...current,[next.id]:next}));setControlAttempt(null);setConfirmControl(null);
+      setCardUpdates(current=>({...current,[next.id]:next}));setCardUnavailable(false);setControlAttempt(null);setConfirmControl(null);
       setNotice(next.status==="FROZEN"?(attempt.action==="unfreeze"?"Your freeze was removed. This card remains frozen. ":"Freeze saved. ")+next.freeze.description:"Card active. New purchases are available within the cardholder’s permissions and funds.");
       router.refresh();
     } catch(failure){
       const unknown=failure instanceof WorkspaceCommandError&&failure.uncertain;
       setError(failure instanceof WorkspaceCommandError&&failure.code==="PRIMARY_FREEZE_ACTIVE"?"Only the primary cardholder can remove this freeze.":failure instanceof Error?failure.message:"We couldn’t update this card.");
-      if(!unknown){setControlAttempt(null);setConfirmControl(null);router.refresh();}
+      if(!unknown&&!retrying){setControlAttempt(null);setConfirmControl(null);router.refresh();}
     } finally{setBusy("");}
   }
 
+  async function reloadCardAccess(){
+    if(busy||!selected)return;setBusy("reload");setError("");
+    try{
+      const current=await readCardholderContext(workspace.service.id),card=current.cards.find(item=>item.id===selected.id);
+      const action=controlAttempt?`cards.${controlAttempt.action}`:"cards.purchase";
+      const unavailable=!card||!capability(current,action)?.allowed||(controlAttempt?card.holderId!==current.member.id&&!capability(current,"cards.manageMembers")?.allowed:["ACCESS_RESTRICTED","SETUP_REQUIRED"].includes(card.purchaseAvailability.code));
+      setCardUnavailable(unavailable);
+      if(!unavailable&&card)setCardUpdates(previous=>({...previous,[card.id]:card}));
+      setNotice(unavailable?"":"Current card access checked. Retry the original request to confirm its result.");
+    }catch(failure){if(deniedContext(failure))setCardUnavailable(true);setError(failure instanceof Error?failure.message:"We couldn’t reload card access.");}
+    finally{setBusy("");}
+  }
+  const leaveUnconfirmed=()=>router.push("/cardholder-services");
+  const purchaseForm=selected&&ownCard&&<CardPurchaseForm key={selected.id} card={selected} pending={purchaseAttempts[selected.id]} contextUnavailable={cardUnavailable} onPending={(attempt)=>setPurchaseAttempts(current=>({...current,[selected.id]:attempt}))} command={command} onBusy={(value)=>setBusy(value?"purchase":"")} onRefresh={()=>router.refresh()} onSuccess={(result)=>{setCardUnavailable(false);setCardUpdates(current=>({...current,[result.card.id]:result.card}));router.refresh();}}/>;
+  const cardRecovery=(controlAttempt||pendingPurchase)&&<div className="consumer-action-row"><Button variant="secondary" busy={busy==="reload"} disabled={!!busy} onClick={()=>void reloadCardAccess()}>Reload card access</Button>{cardUnavailable&&<Button variant="quiet" disabled={!!busy} onClick={leaveUnconfirmed}>Leave unconfirmed request</Button>}</div>;
+
   return <section className="consumer-workspace">
     {selectedId && !selected && <Feedback kind="error" message="This card is no longer available. Return to your cards and refresh." />}
-    {selected && <WorkspaceDialog open onClose={closeCard} title={confirmControl ? `${confirmControl === "unfreeze" ? selected.freeze.unfreezeLabel : selected.freeze.freezeLabel}?` : selected.nickname} serviceName={serviceName} wide>
-      <Feedback kind="error" message={error} /><Feedback kind="success" message={notice} />
-      {confirmControl ? <><div className="consumer-review-highlight"><strong>{selected.nickname} · •••• {selected.lastFour}</strong><span>{selected.holderName}</span><span>{serviceName}</span></div><p>{confirmControl==="unfreeze"?selected.freeze.unfreezeDescription:"Your freeze will stop new purchases. Past activity and available funds stay visible."}</p><p className="consumer-muted">{selected.freeze.description}</p>{!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)&&!controlAttempt&&<p className="consumer-muted">This change is no longer available. Return to the card to review its current restrictions.</p>}{controlAttempt&&!busy&&<p role="status">We haven’t confirmed this change. Retry the same change before taking another action.</p>}<div className="consumer-action-row"><Button variant="secondary" disabled={Boolean(busy)||Boolean(controlAttempt)} onClick={()=>setConfirmControl(null)}>Back to card</Button><Button busy={busy==="control"} disabled={!controlAttempt&&!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)} onClick={()=>void controlCard()}>{controlAttempt?"Retry same change":confirmControl==="unfreeze"?selected.freeze.unfreezeLabel:selected.freeze.freezeLabel}</Button></div></> : <>
+    {selected && <WorkspaceDialog open onClose={closeCard} title={cardUnavailable?"Card access unavailable":confirmControl ? `${confirmControl === "unfreeze" ? selected.freeze.unfreezeLabel : selected.freeze.freezeLabel}?` : selected.nickname} serviceName={cardUnavailable?"Cardholder services":serviceName} wide>
+      <Feedback kind="error" message={error} />{!cardUnavailable&&<Feedback kind="success" message={notice} />}{cardRecovery}
+      {cardUnavailable?<><p>Current access no longer allows this card action. {unconfirmedExitCopy}</p>{controlAttempt?<Button busy={busy==="control"} disabled={!!busy} onClick={()=>void controlCard()}>Retry same change</Button>:purchaseForm}</>:confirmControl ? <><div className="consumer-review-highlight"><strong>{selected.nickname} · •••• {selected.lastFour}</strong><span>{selected.holderName}</span><span>{serviceName}</span></div><p>{confirmControl==="unfreeze"?selected.freeze.unfreezeDescription:"Your freeze will stop new purchases. Past activity and available funds stay visible."}</p><p className="consumer-muted">{selected.freeze.description}</p>{!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)&&!controlAttempt&&<p className="consumer-muted">This change is no longer available. Return to the card to review its current restrictions.</p>}{controlAttempt&&!busy&&<p role="status">We haven’t confirmed this change. Retry the same change before taking another action.</p>}<div className="consumer-action-row"><Button variant="secondary" disabled={Boolean(busy)||Boolean(controlAttempt)} onClick={()=>setConfirmControl(null)}>Back to card</Button><Button busy={busy==="control"} disabled={!controlAttempt&&!(confirmControl==="unfreeze"?selected.canUnfreeze:selected.canFreeze)} onClick={()=>void controlCard()}>{controlAttempt?"Retry same change":confirmControl==="unfreeze"?selected.freeze.unfreezeLabel:selected.freeze.freezeLabel}</Button></div></> : <>
         <div className="consumer-card-detail-grid"><div><CardPreview card={selected} /></div><div className="consumer-card-summary"><StatusBadge status={selected.status}/><p>{selected.holderName} · Ending {selected.lastFour}</p><p>{ownCard ? "Your card" : "Managed by you"} · {selected.relationship === "PRIMARY" ? "Primary card" : "Secondary card"}</p><dl><dt>{ownCard ? "Available to spend" : "Cardholder’s available balance"}</dt><dd>{formatMoney(selected.available)}</dd></dl></div></div>
         {(!ownCard || !selected.canPurchase) && <div className="consumer-card-availability" role="status"><strong>{selected.purchaseAvailability.title}</strong><p>{selected.purchaseAvailability.description}</p></div>}
         {ownCard && <nav className="consumer-card-tasks" aria-label="Card actions"><Button variant={purchaseView?"secondary":"primary"} disabled={cardNavigationBlocked} onClick={()=>chooseCardTask("controls")} aria-pressed={!purchaseView}>Card controls</Button>{(selected.canPurchase || pendingPurchase || purchaseView) && <Button variant={purchaseView?"primary":"secondary"} disabled={cardNavigationBlocked} onClick={()=>chooseCardTask("purchase")} aria-pressed={purchaseView}>Try a purchase</Button>}</nav>}
@@ -122,11 +152,11 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
         <Link className="consumer-text-link" href={cardholderTaskHref("activity", {cardId:selected.id})}>View this card’s activity <span aria-hidden="true">↗</span></Link>
         <details className="consumer-card-more"><summary>Card details and other services</summary><dl className="consumer-detail-list"><div><dt>Cardholder service</dt><dd>{serviceName}</dd></div><div><dt>Card format</dt><dd>{selected.format === "VIRTUAL" ? "Virtual" : "Physical"}</dd></div><div><dt>Starting balance</dt><dd>{formatMoney(selected.limit)}</dd></div></dl><p className="consumer-muted">Adding funds and requesting a replacement are not available yet.</p></details>
         </section>
-        {purchaseView && ownCard && <CardPurchaseForm key={selected.id} card={selected} pending={purchaseAttempts[selected.id]} onPending={(attempt) => setPurchaseAttempts(current => ({ ...current, [selected.id]: attempt }))} command={command} onBusy={(value) => setBusy(value ? "purchase" : "")} onRefresh={() => router.refresh()} onSuccess={(result) => { setCardUpdates(current => ({ ...current, [result.card.id]: result.card })); router.refresh(); }} />}
+        {purchaseView&&purchaseForm}
         <div className="consumer-action-row" aria-label="Related cardholder services">{capability(workspace,"activity.read")?.allowed && relatedService("reports","Statements & reports")}{relatedService("settings","Notification preferences")}{relatedService("help","Help with this card")}</div>
       </>}
     </WorkspaceDialog>}
-    {(showNew || request) && <WorkspaceDialog open onClose={closeRequest} title={request?.status==="ISSUED"||request?.status==="CANCELED"?"Card request":"Add card"} serviceName={serviceName} wide><CardRequestForm key={request?.id ?? "new"} request={request ?? null} history={requestHistory} workspace={workspace} canEdit={requestCapability?.allowed === true} command={command} routeBase={cardRoute} onUpdate={updateRequest} onBusy={requestBusy} onClose={closeRequest} /></WorkspaceDialog>}
+    {(showNew || request) && <WorkspaceDialog open onClose={closeRequest} title={requestUnavailable?"Card request access unavailable":request?.status==="ISSUED"||request?.status==="CANCELED"?"Card request":"Add card"} serviceName={requestUnavailable?"Cardholder services":serviceName} wide><CardRequestForm key={request?.id ?? "new"} request={request ?? null} history={requestHistory} workspace={workspace} canEdit={requestCapability?.allowed === true} command={command} routeBase={cardRoute} onUpdate={updateRequest} onBusy={requestBusy} onClose={closeRequest} onUnavailable={setRequestUnavailable} onLeave={leaveUnconfirmed} /></WorkspaceDialog>}
   </section>;
 }
 
@@ -140,6 +170,7 @@ interface CardRequestFormProps {
   onUpdate: (request: CardRequestProjection) => void;
   onBusy: (busy: boolean) => void;
   onClose: () => void;
+  onUnavailable:(unavailable:boolean)=>void;onLeave:()=>void;
 }
 function limitInput(minor: string) {
   const padded = minor.padStart(3, "0");
@@ -154,8 +185,12 @@ type CardFormAttempt =
   | { kind: "save"; fields: {holderId: string; nickname: string; format: "VIRTUAL" | "PHYSICAL"; requestedLimitMinor: string}; request: CardRequestProjection | null; closeAfter: boolean }
   | { kind: "submit" | "cancel"; request: CardRequestProjection };
 
-function CardRequestForm({ request: initialRequest, history, workspace, canEdit, command, onUpdate, onBusy, onClose, routeBase }: CardRequestFormProps) {
+function CardRequestForm({ request: initialRequest, history, workspace:initialWorkspace, canEdit:initialCanEdit, command, onUpdate, onBusy, onClose, onUnavailable, onLeave, routeBase }: CardRequestFormProps) {
   const params = useSearchParams(), router = useRouter();
+  const [workspace,setWorkspace]=useServerProjection(initialWorkspace);
+  const canEdit=initialCanEdit&&capability(workspace,"cards.request")?.allowed===true;
+  const [unavailable,setUnavailable]=useState(false);
+  useEffect(()=>{onUnavailable(unavailable);return()=>onUnavailable(false);},[onUnavailable,unavailable]);
   const [isNavigating, startNavigation] = useTransition();
   const [request, setRequest] = useState(initialRequest);
   const [step, setStep] = useState(params.get("review") === "1" || initialRequest?.status === "BLOCKED" || initialRequest?.status === "CANCELED" || initialRequest?.status === "ISSUED" ? 1 : 0);
@@ -190,6 +225,7 @@ function CardRequestForm({ request: initialRequest, history, workspace, canEdit,
   }
   async function execute(attempt: CardFormAttempt) {
     if (inFlight.current || isNavigating) return;
+    const retrying=uncertain;
     inFlight.current = true; pending.current = attempt;
     setBusy(true); onBusy(true); setError(""); setUncertain(false);
     let unknown = false;
@@ -199,15 +235,15 @@ function CardRequestForm({ request: initialRequest, history, workspace, canEdit,
         // start/save response. The command wrapper retains each command identity.
         if (!attempt.request) { attempt.request = await command<CardRequestProjection>("/card-requests", "POST"); update(attempt.request); }
         const next = await command<CardRequestProjection>(`/card-requests/${encodeURIComponent(attempt.request.id)}`, "PATCH", {expectedVersion: attempt.request.version, ...attempt.fields});
-        update(next); pending.current = null; setStep(1); navigate(next, attempt.closeAfter);
+        setUnavailable(false); update(next); pending.current = null; setStep(1); navigate(next, attempt.closeAfter);
       } else {
         const action = attempt.kind === "submit" ? "submit" : "cancel";
         const next = await command<CardRequestProjection>(`/card-requests/${encodeURIComponent(attempt.request.id)}/${action}`, "POST", {expectedVersion: attempt.request.version});
-        update(next); pending.current = null; setStep(1);setConfirmCancel(false);router.refresh();
+        setUnavailable(false); update(next); pending.current = null; setStep(1);setConfirmCancel(false);router.refresh();
         if (next.status === "ISSUED") navigate(next);
       }
     } catch (failure) {
-      unknown = failure instanceof WorkspaceCommandError && failure.uncertain;
+      unknown = retrying||(failure instanceof WorkspaceCommandError && failure.uncertain);
       setUncertain(unknown);
       if (!unknown) pending.current = null;
       setError(failure instanceof Error ? failure.message : "We couldn’t confirm your card request. Please try again.");
@@ -221,10 +257,23 @@ function CardRequestForm({ request: initialRequest, history, workspace, canEdit,
     if (minor === null || (!closeAfter && minor === "0")) { setError("Enter a starting balance greater than zero, using no more than two decimal places."); return; }
     void execute({kind: "save", fields: {holderId, nickname: nickname.trim(), format, requestedLimitMinor: minor}, request, closeAfter});
   }
+  async function reloadRequestAccess(){
+    if(working)return;setBusy(true);setError("");
+    try{
+      const current=await readCardholderContext(initialWorkspace.service.id),attempt=pending.current;
+      const target=attempt?.request??request;
+      const saved=target?current.cardRequests.find(item=>item.id===target.id):null;
+      const inaccessible=!capability(current,"cards.request")?.allowed||!!target&&!saved||(attempt?.kind==="submit"&&(!capability(current,"cards.create")?.allowed||!current.cardholderOptions.some(person=>person.id===attempt.request.holderId)));
+      setUnavailable(inaccessible);setWorkspace(current);if(saved)setRequest(saved);
+    }catch(failure){if(deniedContext(failure))setUnavailable(true);setError(failure instanceof Error?failure.message:"We couldn’t reload request access.");}
+    finally{setBusy(false);}
+  }
+  const recovery=uncertain&&<div className="consumer-card-retry"><p>{unavailable?unconfirmedExitCopy:"Keep this form open while we confirm your request. Your details are held safely for this retry."}</p><div className="consumer-action-row"><Button variant="secondary" busy={working} onClick={()=>pending.current&&void execute(pending.current)}>Retry the same request</Button><Button variant="secondary" disabled={working} onClick={()=>void reloadRequestAccess()}>Reload request access</Button>{unavailable&&<Button variant="quiet" disabled={working} onClick={onLeave}>Leave unconfirmed request</Button>}</div></div>;
+  if(unavailable)return <div className="consumer-card-form" aria-busy={working}><h3>Card request unavailable</h3><Feedback kind="error" message={error}/><p>Current access no longer allows this request.</p>{recovery}</div>;
   return <div className="consumer-card-form" aria-busy={working}>
     <div className="consumer-card-form-content">
     <ol className="consumer-stepper consumer-card-stepper" aria-label="Card request progress">{["Card details", "Review & create"].map((label, index) => <li key={label} className={step === index ? "is-current" : step > index ? "is-complete" : ""} aria-current={step === index ? "step" : undefined}><span>{index + 1}</span>{label}</li>)}</ol>
-    <Feedback kind="error" message={error}/>{uncertain && <div className="consumer-card-retry"><p>Keep this form open while we confirm your request. Your details are held safely for this retry.</p><Button variant="secondary" busy={working} onClick={() => pending.current && void execute(pending.current)}>Retry the same request</Button></div>}
+    <Feedback kind="error" message={error}/>{recovery}
     {step === 0 && <><h3>Who is this card for?</h3>{workspace.cardholderOptions.length === 1 && holder ? <div className="consumer-cardholder-selected"><span className="consumer-avatar" aria-hidden="true">{holder?.displayName.slice(0, 1)}</span><span><strong>{holder?.displayName}</strong><small>{holder?.id === workspace.member.id ? "You · Primary cardholder" : "Invited cardholder"}</small></span></div> : <div className="consumer-holder-options">{workspace.cardholderOptions.map(person => <label key={person.id} className={`consumer-holder-option ${holderId === person.id ? "is-selected" : ""}`}><input type="radio" name="cardholder" checked={holderId === person.id} disabled={disabled} onChange={() => setHolderId(person.id)}/><span><strong>{person.displayName}</strong><small>{person.id === workspace.member.id ? "You" : "Invited cardholder"}</small></span></label>)}</div>}
       {!workspace.cardholderOptions.length && <EmptyState title="No cardholders available" description="Invite a cardholder and allow them to use a card before completing these details."/>}
       <div className="consumer-form-fields consumer-card-details-fields"><label>Card name<input name="nickname" value={nickname} maxLength={60} disabled={disabled} onChange={event => setNickname(event.target.value)} autoComplete="off" placeholder="For example, Everyday purchases"/></label>
@@ -246,8 +295,8 @@ function CardRequestForm({ request: initialRequest, history, workspace, canEdit,
 }
 
 interface PurchaseAttempt { expectedVersion: number; amountMinor: string; description: string }
-function CardPurchaseForm({ card, pending, onPending, command, onBusy, onRefresh, onSuccess }: {
-  card: WorkspaceCard; pending?: PurchaseAttempt;
+function CardPurchaseForm({ card, pending, contextUnavailable=false, onPending, command, onBusy, onRefresh, onSuccess }: {
+  card: WorkspaceCard; pending?: PurchaseAttempt;contextUnavailable?:boolean;
   onPending: (attempt: PurchaseAttempt | undefined) => void;
   command: CardRequestFormProps["command"]; onBusy: (busy: boolean) => void; onRefresh: () => void;
   onSuccess: (result: CardPurchaseResult) => void;
@@ -267,11 +316,12 @@ function CardPurchaseForm({ card, pending, onPending, command, onBusy, onRefresh
       onSuccess(result); onPending(undefined); setAmount(""); setDescription("");
       setMessage(`${result.activity.amount.formatted} purchase recorded on ${card.nickname}. Available to spend: ${result.card.available.formatted}.`);
     } catch (failure) {
-      if (!(failure instanceof WorkspaceCommandError && failure.uncertain)) onPending(undefined);
+      if (!pending&&!(failure instanceof WorkspaceCommandError && failure.uncertain)) onPending(undefined);
       const code = failure instanceof WorkspaceCommandError ? failure.code : null;
       setError(code === "INSUFFICIENT_PRACTICE_FUNDS" ? "This purchase exceeds the card’s available balance. Enter a smaller amount." : code === "CARD_FROZEN" ? "This card is frozen. Unfreeze it before trying a purchase." : failure instanceof Error ? failure.message : "We couldn’t confirm this purchase. Retry the same purchase.");
     } finally { setBusy(false); onBusy(false); }
   }
+  if(contextUnavailable)return <section className="consumer-panel consumer-purchase" aria-label="Card purchase"><Feedback kind="error" message={error}/>{pending&&<Button busy={busy} onClick={()=>void purchase()}>Retry same purchase</Button>}</section>;
   return <section className="consumer-panel consumer-purchase" aria-label="Card purchase">
     <h3>Try a purchase</h3><p className="consumer-muted">Enter a purchase to see it in your activity.</p>
     <Feedback kind="error" message={error} /><Feedback kind="success" message={message} />{error && !pending && <Button variant="secondary" disabled={busy} onClick={() => { onRefresh(); setError(""); }}>Refresh card</Button>}

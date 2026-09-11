@@ -367,3 +367,154 @@ test("email callbacks remain private across a pending request and a refreshed lo
     await page.unroute(resetRoute, intercept);
   }
 });
+
+test("sign-out revokes the actual email session, protects both services and permits a fresh sign-in", async ({ page, playwright }) => {
+  const email = `email-e2e-${randomUUID()}@example.test`;
+  const fixture = await register(page, email); await confirm(page, fixture.confirmation);
+  expect((await login(page, email, password)).status()).toBe(200);
+  const oldHash = await authenticated(page);
+  const oldSession = (await page.context().cookies()).find(cookie => cookie.name === "etail_session")!;
+  const previous = await playwright.request.newContext({ baseURL: applicationOrigin, extraHTTPHeaders: { Cookie: `${oldSession.name}=${oldSession.value}` } });
+  try {
+    const response = await submit(page, "logout", page.getByRole("button", { name: "Sign out", exact: true }));
+    expect(response.status()).toBe(200);
+    await expect(page).toHaveURL(`${applicationOrigin}/login`);
+    await expect(page.getByRole("form", { name: "Sign in with email", exact: true })).toBeVisible();
+    expect((await page.context().cookies()).some(cookie => cookie.name.includes("etail_session"))).toBe(false);
+    for (const route of ["/api/v1/services", "/api/v1/cardholder-services", "/api/v1/merchants/dashboard", "/api/v1/auth/sessions"]) {
+      expect((await page.request.get(route)).status()).toBe(401);
+      expect((await previous.get(route)).status()).toBe(401);
+    }
+    for (const route of ["/services", "/cardholder-services", "/merchant-services"]) {
+      await page.goto(route); await expect(page).toHaveURL(`${applicationOrigin}/login`);
+      await expect(page.getByRole("form", { name: "Sign in with email", exact: true })).toBeVisible();
+    }
+    const { rows } = await pool.query('SELECT "revokedAt" FROM app_sessions WHERE "tokenHash"=$1', [oldHash]);
+    expect(rows).toHaveLength(1); expect(rows[0].revokedAt instanceof Date).toBe(true);
+    expect((await login(page, email, password)).status()).toBe(200);
+    const newHash = await authenticated(page); expect(newHash).not.toBe(oldHash);
+    expect((await previous.get("/api/v1/services")).status()).toBe(401);
+  } finally { await previous.dispose(); }
+});
+
+test("an expired application session protects both services and password sign-in restores a fresh session", async ({ page, playwright }) => {
+  const email = `email-e2e-${randomUUID()}@example.test`;
+  const fixture = await register(page, email); await confirm(page, fixture.confirmation);
+  expect((await login(page, email, password)).status()).toBe(200);
+  const oldHash = await authenticated(page);
+  const oldSession = (await page.context().cookies()).find(cookie => cookie.name === "etail_session")!;
+  const previous = await playwright.request.newContext({ baseURL: applicationOrigin, extraHTTPHeaders: { Cookie: `${oldSession.name}=${oldSession.value}` } });
+  try {
+    // Expire only this test-created session in the verified disposable database.
+    // The browser still sends its original cookie, so the server must enforce expiry.
+    const expired = await pool.query(`UPDATE app_sessions s
+      SET "issuedAt"=clock_timestamp()-interval '2 minutes', "expiresAt"=clock_timestamp()-interval '1 second'
+      FROM identity_bindings b
+      WHERE s."identityId"=b.id AND s."tokenHash"=$1 AND b.issuer=$2 AND b.subject=$3
+      RETURNING s."expiresAt", s."revokedAt"`, [oldHash, pinnedIdentityEndpoint(), fixture.subject]);
+    expect(expired.rowCount).toBe(1);
+    expect(expired.rows[0].expiresAt instanceof Date).toBe(true);
+    expect(expired.rows[0].revokedAt).toBeNull();
+    for (const route of ["/api/v1/services", "/api/v1/cardholder-services", "/api/v1/merchants/dashboard", "/api/v1/auth/sessions"]) {
+      expect((await page.request.get(route)).status()).toBe(401);
+      expect((await previous.get(route)).status()).toBe(401);
+    }
+    for (const route of ["/services", "/cardholder-services", "/merchant-services"]) {
+      await page.goto(route); await expect(page).toHaveURL(`${applicationOrigin}/login`);
+      await expect(page.getByRole("form", { name: "Sign in with email", exact: true })).toBeVisible();
+    }
+    expect((await login(page, email, password)).status()).toBe(200);
+    const newHash = await authenticated(page); expect(newHash).not.toBe(oldHash);
+    for (const route of ["/api/v1/cardholder-services", "/api/v1/merchants/dashboard"]) {
+      expect((await page.request.get(route)).status()).toBe(200);
+      expect((await previous.get(route)).status()).toBe(401);
+    }
+    const { rows } = await pool.query('SELECT "expiresAt">clock_timestamp() AS active, "revokedAt" FROM app_sessions WHERE "tokenHash"=$1', [newHash]);
+    expect(rows).toHaveLength(1); expect(rows[0].active).toBe(true); expect(rows[0].revokedAt).toBeNull();
+  } finally { await previous.dispose(); }
+});
+
+test("a stalled sign-out acknowledgement times out without duplicate requests and safely retries the already revoked session", async ({ page }) => {
+  const email = `email-e2e-${randomUUID()}@example.test`;
+  const fixture = await register(page, email); await confirm(page, fixture.confirmation);
+  expect((await login(page, email, password)).status()).toBe(200);
+  const sessionHash = await authenticated(page);
+  await page.clock.install();
+  let requests = 0;
+  let committed!: () => void;
+  const saved = new Promise<void>(resolve => { committed = resolve; });
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const logoutRoute = `${applicationOrigin}/api/v1/auth/logout`;
+  const intercept = async (route: Route) => {
+    requests += 1;
+    const response = await route.fetch(); expect(response.status()).toBe(200);
+    if (requests === 1) {
+      expect(await response.json()).toEqual({ signedOut: true }); committed();
+      await held; await route.abort("failed").catch(() => { /* The bounded client may already have aborted this acknowledgement. */ });
+    } else await route.fulfill({ response });
+  };
+  await page.route(logoutRoute, intercept);
+  try {
+    await page.getByRole("button", { name: "Sign out", exact: true }).evaluate(button => {
+      button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    });
+    await saved;
+    expect(requests).toBe(1);
+    await expect(page.getByRole("button", { name: "Signing out…", exact: true })).toBeDisabled();
+    const { rows } = await pool.query('SELECT "revokedAt" FROM app_sessions WHERE "tokenHash"=$1', [sessionHash]);
+    expect(rows).toHaveLength(1); expect(rows[0].revokedAt instanceof Date).toBe(true);
+    expect((await page.request.get("/api/v1/services")).status()).toBe(401);
+    await page.clock.fastForward(30_001);
+    await expect(page.locator(".logout-control").getByRole("alert")).toHaveText("Sign-out is taking longer than expected. We could not confirm it. Please try Sign out again.");
+    await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeEnabled();
+    await expect(page).toHaveURL(`${applicationOrigin}/services`);
+    await page.clock.fastForward(60_000); expect(requests).toBe(1);
+    release();
+    const response = await submit(page, "logout", page.getByRole("button", { name: "Sign out", exact: true }));
+    expect(response.status()).toBe(200);
+    await expect(page).toHaveURL(`${applicationOrigin}/login`);
+    expect(requests).toBe(2);
+    expect((await page.context().cookies()).some(cookie => cookie.name.includes("etail_session"))).toBe(false);
+    expect((await page.request.get("/api/v1/cardholder-services")).status()).toBe(401);
+    expect((await page.request.get("/api/v1/merchants/dashboard")).status()).toBe(401);
+  } finally { release(); await page.unroute(logoutRoute, intercept); }
+});
+
+test("malformed or rejected sign-out responses keep the current page until an actual acknowledgement", async ({ page }) => {
+  const email = `email-e2e-${randomUUID()}@example.test`;
+  const fixture = await register(page, email); await confirm(page, fixture.confirmation);
+  expect((await login(page, email, password)).status()).toBe(200);
+  await authenticated(page);
+  const logoutRoute = `${applicationOrigin}/api/v1/auth/logout`;
+  const responses = [
+    { status: 200, contentType: "application/json", body: "{" },
+    { status: 200, contentType: "application/json", body: JSON.stringify({ signedOut: false }) },
+    { status: 200, contentType: "application/json", body: JSON.stringify({ authenticated: true }) },
+    { status: 401, contentType: "application/json", body: JSON.stringify({ error: { code: "AUTHENTICATION_REQUIRED" } }) },
+  ];
+  let requests = 0;
+  const intercept = async (route: Route) => {
+    const synthetic = responses[requests++];
+    // These transport failures never reach the server; only the final explicit retry logs out.
+    if (synthetic) await route.fulfill(synthetic);
+    else await route.continue();
+  };
+  await page.route(logoutRoute, intercept);
+  try {
+    for (let index = 0; index < responses.length; index++) {
+      await page.getByRole("button", { name: "Sign out", exact: true }).click();
+      await expect.poll(() => requests).toBe(index + 1);
+      await expect(page.locator(".logout-control").getByRole("alert")).toHaveText("We could not confirm sign-out. Please try Sign out again.");
+      await expect(page).toHaveURL(`${applicationOrigin}/services`);
+      await expect(page.getByRole("button", { name: "Sign out", exact: true })).toBeEnabled();
+      expect((await page.request.get("/api/v1/services")).status()).toBe(200);
+    }
+    const response = await submit(page, "logout", page.getByRole("button", { name: "Sign out", exact: true }));
+    expect(response.status()).toBe(200);
+    await expect(page).toHaveURL(`${applicationOrigin}/login`);
+    expect(requests).toBe(responses.length + 1);
+    expect((await page.request.get("/api/v1/services")).status()).toBe(401);
+  } finally { await page.unroute(logoutRoute, intercept); }
+});

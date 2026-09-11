@@ -49,3 +49,12 @@ export function merchantActivityReturn(value: string | null): string | null {
   if (!value || value.length > 2000 || !/^\/merchant-services(?:\?|$)/.test(value)) return null;
   try {const url = new URL(value,"https://etail.invalid"); if (url.hash || [...url.searchParams.keys()].some(key => !(Object.hasOwn(merchantActivityQuerySchema.shape,key)))) return null; return merchantActivityHref(parseMerchantActivityFilters(url.searchParams));} catch {return null;}
 }
+
+/** Carry a validated activity return through an exact merchant record. */
+export function merchantRecordHref(merchantId: string, selection: Record<string, string>, returnTo: string | null) {
+  const query = new URLSearchParams(selection);
+  query.delete("returnTo");
+  const back = merchantActivityReturn(returnTo);
+  if (back) query.set("returnTo", back);
+  return `/merchants/${encodeURIComponent(merchantId)}?${query}`;
+}
