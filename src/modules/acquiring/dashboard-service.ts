@@ -8,7 +8,7 @@ import { formatMoney } from "../workspace/service";
 import { listMerchantScopes, merchantChannelVisible } from "./service";
 import { paymentChannels } from "./schema";
 import { channelActivations, merchantTestPayments, merchantTestRefunds, merchantTestPayouts, testGateways, testMerchantEnrollments } from "./operations-schema";
-import type { MerchantDashboardProjection, MerchantDashboardTotals, MerchantDashboardUnit, MerchantDashboardView, MerchantDashboardPayment, MerchantDashboardTransfer } from "./dashboard-contracts";
+import type { MerchantCollectionAvailability, MerchantDashboardProjection, MerchantDashboardTotals, MerchantDashboardUnit, MerchantDashboardView, MerchantDashboardPayment, MerchantDashboardTransfer } from "./dashboard-contracts";
 import {parseMerchantActivityQuery,type MerchantActivityQueryInput,type MerchantActivityRow} from "./activity-contracts";
 import {projectMerchantActivity} from "./activity-service";
 
@@ -39,14 +39,38 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
    const setupState:MerchantDashboardUnit["setupState"]=!scope.policy.operating?"PAUSED":!gateway?"NOT_CONFIGURED":gateway.mode==="DISABLED"?"DISABLED":enrollment?.status!=="ENROLLED"?"NOT_ENROLLED":"READY";
    const visibleChannels=channels.filter(row=>row.merchantUnitId===unit.id&&merchantChannelVisible(row,personId,scope.primaryAccess));
    const liveChannels=visibleChannels.filter(row=>row.status==="DRAFT"&&row.expiresAt>now);
+   const activeChannelCount=liveChannels.filter(row=>setupState==="READY"&&activations.some(active=>active.channelId===row.id&&active.status==="ACTIVE")&&(row.usage==="REUSABLE"||!used.has(row.id))).length;
+   const canCreateChannel=eligible&&evaluate(scope.policy,"channels.create").allowed;
+   const helpAction={label:"Open help",href:`/merchants/${unit.id}?tab=help`};
+   const setupAction={label:"Review payment setup",href:`/merchants/${unit.id}?tab=verification`};
+   const channelAction={label:"View payment channels",href:`/merchants/${unit.id}?tab=channels`};
+   // This suggests an existing scoped page, never supplies command authority.
+   // Payment setup alone is not a ready channel, or a published guest checkout.
+   const collectionAvailability:MerchantCollectionAvailability=!scope.policy.operating
+    ?{code:"PAUSED",title:"Payments are unavailable",description:"Review this merchant’s status and payment setup. Existing records remain available within your access.",action:setupAction}
+    :setupState!=="READY"
+      ?scope.primaryAccess
+        ?{code:"SETUP_REQUIRED",title:"Payment setup needs attention",description:"Review payment setup before using a channel to receive sandbox payments.",action:setupAction}
+        :{code:"PRIMARY_ACTION_REQUIRED",title:"Your primary merchant needs to finish setup",description:`Ask ${scope.master.displayName} to review payment setup for this merchant. Your access does not let you enable payments.`,action:helpAction}
+      :!eligible
+        ?{code:"ACCESS_RESTRICTED",title:"Payment access needs attention",description:"Creating and trying sandbox payments is not available for this setup. Open Help to review your access.",action:helpAction}
+        :!canReadChannels
+          ?{code:"ACCESS_RESTRICTED",title:"Payment channels are not shared with you",description:scope.primaryAccess?"Your current access does not include payment channels. Open Help to review your access.":`Ask ${scope.master.displayName} to review your payment channel access. You can still use the records shared with you.`,action:helpAction}
+          :!visibleChannels.length
+            ?canCreateChannel
+              ?{code:"CHANNEL_REQUIRED",title:"Create a payment channel",description:"Payment setup is ready. Create a channel to choose how you receive a sandbox payment.",action:{label:"Create payment channel",href:`/merchants/${unit.id}?tab=channels&new=1`}}
+              :{code:"ACCESS_RESTRICTED",title:"No payment channels are available to you",description:scope.primaryAccess?"Open Help to review your available payment tools.":`Ask ${scope.master.displayName} to create or share a payment channel with you.`,action:helpAction}
+            :!activeChannelCount
+              ?{code:"CHANNEL_REVIEW_REQUIRED",title:"Your payment channels need attention",description:"Your saved channels are not currently ready for a payment. Open them to review the next step.",action:channelAction}
+              :{code:"READY",title:"A payment channel is ready",description:"An active sandbox channel is available. Open channels to see the payment options available to you.",action:channelAction};
    const total=(values:{amountMinor:bigint}[])=>formatMoney(values.reduce((sum,row)=>sum+row.amountMinor,0n));
-   units.push({id:unit.id,name:unit.displayName,kind:unit.kind,primaryId:scope.master.id,primaryName:scope.master.displayName,primaryAccess:scope.primaryAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddSubmerchant:unit.kind==="MASTER"&&evaluate(scope.policy,"merchant.units.create").allowed&&scope.policy.operating&&eligible,canCreateChannel:eligible&&evaluate(scope.policy,"channels.create").allowed,canReadPeople:evaluate(scope.policy,"merchant.people.read").allowed,setupState,totals:{
+   units.push({id:unit.id,name:unit.displayName,kind:unit.kind,primaryId:scope.master.id,primaryName:scope.master.displayName,primaryAccess:scope.primaryAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddSubmerchant:unit.kind==="MASTER"&&evaluate(scope.policy,"merchant.units.create").allowed&&scope.policy.operating&&eligible,canCreateChannel,canReadPeople:evaluate(scope.policy,"merchant.people.read").allowed,setupState,collectionAvailability,totals:{
     collected:canReadPayments?total(payments.filter(row=>row.merchantUnitId===unit.id&&row.outcome==="APPROVED")):null,
     refunded:canReadPayments?total(refunds.filter(row=>row.merchantUnitId===unit.id)):null,
     transferred:canReadPayments?total(payouts.filter(row=>row.merchantUnitId===unit.id)):null,
     available:canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.masterService.id,merchantUnitId:unit.id,bucket:"MERCHANT_AVAILABLE"})):null,
     channelCount:canReadChannels?visibleChannels.length:null,
-    activeChannelCount:canReadChannels?liveChannels.filter(row=>setupState==="READY"&&activations.some(active=>active.channelId===row.id&&active.status==="ACTIVE")&&(row.usage==="REUSABLE"||!used.has(row.id))).length:null,
+    activeChannelCount:canReadChannels?activeChannelCount:null,
    }});
   }
   const primaryNetworks=units.filter(unit=>unit.kind==="MASTER"&&unit.primaryAccess).map(root=>({primaryId:root.id,name:root.name,unitIds:units.filter(unit=>unit.primaryId===root.id).map(unit=>unit.id)}));

@@ -1,4 +1,10 @@
-# Current task — Cardholder service redesigned and locally verified (11 September 2026)
+# Current task — Merchant service redesigned and locally verified (11 September 2026)
+
+D67 extends the user's redesign request to Merchant services on `codex/merchant-experience`, based on local `b5284ff2a5d64a1389a80732bea3f57f54eed639` / tree `e3121108d06ecc854f9c194a120e191920362c83`. [Experience contract](../docs/MERCHANT_EXPERIENCE_REDESIGN.md) and [verification evidence](../docs/MERCHANT_REDESIGN_EVIDENCE.md). The overview now leads with collections and current funds; named merchant workspaces connect channels, records, people, setup and help. Server projections add honest channel readiness, invitation counts and valid access periods. There is no migration or new financial writer.
+
+Passed: 361 unit/contracts, 183 PostgreSQL integration, 35 concurrency and all 134 distinct API/browser/accessibility cases across the full and corrected affected-journey runs; final affected run 72/72. Lint, types, architecture, security/advisories, 35 handoff helpers, production Next and offline Netlify packaging pass. The final visual run passes all63 states at 1440/390/320px with no accessibility violations, overflow or runtime errors; all26 authorized projections and606 source files stayed unchanged during capture. Existing preview records are preserved; testing uses the separate local test database. Publication is a draft review stacked on D66. No merge, deployment, production-source change or visitor-access change is performed by this task; the earlier narrow deployment-setting approval remains pending.
+
+# D66 history — Cardholder service redesigned and locally verified (11 September 2026)
 
 **D66 implements the user's total Cardholder redesign request.** Branch `codex/cardholder-experience`, based on `eef0bc03342a4730397b6ebb77ca5227f53076fe` / tree `bd12163a6d9c580deb9fc829c12b27bc90ea9b4f`. [Experience contract](../docs/CARDHOLDER_EXPERIENCE_REDESIGN.md) and [verification evidence](../docs/CARDHOLDER_REDESIGN_EVIDENCE.md). P3's local implementation now clearly distinguishes Your cards from Cards you manage; it does not create new card types or broaden secondary authority.
 

@@ -1,0 +1,31 @@
+# Merchant experience redesign — D67
+
+11 September 2026. The user requested the same complete experience redesign for Merchant services after reviewing D66's Cardholder service. This extends P4 using the existing Merchant owners and preserved sandbox records.
+
+## Customer outcome and screen contract
+
+The primary merchant needs a clear view of collections across its merchants and an easy path to each submerchant, payment channel and person. A delegated person needs the named merchant they can work with, the actions actually shared with them and their own permitted records. Neither role should navigate an undifferentiated list of setup, financial and access controls to complete a payment task.
+
+One Merchant shell connects the overview, scoped payment records, funds, payment channels, people and payment setup. The overview retains the existing `all`, `network:<id>` and `unit:<id>` server-authorized selections. These are views, not new merchant types or authority. Named scope and dates stay visible; record search/status sits with the payment list, beneath the summary. Payment/refund/transfer totals lead to their exact scoped records. Available practice funds are current, independent of the activity date range. Mobile keeps the selected merchant, money and next action ahead of secondary setup and management detail.
+
+The merchant directory separates primary oversight from shared merchant work, attributes every submerchant to its responsible primary and provides deliberate exact-merchant entry. Setup warnings identify the actual issue and the responsible actor. A configured gateway is not proof that a usable channel exists. No inaccessible setup action is presented as a delegate's next step. A context switch clears old merchant-specific detail selections; returning from a payment or service restores the validated overview scope and filters.
+
+An individual merchant has a concise named header and clear payment/channel/people/setup/help navigation. Payment channels show what a payer sees, their amount, usage, availability and ways to share. One canonical channel form and the existing review, activation, publication and practice checkout remain. Copying a link, publishing a guest page and receiving a payment are distinct outcomes; no message is described as sent. Receipts, refunds and practice transfers preserve exact merchant/payment identity and the existing command/retry owner. Pending or uncertain commands retain their original identity and a visible recovery path.
+
+People & access explains each person's exact merchant scope, actual actions and expiry. Current access is separate from expired/revoked history; limited invitation lists disclose their scope and exact counts. One ordinary collection invitation offers optional customization from the server's permitted actions and valid duration choices. There is no existing edit/extend-access command: the redesign must not invent a working control for one. Onward delegation, refunds, transfers, gateway control and creating submerchants remain separately authorized. Business-detail setup uses explicit progress and a useful return to payment setup; saving sample details never implies verification or approval.
+
+Private payment-linked support continues through the existing case lifecycle to separately assigned operators. Primary membership grants no support impersonation. Unavailable, paused, expired, no-channel, no-payment, restricted and unknown-result states have truthful next steps and preserve history.
+
+## Domain and data boundary
+
+Reuse the acquiring dashboard/workspace/operations readers, Merchant access owner, canonical forms and existing payment/ledger commands. React renders projections and invokes commands; it does not calculate money or eligibility. Minimal additive read-model fields may expose collection availability, invitation counts/list truncation and valid invitation/access durations from existing policy and stored records. No schema migration, new financial lifecycle, new permission, new provider, implicit enrollment, data reset or seed is authorized by this redesign.
+
+Existing full-set search, date/status filters, 25-row server pagination, matching exports and validated receipt return links remain authoritative. Do not turn a bounded recent list into an apparent full history. No settlement, fee, reserve, dispute, partial refund, real bank payout or external delivery workflow is added or claimed. Those retain their P5/P6 scope.
+
+## Reference and acceptance
+
+The published Amex [payment categories](https://www.americanexpress.com/us/merchant/support-center/payments/explore-payments-default-view.html), [settlement drilldown](https://www.americanexpress.com/us/merchant/support-center/payments/viewing-your-settlements.html), [merchant hierarchy](https://www.americanexpress.com/us/merchant/support-center/account-services/view-and-update-account.html) and [location access](https://www.americanexpress.com/us/merchant/support-center/account-services/manage-locations.html), checked on 11 September 2026, support persistent merchant/date context, money-to-record drilldown and explicit location access. Etail adapts those interaction patterns to its actual sandbox capabilities. This is not an authenticated Amex dashboard review, private architecture claim or parity score.
+
+Acceptance covers primary/network and exact delegated access; channels → reviewed activation/publication → payment → receipt → permitted refund/transfer; ordinary invitation → intended acceptance → exact-unit work → revocation/expiry; business setup → payment setup; private payment support and operator continuity. Test guessed IDs, unavailable views, reload/back/filter context, current versus period funds, same-command retries and responsive keyboard/axe/reflow behavior at 1440, 390 and 320 pixels. Preserve all preview records and independently verify financial/authority boundaries.
+
+Build on `codex/merchant-experience`, based on D66 local `b5284ff2a5d64a1389a80732bea3f57f54eed639` / tree `e3121108d06ecc854f9c194a120e191920362c83`. The existing deployment-source approval remains pending; this task does not change the Netlify production branch or visitor controls. Final evidence and review publication will be recorded separately.

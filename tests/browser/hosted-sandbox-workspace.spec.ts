@@ -221,10 +221,10 @@ test("email merchant starts from empty setup and completes a channel, receipt, r
     const channelDetails = page.getByRole("dialog", {name: "Payment channel details", exact: true});
     await expect(channelDetails.getByRole("heading", {name: "Your channel is ready", exact: true})).toBeVisible();
     await expect(channelDetails).not.toContainText("Turn it on below");
-    await expect(row.getByRole("link", {name: "Open checkout", exact: true})).toHaveClass(/consumer-button-primary/);
-    await expect(row.getByRole("link", {name: "Open checkout", exact: true})).toBeInViewport({ratio: 1});
+    await expect(row.getByRole("link", {name: "Try a practice payment", exact: true})).toHaveClass(/consumer-button-secondary/);
+    await expect(row.getByRole("link", {name: "Try a practice payment", exact: true})).toBeInViewport({ratio: 1});
     await capture(page, "merchant-active-channel");
-    await row.getByRole("link", { name: "Open checkout", exact: true }).click();
+    await row.getByRole("link", { name: "Try a practice payment", exact: true }).click();
     await expect(page.getByRole("button", { name: "Pay $12.50 with test funds", exact: true })).toBeVisible();
     await capture(page, "merchant-checkout");
     await page.getByText("Preview sharing formats", { exact: true }).click();
@@ -264,6 +264,7 @@ test("email merchant starts from empty setup and completes a channel, receipt, r
     await expect(page.getByRole("dialog")).toHaveCount(0);
 
     await page.goto(`/merchant-services?view=unit:${master.id}`);
+    await page.getByRole("link", { name: "Merchants & people", exact: true }).click();
     await page.getByRole("button", { name: "Add submerchant", exact: true }).click();
     await page.getByRole("textbox", { name: "Submerchant name", exact: true }).fill("Hosted delegated shop");
     await page.getByRole("button", { name: "Review merchant", exact: true }).click();
@@ -277,7 +278,8 @@ test("email merchant starts from empty setup and completes a channel, receipt, r
     await invite.getByRole("textbox", { name: "Member code", exact: true }).fill(joined.memberCode!);
     await invite.getByRole("button", { name: "Find member", exact: true }).click();
     await expect(invite).toContainText(`Selected: ${colleagueName}`);
-    await invite.getByRole("button", { name: "View records", exact: false }).click();
+    await invite.getByText("Customize access", {exact:true}).click();
+    for(const label of ["Create channels","Edit channels","Share channels","Try a sandbox payment"])await invite.locator(".mp-permission-options").getByRole("checkbox",{name:new RegExp(`^${label}`)}).uncheck();
     await invite.getByRole("button", { name: "Review invitation", exact: true }).click();
     await page.getByRole("dialog", { name: "Review merchant invitation", exact: true }).getByRole("button", { name: "Save invitation", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -340,6 +342,7 @@ test("merchant setup recovers lost connection responses without repeating proces
     }
     await enableAndRecover(primary.id); expect(processingWrites).toBe(1);
     await page.goto(`/merchant-services?view=unit:${primary.id}`);
+    await page.getByRole("link", { name: "Merchants & people", exact: true }).click();
     await page.getByRole("button", { name: "Add submerchant", exact: true }).click();
     await page.getByRole("textbox", { name: "Submerchant name", exact: true }).fill(`${name} branch`);
     await page.getByRole("button", { name: "Review merchant", exact: true }).click();

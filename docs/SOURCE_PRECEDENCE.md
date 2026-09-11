@@ -1,6 +1,6 @@
 # Current source precedence
 
-11 September 2026 · D63–D65. The user identified missing capabilities in the walkthrough and explicitly resumed the actual full sandbox build. D65 lifts the design-only pause. Build complete slices from the consolidated plan; the walkthrough is review evidence, not executable backend behavior. The active work contract is [ACTIVE_SANDBOX_BUILD.md](ACTIVE_SANDBOX_BUILD.md).
+11 September 2026 · D63–D67. The user identified missing capabilities in the walkthrough and explicitly resumed the actual full sandbox build. D65 lifts the design-only pause. Build complete slices from the consolidated plan; the walkthrough is review evidence, not executable backend behavior. The active build contract is [ACTIVE_SANDBOX_BUILD.md](ACTIVE_SANDBOX_BUILD.md), refined by the [Cardholder](CARDHOLDER_EXPERIENCE_REDESIGN.md) and [Merchant](MERCHANT_EXPERIENCE_REDESIGN.md) experience contracts.
 
 ## Authority order
 

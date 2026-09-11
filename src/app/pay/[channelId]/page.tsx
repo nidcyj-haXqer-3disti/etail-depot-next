@@ -5,6 +5,7 @@ import { getMerchantCheckout } from "@/modules/acquiring/operations-service";
 import type { MerchantCheckoutProjection } from "@/modules/acquiring/operations-contracts";
 import { MerchantCheckout } from "@/ui/workspace/merchant-operations";
 import { PageNotice, Shell } from "@/ui/shell";
+import { MerchantNavigationBoundary } from "@/ui/workspace/merchant-navigation-state";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -21,5 +22,5 @@ export default async function Page({ params }: { params: Promise<{ channelId: st
     if (error instanceof SecurityError && [403, 404].includes(error.status)) return <PageNotice authenticated title="This payment preview isn’t available"><p>The channel or your access may have changed. A payment link does not give access to a collection unit.</p></PageNotice>;
     return <PageNotice authenticated title="We couldn’t load this payment"><p>Please retry this page. No payment has been submitted.</p></PageNotice>;
   }
-  return <Shell authenticated><MerchantCheckout key={channelId} initial={checkout} /></Shell>;
+  return <MerchantNavigationBoundary><Shell authenticated><MerchantCheckout key={channelId} initial={checkout} /></Shell></MerchantNavigationBoundary>;
 }

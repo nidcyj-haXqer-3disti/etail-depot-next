@@ -43,7 +43,7 @@ test("seven channel formats share one saved request, with an exact receipt, full
  await row.getByRole("button",{name:"Turn on channel",exact:true}).click();
  const activation=page.getByRole("dialog",{name:"Turn on this channel?",exact:true});await expect(activation).toContainText(name);await expect(activation).toContainText("$12.50");
  await activation.getByRole("button",{name:"Confirm setting",exact:true}).click();await expect(activation).toBeHidden();
- await row.getByRole("link",{name:"Open checkout",exact:true}).click();await page.waitForURL(url=>url.pathname===`/pay/${channel.id}`);
+ await row.getByRole("link",{name:"Try a practice payment",exact:true}).click();await page.waitForURL(url=>url.pathname===`/pay/${channel.id}`);
  await expect(page.getByRole("heading",{name,level:1,exact:true})).toBeVisible();
  await page.getByText("Preview sharing formats",{exact:true}).click();
  const presentation=page.getByRole("region",{name:"Channel presentation preview"});

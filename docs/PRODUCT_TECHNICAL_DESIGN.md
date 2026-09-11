@@ -1,6 +1,6 @@
 # Etail Depot — product and technical design
 
-Version 1.3 · 11 September 2026 · D63–D65 · **Connected sandbox slices implemented; local integrated verification passed; hosted acceptance pending.**
+Version 1.4 · 11 September 2026 · D63–D67 · **Connected sandbox slices and both experience redesigns locally verified; hosted acceptance pending.**
 
 This document consolidates the user's agreed two-service model, implemented behavior and remaining experience. The [delivery plan](../planning/DELIVERY_PLAN.md) controls implementation order; the [project prompt](../02_MASTER_BUILD_PROMPT.md) controls how subsequent work proceeds. The initial planning audit inspected tree `9f7533cc55213702e6c69ffb0c9b5e9656b03aed`; the D65 additions below describe the current implementation, not that earlier tree. [Status](../planning/STATUS.md) records exact candidate and verification evidence. This document does not certify a hosted release.
 
@@ -58,7 +58,7 @@ flowchart TD
 | Public | Cards · Accept payments · Pricing · Help · Sign in | Explain use cases before registration; accurate sandbox availability beside calls to action. |
 | Your services | Cardholder services · Merchant services · Invitations | Enrollment is deliberate. Accepted secondary access opens that participation, not a new primary setup. |
 | Cardholder | Overview · Cards · Activity · Cardholders · Requests | Primary sees group views. Secondary gets own-card views and relevant invitations/help; no empty management tabs. Cards separates named ownership from oversight using server-scoped search and filters. |
-| Merchant | Overview · Payments · Payment channels · People · Settings | Primary chooses All my merchants or one named unit. A delegate gets exact authorized units only. |
+| Merchant | Overview · Available funds · Merchants & people; named merchant: Payments · Payment channels · People & access · Payment setup · Help | Primary chooses All my merchants or one named unit. A delegate gets exact authorized units only. |
 | Shared | Help · Sign-in security · Profile | Support carries authorized resource context. Security does not depend on a financial service. |
 | Operator | Assigned cases · Case detail | Separate entrance and assignments. Customer primary roles do not expose this console. |
 | Guest checkout | Public request → Your order → Review → Receipt | `/checkout/{publicationId}` exposes only published payment details; `/checkout/orders/{orderId}` additionally requires the order's HttpOnly guest session. No merchant sign-in or service enrollment. |
@@ -74,6 +74,8 @@ Selected card, service, merchant, dates and filters remain in validated route/qu
 **Merchant overview — desktop:** named primary/network or merchant selector plus date range; collections, refunds and available simulated funds with explicit definitions; a Payments table below with exact-record links. Period collections/refunds open the same scoped and date-filtered records. Available funds are explicitly as of now, independent of the activity date range; their detail shows current balance movements/availability rather than pretending to be the period sum. Payment channels and people are separate tasks. Pending, fees, reserves and bank-transfer metrics appear only when their simulated lifecycles exist.
 
 **Merchant overview — mobile:** scope/date controls first, one compact financial summary, then a readable payment list. Selecting a row opens amount, merchant, channel, status, receipt and permitted servicing actions. Refund/transfer confirmations name the exact merchant and amount. Do not shrink a desktop table until its information is unreadable.
+
+D67's [Merchant experience contract](MERCHANT_EXPERIENCE_REDESIGN.md) applies these journeys to the existing command owners. Payments and current funds lead the overview; advanced search/status sit with records. Confirmed merchant/date filters survive directory, unit tasks and exact receipts. Merchants you manage and Merchants shared with you have distinct directories. A server projection distinguishes missing setup, missing usable channels, paused units and restricted access. Channel names, actual readiness, activation, customer publication and signed-in practice payments are explicit; copying never means delivery. People shows active/past access and pending-first invitations with exact counts and valid server-derived access terms. Merchant access changes still require revoke and a new accepted invitation; there is no edit/extend command. No schema or financial writer changes are required for this redesign.
 
 **Operator case:** case reason, authorized customer/resource context, timeline, current state, last action and permitted response together. A support reply never silently changes a balance or grants access. Escalation and unresolved outcomes remain visible.
 

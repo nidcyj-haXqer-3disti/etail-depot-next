@@ -13,10 +13,11 @@ import { PageNotice } from "@/ui/shell";
 import { EmptyState } from "@/ui/workspace/primitives";
 import { SecurityError } from "@/platform/security/origin";
 import type { MerchantWorkspaceProjection } from "@/modules/acquiring/contracts";
+import {merchantActivityReturn} from "@/shared/merchant-activity";
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 export const metadata = { title: "Merchant workspace" };
-export default async function Page({ params, searchParams }: { params: Promise<{ merchantId: string }>; searchParams: Promise<{ tab?: string | string[]; payment?:string|string[] }> }) {
+export default async function Page({ params, searchParams }: { params: Promise<{ merchantId: string }>; searchParams: Promise<{ tab?: string | string[]; payment?:string|string[]; returnTo?:string|string[] }> }) {
   const session = await getRequestSession().catch(() => undefined);
   if (session === undefined) return <PageNotice title="We couldn’t load your session"><p>Please retry. Your saved records have not changed.</p></PageNotice>;
   if (!session) redirect("/login");
@@ -43,5 +44,6 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       return {kind:"MERCHANT",merchantId,serviceId:workspace.merchant.master.serviceId,merchantName:workspace.merchant.displayName,primaryName:workspace.merchant.master.displayName,initialCases,linkedPayment,paymentUnavailable};
     }catch{return undefined;}
   })():undefined;
-  return <MerchantWorkspace support={support} workspace={workspace} tab={tab} access={access} operations={tab!=="help"&&(workspace.primaryAccess || workspace.merchant.status === "ACTIVE") ? await getMerchantOperations(session.personId,merchantId).catch(()=>undefined) : undefined} />;
+  const overviewHref=merchantActivityReturn(typeof query.returnTo==="string"?query.returnTo:null)??undefined;
+  return <MerchantWorkspace overviewHref={overviewHref} support={support} workspace={workspace} tab={tab} access={access} operations={tab!=="help"&&(workspace.primaryAccess || workspace.merchant.status === "ACTIVE") ? await getMerchantOperations(session.personId,merchantId).catch(()=>undefined) : undefined} />;
 }
