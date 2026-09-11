@@ -30,7 +30,9 @@
     "db:serve": "node tools/postgres-runtime.mjs serve",
     "preview:fixture": "node tools/run-with-database.mjs --preview next start --hostname 127.0.0.1 --port 3100",
     "contracts:generate": "node --import tsx tools/generate-openapi.ts",
-    "test:handoff": "python3 tools/test-handoff.py"
+    "test:handoff": "python3 tools/test-handoff.py",
+    "test:email-e2e": "node tools/run-with-database.mjs playwright test --config playwright.email.config.ts",
+    "verify:hosted-email": "node tools/verify-hosted-email.mjs"
   },
   "dependencies": {
     "@netlify/database": "2.0.1",
