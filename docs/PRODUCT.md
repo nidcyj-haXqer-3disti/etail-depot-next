@@ -1,9 +1,12 @@
-# Product contract
+# Product contract — historical specification
 
-Current authority: [Service dashboard design](SERVICE_DASHBOARD_DESIGN.md) governs customer navigation and creation, with the [two-service privacy rules](TWO_SERVICE_DESIGN.md). Financial invariants and unrelated future requirements remain.
+> **Superseded for active product design — 11 September 2026.** Use [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) for the current two-service model, scope and acceptance sequence. This document preserves earlier requirements and rationale; its references to retained account enums, host bindings and earlier “current” behavior are historical, not instructions to restore them.
+>
+> Source-defined commercial rules and financial/privacy invariants remain obligations unless an explicit later decision changes them. Preserving a requirement here does not establish its implementation, verification or release status.
 
+Earlier design references: [Service dashboard design](SERVICE_DASHBOARD_DESIGN.md) and [two-service privacy rules](TWO_SERVICE_DESIGN.md).
 
-**Product requirements and current model.** This document retains future obligations beyond the local implementation. The [latest delivery evidence](SERVICE_DASHBOARD_EVIDENCE.md) records what was executed; older acquiring evidence describes earlier delivery stages.
+**Historical product requirements and model.** This document retains future obligations beyond the implementation assessed at that time. The [earlier delivery evidence](SERVICE_DASHBOARD_EVIDENCE.md) records that delivery stage; it is not the latest application assessment.
 
 ## Product mental model
 

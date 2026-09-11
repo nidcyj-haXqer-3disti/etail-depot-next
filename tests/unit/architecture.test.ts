@@ -12,6 +12,33 @@ const operations = "src/modules/acquiring/operations-service.ts";
 const ui = "src/ui/workspace/merchant-operations.tsx";
 
 describe("fresh service enrollment and support boundaries",()=>{
+  it("keeps guest authority separate while sharing the single payment writer",()=>{
+    const guest="src/modules/acquiring/guest-service.ts";
+    const call='import {recordMerchantSandboxPayment as record} from "./operations-service"; async function confirmGuestAttempt(){return record(tx,input);}';
+    expect(probe(guest,call)).toEqual([]);
+    expect(probe(guest,call.replace("confirmGuestAttempt","bypass"))).toContain("PAYMENT_PERSISTENCE_BOUNDARY");
+    expect(probe(guest,'import {postJournal} from "../ledger/service"; function confirmGuestAttempt(){return postJournal(tx,input);}')).toContain("LEDGER_POSTING_BOUNDARY");
+    expect(probe(guest,'import {guestOrders} from "./guest-schema"; function createGuestOrder(){tx.insert(guestOrders).values({});}')).toEqual([]);
+    expect(probe(guest,'import {guestOrders} from "./guest-schema"; function createGuestOrder(){tx.update(guestOrders).set({});}')).toContain("GUEST_WRITER_OWNERSHIP");
+    expect(probe(guest,'function bypass(){tx.execute(sql`UPDATE merchant_guest_orders SET amount=1`);}')).toContain("RAW_GUEST_WRITE");
+    const route='import {confirmGuestAttempt} from "@/modules/acquiring/guest-service"; export async function POST(){return confirmGuestAttempt();}';
+    expect(probe("src/app/api/v1/guest/orders/[orderId]/attempts/[attemptId]/confirm/route.ts",route)).toEqual([]);
+    expect(probe("src/app/api/v1/guest/pay/route.ts",route)).toContain("PARALLEL_GUEST_ROUTE");
+    const ui='"use client"; async function guestRequest(){return fetch("/api/v1/guest/session",{method:"POST"});}';
+    expect(probe("src/ui/guest-checkout.tsx",ui)).toEqual([]);
+    expect(probe("src/ui/other.tsx",ui)).toContain("PARALLEL_GUEST_UI");
+  });
+  it("keeps the shared case engine's writes and both exact list routes finite",()=>{
+    const owner="src/modules/cases/service.ts";
+    const source='import {supportCases,supportCaseMessages,supportCaseCommands} from "./schema"; async function createCase(){tx.insert(supportCases).values({});tx.insert(supportCaseMessages).values({});} async function updateCase(){tx.update(supportCases).set({});tx.insert(supportCaseMessages).values({});} async function execute(){tx.insert(supportCaseCommands).values({});}';
+    expect(probe(owner,source)).toEqual([]);
+    expect(probe(owner,source.replace("function createCase","function bypass"))).toContain("SUPPORT_WRITER_OWNERSHIP");
+    for(const service of ["cardholder-services","merchants"]){
+      const list='"use client"; function list(id,query){fetch(`/api/v1/'+service+'/${encodeURIComponent(id)}/cases?${query}`,{cache:"no-store"});}';
+      expect(probe("src/ui/workspace/cases.tsx",list)).toEqual([]);
+      expect(probe("src/ui/workspace/cases.tsx",list.replace('cache:"no-store"','method:"POST"'))).toContain("UNINSPECTABLE_UI_COMMAND_PATH");
+    }
+  });
   it("creates primary responsibility only in its explicit enrollment owner",()=>{
     const create='import {services,serviceMembers} from "@/platform/database/schema"; export async function createCardholderService(){tx.insert(services).values({});tx.insert(serviceMembers).values({});}';
     expect(probe("src/modules/services/service.ts",create)).toEqual([]);
@@ -86,14 +113,15 @@ describe("financial source ownership mutation probes", () => {
     expect(probe("src/app/api/money/route.ts", 'import {postJournal as post} from "@/modules/ledger/service"; export async function POST(){return post(tx,input);}')).toContain("LEDGER_POSTING_BOUNDARY");
     expect(probe("src/modules/other/service.ts", 'import {issueSandboxCard} from "@/modules/issuing/sandbox-adapter"; function bypass(){return issueSandboxCard(id);}')).toContain("ISSUING_ADAPTER_BOUNDARY");
     expect(probe("src/app/api/pay/route.ts", 'import {testPayment} from "@/modules/acquiring/adapters/sandbox"; function POST(){return testPayment(id,"APPROVED");}')).toContain("ACQUIRING_ADAPTER_BOUNDARY");
-    expect(probe(operations, 'import {testPayment} from "./adapters/sandbox"; export async function simulateMerchantPayment(){return testPayment(id,"APPROVED");}')).toEqual([]);
+    expect(probe(operations, 'import {testPayment} from "./adapters/sandbox"; export async function recordMerchantSandboxPayment(){return testPayment(id,"APPROVED");}')).toEqual([]);
+    expect(probe(operations, 'import {testPayment} from "./adapters/sandbox"; export async function simulateMerchantPayment(){return testPayment(id,"APPROVED");}')).toContain("ACQUIRING_ADAPTER_BOUNDARY");
   });
 
   it("pins operation tables to each exact command and never allows history mutation", () => {
-    const good = 'import {merchantTestPayments as payments} from "./operations-schema"; export async function simulateMerchantPayment(){tx.insert(payments).values({});}';
+    const good = 'import {merchantTestPayments as payments} from "./operations-schema"; export async function recordMerchantSandboxPayment(){tx.insert(payments).values({});}';
     expect(probe(operations, good)).toEqual([]);
     expect(probe(operations, good.replace("tx.insert(payments).values({})", "tx.update(payments).set({})"))).toContain("OPERATION_WRITER_OWNERSHIP");
-    expect(probe(operations, good.replace("simulateMerchantPayment", "unreviewedPayment"))).toContain("OPERATION_WRITER_OWNERSHIP");
+    expect(probe(operations, good.replace("recordMerchantSandboxPayment", "unreviewedPayment"))).toContain("OPERATION_WRITER_OWNERSHIP");
     expect(probe("src/modules/other/service.ts", 'import {testGateways} from "@/modules/acquiring/operations-schema"; function setup(){tx.insert(testGateways).values({});}')).toContain("OPERATION_WRITER_OWNERSHIP");
     expect(probe(operations, 'function bypass(){tx.execute(sql`DELETE FROM merchant_operation_commands`);}')).toContain("RAW_FINANCIAL_WRITE");
   });

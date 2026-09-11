@@ -1,67 +1,43 @@
 # Etail Depot Next — start here
 
-**A fresh-project Codex build brief and source package. Not an application release.**
-Prepared 8 September 2026. No GitHub repository, Netlify project, database, or account was created by preparing this package.
+**This repository contains the working two-service sandbox and its requirements, research and delivery evidence.** It is no longer an unimplemented handoff package. Continue in this workspace and use the existing resources recorded in [project-targets.json](project-targets.json); do not provision another repository, site, database or Identity tenant to restart the project.
 
-## What this package is for
+## Current task: review and plan before building
 
-Build Etail Depot again as one coherent account-first product, rather than editing or layering onto the previous application. Use a **new private GitHub repository**, **new Netlify project**, **new PostgreSQL database**, **new Identity configuration**, and **new secrets**. Keep the existing applications unchanged.
+The user has paused implementation and requested a full video review followed by a product, technical and design plan. Review the evidence, document the intended journeys and resolve the active delivery order before making more application changes. Do not treat this entry document as authorization to resume implementation or deploy.
 
-Proposed name for both new resources: **`etail-depot-next`**. This name has not been reserved or checked for availability. The expected GitHub owner is `nidcyj-haXqer-3disti`; verify the signed-in account before creation. If the name is occupied by an unrelated project, stop and ask for a new name. Do not adopt or overwrite it.
+The target has exactly two services:
 
-## The easiest handoff
+- **CARDHOLDER:** a primary cardholder oversees their card group; secondary cardholders use their own cards and permitted data.
+- **MERCHANT:** a primary merchant oversees its own submerchants; delegated people work within their assigned merchant permissions. Permission to collect does not grant Cardholder access or primary financial authority.
 
-1. Extract this ZIP into a **new empty folder**. The folder containing this file and `AGENTS.md` is the project root.
-2. Open that folder in a local Codex coding workspace, IDE integration, or CLI. Paste the contents of **`01_PASTE_IN_CODEX.md`** into a new task. Do not open the existing Etail Depot repository.
-3. Let Codex read the full brief, inspect the supplied source material, and begin the first implementation milestone. It should create the new GitHub resources when an authorized tool is available. It must report the exact permission step when creation or deployment is blocked, not claim that those actions happened.
+Personal, Household and Seller account types in earlier source material are historical. Preserve the original requirements where they remain applicable, but do not rebuild that superseded customer model.
 
-### Using Codex cloud in a browser instead
+## Read in this order
 
-Codex cloud checks out a selected GitHub repository. Create a **new private** `etail-depot-next` repository, place the **extracted package contents** at its root, authorize that repository for Codex, and create/select its environment. Then paste `01_PASTE_IN_CODEX.md`. The package is intentionally below 100 files before implementation; include hidden `.github` and `.gitignore` files. The GitHub upload limit counts nested files too. Uploading the ZIP itself does **not** make its contents available as repository source unless a task explicitly extracts it. There is no automatic ZIP-import workflow in this package. [C1]
+1. [project-targets.json](project-targets.json) — exact owned resources and excluded legacy targets.
+2. [Source precedence](docs/SOURCE_PRECEDENCE.md) — latest decisions and superseded instructions.
+3. [Master brief](02_MASTER_BUILD_PROMPT.md) — current mandate and boundaries.
+4. [Product and technical design](docs/PRODUCT_TECHNICAL_DESIGN.md) — proposed product journeys, architecture and design decisions.
+5. [Delivery plan](planning/DELIVERY_PLAN.md) — active sequencing and acceptance gates.
+6. [Implementation status](planning/STATUS.md) — actual work, verification and remaining gaps, including D62 email-access evidence.
 
-If your Codex interface supports file attachments, it may accept the ZIP directly, but attachment/extraction support varies. The reliable options are a local extracted folder or an initialized repository containing the extracted files. Do not rely on a file attached to a different chat being visible in Codex.
+[AGENTS.md](AGENTS.md) contains standing project instructions, subject to the latest explicit user decisions. [Video planning review](docs/research/VIDEO_PLANNING_REVIEW.md) records the requested review; distinguish watched material, text-only evidence and unavailable sources. [01_PASTE_IN_CODEX.md](01_PASTE_IN_CODEX.md) is the continuation prompt.
 
-## Read these first
+The original M0–M7 [backlog](planning/backlog.json), source workbooks and master in `sources/original/` remain the scope baseline. They do not replace the active delivery plan or prove that a feature exists. Earlier research and evidence remain historical where superseded.
 
-| File | Purpose |
-|---|---|
-| `01_PASTE_IN_CODEX.md` | Short launch prompt to paste into Codex. |
-| `02_MASTER_BUILD_PROMPT.md` | End-to-end implementation mandate. |
-| `AGENTS.md` | Persistent project rules and working agreements. |
-| `docs/SOURCE_PRECEDENCE.md` | Resolves conflicts between this new-build request and older material. |
-| `docs/PRODUCT.md` | Three account types, product scope, and commercial rules. |
-| `docs/SYSTEM_MAP.md` | Suggested clean module tree and dependency boundaries. |
-| `docs/DATABASE_AND_DOMAIN.md` | New schema responsibilities and financial invariants. |
-| `docs/WORKFLOWS.md` | One card workflow, acquiring flow, and event processing. |
-| `docs/GITHUB_PLAN.md` | New repository, milestones, issue backlog, review and CI. |
-| `docs/NETLIFY_DEPLOYMENT.md` | New site, database, Identity, environment separation, release and live checks. |
+## Preserve the working project
 
-The two original Excel workbooks and original product master are in `sources/original/`; the previous redesign is historical context, **not an instruction to migrate the old system**. The original logo and symbol are in `assets/brand/`. No old application code, font files, credentials, or customer records are included.
+- Use only the GitHub repository, Netlify site and current database/Identity targets explicitly recorded for Etail Depot Next. Keep excluded Etail applications, credentials, customer data and DNS untouched.
+- Keep `ENABLE_REAL_MONEY=false`. Sandbox cards, payment channels, payments, refunds and transfers do not establish live financial processing or provider approval.
+- Preserve one policy engine, card-request/issuance lifecycle, merchant-channel lifecycle and immutable financial ledger. React renders server projections and invokes their existing commands.
+- Do not reset data, replace authentication, copy legacy source, broaden access or create another implementation to make a check pass.
+- Feature merges and releases require the applicable review and authorization. A previous deployment does not authorize another release during this planning pause.
 
-## What Codex should deliver
+Hosted registration, confirmation, password sign-in and recovery are implemented. D62 verified provider settings and enabled forms, plus isolated application journeys. The user's own successful hosted mailbox/password roundtrip remains pending; see [email reliability evidence](docs/EMAIL_ACCESS_RELIABILITY.md).
 
-A working new project—not just more documents—with Personal, Household and Seller account contexts; one card-creation flow; acquiring and issuing; scoped permissions; durable mock-provider operations; correct membership/rewards; management/economics; partner tools; tests; a versioned API; and a verified new Netlify sandbox.
+## Working locally and continuing later
 
-The first milestone is a complete **Accounts + access + canonical card-request** vertical slice. The other milestones remain required; the first slice is not the final product. Review evidence before merging feature PRs. A protected sandbox can be deployed during implementation. Public registration should be opened only after the release review; keep email confirmation required and previews private.
+[README.md](README.md) contains current setup and verification commands. The existing local preview uses a guarded database separate from automated tests. Starting a prepared preview does not migrate or reseed it. Do not run preparation, builds or runtime checks merely to complete this documentation review.
 
-The prompt allows new-project provisioning and sandbox work. It does not authorize modifying existing sites, moving customer data, buying a plan, changing DNS, or turning on real-money processing.
-
-## Package validation
-
-Codex can run:
-
-```bash
-python3 tools/verify_handoff.py
-python3 -m unittest discover -s tests -p 'test_handoff_tools.py' -v
-python3 tools/seed_github_plan.py
-```
-
-These helpers require Python 3.10 or newer; see `tools/README.md`. Run initial hash validation before intentional implementation edits.
-
-The third command is a **dry run**. It creates nothing. These checks validate the handoff and helper behavior, not the future application. Implementation must supply and execute its own build, PostgreSQL, security and browser tests.
-
-## Continue across tasks
-
-The full project is larger than one short task. Codex must record completed work, exact checks, remaining blockers and the next action in `planning/STATUS.md`; open the next milestone prompt from `prompts/` when continuing. Never restart with a second architecture or duplicate module.
-
-[C1] Official Codex cloud/environment documentation, checked 2026-09-08: https://learn.chatgpt.com/docs/environments/cloud-environment
+When implementation is resumed, follow the active delivery plan and record exact changes, checks, limitations and next steps in `planning/STATUS.md` and the decision log. Preserve the current implementation and its evidence across tasks.

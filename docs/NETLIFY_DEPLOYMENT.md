@@ -1,5 +1,9 @@
 # New-project Netlify deployment runbook
 
+> **Historical provisioning/model descriptions; retained release safeguards.** Follow [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) for the current model and existing owned deployment. References below to an unreserved slug, new provisioning, three account types or unimplemented hosting describe earlier stages; do not reprovision or attach another project from those instructions.
+>
+> Exact target isolation, secrets handling, authentication/CSRF, security and financial checks, release approvals and commercial obligations remain required. This notice does not authorize a deployment, access change, purchase or DNS change. A historical release script is not evidence of a current successful hosted journey.
+
 **Target: a NEW sandbox only.** Nothing in this file authorizes use of an existing Etail Depot site, database, Identity configuration or DNS. Proposed slug `etail-depot-next` is unreserved.
 
 ## A. Verify and provision

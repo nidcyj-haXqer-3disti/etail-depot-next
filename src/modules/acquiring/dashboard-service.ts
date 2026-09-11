@@ -9,9 +9,12 @@ import { listMerchantScopes, merchantChannelVisible } from "./service";
 import { paymentChannels } from "./schema";
 import { channelActivations, merchantTestPayments, merchantTestRefunds, merchantTestPayouts, testGateways, testMerchantEnrollments } from "./operations-schema";
 import type { MerchantDashboardProjection, MerchantDashboardTotals, MerchantDashboardUnit, MerchantDashboardView, MerchantDashboardPayment, MerchantDashboardTransfer } from "./dashboard-contracts";
+import {parseMerchantActivityQuery,type MerchantActivityQueryInput,type MerchantActivityRow} from "./activity-contracts";
+import {projectMerchantActivity} from "./activity-service";
 
 /** One scoped read snapshot: service hierarchy and operation summaries, with no service-container projection. */
-export async function getMerchantDashboard(personId:string):Promise<MerchantDashboardProjection> {
+export async function getMerchantDashboard(personId:string,input:MerchantActivityQueryInput={},options:{exportRows?:boolean}={}):Promise<MerchantDashboardProjection> {
+ const query=parseMerchantActivityQuery(input);
  return getDb().transaction(async tx=>{
   const scopes=await listMerchantScopes(tx,personId),now=await merchantNow(tx);
   const {canCreatePrimary}=await requireServiceReader(tx,personId);
@@ -37,7 +40,7 @@ export async function getMerchantDashboard(personId:string):Promise<MerchantDash
    const visibleChannels=channels.filter(row=>row.merchantUnitId===unit.id&&merchantChannelVisible(row,personId,scope.primaryAccess));
    const liveChannels=visibleChannels.filter(row=>row.status==="DRAFT"&&row.expiresAt>now);
    const total=(values:{amountMinor:bigint}[])=>formatMoney(values.reduce((sum,row)=>sum+row.amountMinor,0n));
-   units.push({id:unit.id,name:unit.displayName,kind:unit.kind,primaryId:scope.master.id,primaryName:scope.master.displayName,primaryAccess:scope.primaryAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddSubmerchant:unit.kind==="MASTER"&&evaluate(scope.policy,"merchant.units.create").allowed&&scope.policy.operating&&eligible,canCreateChannel:eligible&&evaluate(scope.policy,"channels.create").allowed,setupState,totals:{
+   units.push({id:unit.id,name:unit.displayName,kind:unit.kind,primaryId:scope.master.id,primaryName:scope.master.displayName,primaryAccess:scope.primaryAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddSubmerchant:unit.kind==="MASTER"&&evaluate(scope.policy,"merchant.units.create").allowed&&scope.policy.operating&&eligible,canCreateChannel:eligible&&evaluate(scope.policy,"channels.create").allowed,canReadPeople:evaluate(scope.policy,"merchant.people.read").allowed,setupState,totals:{
     collected:canReadPayments?total(payments.filter(row=>row.merchantUnitId===unit.id&&row.outcome==="APPROVED")):null,
     refunded:canReadPayments?total(refunds.filter(row=>row.merchantUnitId===unit.id)):null,
     transferred:canReadPayments?total(payouts.filter(row=>row.merchantUnitId===unit.id)):null,
@@ -59,6 +62,12 @@ export async function getMerchantDashboard(personId:string):Promise<MerchantDash
    const recentPayments=paymentRows.filter(row=>ids.includes(row.merchantId)),recentTransfers=transferRows.filter(row=>ids.includes(row.merchantId));
    return {id,name,description,unitIds:ids,totals,payments:recentPayments.slice(0,12),transfers:recentTransfers.slice(0,6),paymentsHasMore:recentPayments.length>12,transfersHasMore:recentTransfers.length>6};
   }
-  return {mode:"TEST",canCreatePrimary,primaryNetworks,delegatedUnitIds,units,views:[view("all","All your merchants","Your primary merchants and separately shared merchant work.",unitIds),...primaryNetworks.map(root=>view(`network:${root.primaryId}`,root.name,"Primary merchant and its submerchants.",root.unitIds)),...units.map(unit=>view(`unit:${unit.id}`,unit.name,unit.kind==="MASTER"?"This primary merchant’s own collections.":`Submerchant of ${unit.primaryName}.`,[unit.id]))]};
+  const views=[view("all","All your merchants","Your primary merchants and separately shared merchant work.",unitIds),...primaryNetworks.map(root=>view(`network:${root.primaryId}`,root.name,"Primary merchant and its submerchants.",root.unitIds)),...units.map(unit=>view(`unit:${unit.id}`,unit.name,unit.kind==="MASTER"?"This primary merchant’s own collections.":`Submerchant of ${unit.primaryName}.`,[unit.id]))];
+  const activityRecords:Omit<MerchantActivityRow,"href">[]=[
+   ...paymentRows.map(row=>({...row,kind:"payment" as const,paymentId:row.id,paymentReference:row.reference})),
+   ...refunds.map(row=>({id:row.id,kind:"refund" as const,merchantId:row.merchantUnitId,merchantName:units.find(unit=>unit.id===row.merchantUnitId)!.name,description:payments.find(payment=>payment.id===row.paymentId)!.description,amount:formatMoney(row.amountMinor),status:"COMPLETED" as const,reference:row.testReference,at:row.createdAt.toISOString(),paymentId:row.paymentId,paymentReference:payments.find(payment=>payment.id===row.paymentId)!.testReference})),
+   ...transferRows.map(row=>({...row,kind:"transfer" as const,description:"Transfer to sandbox destination",status:"COMPLETED" as const,paymentId:null,paymentReference:null})),
+  ];
+  return {mode:"TEST",canCreatePrimary,primaryNetworks,delegatedUnitIds,units,views,activity:projectMerchantActivity(query,views.find(view=>view.id===query.view),activityRecords,now,options.exportRows)};
  },{isolationLevel:"repeatable read"});
 }

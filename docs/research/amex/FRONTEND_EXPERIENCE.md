@@ -1,5 +1,9 @@
 # Amex front-end experience: screens and interactions
 
+> **Dated research evidence; earlier Etail design instructions superseded.** Use [Product and technical design](../../PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../../../planning/DELIVERY_PLAN.md) for the current model, scope and acceptance. The inspected Amex images and limitations below retain their original provenance; references to three Etail account types, the original 90% ambition and the next implementation step are historical, not active instructions.
+>
+> The current target is 100% of the retained public-workflow inventory, without any parity awarded by this research. Security, privacy, financial meaning, release approval and commercial obligations remain unchanged. Public illustrations are not verified current signed-in journeys or evidence that Etail implements them.
+
 Inspected 2026-09-08. **Latest user correction: the target is Amex's front-end experience—what people see, where they click, and how the interface responds.** This is the current starting reference for interface work. Earlier business and technical studies remain supporting material.
 
 The references below are official Amex screenshots and public tours. Root visually inspected 15 published images, including the US app hero within its public page. They are illustrations of the interface, not an exercised signed-in session. Image publication dates are generally unstated; examples can represent different releases. The Canadian and International Currency examples are labelled explicitly.

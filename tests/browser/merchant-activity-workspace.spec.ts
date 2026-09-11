@@ -1,0 +1,31 @@
+import {randomUUID} from "node:crypto";
+import {expect,test} from "@playwright/test";
+import {headers,signIn} from "./helpers/fresh";
+import {createMerchantViaApi} from "../helpers/merchant-api";
+import {merchantDashboardProjectionSchema} from "../../src/modules/acquiring/dashboard-contracts";
+
+test("merchant network activity keeps scope, dates and pages through exact records, exports and current funds",async({page})=>{
+ test.setTimeout(120000);await signIn(page.request);
+ const name=`Activity network ${randomUUID().slice(0,8)}`,primary=await createMerchantViaApi(page.request,name);
+ const created=await page.request.post(`/api/v1/merchants/${primary.merchantId}/submerchants`,{headers,data:{commandId:randomUUID(),displayName:"Weekend collection"}});expect(created.status()).toBe(200);const sub=await created.json() as {id:string};
+ for(const [id,path] of [[primary.merchantId,"gateway"],[sub.id,"test-enrollment"]])expect((await page.request.put(`/api/v1/merchants/${id}/${path}`,{headers,data:{commandId:randomUUID(),expectedVersion:0,enabled:true}})).status()).toBe(200);
+ const saved=await page.request.post(`/api/v1/merchants/${sub.id}/channels`,{headers,data:{commandId:randomUUID(),description:name,amountMinor:"750",currency:"USD",usage:"REUSABLE",expiresAt:new Date(Date.now()+86400000).toISOString(),presentations:["WEB"],visibility:"CREATOR_PRIVATE"}});expect(saved.status()).toBe(200);const channel=await saved.json() as {id:string;version:number};
+ expect((await page.request.put(`/api/v1/merchants/${sub.id}/channels/${channel.id}/activation`,{headers,data:{commandId:randomUUID(),expectedVersion:0,expectedChannelVersion:channel.version,active:true}})).status()).toBe(200);
+ for(let i=0;i<26;i++)expect((await page.request.post(`/api/v1/merchants/${sub.id}/channels/${channel.id}/test-payments`,{headers,data:{commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"APPROVED"}})).status()).toBe(200);
+ const today=new Date().toISOString().slice(0,10),query=new URLSearchParams({view:`network:${primary.merchantId}`,period:"custom",from:today,to:today,q:name,status:"COLLECTED",activity:"payments"});
+ await page.goto(`/merchant-services?${query}`);
+ await expect(page.getByRole("heading",{name:"Merchant overview",exact:true})).toBeVisible();
+ await expect(page.getByRole("combobox",{name:"Merchant",exact:true})).toHaveValue(`network:${primary.merchantId}`);
+ await expect(page.getByRole("searchbox",{name:"Search payments",exact:true})).toHaveValue(name);
+ const table=page.getByRole("table",{name:`payments for ${name}`,exact:true});await expect(table.locator("tbody tr")).toHaveCount(25);
+ await page.getByRole("link",{name:"Next page",exact:true}).click();await expect(table.locator("tbody tr")).toHaveCount(1);await page.reload();expect(new URL(page.url()).searchParams.get("page")).toBe("2");
+ const data=await page.request.get(`/api/v1/merchants/dashboard?${query}&page=2`);expect(data.status()).toBe(200);const selected=merchantDashboardProjectionSchema.parse(await data.json()).activity.rows[0];
+ await table.getByRole("link",{name,exact:true}).click();const detail=page.getByRole("dialog",{name:"Payment details",exact:true});await expect(detail).toContainText(selected.reference);await page.reload();await expect(detail).toContainText(selected.reference);
+ await expect(detail.getByRole("link",{name:"Get help with this payment",exact:true})).toHaveAttribute("href",new RegExp(`payment=${selected.paymentId}`));
+ await detail.getByRole("link",{name:"Back to merchant activity",exact:true}).click();
+ await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&[...query].every(([key,value])=>url.searchParams.get(key)===value)&&url.searchParams.get("page")==="2");
+ const exportLink=page.getByRole("link",{name:"Download payments CSV",exact:true});const csv=await page.request.get((await exportLink.getAttribute("href"))!);expect(csv.status()).toBe(200);expect(csv.headers()["cache-control"]).toContain("no-store");expect((await csv.text()).split("\r\n")).toHaveLength(28);
+ await page.getByRole("navigation",{name:"Merchant workspace views"}).getByRole("link",{name:"Available funds",exact:true}).click();await expect(page.getByRole("heading",{name:"Available practice funds",exact:true})).toBeVisible();await expect(page.locator(".md-funds-total")).toHaveText("$195.00");
+ await page.getByRole("link",{name:"Back to payment activity",exact:true}).click();await expect(page.getByRole("searchbox",{name:"Search payments",exact:true})).toHaveValue(name);
+ await page.getByRole("navigation",{name:"Payment activity views"}).getByRole("link",{name:"Transfers",exact:true}).click();await expect(page.getByRole("heading",{name:"No matching records",exact:true})).toBeVisible();
+});

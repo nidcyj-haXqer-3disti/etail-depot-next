@@ -1,5 +1,9 @@
 # One action-policy and control model
 
+> **Historical account-model specification — superseded for active work.** Follow [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md). References below to “current” account scopes, host relationships, role templates and implementation status describe an earlier model, not instructions to restore it.
+>
+> This notice changes model/status authority only. Existing deny-by-default security, privacy, financial responsibility, release approval and commercial obligations remain required unless explicitly superseded by an authorized decision. Retained requirements are not current validation evidence.
+
 Current override: [Two-service design](TWO_SERVICE_DESIGN.md) governs customer navigation, named primary/secondary card scope and primary/submerchant scope. Conflicting three-tier and broad secondary visibility rules below are historical. Financial invariants and unrelated requirements remain.
 
 

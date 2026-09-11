@@ -84,10 +84,14 @@ export async function getCardProjection(tx: Transaction, scope: Scope, row: type
   const available = await getBalance(tx, { serviceId: row.serviceId, bucket: "CARD_AVAILABLE", cardId: row.id });
   const readiness = await holderReadiness(tx, row.serviceId, row.holderId);
   const manageable = canManageHolder(scope, row.holderId);
+  const primary=scope.actor.id===scope.policy.primaryPersonId;
+  const primaryRestriction=row.primaryFrozen||row.freezeReviewRequired;
+  const reasons=[row.primaryFrozen?"Paused by the primary cardholder.":"",row.holderFrozen?"Paused by the person named on the card.":"",row.freezeReviewRequired?"An earlier freeze needs review by the primary cardholder.":""].filter(Boolean);
   return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder!.displayName, nickname: row.nickname,
     relationship: row.holderId === scope.policy.primaryPersonId ? "PRIMARY" : "SECONDARY",
     lastFour: row.lastFour, format: row.format, status: row.status, version: row.version, limit: formatMoney(row.limitMinor), available: formatMoney(available),
-    canFreeze: manageable && row.status === "ACTIVE" && permits(scope, "cards.freeze"), canUnfreeze: manageable && row.status === "FROZEN" && permits(scope, "cards.unfreeze"),
+    freeze:{primary:row.primaryFrozen,holder:row.holderFrozen,reviewRequired:row.freezeReviewRequired,description:reasons.join(" ")||"Ready for permitted sandbox purchases.",freezeLabel:row.status==="ACTIVE"?"Freeze card":primary?"Keep card frozen":"Add your freeze",unfreezeLabel:!primary&&primaryRestriction?"Remove your freeze":"Unfreeze card",unfreezeDescription:primary?"This removes all current freezes on this card. New purchases will be available to the named cardholder, within their permissions and available funds.":primaryRestriction?"Your own freeze will be removed. The card will stay frozen until the primary cardholder removes the remaining restriction.":"Your freeze will be removed. New purchases will be available within your permissions and available funds."},
+    canFreeze: manageable && !(primary?row.primaryFrozen:row.holderFrozen) && permits(scope, "cards.freeze"), canUnfreeze: manageable && (primary?row.status === "FROZEN":row.holderFrozen) && permits(scope, "cards.unfreeze"),
     canPurchase: row.holderId === scope.actor.id && readiness.allowed && readiness.persona === "FICTIONAL_ADULT" && row.status === "ACTIVE" && available > 0n && permits(scope, "cards.purchase"), fictional: true };
 }
 
@@ -188,13 +192,24 @@ async function command<T extends {commandId:string}>(personId: string, serviceId
 
 export async function controlCard(personId: string, serviceId: string, cardId: string, raw: CardControlCommand): Promise<WorkspaceCard> {
   const input = validate(cardControlCommandSchema, raw);
-  await command(personId, serviceId, `card.${input.action}`, `cards.${input.action}`, cardId, input, async tx => {
+  await command(personId, serviceId, `card.${input.action}`, `cards.${input.action}`, cardId, input, async (tx,scope) => {
     const [card] = await tx.select().from(cards).where(and(eq(cards.id, cardId), eq(cards.serviceId, serviceId))).for("update");
     if (!card) throw new SecurityError("RESOURCE_UNAVAILABLE", 404);
     requireVersion(card.version, input.expectedVersion);
-    const status = input.action === "freeze" ? "FROZEN" : "ACTIVE";
-    if (card.status === status) throw new SecurityError("INVALID_STATE", 422);
-    await tx.update(cards).set({ status, version: card.version + 1 }).where(eq(cards.id, card.id));
+    const primary=scope.actor.id===scope.policy.primaryPersonId;
+    let primaryFrozen=card.primaryFrozen,holderFrozen=card.holderFrozen,freezeReviewRequired=card.freezeReviewRequired;
+    if(input.action==="freeze"){
+      if(primary?primaryFrozen:holderFrozen)throw new SecurityError("INVALID_STATE",422);
+      if(primary)primaryFrozen=true;else holderFrozen=true;
+    }else if(primary){
+      if(card.status!=="FROZEN")throw new SecurityError("INVALID_STATE",422);
+      primaryFrozen=false;holderFrozen=false;freezeReviewRequired=false;
+    }else{
+      if(!holderFrozen)throw new SecurityError(primaryFrozen||freezeReviewRequired?"PRIMARY_FREEZE_ACTIVE":"INVALID_STATE",422);
+      holderFrozen=false;
+    }
+    const status=primaryFrozen||holderFrozen||freezeReviewRequired?"FROZEN":"ACTIVE";
+    await tx.update(cards).set({ status,primaryFrozen,holderFrozen,freezeReviewRequired, version: card.version + 1 }).where(eq(cards.id, card.id));
     return card.id;
   }, async (tx, scope) => {
     const [card] = await tx.select().from(cards).where(and(eq(cards.id, cardId), eq(cards.serviceId, serviceId))).for("update");

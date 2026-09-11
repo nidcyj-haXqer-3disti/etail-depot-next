@@ -105,8 +105,11 @@ test("primary invitation, intended acceptance, permission changes and revocation
 
     await page.goto(accessUrl);
     await page.locator("button.ws-person-row").filter({ hasText: recipient.name }).click();
-    await page.getByRole("dialog", { name: recipient.name, exact: true }).getByRole("button", { name: "Change access", exact: true }).click();
+    // Click the next action as soon as it is visible: a pending person-route
+    // transition must not replace and discard this newly opened review.
+    await page.getByRole("button", { name: "Change access", exact: true }).click();
     const edit = page.getByRole("dialog", { name: "Change cardholder access", exact: true });
+    await expect(page).toHaveURL(new RegExp(`person=${recipient.id}`));
     await edit.getByRole("radio", {name: /^View their own card/}).check();
     await edit.getByRole("button", { name: "Review access", exact: true }).click();
     const editReview = page.getByRole("dialog", { name: "Review cardholder access", exact: true });
@@ -116,7 +119,7 @@ test("primary invitation, intended acceptance, permission changes and revocation
 
     await page.goto(accessUrl);
     await page.locator("button.ws-person-row").filter({ hasText: recipient.name }).click();
-    await page.getByRole("dialog", { name: recipient.name, exact: true }).getByRole("button", { name: "Revoke cardholder access", exact: true }).click();
+    await page.getByRole("button", { name: "Remove access", exact: true }).click();
     const revoke = page.getByRole("dialog", { name: "Revoke cardholder access", exact: true });
     await revoke.getByRole("button", { name: "Confirm revocation", exact: true }).click();
     await expect(revoke).toBeHidden();

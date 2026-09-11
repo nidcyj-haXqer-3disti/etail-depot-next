@@ -1,5 +1,9 @@
 # Service dashboards and connected responsibility
 
+> **Historical dashboard design — superseded for active work.** Follow [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md). The earlier account-provenance/compatibility model and source-status descriptions below are preserved for design history, not instructions to restore retired accounts or treat earlier screens as the current implementation.
+>
+> Existing security, privacy, financial responsibility, release approval and commercial obligations remain required unless explicitly superseded by an authorized decision. Proposed interactions and historical delivery evidence do not establish present usability or Amex parity.
+
 Implementation design, 9 September 2026. This supersedes the residual customer-facing Personal/Household/Merchant directory described by D47. [The two-service privacy rules](TWO_SERVICE_DESIGN.md) remain in force. The front door presents **Cardholder services** and **Merchant services**, each with useful work and its own permissions. Preserved account types describe stored financial provenance; customers do not choose a type before managing a card or merchant.
 
 This document describes the local source implementation. Final production-build, browser, accessibility and preservation receipts belong to the delivery evidence maintained separately. A dashboard is not a new financial engine or proof of complete Amex parity.

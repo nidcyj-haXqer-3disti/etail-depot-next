@@ -1,9 +1,12 @@
-# UX contract: one context, one task, one workflow
+# UX contract: one context, one task, one workflow — historical specification
 
-Current authority: [Service dashboard design](SERVICE_DASHBOARD_DESIGN.md) governs customer navigation and creation, with the [two-service privacy rules](TWO_SERVICE_DESIGN.md). Financial invariants and unrelated future requirements remain.
+> **Superseded for active experience design — 11 September 2026.** Use [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) for the current journeys, scope and acceptance sequence. The retained text describes earlier design stages. References to account compatibility routes, legacy scopes and the earlier 90% target do not govern new work.
+>
+> Keep the documented privacy, financial meaning and accessibility obligations where they remain compatible with the current design. Proposed tasks and historical screenshots are not evidence that the current customer can complete them.
 
+Earlier design references: [Service dashboard design](SERVICE_DASHBOARD_DESIGN.md) and [two-service privacy rules](TWO_SERVICE_DESIGN.md).
 
-**Target UX requirements with a local implementation.** The current application uses direct Cardholder and Merchant dashboards, independent access and canonical card/channel workflows. Local test gateways and financial practice commands are implemented; real provider MIDs, public checkout and external delivery remain unavailable. [Current evidence](SERVICE_DASHBOARD_EVIDENCE.md) distinguishes executed behavior from the broader requirements below.
+**Historical target UX requirements with a local implementation.** At this document's assessment, the application used direct Cardholder and Merchant dashboards, independent access and canonical card/channel workflows. Local test gateways and financial practice commands were implemented; real provider MIDs, public checkout and external delivery remained unavailable. [Earlier evidence](SERVICE_DASHBOARD_EVIDENCE.md) distinguishes that stage's executed behavior from the broader requirements below.
 
 ## Goal
 The customer should understand which card or merchant they are using, what the relevant money amounts mean, who can act, and what happens next—without understanding internal financial containers or provider choreography. Passing tests is not proof of ease of use; include user acceptance.

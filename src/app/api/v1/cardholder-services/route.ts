@@ -10,7 +10,7 @@ export async function GET(request:Request){
   if([...params.keys()].some(key=>params.getAll(key).length!==1))throw new SecurityError("INVALID_REQUEST",422);
   const query=cardholderDashboardQuerySchema.safeParse(Object.fromEntries(params));
   if(!query.success)throw new SecurityError("INVALID_REQUEST",422);
-  return json(await getCardholderDashboard(session!.personId,Number(query.data.page??"0")));
+  return json(await getCardholderDashboard(session!.personId,Number(query.data.page??"0"),{requestPage:Number(query.data.requestPage??"0"),requestStatus:query.data.requestStatus,requestSearch:query.data.requestSearch}));
  },{authenticated:true});
 }
 

@@ -10,6 +10,7 @@ export interface WorkspaceCard {
   lastFour: string; format: "VIRTUAL" | "PHYSICAL"; status: "ACTIVE" | "FROZEN";
   version: number; limit: Money; available: Money;
   canFreeze: boolean; canUnfreeze: boolean; canPurchase: boolean; fictional: true;
+  freeze:{primary:boolean;holder:boolean;reviewRequired:boolean;description:string;freezeLabel:string;unfreezeLabel:string;unfreezeDescription:string};
 }
 export interface WorkspaceActivity {
   id: string; serviceId: string; cardId: string | null; title: string; category: string;

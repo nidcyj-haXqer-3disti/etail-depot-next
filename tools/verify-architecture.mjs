@@ -67,6 +67,7 @@ const channelUiOwner = "src/ui/workspace/merchant-channels.tsx";
 const channelOwner = "src/modules/acquiring/service.ts";
 const operationsOwner = "src/modules/acquiring/operations-service.ts";
 const ledgerOwner = "src/modules/ledger/service.ts";
+const guestOwner = "src/modules/acquiring/guest-service.ts";
 const operationUiOwner = "src/ui/workspace/merchant-operations.tsx";
 const operationUiPaths = new Map([
   ["/gateway", ["PUT"]], ["/test-enrollment", ["PUT"]],
@@ -95,12 +96,18 @@ const operationWriters = {
   testGateways: { insert: ["configureTestGateway"], update: ["configureTestGateway"] },
   testMerchantEnrollments: { insert: ["enrollTestMerchant"], update: ["enrollTestMerchant"] },
   channelActivations: { insert: ["setChannelActivation"], update: ["setChannelActivation"] },
-  merchantTestPayments: { insert: ["simulateMerchantPayment"] },
+  merchantTestPayments: { insert: ["recordMerchantSandboxPayment"] },
   merchantTestRefunds: { insert: ["refundMerchantPayment"] },
   merchantTestPayouts: { insert: ["createMerchantPayout"] },
   merchantOperationCommands: { insert: ["finish"] },
 };
 const ledgerWriters = { ledgerJournals: { insert: ["postJournal"] }, ledgerEntries: { insert: ["postJournal"] } };
+const guestWriters = {
+  guestPublications:{insert:["publishGuestChannel"],update:["publishGuestChannel","revokeGuestPublication"]},
+  guestPublicationCommands:{insert:["publishGuestChannel","revokeGuestPublication"]},
+  guestSessions:{insert:["ensureGuestSession"]},guestOrders:{insert:["createGuestOrder"]},guestAttempts:{insert:["prepareGuestAttempt"]},
+  guestRequestBudgets:{insert:["consumeBudget"],update:["consumeBudget"],delete:["consumeBudget"]},
+};
 const writerOwners = {
   workspaceBalances: {}, serviceActivity: { insert: ["purchaseCard"] }, settlements: {},
   cards: { insert: ["submitCardRequest"], update: ["controlCard", "purchaseCard"] },
@@ -163,7 +170,7 @@ function stringValues(file, node, seen = new Set()) {
   if (ts.isParenthesizedExpression(node) || ts.isAsExpression(node)) return stringValues(file, node.expression, next);
   if (ts.isConditionalExpression(node)) return [...new Set([...stringValues(file, node.whenTrue, next), ...stringValues(file, node.whenFalse, next)])];
   if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "encodeURIComponent") return [":id"];
-  if (ts.isPropertyAccessExpression(node) && /^(?:id|serviceId|requestId|cardId|merchantId|merchantUnitId|channelId|paymentId)$/.test(node.name.text)) return [":id"];
+  if (ts.isPropertyAccessExpression(node) && /^(?:id|serviceId|requestId|cardId|merchantId|merchantUnitId|channelId|paymentId|publicationId|orderId|attemptId)$/.test(node.name.text)) return [":id"];
   if (ts.isIdentifier(node)) {
     const declaration = localDeclaration(file, node);
     if (declaration?.initializer) return stringValues(file, declaration.initializer, next);
@@ -286,6 +293,8 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       const serviceCommandOwner={createCardholderService:"src/modules/services/service.ts",createPrimaryMerchant:"src/modules/services/create-merchant.ts",createOwnedSubmerchant:channelOwner,pauseMerchant:channelOwner,resumeMerchant:channelOwner,respondToCase:"src/modules/operations/service.ts"}[symbol];
       if(serviceCommandOwner&&name!==serviceCommandOwner&&declaration.modifiers?.some(modifier=>modifier.kind===ts.SyntaxKind.ExportKeyword))emit(file,declaration,"DUPLICATE_SERVICE_COMMAND","Service enrollment, merchant hierarchy and assigned support responses each have one owning command.");
       if (["MerchantOperations", "MerchantCheckout"].includes(symbol) && name !== operationUiOwner) emit(file, declaration, "DUPLICATE_OPERATION_UI", "Merchant setup/payment commands and checkout have their canonical operation UI owner.");
+      if(["GuestOffer","GuestOrder","guestRequest"].includes(symbol)&&name!=="src/ui/guest-checkout.tsx")emit(file,declaration,"DUPLICATE_GUEST_UI","The public guest offer and private order use one reviewed checkout UI.");
+      if(symbol==="recordMerchantSandboxPayment"&&name!==operationsOwner)emit(file,declaration,"DUPLICATE_PAYMENT_PERSISTENCE","Merchant and guest orders share the sole existing payment persistence owner.");
       if (symbol === "MerchantChannels" && name !== channelUiOwner) emit(file, declaration, "DUPLICATE_CHANNEL_FORM", "Payment channels have one canonical form for all seven presentations.");
       if (["createChannel", "updateChannel", "cancelChannel", "channelCommand"].includes(symbol) && name !== channelOwner) emit(file, declaration, "DUPLICATE_CHANNEL_COMMAND", "Channel mutations belong to the canonical acquiring command.");
       if (["CardsWorkspace", "CardRequestForm", "CardPurchaseForm"].includes(symbol) && name !== cardUiOwner) emit(file, declaration, "DUPLICATE_CARD_FORM", "Saved card requests and practice purchases belong only to the canonical Cards workspace.");
@@ -317,12 +326,16 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         for (const [module, owner, definitions, code] of [["src/modules/ledger/schema", ledgerOwner, ledgerWriters, "LEDGER_WRITER_OWNERSHIP"], ["src/modules/acquiring/operations-schema", operationsOwner, operationWriters, "OPERATION_WRITER_OWNERSHIP"]]) {
           if (tableModule !== module) continue;
           counts.guardedWriters++;
-          const allowed = name === owner && definitions[table.imported]?.[callee]?.includes(chain[0]);
+          const guestReceipt = tableModule === "src/modules/acquiring/operations-schema" && table.imported === "merchantOperationCommands" && callee === "insert" && name === guestOwner && chain[0] === "confirmGuestAttempt";
+          const allowed = guestReceipt || name === owner && definitions[table.imported]?.[callee]?.includes(chain[0]);
           if (!allowed) emit(file, call, code, `${table.imported}.${callee} belongs only to its finite canonical posting/operation function.`);
           else {
             const key = `${table.imported}.${callee}:${chain[0]}`;
             writerSites.set(key, [...(writerSites.get(key) ?? []), { file, call }]);
           }
+        }
+        if(tableModule === "src/modules/acquiring/guest-schema") {
+          if(name !== guestOwner || !guestWriters[table.imported]?.[callee]?.includes(chain[0]))emit(file,call,"GUEST_WRITER_OWNERSHIP","Publications, guest authority, orders and attempts have finite owning commands; snapshots cannot be edited or removed.");
         }
         if(tableModule === "src/modules/acquiring/schema" && !(name === "src/modules/acquiring/service.ts" || (name === "src/modules/acquiring/fixtures.ts" && callee === "insert"))) emit(file,call,"ACQUIRING_WRITER_OWNERSHIP","Merchant setup and payment channels have one owning service; fixture preparation may only insert fictional references.");
         if (tableModule === "src/modules/acquiring/schema" && ["paymentChannels", "paymentChannelCommands"].includes(table.imported) && (name !== channelOwner || chain[0] !== "channelCommand")) emit(file,call,"CHANNEL_WRITER_OWNERSHIP","All channel writes and retry receipts belong to channelCommand.");
@@ -338,7 +351,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         }
         if(tableModule === "src/modules/sandbox/schema" && !(name === "src/modules/sandbox/service.ts" && table.imported === "sandboxParticipants" && callee === "insert" && chain[0] === "startSandbox"))emit(file,call,"SANDBOX_ENROLLMENT_OWNER","Explicit sandbox participation is written only by startSandbox; login, reads and fixtures do not enroll provider members.");
         if(tableModule === "src/modules/cases/schema") {
-          const customer=name === "src/modules/cases/service.ts" && ({supportCases:{insert:["createSupportCase"],update:["addSupportMessage","withdrawSupportCase"]},supportCaseMessages:{insert:["createSupportCase","addSupportMessage","withdrawSupportCase"]},supportCaseCommands:{insert:["execute"]}})[table.imported]?.[callee]?.includes(chain[0]);
+          const customer=name === "src/modules/cases/service.ts" && ({supportCases:{insert:["createCase"],update:["updateCase"]},supportCaseMessages:{insert:["createCase","updateCase"]},supportCaseCommands:{insert:["execute"]}})[table.imported]?.[callee]?.includes(chain[0]);
           const operator=name === "src/modules/operations/service.ts" && chain[0] === "respondToCase" && ((table.imported === "supportCases" && callee === "update") || (table.imported === "supportCaseMessages" && callee === "insert"));
           if(!customer&&!operator)emit(file,call,"SUPPORT_WRITER_OWNERSHIP","Customer cases and explicit operator responses have finite owning commands; no separate financial authority is granted.");
         }
@@ -365,6 +378,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:services|service_members|cardholder_creation_commands|workspace_balance_snapshots|service_activity|settlements|cards|card_requests|disputes|dispute_timeline|notification_preferences|workspace_command_receipts)\b/i.test(value))) emit(file, call, "RAW_WORKSPACE_WRITE", "Workspace record writes must use the inspected typed canonical writers; raw SQL writes bypass ownership checks.");
         if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:ledger_journals|ledger_entries|merchant_test_gateways|merchant_test_enrollments|merchant_channel_activations|merchant_test_payments|merchant_test_refunds|merchant_test_payouts|merchant_operation_commands)\b/i.test(value))) emit(file, call, "RAW_FINANCIAL_WRITE", "Ledger and operation writes must use their finite typed owners; migration SQL is reviewed separately.");
         if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:support_cases|support_case_messages|support_case_commands|operator_service_access|operator_command_receipts)\b/i.test(value))) emit(file, call, "RAW_SUPPORT_WRITE", "Support writes use their typed customer or assigned-operator command; raw SQL cannot grant support authority.");
+        if(sqlTexts.some(value=>/\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?merchant_guest_\w+/i.test(value)))emit(file,call,"RAW_GUEST_WRITE","Guest records use their typed owning commands, never raw SQL writes.");
       }
       if(bound?.imported === "createCardholderService" && sourceModule(file,bound.specifier)==="src/modules/services/service" && (name !== "src/app/api/v1/cardholder-services/route.ts" || chain[0] !== "POST")) emit(file,call,"PARALLEL_CARDHOLDER_CREATION_ROUTE","Cardholder enrollment uses its one explicit service entry route.");
       const merchantUnitRoutes={createOwnedSubmerchant:["submerchants","POST"],pauseMerchant:["pause","POST"],resumeMerchant:["resume","POST"]};
@@ -375,6 +389,11 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       if(bound && sourceModule(file,bound.specifier)==="src/modules/operations/service" && ["getOperatorQueue","getOperatorCase","respondToCase"].includes(bound.imported) && name.startsWith("src/app/api/")) {
         const expected={getOperatorQueue:["src/app/api/v1/operations/cases/route.ts","GET"],getOperatorCase:["src/app/api/v1/operations/cases/[caseId]/route.ts","GET"],respondToCase:["src/app/api/v1/operations/cases/[caseId]/responses/route.ts","POST"]}[bound.imported];
         if(name!==expected[0]||chain[0]!==expected[1])emit(file,call,"PARALLEL_OPERATOR_ROUTE","Assigned support reads and responses use their exact canonical routes.");
+      }
+      if(bound && sourceModule(file,bound.specifier)===guestOwner.slice(0,-3)&&name.startsWith("src/app/api/")) {
+        const prefix="src/app/api/v1/",publication="merchants/[merchantId]/channels/[channelId]/publication";
+        const expected={getGuestPublicationManagement:[`${publication}/route.ts`,"GET"],publishGuestChannel:[`${publication}/route.ts`,"POST"],revokeGuestPublication:[`${publication}/[publicationId]/revoke/route.ts`,"POST"],ensureGuestSession:["guest/session/route.ts","POST"],getPublicGuestRequest:["guest/publications/[publicationId]/route.ts","GET"],createGuestOrder:["guest/publications/[publicationId]/orders/route.ts","POST"],getGuestOrder:["guest/orders/[orderId]/route.ts","GET"],prepareGuestAttempt:["guest/orders/[orderId]/attempts/route.ts","POST"],confirmGuestAttempt:["guest/orders/[orderId]/attempts/[attemptId]/confirm/route.ts","POST"]}[bound.imported];
+        if(!expected||name!==prefix+expected[0]||chain[0]!==expected[1])emit(file,call,"PARALLEL_GUEST_ROUTE","Guest authority and order commands use exact reviewed HTTP routes and methods.");
       }
       const importedCardCommand = bound && sourceModule(file, bound.specifier) === workspaceOwner.slice(0, -3) && [...cardRoutes.values()].some(([, command]) => command === bound.imported);
       if(bound?.imported === "createPrimaryMerchant" && sourceModule(file,bound.specifier)==="src/modules/services/create-merchant" && (name !== "src/app/api/v1/merchants/route.ts" || chain[0] !== "POST")) emit(file,call,"PARALLEL_MERCHANT_CREATION_ROUTE","Merchant creation must use its single service entry route.");
@@ -391,13 +410,17 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         else { counts.operationRouteCalls++; operationStages.set(bound.imported, (operationStages.get(bound.imported) ?? 0) + 1); }
       }
       if (bound?.imported === "postJournal" && ["src/modules/ledger", "src/modules/ledger/index", "src/modules/ledger/service"].includes(sourceModule(file, bound.specifier))) {
-        const allowed = (name === workspaceOwner && ["submitCardRequest", "purchaseCard"].includes(chain[0])) || (name === operationsOwner && ["simulateMerchantPayment", "refundMerchantPayment", "createMerchantPayout"].includes(chain[0]));
+        const allowed = (name === workspaceOwner && ["submitCardRequest", "purchaseCard"].includes(chain[0])) || (name === operationsOwner && ["recordMerchantSandboxPayment", "refundMerchantPayment", "createMerchantPayout"].includes(chain[0]));
         if (!allowed) emit(file, call, "LEDGER_POSTING_BOUNDARY", "Only the reviewed card and Merchant economic commands post journals.");
       }
       if (bound && sourceModule(file, bound.specifier) === "src/modules/issuing/sandbox-adapter" && !(name === workspaceOwner && chain[0] === "submitCardRequest" && bound.imported === "issueSandboxCard")) emit(file, call, "ISSUING_ADAPTER_BOUNDARY", "Only canonical request submission invokes the sandbox issuer.");
       if (bound && sourceModule(file, bound.specifier) === "src/modules/acquiring/adapters/sandbox") {
-        const owner = { testPayment: "simulateMerchantPayment", testRefund: "refundMerchantPayment", testPayout: "createMerchantPayout" }[bound.imported];
+        const owner = { testPayment: "recordMerchantSandboxPayment", testRefund: "refundMerchantPayment", testPayout: "createMerchantPayout" }[bound.imported];
         if (name !== operationsOwner || !owner || chain[0] !== owner) emit(file, call, "ACQUIRING_ADAPTER_BOUNDARY", "Only its canonical operation invokes each sandbox acquiring adapter.");
+      }
+      if(callee === "recordMerchantSandboxPayment" || bound?.imported === "recordMerchantSandboxPayment") {
+        const allowed = name === operationsOwner && chain[0] === "simulateMerchantPayment" || name === guestOwner && chain[0] === "confirmGuestAttempt" && sourceModule(file,bound?.specifier) === operationsOwner.slice(0,-3);
+        if(!allowed)emit(file,call,"PAYMENT_PERSISTENCE_BOUNDARY","Only the authenticated payment command or exact guest-order confirmation may call the sole payment persistence owner.");
       }
       if (!isUi) continue;
       const workspaceCall = bound?.imported === "workspaceCommand" && sourceModule(file, bound.specifier) === workspaceTransport.slice(0, -4);
@@ -447,9 +470,14 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       const options = fetchCall ? call.arguments[1] : null;
       const explicitMethod = options && ts.isObjectLiteralExpression(options) ? options.properties.find(property => property.name?.getText(file.tree) === "method") : null;
       const readOnly = fetchCall && (!options || (ts.isObjectLiteralExpression(options) && (!explicitMethod || (ts.isPropertyAssignment(explicitMethod) && stringValues(file,explicitMethod.initializer).every(value=>value==="GET")))));
-      const reviewedQuery = readOnly && ((["src/ui/workspace/reports.tsx", "src/ui/workspace/cases.tsx"].includes(name) && paths.every(value=>/^\/api\/v1\/cardholder-services\/:id\/(?:reports(?:\/export)?|cases)\?/.test(value))) || (name === "src/ui/workspace/member-code-picker.tsx" && paths.every(value=>value === "/api/v1/sandbox/recipient?code=:id")));
+      const reviewedQuery = readOnly && ((name === "src/ui/workspace/reports.tsx" && paths.every(value=>/^\/api\/v1\/cardholder-services\/:id\/reports(?:\/export)?\?/.test(value))) || (name === "src/ui/workspace/cases.tsx" && paths.every(value=>/^\/api\/v1\/(?:cardholder-services|merchants)\/:id\/cases\?/.test(value))) || (name === "src/ui/workspace/member-code-picker.tsx" && paths.every(value=>value === "/api/v1/sandbox/recipient?code=:id")));
       if (paths.some(value => value.includes("?")) && !reviewedQuery) emit(file, call, "UNINSPECTABLE_UI_COMMAND_PATH", "The UI command path must resolve to a reviewed route; add an explicit inspected adapter for dynamic routing.");
       for (const targetPath of paths) {
+        if(targetPath.startsWith("/api/v1/guest/")&&!readOnly){
+          const allowed=["/api/v1/guest/session","/api/v1/guest/publications/:id/orders","/api/v1/guest/orders/:id/attempts","/api/v1/guest/orders/:id/attempts/:id/confirm"];
+          if(name!=="src/ui/guest-checkout.tsx"||chain.join("/")!=="guestRequest"||!fetchCall||!allowed.includes(targetPath))emit(file,call,"PARALLEL_GUEST_UI","Guest mutations use the finite session, order, review and confirmation dispatcher.");
+        }
+        if(/^\/channels\/:id\/publication(?:\/:id\/revoke)?$/.test(targetPath)&&(!merchantCall||name!=="src/ui/workspace/merchant-channel-publication.tsx"||chain.join("/")!=="MerchantChannelPublication/send"||stringValues(file,call.arguments[2]).join()!=="POST"))emit(file,call,"PARALLEL_PUBLICATION_UI","Public link publication and revocation use the explicit reviewed channel controls.");
         if (/\/cards\/[^/]+\/purchase$/.test(targetPath)) {
           const methods = stringValues(file, call.arguments[ownerWrapper ? 1 : 2]);
           if (!ownerWrapper || targetPath !== "/cards/:id/purchase" || chain.join("/") !== "CardPurchaseForm/purchase" || methods.length !== 1 || methods[0] !== "POST") emit(file, call, "PARALLEL_CARD_PURCHASE_UI", "Practice purchases use the one card purchase form and exact command route.");

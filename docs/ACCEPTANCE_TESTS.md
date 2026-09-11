@@ -1,5 +1,9 @@
 # Acceptance catalogue
 
+> **Original requirement inventory, not current test results.** [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) govern the active model and acceptance sequence. Original case IDs, three-account wording and handoff-era “not implemented / not tested” labels are retained for traceability; they neither restore the retired model nor assess today's implementation.
+>
+> This notice supersedes model/status authority only. Preserve the underlying security, privacy, financial, release approval and commercial obligations unless explicitly changed by an authorized decision. Current completion requires mapped, executed evidence.
+
 All cases are required behavior for the new application. None is marked executed by this handoff. See `TEST_AND_EVIDENCE.md` for evidence requirements and `contracts/acceptance-cases.json` for the machine-readable version.
 
 ### NEW-01 — New-resource isolation

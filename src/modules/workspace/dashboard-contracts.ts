@@ -20,6 +20,14 @@ export interface DashboardActivity extends WorkspaceActivity {
  lastFour:string;
  holderName:string;
 }
+export type RequestStatusFilter = "ALL" | "DRAFT" | "BLOCKED" | "ISSUED" | "CANCELED";
+export interface CardholderRequestFilters { requestPage?: number; requestStatus?: RequestStatusFilter; requestSearch?: string }
+export interface CardRequestHistory {
+ createdAt:string;
+ events:{id:string;label:string;occurredAt:string}[];
+ hasEarlierEvents:boolean;
+}
+export interface CardControlHistory {events:{id:string;label:string;actorName:string;occurredAt:string}[];hasEarlierEvents:boolean}
 export interface CardholderDashboardProjection {
  person:{id:string;displayName:string};
  canCreatePrimary:boolean;
@@ -33,12 +41,20 @@ export interface CardholderDashboardProjection {
  cardholdersHasMore:boolean;
  activity:DashboardActivity[];
  requests:CardRequestProjection[];
+ requestPage:number;
+ requestsHasMore:boolean;
+ requestCount:number;
+ unfinishedRequestCount:number;
+ requestStatus:RequestStatusFilter;
+ requestSearch:string;
  fictional:true;
 }
 /** One exact underlying scope for the existing command form, never an aggregate workspace. */
 export interface CardholderDashboardDetail {
  kind:"CARD"|"REQUEST"|"NEW"|"PEOPLE"|"ACTIVITY";
  workspace:WorkspaceProjection;
+ requestHistory?:CardRequestHistory;
+ cardHistory?:CardControlHistory;
 }
 
 /** Bounded Home context; command forms continue to load their exact workspace. */

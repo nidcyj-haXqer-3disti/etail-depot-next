@@ -44,7 +44,7 @@ describe("service-first Cardholder dashboard", () => {
     expect(dashboard.cards.filter(card => card.accessRole === "PRIMARY").map(card => card.id).sort()).toEqual([f.ownPrimary.card.id, f.managedAdditional.card.id].sort());
     expect(dashboard.cards.filter(card => card.accessRole === "SECONDARY")).toMatchObject([{ id: f.ownSecondary.card.id, serviceId: f.otherPrimary.serviceId, holderId: f.actor.personId, canPurchase: false, canManageAccess: false, available: { minor: "9889" } }]);
     expect(dashboard.activity.map(row => row.id).sort()).toEqual([f.ownPrimary.activity!.id, f.managedAdditional.activity!.id, f.ownSecondary.activity!.id].sort());
-    expect(dashboard.requests.map(row => row.id)).toEqual([f.pendingOwned.id]);
+    expect(dashboard.requests.map(row => row.id).sort()).toEqual([f.pendingOwned.id,f.ownPrimary.request.id,f.managedAdditional.request.id].sort());
     for (const hidden of [f.hiddenPrimary.card.id, f.hiddenAdditional.card.id, f.hiddenPrimary.activity!.id, f.hiddenAdditional.activity!.id, f.pendingOther.id, f.pendingForeign.id, f.foreignCard.card.id]) expect(JSON.stringify(dashboard)).not.toContain(hidden);
     await expect(purchaseCard(f.actor.personId, f.otherPrimary.serviceId, f.ownSecondary.card.id, { commandId: randomUUID(), expectedVersion: f.ownSecondary.card.version, amountMinor: "1", description: "No cross-service grants" })).rejects.toMatchObject({ status: 403 });
     expect(await f.snapshot()).toEqual(before);

@@ -1,5 +1,9 @@
 # GitHub delivery plan — new repository only
 
+> **Historical provisioning and milestone plan.** Use [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) for the current two-service model, existing-resource baseline and next work. Repository creation instructions and original milestone labels below preserve the initial handoff; they do not authorize reprovisioning or restarting completed foundations.
+>
+> Exact target isolation, security, feature-branch/review requirements, release approval and commercial obligations remain in force. Historical planning or workflow status does not prove current implementation or CI completion.
+
 ## Repository creation and initial import
 
 Proposed private repository: `nidcyj-haXqer-3disti/etail-depot-next`. Verify authenticated ownership, absence of an unrelated repository with that name, current working directory, and every existing Git remote. Abort if any remote points to the old applications. Create the new private repository with authorized GitHub tools or CLI. `gh repo create` is an available CLI operation when installed/authenticated; do not infer that every connector exposes repository creation. [G1]

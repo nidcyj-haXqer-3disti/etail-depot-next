@@ -169,6 +169,14 @@ export async function setChannelActivation(personId:string,merchantUnitId:string
     await finish(tx,personId,scopeKey,"ACTIVATION",input,receipt.digest,channelId);return activationProjection(tx,scope,row,true,config.ready,now);
   });
 }
+/** Sole merchant payment persistence owner. Callers supply an already locked, currently authorized channel.
+ * Guest authority is an exact persisted order, never an impersonated merchant person. */
+export async function recordMerchantSandboxPayment(tx:ScopedTransaction,row:Channel,authority:{kind:"MERCHANT";actorId:string;guestOrderId:null}|{kind:"GUEST_ORDER";actorId:null;guestOrderId:string},outcome:"APPROVED"|"DECLINED",gatewayVersion:number,enrollmentVersion:number,now:Date):Promise<Payment>{
+  const id=randomUUID(),result=testPayment(id,outcome);
+  const journalId=result.outcome==="APPROVED"?await postJournal(tx,{businessKey:`merchant-payment:${id}`,kind:"MERCHANT_PAYMENT",referenceId:id,lines:[{serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,bucket:"GATEWAY_CLEARING",deltaMinor:-row.amountMinor},{serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,bucket:"MERCHANT_AVAILABLE",deltaMinor:row.amountMinor}]}):null;
+  const [saved]=await tx.insert(merchantTestPayments).values({id,serviceId:row.serviceId,merchantUnitId:row.merchantUnitId,channelId:row.id,actorId:authority.actorId,guestOrderId:authority.guestOrderId,channelVersion:row.version,channelUsage:row.usage,description:row.description,amountMinor:row.amountMinor,currency:"USD",outcome:result.outcome,testReference:result.testReference,gatewayVersion,enrollmentVersion,journalId,createdAt:now}).returning();
+  return saved!;
+}
 export async function simulateMerchantPayment(personId:string,merchantUnitId:string,channelId:string,raw:SimulateMerchantPaymentInput):Promise<MerchantTestPayment> {
   merchantUnitId=uuid(merchantUnitId);channelId=uuid(channelId);const input=parse(simulateMerchantPaymentSchema,raw),scopeKey=`channel:${channelId}`;
   return getDb().transaction(async tx=>{
@@ -178,9 +186,8 @@ export async function simulateMerchantPayment(personId:string,merchantUnitId:str
     checkVersion(row.version,input.expectedChannelVersion);
     const config=await configuration(tx,scope),now=await merchantNow(tx),activation=await activationProjection(tx,scope,row,true,config.ready,now);
     if(!activation.canSimulate)throw new SecurityError(activation.state==="USED"?"CHANNEL_ALREADY_USED":"CHANNEL_NOT_READY",409);
-    const id=randomUUID(),result=testPayment(id,input.outcome);
-    const journalId=result.outcome==="APPROVED"?await postJournal(tx,{businessKey:`merchant-payment:${id}`,kind:"MERCHANT_PAYMENT",referenceId:id,lines:[{serviceId:scope.masterService.id,merchantUnitId,bucket:"GATEWAY_CLEARING",deltaMinor:-row.amountMinor},{serviceId:scope.masterService.id,merchantUnitId,bucket:"MERCHANT_AVAILABLE",deltaMinor:row.amountMinor}]}):null;
-    const [saved]=await tx.insert(merchantTestPayments).values({id,serviceId:scope.masterService.id,merchantUnitId,channelId,actorId:personId,channelVersion:row.version,channelUsage:row.usage,description:row.description,amountMinor:row.amountMinor,currency:"USD",outcome:result.outcome,testReference:result.testReference,gatewayVersion:config.gateway!.version,enrollmentVersion:config.enrollment!.version,journalId,createdAt:now}).returning();
+    const saved=await recordMerchantSandboxPayment(tx,row,{kind:"MERCHANT",actorId:personId,guestOrderId:null},input.outcome,config.gateway!.version,config.enrollment!.version,now);
+    const id=saved.id;
     await finish(tx,personId,scopeKey,"PAYMENT",input,receipt.digest,id);return paymentProjection(saved!,undefined,canRefund);
   });
 }

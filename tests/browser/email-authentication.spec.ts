@@ -267,3 +267,103 @@ test("recovery callback changes the password, revokes the prior session and perm
     expect((await control<{ calls: string[] }>("calls")).calls).toContain("PUT /user");
   } finally { await previous.dispose(); }
 });
+
+test("reset guidance separates an expired link from an unresolved password change", async ({ page }) => {
+  // UI transport cases only. No reset request is forwarded to the application or provider.
+  const cases = [
+    { code: "IDENTITY_UNAVAILABLE", status: 503, lost: false, message: "We could not confirm the password change. Contact the site owner to review it before trying to sign in or requesting another reset email." },
+    { code: "LOST_RESPONSE", status: 0, lost: true, message: "We could not confirm the password change. Contact the site owner to review it before trying to sign in or requesting another reset email." },
+    { code: "INVALID_EMAIL_LINK", status: 401, lost: false, message: "This reset link is invalid or has expired. Request a new reset email and open its link to choose your password." },
+    { code: "PASSWORD_RESET_PENDING", status: 409, lost: false, message: "Your password change needs review before you can sign in. Contact the site owner. A new reset email cannot clear this block." },
+  ];
+  const resetRoute = `${applicationOrigin}/api/v1/auth/reset-password`;
+  for (const scenario of cases) {
+    let requests = 0;
+    const intercept = async (route: Route) => {
+      requests += 1;
+      if (scenario.lost) await route.abort("failed");
+      else await route.fulfill({ status: scenario.status, contentType: "application/json", body: JSON.stringify({ error: { code: scenario.code, requestId: "synthetic-reset-guidance" } }) });
+    };
+    await page.route(resetRoute, intercept);
+    try {
+      await page.goto("/login#recovery_token=synthetic-unredeemed-link");
+      const form = page.getByRole("form", { name: "Choose a new password", exact: true });
+      await expect(form).toBeVisible();
+      await expect(page).toHaveURL(url => url.pathname === "/login" && url.hash === "");
+      await form.getByLabel("New password", { exact: true }).fill(newPassword);
+      await form.getByLabel("Confirm password", { exact: true }).fill(newPassword);
+      await form.getByRole("button", { name: "Save new password", exact: true }).click();
+      const alert = page.getByRole("main").getByRole("alert");
+      await expect(alert).toHaveText(scenario.message);
+      await expect(alert).toBeFocused();
+      await expect(form.getByLabel("New password", { exact: true })).toHaveValue("");
+      await expect(form.getByLabel("Confirm password", { exact: true })).toHaveValue("");
+      expect(requests).toBe(1);
+      if (scenario.code === "INVALID_EMAIL_LINK") {
+        await page.getByRole("button", { name: "Request a new reset email", exact: true }).click();
+        await expect(page.getByRole("form", { name: "Reset your password", exact: true })).toBeVisible();
+      }
+    } finally { await page.unroute(resetRoute, intercept); }
+  }
+  expect((await control<{ calls: string[] }>("calls")).calls.every(call => call.startsWith("GET "))).toBe(true);
+  expect((await page.context().cookies()).some(cookie => cookie.name.includes("etail_session"))).toBe(false);
+});
+
+test("email callbacks remain private across a pending request and a refreshed login page", async ({ page }) => {
+  // Run this same browser journey against both the production build and the
+  // guarded dev server, where React replays effects under Strict Mode.
+  const resetRoute = `${applicationOrigin}/api/v1/auth/reset-password`;
+  const requestedTokens: string[] = [];
+  let releaseFirst!: () => void;
+  const pendingResponse = new Promise<void>(resolve => { releaseFirst = resolve; });
+  const intercept = async (route: Route) => {
+    requestedTokens.push(route.request().postDataJSON().token);
+    if (requestedTokens.length === 1) await pendingResponse;
+    await route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: { code: "IDENTITY_UNAVAILABLE", requestId: "synthetic-callback-review" } }) });
+  };
+  await page.route(resetRoute, intercept);
+  try {
+    await page.goto("/login#recovery_token=synthetic-original-link");
+    const form = page.getByRole("form", { name: "Choose a new password", exact: true });
+    const cleanLogin = (url: URL) => url.pathname === "/login" && url.hash === "";
+    await expect(form).toBeVisible();
+    await expect(form.getByLabel("Password reset link", { exact: true })).toHaveCount(0);
+    await expect(page).toHaveURL(cleanLogin);
+    await form.getByLabel("New password", { exact: true }).fill(newPassword);
+    await form.getByLabel("Confirm password", { exact: true }).fill(newPassword);
+    await form.getByRole("button", { name: "Save new password", exact: true }).click();
+    await expect.poll(() => requestedTokens.length).toBe(1);
+
+    // A second callback must be scrubbed, but cannot replace a request already
+    // being processed or submit anything automatically.
+    await page.goto("/login#recovery_token=synthetic-next-link");
+    await expect(page).toHaveURL(cleanLogin);
+    await expect(page.getByRole("main").getByRole("alert")).toHaveText("Wait for your current request to finish, then open the email link again.");
+    expect(requestedTokens).toEqual(["synthetic-original-link"]);
+    releaseFirst();
+    await expect(form.getByRole("button", { name: "Save new password", exact: true })).toBeEnabled();
+
+    // Readiness refresh must not restore the consumed fragment. Reopening the
+    // second email then supplies that exact new link only after an explicit save.
+    await page.getByRole("button", { name: "Check availability", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Check availability", exact: true })).toBeEnabled();
+    await expect(page).toHaveURL(cleanLogin);
+    await page.goto("/login#recovery_token=synthetic-next-link");
+    await expect(page).toHaveURL(cleanLogin);
+    await expect(page.getByText("Your email link is ready. Continue below.", { exact: true })).toBeVisible();
+    await form.getByLabel("New password", { exact: true }).fill(newPassword);
+    await form.getByLabel("Confirm password", { exact: true }).fill(newPassword);
+    await form.getByRole("button", { name: "Save new password", exact: true }).click();
+    await expect.poll(() => requestedTokens.length).toBe(2);
+    await expect(form.getByRole("button", { name: "Save new password", exact: true })).toBeEnabled();
+    await expect(page.getByRole("main").getByRole("alert")).toHaveText("We could not confirm the password change. Contact the site owner to review it before trying to sign in or requesting another reset email.");
+    expect(requestedTokens).toEqual(["synthetic-original-link", "synthetic-next-link"]);
+    await expect(page).toHaveURL(cleanLogin);
+    expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+    expect((await page.context().cookies()).some(cookie => cookie.name.includes("etail_session"))).toBe(false);
+    expect((await control<{ calls: string[] }>("calls")).calls.every(call => call.startsWith("GET "))).toBe(true);
+  } finally {
+    releaseFirst();
+    await page.unroute(resetRoute, intercept);
+  }
+});

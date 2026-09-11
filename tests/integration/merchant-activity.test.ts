@@ -1,0 +1,54 @@
+import {randomUUID} from "node:crypto";
+import {and,eq} from "drizzle-orm";
+import {afterAll,expect,it} from "vitest";
+import {closeDatabase,getDb} from "../../src/platform/database/client";
+import {permissionGrants} from "../../src/platform/database/schema";
+import {ledgerEntries} from "../../src/modules/ledger/schema";
+import {merchantAssignments} from "../../src/modules/access/schema";
+import {createChannel} from "../../src/modules/acquiring/service";
+import {configureTestGateway,enrollTestMerchant,setChannelActivation,simulateMerchantPayment,refundMerchantPayment,createMerchantPayout} from "../../src/modules/acquiring/operations-service";
+import {getMerchantDashboard} from "../../src/modules/acquiring/dashboard-service";
+import {merchantDashboardProjectionSchema} from "../../src/modules/acquiring/dashboard-contracts";
+import {merchantActivityCsv} from "../../src/modules/acquiring/activity-service";
+import {merchantAccessFixture} from "../helpers/merchant-access";
+import {paymentInput} from "../helpers/acquiring";
+afterAll(closeDatabase);
+
+it("reads the complete authorized network, paginates/exports matching records and preserves current money",async()=>{
+ const f=await merchantAccessFixture();
+ await configureTestGateway(f.merchant.personId,f.master.id,{commandId:randomUUID(),expectedVersion:0,enabled:true});
+ await enrollTestMerchant(f.merchant.personId,f.unit.id,{commandId:randomUUID(),expectedVersion:0,enabled:true});
+ const channel=await createChannel(f.operator.personId,f.unit.id,{...paymentInput(),usage:"REUSABLE",description:"Network activity order",presentations:["WEB"],visibility:"CREATOR_PRIVATE"});
+ await setChannelActivation(f.operator.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedVersion:0,expectedChannelVersion:channel.version,active:true});
+ const payments=[];
+ for(let i=0;i<27;i++)payments.push(await simulateMerchantPayment(f.operator.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"APPROVED"}));
+ await simulateMerchantPayment(f.operator.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"DECLINED"});
+ await refundMerchantPayment(f.merchant.personId,f.unit.id,payments[0].id,{commandId:randomUUID(),expectedVersion:1,reason:"Refund for test reconciliation"});
+ const transfer=await createMerchantPayout(f.merchant.personId,f.unit.id,{commandId:randomUUID(),amountMinor:"100",currency:"USD"});
+ const snapshot=()=>getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,f.merchant.serviceId)).orderBy(ledgerEntries.id);
+ const before=await snapshot(),query={view:`network:${f.master.id}`,status:"COLLECTED",q:"Network activity order"};
+ const first=merchantDashboardProjectionSchema.parse(await getMerchantDashboard(f.merchant.personId,query)),second=await getMerchantDashboard(f.merchant.personId,{...query,page:"2"});
+ expect(first.activity).toMatchObject({totalCount:27,pageCount:2,periodTotals:{collected:{minor:"33750"},refunded:{minor:"1250"},transferred:{minor:"100"}}});
+ expect(first.activity.rows).toHaveLength(25);expect(second.activity.rows).toHaveLength(2);
+ expect(new Set([...first.activity.rows,...second.activity.rows].map(row=>row.id)).size).toBe(27);
+ const view=first.views.find(view=>view.id===query.view)!;expect(view.totals.available?.minor).toBe("32400");
+ const none=await getMerchantDashboard(f.merchant.personId,{...query,period:"custom",from:"2099-01-01",to:"2099-01-02"});
+ expect(none.activity.rows).toEqual([]);expect(none.views.find(view=>view.id===query.view)?.totals.available?.minor).toBe("32400");
+ const exported=await getMerchantDashboard(f.merchant.personId,query,{exportRows:true});expect(exported.activity.rows).toHaveLength(27);expect(merchantActivityCsv(exported.activity)).toContain(payments[0].testReference);
+ const refunds=await getMerchantDashboard(f.merchant.personId,{view:query.view,activity:"refunds"});expect(refunds.activity.rows).toHaveLength(1);expect(refunds.activity.rows[0].paymentId).toBe(payments[0].id);
+ const transfers=await getMerchantDashboard(f.merchant.personId,{view:query.view,activity:"transfers"});expect(transfers.activity.rows[0].href).toContain(`transfer=${transfer.id}`);
+ expect(await snapshot()).toEqual(before);
+});
+
+it("enforces exact delegate scope and rechecks revoked records and export permission",async()=>{
+ const f=await merchantAccessFixture();
+ const own=await getMerchantDashboard(f.operator.personId,{view:`unit:${f.unit.id}`});expect(own.activity.available).toBe(true);expect(own.units.map(row=>row.id)).toEqual([f.unit.id]);
+ const network=await getMerchantDashboard(f.operator.personId,{view:`network:${f.master.id}`});expect(network.activity.available).toBe(false);expect(network.activity.rows).toEqual([]);
+ await expect(getMerchantDashboard(f.operator.personId,{view:`network:${f.master.id}`},{exportRows:true})).rejects.toMatchObject({status:403});
+ await getDb().update(merchantAssignments).set({state:"REVOKED",version:2,revokedAt:new Date()}).where(and(eq(merchantAssignments.merchantUnitId,f.unit.id),eq(merchantAssignments.personId,f.operator.personId)));
+ const revoked=await getMerchantDashboard(f.operator.personId,{view:`unit:${f.unit.id}`});expect(revoked.activity.available).toBe(false);expect(revoked.units).toEqual([]);
+ await expect(getMerchantDashboard(f.operator.personId,{view:`unit:${f.unit.id}`},{exportRows:true})).rejects.toMatchObject({status:403});
+ await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,f.merchant.serviceId),eq(permissionGrants.action,"payments.read")));
+ const primary=await getMerchantDashboard(f.merchant.personId);expect(primary.activity).toMatchObject({completeScope:false,rows:[],periodTotals:{collected:null}});
+ await expect(getMerchantDashboard(f.merchant.personId,{}, {exportRows:true})).rejects.toMatchObject({status:403});
+});

@@ -78,7 +78,7 @@ async function personProjection(tx:ScopedTransaction,scope:Scope,member:typeof s
 function canRevokeOffer(scope:Scope,invitation:Invitation) {
  return evaluate(scope.policy,"people.revoke").allowed||(invitation.inviterId===scope.membership.personId&&evaluate(scope.policy,"people.invite").allowed);
 }
-async function invitationProjection(tx:ScopedTransaction,row:Invitation,viewerId:string,viewerScope?:Scope):Promise<InvitationProjection> {
+async function invitationProjection(tx:ScopedTransaction,row:Invitation,viewerId:string,viewerScope?:Scope,asOf?:Date):Promise<InvitationProjection> {
   serviceTarget(row);
   const [service]=await tx.select().from(services).where(eq(services.id,row.serviceId));
   const [inviter]=await tx.select().from(people).where(eq(people.id,row.inviterId));
@@ -87,7 +87,7 @@ async function invitationProjection(tx:ScopedTransaction,row:Invitation,viewerId
   const [primary]=await tx.select({name:people.displayName,state:serviceMembers.state}).from(serviceMembers).innerJoin(people,eq(people.id,serviceMembers.personId)).where(and(eq(serviceMembers.serviceId,row.serviceId),eq(serviceMembers.personId,service.primaryPersonId)));
   const permissions=await tx.select().from(invitationPermissions).where(eq(invitationPermissions.invitationId,row.id)).orderBy(invitationPermissions.action);
   const [membership]=await tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,row.serviceId),eq(serviceMembers.personId,row.recipientId)));
-  const timestamp=await now(tx);
+  const timestamp=asOf??await now(tx);
   const status=row.status==="PENDING"&&row.expiresAt<=timestamp?"EXPIRED":row.status;
   const policy:PolicyScope={actorPersonId:viewerId,serviceId:row.serviceId,resourceServiceId:row.serviceId,membershipPersonId:viewerId,membershipServiceId:row.serviceId,membershipState:"INVITED",role:row.role,serviceKind:service!.kind,status:service!.status,primaryPersonId:service!.primaryPersonId,primaryMembershipState:primary?.state??"REVOKED",invitation:{recipientPersonId:row.recipientId,status:row.status,expiresAt:row.expiresAt,now:timestamp}};
   return {targetKind:"SERVICE",id:row.id,serviceId:row.serviceId,serviceName:primary?`Cards with ${primary.name}`:"Cardholder services",serviceKind:service!.kind,inviterName:inviter!.displayName,recipientId:row.recipientId,recipientName:recipient!.displayName,role:row.role,
@@ -102,15 +102,22 @@ export async function getAccessOverview(personId:string,serviceId:string):Promis
     const members=await tx.select().from(serviceMembers).where(eq(serviceMembers.serviceId,serviceId)).orderBy(serviceMembers.personId);
     const peopleRows:AccessPerson[]=[];for(const member of members) peopleRows.push(await personProjection(tx,scope,member));
     peopleRows.sort((a,b)=>a.displayName.localeCompare(b.displayName)||a.id.localeCompare(b.id));
-    const rows=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.serviceId,serviceId)).orderBy(desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
-    const invitations:InvitationProjection[]=[];for(const row of rows)invitations.push(await invitationProjection(tx,row,personId,scope));
+    const timestamp=await now(tx),pending=and(eq(serviceInvitations.status,"PENDING"),sql`${serviceInvitations.expiresAt}>${timestamp}`);
+    const [counts]=await tx.select({total:sql<number>`count(*)::integer`,pending:sql<number>`count(*) filter (where ${pending})::integer`}).from(serviceInvitations).where(eq(serviceInvitations.serviceId,serviceId));
+    const rows=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.serviceId,serviceId)).orderBy(sql`case when ${pending} then 0 else 1 end`,desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
+    const invitations:InvitationProjection[]=[];for(const row of rows)invitations.push(await invitationProjection(tx,row,personId,scope,timestamp));
     const canInvite=evaluate(scope.policy,"people.invite").allowed;
     const candidates=canInvite&&sandboxFixturesAllowed()?await tx.select({id:people.id,displayName:people.displayName}).from(identityBindings).innerJoin(people,eq(people.id,identityBindings.personId)).where(and(eq(identityBindings.issuer,"urn:etail:isolated-fixture"),inArray(identityBindings.subject,["owner","viewer"]))):[];
     const recipients=candidates.filter(candidate=>candidate.id!==personId&&!members.some(member=>member.personId===candidate.id&&member.state==="ACCEPTED")&&!invitations.some(invite=>invite.recipientId===candidate.id&&invite.status==="PENDING"));
-    return {serviceId,serviceName:"Cardholder access",serviceKind:"CARDHOLDER",canInvite,canManage:evaluate(scope.policy,"people.changeRole").allowed,people:peopleRows,invitations,recipients,
+    const historyLabels:Record<string,string>={INVITED:"Invitation created",INVITATION_ACCEPTED:"Invitation accepted",INVITATION_DECLINED:"Invitation declined",INVITATION_REVOKED:"Invitation canceled",INVITATION_EXPIRED:"Invitation expired",ACCESS_CHANGED:"Access changed",ACCESS_REVOKED:"Cardholder access removed"};
+    const changes=await tx.select().from(accessHistory).where(and(eq(accessHistory.targetKind,"SERVICE"),eq(accessHistory.serviceId,serviceId))).orderBy(desc(accessHistory.createdAt),accessHistory.id).limit(101);
+    const names=changes.length?await tx.select({id:people.id,name:people.displayName}).from(people).where(inArray(people.id,[...new Set(changes.flatMap(change=>[change.personId,change.actorId]))])):[];
+    const nameById=new Map(names.map(person=>[person.id,person.name]));
+    return {serviceId,serviceName:"Cardholder access",serviceKind:"CARDHOLDER",canInvite,canManage:evaluate(scope.policy,"people.changeRole").allowed,people:peopleRows,invitations,invitationTotal:counts!.total,pendingInvitationCount:counts!.pending,invitationsTruncated:counts!.total>rows.length,recipients,
+      history:changes.slice(0,100).map(change=>({id:change.id,personId:change.personId,personName:nameById.get(change.personId)??"Cardholder",actorName:nameById.get(change.actorId)??"Cardholder",label:historyLabels[change.kind]??"Access updated",createdAt:change.createdAt.toISOString()})),historyHasMore:changes.length>100,
       permissionOptions:ceiling(scope).filter(action=>(secondaryCardPermissions as readonly string[]).includes(action)).map(action=>({action,label:permissionLabels[action][0],description:permissionLabels[action][1],canDelegate:false,allowedRoles:(["SECONDARY"] as const).filter(role=>evaluate({...scope.policy,actorPersonId:"secondary-recipient",membershipPersonId:"secondary-recipient",role,grants:ceiling(scope)},action).allowed)})).filter(option=>option.allowedRoles.length>0),roleOptions:["SECONDARY"],
       notice:"Invitations are saved for named sandbox members. No email is sent. Roles do not approve spending, issue cards or grant access to another service."};
-  });
+  },{isolationLevel:"repeatable read"});
 }
 export async function listInvitationsForPerson(personId:string):Promise<AnyInvitationProjection[]> {
   return getDb().transaction(async tx=>{
@@ -147,7 +154,11 @@ async function serviceCommand(personId:string,serviceId:string,kind:string,actio
   });
 }
 async function serviceInvitation(personId:string,serviceId:string,invitationId:string) {
-  const result=(await getAccessOverview(personId,serviceId)).invitations.find(item=>item.id===invitationId);if(!result)throw new SecurityError("INVITATION_UNAVAILABLE",404);return result;
+  return getDb().transaction(async tx=>{
+    await sandboxPerson(tx,personId);const scope=await loadServiceScope(tx,personId,serviceId);requireAction(scope,"people.read");
+    const [row]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,invitationId),eq(serviceInvitations.serviceId,serviceId)));
+    if(!row)throw new SecurityError("INVITATION_UNAVAILABLE",404);return invitationProjection(tx,row,personId,scope);
+  });
 }
 export async function createInvitation(personId:string,serviceId:string,raw:CreateInvitationInput):Promise<InvitationProjection> {
   const input=parse(createInvitationSchema,raw);
