@@ -17,13 +17,13 @@ test("selected card keeps balance, activity and reversible controls together",as
  const first=card.status==="FROZEN"?"Unfreeze":"Freeze",second=first==="Freeze"?"Unfreeze":"Freeze";
  for(const action of [first,second]){await overview.getByRole("button",{name:`${action} card`,exact:true}).click();const dialog=page.getByRole("dialog");await expect(dialog.getByRole("heading",{name:`${action} card?`,exact:true})).toBeVisible();await dialog.getByRole("button",{name:`${action} card`,exact:true}).click();await expect(dialog.getByRole("button",{name:action==="Freeze"?"Unfreeze":"Freeze",exact:true})).toBeVisible();await page.keyboard.press("Escape");await expect(dialog).toHaveCount(0);}
  expect((await cardDashboard(page.request)).cards.find(row=>row.id===card.id)!.available.minor).toBe(card.available.minor);
- await overview.getByRole("link",{name:/View this card’s activity/}).click();await expect(page).toHaveURL(new RegExp(`/cardholder-services/activity\\?focus=${card.id}`));await expect(page.locator("main")).not.toContainText(/Household|Seller account|Personal account/);
+ await page.getByRole("region",{name:"Recent activity",exact:true}).getByRole("link",{name:"View activity",exact:true}).click();await expect(page).toHaveURL(new RegExp(`/cardholder-services/activity\\?focus=${card.id}`));await expect(page.locator("main")).not.toContainText(/Household|Seller account|Personal account/);
 });
 
 test("primary issues a named card through one review without adding money or changing their shared limit",async({page})=>{
  const {primary}=await freshPrepaidCard();await signInPerson(page,primary.personId);const data=await cardDashboard(page.request);
  const before=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId)).orderBy(ledgerEntries.journalId,ledgerEntries.lineNumber);
- const name=`Travel ${randomUUID().slice(0,8)}`;await page.goto("/cardholder-services");await page.getByRole("link",{name:"Add card",exact:true}).click();
+ const name=`Travel ${randomUUID().slice(0,8)}`;await page.goto("/cardholder-services");await page.getByRole("navigation",{name:"Cardholder navigation"}).getByText("More",{exact:true}).click();await page.getByRole("link",{name:"Add card",exact:true}).click();
  const dialog=page.getByRole("dialog");await expect(dialog.getByRole("heading",{name:"Who is this card for?"})).toBeVisible();const holderChoice=dialog.getByRole("radio",{name:new RegExp(data.person.displayName)});if(await holderChoice.count())await holderChoice.check();
  await expect(dialog.getByRole("textbox",{name:"Starting balance (USD)"})).toHaveCount(0);
  await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);await dialog.getByRole("button",{name:"Review card",exact:true}).click();
@@ -60,8 +60,8 @@ test("primary adds a submerchant without enrolling a cardholder service",async({
  const merchant=await acquiringFixture();await signInPerson(page,merchant.personId);
  const before=await(await page.request.get("/api/v1/services")).json();expect(before.services).toHaveLength(1);expect(before.services[0]).toMatchObject({id:merchant.serviceId,kind:"MERCHANT"});
  const directory=await merchantDashboard(page.request),unit=directory.units.find(row=>row.id===merchant.merchantId)!,name=`Studio ${randomUUID().slice(0,8)}`;
- await page.goto(`/merchant-services?view=unit:${unit.id}`);await page.getByRole("navigation",{name:"Merchant workspace views"}).getByRole("link",{name:"Merchants & people",exact:true}).click();await page.getByRole("button",{name:"Add submerchant",exact:true}).click();
- const dialog=page.getByRole("dialog");await dialog.getByRole("textbox",{name:"Submerchant name"}).fill(name);await dialog.getByRole("button",{name:"Review merchant"}).click();await expect(dialog).toContainText(unit.name);await dialog.getByRole("button",{name:"Create submerchant",exact:true}).click();await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();
+ await page.goto(`/merchant-services?view=unit:${unit.id}`);await page.getByRole("navigation",{name:"Merchant workspace views"}).getByRole("link",{name:"Merchants & people",exact:true}).click();await page.getByRole("article",{name:`Merchant tools for ${unit.name}`,exact:true}).locator("summary").filter({hasText:`Manage ${unit.name}`}).click();await page.getByRole("button",{name:"Add submerchant",exact:true}).click();
+ const dialog=page.getByRole("dialog");await dialog.getByRole("textbox",{name:"Submerchant name"}).fill(name);await expect(dialog).toContainText(`${unit.name} remains responsible`);await dialog.getByRole("button",{name:"Add submerchant",exact:true}).click();await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();
  const created=(await merchantDashboard(page.request)).units.find(row=>row.name===name)!;expect(created.primaryId).toBe(unit.id);expect(new URL(page.url()).pathname).toBe(`/merchants/${created.id}`);
  expect(await(await page.request.get("/api/v1/services")).json()).toEqual(before);
  const cards=await cardDashboard(page.request);expect(cards.cards).toEqual([]);expect(cards.primaryService).toBeNull();

@@ -306,3 +306,16 @@ D69 publication: draft PR14 records GitHub application `a97c8105ce8abcec2cfb84eb
 ## D70 — block financial confirmation during saved-review navigation
 
 12 September 2026. The user's reported CI exit1 exposed a checkout state-ownership race, reproduced deterministically in both checkout and Add money. Use React's pending navigation transition to keep confirmation handlers/controls blocked until the durable review page takes ownership. Preserve review-key changes, original command identity, server permission checks and financial writers. Do not hide the failure with longer timeouts or retries. The preceding build fails both held-response regressions; the corrected packaged application passes all18 targeted browser/accessibility cases. See `docs/CHECKOUT_NAVIGATION_FIX.md` and exact publication/workflow evidence.
+
+## D71 — simplify entry and the two service dashboards (2026-09-12)
+
+Put selected-card money and controls, or current merchant funds and payment activity, first. Disclose lower-frequency tools without creating another mode or command engine. Keep each displayed balance tied to its actual group; make authorized spending limits and parent-merchant management directly reachable. Preserve secondary and submerchant isolation, exact saved records and recovery owners. A merchant name needs one explicit creation form with responsibility text; it does not need a separate nonfinancial review step.
+
+Registration opens directly from the landing page and confirmation comes from the emailed callback. Remove manual confirmation/reset-link entry. Synchronize idle form navigation while preserving pending operations, held callbacks and unconfirmed results. Public dashboard examples remain visibly illustrative and issue no customer commands.
+
+[D71 evidence](CONSUMER_ENTRY_REDESIGN.md) records401 unit/contracts,195 distinct API/browser/accessibility cases,26 isolated email journeys and60 responsive visual states, including initial failures and corrected checks. D71 is locally verified, not pushed, merged or deployed. Customer usability acceptance, actual hosted email acceptance and broader product/release scope remain separate.
+
+
+## D72 — one environment badge, ordinary customer language (2026-09-12)
+
+Keep one Sandbox badge in the global header. Remove repeated demo/practice explanations and internal wording from customer journeys while retaining truthful availability and restrictions. Remove sample sign-in/person selectors and proven unused code; use member codes from Your profile for scoped service invitations. Do not delete required migrations, guards or test infrastructure to inflate a cleanup count. Preserve financial, permission, enrollment and retry owners. The user explicitly authorizes verification and deployment; [release evidence](PRODUCTION_UI_CLEANUP.md) records final local checks and the exact-publication receipt location.

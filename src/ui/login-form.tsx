@@ -7,7 +7,7 @@ import { Icon } from "./icon";
 import { parseEmailLink, takeEmailLink, type EmailLink } from "./identity-email-link";
 
 type Mode = "login" | "register" | "confirm" | "recover" | "reset";
-type Operation = Mode | "owner" | "viewer" | "operator";
+type Operation = Mode;
 const titles: Record<Mode, string> = { login: "Sign in with email", register: "Create your login", confirm: "Confirm your email", recover: "Reset your password", reset: "Choose a new password" };
 const actions: Record<Mode, string> = { login: "Sign in", register: "Create login", confirm: "Confirm email", recover: "Send reset email", reset: "Save new password" };
 const requestTimeoutMs = 30_000;
@@ -25,11 +25,11 @@ function failureCode(failure: unknown): string | null {
   return typeof failure.error.code === "string" ? failure.error.code : null;
 }
 
-export function LoginForm({ nextPath="/services",localFixtureIdentity, localEmailLinkBridge, emailSignIn, providerOrigin }: { nextPath?:string;localFixtureIdentity: boolean; localEmailLinkBridge: boolean; emailSignIn: EmailAuthenticationAvailability; providerOrigin: string }) {
+export function LoginForm({ nextPath="/services",initialMode="login",localEmailLinkBridge, emailSignIn, providerOrigin }: { nextPath?:string;initialMode?:"login"|"register";localEmailLinkBridge: boolean; emailSignIn: EmailAuthenticationAvailability; providerOrigin: string }) {
   const router = useRouter();
   const [checking, startChecking] = useTransition();
   const [pending, setPending] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [linkReady, setLinkReady] = useState(false);
@@ -39,6 +39,7 @@ export function LoginForm({ nextPath="/services",localFixtureIdentity, localEmai
   const incomingLink = useRef<{ link: EmailLink | null } | null>(null);
   const inFlight = useRef(false);
   const navigationStarted = useRef(false);
+  const observedInitialMode = useRef(initialMode);
   const errorRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => { if (error) errorRef.current?.focus(); }, [error]);
@@ -69,7 +70,7 @@ export function LoginForm({ nextPath="/services",localFixtureIdentity, localEmai
         if (inFlight.current) { setError("Wait for your current request to finish, then open the email link again."); return; }
         const { link } = incoming;
         emailLink.current = link; setLinkReady(Boolean(link)); setNotice("");
-        if (!link) { setError("This email link is not supported. Copy the confirmation or reset link from your latest email."); return; }
+        if (!link) { setError("This email link is not supported. Open the link in your latest confirmation or password reset email."); return; }
         setError(""); setMode(link.kind === "confirmation" ? "confirm" : "reset"); setNotice("Your email link is ready. Continue below.");
       });
     }
@@ -77,6 +78,25 @@ export function LoginForm({ nextPath="/services",localFixtureIdentity, localEmai
     window.addEventListener("hashchange", receiveLink);
     return () => { active = false; window.removeEventListener("hashchange", receiveLink); };
   }, [providerOrigin]);
+
+  useEffect(() => {
+    if (observedInitialMode.current === initialMode) return;
+    // A same-route header/history navigation may change the requested form.
+    // Consume changes during an owned flow instead of replaying them after its
+    // result arrives and discarding an email link or an unconfirmed outcome.
+    if (inFlight.current || checking || navigationStarted.current || emailLink.current || incomingLink.current || linkReady || (mode !== "login" && mode !== "register") || error || notice) {
+      observedInitialMode.current = initialMode;
+      return;
+    }
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      observedInitialMode.current = initialMode;
+      if (inFlight.current || navigationStarted.current || emailLink.current || incomingLink.current) return;
+      setMode(initialMode);
+    });
+    return () => { active = false; };
+  }, [initialMode, checking, linkReady, mode, error, notice]);
 
   function changeMode(next: Mode) {
     if (inFlight.current || checking) return;
@@ -126,8 +146,8 @@ export function LoginForm({ nextPath="/services",localFixtureIdentity, localEmai
         window.location.replace(nextPath); return;
       }
       emailLink.current = null; setLinkReady(false);
-      if (operation === "register") { setMode("confirm"); setNotice("Your request was received. For a new login, check your inbox and spam folder for a confirmation email. If you already have a login, use your existing password or reset it. Registering again does not change your password."); }
-      if (operation === "recover") { setMode("reset"); setNotice("If this email has a login, a reset email has been requested. Check your inbox and spam folder. Open its link and choose your new password on the Etail Depot page it opens."); }
+      if (operation === "register") { setMode("confirm"); setNotice("Your request was received. If you already have a login, use your existing password or reset it."); }
+      if (operation === "recover") { setMode("reset"); setNotice("If this email has a login, a reset email has been requested."); }
       if (operation === "confirm") { setMode("login"); setNotice("Your email is confirmed. Sign in with your email and password."); }
       if (operation === "reset") { setMode("login"); setNotice("Your password has been changed and previous sessions signed out. Sign in with your new password."); }
     } catch {
@@ -143,11 +163,10 @@ export function LoginForm({ nextPath="/services",localFixtureIdentity, localEmai
     if (inFlight.current || checking || !emailSignIn.available || (mode === "register" && !emailSignIn.registrationAvailable)) return;
     const form = event.currentTarget; const data = new FormData(form);
     const email = String(data.get("email") ?? "").trim(), password = String(data.get("password") ?? "");
+    const link = emailLink.current;
+    if ((mode === "confirm" || mode === "reset") && (!link || link.kind !== (mode === "confirm" ? "confirmation" : "recovery"))) { setError("Open the link in your latest confirmation or password reset email to continue."); return; }
     if ((mode === "register" || mode === "reset") && password !== data.get("confirmPassword")) { setError("The passwords do not match."); return; }
-    const pasted = String(data.get("emailLink") ?? "");
-    const link = pasted ? parseEmailLink(pasted, providerOrigin) : emailLink.current;
-    if ((mode === "confirm" || mode === "reset") && (!link || link.kind !== (mode === "confirm" ? "confirmation" : "recovery"))) { setError("Paste the complete link from the matching Etail Depot email."); return; }
-    for (const name of ["password", "confirmPassword", "emailLink"]) { const field = form.elements.namedItem(name); if (field instanceof HTMLInputElement) field.value = ""; }
+    for (const name of ["password", "confirmPassword"]) { const field = form.elements.namedItem(name); if (field instanceof HTMLInputElement) field.value = ""; }
     if (link) { emailLink.current = link; setLinkReady(true); }
     if (mode === "login") void submit("/api/v1/auth/login", { email, password }, mode);
     if (mode === "register") void submit("/api/v1/auth/register", { email, password }, mode);
@@ -160,39 +179,27 @@ export function LoginForm({ nextPath="/services",localFixtureIdentity, localEmai
 
   const busy = pending !== null || checking;
   const disabled = busy || !emailSignIn.available || (mode === "register" && !emailSignIn.registrationAvailable);
+  const waitingForLink = (mode === "confirm" || mode === "reset") && !linkReady;
   return <div className="login-forms">
     {error && <div className="error-message" role="alert" tabIndex={-1} ref={errorRef}>{error}</div>}
     {notice && <p className="form-note" role="status">{notice}</p>}
     <form key={mode} aria-labelledby="email-mode-title" onSubmit={submitForm}>
-      <h3 id="email-mode-title" ref={titleRef} tabIndex={-1}>{titles[mode]}</h3>
+      <h3 id="email-mode-title" ref={titleRef} tabIndex={-1}>{waitingForLink ? "Check your email" : titles[mode]}</h3>
       {(mode === "login" || mode === "register" || mode === "recover") && <div className="field"><label htmlFor="email">Email address</label><input type="email" name="email" id="email" autoComplete={mode === "login" ? "username" : "email"} inputMode="email" maxLength={254} required disabled={disabled} placeholder="you@example.com" /></div>}
-      {(mode === "confirm" || mode === "reset") && !linkReady && <><p className="form-note">Open the link in your latest Etail Depot email and {mode === "confirm" ? "confirm your email" : "choose your new password"} on the page it opens.{localEmailLinkBridge && " Then return here to sign in."}</p><p className="form-note">If you already copied a link that still contains its {mode === "confirm" ? "confirmation" : "reset"} code, you can paste it below. Do not share it with anyone.</p><div className="field"><label htmlFor="email-link">{mode === "confirm" ? "Confirmation link" : "Password reset link"}</label><input type="password" name="emailLink" id="email-link" autoComplete="off" maxLength={4096} required disabled={disabled} placeholder="Paste the complete email link" /></div></>}
-      {(mode === "login" || mode === "register" || mode === "reset") && <div className="field"><label htmlFor="password">{mode === "reset" ? "New password" : "Password"}</label><input type="password" name="password" id="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={mode === "login" ? undefined : 12} maxLength={1024} required disabled={disabled} />{mode !== "login" && <p className="form-note">Use at least 12 characters.</p>}</div>}
-      {(mode === "register" || mode === "reset") && <div className="field"><label htmlFor="confirm-password">Confirm password</label><input type="password" name="confirmPassword" id="confirm-password" autoComplete="new-password" minLength={12} maxLength={1024} required disabled={disabled} /></div>}
+      {waitingForLink && <p className="form-note">{mode === "confirm" ? "For a new login, open the confirmation email in your inbox or spam folder and follow its link." : "Check your inbox and spam folder. Open the link in your latest password reset email to choose a new password."}{localEmailLinkBridge && " Then return here to sign in."}</p>}
+      {(mode === "login" || mode === "register" || (mode === "reset" && linkReady)) && <div className="field"><label htmlFor="password">{mode === "reset" ? "New password" : "Password"}</label><input type="password" name="password" id="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={mode === "login" ? undefined : 12} maxLength={1024} required disabled={disabled} />{mode !== "login" && <p className="form-note">Use at least 12 characters.</p>}</div>}
+      {(mode === "register" || (mode === "reset" && linkReady)) && <div className="field"><label htmlFor="confirm-password">Confirm password</label><input type="password" name="confirmPassword" id="confirm-password" autoComplete="new-password" minLength={12} maxLength={1024} required disabled={disabled} /></div>}
       {mode === "register" && <p className="form-note">We will email you a confirmation link. Creating a login does not automatically open card or merchant services.</p>}
       {!emailSignIn.available && <p className="form-note" id="identity-readiness" role="status"><Icon name="info" />Email sign-in is temporarily unavailable. Check availability to try again.</p>}
       {mode === "register" && emailSignIn.available && !emailSignIn.registrationAvailable && <p className="form-note" id="registration-readiness" role="status">Creating a login is temporarily unavailable. If you already have a login, return to sign in.</p>}
-      <button type="submit" className="button primary full-width" disabled={disabled}>{pending === mode ? "Please wait…" : actions[mode]}<Icon name="arrow" /></button>
+      {!waitingForLink && <button type="submit" className="button primary full-width" disabled={disabled}>{pending === mode ? "Please wait…" : actions[mode]}<Icon name="arrow" /></button>}
       {(availabilityCheckOffered || !emailSignIn.available || (mode === "register" && !emailSignIn.registrationAvailable)) && <button type="button" className="button secondary full-width" disabled={busy} onClick={checkAvailability}>{checking ? "Checking…" : "Check availability"}</button>}
     </form>
     <div className="email-access-options" aria-label="Email access options">
       {mode !== "login" && <button type="button" className="button secondary full-width" disabled={busy} onClick={() => changeMode("login")}>Back to sign in</button>}
       {mode === "login" && <><button type="button" className="button secondary full-width" disabled={busy} onClick={() => changeMode("register")}>Create a login</button><button type="button" className="button secondary full-width" disabled={busy} onClick={() => changeMode("recover")}>Forgot your password?</button></>}
-      {(mode === "login" || mode === "register") && <button type="button" className="button secondary full-width" disabled={busy} onClick={() => changeMode("confirm")}>I have a confirmation email</button>}
-      {mode === "recover" && <button type="button" className="button secondary full-width" disabled={busy} onClick={() => changeMode("reset")}>I have a reset email</button>}
       {mode === "reset" && <button type="button" className="button secondary full-width" disabled={busy} onClick={() => changeMode("recover")}>Request a new reset email</button>}
       {mode === "confirm" && <><button type="button" className="button secondary full-width" disabled={busy} onClick={() => changeMode("recover")}>Forgot your password?</button><button type="button" className="button secondary full-width" disabled={busy} onClick={() => changeMode("register")}>Back to registration</button></>}
     </div>
-    {localFixtureIdentity && <section className="fixture-panel" aria-labelledby="local-session-title">
-      <span className="local-label">Sandbox</span><h2 id="local-session-title">Explore the sandbox</h2><p>Sample users are separate from your email login. Choose a role to explore with demo data.</p>
-      <div className="fixture-actions">
-        <button type="button" className="button primary full-width" disabled={busy} onClick={() => void submit("/api/v1/auth/local-fixture", { persona: "owner" }, "owner")}>{pending === "owner" ? "Opening…" : "Continue as primary user"}<Icon name="arrow" /></button>
-        <p className="form-note">Manage your cardholders and merchants.</p>
-        <button type="button" className="button secondary full-width" disabled={busy} onClick={() => void submit("/api/v1/auth/local-fixture", { persona: "viewer" }, "viewer")}>{pending === "viewer" ? "Opening…" : "Continue as secondary user"}<Icon name="arrow" /></button>
-        <p className="form-note">See only your cards and shared merchant tools.</p>
-        <button type="button" className="button secondary full-width" disabled={busy} onClick={() => void submit("/api/v1/auth/local-fixture", { persona: "operator" }, "operator")}>{pending === "operator" ? "Opening…" : "Continue as support operator"}<Icon name="arrow" /></button>
-        <p className="form-note">Review and answer assigned customer questions.</p>
-      </div>
-    </section>}
   </div>;
 }

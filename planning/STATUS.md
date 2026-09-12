@@ -1,3 +1,21 @@
+# D72 — verified customer interface cleanup (12 September 2026)
+
+The user accepted D71 and authorized cleanup, comprehensive checks and deployment. [D72 scope and evidence](../docs/PRODUCTION_UI_CLEANUP.md) records normal customer copy, one shared Sandbox badge, consistent headers/footers, member-code access and removal of proven unused code. Financial commands, permissions, schema and saved data remain unchanged.
+
+Local verification passes:401 unit/contracts,208 distinct PostgreSQL integration,39 concurrency,195 distinct API/browser/accessibility cases,26 email/session cases and35 handoff helpers. The final Merchant shared-footer correction additionally passes all10 role/keyboard/accessibility cases. Both final production build and Netlify packaging pass. Sixty responsive states across public and private journeys have no accessibility/reflow/runtime failures; all15 authorized preview projections remain unchanged. Initial outdated-label failures and the corrected runs are retained.
+
+Branch `codex/production-ui-cleanup` carries accepted D71 plus D72. The release targets the existing private repository and canonical `etail-depot-next` site, with reviewed feature publication/CI before merge and deployment. Exact revision/tree/CI/deploy acceptance is recorded in the release pull request and `artifacts/d72-publication.json`; local results do not independently certify hosted acceptance. Previous PR14 is merged at `9e6a650f4a43b968118cb4f0c66b1ff38be3454d`. No data reset, provider/visitor configuration change or real-money action is authorized or needed for this release. Broader product scope remains open.
+
+# D71 — simpler dashboards, setup and consumer entry (12 September 2026)
+
+The user requested simpler Cardholder/Merchant dashboards and workflows, a stronger consumer landing page and removal of manual email-confirmation entry. The local candidate prioritizes selected-card money and controls, current merchant funds and payment activity; supporting tools use named disclosures. Setup drops redundant steps, People links directly to spending limits, and a primary can return from a submerchant to its parent management. Funding no longer appears beside a card belonging to a different primary's group. Service permissions, saved requests, financial commands and database rules remain intact.
+
+The landing page has interactive labelled examples, direct registration and clearer prepaid/payment-sharing content. Customers confirm from their emailed link; there are no pasted confirmation/reset-link fields. Idle registration/sign-in URL navigation stays synchronized while pending requests and callbacks retain their owner.
+
+Local checks pass:401 unit/contracts, all195 distinct API/browser/accessibility cases after the documented contrast correction,26 isolated email/session cases, production Next/offline Netlify packaging, lint, types, architecture and source security. All60 responsive capture states pass at1440/390/320px; authorized preview projections and source remain unchanged during capture. [D71 design and evidence](../docs/CONSUMER_ENTRY_REDESIGN.md) retains initial failures, corrected reruns and limits. The preview is running on3100.
+
+**D71 is local only, on `codex/consumer-entry-experience`.** No push, merge, hosted deployment, provider setting, database reset or live-money action occurred. Customer usability acceptance and hosted release acceptance remain separate; no full-product or measured Amex-parity claim is made.
+
 # D70 — checkout and top-up navigation race corrected (12 September 2026)
 
 The reported PR14 GitHub failure was one desktop checkout-recovery case: 139 other browser cases and all preceding application/database gates passed. A fast confirmation could start before saved-review navigation changed the component key, allowing an older server projection to replace its receipt/recovery state. The same pattern was reproduced in Add money.

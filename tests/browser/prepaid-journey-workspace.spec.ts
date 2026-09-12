@@ -171,6 +171,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
 
   await test.step("save a top-up review and recover a committed but lost confirmation",async()=>{
     await page.goto("/cardholder-services");
+    await page.getByRole("navigation",{name:"Cardholder navigation"}).getByText("More",{exact:true}).click();
     await page.getByRole("navigation",{name:"Cardholder navigation"})
       .getByRole("link",{name:"Add money",exact:true}).click();
     await expect(page.getByRole("heading",{name:"Add money & spending limits",exact:true})).toBeVisible();
@@ -352,7 +353,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     await signIn(page,merchant.personId);
     await page.goto("/merchants/"+merchant.merchantId+"?tab=payments");
     await expect(moneyCard(page,"Awaiting settlement")).toContainText("$12.50");
-    await expect(moneyCard(page,"Sandbox bank balance")).toContainText("$0.00");
+    await expect(moneyCard(page,"Deposited balance")).toContainText("$0.00");
     const operations=await merchantProjection(page,merchant.merchantId);
     expect(operations.depositReview).toMatchObject({amount:{minor:"1250"},paymentCount:1});
     await page.getByRole("region",{name:"Current available balance",exact:true})
@@ -361,7 +362,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     await expect(request).toContainText("$12.50");
     await request.getByRole("button",{name:"Review deposit",exact:true}).click();
     const review=page.getByRole("dialog",{name:"Review deposit",exact:true});
-    await expect(review).toContainText("Sandbox bank");
+    await expect(review).toContainText("Deposited balance");
     const response=responseFor(page,"/api/v1/merchants/"+merchant.merchantId+"/payouts");
     await review.getByRole("button",{name:"Request deposit",exact:true}).click();
     const saved=await successful(await response,value=>merchantTestPayoutProjectionSchema.parse(value));
@@ -387,7 +388,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     await expect(detail.getByRole("button",{name:"Review new deposit",exact:true})).toHaveCount(0);
     await capture(page,info,"05-deposit-pending-with-exact-payment");
     await page.goto("/operations/deposits");
-    await expect(page.getByRole("heading",{name:"Operator access required",exact:true})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Access required",exact:true})).toBeVisible();
     await expect(page.getByRole("button",{name:"Complete deposit",exact:true})).toHaveCount(0);
     return saved;
   });
@@ -402,7 +403,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     await expect(row).toContainText(second.receipt.reference);
     await expect(row).not.toContainText(first.receipt.reference);
     await row.getByRole("button",{name:"Complete deposit",exact:true}).click();
-    await expect(row).toContainText("Record this deposit as completed at Sandbox bank?");
+    await expect(row).toContainText("Record this deposit as completed?");
     await capture(page,info,"06-assigned-operator-reviews-completion");
     const processed=responseFor(page,"/api/v1/operations/deposits/"+deposit.id);
     await row.getByRole("button",{name:"Confirm result",exact:true}).click();
@@ -413,19 +414,19 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     expect(outcome.processedAt).not.toBeNull();
     expect(outcome.payments.map(payment=>payment.id)).toEqual([second.receipt.paymentId]);
     await expect(row).toHaveCount(0);
-    await expect(page.getByText("No pending deposits are available with your processing assignment.",{exact:true})).toBeVisible();
+    await expect(page.getByText("No pending deposits for your assigned merchants.",{exact:true})).toBeVisible();
   });
 
   await test.step("the merchant sees its saved bank balance and matching completed deposit",async()=>{
     await signIn(page,merchant.personId);
     await page.goto("/merchants/"+merchant.merchantId+"?tab=payments&activity=transfers");
-    await expect(moneyCard(page,"Sandbox bank balance")).toContainText("$12.50");
+    await expect(moneyCard(page,"Deposited balance")).toContainText("$12.50");
     await expect(moneyCard(page,"Processing")).toContainText("$0.00");
     const row=page.getByRole("row").filter({hasText:deposit.testReference});
     await expect(row).toContainText("Completed");
     await expect(row).toContainText("$12.50");
     await page.reload();
-    await expect(moneyCard(page,"Sandbox bank balance")).toContainText("$12.50");
+    await expect(moneyCard(page,"Deposited balance")).toContainText("$12.50");
     const operations=await merchantProjection(page,merchant.merchantId);
     expect(operations).toMatchObject({
       availableFunds:{minor:"0"},settledFunds:{minor:"0"},pendingDeposits:{minor:"0"},bankFunds:{minor:"1250"},depositReview:null,

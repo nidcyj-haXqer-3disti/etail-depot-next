@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
-import { identityBindings } from "../../src/platform/database/schema";
+import { identityBindings, permissionGrants } from "../../src/platform/database/schema";
 import { SessionService } from "../../src/modules/identity";
 import { sessionRepository } from "../../src/platform/database/session-repository";
 import { getAccessOverview, updateMemberAccess } from "../../src/modules/access/service";
@@ -30,6 +30,71 @@ async function dashboard(page: Page, scope = "ALL", search = "") {
   return cardholderDashboardSchema.parse(await response.json());
 }
 
+test("simple cardholder home keeps money clear and supporting tools scoped under More", async ({page}) => {
+  const primary=await cardPrimary(`Simple primary ${randomUUID().slice(0,8)}`),holder=await cardPerson("Simple secondary");
+  await enrollCardholder(primary.personId,primary.serviceId,holder);
+  await fundCardGroup(primary.personId,primary.serviceId,"8500");
+  await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"4000");
+  await setPersonLimit(primary.personId,primary.serviceId,holder,"2500");
+  const own=await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Simple everyday card");
+  const shared=await issuePracticeCard(primary.personId,primary.serviceId,holder,"Simple shared card");
+  await signIn(page,primary.personId);
+  await page.goto(`/cardholder-services?focus=${own.card.id}`);
+  const navigation=page.getByRole("navigation",{name:"Cardholder navigation",exact:true});
+  await expect(navigation.getByRole("link")).toHaveText(["Home","Cards","Activity","People"]);
+  const overview=page.getByRole("region",{name:"Selected card overview",exact:true});
+  await expect(overview.locator(".ch-focus-balance")).toContainText("Available to spend");
+  await expect(overview.locator(".ch-focus-balance")).toContainText("$40.00");
+  await expect(overview.getByRole("button",{name:/Freeze/})).toBeVisible();
+  const group=page.getByRole("region",{name:"Your group balance",exact:true});
+  await expect(group).toContainText("Group balance");await expect(group).toContainText("$85.00");
+  await expect(group.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`/cardholder-services/funds?service=${primary.serviceId}`);
+  const monthlyLimit=overview.getByText(/^Monthly limit/);
+  await expect(monthlyLimit).toHaveCount(1);
+  await expect(monthlyLimit).toBeHidden();
+  await overview.getByText("Spending details",{exact:true}).click();
+  await expect(monthlyLimit).toBeVisible();
+  await expect(monthlyLimit.locator("strong")).toHaveText("$40.00");
+  await expect(page.getByRole("heading",{name:"Recent activity",exact:true})).toBeVisible();
+  await navigation.getByText("More",{exact:true}).click();
+  await expect(navigation.getByRole("link",{name:"Requests",exact:true})).toHaveAttribute("href",new RegExp(`focus=${own.card.id}`));
+  await expect(navigation.getByRole("link",{name:"Account services",exact:true})).toHaveAttribute("href",`/cardholder-services/settings?focus=${own.card.id}`);
+  await navigation.getByRole("link",{name:"Requests",exact:true}).click();
+  await expect(page).toHaveURL(url=>url.searchParams.get("view")==="requests"&&url.searchParams.get("focus")===own.card.id);
+  await expect(navigation.getByText("More",{exact:true})).toHaveAttribute("aria-current","page");
+  await navigation.getByText("More",{exact:true}).click();
+  await expect(navigation.getByRole("link",{name:"Requests",exact:true})).toHaveAttribute("aria-current","page");
+  await navigation.getByRole("link",{name:"Home",exact:true}).click();
+  await expect(overview).toContainText(own.card.nickname);
+  await expect(navigation.getByRole("link",{name:"Requests",exact:true})).not.toBeVisible();
+
+  await navigation.getByRole("link",{name:"People",exact:true}).click();
+  const spendingLimits=page.getByRole("link",{name:"Spending limits",exact:true});
+  const limitsHref=`/cardholder-services/funds?service=${primary.serviceId}#limits-title`;
+  await expect(spendingLimits).toHaveAttribute("href",limitsHref);
+  const limitGrant=and(eq(permissionGrants.personId,primary.personId),eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.action,"cardholder.limits.manage"));
+  expect(await getDb().update(permissionGrants).set({state:"REVOKED"}).where(limitGrant).returning({action:permissionGrants.action})).toHaveLength(1);
+  await page.reload();await expect(spendingLimits).toHaveCount(0);
+  expect(await getDb().update(permissionGrants).set({state:"ACCEPTED"}).where(limitGrant).returning({action:permissionGrants.action})).toHaveLength(1);
+  await page.reload();await expect(spendingLimits).toHaveAttribute("href",limitsHref);
+  await spendingLimits.click();
+  await expect(page).toHaveURL(`${origin}${limitsHref}`);
+  await expect(page.getByRole("heading",{name:"Monthly spending limits",exact:true})).toBeVisible();
+
+  await signIn(page,holder);await page.goto(`/cardholder-services?focus=${shared.card.id}`);
+  await expect(overview.locator(".ch-focus-balance")).toContainText("$25.00");
+  await expect(page.locator("main")).not.toContainText(own.card.nickname);
+  await expect(group).toHaveCount(0);
+  await expect(navigation.getByRole("link",{name:"People",exact:true})).toHaveCount(0);
+  await navigation.getByText("More",{exact:true}).click();
+  await expect(navigation.getByRole("link",{name:"Requests",exact:true})).toHaveCount(0);
+  await expect(navigation.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
+  await expect(navigation.getByRole("link",{name:"Account services",exact:true})).toHaveAttribute("href",`/cardholder-services/settings?focus=${shared.card.id}`);
+  await page.setViewportSize({width:320,height:900});
+  expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
+});
+
 test("your cards and cards you manage remain distinct through server filters, search and reload", async ({ page }) => {
   test.setTimeout(120_000);
   const primary = await cardPrimary(`Avery ${randomUUID().slice(0, 8)}`);
@@ -38,9 +103,29 @@ test("your cards and cards you manage remain distinct through server filters, se
   await enrollCardholder(primary.personId, primary.serviceId, managedHolder);
   await enrollCardholder(otherPrimary.personId, otherPrimary.serviceId, primary.personId);
   const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"4200");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"2400");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Everyday in my name");})();
-  const received = await (async()=>{await fundCardGroup(otherPrimary.personId,otherPrimary.serviceId,"3100");await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,primary.personId,"3100");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,primary.personId,"Shared travel in my name");})();
+  const received = await (async()=>{await fundCardGroup(otherPrimary.personId,otherPrimary.serviceId,"7300");await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,primary.personId,"3100");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,primary.personId,"Shared travel in my name");})();
   const managed = await (async()=>{await setPersonLimit(primary.personId,primary.serviceId,managedHolder,"1800");return issuePracticeCard(primary.personId,primary.serviceId,managedHolder,"Jordan daily card");})();
   await signIn(page, primary.personId);
+
+  await page.goto(`/cardholder-services?focus=${own.card.id}`);
+  const groupBalance=page.getByRole("region",{name:"Your group balance",exact:true});
+  await expect(groupBalance).toContainText("$42.00");
+  await expect(groupBalance.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`/cardholder-services/funds?service=${primary.serviceId}`);
+  await page.getByLabel("Selected card",{exact:true}).selectOption(received.card.id);
+  const selected=page.getByRole("region",{name:"Selected card overview",exact:true});
+  await expect(selected).toContainText(received.card.nickname);
+  await expect(selected.locator(".ch-focus-balance")).toContainText("$31.00");
+  await expect(groupBalance).toHaveCount(0);
+  await expect(page.locator("main")).not.toContainText("$73.00");
+  await page.reload();await expect(groupBalance).toHaveCount(0);
+  await page.locator(".ch-group-details > summary").filter({hasText:"Manage your primary card group"}).click();
+  const ownGroup=page.getByRole("region",{name:"Your card group",exact:true});
+  await expect(ownGroup).toContainText("$42.00");
+  await expect(ownGroup.getByRole("link",{name:/Manage monthly limits/})).toHaveAttribute("href",`/cardholder-services/funds?service=${primary.serviceId}#limits-title`);
+  await expect(page.locator("main")).not.toContainText("$73.00");
+  await page.getByLabel("Selected card",{exact:true}).selectOption(managed.card.id);
+  await expect(selected).toContainText(managed.card.nickname);
+  await expect(groupBalance).toContainText("$42.00");
 
   const groups = [
     { scope: "OWN", label: /^Your cards/, names: [own.card.nickname, received.card.nickname], ids: [own.card.id, received.card.id] },
@@ -143,7 +228,7 @@ test("restricted secondary cards stay their own with an accurate explanation and
   await expect(overview.getByText("YOUR CARD", { exact: true })).toBeVisible();
   await expect(overview).toContainText("Purchases are not enabled for your access");
   await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
-  await expect(page.getByRole("link", { name: "Cardholders", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "People", exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Try a purchase", exact: true })).toHaveCount(0);
   await overview.getByRole("link", { name: "Card controls", exact: true }).click();
   await expect(page.getByRole("dialog")).toContainText("Ask your primary cardholder to review your card access");

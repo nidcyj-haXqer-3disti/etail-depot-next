@@ -25,7 +25,7 @@ test("an operator retries a committed deposit result after valid JSON with a mal
  await expect(row).toBeVisible();await expect(row).toContainText("$12.50");
  await row.getByText("Included payments",{exact:true}).click();await expect(row).toContainText(paid.receipt!.reference);
  await row.getByRole("button",{name:"Complete deposit",exact:true}).click();
- await expect(row).toContainText("Record this deposit as completed at Sandbox bank?");
+ await expect(row).toContainText("Record this deposit as completed?");
  const attempts:Array<{path:string;body:unknown}>=[],statuses:number[]=[];
  const path=`/api/v1/operations/deposits/${deposit.id}`;
  await page.route(`**${path}`,async route=>{
@@ -48,7 +48,7 @@ test("an operator retries a committed deposit result after valid JSON with a mal
  expect(await getDb().select().from(merchantDepositEvents).where(eq(merchantDepositEvents.depositId,deposit.id))).toHaveLength(1);
  await row.getByRole("button",{name:"Retry processing",exact:true}).click();
  await expect(row).toHaveCount(0);
- await expect(page.getByText("No pending deposits are available with your processing assignment.",{exact:true})).toBeVisible();
+ await expect(page.getByText("No pending deposits for your assigned merchants.",{exact:true})).toBeVisible();
  expect(statuses).toEqual([200,200]);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[0]!.body).toMatchObject({outcome:"COMPLETED"});
  expect(attempts[0]!.path).toBe(path);
  const events=await getDb().select().from(merchantDepositEvents).where(eq(merchantDepositEvents.depositId,deposit.id));

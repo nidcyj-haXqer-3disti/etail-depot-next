@@ -3,7 +3,7 @@ import { formatMoney } from "../workspace/service";
 import { SecurityError } from "../../platform/security/origin";
 import { reportFiltersSchema, type HistoricalReportProjection, type ReportFilters, type ReportSource, type ReportTotal, type SavedReportDefinition } from "./contracts";
 
-export const REPORT_DISCLOSURE = "Sandbox card activity. Totals include the matching transactions you can view. Pending and declined amounts are separate from posted purchases. This is not a billing statement.";
+export const REPORT_DISCLOSURE = "Card activity report. Totals include the matching transactions you can view. Pending and declined amounts are separate from posted purchases. This is not a billing statement.";
 
 export function availableReportSources(allowed: (action: string) => boolean): HistoricalReportProjection["availableSources"] {
   return allowed("activity.read") ? [{value:"ACTIVITY",label:"Card activity"}] : [];

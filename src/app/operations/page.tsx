@@ -16,7 +16,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   try {
     queue = await getOperatorQueue(session.personId);
     selected = query.case === undefined ? null : typeof query.case === "string" ? await getOperatorCase(session.personId, query.case) : null;
-  } catch (error) { unstable_rethrow(error); return <PageNotice title="Support workspace unavailable" authenticated><p>This view requires an active support assignment.</p></PageNotice>; }
+  } catch (error) { unstable_rethrow(error); return <PageNotice title="Customer care unavailable" authenticated><p>This view requires an active support assignment.</p></PageNotice>; }
   if (query.case !== undefined && !selected) return <PageNotice title="This case is unavailable" authenticated><p>Choose an available case from your support queue.</p></PageNotice>;
   return <Shell authenticated><div className="page-container"><Link href="/operations/deposits">Deposit processing</Link></div><OperationsWorkspace key={selected?.id ?? "queue"} queue={queue} selected={selected}/> </Shell>;
 }

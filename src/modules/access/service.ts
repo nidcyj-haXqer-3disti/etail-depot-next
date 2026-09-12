@@ -116,7 +116,7 @@ export async function getAccessOverview(personId:string,serviceId:string):Promis
     return {serviceId,serviceName:"Cardholder access",serviceKind:"CARDHOLDER",canInvite,canManage:evaluate(scope.policy,"people.changeRole").allowed,people:peopleRows,invitations,invitationTotal:counts!.total,pendingInvitationCount:counts!.pending,invitationsTruncated:counts!.total>rows.length,recipients,
       history:changes.slice(0,100).map(change=>({id:change.id,personId:change.personId,personName:nameById.get(change.personId)??"Cardholder",actorName:nameById.get(change.actorId)??"Cardholder",label:historyLabels[change.kind]??"Access updated",createdAt:change.createdAt.toISOString()})),historyHasMore:changes.length>100,
       permissionOptions:ceiling(scope).filter(action=>(secondaryCardPermissions as readonly string[]).includes(action)).map(action=>({action,label:permissionLabels[action][0],description:permissionLabels[action][1],canDelegate:false,allowedRoles:(["SECONDARY"] as const).filter(role=>evaluate({...scope.policy,actorPersonId:"secondary-recipient",membershipPersonId:"secondary-recipient",role,grants:ceiling(scope)},action).allowed)})).filter(option=>option.allowedRoles.length>0),roleOptions:["SECONDARY"],
-      notice:"Invitations are saved for named sandbox members. No email is sent. Roles do not approve spending, issue cards or grant access to another service."};
+      notice:"Invitations are saved for the people you choose. No email is sent. Accepting access does not create a card, add funds or grant access to another service."};
   },{isolationLevel:"repeatable read"});
 }
 export async function listInvitationsForPerson(personId:string):Promise<AnyInvitationProjection[]> {

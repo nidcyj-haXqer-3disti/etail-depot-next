@@ -32,9 +32,9 @@ async function syntheticSession(page: Page) {
 
 async function join(page: Page, name: string) {
   await page.getByRole("textbox", { name: "Your display name", exact: true }).fill(name);
-  await page.getByRole("checkbox", { name: "I understand this is a sandbox. Cards, balances, payments and verification are simulated. No real money moves.", exact: true }).check();
+  await expect(page.getByRole("checkbox")).toHaveCount(0);
   const merchant = new URL(page.url()).pathname === "/merchant-services";
-  await page.getByRole("button", { name: merchant ? "Continue to payments" : "Continue to cards", exact: true }).click();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await expect(page).toHaveURL(merchant ? /\/merchant-services$/ : /\/cardholder-services$/);
   await expect(page.getByRole("heading", {name: merchant ? "Merchant overview" : "Cardholder services", level: 1, exact: true})).toBeVisible();
 }
@@ -75,11 +75,11 @@ test("email member starts a sandbox and uses cards, support, reports and a named
   const name = `Sandbox primary ${randomUUID().slice(0, 8)}`, secondName = `Sandbox secondary ${randomUUID().slice(0, 8)}`;
   try {
     await page.goto("/services");
-    await expect(page.getByRole("heading", { name: "Let’s get you started.", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Choose where to start.", exact: true })).toBeVisible();
     await accessible(page);
     await join(page, name);
     await expect(page.getByRole("link", { name: "Open customer care", exact: true })).toHaveCount(0);
-    await page.getByRole("button", { name: "Create your first card", exact: true }).click();
+    await page.getByRole("button", { name: "Set up my cards", exact: true }).click();
     await expect(page.getByRole("dialog").getByRole("textbox", {name: "Card name", exact: true})).toBeVisible();
     await accessible(page);
     await capture(page, "cardholder-first-card-form");
@@ -154,9 +154,9 @@ test("email member starts a sandbox and uses cards, support, reports and a named
     await expect(waiting).toContainText(`Cards with ${name}`);
     await expect(waiting).toContainText("INVITATION ACCEPTED");
     await expect(waiting).toContainText("Your card will appear here when your primary cardholder creates it");
-    await expect(secondaryPage.getByRole("button",{name:"Create your first card",exact:true})).toBeHidden();
+    await expect(secondaryPage.getByRole("button",{name:"Set up my cards",exact:true})).toBeHidden();
     await secondaryPage.getByText("Optional: start your own card group",{exact:true}).click();
-    await expect(secondaryPage.getByRole("button",{name:"Create your first card",exact:true})).toBeVisible();
+    await expect(secondaryPage.getByRole("button",{name:"Set up my cards",exact:true})).toBeVisible();
     await secondaryPage.getByText("Optional: start your own card group",{exact:true}).click();
     expect((await cardDashboard(secondaryPage.request)).primaryService).toBeNull();
     await secondaryPage.reload();
@@ -204,18 +204,17 @@ test("email merchant enrolls, publishes a prepaid checkout, refunds, requests a 
   try {
     await page.goto("/merchant-services");
     await join(page, "Hosted shop primary");
-    await page.getByRole("button", { name: "Create a primary merchant", exact: true }).click();
+    await page.getByRole("button", { name: "Create merchant", exact: true }).click();
     await page.getByRole("textbox", { name: "Primary merchant name", exact: true }).fill(name);
-    await page.getByRole("button", { name: "Review merchant", exact: true }).click();
-    await page.getByRole("button", { name: "Create primary merchant", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Create merchant", exact: true }).click();
     await expect(page.getByRole("heading", { name, level: 1, exact: true })).toBeVisible();
     const master = (await merchantDashboard(page.request)).units.find(unit => unit.kind === "MASTER")!;
     expect((await cardDashboard(page.request)).profiles).toEqual([]);
     await page.goto(`/merchants/${master.id}?tab=verification`);
-    await page.getByRole("button", { name: "Enable sandbox payments", exact: true }).click();
-    await page.getByRole("dialog", { name: "Enable sandbox payments?", exact: true }).getByRole("button", { name: "Enable sandbox payments", exact: true }).click();
+    await page.getByRole("button", { name: "Enable payments", exact: true }).click();
+    await page.getByRole("dialog", { name: "Enable payments?", exact: true }).getByRole("button", { name: "Enable payments", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "Your sandbox payments are ready", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your payments are ready", exact: true })).toBeVisible();
     await expect(page.getByRole("link", {name: "Create payment channel", exact: true})).toBeInViewport({ratio: 1});
     await capture(page, "merchant-setup-ready");
     await accessible(page);
@@ -266,7 +265,7 @@ test("email merchant enrolls, publishes a prepaid checkout, refunds, requests a 
     expect(payout.amount.minor).toBe("1250");
     expect((await operations(page,master.id)).pendingDeposits?.minor).toBe("1250");
     await page.goto("/operations/deposits");
-    await expect(page.getByRole("heading",{name:"Operator access required",exact:true})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Access required",exact:true})).toBeVisible();
     operator=await assignedDepositOperator(operatorPage,channel.serviceId);
     await completeDeposit(operatorPage,payout.id,payout.testReference);
     const afterDeposit=await operations(page,master.id);
@@ -277,10 +276,10 @@ test("email merchant enrolls, publishes a prepaid checkout, refunds, requests a 
 
     await page.goto(`/merchant-services?view=unit:${master.id}`);
     await page.getByRole("link", { name: "Merchants & people", exact: true }).click();
+    await page.getByRole("article", { name: `Merchant tools for ${master.name}`, exact: true }).getByText(`Manage ${master.name}`, { exact: true }).click();
     await page.getByRole("button", { name: "Add submerchant", exact: true }).click();
     await page.getByRole("textbox", { name: "Submerchant name", exact: true }).fill("Hosted delegated shop");
-    await page.getByRole("button", { name: "Review merchant", exact: true }).click();
-    await page.getByRole("button", { name: "Create submerchant", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Add submerchant", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Hosted delegated shop", level: 1, exact: true })).toBeVisible();
     const sub = (await merchantDashboard(page.request)).units.find(unit => unit.name === "Hosted delegated shop")!;
     const joined = await startSandbox(colleague.personId, { commandId: randomUUID(), displayName: colleagueName, acknowledged: true });
@@ -317,10 +316,9 @@ test("merchant setup recovers lost connection responses without repeating proces
   let processingWrites = 0;
   try {
     await page.goto("/merchant-services"); await join(page, "Setup recovery primary");
-    await page.getByRole("button", { name: "Create a primary merchant", exact: true }).click();
+    await page.getByRole("button", { name: "Create merchant", exact: true }).click();
     await page.getByRole("textbox", { name: "Primary merchant name", exact: true }).fill(name);
-    await page.getByRole("button", { name: "Review merchant", exact: true }).click();
-    await page.getByRole("button", { name: "Create primary merchant", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Create merchant", exact: true }).click();
     await expect(page.getByRole("heading", { name, exact: true, level: 1 })).toBeVisible();
     const primary = (await merchantDashboard(page.request)).units.find(unit => unit.kind === "MASTER")!;
     await page.route("**/api/v1/merchants/*/gateway", async route => {
@@ -341,13 +339,13 @@ test("merchant setup recovers lost connection responses without repeating proces
       } else await route.continue();
     });
     async function enableAndRecover(merchantId: string) {
-      await page.getByRole("button", { name: "Enable sandbox payments", exact: true }).click();
-      const dialog = page.getByRole("dialog", { name: "Enable sandbox payments?", exact: true });
-      await dialog.getByRole("button", { name: "Enable sandbox payments", exact: true }).click();
+      await page.getByRole("button", { name: "Enable payments", exact: true }).click();
+      const dialog = page.getByRole("dialog", { name: "Enable payments?", exact: true });
+      await dialog.getByRole("button", { name: "Enable payments", exact: true }).click();
       await expect(dialog.getByRole("alert")).toContainText("This merchant’s connection is not yet confirmed");
       await page.getByRole("button", { name: "Retry payment setup", exact: true }).click();
       await expect(dialog).toBeHidden();
-      await expect(page.getByRole("region", {name: /^(Payment setup|Getting started with payments)$/})).toContainText(/Your sandbox payments are ready|Sandbox payments are ready/);
+      await expect(page.getByRole("region", {name: /^(Payment setup|Getting started with payments)$/})).toContainText(/Your payments are ready|Payments are ready/);
       const commands = enrollmentAttempts.get(`/api/v1/merchants/${merchantId}/test-enrollment`)!;
       expect(commands).toHaveLength(2); expect(commands[1]).toBe(commands[0]);
       const result = await page.request.get(`/api/v1/merchants/${merchantId}/operations`);
@@ -359,21 +357,21 @@ test("merchant setup recovers lost connection responses without repeating proces
     await enableAndRecover(primary.id); expect(processingWrites).toBe(1);
     await page.goto(`/merchant-services?view=unit:${primary.id}`);
     await page.getByRole("link", { name: "Merchants & people", exact: true }).click();
+    await page.getByRole("article", { name: `Merchant tools for ${primary.name}`, exact: true }).getByText(`Manage ${primary.name}`, { exact: true }).click();
     await page.getByRole("button", { name: "Add submerchant", exact: true }).click();
     await page.getByRole("textbox", { name: "Submerchant name", exact: true }).fill(`${name} branch`);
-    await page.getByRole("button", { name: "Review merchant", exact: true }).click();
-    await page.getByRole("button", { name: "Create submerchant", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Add submerchant", exact: true }).click();
     await expect(page.getByRole("heading", { name: `${name} branch`, exact: true, level: 1 })).toBeVisible();
     const sub = (await merchantDashboard(page.request)).units.find(unit => unit.kind === "SUB")!;
     await enableAndRecover(sub.id); expect(processingWrites).toBe(1);
     await page.goto(`/merchants/${primary.id}?tab=verification`);
     await page.getByText("Advanced payment settings", { exact: true }).click();
     await page.getByRole("button", { name: "Turn off payments", exact: true }).click();
-    await page.getByRole("dialog", { name: "Turn off sandbox payments?", exact: true }).getByRole("button", { name: "Confirm setting", exact: true }).click();
+    await page.getByRole("dialog", { name: "Turn off payments?", exact: true }).getByRole("button", { name: "Confirm setting", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await page.goto(`/merchants/${sub.id}?tab=channels`);
     await expect(page.getByRole("heading", { name: "Payments need your attention", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Enable sandbox payments", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Enable payments", exact: true })).toHaveCount(0);
     expect(processingWrites).toBe(2);
     const paused = await page.request.get(`/api/v1/merchants/${sub.id}/operations`);
     expect((await paused.json() as { gateway: { mode: string } }).gateway.mode).toBe("DISABLED");

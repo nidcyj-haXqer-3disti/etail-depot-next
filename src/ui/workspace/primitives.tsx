@@ -31,13 +31,11 @@ export function StatusBadge({ status, label }: { status: string; label?: string 
   const text = label ?? status.toLowerCase().replaceAll("_", " ").replace(/^\w/, (first) => first.toUpperCase());
   return <span className={`consumer-status consumer-status-${tone}`}><span aria-hidden="true" />{text}</span>;
 }
-export const StatusPill = StatusBadge;
 
 export function Feedback({ kind, message }: { kind: "success" | "error" | "info"; message: string }) {
   if (!message) return null;
   return <div className={`consumer-feedback consumer-feedback-${kind}`} role={kind === "error" ? "alert" : "status"}>{message}</div>;
 }
-export const Notice = Feedback;
 
 export function EmptyState({ title, description, children }: { title: string; description: string; children?: ReactNode }) {
   return <div className="consumer-empty"><span className="consumer-empty-symbol" aria-hidden="true">◇</span><h3>{title}</h3><p>{description}</p>{children}</div>;

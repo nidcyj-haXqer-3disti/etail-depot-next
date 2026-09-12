@@ -1,5 +1,9 @@
 # Etail Depot — active delivery plan
 
+12 September 2026 · D72: the user accepted D71 and requests customer-copy/dead-code cleanup, full verification and deployment. Follow [D72 release evidence](../docs/PRODUCTION_UI_CLEANUP.md) for the exact candidate. Preserve current schema, saved data, two-service permissions and disabled real-money controls.
+
+12 September 2026 · D71 experience refinement: [simpler consumer entry and dashboards](../docs/CONSUMER_ENTRY_REDESIGN.md) are implemented and locally verified on the existing prepaid slice. Review the revised desktop/mobile customer experience next; the financial contract and remaining release/product sequence below remain in force. D71 changes no schema or hosted resource and does not constitute a deployment.
+
 12 September 2026 · D69 · **Current stage: review the locally verified prepaid replacement and its connected customer/operator journey.** The working candidate replaces starting allocations, customer-authored purchase simulators, guest payment mutations and instant transfers. Both old local generations are preserved offline; active generations use `fresh-services-d69`. D69 tests, 33 visual views and offline packaging pass; [evidence](../docs/PREPAID_REBUILD_EVIDENCE.md) separates these results from hosted release acceptance.
 
 [FRESH_PREPAID_REBUILD.md](../docs/FRESH_PREPAID_REBUILD.md) is the active replacement contract, consolidated in [the product design](../docs/PRODUCT_TECHNICAL_DESIGN.md) and [project prompt](../02_MASTER_BUILD_PROMPT.md). [Status](STATUS.md) holds actual evidence. D65–D68 and their draft reviews remain history, not competing execution instructions. [M0–M7](backlog.json) retains original requirements and stable IDs without restoring retired account types.

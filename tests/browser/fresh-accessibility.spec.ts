@@ -6,6 +6,9 @@ import {merchantDashboard,openCardholder,signIn} from "./helpers/fresh";
 
 async function accessible(page:Page,label:string) {
  await test.step(label,async()=>{
+  await expect(page.locator("footer.site-footer")).toHaveCount(1);
+  await expect(page.locator('footer a[href="/help"]')).toHaveCount(1);
+  await expect(page.locator('footer a[href="/services"]')).toHaveCount(1);
   const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
   expect(result.violations.map(({id,impact,nodes})=>({id,impact,nodes:nodes.map(node=>({target:node.target,summary:node.failureSummary}))})),label).toEqual([]);
   expect(await page.evaluate(()=>Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)-window.innerWidth),`${label}: no horizontal page overflow`).toBeLessThanOrEqual(1);
@@ -67,7 +70,7 @@ for(const width of [1440,320]) {
     await accessible(page,`Merchant ${view.toLowerCase()}`);
    }
    await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Account services",exact:true}).click();
-   await expect(page.getByRole("heading",{name:"Your sandbox payments are ready",exact:true})).toBeVisible();
+   await expect(page.getByRole("heading",{name:"Your payments are ready",exact:true})).toBeVisible();
    await accessible(page,"Merchant payment setup");
    if(persona==="viewer") {
     await expect(page.getByRole("button",{name:"Request deposit",exact:true})).toHaveCount(0);

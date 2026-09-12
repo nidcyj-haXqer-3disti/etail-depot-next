@@ -1,12 +1,47 @@
 import {closeDatabase} from "../../src/platform/database/client";
-import {freshPrepaidCard,payPublishedWithCard} from "./helpers/prepaid";
+import {freshPrepaidCard,payPublishedWithCard,signInPerson} from "./helpers/prepaid";
 import {randomUUID} from "node:crypto";
 import {expect,test} from "@playwright/test";
 import {headers,signIn} from "./helpers/fresh";
 import {createMerchantViaApi} from "../helpers/merchant-api";
 import {merchantDashboardProjectionSchema} from "../../src/modules/acquiring/dashboard-contracts";
+import {merchantAccessFixture} from "../helpers/merchant-access";
 
 test.afterAll(closeDatabase);
+test("a primary can return from one submerchant to parent management without widening shared access",async({page})=>{
+ const fixture=await merchantAccessFixture(),{merchant,master,unit,operator}=fixture;
+ const savedFilters={period:"last7",q:"Saved merchant search",status:"COLLECTED",activity:"payments"};
+ const query=new URLSearchParams({...savedFilters,section:"merchants",view:`unit:${unit.id}`});
+ await signInPerson(page,merchant.personId);
+ await page.goto(`/merchant-services?${query}`);
+ const parentName=`Manage ${master.displayName}`;
+ const contextLink=page.locator(".md-context").getByRole("link",{name:parentName,exact:true});
+ const subCard=page.getByRole("article",{name:`Merchant tools for ${unit.displayName}`,exact:true});
+ const parentLink=subCard.getByRole("link",{name:parentName,exact:true});
+ await expect(contextLink).toBeVisible();
+ await expect(parentLink).toHaveAttribute("href",(await contextLink.getAttribute("href"))!);
+ await expect(page.getByRole("article",{name:`Merchant tools for ${master.displayName}`,exact:true})).toHaveCount(0);
+ await parentLink.click();
+ await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&url.searchParams.get("section")==="merchants"&&url.searchParams.get("view")===`network:${master.id}`&&Object.entries(savedFilters).every(([key,value])=>url.searchParams.get(key)===value));
+ const parentCard=page.getByRole("article",{name:`Merchant tools for ${master.displayName}`,exact:true});
+ await parentCard.getByText(parentName,{exact:true}).click();
+ await expect(parentCard.getByRole("button",{name:"Add submerchant",exact:true})).toBeVisible();
+ await expect(parentCard.getByRole("navigation",{name:`Tools for ${master.displayName}`,exact:true})).toBeVisible();
+ await page.reload();
+ await expect(parentCard).toBeVisible();
+ await signInPerson(page,operator.personId);
+ await page.goto(`/merchant-services?${query}`);
+ await expect(subCard).toBeVisible();
+ await expect(page.getByText(`Submerchant of ${master.displayName}`,{exact:true})).toHaveCount(2);
+ await expect(page.getByRole("link",{name:parentName,exact:true})).toHaveCount(0);
+ await expect(parentCard).toHaveCount(0);
+ await expect(page.getByRole("button",{name:"Add submerchant",exact:true})).toHaveCount(0);
+ const dashboard=await page.request.get(`/api/v1/merchants/dashboard?${query}`);
+ expect(dashboard.status()).toBe(200);
+ expect(merchantDashboardProjectionSchema.parse(await dashboard.json()).units.map(row=>row.id)).toEqual([unit.id]);
+ expect((await page.request.get(`/api/v1/merchants/${master.id}/operations`)).status()).toBe(404);
+});
+
 test("merchant network activity keeps scope, dates and pages through exact records, exports and current funds",async({page})=>{
  test.setTimeout(120000);await signIn(page.request);
  const name=`Activity network ${randomUUID().slice(0,8)}`,primary=await createMerchantViaApi(page.request,name);
@@ -44,6 +79,7 @@ test("merchant network activity keeps scope, dates and pages through exact recor
  expect(new URL(page.url()).searchParams.get("returnTo")).toBe(activityReturn);
  await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Overview",exact:true}).click();
  await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&[...query].every(([key,value])=>url.searchParams.get(key)===value)&&url.searchParams.get("page")==="2");
+ await page.locator("summary").filter({hasText:"Totals & downloads"}).click();
  const exportLink=page.getByRole("link",{name:"Download payments CSV",exact:true});const csv=await page.request.get((await exportLink.getAttribute("href"))!);expect(csv.status()).toBe(200);expect(csv.headers()["cache-control"]).toContain("no-store");expect((await csv.text()).split("\r\n")).toHaveLength(28);
  await page.getByRole("navigation",{name:"Merchant workspace views"}).getByRole("link",{name:"Funds & deposits",exact:true}).click();await expect(page.getByRole("heading",{name:"Funds & deposits",exact:true})).toBeVisible();await expect(page.locator(".md-balance-grid>div").filter({has:page.getByText("Awaiting settlement",{exact:true})})).toContainText("$195.00");
  await page.getByRole("link",{name:"Back to payment activity",exact:true}).click();await expect(page.getByRole("searchbox",{name:"Search payments",exact:true})).toHaveValue(name);
@@ -57,6 +93,7 @@ test("merchant network activity keeps scope, dates and pages through exact recor
  await page.getByRole("navigation",{name:"Merchant workspace views"}).getByRole("link",{name:"Merchants & people",exact:true}).click();
  await expect(page).toHaveURL(url=>url.searchParams.get("section")==="merchants");
  const directoryUrl=page.url();
+ await page.getByRole("article",{name:"Merchant tools for Weekend collection",exact:true}).locator("summary").filter({hasText:"Manage Weekend collection"}).click();
  await page.getByRole("article",{name:"Merchant tools for Weekend collection",exact:true}).getByRole("navigation",{name:"Tools for Weekend collection",exact:true}).getByRole("link",{name:"Payment channels",exact:true}).click();
  await expect(page.getByRole("heading",{name:"Weekend collection",exact:true})).toBeVisible();
  await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Payments",exact:true}).click();

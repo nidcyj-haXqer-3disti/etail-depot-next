@@ -71,6 +71,5 @@ export function CardCheckout({offer,cards,hasMore,page,search,review:initial}:{o
     <Feedback kind="error" message={error}/>
     {error&&!working&&!uncertain&&!accessDenied&&<a className="gc-back" href={`/checkout/${publication.id}/card`}>Reload cards and choose again</a>}
     {uncertain&&<p className="gc-note">The result is not yet confirmed. Retrying checks this saved request; it does not create a second payment.</p>}
-    <p className="gc-note">Sandbox · No real money moves.</p>
   </section></div>;
 }

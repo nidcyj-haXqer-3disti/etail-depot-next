@@ -33,12 +33,12 @@ async function applicantAllowed(tx:ScopedTransaction,personId:string) {
 }
 function requirements(row:Application):SetupRequirement[] {
   return [
-    {code:"ENTITY_TYPE",label:"Merchant type",status:row.legalEntityType?"COMPLETE":"REQUIRED",detail:"Choose individual, sole proprietor or business. This choice is not an approval."},
-    {code:"SELLING_NAME",label:"Selling name",status:row.sellingName?"COMPLETE":"REQUIRED",detail:"Use a fictional selling name for this sandbox setup."},
-    {code:"LEGAL_NAME",label:"Fictional legal name",status:row.legalName?"COMPLETE":"REQUIRED",detail:"Name the unverified fictional legal party separately from its selling name and human applicant."},
-    {code:"ACTIVITY",label:"What you sell",status:row.activityDescription?"COMPLETE":"REQUIRED",detail:"Describe the fictional goods or services."},
-    {code:"FICTIONAL_CONFIRMATION",label:"Fictional details confirmed",status:row.fictionalDetailsConfirmed?"COMPLETE":"REQUIRED",detail:"Do not enter real identity, tax, card or bank details."},
-    {code:"MERCHANT_REVIEW",label:"Merchant review",status:"UNAVAILABLE",detail:"No verification or merchant decision provider is connected. Your details can be saved for review; no live verification is performed."},
+    {code:"ENTITY_TYPE",label:"Business type",status:row.legalEntityType?"COMPLETE":"REQUIRED",detail:"Choose an individual, sole proprietor or business."},
+    {code:"SELLING_NAME",label:"Selling name",status:row.sellingName?"COMPLETE":"REQUIRED",detail:"Enter your shop or trading name."},
+    {code:"LEGAL_NAME",label:"Legal name",status:row.legalName?"COMPLETE":"REQUIRED",detail:"Enter the name of the person or business applying."},
+    {code:"ACTIVITY",label:"What you sell",status:row.activityDescription?"COMPLETE":"REQUIRED",detail:"Describe your products or services."},
+    {code:"FICTIONAL_CONFIRMATION",label:"Business details",status:row.fictionalDetailsConfirmed?"COMPLETE":"REQUIRED",detail:"Review your details before submitting."},
+    {code:"MERCHANT_REVIEW",label:"Business review",status:"UNAVAILABLE",detail:"Your details can be saved for review."},
   ];
 }
 async function applicationProjection(tx:ScopedTransaction,row:Application,canManage:boolean):Promise<MerchantSetupProjection> {
@@ -49,9 +49,9 @@ async function applicationProjection(tx:ScopedTransaction,row:Application,canMan
     try {const responsible=await loadServiceScope(tx,row.responsiblePersonId,row.serviceId);responsibleAllowed=evaluate(responsible.policy,"acquiring.setup").allowed&&await applicantAllowed(tx,row.responsiblePersonId);}
     catch(error){if(error instanceof SecurityError&&error.status===404)responsibleAllowed=false;else throw error;}
   }
-  const items:SetupRequirement[]=[...requirements(row),{code:"RESPONSIBLE_APPLICANT",label:"Named responsible applicant",status:responsibleAllowed?"COMPLETE":"REQUIRED",detail:row.status==="PENDING_LOCAL_REVIEW"?"The application preserves its named fictional applicant at submission; it does not assert current access or verified legal authority.":responsibleAllowed?"The named fictional applicant is eligible and has explicit setup permission; no real identity or legal authority has been verified.":"The named applicant must retain accepted Merchant access, explicit setup permission and fictional adult eligibility before submission."}];
+  const items:SetupRequirement[]=[...requirements(row),{code:"RESPONSIBLE_APPLICANT",label:"Applicant",status:responsibleAllowed?"COMPLETE":"REQUIRED",detail:row.status==="PENDING_LOCAL_REVIEW"?"The applicant is recorded with this submission.":responsibleAllowed?"The applicant has permission to submit these business details.":"The applicant needs current permission to submit these business details."}];
   const canEdit=canManage&&row.status==="DRAFT";
-  return {id:row.id,serviceId:row.serviceId,responsiblePersonId:row.responsiblePersonId,responsiblePersonName:person!.displayName,status:row.status,version:row.version,legalEntityType:row.legalEntityType,sellingName:row.sellingName,legalName:row.legalName,activityDescription:row.activityDescription,country:"US",fictionalDetailsConfirmed:row.fictionalDetailsConfirmed,createdAt:row.createdAt.toISOString(),updatedAt:row.updatedAt.toISOString(),submittedAt:row.submittedAt?.toISOString()??null,canEdit,canSubmit:canEdit&&!items.some(item=>item.status==="REQUIRED"),requirements:items,timelineHasMore:events.length>100,timeline:events.slice(0,100).reverse().map(event=>({id:event.id,at:event.createdAt.toISOString(),label:{CREATED:"Setup draft created",SAVED:"Setup draft saved",SUBMITTED_LOCAL:"Details saved for review; no live verification performed"}[event.kind]}))};
+  return {id:row.id,serviceId:row.serviceId,responsiblePersonId:row.responsiblePersonId,responsiblePersonName:person!.displayName,status:row.status,version:row.version,legalEntityType:row.legalEntityType,sellingName:row.sellingName,legalName:row.legalName,activityDescription:row.activityDescription,country:"US",fictionalDetailsConfirmed:row.fictionalDetailsConfirmed,createdAt:row.createdAt.toISOString(),updatedAt:row.updatedAt.toISOString(),submittedAt:row.submittedAt?.toISOString()??null,canEdit,canSubmit:canEdit&&!items.some(item=>item.status==="REQUIRED"),requirements:items,timelineHasMore:events.length>100,timeline:events.slice(0,100).reverse().map(event=>({id:event.id,at:event.createdAt.toISOString(),label:{CREATED:"Business details started",SAVED:"Business details saved",SUBMITTED_LOCAL:"Business details submitted for review"}[event.kind]}))};
 }
 function profileMutable(profile:Profile|undefined) {return !profile||!["RESTRICTED","DECLINED","CLOSED"].includes(profile.status);}
 
@@ -81,7 +81,7 @@ export async function getMerchantBusinessDetails(personId:string,merchantId:stri
     const [application]=await tx.select().from(merchantApplications).where(eq(merchantApplications.serviceId,scope.service.id));
     const canManageSetup=await applicantAllowed(tx,personId)&&evaluate(scope.policy,"acquiring.setup").allowed&&(!profile||profile.status==="DRAFT");
     return {merchantId:merchant.unit.id,name:merchant.unit.displayName,primaryAccess:merchant.primaryAccess,
-      merchantStatus:profile?.status??"NOT_STARTED",statusDetail:profile?.status==="PENDING_LOCAL_REVIEW"?"Business details are saved for review. Live verification is not connected.":"Review your business details. Sandbox payment setup remains separate from live verification.",
+      merchantStatus:profile?.status??"NOT_STARTED",statusDetail:profile?.status==="PENDING_LOCAL_REVIEW"?"Business details are saved for review.":"Review your business details, then continue to payment setup.",
       canStartSetup:canManageSetup&&!application,canManageSetup,setup:application?await applicationProjection(tx,application,canManageSetup):null};
   },{isolationLevel:"repeatable read"});
 }
@@ -133,12 +133,12 @@ export async function initializeMasterMerchant(tx:ScopedTransaction,serviceId:st
 }
 async function merchantReadiness(tx:ScopedTransaction,scope:MerchantScope):Promise<MerchantReadiness> {
   const requirements:SetupRequirement[]=[
-    {code:"MASTER_RESPONSIBILITY",label:"Responsible primary merchant",status:scope.policy.operating?"COMPLETE":"REQUIRED",detail:`${scope.master.displayName} is responsible for this merchant’s collections, refunds and transfers. ${scope.policy.operating?"Merchant access is active.":"Merchant activity is paused or access has changed."}`},
-    {code:"BUSINESS_VERIFICATION",label:"Live business verification",status:"UNAVAILABLE",detail:"Live verification is not connected. Use fictional information in this sandbox."},
-    {code:"GATEWAY_BINDING",label:"Live payment setup",status:"UNAVAILABLE",detail:"A live payment provider is not connected. Sandbox payment setup is managed separately."},
-    {code:"PAYMENT_PROCESSING",label:"Live payments",status:"UNAVAILABLE",detail:"Sandbox payments use test funds. No real card is charged."},
-    {code:"PAYOUTS",label:"Live transfers",status:"UNAVAILABLE",detail:"Sandbox transfers do not send money to a bank."},
-    {code:"DELIVERY",label:"Message delivery",status:"UNAVAILABLE",detail:"Preview links and QR codes are available to permitted sandbox users. Messages are not sent."},
+    {code:"MASTER_RESPONSIBILITY",label:"Responsible primary merchant",status:scope.policy.operating?"COMPLETE":"REQUIRED",detail:`${scope.master.displayName} is responsible for this merchant’s collections, refunds and deposits. ${scope.policy.operating?"Merchant access is active.":"Merchant activity is paused or access has changed."}`},
+    {code:"BUSINESS_VERIFICATION",label:"Business verification",status:"UNAVAILABLE",detail:"Business verification is not available."},
+    {code:"GATEWAY_BINDING",label:"Bank payment connection",status:"UNAVAILABLE",detail:"A bank payment connection is not available."},
+    {code:"PAYMENT_PROCESSING",label:"Bank card payments",status:"UNAVAILABLE",detail:"Payments with bank-issued cards are not available."},
+    {code:"PAYOUTS",label:"Bank deposits",status:"UNAVAILABLE",detail:"Bank deposits are not available."},
+    {code:"DELIVERY",label:"Message delivery",status:"UNAVAILABLE",detail:"Copy a payment link or QR code to share it. Automatic messages are not available."},
   ];
   return {responsibility:"MASTER_RESPONSIBLE",verification:"NOT_VERIFIED",gateway:"NOT_CONNECTED",externalMid:null,paymentAcceptance:false,payouts:false,commercialSpending:"NOT_ASSESSED",requirements};
 }

@@ -24,7 +24,8 @@ async function submit(page: Page, path: string, button: ReturnType<Page["getByRo
 }
 async function register(page: Page, email: string, credential = password) {
   await page.goto("/login");
-  await expect(page.getByRole("button", { name: "Continue as primary user", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Continue as (primary user|secondary user|support operator)$/ })).toHaveCount(0);
+  await expect(page.locator(".fixture-panel")).toHaveCount(0);
   await page.getByRole("button", { name: "Create a login", exact: true }).click();
   const form = page.getByRole("form", { name: "Create your login", exact: true });
   await form.getByLabel("Email address", { exact: true }).fill(email);
@@ -34,16 +35,22 @@ async function register(page: Page, email: string, credential = password) {
   expect(response.status()).toBe(200);
   expect(await response.json()).toEqual({ registrationRequested: true });
   expect(Boolean((await response.allHeaders())["set-cookie"])).toBe(false);
-  await expect(page.getByRole("form", { name: "Confirm your email", exact: true })).toBeVisible();
+  const waiting = page.getByRole("form", { name: "Check your email", exact: true });
+  await expect(waiting).toBeVisible();
+  await expect(waiting.locator("input")).toHaveCount(0);
+  await expect(waiting.getByRole("button", { name: "Confirm email", exact: true })).toHaveCount(0);
+  await expect(waiting).toContainText("For a new login, open the confirmation email in your inbox or spam folder and follow its link.");
   return member(email);
 }
 async function confirm(page: Page, confirmation: string) {
   // Exercise the real default provider callback landing and single-use memory bridge.
   // The token is synthetic and immediately stripped; no URL/header/request recording is enabled.
+  const priorCalls = (await control<{ calls: string[] }>("calls")).calls.filter(call => call === "POST /verify").length;
   await page.goto(`/#confirmation_token=${confirmation}`);
   await expect(page).toHaveURL(url => url.pathname === "/login" && url.hash === "");
   const form = page.getByRole("form", { name: "Confirm your email", exact: true });
   await expect(form.getByLabel("Confirmation link", { exact: true })).toHaveCount(0);
+  expect((await control<{ calls: string[] }>("calls")).calls.filter(call => call === "POST /verify")).toHaveLength(priorCalls);
   const response = await submit(page, "confirm", form.getByRole("button", { name: "Confirm email", exact: true }));
   expect(response.status()).toBe(200); expect(await response.json()).toEqual({ confirmed: true });
   expect(Boolean((await response.allHeaders())["set-cookie"])).toBe(false);
@@ -57,10 +64,10 @@ async function login(page: Page, email: string, credential: string) {
 }
 async function authenticated(page: Page) {
   await expect(page).toHaveURL(`${applicationOrigin}/services`);
-  await expect(page.getByRole("heading", { level: 1, name: "Choose your first service", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Welcome to Etail Depot", exact: true })).toBeVisible();
   expect((await page.request.get("/api/v1/services")).status()).toBe(200);
   await page.reload();
-  await expect(page.getByRole("heading", { level: 1, name: "Choose your first service", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Welcome to Etail Depot", exact: true })).toBeVisible();
   expect((await page.request.get("/api/v1/auth/sessions")).status()).toBe(200);
   const cookies = (await page.context().cookies()).filter(cookie => cookie.name === "etail_session");
   expect(cookies.length).toBe(1);
@@ -135,7 +142,6 @@ test("confirmed duplicate registration gives neutral guidance and leaves the ori
   await register(page, email, newPassword);
   const notice = page.getByRole("main").getByRole("status").filter({ hasText: "Your request was received." });
   await expect(notice).toContainText("If you already have a login, use your existing password or reset it.");
-  await expect(notice).toContainText("Registering again does not change your password.");
   await expect(page.getByRole("button", { name: "Forgot your password?", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Request a new confirmation email", exact: true })).toHaveCount(0);
   expect((await page.context().cookies()).some(cookie => cookie.name.includes("etail_session"))).toBe(false);
@@ -148,6 +154,42 @@ test("confirmed duplicate registration gives neutral guidance and leaves the ori
   expect(calls.filter(call => call === "POST /signup")).toHaveLength(2);
   expect(calls.filter(call => call === "POST /verify")).toHaveLength(1);
   expect(calls.filter(call => call === "POST /token")).toHaveLength(2);
+});
+
+test("an emailed confirmation overrides registration mode and preserves checkout return after a lost acknowledgement", async ({ page }) => {
+  const email = `email-e2e-${randomUUID()}@example.test`;
+  const fixture = await register(page, email);
+  const destination = `/checkout/${randomUUID()}/card?review=${randomUUID()}`;
+  const confirmationRoute = `${applicationOrigin}/api/v1/auth/confirm`;
+  let requests = 0;
+  await page.route(confirmationRoute, async route => {
+    requests += 1;
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toEqual({confirmed:true});
+    await route.abort("connectionfailed");
+  });
+  await page.goto(`/login?mode=register&next=${encodeURIComponent(destination)}#confirmation_token=${fixture.confirmation}`);
+  const form = page.getByRole("form", {name:"Confirm your email",exact:true});
+  await expect(form).toBeVisible();
+  await expect(page).toHaveURL(url=>url.hash===""&&url.searchParams.get("next")===destination);
+  await expect(form.locator("input")).toHaveCount(0);
+  expect(requests).toBe(0);
+  expect((await control<{calls:string[]}>("calls")).calls).not.toContain("POST /verify");
+  await form.getByRole("button", {name:"Confirm email",exact:true}).click();
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText("We could not confirm the result. Try signing in with your email and password. If confirmation is still needed, open the link in your latest confirmation email again.");
+  expect(requests).toBe(1);
+  expect((await member(email)).confirmed).toBe(true);
+  expect((await page.request.get("/api/v1/services")).status()).toBe(401);
+  expect(await page.evaluate(()=>localStorage.length+sessionStorage.length)).toBe(0);
+  await page.getByRole("button", {name:"Back to sign in",exact:true}).click();
+  expect((await login(page,email,password)).status()).toBe(200);
+  // This checks the authentication return destination only; no checkout or
+  // payment fixture is created, and the unknown checkout stays unavailable.
+  await expect(page).toHaveURL(`${applicationOrigin}${destination}`);
+  expect((await page.request.get("/api/v1/auth/sessions")).status()).toBe(200);
+  expect(requests).toBe(1);
+  expect((await control<{calls:string[]}>("calls")).calls.filter(call=>call==="POST /verify")).toHaveLength(1);
 });
 
 test("confirmation-setting drift blocks signup at submit and clears after availability is checked", async ({ page }) => {
@@ -174,14 +216,13 @@ test("confirmation-setting drift blocks signup at submit and clears after availa
   await form.getByLabel("Password", { exact: true }).fill(password);
   await form.getByLabel("Confirm password", { exact: true }).fill(password);
   expect((await submit(page, "register", form.getByRole("button", { name: "Create login", exact: true }))).status()).toBe(200);
-  await expect(page.getByRole("form", { name: "Confirm your email", exact: true })).toBeVisible();
+  await expect(page.getByRole("form", { name: "Check your email", exact: true })).toBeVisible();
   expect((await control<{ calls: string[] }>("calls")).calls.filter(call => call === "POST /signup")).toHaveLength(1);
 });
 
 test("UI edge case: an intercepted signup response cannot double-submit or resend after a timeout", async ({ page }) => {
   const email = `email-e2e-${randomUUID()}@example.test`;
-  await page.goto("/login");
-  await page.getByRole("button", { name: "Create a login", exact: true }).click();
+  await page.goto("/login?mode=register");
   const form = page.getByRole("form", { name: "Create your login", exact: true });
   await form.getByLabel("Email address", { exact: true }).fill(email);
   await form.getByLabel("Password", { exact: true }).fill(password);
@@ -214,6 +255,11 @@ test("UI edge case: an intercepted signup response cannot double-submit or resen
     expect(requests).toBe(1);
     await expect(form.getByRole("button", { name: "Please wait…", exact: true })).toBeDisabled();
     await expect(page.getByRole("button", { name: "Back to sign in", exact: true })).toBeDisabled();
+    await page.getByRole("banner").getByRole("link", { name: "Sign in", exact: true }).click();
+    await expect(page).toHaveURL(url => url.pathname === "/login" && url.search === "");
+    await expect(form).toBeVisible();
+    await expect(form.getByRole("button", { name: "Please wait…", exact: true })).toBeDisabled();
+    await expect(page.getByRole("form", { name: "Sign in with email", exact: true })).toHaveCount(0);
     expect((await control<{ calls: string[] }>("calls")).calls.filter(call => call === "POST /signup")).toHaveLength(1);
     await page.clock.fastForward(30_001);
     const alert = page.getByRole("main").getByRole("alert");
@@ -248,6 +294,12 @@ test("recovery callback changes the password, revokes the prior session and perm
     await recover.getByLabel("Email address", { exact: true }).fill(email);
     const requested = await submit(page, "recover", recover.getByRole("button", { name: "Send reset email", exact: true }));
     expect(requested.status()).toBe(200);
+    const waiting = page.getByRole("form", { name: "Check your email", exact: true });
+    await expect(waiting).toBeVisible();
+    await expect(waiting.locator("input")).toHaveCount(0);
+    await expect(waiting.getByRole("button", { name: "Save new password", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Request a new reset email", exact: true })).toBeVisible();
+    await expect(page.getByRole("main").getByRole("status")).toHaveText("If this email has a login, a reset email has been requested.");
     const recovery = (await member(email)).recovery;
     await page.goto(`/#recovery_token=${recovery}`);
     await expect(page).toHaveURL(url => url.pathname === "/login" && url.hash === "");

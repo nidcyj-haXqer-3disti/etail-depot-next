@@ -36,6 +36,9 @@ async function bounded(promise,ms){let timer;try{return await Promise.race([prom
 async function capture(page,role,width,screen,url,ready){
  current={role,width,screen};const response=await page.goto(origin+url,{waitUntil:'domcontentloaded'});assert(response?.ok(),'PAGE_OPEN_FAILED');assert(new URL(page.url()).origin===origin,'UNEXPECTED_PAGE_ORIGIN');await ready(page);
  await bounded(page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.images].filter(image=>image.getClientRects().length>0).map(image=>{image.loading='eager';return image.complete?Promise.resolve():new Promise(resolve=>{image.addEventListener('load',resolve,{once:true});image.addEventListener('error',resolve,{once:true});});}));await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));}),15_000);
+ await expect(page.locator('footer.site-footer')).toHaveCount(1);await expect(page.locator('footer.site-footer a[href="/help"]')).toHaveCount(1);
+ await expect(page.locator('.sandbox-badge')).toHaveText('Sandbox');await expect(page.locator('.sandbox-badge')).toHaveCount(1);
+ assert(!/\b(sandbox|demo|practice|fixture)\b/i.test(await page.locator('main').innerText()),'CUSTOMER_ENVIRONMENT_COPY');
  const geometry=await page.evaluate(()=>({viewport:innerWidth,scrollWidth:Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)}));
  const axe=await bounded(new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze(),30_000);
  const violations=axe.violations.map(item=>({id:item.id,nodes:item.nodes.length}));
@@ -89,7 +92,7 @@ try{
      await capture(page,role,width,'merchant',`/merchants/${popup.unitId}?tab=payments`,page=>expect(page.getByRole('region',{name:'Payments',exact:true})).toBeVisible());
     }else{
      await capture(page,role,width,'support-queue','/operations',heading('Customer care'));
-     await capture(page,role,width,'deposit-queue','/operations/deposits',async page=>{await expect(page.getByRole('heading',{name:'Deposit processing',exact:true})).toBeVisible();await expect(page.getByText('No pending deposits are available with your processing assignment.',{exact:true})).toBeVisible();});
+     await capture(page,role,width,'deposit-queue','/operations/deposits',async page=>{await expect(page.getByRole('heading',{name:'Deposit processing',exact:true})).toBeVisible();await expect(page.getByText('No pending deposits for your assigned merchants.',{exact:true})).toBeVisible();});
     }
    }
    const after=await snapshot(page,endpoints);preserved.push({role,reads:endpoints.length,before,after,unchanged:before===after});
