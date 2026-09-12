@@ -1,3 +1,11 @@
+# D75 — practical dashboard correction (12 September 2026)
+
+The user requested a simpler services page and a practical American Express benchmark. [D75 review](../docs/PRACTICAL_DASHBOARD_REVIEW.md) records freshly inspected public references, concrete task gaps and the implementation boundaries. Branch `codex/amex-practical-dashboards` starts from local D74 `05545226313d626fa20d9627f888ca170ea28bee`, the same tree as deployed main `7aa3226524e0f148bacafca214dfa27c636a68f1` (PR17, deploy `6aa52e4e7b73063e222ec7f3`).
+
+The services hub has two compact destinations. Card limits and available spending are visible together, owners have a direct limit action, and an unselected account offers actual authorized cards. Merchant searches retain scope/date/status through forms and exact records; refunds/deposits have contextual labels and current money stays separate from search history. The existing limit capability is evaluated in the selected-card projection. No schema, saved-data, provider or financial-rule change is needed.
+
+Local verification passes402 unit,12 contract,8 focused PostgreSQL,26 distinct affected browser/accessibility,26 isolated email and35 handoff cases. Final lint/types/architecture/security and production Netlify packaging pass. Manual review covers57 after-state captures,12 final merchant views and3 genuine multi-card picker views. Original failures and corrections are recorded in the review. Exact source identity, GitHub checks, reviewed merge and canonical release are tracked in the D75 release PR and `artifacts/d75-publication.json`; local results alone do not establish a deployment. Practical dispute triage and external provider capabilities remain open.
+
 # D74 — clear customer language (12 September 2026)
 
 The user requested wording that first-time customers can recognize. [The language contract](../docs/CUSTOMER_LANGUAGE.md) names the services Cards & spending and Accept payments, explains balances and total spending limits, and separates collecting a payment from paying it. Public pages, navigation, dashboards, invitations, help and checkout now use the same terms. A payment-request illustration clarifies the seller journey; interrupted checkout results show plain recovery instructions. Internal service enums, routes, financial commands, permissions and database schema remain unchanged.

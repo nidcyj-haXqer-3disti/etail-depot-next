@@ -18,3 +18,34 @@
 @media(max-width:350px){.md-money-grid>div{padding:14px 11px}.md-money-grid dd{font-size:22px}.md-activity-tabs{gap:20px}}
 
 .md-money-grid>div:only-child{grid-column:1/-1}
+
+/* Keep the working records close to their scope, filters and download. */
+.md-context{padding:0;border:0;border-radius:0;background:transparent;gap:16px}
+.md-context h2{font-size:20px}
+.md-context p:not(.consumer-eyebrow){margin-top:4px}
+.md-context>.consumer-button{min-height:44px;font-size:13px;white-space:normal}
+.md-terminal-filter{padding:0;max-width:640px}
+.md-balance-summary{padding-bottom:20px;margin-bottom:22px;border-bottom:1px solid var(--md-line)}
+.md-balance-summary .md-section-heading{margin-bottom:10px}
+.md-balance-summary dl{display:grid;gap:12px;margin:0}
+.md-balance-summary dl>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0}
+.md-balance-summary dt{font-size:13px;line-height:1.6;color:var(--md-muted);overflow-wrap:anywhere}
+.md-balance-summary dd{margin:0;font-size:28px;line-height:1.3;letter-spacing:-.03em;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;min-width:0}
+.md-balance-summary>p{margin:10px 0 0;font-size:12px;line-height:1.6;color:var(--md-muted)}
+.md-activity-filters{padding:0;gap:12px}
+.md-activity-filters>.md-filter-search{flex:2 1 230px}
+.md-period-context{display:block;color:var(--md-muted);font-weight:400;overflow-wrap:anywhere}
+.md-result-bar .md-download{min-height:44px}
+.md-panel td>.md-visible-reference{font-size:11px;overflow-wrap:anywhere}
+@media(max-width:600px){
+ .md-context{padding:0;gap:12px}
+ .md-context h2{font-size:20px}
+ .md-terminal-filter{width:100%;gap:10px}
+ .md-terminal-filter>label{flex:1 1 140px}
+ .md-terminal-filter>.consumer-button{width:auto}
+ .md-balance-summary dl>div{align-items:flex-start;flex-direction:column;gap:4px}
+ .md-balance-summary dd{font-size:27px}
+ .md-activity-filters>label{flex:1 1 calc(50% - 6px)}
+ .md-activity-filters>.md-filter-search{flex-basis:100%}
+ .md-result-bar{gap:8px}
+}

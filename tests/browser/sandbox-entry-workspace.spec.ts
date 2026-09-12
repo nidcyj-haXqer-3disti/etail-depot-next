@@ -51,7 +51,9 @@ test("first service choice survives an unknown setup result without opening fina
   await page.goto("/services");
   await expect(page.getByRole("heading",{name:"Your dashboard",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Your member code",exact:true})).not.toBeVisible();
-  await page.getByRole("link",{name:"Open your profile",exact:true}).click();
+  await expect(page.locator("main").getByRole("link")).toHaveCount(2);
+  await expect(page.locator("main")).not.toContainText("Account support");
+  await page.getByRole("navigation",{name:"Footer support",exact:true}).getByRole("link",{name:"Your profile",exact:true}).click();
   await expect(page).toHaveURL(/\/profile$/);
   const memberCode=page.getByRole("complementary",{name:"Your member code",exact:true});
   await expect(memberCode).toBeVisible();
