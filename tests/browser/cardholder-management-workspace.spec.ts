@@ -104,7 +104,9 @@ test("an owner sees a person's cards and history while holders cannot open manag
  const profile=page.locator(".access-cardholder");await expect(profile.locator(".access-person-card-list li")).toHaveCount(2);await expect(profile).toContainText("Jordan groceries");await expect(profile).toContainText("Jordan travel");
  await expect(page.getByRole("button",{name:"Change access",exact:true})).toHaveCount(0);await accessible(page);
  await page.getByRole("link",{name:"All people",exact:true}).click();
- await page.getByRole("searchbox",{name:"Search people",exact:true}).fill("Jordan");await page.getByRole("button",{name:"Search",exact:true}).click();await page.reload();
+ await page.getByRole("searchbox",{name:"Search people",exact:true}).fill("Jordan");await page.getByRole("button",{name:"Search",exact:true}).click();
+ await page.waitForURL(url=>url.pathname==="/cardholder-services"&&url.searchParams.get("view")==="cardholders"&&url.searchParams.get("peopleSearch")==="Jordan",{waitUntil:"domcontentloaded"});
+ await expect(profile).toHaveCount(1);await page.reload();
  await expect(page.getByRole("searchbox",{name:"Search people",exact:true})).toHaveValue("Jordan");await expect(profile).toHaveCount(1);
  await profile.getByRole("link",{name:"Jordan Sample",exact:true}).click();await expect(profile.locator(".access-person-card-list li")).toHaveCount(2);
  await profile.locator("li").filter({hasText:"Jordan travel"}).getByRole("link",{name:"Card settings",exact:true}).click();
