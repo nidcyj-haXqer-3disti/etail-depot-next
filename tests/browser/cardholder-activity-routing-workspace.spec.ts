@@ -49,7 +49,7 @@ test("older activity links preserve unavailable and duplicate selection handling
     `activityCard=${own.card.id}&transaction=${foreign.activity!.id}`,
   ]){
     await page.goto(`/cardholder-services?${query}`);
-    await expect(page.getByRole("heading",{name:"This cardholder view is unavailable",exact:true})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"This card view is unavailable",exact:true})).toBeVisible();
     expect(new URL(page.url()).pathname).toBe("/cardholder-services/activity");
     await expect(page.getByRole("heading",{name:"Card activity",exact:true})).toHaveCount(0);
     await expect(page.locator("main")).not.toContainText(foreign.card.nickname);

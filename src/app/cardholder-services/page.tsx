@@ -13,14 +13,14 @@ import { CardholderDashboard } from "@/ui/cardholder-dashboard";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
-export const metadata = { title: "Cardholder services" };
+export const metadata = { title: "Cards & spending" };
 
 export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const session = await getRequestSession().catch(() => undefined);
   if (session === undefined) return <PageNotice title="We couldn’t load your session"><p>Please try signing in again.</p></PageNotice>;
   if (!session) redirect("/login");
   const sandbox = await getSandboxOverview(session.personId);
-  if (!sandbox.joined) return <Shell authenticated><div className="page-container services-page"><div className="page-heading"><p className="eyebrow">CARDHOLDER SERVICES</p><h1>Cards for you and your people</h1><p>A clear view of spending, with you in control.</p></div><SandboxEntry initial={sandbox} service="cardholder"/></div></Shell>;
+  if (!sandbox.joined) return <Shell authenticated><div className="page-container services-page"><div className="page-heading"><p className="eyebrow">CARDS & SPENDING</p><h1>Cards for you and your people</h1><p>A clear view of spending, with you in control.</p></div><SandboxEntry initial={sandbox} service="cardholder"/></div></Shell>;
   const query = await searchParams;
   const pageValue = query.page ?? "0";
   if (typeof pageValue !== "string" || !/^(0|[1-9][0-9]{0,4})$/.test(pageValue)) return <PageNotice title="This card page is unavailable" authenticated><p>Return to your cards to continue.</p><Link href="/cardholder-services">Your cards</Link></PageNotice>;
@@ -60,7 +60,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     unstable_rethrow(error);
     return null;
   } })();
-  if (!result) return <PageNotice title="Your cardholder dashboard couldn’t load" authenticated><p>Please retry. Your cards, requests and permissions have not changed.</p><Link href="/cardholder-services">Reload cardholder services</Link></PageNotice>;
+  if (!result) return <PageNotice title="Your cardholder dashboard couldn’t load" authenticated><p>Please retry. Your cards, requests and permissions have not changed.</p><Link href="/cardholder-services">Reload Cards & spending</Link></PageNotice>;
   // Older selected-card links omitted the view. Route them through the same
   // exact-card loader, including its duplicate and unavailable-resource checks.
   if (query.view === "activity" || (query.view === undefined && query.activityCard !== undefined)) {

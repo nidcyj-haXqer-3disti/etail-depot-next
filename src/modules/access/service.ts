@@ -58,7 +58,7 @@ async function invitationProjection(tx:ScopedTransaction,row:Invitation,viewerId
   const timestamp=asOf??await now(tx);
   const status=row.status==="PENDING"&&row.expiresAt<=timestamp?"EXPIRED":row.status;
   const policy:PolicyScope={actorPersonId:viewerId,serviceId:row.serviceId,resourceServiceId:row.serviceId,membershipPersonId:viewerId,membershipServiceId:row.serviceId,membershipState:"INVITED",role:row.role,serviceKind:service!.kind,status:service!.status,primaryPersonId:service!.primaryPersonId,primaryMembershipState:primary?.state??"REVOKED",invitation:{recipientPersonId:row.recipientId,status:row.status,expiresAt:row.expiresAt,now:timestamp}};
-  return {targetKind:"SERVICE",id:row.id,serviceId:row.serviceId,serviceName:primary?`Cards with ${primary.name}`:"Cardholder services",serviceKind:service!.kind,inviterName:inviter!.displayName,recipientId:row.recipientId,recipientName:recipient!.displayName,role:row.role,
+  return {targetKind:"SERVICE",id:row.id,serviceId:row.serviceId,serviceName:primary?`Cards with ${primary.name}`:"Cards & spending",serviceKind:service!.kind,inviterName:inviter!.displayName,recipientId:row.recipientId,recipientName:recipient!.displayName,role:row.role,
     permissions:[...CARDHOLDER_ACCESS_PERMISSIONS],delegablePermissions:[],status,version:row.version,createdAt:row.createdAt.toISOString(),expiresAt:row.expiresAt.toISOString(),
     canRespond:inviterCurrent&&evaluate(policy,"invitation.accept").allowed,canRevoke:status==="PENDING"&&!!viewerScope&&canRevokeOffer(viewerScope,row),hasServiceAccess:membership?.state==="ACCEPTED"&&primary?.state==="ACCEPTED"&&service!.status==="ACTIVE"};
 }
@@ -83,7 +83,7 @@ export async function getAccessOverview(personId:string,serviceId:string):Promis
     return {serviceId,serviceName:"Cardholder access",serviceKind:"CARDHOLDER",canInvite,canManage:false,people:peopleRows,invitations,invitationTotal:counts!.total,pendingInvitationCount:counts!.pending,invitationsTruncated:counts!.total>rows.length,recipients,
       history:changes.slice(0,100).map(change=>({id:change.id,personId:change.personId,personName:nameById.get(change.personId)??"Cardholder",actorName:nameById.get(change.actorId)??"Cardholder",label:historyLabels[change.kind]??"Access updated",createdAt:change.createdAt.toISOString()})),historyHasMore:changes.length>100,
       permissionOptions:[],roleOptions:[],
-      notice:"Invite a person to use their own cards. You manage the group money and each card’s allowance."};
+      notice:"Invite someone to use a card. You manage the card balance and each card’s total spending limit."};
   },{isolationLevel:"repeatable read"});
 }
 export async function listInvitationsForPerson(personId:string):Promise<AnyInvitationProjection[]> {

@@ -26,10 +26,10 @@ test("a lost card allowance result hides card details after denial and retries w
  page.on("request",request=>{const pathname=new URL(request.url()).pathname;if(!["GET","HEAD"].includes(request.method())&&(pathname.startsWith(`${prefix}/funds`)||pathname.includes("/money-accounts/")))fundingWrites.push(pathname);});
  await signInPerson(page,primary.personId);
  await page.goto(`/cardholder-services?card=${card.id}`);
- const dialog=page.getByRole("dialog"),row=dialog.getByRole("article",{name:"Card allowance",exact:true});
- await row.getByRole("button",{name:`Change allowance for ${card.nickname}`,exact:true}).click();
- await row.getByRole("textbox",{name:`New total allowance for ${card.nickname}`,exact:true}).fill("17.23");
- await row.getByRole("button",{name:"Review allowance",exact:true}).click();
+ const dialog=page.getByRole("dialog"),row=dialog.getByRole("article",{name:"Card spending limit",exact:true});
+ await row.getByRole("button",{name:`Change spending limit for ${card.nickname}`,exact:true}).click();
+ await row.getByRole("textbox",{name:`New total spending limit for ${card.nickname}`,exact:true}).fill("17.23");
+ await row.getByRole("button",{name:"Review spending limit",exact:true}).click();
  await expect(row).toContainText("$17.23");
  await page.route(`**${path}`,async route=>{
   if(route.request().method()!=="PUT"){await route.continue();return;}
@@ -38,12 +38,12 @@ test("a lost card allowance result hides card details after denial and retries w
   if(attempts.length===1){expect(response.status()).toBe(200);expect(cardSpendingSchema.parse(await response.json())).toMatchObject({cardId:card.id,allowance:{minor:"1723"},version:2});await route.fulfill({status:200,json:{}});}
   else await route.fulfill({response});
  });
- await row.getByRole("button",{name:"Save allowance",exact:true}).click();
- await expect(row.getByRole("button",{name:"Retry saved allowance",exact:true})).toBeEnabled();
+ await row.getByRole("button",{name:"Save spending limit",exact:true}).click();
+ await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  await expect(row.getByRole("button",{name:"Cancel",exact:true})).toHaveCount(0);
  const grant=and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),eq(permissionGrants.action,"cardholder.limits.manage"));
  expect(await getDb().update(permissionGrants).set({state:"REVOKED"}).where(grant).returning({action:permissionGrants.action})).toEqual([{action:"cardholder.limits.manage"}]);
- await row.getByRole("button",{name:"Retry saved allowance",exact:true}).click();
+ await row.getByRole("button",{name:"Retry saved spending limit",exact:true}).click();
  await expect.poll(()=>statuses.length).toBe(2);expect(statuses).toEqual([200,403]);
  await expect(dialog).toContainText("Current access no longer allows this card action");
  await expect(dialog).not.toContainText(card.nickname);await expect(dialog.locator(".funds-person")).toHaveCount(0);await expect(dialog.getByRole("textbox")).toHaveCount(0);

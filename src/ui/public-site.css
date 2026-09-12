@@ -45,3 +45,10 @@
 
 @media(max-width:740px){.channel-showcase{max-width:510px;width:100%;justify-self:center}.channel-showcase-heading{padding:23px 20px 18px}.channel-example-tabs{padding:0 20px 20px;gap:7px}.channel-example-tabs button{font-size:11px;min-height:44px;padding:9px 11px}.channel-example-panel{padding:20px;min-height:400px}.channel-message{padding:17px}.channel-demo-note{padding:14px 20px;font-size:10px}.channel-example-context>small{font-size:7px}}
 @media(max-width:360px){.channel-example-context>small{display:none}.channel-example-tabs,.channel-showcase-heading,.channel-example-panel,.channel-demo-note{padding-left:16px;padding-right:16px}.channel-message{padding:14px}}
+
+/* The payment page illustrates collecting a payment rather than holding a card. */
+.product-preview-payments .preview-request-illustration{background:#fff;color:#173e32;border-color:#bdcabb;transform:rotate(4deg)}
+.preview-request-illustration .preview-card-top>span:last-child{color:#496356}
+.preview-request-amount{position:absolute;left:24px;top:30%;font-size:clamp(30px,4vw,44px);font-weight:600;letter-spacing:-.05em;line-height:1.1}
+.preview-request-illustration .preview-card-bottom{font-size:14px;line-height:1.35;letter-spacing:0}
+@media(max-width:390px){.preview-request-amount{left:18px;font-size:30px}.preview-request-illustration .preview-card-bottom{font-size:12px}}

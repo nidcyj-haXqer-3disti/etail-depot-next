@@ -21,12 +21,12 @@ test("first service choice survives an unknown setup result without opening fina
   await page.goto("/services");
   await expect(page.getByRole("heading",{name:"Welcome to Etail Depot",exact:true,level:1})).toBeVisible();
   await expect(page.getByRole("list",{name:"What happens next",exact:true})).toHaveCount(0);
-  await page.getByRole("radio",{name:"Merchant services",exact:true}).check();
+  await page.getByRole("radio",{name:"Accept payments",exact:true}).check();
   await expect(page.locator("main")).toContainText("Next: set up your payments.");
-  await page.getByRole("textbox",{name:"Your display name",exact:true}).fill("Journey merchant");
+  await page.getByRole("textbox",{name:"Your name",exact:true}).fill("Journey merchant");
   await expect(page.getByRole("checkbox")).toHaveCount(0);
   expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
-  if(process.env.ETAIL_JOURNEY_SCREENSHOTS==="1"){await page.getByRole("textbox",{name:"Your display name",exact:true}).focus();await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));await expect(page.getByRole("link",{name:"Skip to main content",exact:true})).toHaveCount(1);await expect(page.getByRole("link",{name:"Skip to main content",exact:true})).not.toBeInViewport();await mkdir("artifacts/journey-refinement/after",{recursive:true});await page.screenshot({path:`artifacts/journey-refinement/after/welcome-${page.viewportSize()!.width}.png`,fullPage:true});}
+  if(process.env.ETAIL_JOURNEY_SCREENSHOTS==="1"){await page.getByRole("textbox",{name:"Your name",exact:true}).focus();await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));await expect(page.getByRole("link",{name:"Skip to main content",exact:true})).toHaveCount(1);await expect(page.getByRole("link",{name:"Skip to main content",exact:true})).not.toBeInViewport();await mkdir("artifacts/journey-refinement/after",{recursive:true});await page.screenshot({path:`artifacts/journey-refinement/after/welcome-${page.viewportSize()!.width}.png`,fullPage:true});}
   const bodies:unknown[]=[];
   expect(await getDb().select().from(sandboxParticipants).where(eq(sandboxParticipants.personId,identity.personId))).toEqual([]);
   expect(await getDb().select().from(services).where(eq(services.primaryPersonId,identity.personId))).toEqual([]);
@@ -37,11 +37,11 @@ test("first service choice survives an unknown setup result without opening fina
   });
   await page.getByRole("button",{name:"Continue",exact:true}).click();
   await expect(page.getByRole("button",{name:"Retry setup",exact:true})).toBeEnabled();
-  await expect(page.getByRole("textbox",{name:"Your display name",exact:true})).toBeDisabled();
-  await expect(page.getByRole("radio",{name:"Cardholder services",exact:true})).toBeDisabled();
+  await expect(page.getByRole("textbox",{name:"Your name",exact:true})).toBeDisabled();
+  await expect(page.getByRole("radio",{name:"Cards & spending",exact:true})).toBeDisabled();
   await page.getByRole("button",{name:"Retry setup",exact:true}).click();
   await expect(page).toHaveURL(/\/merchant-services$/);
-  await expect(page.getByRole("heading",{name:"Your terminals",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Payments you collect",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Start receiving payments",exact:true})).toBeVisible();
   expect(bodies).toHaveLength(2);expect(bodies[0]).toMatchObject({displayName:"Journey merchant",acknowledged:true});expect(bodies[1]).toEqual(bodies[0]);
   const participants=await getDb().select().from(sandboxParticipants).where(eq(sandboxParticipants.personId,identity.personId));
@@ -49,7 +49,7 @@ test("first service choice survives an unknown setup result without opening fina
   expect(await getDb().select().from(services).where(eq(services.primaryPersonId,identity.personId))).toEqual([]);
   await expect(page.getByRole("complementary",{name:"Your member code",exact:true})).toHaveCount(0);
   await page.goto("/services");
-  await expect(page.getByRole("heading",{name:"Your services",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Your dashboard",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Your member code",exact:true})).not.toBeVisible();
   await page.getByRole("link",{name:"Open your profile",exact:true}).click();
   await expect(page).toHaveURL(/\/profile$/);
@@ -67,7 +67,7 @@ test("first service choice survives an unknown setup result without opening fina
   await expect(memberCode.getByRole("button",{name:"Copied",exact:true})).toBeVisible();
   expect(await page.evaluate(()=>Reflect.get(window,"__copiedMemberCodes"))).toEqual([participants[0]!.memberCode]);
   expect(bodies).toHaveLength(2);
-  await page.getByRole("link",{name:"← Your services",exact:true}).click();
+  await page.getByRole("link",{name:"← Your dashboard",exact:true}).click();
   await expect(page).toHaveURL(/\/services$/);
   await expect(memberCode).not.toBeVisible();
   await expect(page.getByRole("heading",{name:"Invitations",exact:true})).toHaveCount(0);

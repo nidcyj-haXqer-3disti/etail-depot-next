@@ -39,7 +39,7 @@ export async function freshPublishedPayment(amountMinor:string,description=`Brow
 }
 export async function openSavedCardReview(page:Page,publicationId:string,cardId:string){
  await page.goto(`/checkout/${publicationId}/card`);
- await expect(page.getByRole("heading",{name:"Pay with your Etail card",exact:true})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Choose a card",exact:true})).toBeVisible();
  await page.getByRole("combobox",{name:"Your card",exact:true}).selectOption(cardId);
  await page.getByRole("button",{name:"Review payment",exact:true}).click();
  await expect(page.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();

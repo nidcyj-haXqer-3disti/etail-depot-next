@@ -35,11 +35,11 @@ test("invitations grant fixed own-card access after owner review without a permi
   expect(joined.memberCode).toBeTruthy();
   await page.goto(`${origin}/cardholder-services?manage=${primary.serviceId}`);
   await page.getByRole("button",{name:"Invite a person",exact:true}).click();
-  const dialog=page.getByRole("dialog",{name:"Invite a cardholder",exact:true});
+  const dialog=page.getByRole("dialog",{name:"Invite someone to use a card",exact:true});
   await expect(dialog.getByRole("button",{name:"Review invitation",exact:true})).toBeDisabled();
   await expect(dialog.getByRole("combobox",{name:"Named recipient",exact:true})).toHaveCount(0);
   await dialog.getByRole("textbox",{name:"Member code",exact:true}).fill(joined.memberCode!);
-  await dialog.getByRole("button",{name:"Find member",exact:true}).click();
+  await dialog.getByRole("button",{name:"Find person",exact:true}).click();
   await expect(dialog.getByRole("status")).toContainText(recipient.name);
   await expect(dialog.getByRole("radio")).toHaveCount(0);
   await expect(dialog.getByRole("checkbox")).toHaveCount(0);
@@ -48,7 +48,7 @@ test("invitations grant fixed own-card access after owner review without a permi
   expect((await getAccessOverview(primary.personId,primary.serviceId)).invitations).toEqual([]);
   const review=page.getByRole("dialog",{name:"Review invitation",exact:true});
   await expect(review).toContainText("Can use and freeze cards in their name");
-  await review.getByRole("button",{name:"Save invitation",exact:true}).click();
+  await review.getByRole("button",{name:"Create invitation",exact:true}).click();
   await expect(review).toHaveCount(0);
   const result=await getAccessOverview(primary.personId,primary.serviceId), invitation=result.invitations[0]!;
   expect(invitation.status).toBe("PENDING");
@@ -83,17 +83,17 @@ test("owner invitation, intended acceptance, card freeze and access removal stay
   try {
     await page.goto(accessUrl);
     await page.getByRole("button", { name: "Invite a person", exact: true }).click();
-    const invite = page.getByRole("dialog", { name: "Invite a cardholder", exact: true });
+    const invite = page.getByRole("dialog", { name: "Invite someone to use a card", exact: true });
     await expect(invite.getByRole("combobox", { name: "Named recipient" })).toHaveCount(0);
     await invite.getByRole("textbox",{name:"Member code",exact:true}).fill(joined.memberCode!);
-    await invite.getByRole("button",{name:"Find member",exact:true}).click();
+    await invite.getByRole("button",{name:"Find person",exact:true}).click();
     await expect(invite.getByRole("status")).toContainText(recipient.name);
     await expect(invite).toContainText("After they accept, add cards in their name");
     await expect(invite.getByRole("radio")).toHaveCount(0);
     await invite.getByRole("button", { name: "Review invitation", exact: true }).click();
     const review = page.getByRole("dialog", { name: "Review invitation", exact: true });
     await expect(review.getByRole("heading", { name: recipient.name, exact: true })).toBeVisible();
-    await review.getByRole("button", { name: "Save invitation", exact: true }).click();
+    await review.getByRole("button", { name: "Create invitation", exact: true }).click();
     await expect(review).toBeHidden();
     const pending = (await getAccessOverview(primary.personId, primary.serviceId)).invitations.find(row => row.recipientId === recipient.id && row.status === "PENDING")!;
     expect(pending).toBeTruthy();
@@ -105,8 +105,8 @@ test("owner invitation, intended acceptance, card freeze and access removal stay
     await recipientPage.goto(`${origin}/shared-access`);
     const invitationRow = recipientPage.locator(".ws-person-row").filter({ hasText: `Reference ${pending.id.slice(0, 8).toUpperCase()}` });
     await invitationRow.getByRole("button", { name: "Review invitation", exact: true }).click();
-    const acceptance = recipientPage.getByRole("dialog", { name: "Review cardholder invitation", exact: true });
-    await acceptance.getByRole("button", { name: "Accept this access", exact: true }).click();
+    const acceptance = recipientPage.getByRole("dialog", { name: "Review card invitation", exact: true });
+    await acceptance.getByRole("button", { name: "Accept invitation", exact: true }).click();
     await expect(acceptance).toBeHidden();
     const secondaryCard = await (async()=>{return issuePracticeCard(primary.personId, primary.serviceId, recipient.id, "My secondary UI card", "25", "1000");})();
     await recipientPage.goto(`${origin}/cardholder-services?focus=${secondaryCard.card.id}`);
@@ -145,7 +145,7 @@ test("owner invitation, intended acceptance, card freeze and access removal stay
 
     await page.goto(accessUrl+`&person=${recipient.id}`);
     await page.getByRole("button", { name: "Remove access", exact: true }).click();
-    const revoke = page.getByRole("dialog", { name: "Remove cardholder access", exact: true });
+    const revoke = page.getByRole("dialog", { name: "Remove card access", exact: true });
     await revoke.getByRole("button", { name: "Confirm removal", exact: true }).click();
     await expect(revoke).toBeHidden();
     await recipientPage.goto(`${origin}/cardholder-services?focus=${secondaryCard.card.id}`);

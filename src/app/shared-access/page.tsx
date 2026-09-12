@@ -6,9 +6,9 @@ import {Shell} from "@/ui/shell";
 import "@/ui/workspace/workspace.css";
 
 export const dynamic="force-dynamic";
-export const metadata={title:"Shared access"};
+export const metadata={title:"Invitations"};
 export default async function Page(){
  const session=await getRequestSession();if(!session)redirect("/login");
  const invitations=await listInvitationsForPerson(session.personId);
- return <Shell authenticated><section className="page-container services-page"><h1>Shared access</h1><p>Review access someone has offered you before joining their service.</p><InvitationsInbox invitations={invitations}/></section></Shell>;
+ return <Shell authenticated><section className="page-container services-page"><h1>Invitations</h1><p>Review invitations to use someone’s cards or collect payments for them.</p><InvitationsInbox invitations={invitations}/></section></Shell>;
 }

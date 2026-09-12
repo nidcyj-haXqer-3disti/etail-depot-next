@@ -23,10 +23,10 @@ test("selected card keeps balance, activity and reversible controls together",as
 test("primary issues a named card through one review without adding money or changing their shared limit",async({page})=>{
  const {primary}=await freshPrepaidCard();await signInPerson(page,primary.personId);const data=await cardDashboard(page.request);
  const before=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId)).orderBy(ledgerEntries.journalId,ledgerEntries.lineNumber);
- const name=`Travel ${randomUUID().slice(0,8)}`;await page.goto("/cardholder-services");await page.getByRole("navigation",{name:"Cardholder navigation"}).getByText("More",{exact:true}).click();await page.getByRole("link",{name:"Add card",exact:true}).click();
+ const name=`Travel ${randomUUID().slice(0,8)}`;await page.goto("/cardholder-services");await page.getByRole("navigation",{name:"Cards and spending navigation"}).getByText("More",{exact:true}).click();await page.getByRole("link",{name:"Add card",exact:true}).click();
  const dialog=page.getByRole("dialog");await expect(dialog.getByRole("heading",{name:"Who is this card for?"})).toBeVisible();const holderChoice=dialog.getByRole("radio",{name:new RegExp(data.person.displayName)});if(await holderChoice.count())await holderChoice.check();
  await expect(dialog.getByRole("textbox",{name:"Starting balance (USD)"})).toHaveCount(0);
- await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);await dialog.getByRole("textbox",{name:"Total card allowance (USD)",exact:true}).fill("25.00");await dialog.getByRole("button",{name:"Review card",exact:true}).click();
+ await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);await dialog.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill("25.00");await dialog.getByRole("button",{name:"Review card",exact:true}).click();
  await expect(dialog).toContainText("Review your card");await expect(dialog).toContainText(name);
  await dialog.getByRole("button",{name:"Create card",exact:true}).click();await expect(dialog).toHaveCount(0);
  await expect(page.getByRole("region",{name:"Selected card overview",exact:true})).toContainText(name);
@@ -40,8 +40,8 @@ test("secondary sees only assigned cards and reports and cannot open a guessed p
  const {primary,card:foreign}=await freshPrepaidCard();const secondary=await cardPerson(`Secondary ${randomUUID().slice(0,8)}`);
  await enrollCardholder(primary.personId,primary.serviceId,secondary);
  const {card}=await issuePracticeCard(primary.personId, primary.serviceId, secondary, "Secondary reporting card", undefined, "2000");await signInPerson(page,secondary);await page.goto(`/cardholder-services?focus=${card.id}`);
- await expect(page.getByLabel("Selected card").locator("option[value]:not([value=''])")).toHaveCount(1);await expect(page.getByRole("link",{name:"Add card",exact:true})).toHaveCount(0);await expect(page.getByRole("link",{name:"Cardholders",exact:true})).toHaveCount(0);
- await page.getByRole("region",{name:"Selected card overview",exact:true}).getByRole("link",{name:"Card controls",exact:true}).click();
+ await expect(page.getByLabel("Selected card").locator("option[value]:not([value=''])")).toHaveCount(1);await expect(page.getByRole("link",{name:"Add card",exact:true})).toHaveCount(0);await expect(page.getByRole("link",{name:"People",exact:true})).toHaveCount(0);
+ await page.getByRole("region",{name:"Selected card overview",exact:true}).getByRole("link",{name:"Card settings",exact:true}).click();
  await page.getByRole("dialog").getByRole("link",{name:"Statements & reports",exact:true}).click();await expect(page).toHaveURL(new RegExp(`reports\\?focus=${card.id}`));await expect(page.locator("main")).not.toContainText(foreign.nickname);
  const download=page.waitForEvent("download");await page.getByRole("button",{name:"Download CSV"}).click();expect((await download).suggestedFilename()).toMatch(/^etail-card-activity-/);
  await page.goto(`/cardholder-services?focus=${foreign.id}`);await expect(page.getByRole("heading",{name:"This card is unavailable",exact:true})).toBeVisible();await expect(page.getByRole("region",{name:"Selected card overview"})).toHaveCount(0);
@@ -60,8 +60,8 @@ test("owner adds a terminal without enrolling a cardholder service",async({page}
  const merchant=await acquiringFixture();await signInPerson(page,merchant.personId);
  const before=await(await page.request.get("/api/v1/services")).json();expect(before.services).toHaveLength(1);expect(before.services[0]).toMatchObject({id:merchant.serviceId,kind:"MERCHANT"});
  const directory=await merchantDashboard(page.request),unit=directory.units.find(row=>row.id===merchant.merchantId)!,name=`Studio ${randomUUID().slice(0,8)}`;
- await page.goto(`/merchant-services?view=unit:${unit.id}&section=merchants`);await page.getByRole("button",{name:"Add terminal",exact:true}).click();
- const dialog=page.getByRole("dialog");await dialog.getByRole("textbox",{name:"Terminal name"}).fill(name);await expect(dialog).toContainText(`${unit.merchantName} remains responsible`);await dialog.getByRole("button",{name:"Add terminal",exact:true}).click();await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();
+ await page.goto(`/merchant-services?view=unit:${unit.id}&section=merchants`);await page.getByRole("button",{name:"Add payment terminal",exact:true}).click();
+ const dialog=page.getByRole("dialog");await dialog.getByRole("textbox",{name:"Payment terminal name"}).fill(name);await expect(dialog).toContainText(`All payments belong to ${unit.merchantName}`);await dialog.getByRole("button",{name:"Add payment terminal",exact:true}).click();await expect(page.getByRole("heading",{name,exact:true})).toBeVisible();
  const created=(await merchantDashboard(page.request)).units.find(row=>row.name===name)!;expect(created.merchantServiceId).toBe(merchant.serviceId);expect(new URL(page.url()).pathname).toBe(`/merchants/${created.id}`);
  expect(await(await page.request.get("/api/v1/services")).json()).toEqual(before);
  const cards=await cardDashboard(page.request);expect(cards.cards).toEqual([]);expect(cards.primaryService).toBeNull();
@@ -73,7 +73,7 @@ test("terminal users see only their own payment workspace and cannot request dep
  const directory=await merchantDashboard(page.request);expect(directory.merchants.every(item=>!item.ownerAccess)).toBe(true);expect(directory.units.map(unit=>unit.id)).toEqual([merchant.unit.id]);
  await page.goto(`/merchants/${merchant.unit.id}?tab=payments&payment=${payment.id}`);await expect(page.getByRole("heading",{name:merchant.unit.displayName,exact:true})).toBeVisible();
  await expect(page.getByRole("dialog",{name:"Payment details",exact:true})).toContainText(payment.testReference);
- await expect(page.getByRole("button",{name:"Request deposit",exact:true})).toHaveCount(0);await expect(page.getByRole("button",{name:"Refund payment",exact:true})).toHaveCount(0);await expect(page.getByRole("button",{name:"Add terminal",exact:true})).toHaveCount(0);await expect(page.getByRole("button",{name:"Turn off payments",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("button",{name:"Request deposit",exact:true})).toHaveCount(0);await expect(page.getByRole("button",{name:"Refund payment",exact:true})).toHaveCount(0);await expect(page.getByRole("button",{name:"Add payment terminal",exact:true})).toHaveCount(0);await expect(page.getByRole("button",{name:"Turn off payments",exact:true})).toHaveCount(0);
  const operations=await merchantOperations(page,merchant.unit.id);expect(operations.canPayout).toBe(false);expect(operations.payments.every(row=>row.merchantUnitId===merchant.unit.id)).toBe(true);
  await page.goto(`/merchants/${merchant.master.id}?tab=payments`);await expect(page.getByRole("dialog",{name:"Payment details",exact:true})).toHaveCount(0);await expect(page.locator("main")).not.toContainText(payment.testReference);
 });

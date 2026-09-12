@@ -11,7 +11,7 @@ export function Header({ authenticated = false }: { authenticated?: boolean }) {
 }
 
 export function Footer({ authenticated = false }: { authenticated?: boolean }) {
-  return <footer className={`site-footer${authenticated ? "" : " public-footer"}`}>{!authenticated && <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Cards for your people. More ways to get paid.</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cardholder services</Link><Link href="/payment-services">Merchant services</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>}<div className="footer-inner"><span>© Etail Depot</span><nav className="footer-support-links" aria-label="Footer support">{authenticated && <Link href="/services">Your services</Link>}<Link href="/help">Help center</Link></nav></div></footer>;
+  return <footer className={`site-footer${authenticated ? "" : " public-footer"}`}>{!authenticated && <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Cards for your people. More ways to get paid.</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cards & spending</Link><Link href="/payment-services">Accept payments</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>}<div className="footer-inner"><span>© Etail Depot</span><nav className="footer-support-links" aria-label="Footer support">{authenticated && <Link href="/services">Your dashboard</Link>}<Link href="/help">Help center</Link></nav></div></footer>;
 }
 
 export function Shell({ children, authenticated = false }: { children: React.ReactNode; authenticated?: boolean }) {
@@ -19,5 +19,5 @@ export function Shell({ children, authenticated = false }: { children: React.Rea
 }
 
 export function PageNotice({ title, children, authenticated = false }: { title: string; children: React.ReactNode; authenticated?: boolean }) {
-  return <Shell authenticated={authenticated}><div className="page-container notice-page"><span className="large-icon"><Icon name="info" /></span><h1>{title}</h1><div className="muted notice-copy">{children}</div><Link href={authenticated ? "/services" : "/login"} className="button primary">{authenticated ? "Back to services" : "Go to sign in"}<Icon name="arrow" /></Link></div></Shell>;
+  return <Shell authenticated={authenticated}><div className="page-container notice-page"><span className="large-icon"><Icon name="info" /></span><h1>{title}</h1><div className="muted notice-copy">{children}</div><Link href={authenticated ? "/services" : "/login"} className="button primary">{authenticated ? "Back to your dashboard" : "Go to sign in"}<Icon name="arrow" /></Link></div></Shell>;
 }
