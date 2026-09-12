@@ -14,7 +14,7 @@ export function TaskSearch({workspace:w,primaryService,selectedCardId}:{workspac
   useEffect(()=>{function shortcut(e:KeyboardEvent){if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"&&!document.querySelector("dialog[open]")){e.preventDefault();setQuery("");setOpen(true);}}document.addEventListener("keydown",shortcut);return()=>document.removeEventListener("keydown",shortcut);},[]);
   const can=(action:string)=>w?.capabilities.some(item=>item.action===action&&item.allowed)===true;
   const selection={cardId:selectedCardId,contextId:w?.service.id};
-  const manage=primaryService?.canInvite?primaryService.id:w?.cardholderRole==="PRIMARY"&&can("people.read")?w.service.id:null;
+  const manage=primaryService?.canInvite?primaryService.id:w?.cardholderRole==="OWNER"&&can("people.read")?w.service.id:null;
   const tasks:{label:string;detail:string;path:string;icon:WorkspaceIconName;allowed:boolean;keywords:string}[]=[
     {label:"Manage cards",detail:"Review cards and their current controls",path:"/cardholder-services?view=cards",icon:"cards",allowed:true,keywords:"freeze unfreeze pause resume"},
     {label:"Add a card",detail:"Create a card or continue a saved request",path:"/cardholder-services?new=1",icon:"plus",allowed:primaryService?.canAddCard===true,keywords:"apply application new holder"},

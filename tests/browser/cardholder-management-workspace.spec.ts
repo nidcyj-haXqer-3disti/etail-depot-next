@@ -1,4 +1,4 @@
-import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
+import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and,eq } from "drizzle-orm";
 import AxeBuilder from "@axe-core/playwright";
@@ -21,6 +21,7 @@ async function signIn(page:Page,personId:string){
 async function fillCard(page:Page,name:string){
  const dialog=page.getByRole("dialog");
  await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);
+ await dialog.getByRole("textbox",{name:"Total card allowance (USD)",exact:true}).fill("25.00");
  return dialog;
 }
 async function accessible(page:Page){
@@ -89,88 +90,43 @@ test("multiple drafts retain their own details and created/canceled requests rem
  await accessible(page);
 });
 
-test("a primary opens a person's complete card profile while secondary management stays unavailable",async({page,browser})=>{
+test("an owner sees a person's cards and history while holders cannot open management",async({page,browser})=>{
  test.setTimeout(120_000);
  const primary=await cardPrimary(`People UI ${randomUUID().slice(0,8)}`),secondary=await cardPerson("Jordan Sample");
- await enrollCardholder(primary.personId,primary.serviceId,secondary);
- await signIn(page,primary.personId);
+ await enrollCardholder(primary.personId,primary.serviceId,secondary);await signIn(page,primary.personId);
  for(const name of ["Jordan groceries","Jordan travel"]){
   await page.goto(`${origin}/cardholder-services?view=cardholders&person=${secondary}`);
   await page.getByRole("link",{name:"Add card for Jordan Sample",exact:true}).click();
-  const dialog=await fillCard(page,name);
-  await expect(dialog.getByRole("radio",{name:/Jordan Sample/})).toBeChecked();
-  await dialog.getByRole("button",{name:"Review card",exact:true}).click();
-  await dialog.getByRole("button",{name:"Create card",exact:true}).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  const dialog=await fillCard(page,name);await expect(dialog.getByRole("radio",{name:/Jordan Sample/})).toBeChecked();
+  await dialog.getByRole("button",{name:"Review card",exact:true}).click();await dialog.getByRole("button",{name:"Create card",exact:true}).click();await expect(page.getByRole("dialog")).toHaveCount(0);
  }
  await page.goto(`${origin}/cardholder-services?view=cardholders&person=${secondary}`);
- const profile=page.getByRole("region",{name:"Cards for Jordan Sample",exact:true});
- await expect(profile.getByRole("article")).toHaveCount(2);
- await expect(profile).toContainText("Jordan groceries");
- await expect(profile).toContainText("Jordan travel");
- await expect(page.getByRole("region",{name:"Access history",exact:true})).toContainText("Invitation accepted");
- await accessible(page);
- await page.getByRole("button",{name:"← All cardholders",exact:true}).click();
- await page.getByRole("searchbox",{name:"Search people",exact:true}).fill("Jordan");
- await page.getByRole("combobox",{name:"Access status",exact:true}).selectOption("ACCEPTED");
- await page.getByRole("button",{name:"Apply filters",exact:true}).click();
- await expect(page).toHaveURL(/peopleSearch=Jordan/);
- await expect(page.locator("button.ws-person-row")).toHaveCount(1);
- await page.locator("button.ws-person-row").click();
- await expect(profile.getByRole("article")).toHaveCount(2);
- await page.getByRole("button",{name:"← All cardholders",exact:true}).click();
- await expect(page.getByRole("searchbox",{name:"Search people",exact:true})).toHaveValue("Jordan");
- await page.reload();
- await expect(page.getByRole("searchbox",{name:"Search people",exact:true})).toHaveValue("Jordan");
- await expect(page.getByRole("combobox",{name:"Access status",exact:true})).toHaveValue("ACCEPTED");
- await page.getByRole("button",{name:/^Invitations \(/}).click();
- await page.getByRole("combobox",{name:"Invitation status",exact:true}).selectOption("ACCEPTED");
- await expect(page).toHaveURL(/invitationStatus=ACCEPTED/);
- await page.reload();
- await expect(page.getByRole("combobox",{name:"Invitation status",exact:true})).toHaveValue("ACCEPTED");
- await expect(page.locator(".access-invitation-card")).toHaveCount(1);
- await page.getByRole("button",{name:"View cardholder",exact:true}).click();
-  await expect(profile.getByRole("article")).toHaveCount(2);
- await profile.getByRole("link",{name:"Manage Jordan travel",exact:true}).click();
-  await expect(page.getByRole("dialog")).toContainText("Jordan Sample’s card");
-  await expect(page.getByRole("dialog")).toContainText("Jordan Sample makes purchases when signed in to their own login");
-  await expect(page.getByRole("dialog").getByRole("textbox",{name:"Purchase description",exact:true})).toHaveCount(0);
- await page.keyboard.press("Escape");
- await expect(profile.getByRole("article")).toHaveCount(2);
- await page.getByRole("button",{name:"Change access",exact:true}).click();
-  await page.getByRole("dialog").getByRole("checkbox",{name:/^Make purchases/}).uncheck();
- await page.getByRole("dialog").getByRole("button",{name:"Review access",exact:true}).click();
- await page.getByRole("dialog").getByRole("button",{name:"Save these permissions",exact:true}).click();
- await expect(page.getByRole("dialog")).toHaveCount(0);
- await expect(page.getByRole("region",{name:"Access history",exact:true})).toContainText("Access changed");
- await page.reload();
- await expect(profile.getByRole("article")).toHaveCount(2);
- const secondaryContext=await browser.newContext({viewport:page.viewportSize()??undefined});
- try{
-  const secondaryPage=await secondaryContext.newPage();await signIn(secondaryPage,secondary);
-  await secondaryPage.goto(`${origin}/cardholder-services?view=cardholders&person=${primary.personId}`);
-  await expect(secondaryPage.getByRole("heading",{name:"Cardholder management is unavailable",exact:true})).toBeVisible();
-  await expect(secondaryPage.getByRole("button",{name:"Change access",exact:true})).toHaveCount(0);
-  await secondaryPage.goto(`${origin}/cardholder-services?view=requests`);
-  await expect(secondaryPage.locator(".ch-request-record")).toHaveCount(0);
- }finally{await secondaryContext.close();}
- await page.goto(`${origin}/cardholder-services?view=cardholders&person=${randomUUID()}`);
- await expect(page.getByRole("heading",{name:"This cardholder is unavailable",exact:true})).toBeVisible();
- await expect(page.getByRole("region",{name:"Cards for Jordan Sample",exact:true})).toHaveCount(0);
+ const profile=page.locator(".access-cardholder");await expect(profile.locator(".access-person-card-list li")).toHaveCount(2);await expect(profile).toContainText("Jordan groceries");await expect(profile).toContainText("Jordan travel");
+ await expect(page.getByRole("button",{name:"Change access",exact:true})).toHaveCount(0);await accessible(page);
+ await page.getByRole("link",{name:"All people",exact:true}).click();
+ await page.getByRole("searchbox",{name:"Search people",exact:true}).fill("Jordan");await page.getByRole("button",{name:"Search",exact:true}).click();await page.reload();
+ await expect(page.getByRole("searchbox",{name:"Search people",exact:true})).toHaveValue("Jordan");await expect(profile).toHaveCount(1);
+ await profile.getByRole("link",{name:"Jordan Sample",exact:true}).click();await expect(profile.locator(".access-person-card-list li")).toHaveCount(2);
+ await profile.locator("li").filter({hasText:"Jordan travel"}).getByRole("link",{name:"Card controls",exact:true}).click();
+ await expect(page.getByRole("dialog")).toContainText("Jordan Sample makes purchases when signed in to their own login");await expect(page.getByRole("dialog").getByRole("article",{name:"Card allowance"})).toContainText("$25.00");await page.keyboard.press("Escape");
+ await page.getByRole("link",{name:"All people",exact:true}).click();await page.getByRole("button",{name:"History",exact:true}).click();await expect(page.locator(".access-history")).toContainText("Invitation accepted");
+ const context=await browser.newContext({viewport:page.viewportSize()??undefined});
+ try{const holderPage=await context.newPage();await signIn(holderPage,secondary);await holderPage.goto(`${origin}/cardholder-services?view=cardholders&person=${primary.personId}`);await expect(holderPage.getByRole("heading",{name:"Cardholder management is unavailable",exact:true})).toBeVisible();await expect(holderPage.getByRole("button",{name:"Remove access",exact:true})).toHaveCount(0);await holderPage.goto(`${origin}/cardholder-services?view=requests`);await expect(holderPage.locator(".ch-request-record")).toHaveCount(0);}finally{await context.close();}
+ await page.goto(`${origin}/cardholder-services?view=cardholders&person=${randomUUID()}`);await expect(page.getByRole("heading",{name:"This person is unavailable",exact:true})).toBeVisible();await expect(profile).toHaveCount(0);
 });
 
 test("a secondary can remove their own freeze while the primary's restriction stays in place",async({page,browser})=>{
  test.setTimeout(120_000);
  const primary=await cardPrimary(`Freeze UI ${randomUUID().slice(0,8)}`),holder=await cardPerson("Taylor Sample");
  await enrollCardholder(primary.personId,primary.serviceId,holder);
- const {card}=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2400");await setPersonLimit(primary.personId,primary.serviceId,holder,"2400");return issuePracticeCard(primary.personId,primary.serviceId,holder,"Taylor daily card");})();
+ const {card}=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2400");return issuePracticeCard(primary.personId, primary.serviceId, holder, "Taylor daily card", undefined, "2400");})();
  const cardUrl=`${origin}/cardholder-services?card=${card.id}`;
  await signIn(page,primary.personId);
  await page.goto(cardUrl);
  const primaryDialog=page.getByRole("dialog");
  await primaryDialog.getByRole("button",{name:"Freeze",exact:true}).click();
  await primaryDialog.getByRole("button",{name:"Freeze card",exact:true}).click();
- await expect(primaryDialog.locator(".consumer-restriction-status")).toHaveText("Paused by the primary cardholder.");
+ await expect(primaryDialog.locator(".consumer-restriction-status")).toHaveText("Paused by the account owner.");
  const secondaryContext=await browser.newContext({viewport:page.viewportSize()??undefined});
  try{
   const secondaryPage=await secondaryContext.newPage();await signIn(secondaryPage,holder);
@@ -184,10 +140,10 @@ test("a secondary can remove their own freeze while the primary's restriction st
   await dialog.getByRole("button",{name:"Remove your freeze",exact:true}).click();
   await expect(dialog).toContainText("will stay frozen");
   await dialog.getByRole("button",{name:"Remove your freeze",exact:true}).click();
-  await expect(dialog.locator(".consumer-restriction-status")).toHaveText("Paused by the primary cardholder.");
+  await expect(dialog.locator(".consumer-restriction-status")).toHaveText("Paused by the account owner.");
   await expect(dialog.getByRole("button",{name:"Unfreeze",exact:true})).toHaveCount(0);
   await secondaryPage.reload();
-  await expect(dialog.locator(".consumer-restriction-status")).toHaveText("Paused by the primary cardholder.");
+  await expect(dialog.locator(".consumer-restriction-status")).toHaveText("Paused by the account owner.");
   await dialog.getByText("Card control history",{exact:true}).click();
   await expect(dialog).toContainText("Unfreeze recorded");
   expect((await getWorkspace(holder,primary.serviceId)).cards[0]).toMatchObject({status:"FROZEN",canPurchase:false,freeze:{primary:true,holder:false}});

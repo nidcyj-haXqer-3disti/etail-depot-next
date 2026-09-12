@@ -10,7 +10,7 @@ describe("direct primary Cardholder navigation", () => {
   it("matches the dashboard's current own service and its exact grant changes", async () => {
     const f = await cardPrimary("Navigation primary");
     expect(await getPrimaryCardholderService(f.personId)).toEqual((await getCardholderDashboard(f.personId)).primaryService);
-    expect(await getPrimaryCardholderService(f.personId)).toMatchObject({ id: f.serviceId, primaryPersonId: f.personId, relationship: "PRIMARY", canAddCard: true, canInvite: true });
+    expect(await getPrimaryCardholderService(f.personId)).toMatchObject({ id: f.serviceId, primaryPersonId: f.personId, relationship: "OWNER", canAddCard: true, canInvite: true });
     await getDb().update(permissionGrants).set({ state: "REVOKED" }).where(and(eq(permissionGrants.serviceId, f.serviceId), eq(permissionGrants.personId, f.personId), eq(permissionGrants.action, "cards.request")));
     expect(await getPrimaryCardholderService(f.personId)).toEqual((await getCardholderDashboard(f.personId)).primaryService);
     expect(await getPrimaryCardholderService(f.personId)).toMatchObject({ canAddCard: false, canInvite: true });
@@ -25,7 +25,7 @@ describe("direct primary Cardholder navigation", () => {
     const dashboard = await getCardholderDashboard(f.personId);
     expect(dashboard.primaryService).toEqual(await getPrimaryCardholderService(f.personId));
     expect(dashboard.primaryService).toMatchObject({ id: f.serviceId, canAddCard: false, canInvite: false });
-    expect(dashboard.profiles).toMatchObject([{ id: other.serviceId, relationship: "SECONDARY", canAddCard: false, canInvite: false }]);
+    expect(dashboard.profiles).toMatchObject([{ id: other.serviceId, relationship: "CARDHOLDER", canAddCard: false, canInvite: false }]);
   });
 
   it("does not manufacture primary navigation for a secondary-only identity", async () => {

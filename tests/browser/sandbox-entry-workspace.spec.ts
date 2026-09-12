@@ -41,7 +41,8 @@ test("first service choice survives an unknown setup result without opening fina
   await expect(page.getByRole("radio",{name:"Cardholder services",exact:true})).toBeDisabled();
   await page.getByRole("button",{name:"Retry setup",exact:true}).click();
   await expect(page).toHaveURL(/\/merchant-services$/);
-  await expect(page.getByRole("heading",{name:"Merchant overview",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Your terminals",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Start receiving payments",exact:true})).toBeVisible();
   expect(bodies).toHaveLength(2);expect(bodies[0]).toMatchObject({displayName:"Journey merchant",acknowledged:true});expect(bodies[1]).toEqual(bodies[0]);
   const participants=await getDb().select().from(sandboxParticipants).where(eq(sandboxParticipants.personId,identity.personId));
   expect(participants).toHaveLength(1);
@@ -50,7 +51,8 @@ test("first service choice survives an unknown setup result without opening fina
   await page.goto("/services");
   await expect(page.getByRole("heading",{name:"Your services",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Your member code",exact:true})).not.toBeVisible();
-  await page.getByText("Your profile",{exact:true}).click();
+  await page.getByRole("link",{name:"Open your profile",exact:true}).click();
+  await expect(page).toHaveURL(/\/profile$/);
   const memberCode=page.getByRole("complementary",{name:"Your member code",exact:true});
   await expect(memberCode).toBeVisible();
   await expect(memberCode.locator("code")).toHaveText(participants[0]!.memberCode);
@@ -65,7 +67,8 @@ test("first service choice survives an unknown setup result without opening fina
   await expect(memberCode.getByRole("button",{name:"Copied",exact:true})).toBeVisible();
   expect(await page.evaluate(()=>Reflect.get(window,"__copiedMemberCodes"))).toEqual([participants[0]!.memberCode]);
   expect(bodies).toHaveLength(2);
-  await page.getByText("Your profile",{exact:true}).click();
+  await page.getByRole("link",{name:"← Your services",exact:true}).click();
+  await expect(page).toHaveURL(/\/services$/);
   await expect(memberCode).not.toBeVisible();
   await expect(page.getByRole("heading",{name:"Invitations",exact:true})).toHaveCount(0);
  }finally{await sessions.logout(pair);}

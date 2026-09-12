@@ -2,8 +2,9 @@ import {randomUUID} from "node:crypto";
 import {eq} from "drizzle-orm";
 import {expect,test} from "@playwright/test";
 import {closeDatabase,getDb} from "../../src/platform/database/client";
-import {cardholderFundingIntents,cardholderTopups} from "../../src/modules/workspace/funding-schema";
+import {moneyFundingIntents,moneyTopups} from "../../src/modules/money/schema";
 import {getCardholderFunds} from "../../src/modules/workspace/service";
+import {getServiceMoneyAccount} from "../../src/modules/money/service";
 import {ledgerEntries,ledgerJournals} from "../../src/modules/ledger/schema";
 import {fundingIntentSchema,topupReceiptSchema} from "../../src/shared/funding-response";
 import {cardPrimary} from "../helpers/cardholder";
@@ -13,6 +14,7 @@ test.afterAll(closeDatabase);
 
 test("funding waits for its saved review navigation before confirming and recovers one committed top-up",async({page})=>{
  const primary=await cardPrimary(`Funding navigation ${randomUUID().slice(0,8)}`),amount="7361";
+ const account=await getDb().transaction(tx=>getServiceMoneyAccount(tx,primary.serviceId));
  await signInPerson(page,primary.personId);
  const base=`/api/v1/cardholder-services/${primary.serviceId}/funds/intents`;
  await page.goto(`/cardholder-services/funds?service=${primary.serviceId}`);
@@ -63,7 +65,7 @@ test("funding waits for its saved review navigation before confirming and recove
   await expect(panel.getByRole("link",{name:"Change amount",exact:true})).toHaveCount(0);
   await confirm.evaluate(button=>(button as HTMLButtonElement).click());
   expect(confirmations).toHaveLength(0);
-  expect(await getDb().select().from(cardholderTopups).where(eq(cardholderTopups.serviceId,primary.serviceId))).toHaveLength(0);
+  expect(await getDb().select().from(moneyTopups).where(eq(moneyTopups.moneyAccountId,account.id))).toHaveLength(0);
   expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("0");
  }finally{releaseNavigation();}
  await expect(page).toHaveURL(url=>url.searchParams.get("review")===preparedId);
@@ -87,14 +89,14 @@ test("funding waits for its saved review navigation before confirming and recove
  await page.reload();expect(page.url()).toBe(savedUrl);
  await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
  await expect(panel).toContainText(saved.receipt!.reference);
- const intents=await getDb().select().from(cardholderFundingIntents).where(eq(cardholderFundingIntents.serviceId,primary.serviceId));
+ const intents=await getDb().select().from(moneyFundingIntents).where(eq(moneyFundingIntents.moneyAccountId,account.id));
  expect(intents).toHaveLength(1);expect(intents[0]!.id).toBe(preparedId);expect(intents[0]!.confirmCommandId).toBe(receiptId);
- const topups=await getDb().select().from(cardholderTopups).where(eq(cardholderTopups.serviceId,primary.serviceId));
+ const topups=await getDb().select().from(moneyTopups).where(eq(moneyTopups.moneyAccountId,account.id));
  expect(topups).toHaveLength(1);expect(topups[0]!.id).toBe(receiptId);
  const journals=await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.referenceId,receiptId));
- expect(journals).toHaveLength(1);expect(journals[0]!.kind).toBe("GROUP_FUNDING");
- const entries=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId));
+ expect(journals).toHaveLength(1);expect(journals[0]!.kind).toBe("MONEY_FUNDING");
+ const entries=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.moneyAccountId,account.id));
  expect(entries).toHaveLength(2);expect(entries.reduce((sum,line)=>sum+line.deltaMinor,0n)).toBe(0n);
- expect(entries.find(line=>line.bucket==="GROUP_AVAILABLE")?.deltaMinor).toBe(7361n);
+ expect(entries.find(line=>line.bucket==="MONEY_AVAILABLE")?.deltaMinor).toBe(7361n);
  expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe(amount);
 });

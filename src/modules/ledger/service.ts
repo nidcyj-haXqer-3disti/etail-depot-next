@@ -4,27 +4,30 @@ import { z } from "zod";
 import { getDb } from "../../platform/database/client";
 import { services, cards } from "../../platform/database/schema";
 import { SecurityError } from "../../platform/security/origin";
-import { merchantUnits } from "../acquiring/schema";
-import { JOURNAL_KINDS, LEDGER_BUCKETS, type JournalLine, type LedgerPosition, type PostJournalInput } from "./contracts";
+import { merchantTerminals } from "../acquiring/schema";
+import {moneyAccounts,moneyAccountServices} from "../money/schema";
+import { JOURNAL_KINDS, LEDGER_BUCKETS, MONEY_BUCKETS, type JournalLine, type LedgerPosition, type PostJournalInput } from "./contracts";
 import { ledgerEntries, ledgerJournals } from "./schema";
 
 export type LedgerTransaction = Parameters<Parameters<ReturnType<typeof getDb>["transaction"]>[0]>[0];
 export type { JournalKind, JournalLine, LedgerBucket, LedgerPosition, PostJournalInput } from "./contracts";
 const uuid = z.uuid();
 const MAX_LINE = 9_223_372_036_854_775_807n;
-type Position = { serviceId: string; bucket: LedgerPosition["bucket"]; cardId: string | null; merchantUnitId: string | null };
+type Position = { serviceId: string|null; moneyAccountId:string|null; bucket: LedgerPosition["bucket"]; cardId: string | null; merchantUnitId: string | null };
 function invalid(): never { throw new SecurityError("INVALID_LEDGER_JOURNAL", 422); }
 function normalizePosition(input: LedgerPosition): Position {
-  if (!input || !uuid.safeParse(input.serviceId).success || !(LEDGER_BUCKETS as readonly string[]).includes(input.bucket)) invalid();
+  if (!input || !(LEDGER_BUCKETS as readonly string[]).includes(input.bucket)) invalid();
+  const money=(MONEY_BUCKETS as readonly string[]).includes(input.bucket);
+  if(money?input.serviceId!==null||!uuid.safeParse(input.moneyAccountId).success:!uuid.safeParse(input.serviceId).success||input.moneyAccountId!=null)invalid();
   if (input.cardId != null && !uuid.safeParse(input.cardId).success) invalid();
   if (input.merchantUnitId != null && !uuid.safeParse(input.merchantUnitId).success) invalid();
-  const p = { serviceId: input.serviceId.toLowerCase(), bucket: input.bucket, cardId: input.cardId?.toLowerCase() ?? null, merchantUnitId: input.merchantUnitId?.toLowerCase() ?? null };
-  if (["PRACTICE_SOURCE","GROUP_AVAILABLE"].includes(p.bucket) ? p.cardId !== null || p.merchantUnitId !== null : p.bucket.startsWith("CARD_") ? p.cardId === null || p.merchantUnitId !== null : p.cardId !== null || p.merchantUnitId === null) invalid();
+  const p = { serviceId: input.serviceId?.toLowerCase()??null,moneyAccountId:input.moneyAccountId?.toLowerCase()??null, bucket: input.bucket, cardId: input.cardId?.toLowerCase() ?? null, merchantUnitId: input.merchantUnitId?.toLowerCase() ?? null };
+  if (money||["PRACTICE_SOURCE","GROUP_AVAILABLE"].includes(p.bucket) ? p.cardId !== null || p.merchantUnitId !== null : p.bucket.startsWith("CARD_") ? p.cardId === null || p.merchantUnitId !== null : p.cardId !== null || p.merchantUnitId === null) invalid();
   return p;
 }
-function positionKey(p: Position) { return [p.serviceId, p.bucket, p.cardId ?? "", p.merchantUnitId ?? ""].join(":"); }
+function positionKey(p: Position) { return p.moneyAccountId?`money:${p.moneyAccountId}:${p.bucket}`:[p.serviceId, p.bucket, p.cardId ?? "", p.merchantUnitId ?? ""].join(":"); }
 function positionWhere(p: Position) {
-  return and(eq(ledgerEntries.serviceId, p.serviceId), eq(ledgerEntries.bucket, p.bucket), p.cardId ? eq(ledgerEntries.cardId, p.cardId) : isNull(ledgerEntries.cardId), p.merchantUnitId ? eq(ledgerEntries.merchantUnitId, p.merchantUnitId) : isNull(ledgerEntries.merchantUnitId));
+  return and(p.serviceId?eq(ledgerEntries.serviceId,p.serviceId):isNull(ledgerEntries.serviceId),p.moneyAccountId?eq(ledgerEntries.moneyAccountId,p.moneyAccountId):isNull(ledgerEntries.moneyAccountId),eq(ledgerEntries.bucket, p.bucket), p.cardId ? eq(ledgerEntries.cardId, p.cardId) : isNull(ledgerEntries.cardId), p.merchantUnitId ? eq(ledgerEntries.merchantUnitId, p.merchantUnitId) : isNull(ledgerEntries.merchantUnitId));
 }
 /** This projection confers no authority; the owning command must authorize its caller first. */
 export async function getBalance(tx: LedgerTransaction, input: LedgerPosition): Promise<bigint> {
@@ -33,6 +36,8 @@ export async function getBalance(tx: LedgerTransaction, input: LedgerPosition): 
   return BigInt(row!.total);
 }
 async function requireResources(tx: LedgerTransaction, p: Position) {
+  if(p.moneyAccountId){const [account]=await tx.select({id:moneyAccounts.id}).from(moneyAccounts).where(eq(moneyAccounts.id,p.moneyAccountId));if(!account)throw new SecurityError("LEDGER_RESOURCE_UNAVAILABLE",422);return;}
+  if(!p.serviceId)throw new SecurityError("LEDGER_RESOURCE_UNAVAILABLE",422);
   const [service] = await tx.select({ id: services.id,kind:services.kind }).from(services).where(eq(services.id, p.serviceId));
   if (!service || (["PRACTICE_SOURCE","GROUP_AVAILABLE"].includes(p.bucket)&&service.kind!=="CARDHOLDER")) throw new SecurityError("LEDGER_RESOURCE_UNAVAILABLE", 422);
   if (p.cardId) {
@@ -40,7 +45,7 @@ async function requireResources(tx: LedgerTransaction, p: Position) {
     if (!card) throw new SecurityError("LEDGER_RESOURCE_UNAVAILABLE", 422);
   }
   if (p.merchantUnitId) {
-    const [unit] = await tx.select({ id: merchantUnits.id }).from(merchantUnits).where(and(eq(merchantUnits.id, p.merchantUnitId), eq(merchantUnits.masterServiceId, p.serviceId)));
+    const [unit] = await tx.select({ id: merchantTerminals.id }).from(merchantTerminals).where(and(eq(merchantTerminals.id, p.merchantUnitId), eq(merchantTerminals.merchantServiceId, p.serviceId)));
     if (!unit) throw new SecurityError("LEDGER_RESOURCE_UNAVAILABLE", 422);
   }
 }
@@ -59,7 +64,11 @@ export async function postJournal(tx: LedgerTransaction, input: PostJournalInput
   }).sort((a, b) => positionKey(a) < positionKey(b) ? -1 : positionKey(a) > positionKey(b) ? 1 : 0);
   if (new Set(lines.map(positionKey)).size !== lines.length || lines.reduce((sum, line) => sum + line.deltaMinor, 0n) !== 0n) invalid();
   const referenceId = input.referenceId.toLowerCase();
-  const digest = createHash("sha256").update(JSON.stringify({ kind: input.kind, referenceId, currency: "USD", ...(input.occurredAt?{occurredAt:input.occurredAt.toISOString()}:{}), lines: lines.map(line => ({ ...line, deltaMinor: line.deltaMinor.toString() })) })).digest("hex");
+  // Keep historical service-position payload bytes stable; old retry identities survive D73.
+  const digest = createHash("sha256").update(JSON.stringify({ kind: input.kind, referenceId, currency: "USD", ...(input.occurredAt?{occurredAt:input.occurredAt.toISOString()}:{}), lines: lines.map(line => ({serviceId:line.serviceId,bucket:line.bucket,cardId:line.cardId,merchantUnitId:line.merchantUnitId,...(line.moneyAccountId?{moneyAccountId:line.moneyAccountId}:{}),deltaMinor:line.deltaMinor.toString()})) })).digest("hex");
+  const accountIds=new Set(lines.flatMap(line=>line.moneyAccountId?[line.moneyAccountId]:[]));
+  for(const serviceId of new Set(lines.flatMap(line=>line.serviceId?[line.serviceId]:[]))){const [link]=await tx.select().from(moneyAccountServices).where(eq(moneyAccountServices.serviceId,serviceId));if(link)accountIds.add(link.moneyAccountId);}
+  for(const accountId of [...accountIds].sort())await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"money-account:"+accountId},0))`);
   // Business identity locks precede sorted position locks. Both key and reference are unique.
   for (const key of [`ledger-effect:${input.kind}:${referenceId}`, `ledger-journal:${input.businessKey}`].sort()) await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${key},0))`);
   const previous = await tx.select().from(ledgerJournals).where(or(eq(ledgerJournals.businessKey, input.businessKey), and(eq(ledgerJournals.kind, input.kind), eq(ledgerJournals.referenceId, referenceId))));
@@ -71,7 +80,7 @@ export async function postJournal(tx: LedgerTransaction, input: PostJournalInput
   for (const line of lines) await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"ledger-position:" + positionKey(line)},0))`);
   for (const line of lines) {
     await requireResources(tx, line);
-    if ((["GROUP_AVAILABLE","CARD_AVAILABLE","MERCHANT_AVAILABLE","MERCHANT_SETTLED","MERCHANT_PAYOUT_PENDING","PAYOUT_CLEARING"].includes(line.bucket)) && await getBalance(tx, line) + line.deltaMinor < 0n) throw new SecurityError("INSUFFICIENT_LEDGER_FUNDS", 409);
+    if ((["GROUP_AVAILABLE","CARD_AVAILABLE","MERCHANT_AVAILABLE","MERCHANT_SETTLED","MERCHANT_PAYOUT_PENDING","PAYOUT_CLEARING","MONEY_AVAILABLE","MONEY_WITHDRAWAL_PENDING","MONEY_WITHDRAWN"].includes(line.bucket)) && await getBalance(tx, line) + line.deltaMinor < 0n) throw new SecurityError("INSUFFICIENT_LEDGER_FUNDS", 409);
   }
   const [journal] = await tx.insert(ledgerJournals).values({ businessKey: input.businessKey, kind: input.kind, referenceId, digest, createdAt:input.occurredAt??sql`clock_timestamp()` }).returning();
   await tx.insert(ledgerEntries).values(lines.map((line, index) => ({ ...line, journalId: journal!.id, lineNumber: index + 1 })));

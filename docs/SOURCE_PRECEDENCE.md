@@ -1,5 +1,8 @@
 # Current source precedence
 
+> **D73 active override — 12 September 2026:** [Owner, cards and terminals](OWNER_CARDS_TERMINALS_DESIGN.md) governs the current rebuild. The user explicitly chose **separate card and merchant money** and **per-card total allowances with no monthly reset**. Owners manage cards and one merchant’s flat terminals; invited holders/users have only their own resource access. Primary/secondary customer tiers, per-person monthly limits, submerchant responsibility and shared card/merchant balances are superseded. The text below retains the dated D69–D72 baseline for migration and review history; it does not override D73.
+
+
 12 September 2026 · D69. The user has approved a fresh prepaid replacement of both sandbox experiences. [FRESH_PREPAID_REBUILD.md](FRESH_PREPAID_REBUILD.md) is the active override for money, checkout, customer navigation and local data replacement. The [product design](PRODUCT_TECHNICAL_DESIGN.md), [project prompt](../02_MASTER_BUILD_PROMPT.md) and [delivery plan](../planning/DELIVERY_PLAN.md) apply that decision. D63–D68 plans and evidence retain their dated history; their allocation demo, guest simulator and preservation-only instructions do not override D69.
 
 ## Authority order

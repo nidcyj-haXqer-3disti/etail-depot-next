@@ -1,10 +1,10 @@
 import {randomUUID} from "node:crypto";
 import {describe,expect,it} from "vitest";
-import {createChannelSchema,updateChannelSchema,createSubmerchantSchema,pauseMerchantSchema} from "../../src/modules/acquiring/contracts";
+import {createChannelSchema,updateChannelSchema,createTerminalSchema,pauseMerchantSchema} from "../../src/modules/acquiring/contracts";
 import {readMerchantDirectoryQuery} from "../../src/modules/acquiring/routes";
 
 const input=()=>({commandId:randomUUID(),description:"Fictional handmade item",amountMinor:"1250",currency:"USD",usage:"ONE_TIME",expiresAt:"2026-10-01T00:00:00.000Z",presentations:["WEB"],visibility:"CREATOR_PRIVATE"});
-describe("strict channel and merchant relationship contracts",()=>{
+describe("strict channel and terminal contracts",()=>{
   it("accepts the seven presentation choices without making receipts or publishing another payable channel",()=>{
     expect(createChannelSchema.safeParse({...input(),presentations:["SMS","EMAIL","INVOICE","BILL","SOCIAL","QR","WEB"]}).success).toBe(true);
     for(const presentations of [[],["WEB","WEB"],["RECEIPT"],["CARD"],["TEXT"]])expect(createChannelSchema.safeParse({...input(),presentations}).success).toBe(false);
@@ -17,10 +17,10 @@ describe("strict channel and merchant relationship contracts",()=>{
     expect(updateChannelSchema.safeParse(input()).success).toBe(false);
     expect(updateChannelSchema.safeParse({...input(),expectedVersion:1}).success).toBe(true);
   });
-  it("creates a named submerchant without accepting caller-supplied responsibility or consent",()=>{
+  it("creates a named terminal without accepting caller-supplied responsibility or consent",()=>{
     const request={commandId:randomUUID(),displayName:"Named collection unit"};
-    expect(createSubmerchantSchema.safeParse(request).success).toBe(true);
-    for(const extra of [{displayName:" "},{masterId:randomUUID()},{status:"ACTIVE"},{primaryPersonId:randomUUID()}])expect(createSubmerchantSchema.safeParse({...request,...extra}).success).toBe(false);
+    expect(createTerminalSchema.safeParse(request).success).toBe(true);
+    for(const extra of [{displayName:" "},{masterId:randomUUID()},{status:"ACTIVE"},{primaryPersonId:randomUUID()}])expect(createTerminalSchema.safeParse({...request,...extra}).success).toBe(false);
     expect(pauseMerchantSchema.safeParse({commandId:randomUUID(),expectedVersion:1,reason:""}).success).toBe(false);
   });
   it("rejects duplicated or foreign directory query scope",()=>{

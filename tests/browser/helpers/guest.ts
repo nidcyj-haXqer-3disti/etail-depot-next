@@ -6,7 +6,7 @@ import {guestPublicationManagementSchema} from "../../../src/modules/acquiring/g
 import {headers,merchantDashboard,signIn} from "./fresh";
 
 export async function activeGuestChannel(request:APIRequestContext,usage:"ONE_TIME"|"REUSABLE"="ONE_TIME"){
- await signIn(request);const dashboard=await merchantDashboard(request);const merchant=dashboard.units.find(unit=>unit.kind==="MASTER"&&unit.primaryAccess)!;
+ await signIn(request);const dashboard=await merchantDashboard(request);const merchant=dashboard.units.find(unit=>unit.ownerAccess)!;
  const response=await request.get(`/api/v1/merchants/${merchant.id}/operations`);expect(response.status()).toBe(200);const operations=merchantOperationsProjectionSchema.parse(await response.json());
  if(operations.gateway.mode!=="TEST_READY")expect((await request.put(`/api/v1/merchants/${merchant.id}/gateway`,{headers,data:{commandId:randomUUID(),expectedVersion:operations.gateway.version,enabled:true}})).status()).toBe(200);
  if(operations.enrollment.status!=="ENROLLED")expect((await request.put(`/api/v1/merchants/${merchant.id}/test-enrollment`,{headers,data:{commandId:randomUUID(),expectedVersion:operations.enrollment.version,enabled:true}})).status()).toBe(200);

@@ -6,11 +6,10 @@ import {createChannel} from "../../../src/modules/acquiring/service";
 import {setChannelActivation} from "../../../src/modules/acquiring/operations-service";
 import {publishGuestChannel} from "../../../src/modules/acquiring/guest-service";
 import {cardCheckoutReviewSchema} from "../../../src/modules/acquiring/card-checkout-contracts";
-import {merchantOperationsProjectionSchema,merchantTestPayoutProjectionSchema} from "../../../src/modules/acquiring/operations-api-contracts";
+import {merchantOperationsProjectionSchema} from "../../../src/modules/acquiring/operations-api-contracts";
 import {paymentInput} from "../../helpers/acquiring";
 import {cardPerson} from "../../helpers/cardholder";
 import {freshPrepaidCard,freshPublishedPayment,openSavedCardReview,signInPerson} from "./prepaid";
-import {headers} from "./fresh";
 
 export type PublishedMerchant=Awaited<ReturnType<typeof freshPublishedPayment>>;
 export type PrepaidPayer=Awaited<ReturnType<typeof freshPrepaidCard>>;
@@ -54,16 +53,4 @@ export async function explicitDepositOperator(serviceId:string,canProcessDeposit
  const personId=await cardPerson(`Deposit operator ${randomUUID().slice(0,8)}`);
  await getDb().insert(operatorServiceAccess).values({serviceId,personId,state:"ACCEPTED",canRespond:true,canProcessDeposits});
  return personId;
-}
-
-export async function recordDepositOutcome(page:Page,operatorId:string,depositId:string,outcome:"COMPLETED"|"FAILED"){
- await signInPerson(page,operatorId);
- const input={commandId:randomUUID(),outcome};
- const response=await page.request.post(`/api/v1/operations/deposits/${depositId}`,{headers,data:input});
- expect(response.status()).toBe(200);
- const result=merchantTestPayoutProjectionSchema.parse(await response.json());
- expect(result.status).toBe(outcome);
- const retry=await page.request.post(`/api/v1/operations/deposits/${depositId}`,{headers,data:input});
- expect(retry.status()).toBe(200);expect(await retry.json()).toEqual(result);
- return {result,input};
 }

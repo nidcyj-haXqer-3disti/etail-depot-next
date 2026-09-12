@@ -13,11 +13,12 @@ export function ProductPreview({ variant = "cards" }: { variant?: "cards" | "pay
 }
 
 const commonQuestions = [
-  { question: "What can I do with Etail Depot?", answer: "Fund one prepaid card group and set a monthly spending limit for each adult cardholder, or share payment tools through Merchant services. Customers pay through published links with their own Etail cards. You choose permissions and keep the overview." },
-  { question: "Who can see my cards and payments?", answer: "The primary cardholder manages their card group. Each additional cardholder sees only their own cards and activity. A primary merchant oversees its submerchants. Invited people see the merchant records their permissions allow; people assigned to the same merchant may share its payment view. Authorized support staff can read questions assigned to them." },
-  { question: "Can I give someone both a card and payment tools?", answer: "Yes, with separate invitations and permissions for each service. Giving someone a card does not give them access to merchant payments, and payment access does not reveal private card activity. Cards are currently available for adults." },
-  { question: "How do I get started?", answer: "Create a login, confirm your email and choose your service. Start with your own cards or business, then add people whenever you’re ready." },
-  { question: "Can I use Etail Depot on my phone?", answer: "Yes. Open this website in your phone’s browser to use the same card and payment tools. You do not need to install an app." },
+ {question:"What can I do with Etail Depot?",answer:"Give your people prepaid cards, each with its own total allowance. Or give them terminals to collect payments for your merchant. You own the money and keep the overview."},
+ {question:"Who can see my cards and payments?",answer:"The account owner sees all cards or terminals in that service. Cardholders see only their own cards and activity. Terminal users see only their assigned terminal records and can respond to disputes; they cannot manage money."},
+ {question:"Do card allowances reset each month?",answer:"No. Each card has a total allowance that stays in place until its owner changes it. Spending uses that card’s allowance and the available card-group money. Refunds return money to the group but do not replenish the used allowance."},
+ {question:"Do merchant payments fund my cards?",answer:"No. Your card money and merchant money stay separate. Every terminal’s settled payments go to the merchant balance. Only the account owner can add or withdraw money."},
+ {question:"Can I give someone both a card and a terminal?",answer:"Yes. Invite them separately to each service. Their card access and terminal access stay separate, and each invitation tells them what they can do."},
+ {question:"How do I get started?",answer:"Create a login, confirm your email and choose Cardholder or Merchant services. You can invite people when you’re ready. Open the same website on your phone; no app installation is needed."},
 ];
 export function PublicQuestions() {
   return <div className="public-questions">{commonQuestions.map(item => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}</p></details>)}</div>;

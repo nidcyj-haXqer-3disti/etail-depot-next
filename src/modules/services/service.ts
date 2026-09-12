@@ -8,6 +8,7 @@ import {cardholderRole, type CardholderRole} from "../policy/cardholder-scope";
 import { loadServiceScope,type ScopedTransaction } from "../access/scope";
 import { requireMerchantApplicant } from "./merchant-eligibility";
 import {createCardholderServiceSchema,type CreateCardholderServiceInput,type CreatedCardholderService} from "./cardholder-contracts";
+import {attachServiceMoneyAccount,lockMoneyAccount} from "../money/service";
 export interface ServiceSummary {id:string;kind:ServiceKind;primaryPersonId:string;displayName:string;role:Role;status:string;version:number;cardholderRole:CardholderRole}
 export interface ServiceProjection extends ServiceSummary {capabilities:ReturnType<typeof evaluate>[];peopleCount:number|null}
 /** Binding identity never enrolls someone in a service. */
@@ -27,8 +28,9 @@ export const PRIMARY_CARDHOLDER_PERMISSIONS=["cardholder.funds.read","cardholder
 /** Sole enrollment writer for a primary Cardholder service. No card or money is created here. */
 export async function createCardholderService(personId:string,raw:CreateCardholderServiceInput):Promise<CreatedCardholderService> {
  const parsed=createCardholderServiceSchema.safeParse(raw);if(!parsed.success)throw new SecurityError("INVALID_REQUEST",422);const input=parsed.data;
- const digest=createHash("sha256").update(JSON.stringify({personId,displayName:input.displayName})).digest("hex");
+ const digest=createHash("sha256").update(JSON.stringify({personId,displayName:input.displayName,...(input.moneyAccountId?{moneyAccountId:input.moneyAccountId}:{})})).digest("hex");
  return getDb().transaction(async tx=>{
+  if(input.moneyAccountId)await lockMoneyAccount(tx,input.moneyAccountId);
   await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"cardholder-enrollment:"+personId},0))`);
   await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"cardholder-command:"+input.commandId},0))`);
   await requireMerchantApplicant(tx,personId);
@@ -36,12 +38,13 @@ export async function createCardholderService(personId:string,raw:CreateCardhold
   if(receipt){
    if(receipt.actorId!==personId||receipt.digest!==digest)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);
    const current=await loadServiceScope(tx,personId,receipt.serviceId,true);
-   if(cardholderRole(current.policy)!=="PRIMARY")throw new SecurityError("ACTION_DENIED",403);
+   if(cardholderRole(current.policy)!=="OWNER")throw new SecurityError("ACTION_DENIED",403);
    return {serviceId:receipt.serviceId,kind:"CARDHOLDER",nextHref:"/cardholder-services"};
   }
   const [existing]=await tx.select().from(services).where(and(eq(services.kind,"CARDHOLDER"),eq(services.primaryPersonId,personId)));
   if(existing)throw new SecurityError("CARDHOLDER_SERVICE_EXISTS",409);
   const [service]=await tx.insert(services).values({kind:"CARDHOLDER",primaryPersonId:personId,displayName:input.displayName,status:"ACTIVE"}).returning();
+  await attachServiceMoneyAccount(tx,service!.id,personId,"CARDHOLDER",input.displayName,input.moneyAccountId);
   await tx.insert(serviceMembers).values({serviceId:service!.id,personId,state:"ACCEPTED"});
   await tx.insert(permissionGrants).values(PRIMARY_CARDHOLDER_PERMISSIONS.map(action=>({serviceId:service!.id,personId,action,delegable:true})));
   await tx.insert(cardholderCreationCommands).values({commandId:input.commandId,actorId:personId,serviceId:service!.id,digest});
@@ -61,14 +64,14 @@ export async function listServicesForPersonInTransaction(tx:ScopedTransaction,pe
  const result:ServiceSummary[]=[];for(const row of rows)try{result.push(summary(await loadServiceScope(tx,personId,row.serviceId)));}catch(error){if(!(error instanceof SecurityError&&[403,404].includes(error.status)))throw error;}return result;
 }
 export async function listServicesForPerson(personId:string):Promise<ServiceSummary[]>{return getDb().transaction(tx=>listServicesForPersonInTransaction(tx,personId));}
-export interface CardholderDirectoryEntry {id:string;displayName:string;cardholderRole:CardholderRole;cards:{id:string;nickname:string;lastFour:string;relationship:"PRIMARY"|"SECONDARY"}[]}
+export interface CardholderDirectoryEntry {id:string;displayName:string;cardholderRole:CardholderRole;cards:{id:string;nickname:string;lastFour:string;relationship:"OWNER"|"CARDHOLDER"}[]}
 export async function getCardholderDirectory(personId:string):Promise<CardholderDirectoryEntry[]> {
  return getDb().transaction(async tx=>{
   const result:CardholderDirectoryEntry[]=[];
   for(const context of await getCardholderContextPolicies(tx,personId)){
    const scope=await loadServiceScope(tx,personId,context.serviceId),role=cardholderRole(scope.policy);
-   const rows=evaluate(scope.policy,"cards.read").allowed?await tx.select().from(cards).where(and(eq(cards.serviceId,context.serviceId),role==="PRIMARY"?undefined:eq(cards.holderId,personId))).orderBy(cards.nickname,cards.id).limit(3):[];
-   result.push({id:context.serviceId,displayName:scope.service.displayName,cardholderRole:role,cards:rows.map(card=>({id:card.id,nickname:card.nickname,lastFour:card.lastFour,relationship:card.holderId===scope.service.primaryPersonId?"PRIMARY":"SECONDARY"}))});
+   const rows=evaluate(scope.policy,"cards.read").allowed?await tx.select().from(cards).where(and(eq(cards.serviceId,context.serviceId),role==="OWNER"?undefined:eq(cards.holderId,personId))).orderBy(cards.nickname,cards.id).limit(3):[];
+   result.push({id:context.serviceId,displayName:scope.service.displayName,cardholderRole:role,cards:rows.map(card=>({id:card.id,nickname:card.nickname,lastFour:card.lastFour,relationship:card.holderId===scope.service.primaryPersonId?"OWNER":"CARDHOLDER"}))});
   }return result;
  });
 }

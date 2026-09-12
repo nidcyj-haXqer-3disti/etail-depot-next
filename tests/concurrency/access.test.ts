@@ -26,10 +26,10 @@ for(const firstOperation of ["accept","revoke"] as const)it(`serializes overlapp
   const memberships=await getDb().select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,f.serviceId),eq(serviceMembers.personId,f.recipient.personId)));expect(memberships).toHaveLength(firstOperation==="accept"?1:0);
  }finally{if(open)await locker.query("ROLLBACK");await Promise.allSettled(pending);await Promise.all([locker.end(),observer.end()]);}
 });
-it("acceptance waiting on an in-flight delegation revocation cannot use the old permission",async()=>{
+it("acceptance waiting on an in-flight owner access revocation cannot use old authority",async()=>{
  const f=await accessFixture(),invite=await createInvitation(f.owner.personId,f.serviceId,offer(f.recipient.personId));const locker=new pg.Client({connectionString:process.env.DATABASE_URL,application_name:"etail-delegation-revocation-barrier"}),observer=new pg.Client({connectionString:process.env.DATABASE_URL,application_name:"etail-access-observer"});let open=false;const pending:Promise<unknown>[]=[];
- try{await locker.connect();await observer.connect();await locker.query("BEGIN");open=true;const {rows:[row]}=await locker.query<{pid:number}>("SELECT pg_backend_pid() AS pid");await locker.query('UPDATE permission_grants SET delegable=false WHERE "serviceId"=$1 AND "personId"=$2 AND action=\'activity.read\'',[f.serviceId,f.owner.personId]);
-  const acceptance=acceptInvitation(f.recipient.personId,invite.id,decision());pending.push(acceptance);void acceptance.catch(()=>undefined);await blockedBy(observer,row!.pid);await locker.query("COMMIT");open=false;await expect(acceptance).rejects.toThrow("DELEGATION_CEILING_EXCEEDED");
+ try{await locker.connect();await observer.connect();await locker.query("BEGIN");open=true;const {rows:[row]}=await locker.query<{pid:number}>("SELECT pg_backend_pid() AS pid");await locker.query('UPDATE service_members SET state=\'REVOKED\',version=version+1 WHERE "serviceId"=$1 AND "personId"=$2',[f.serviceId,f.owner.personId]);
+  const acceptance=acceptInvitation(f.recipient.personId,invite.id,decision());pending.push(acceptance);void acceptance.catch(()=>undefined);await blockedBy(observer,row!.pid);await locker.query("COMMIT");open=false;await expect(acceptance).rejects.toThrow("INVITER_ACCESS_CHANGED");
   expect(await getDb().select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,f.serviceId),eq(serviceMembers.personId,f.recipient.personId)))).toEqual([]);expect((await getDb().select().from(serviceInvitations).where(eq(serviceInvitations.id,invite.id)))[0]!.status).toBe("PENDING");
  }finally{if(open)await locker.query("ROLLBACK");await Promise.allSettled(pending);await Promise.all([locker.end(),observer.end()]);}
 });

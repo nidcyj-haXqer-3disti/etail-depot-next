@@ -5,15 +5,15 @@ import {getDb} from "../../../src/platform/database/client";
 import {identityBindings} from "../../../src/platform/database/schema";
 import {sessionRepository} from "../../../src/platform/database/session-repository";
 import {SessionService} from "../../../src/modules/identity/session";
-import {operatorServiceAccess} from "../../../src/modules/operations/schema";
-import {getCardholderFunds,getPersonSpending} from "../../../src/modules/workspace/service";
+import {merchantSettlementItems} from "../../../src/modules/acquiring/settlement-schema";
+import {getCardholderFunds,getCardSpending} from "../../../src/modules/workspace/service";
 import {createChannel,updateMerchantSetup,submitMerchantSetup} from "../../../src/modules/acquiring/service";
 import {configureTestGateway,enrollTestMerchant,setChannelActivation} from "../../../src/modules/acquiring/operations-service";
 import {publishGuestChannel} from "../../../src/modules/acquiring/guest-service";
 import {guestPublicationManagementSchema,type GuestPublication} from "../../../src/modules/acquiring/guest-contracts";
 import {cardCheckoutReviewSchema} from "../../../src/modules/acquiring/card-checkout-contracts";
-import {merchantOperationsProjectionSchema,merchantTestPaymentProjectionSchema,merchantTestPayoutProjectionSchema} from "../../../src/modules/acquiring/operations-api-contracts";
-import {cardPerson,cardPrimary} from "../../helpers/cardholder";
+import {merchantOperationsProjectionSchema,merchantTestPaymentProjectionSchema,merchantSettlementReceiptSchema} from "../../../src/modules/acquiring/operations-api-contracts";
+import {cardPrimary} from "../../helpers/cardholder";
 import {acquiringFixture,completeSetup} from "../../helpers/acquiring";
 import {cardDashboard} from "./fresh";
 
@@ -70,7 +70,7 @@ export async function publishedMerchantFixture(amountMinor="1250",description="F
 }
 export async function addMoney(page:Page,serviceId:string,amount="50.00"){
   await page.goto(`/cardholder-services/funds?service=${serviceId}`);
-  await expect(page.getByRole("heading",{name:"Add money & spending limits",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
   await page.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill(amount);
   await page.getByRole("button",{name:"Continue",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
@@ -85,19 +85,19 @@ export async function addMoney(page:Page,serviceId:string,amount="50.00"){
   expect((await confirming).status()).toBe(200);
   await expect(page.locator('section[aria-labelledby="funding-title"]')).toContainText("Money added");
 }
-export async function setMonthlyLimit(page:Page,serviceId:string,personId:string,name:string,amount="25.00"){
-  await page.goto(`/cardholder-services/funds?service=${serviceId}`);
-  const person=page.locator(".funds-person").filter({has:page.getByRole("heading",{name,exact:true})});
-  await person.getByRole("button",{name:"Change limit for "+name,exact:true}).click();
-  await person.getByRole("textbox",{name:"New monthly limit for "+name,exact:true}).fill(amount);
-  await person.getByRole("button",{name:"Review limit",exact:true}).click();
-  await expect(person).toContainText("This does not add money or reset spending already recorded.");
-  const saving=responseFor(page,`/api/v1/cardholder-services/${serviceId}/cardholders/${personId}/spending-limit`,"PUT");
-  await person.getByRole("button",{name:"Save limit",exact:true}).click();
+export async function setCardAllowance(page:Page,serviceId:string,cardId:string,name:string,amount="25.00"){
+  await page.goto(`/cardholder-services?card=${cardId}`);
+  const control=page.getByRole("dialog").getByRole("article",{name:"Card allowance",exact:true});
+  await control.getByRole("button",{name:"Change allowance for "+name,exact:true}).click();
+  await control.getByRole("textbox",{name:"New total allowance for "+name,exact:true}).fill(amount);
+  await control.getByRole("button",{name:"Review allowance",exact:true}).click();
+  await expect(control).toContainText("This does not add money or reset previous spending.");
+  const saving=responseFor(page,`/api/v1/cardholder-services/${serviceId}/cards/${cardId}/spending-limit`,"PUT");
+  await control.getByRole("button",{name:"Save allowance",exact:true}).click();
   expect((await saving).status()).toBe(200);
-  await expect(person.locator(".funds-limit-value")).toHaveText("$"+amount);
+  await expect(control.locator(".funds-limit-value")).toHaveText("$"+amount);
 }
-export async function addUnfundedCard(page:Page,name:string,holderName:string){
+export async function addUnfundedCard(page:Page,name:string,holderName:string,allowance="0.00"){
   if(!(await page.getByRole("dialog").count())){
     await page.getByRole("link",{name:/^(Add card|Create your first card)$/}).click();
   }
@@ -105,6 +105,7 @@ export async function addUnfundedCard(page:Page,name:string,holderName:string){
   const holder=dialog.getByRole("radio",{name:new RegExp(holderName)});
   if(await holder.count())await holder.check();
   await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);
+  await dialog.getByRole("textbox",{name:"Total card allowance (USD)",exact:true}).fill(allowance);
   await expect(dialog.getByRole("textbox",{name:"Starting balance (USD)",exact:true})).toHaveCount(0);
   await dialog.getByRole("button",{name:"Review card",exact:true}).click();
   await expect(dialog).toContainText("Creating a card does not add money.");
@@ -116,14 +117,13 @@ export async function addUnfundedCard(page:Page,name:string,holderName:string){
   expect(card).toBeTruthy();
   return card!;
 }
-/** Empty service fixture; funding, monthly limit and card all use actual UI commands. */
+/** Empty service fixture; funding, total allowance and card all use actual UI commands. */
 export async function prepaidPayer(page:Page,name:string){
   const primary=await cardPrimary(name),session=await isolatedSession(page,primary.personId);
   await addMoney(page,primary.serviceId,"50.00");
-  await setMonthlyLimit(page,primary.serviceId,primary.personId,name,"50.00");
   await page.goto("/cardholder-services");
   const before=await getCardholderFunds(primary.personId,primary.serviceId);
-  const card=await addUnfundedCard(page,"Prepaid checkout card",name);
+  const card=await addUnfundedCard(page,"Prepaid checkout card",name,"50.00");
   expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe(before.available.minor);
   expect(card.available.minor).toBe("5000");
   return {...primary,card,close:session.close};
@@ -185,39 +185,22 @@ export async function refundPayment(page:Page,merchantId:string,paymentId:string
   expect(payment).toMatchObject({id:paymentId,status:"REFUNDED"});
   await expect(page.getByRole("dialog")).toHaveCount(0);return payment;
 }
-export async function requestExactDeposit(page:Page,merchantId:string,paymentId:string){
+export async function settleExactPayment(page:Page,merchantId:string,paymentId:string){
   await page.goto(`/merchants/${merchantId}?tab=payments`);
-  await page.getByRole("region",{name:"Current available balance",exact:true}).getByRole("button",{name:"Request deposit",exact:true}).click();
-  await page.getByRole("dialog",{name:"Request deposit",exact:true}).getByRole("button",{name:"Review deposit",exact:true}).click();
-  const review=page.getByRole("dialog",{name:"Review deposit",exact:true});
-  await expect(review).toContainText("Deposited balance");
-  const requesting=responseFor(page,`/api/v1/merchants/${merchantId}/payouts`);
-  await review.getByRole("button",{name:"Request deposit",exact:true}).click();
+  await page.getByRole("button",{name:"Settle payments",exact:true}).click();
+  await page.getByRole("dialog",{name:"Settle payments",exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();
+  const review=page.getByRole("dialog",{name:"Review settlement",exact:true});
+  await expect(review).toContainText("Merchant money");
+  await expect(review).toContainText("Card money stays separate.");
+  const requesting=responseFor(page,`/api/v1/merchants/${merchantId}/settlements`);
+  await review.getByRole("button",{name:"Settle payments",exact:true}).click();
   const result=await requesting;expect(result.status()).toBe(200);
-  const deposit=merchantTestPayoutProjectionSchema.parse(await result.json());
-  expect(deposit.status).toBe("PENDING");expect(deposit.processedAt).toBeNull();
-  expect(deposit.payments.map(payment=>payment.id)).toEqual([paymentId]);
+  const receipt=merchantSettlementReceiptSchema.parse(await result.json());
+  expect(receipt.terminalId).toBe(merchantId);
+  const items=await getDb().select().from(merchantSettlementItems).where(eq(merchantSettlementItems.settlementId,receipt.settlementId));
+  expect(items.map(item=>item.paymentId)).toEqual([paymentId]);
   await expect(review).toBeHidden();
-  expect((await operations(page,merchantId)).bankFunds?.minor).toBe("0");
-  return deposit;
+  expect((await operations(page,merchantId)).bankFunds?.minor).toBe(receipt.amount.minor);
+  return receipt;
 }
-export async function assignedDepositOperator(page:Page,serviceId:string){
-  requireFictionalTestDatabase();
-  const personId=await cardPerson("Fictional deposit operator "+randomUUID().slice(0,8));
-  await getDb().insert(operatorServiceAccess).values({serviceId,personId,state:"ACCEPTED",canRespond:false,canProcessDeposits:true});
-  return isolatedSession(page,personId);
-}
-export async function completeDeposit(page:Page,depositId:string,reference:string){
-  await page.goto("/operations/deposits");
-  const deposit=page.locator("article").filter({hasText:reference});
-  await expect(deposit).toContainText(reference);
-  await deposit.getByRole("button",{name:"Complete deposit",exact:true}).click();
-  const completing=responseFor(page,`/api/v1/operations/deposits/${depositId}`);
-  await deposit.getByRole("button",{name:"Confirm result",exact:true}).click();
-  const result=await completing;expect(result.status()).toBe(200);
-  const completed=merchantTestPayoutProjectionSchema.parse(await result.json());
-  expect(completed).toMatchObject({id:depositId,status:"COMPLETED"});
-  expect(completed.processedAt).not.toBeNull();await expect(deposit).toHaveCount(0);
-  return completed;
-}
-export {getCardholderFunds,getPersonSpending};
+export {getCardholderFunds,getCardSpending};

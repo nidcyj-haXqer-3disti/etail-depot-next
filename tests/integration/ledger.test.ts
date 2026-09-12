@@ -4,10 +4,11 @@ import { and, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { services, serviceMembers, cards, cardRequests, people, serviceActivity, workspaceCommands } from "../../src/platform/database/schema";
-import { merchantUnits } from "../../src/modules/acquiring/schema";
+import { merchantTerminals } from "../../src/modules/acquiring/schema";
+import {readServiceMoneyAvailable} from "../../src/modules/money/service";
 import { getBalance, postJournal, type LedgerPosition, type PostJournalInput } from "../../src/modules/ledger/service";
 import { ledgerEntries, ledgerJournals } from "../../src/modules/ledger/schema";
-import { cardPrimary, fundCardGroup, setPersonLimit, issuePracticeCard } from "../helpers/cardholder";
+import { cardPrimary, fundCardGroup, issuePracticeCard } from "../helpers/cardholder";
 import { purchaseCardInTransaction } from "../../src/modules/workspace/service";
 
 const raw = new pg.Client({ connectionString: process.env.DATABASE_URL, application_name: "etail-ledger-integrity-tests" });
@@ -23,7 +24,7 @@ async function fixture() {
     const [request] = await tx.insert(cardRequests).values({ serviceId: service!.id, creatorId: person!.id, holderId: person!.id, nickname: "Ledger fixture request", format: "VIRTUAL", requestedLimitMinor: 0n, status: "ISSUED" }).returning();
     const [card] = await tx.insert(cards).values({ serviceId: service!.id, requestId: request!.id, holderId: person!.id, nickname: "Fictional ledger card", lastFour: "0000", format: "VIRTUAL", limitMinor: 0n }).returning();
     const [merchant] = await tx.insert(services).values({ kind: "MERCHANT", primaryPersonId: person!.id, displayName: "Fictional ledger merchant" }).returning();
-    const [unit] = await tx.insert(merchantUnits).values({ kind: "MASTER", masterServiceId: merchant!.id, displayName: "Fictional ledger master", status: "ACTIVE" }).returning();
+    const [unit] = await tx.insert(merchantTerminals).values({ merchantServiceId: merchant!.id, displayName: "Fictional ledger master", status: "ACTIVE" }).returning();
     return { serviceId: service!.id, cardId: card!.id, merchantServiceId: merchant!.id, merchantUnitId: unit!.id };
   });
 }
@@ -135,15 +136,15 @@ describe("single immutable practice USD ledger", () => {
   it("rolls a canonical prepaid purchase and its activity, receipt and card version back with its caller", async () => {
     const owner = await cardPrimary("Canonical ledger rollback primary");
     await fundCardGroup(owner.personId, owner.serviceId, "10000");
-    await setPersonLimit(owner.personId, owner.serviceId, owner.personId, "20000");
-    const { card } = await issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "Rollback purchase card");
+
+    const { card } = await issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "Rollback purchase card", undefined, "20000");
     const input = { commandId: randomUUID(), expectedVersion: card.version, amountMinor: "101", description: "Purchase rolled back by owner" };
     await expect(getDb().transaction(async tx => {
       await purchaseCardInTransaction(tx, owner.personId, owner.serviceId, card.id, input);
-      expect(await getBalance(tx, { serviceId: owner.serviceId, bucket: "GROUP_AVAILABLE" })).toBe(9899n);
+      expect(await readServiceMoneyAvailable(tx,owner.serviceId)).toBe(9899n);
       throw new Error("Canonical owning command failed");
     })).rejects.toThrow("Canonical owning command failed");
-    expect(await balance({ serviceId: owner.serviceId, bucket: "GROUP_AVAILABLE" })).toBe(10000n);
+    expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,owner.serviceId))).toBe(10000n);
     expect(await balance({ serviceId: owner.serviceId, cardId: card.id, bucket: "CARD_SPENT" })).toBe(0n);
     expect(await getDb().select().from(serviceActivity).where(eq(serviceActivity.cardId, card.id))).toEqual([]);
     expect(await getDb().select().from(workspaceCommands).where(eq(workspaceCommands.commandId, input.commandId))).toEqual([]);

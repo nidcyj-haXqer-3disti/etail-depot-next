@@ -18,5 +18,5 @@ export default async function Page({params}:{params:Promise<{merchantId:string}>
  }catch(error){unstable_rethrow(error);return null;} })();
  if(!data)return <PageNotice title="Merchant setup is unavailable" authenticated><p>Check your merchant access or retry.</p><Link href="/merchant-services">Return to Merchant overview</Link></PageNotice>;
  const {merchantId}=data;
- return <MerchantShell merchantId={merchantId} name={data.name} kind="MASTER" tab="verification"><Link href={`/merchants/${merchantId}?tab=verification`}>Back to payment setup</Link><MerchantBusinessDetails initial={data}/></MerchantShell>;
+ return <MerchantShell merchantId={merchantId} name={data.name} showSettings tab="verification"><Link href={`/merchants/${merchantId}?tab=verification`}>Back to payment setup</Link><MerchantBusinessDetails initial={data}/></MerchantShell>;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import {createContext,useCallback,useContext,useEffect,useId,useState,type MouseEvent,type ReactNode} from "react";
+import {createContext,useCallback,useContext,useEffect,useId,useLayoutEffect,useRef,useState,type MouseEvent,type ReactNode} from "react";
 
 import "./merchant-navigation-state.css";
 
@@ -24,4 +24,25 @@ export function MerchantNavigationBoundary({children}:{children:ReactNode}) {
 export function useMerchantNavigationLock(locked:boolean){
  const register=useContext(MerchantNavigationContext),id=useId();
  useEffect(()=>{register?.(id,locked);return()=>register?.(id,false);},[register,id,locked]);
+}
+
+/** Reveal only the nearest horizontal edge; page scroll and the selected route stay unchanged. */
+export function MerchantNavigation({label,activeKey,children}:{label:string;activeKey:string;children:ReactNode}) {
+ const navigation=useRef<HTMLElement>(null);
+ const reveal=useCallback((link:HTMLElement|null)=>{
+  const nav=navigation.current;if(!nav||!link||nav.scrollWidth<=nav.clientWidth)return;
+  const container=nav.getBoundingClientRect(),item=link.getBoundingClientRect();
+  const left=container.left+nav.clientLeft,right=left+nav.clientWidth;
+  const movement=item.left<left?item.left-left:item.right>right?item.right-right:0;
+  if(movement)nav.scrollLeft+=movement;
+ },[]);
+ useLayoutEffect(()=>{
+  const nav=navigation.current;if(!nav)return;
+  const showActive=()=>reveal(nav.querySelector<HTMLElement>('a[aria-current="page"]'));
+  showActive();const resize=new ResizeObserver(showActive);resize.observe(nav);
+  return()=>resize.disconnect();
+ },[activeKey,reveal]);
+ return <nav ref={navigation} aria-label={label} onFocusCapture={event=>{
+  const target=event.target;if(target instanceof HTMLElement)reveal(target.closest<HTMLAnchorElement>('a[href]'));
+ }}>{children}</nav>;
 }

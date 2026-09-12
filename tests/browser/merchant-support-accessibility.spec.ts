@@ -12,7 +12,7 @@ async function accessible(page:Page) {
 }
 for(const width of [1440,320])test(`merchant payment support and assigned operator context are accessible at ${width}px`,async({page})=>{
   test.setTimeout(90_000);await page.setViewportSize({width,height:900});await signIn(page.request);
-  const dashboard=await merchantDashboard(page.request),unit=dashboard.units.find(row=>row.primaryAccess&&row.name==="Online store")!;
+  const dashboard=await merchantDashboard(page.request),unit=dashboard.units.find(row=>row.ownerAccess&&row.name==="Online store")!;
   const response=await page.request.get(`/api/v1/merchants/${unit.id}/operations`);expect(response.status()).toBe(200);
   const payment=merchantOperationsProjectionSchema.parse(await response.json()).payments.find(row=>row.refund)!;
   await page.goto(`/merchants/${unit.id}?tab=help&new=1&payment=${payment.id}`);

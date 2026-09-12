@@ -2,6 +2,14 @@
 
 These are optional implementation-assistance tools for Codex. The owner does not need to run them manually to use the prompt. Require Python 3.10 or newer and the standard library. Only the explicitly requested planning import needs an installed/authenticated GitHub CLI. The verification and target guard use no network.
 
+## Current D73 preview model
+
+The active product contract is `docs/OWNER_CARDS_TERMINALS_DESIGN.md`. Keep the same marked D69 preview/test database generations and completed preparation receipts. Four additive D73 migrations create separate Card money and Merchant money, replace active merchant hierarchy with flat terminals, and replace monthly person limits with total card allowances. Posted history and historical pending deposit processing are retained. Applied migrations are immutable.
+
+Fresh initialization uses owner/cardholder/terminal-user assignments, per-card total allowances, connected checkout and a reviewed settlement into Merchant money. The account owner need not hold a card. Completed historical preparation is never replayed to overwrite existing permissions, balances or edits. A read-only check supports both the preserved completed sample and the current fresh seed.
+
+Only explicit `node tools/run-with-database.mjs --prepare-preview` may apply pending preview migrations. Startup remains read-only. Historical D69 instructions and sample descriptions below explain retained data; their primary/secondary and monthly allowance terminology is superseded by D73.
+
 ## D69 prepaid local preview and test generations
 
 The fresh application uses only `etail_depot_next_services_preview` and `etail_depot_next_services_test`, now marked `fresh-services-d69`. D69 preserved the originals as `etail_depot_next_services_preview_retired_d69` and `etail_depot_next_services_test_retired_d69`, retaining their OIDs and records with `ALLOW_CONNECTIONS=false`. They are offline recovery records, outside the application allowlist. Do not re-enable or connect application code to them, or copy their rows into the new generation.

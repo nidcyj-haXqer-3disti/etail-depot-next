@@ -1,5 +1,8 @@
 # Etail Depot — product and technical design
 
+> **D73 active override — 12 September 2026:** [Owner, cards and terminals](OWNER_CARDS_TERMINALS_DESIGN.md) governs the current rebuild. The user explicitly chose **separate card and merchant money** and **per-card total allowances with no monthly reset**. Owners manage cards and one merchant’s flat terminals; invited holders/users have only their own resource access. Primary/secondary customer tiers, per-person monthly limits, submerchant responsibility and shared card/merchant balances are superseded. The text below retains the dated D69–D72 baseline for migration and review history; it does not override D73.
+
+
 Version 2.0 · 12 September 2026 · D69 · **Prepaid replacement locally verified; hosted release remains separate.** See [D69 evidence](PREPAID_REBUILD_EVIDENCE.md).
 
 [FRESH_PREPAID_REBUILD.md](FRESH_PREPAID_REBUILD.md) is the accepted money/experience replacement contract. This document consolidates its active architecture with the retained two-service permissions. [The project prompt](../02_MASTER_BUILD_PROMPT.md) governs implementation and [the delivery plan](../planning/DELIVERY_PLAN.md) governs sequence. [Status](../planning/STATUS.md) distinguishes this candidate from the dated D65–D68 evidence. Earlier allocation and guest-simulator journeys are historical, not an alternate active product.

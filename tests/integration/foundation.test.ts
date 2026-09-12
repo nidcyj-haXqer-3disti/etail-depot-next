@@ -19,7 +19,7 @@ describe("fresh native PostgreSQL service foundation",()=>{
  });
  it("enrolls one primary service with a retry-safe command, without issuing a card",async()=>{
   const owner=await person(),command={commandId:randomUUID()};const service=await createCardholderService(owner.personId,command);expect(await createCardholderService(owner.personId,command)).toEqual(service);
-  expect(await listServicesForPerson(owner.personId)).toMatchObject([{id:service.serviceId,kind:"CARDHOLDER",role:"PRIMARY",primaryPersonId:owner.personId}]);
+  expect(await listServicesForPerson(owner.personId)).toMatchObject([{id:service.serviceId,kind:"CARDHOLDER",role:"OWNER",primaryPersonId:owner.personId}]);
   expect(await getDb().select().from(cards).where(eq(cards.serviceId,service.serviceId))).toEqual([]);
   await expect(createCardholderService(owner.personId,{commandId:randomUUID()})).rejects.toMatchObject({code:"CARDHOLDER_SERVICE_EXISTS"});
  });
@@ -36,7 +36,7 @@ describe("fresh native PostgreSQL service foundation",()=>{
  it("requires exact current membership and excludes a revoked service from the directory",async()=>{
   const owner=await person(),secondary=await person(),foreign=await person();const {serviceId}=await createCardholderService(owner.personId,{commandId:randomUUID()});
   await getDb().insert(serviceMembers).values({serviceId,personId:secondary.personId,state:"ACCEPTED"});
-  expect(await getServiceForPerson(secondary.personId,serviceId)).toMatchObject({role:"SECONDARY",peopleCount:null});
+  expect(await getServiceForPerson(secondary.personId,serviceId)).toMatchObject({role:"CARDHOLDER",peopleCount:null});
   await expect(getServiceForPerson(foreign.personId,serviceId)).rejects.toMatchObject({code:"SERVICE_UNAVAILABLE"});
   await getDb().update(serviceMembers).set({state:"REVOKED",version:2}).where(and(eq(serviceMembers.serviceId,serviceId),eq(serviceMembers.personId,secondary.personId)));
   await expect(getServiceForPerson(secondary.personId,serviceId)).rejects.toMatchObject({code:"SERVICE_UNAVAILABLE"});expect(await listServicesForPerson(secondary.personId)).toEqual([]);

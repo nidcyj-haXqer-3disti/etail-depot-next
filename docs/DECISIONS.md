@@ -319,3 +319,10 @@ Registration opens directly from the landing page and confirmation comes from th
 ## D72 — one environment badge, ordinary customer language (2026-09-12)
 
 Keep one Sandbox badge in the global header. Remove repeated demo/practice explanations and internal wording from customer journeys while retaining truthful availability and restrictions. Remove sample sign-in/person selectors and proven unused code; use member codes from Your profile for scoped service invitations. Do not delete required migrations, guards or test infrastructure to inflate a cleanup count. Preserve financial, permission, enrollment and retry owners. The user explicitly authorizes verification and deployment; [release evidence](PRODUCTION_UI_CLEANUP.md) records final local checks and the exact-publication receipt location.
+
+
+## D73 — owner-controlled cards and terminals (12 September 2026)
+
+The user replaces primary/secondary cardholder tiers with account ownership and named cards, and replaces primary/submerchant units with one merchant and flat user terminals. Two explicit follow-up answers require separate card and merchant money, and total per-card allowances without a monthly reset. Adopt the [D73 contract](OWNER_CARDS_TERMINALS_DESIGN.md), fixed owner-issued access, real scoped dispute responses, separate money-purpose ledger positions and an additive reconciled migration. Cardholders cannot see group money; terminal users cannot manage funds. No automatic card/merchant transfer or artificial card-count cap. Implementation, review and deployment are authorized; resource isolation, real-money-disabled operation and immutable financial history persist.
+
+D73 verification: 414 unit/contracts, 258 real PostgreSQL integration/concurrency,215 distinct API/browser/accessibility and26 email/session cases pass. Four additive migrations preserve posted history and reconcile separate money accounts; fresh canonical initialization and unchanged replay pass. Final mobile corrections and recovery/access fixes are recorded in [delivery evidence](OWNER_CARDS_TERMINALS_EVIDENCE.md). GitHub CI and hosted deployment acceptance remain separate release receipts.

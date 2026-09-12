@@ -1,8 +1,10 @@
 import { z } from "zod";
+import {ACCESS_PERMISSIONS} from "../../shared/access-permissions";
+export {ACCESS_PERMISSIONS,CARDHOLDER_ACCESS_PERMISSIONS} from "../../shared/access-permissions";
 
-export const ACCESS_PERMISSIONS = ["cards.read","cards.hold","cards.request","cards.create","cards.purchase","cards.freeze","cards.unfreeze","cards.manageMembers","activity.read","people.read","people.invite","people.changeRole","people.revoke","notifications.manage"] as const;
+
 export type AccessPermission = typeof ACCESS_PERMISSIONS[number];
-export type InvitedRole = "SECONDARY";
+export type InvitedRole = "CARDHOLDER";
 export interface PermissionOption { action: AccessPermission; label: string; description: string; canDelegate: boolean; allowedRoles: InvitedRole[] }
 export interface InvitationProjection {
   targetKind:"SERVICE";
@@ -13,7 +15,7 @@ export interface InvitationProjection {
   version:number; createdAt:string; expiresAt:string; canRespond:boolean; canRevoke:boolean; hasServiceAccess:boolean;
 }
 export interface AccessPerson {
-  id:string; displayName:string; role:"PRIMARY"|InvitedRole; state:"ACCEPTED"|"REVOKED"; version:number;
+  id:string; displayName:string; role:"OWNER"|InvitedRole; state:"ACCEPTED"|"REVOKED"; version:number;
   permissions:string[]; delegablePermissions:string[]; canManage:boolean; canRevoke:boolean; isCurrentPerson:boolean;
 }
 export interface AccessOverview {
@@ -25,10 +27,8 @@ export interface AccessOverview {
   history:{id:string;personId:string;personName:string;actorName:string;label:string;createdAt:string}[];
   historyHasMore:boolean;
 }
-const permissions = z.array(z.enum(ACCESS_PERMISSIONS)).max(ACCESS_PERMISSIONS.length).refine(values=>new Set(values).size===values.length,"Permissions must be unique");
-export const createInvitationSchema=z.object({commandId:z.uuid(),recipientId:z.uuid(),role:z.literal("SECONDARY"),permissions,delegablePermissions:permissions,expiresInDays:z.union([z.literal(1),z.literal(3),z.literal(7)])}).strict();
+
+export const createInvitationSchema=z.object({commandId:z.uuid(),recipientId:z.uuid(),expiresInDays:z.union([z.literal(1),z.literal(3),z.literal(7)])}).strict();
 export const invitationDecisionSchema=z.object({commandId:z.uuid(),expectedVersion:z.int().positive()}).strict();
-export const updateAccessSchema=z.object({commandId:z.uuid(),expectedVersion:z.int().positive(),role:z.literal("SECONDARY"),permissions,delegablePermissions:permissions}).strict();
 export type CreateInvitationInput=z.infer<typeof createInvitationSchema>;
 export type InvitationDecisionInput=z.infer<typeof invitationDecisionSchema>;
-export type UpdateAccessInput=z.infer<typeof updateAccessSchema>;

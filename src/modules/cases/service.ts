@@ -6,7 +6,7 @@ import { serviceActivity, cards } from "../../platform/database/schema";
 import { requireSandboxParticipant } from "../sandbox/service";
 import { SecurityError } from "../../platform/security/origin";
 import { loadServiceScope, type ScopedTransaction } from "../access/scope";
-import { loadMerchantUnitScope } from "../access/merchant-scope";
+import { loadTerminalScope } from "../access/merchant-scope";
 import { evaluate } from "../policy/evaluate";
 import { canReadCardholderActivity } from "../workspace/service";
 import { supportCases, supportCaseMessages, supportCaseCommands } from "./schema";
@@ -14,14 +14,14 @@ import { readSupportPayment } from "./payment-context";
 import { createSupportCaseSchema, createMerchantSupportCaseSchema, addSupportMessageSchema, withdrawSupportCaseSchema, supportCaseQuerySchema, type CreateSupportCaseCommand, type CreateMerchantSupportCaseCommand, type AddSupportMessageCommand, type WithdrawSupportCaseCommand, type SupportCaseQuery, type SupportCaseSummary, type SupportCaseDetail, type SupportCaseList } from "./contracts";
 
 type Target={kind:"CARDHOLDER";serviceId:string}|{kind:"MERCHANT";merchantId:string};
-type Scope={serviceId:string;target:Target;canRead:boolean;canManage:boolean;cardholder:Awaited<ReturnType<typeof loadServiceScope>>|null;merchant:Awaited<ReturnType<typeof loadMerchantUnitScope>>|null};
+type Scope={serviceId:string;target:Target;canRead:boolean;canManage:boolean;cardholder:Awaited<ReturnType<typeof loadServiceScope>>|null;merchant:Awaited<ReturnType<typeof loadTerminalScope>>|null};
 type CaseRow=typeof supportCases.$inferSelect;
 async function supportScope(tx:ScopedTransaction,personId:string,target:Target,write=false):Promise<Scope> {
   try {await requireSandboxParticipant(tx,personId);}catch(error){if(error instanceof SecurityError)throw new SecurityError("SUPPORT_UNAVAILABLE",404);throw error;}
   if(target.kind==="MERCHANT") {
-    const merchant=await loadMerchantUnitScope(tx,personId,target.merchantId,write,{read:true});
+    const merchant=await loadTerminalScope(tx,personId,target.merchantId,write,{read:true});
     const allowed=evaluate(merchant.policy,"merchant.read").allowed;
-    return {serviceId:merchant.masterService.id,target,merchant,cardholder:null,canRead:allowed,canManage:allowed};
+    return {serviceId:merchant.merchantService.id,target,merchant,cardholder:null,canRead:allowed,canManage:allowed};
   }
   const cardholder=await loadServiceScope(tx,personId,target.serviceId,write);
   if(cardholder.service.kind!=="CARDHOLDER")throw new SecurityError("SUPPORT_UNAVAILABLE",404);
@@ -89,7 +89,7 @@ async function createCase(personId:string,target:Target,input:CreateSupportCaseC
     }
     if(paymentId) {
       if(!scope.merchant||!evaluate(scope.merchant.policy,"payments.read").allowed)throw new SecurityError("ACTION_DENIED",403);
-      if(!await readSupportPayment(tx,paymentId,scope.merchant.unit.id,scope.serviceId))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+      if(!await readSupportPayment(tx,paymentId,scope.merchant.terminal.id,scope.serviceId))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
     }
     const id=randomUUID();
     const [row]=await tx.insert(supportCases).values({id,serviceId:scope.serviceId,serviceKind:target.kind,creatorId:personId,transactionId,paymentId,merchantUnitId:target.kind==="MERCHANT"?target.merchantId:null,topic:input.topic,subject:input.subject,reference:`CASE-${id.toUpperCase()}`}).returning();

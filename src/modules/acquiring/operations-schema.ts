@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import { pgTable, uuid, text, integer, timestamp, bigint, foreignKey, check, unique, uniqueIndex, index } from "drizzle-orm/pg-core";
 import { people,serviceActivity } from "../../platform/database/schema";
 import { ledgerJournals } from "../ledger/schema";
-import { merchantProfiles, merchantUnits, paymentChannels } from "./schema";
+import { merchantProfiles, merchantTerminals, paymentChannels } from "./schema";
 import {cardCheckoutAttempts} from "./card-checkout-schema";
 import { guestOrders } from "./guest-schema";
 
@@ -14,7 +14,7 @@ export const testGateways=pgTable("merchant_test_gateways",{
 export const testMerchantEnrollments=pgTable("merchant_test_enrollments",{
   merchantUnitId:uuid().primaryKey(),serviceId:uuid().notNull().references(()=>testGateways.serviceId),status:text({enum:["ENROLLED","DISABLED"]}).notNull(),
   version:integer().notNull().default(1),updatedBy:uuid().notNull().references(()=>people.id),createdAt:timestamp({withTimezone:true}).notNull().defaultNow(),updatedAt:timestamp({withTimezone:true}).notNull().defaultNow(),
-},t=>[foreignKey({columns:[t.merchantUnitId,t.serviceId],foreignColumns:[merchantUnits.id,merchantUnits.masterServiceId]}),unique("test_enrollment_scope").on(t.merchantUnitId,t.serviceId),check("test_enrollment_fields",sql`${t.status} in ('ENROLLED','DISABLED') and ${t.version}>0`)]);
+},t=>[foreignKey({columns:[t.merchantUnitId,t.serviceId],foreignColumns:[merchantTerminals.id,merchantTerminals.merchantServiceId]}),unique("test_enrollment_scope").on(t.merchantUnitId,t.serviceId),check("test_enrollment_fields",sql`${t.status} in ('ENROLLED','DISABLED') and ${t.version}>0`)]);
 export const channelActivations=pgTable("merchant_channel_activations",{
   channelId:uuid().primaryKey(),merchantUnitId:uuid().notNull(),serviceId:uuid().notNull(),status:text({enum:["ACTIVE","DISABLED"]}).notNull(),
   version:integer().notNull().default(1),updatedBy:uuid().notNull().references(()=>people.id),createdAt:timestamp({withTimezone:true}).notNull().defaultNow(),updatedAt:timestamp({withTimezone:true}).notNull().defaultNow(),
@@ -32,7 +32,7 @@ export const merchantTestRefunds=pgTable("merchant_test_refunds",{
 },t=>[foreignKey({columns:[t.paymentId,t.merchantUnitId,t.serviceId],foreignColumns:[merchantTestPayments.id,merchantTestPayments.merchantUnitId,merchantTestPayments.serviceId]}),check("merchant_test_refund_fields",sql`${t.amountMinor}>0 and ${t.currency}='USD' and char_length(${t.reason}) between 1 and 300 and ${t.testReference} like 'TEST-%'`)]);
 export const merchantTestPayouts=pgTable("merchant_test_payouts",{
   id:uuid().primaryKey(),serviceId:uuid().notNull(),merchantUnitId:uuid().notNull(),actorId:uuid().notNull().references(()=>people.id),amountMinor:bigint({mode:"bigint"}).notNull(),currency:text().notNull().default("USD"),testReference:text().notNull().unique(),journalId:uuid().notNull().references(()=>ledgerJournals.id),createdAt:timestamp({withTimezone:true}).notNull().defaultNow(),
-},t=>[foreignKey({columns:[t.merchantUnitId,t.serviceId],foreignColumns:[merchantUnits.id,merchantUnits.masterServiceId]}),index("merchant_test_payout_unit_time").on(t.merchantUnitId,t.createdAt.desc(),t.id),check("merchant_test_payout_fields",sql`${t.amountMinor}>0 and ${t.amountMinor}<=999999999999 and ${t.currency}='USD' and ${t.testReference} like 'TEST-%'`)]);
+},t=>[foreignKey({columns:[t.merchantUnitId,t.serviceId],foreignColumns:[merchantTerminals.id,merchantTerminals.merchantServiceId]}),index("merchant_test_payout_unit_time").on(t.merchantUnitId,t.createdAt.desc(),t.id),check("merchant_test_payout_fields",sql`${t.amountMinor}>0 and ${t.amountMinor}<=999999999999 and ${t.currency}='USD' and ${t.testReference} like 'TEST-%'`)]);
 export const merchantOperationCommands=pgTable("merchant_operation_commands",{
-  commandId:uuid().primaryKey(),actorId:uuid().references(()=>people.id),guestOrderId:uuid().references(()=>guestOrders.id),scopeKey:text().notNull(),kind:text({enum:["GATEWAY","ENROLLMENT","ACTIVATION","PAYMENT","REFUND","PAYOUT"]}).notNull(),digest:text().notNull(),resultId:uuid().notNull(),createdAt:timestamp({withTimezone:true}).notNull().defaultNow(),
-},t=>[check("merchant_operation_actor_origin",sql`(${t.actorId} is not null and ${t.guestOrderId} is null) or (${t.actorId} is null and ${t.guestOrderId} is not null and ${t.kind}='PAYMENT' and ${t.scopeKey}='guest-order:'||${t.guestOrderId}::text)`),check("merchant_operation_command_fields",sql`${t.kind} in ('GATEWAY','ENROLLMENT','ACTIVATION','PAYMENT','REFUND','PAYOUT') and ${t.digest} ~ '^[0-9a-f]{64}$' and char_length(${t.scopeKey}) between 1 and 120`)]);
+  commandId:uuid().primaryKey(),actorId:uuid().references(()=>people.id),guestOrderId:uuid().references(()=>guestOrders.id),scopeKey:text().notNull(),kind:text({enum:["GATEWAY","ENROLLMENT","ACTIVATION","PAYMENT","REFUND","PAYOUT","SETTLEMENT"]}).notNull(),digest:text().notNull(),resultId:uuid().notNull(),createdAt:timestamp({withTimezone:true}).notNull().defaultNow(),
+},t=>[check("merchant_operation_actor_origin",sql`(${t.actorId} is not null and ${t.guestOrderId} is null) or (${t.actorId} is null and ${t.guestOrderId} is not null and ${t.kind}='PAYMENT' and ${t.scopeKey}='guest-order:'||${t.guestOrderId}::text)`),check("merchant_operation_command_fields",sql`${t.kind} in ('GATEWAY','ENROLLMENT','ACTIVATION','PAYMENT','REFUND','PAYOUT','SETTLEMENT') and ${t.digest} ~ '^[0-9a-f]{64}$' and char_length(${t.scopeKey}) between 1 and 120`)]);

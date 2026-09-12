@@ -22,3 +22,15 @@
 /* Card use and oversight share one detail surface with distinct tasks. */
 .consumer-card-availability{padding:16px 18px;margin:20px 0;border:1px solid #d2e0d8;border-radius:11px;background:#f0f6f1;color:#244b3f}.consumer-card-availability>strong{font-size:14px;line-height:1.5}.consumer-card-availability>p{font-size:13px;line-height:1.7;margin:7px 0 0;color:#4a6556}.consumer-card-tasks{display:flex;gap:9px;flex-wrap:wrap;border-bottom:1px solid #d9e3db;padding:0 0 20px;margin:24px 0}.consumer-card-tasks .consumer-button{min-height:44px;font-size:12px}.consumer-card-controls-panel[hidden]{display:none}.consumer-card-controls-panel>h3{font-size:20px;font-weight:600;letter-spacing:-.025em;margin:24px 0 10px}.consumer-card-controls-panel .consumer-control-list{margin:18px 0}.consumer-card-controls-panel .consumer-card-more{margin-bottom:24px}.consumer-card-availability+ .consumer-card-controls-panel{margin-top:24px}
 @media(max-width:540px){.consumer-card-summary dd{font-size:29px}.consumer-card-tasks>.consumer-button{flex:1;justify-content:center}.consumer-card-availability{padding:15px}.consumer-card-availability>strong{font-size:13px}.consumer-card-availability>p{font-size:12px}.consumer-card-detail-grid{gap:20px}}
+
+/* Keep the allowance description separate from its accessible label. */
+.consumer-card-allowance-field,.consumer-card-allowance-field>label{display:grid;gap:9px;min-width:0}
+.consumer-card-allowance-field>label{font-size:13px;font-weight:550}
+.consumer-card-allowance-field input{width:100%}
+@media(max-width:600px){
+ .consumer-card-form>.consumer-form-footer{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;min-width:0}
+ .consumer-card-form>.consumer-form-footer>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;min-width:0;margin-left:0;gap:10px}
+ .consumer-card-form>.consumer-form-footer>.consumer-button{justify-self:start}
+ .consumer-card-form>.consumer-form-footer>div>.consumer-button{width:100%;min-width:0;white-space:normal}
+ .consumer-card-form>.consumer-form-footer>div>.consumer-button:only-child{grid-column:2}
+}

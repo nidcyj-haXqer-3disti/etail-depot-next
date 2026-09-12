@@ -26,12 +26,14 @@ export function CardholderEnrollment() {
         if (!mounted.current) return;
         if (response.status === 401) { setSignInRequired(true); throw new Error("Your sign-in expired. Sign in again before continuing setup."); }
         if (response.status === 403) { setUnavailable(true); throw new Error("Cardholder setup is not available for your current access. Cards already assigned to you are unchanged."); }
-        if (code === "CARDHOLDER_SERVICE_EXISTS") { router.push("/cardholder-services?new=1"); router.refresh(); return; }
+        if (code === "CARDHOLDER_SERVICE_EXISTS") { router.push("/cardholder-services"); router.refresh(); return; }
         throw new Error("We couldn’t confirm your cardholder setup. Try again to safely check this request.");
       }
-      if (mounted.current) { setAttempt(null); router.push("/cardholder-services?new=1"); router.refresh(); }
+      const saved=await response.json();
+      if(saved?.kind!=="CARDHOLDER"||typeof saved.serviceId!=="string"||! /^[0-9a-f-]{36}$/.test(saved.serviceId))throw new Error("We couldn’t verify your cardholder setup. Retry the saved request.");
+      if (mounted.current) { setAttempt(null); router.push("/cardholder-services"); router.refresh(); }
     } catch (caught) { if (mounted.current) setError(caught instanceof Error ? caught.message : "Please try again."); }
     finally { inFlight.current = false; if (mounted.current) setBusy(false); }
   }
-  return <section className="ch-enrollment"><p className="consumer-eyebrow">YOUR CARDS, YOUR CONTROL</p><h2>Start your card group.</h2><p>You’ll choose your first card next. Add family or teammates when you’re ready. Each person sees only their own cards and purchases.</p><Feedback kind="error" message={error}/>{signInRequired ? <Link href="/login">Sign in to continue setup</Link> : <Button busy={busy} disabled={unavailable} onClick={enroll}>Set up my cards</Button>}<p className="consumer-form-footnote">You’ll review the card details before creating it.</p></section>;
+  return <section className="ch-enrollment"><p className="consumer-eyebrow">YOUR CARDS, YOUR CONTROL</p><h2>Cards for you and your people.</h2><p>Open a shared card balance. Add money, invite people and give each card its own allowance. You can manage the account without having a card yourself.</p><Feedback kind="error" message={error}/>{signInRequired ? <Link href="/login">Sign in to continue setup</Link> : <Button busy={busy} disabled={unavailable} onClick={enroll}>Open cardholder services</Button>}<p className="consumer-form-footnote">You choose who gets a card and how much it can use.</p></section>;
 }

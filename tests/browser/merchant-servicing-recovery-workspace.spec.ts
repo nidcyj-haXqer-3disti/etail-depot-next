@@ -15,8 +15,8 @@ test("a lost merchant status change remains owned after closing its dialog and h
  test.setTimeout(90_000);await signIn(page.request);
  const merchant=await createMerchantViaApi(page.request,`Status recovery ${randomUUID().slice(0,8)}`),reason=`Private pause explanation ${randomUUID()}`;
  await page.goto(`/merchants/${merchant.merchantId}?tab=verification`);
- await page.getByRole("button",{name:"Pause merchant",exact:true}).click();
- const review=page.getByRole("dialog",{name:"Pause this merchant?",exact:true});
+ await page.getByRole("button",{name:"Pause terminal",exact:true}).click();
+ const review=page.getByRole("dialog",{name:"Pause this terminal?",exact:true});
  await review.getByRole("textbox",{name:"Reason for this change",exact:true}).fill(reason);
  const requests:unknown[]=[];let savedVersion=0;
  await page.route(`**/api/v1/merchants/${merchant.merchantId}/pause`,async route=>{
@@ -32,7 +32,7 @@ test("a lost merchant status change remains owned after closing its dialog and h
  const before=page.url();await page.locator("header a[href]").first().dispatchEvent("click");expect(page.url()).toBe(before);
  await page.getByRole("button",{name:"Continue status change",exact:true}).click();
  await review.getByRole("button",{name:"Retry saved change",exact:true}).click();
- const recovery=page.getByRole("region",{name:"Merchant status recovery",exact:true});
+ const recovery=page.getByRole("region",{name:"Terminal status recovery",exact:true});
  await expect(recovery).toContainText("Leaving does not cancel or confirm the change.");
  await expect(recovery).not.toContainText(reason);await expect(recovery.getByRole("textbox")).toHaveCount(0);
  await recovery.getByRole("button",{name:"Retry saved change",exact:true}).click();

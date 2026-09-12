@@ -50,6 +50,7 @@ test("one card form starts only on review and safely retries lost start, save an
   await self.click();
   await expect(dialog.locator(".consumer-cardholder-selected")).toContainText(data.person.displayName);
   await cardName.fill(name);
+  await dialog.getByLabel("Total card allowance (USD)",{exact:true}).fill("16.00");
   await initialReview.click();
   const retry = dialog.getByRole("button", { name: "Retry the same request", exact: true });
   await expect(retry).toBeEnabled();
@@ -63,6 +64,7 @@ test("one card form starts only on review and safely retries lost start, save an
   await retry.click();
   await expect(dialog.getByRole("heading", { name: "Review your card", exact: true })).toBeVisible();
   await expect(dialog).toContainText("Creating a card does not add money.");
+  await expect(dialog.getByText("$16.00",{exact:true})).toBeVisible();
   expect(attempts.start).toHaveLength(2);
   expect(attempts.start![0]).toEqual(attempts.start![1]);
   expect(attempts.save).toHaveLength(2);

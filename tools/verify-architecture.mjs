@@ -72,20 +72,48 @@ const operationUiOwner = "src/ui/workspace/merchant-operations.tsx";
 const checkoutOwner = "src/modules/acquiring/card-checkout-service.ts";
 const checkoutUiOwner = "src/ui/card-checkout.tsx";
 const fundingUiOwner = "src/ui/cardholder-funds.tsx";
+const cardLimitUiOwner = "src/ui/workspace/card-limit-control.tsx";
 const depositUiOwner = "src/ui/deposit-processing.tsx";
+const moneyOwner = "src/modules/money/service.ts";
+const moneyUiOwner = "src/ui/money-account.tsx";
+const withdrawalUiOwner = "src/ui/money-withdrawal-processing.tsx";
+const disputeOwner = "src/modules/disputes/service.ts";
+const disputeUiOwner = "src/ui/workspace/merchant-disputes.tsx";
+const terminalAccessOwner = "src/modules/access/merchant-service.ts";
+const peopleUiOwner = "src/ui/workspace/people.tsx";
+const terminalPeopleUiOwner = "src/ui/workspace/merchant-people.tsx";
 const connectedRoutes = [
   [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/funds/route.ts", "GET", "getCardholderFunds"],
   [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/funds/top-ups/[topupId]/route.ts", "GET", "getCardholderTopup"],
   [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/funds/intents/route.ts", "POST", "prepareCardholderFunding"],
   [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/funds/intents/[intentId]/route.ts", "GET", "getCardholderFundingIntent"],
   [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/funds/intents/[intentId]/route.ts", "POST", "confirmCardholderFunding"],
-  [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/cardholders/[holderId]/spending-limit/route.ts", "GET", "getPersonSpending"],
-  [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/cardholders/[holderId]/spending-limit/route.ts", "PUT", "setCardholderSpendingLimit"],
+  [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/cards/[cardId]/spending-limit/route.ts", "GET", "getCardSpending"],
+  [workspaceOwner, "src/app/api/v1/cardholder-services/[serviceId]/cards/[cardId]/spending-limit/route.ts", "PUT", "setCardSpendingLimit"],
   [checkoutOwner, "src/app/api/v1/checkout/[publicationId]/card/route.ts", "POST", "prepareCardCheckout"],
   [checkoutOwner, "src/app/api/v1/checkout/[publicationId]/card/[attemptId]/route.ts", "GET", "getCardCheckoutReview"],
   [checkoutOwner, "src/app/api/v1/checkout/[publicationId]/card/[attemptId]/route.ts", "POST", "confirmCardCheckout"],
+  [moneyOwner, "src/app/api/v1/money-accounts/route.ts", "GET", "listOwnedMoneyAccounts"],
+  [moneyOwner, "src/app/api/v1/money-accounts/[moneyAccountId]/route.ts", "GET", "getMoneyAccountOverview"],
+  [moneyOwner, "src/app/api/v1/money-accounts/[moneyAccountId]/funding/intents/route.ts", "POST", "prepareMoneyFunding"],
+  [moneyOwner, "src/app/api/v1/money-accounts/[moneyAccountId]/funding/intents/[intentId]/route.ts", "GET", "getMoneyFundingIntent"],
+  [moneyOwner, "src/app/api/v1/money-accounts/[moneyAccountId]/funding/intents/[intentId]/route.ts", "POST", "confirmMoneyFunding"],
+  [moneyOwner, "src/app/api/v1/money-accounts/[moneyAccountId]/withdrawals/intents/route.ts", "POST", "prepareMoneyWithdrawal"],
+  [moneyOwner, "src/app/api/v1/money-accounts/[moneyAccountId]/withdrawals/intents/[intentId]/route.ts", "GET", "getMoneyWithdrawalIntent"],
+  [moneyOwner, "src/app/api/v1/money-accounts/[moneyAccountId]/withdrawals/intents/[intentId]/route.ts", "POST", "confirmMoneyWithdrawal"],
+  [moneyOwner, "src/app/api/v1/operations/money-withdrawals/[withdrawalId]/route.ts", "POST", "processMoneyWithdrawal"],
+  [disputeOwner, "src/app/api/v1/payments/[paymentId]/dispute/route.ts", "GET", "getPayerDispute"],
+  [disputeOwner, "src/app/api/v1/payments/[paymentId]/dispute/route.ts", "POST", "openPaymentDispute"],
+  [disputeOwner, "src/app/api/v1/merchants/[merchantId]/disputes/route.ts", "GET", "listTerminalDisputes"],
+  [disputeOwner, "src/app/api/v1/merchants/[merchantId]/disputes/[disputeId]/respond/route.ts", "POST", "respondToTerminalDispute"],
+  [disputeOwner, "src/app/api/v1/operations/disputes/route.ts", "GET", "getOperatorDisputes"],
+  [disputeOwner, "src/app/api/v1/operations/disputes/[disputeId]/route.ts", "POST", "resolveMerchantDispute"],
+  [channelOwner, "src/app/api/v1/merchants/[merchantId]/terminals/route.ts", "POST", "createTerminal"],
 ];
 const retiredMutationRoutes = new Set([
+  "src/app/api/v1/merchants/[merchantId]/submerchants/route.ts",
+  "src/app/api/v1/merchants/[merchantId]/payouts/route.ts",
+  "src/app/api/v1/cardholder-services/[serviceId]/cardholders/[holderId]/spending-limit/route.ts",
   "src/app/api/v1/cardholder-services/[serviceId]/cards/[cardId]/purchase/route.ts",
   "src/app/api/v1/cardholder-services/[serviceId]/funds/top-ups/route.ts",
   "src/app/api/v1/merchants/[merchantId]/channels/[channelId]/test-payments/route.ts",
@@ -95,13 +123,13 @@ const retiredMutationRoutes = new Set([
   "src/app/api/v1/guest/orders/[orderId]/attempts/[attemptId]/confirm/route.ts",
 ]);
 const fundingUiStages = new Map([
-  ["/funds/intents", ["CardholderFundsWorkspace/prepare", "POST"]],
-  ["/funds/intents/:id", ["CardholderFundsWorkspace/confirm", "POST"]],
-  ["/cardholders/:id/spending-limit", ["SpendingLimit/save", "PUT"]],
+  ["/funds/intents", ["CardholderFundsWorkspace/prepare", "POST", fundingUiOwner]],
+  ["/funds/intents/:id", ["CardholderFundsWorkspace/confirm", "POST", fundingUiOwner]],
+  ["/cards/:id/spending-limit", ["CardLimitControl/save", "PUT", cardLimitUiOwner]],
 ]);
 const operationUiPaths = new Map([
   ["/gateway", ["PUT"]], ["/test-enrollment", ["PUT"]],
-  ["/channels/:id/activation", ["PUT"]], ["/payments/:id/refund", ["POST"]], ["/payouts", ["POST"]],
+  ["/channels/:id/activation", ["PUT"]], ["/payments/:id/refund", ["POST"]], ["/settlements", ["POST"]],
 ]);
 const workspaceTransport = "src/ui/workspace/primitives.tsx";
 const fixtureOwner = "src/modules/workspace/fixtures.ts";
@@ -118,7 +146,7 @@ const operationRoutes = new Map([
   ["src/app/api/v1/merchants/[merchantId]/test-enrollment/route.ts", ["PUT", "enrollTestMerchant"]],
   ["src/app/api/v1/merchants/[merchantId]/channels/[channelId]/activation/route.ts", ["PUT", "setChannelActivation"]],
   ["src/app/api/v1/merchants/[merchantId]/payments/[paymentId]/refund/route.ts", ["POST", "refundMerchantPayment"]],
-  ["src/app/api/v1/merchants/[merchantId]/payouts/route.ts", ["POST", "createMerchantPayout"]],
+  ["src/app/api/v1/merchants/[merchantId]/settlements/route.ts", ["POST", "createMerchantSettlement"]],
   ["src/app/api/v1/merchants/[merchantId]/operations/route.ts", ["GET", "getMerchantOperations"]],
 ]);
 const operationWriters = {
@@ -131,24 +159,52 @@ const operationWriters = {
   merchantOperationCommands: { insert: ["finish"] },
 };
 const fundingWriters = {
-  cardholderTopups: { insert: ["addCardholderFunds"] },
-  cardholderFundingIntents: { insert: ["prepareCardholderFunding"] },
-  cardholderSpendingLimits: { insert: ["setCardholderSpendingLimit"], update: ["setCardholderSpendingLimit"] },
-  cardholderLimitChanges: { insert: ["setCardholderSpendingLimit"] },
+  cardholderTopups: {}, // Historical receipts only; canonical money module owns new funding.
+  cardholderFundingIntents: {},
+  cardholderSpendingLimits: {}, // Person limits were retired by the reviewed cutover.
+  cardholderLimitChanges: {},
+  cardSpendingLimits: { insert: ["writeCardLimit"], update: ["writeCardLimit"] },
+  cardLimitChanges: { insert: ["writeCardLimit"] },
 };
 const checkoutWriters = { cardCheckoutAttempts: { insert: ["prepareCardCheckout"] } };
 const settlementWriters = {
-  merchantSettlements: { insert: ["createMerchantPayout"] },
-  merchantSettlementItems: { insert: ["createMerchantPayout"] },
-  merchantDeposits: { insert: ["createMerchantPayout"] },
-  merchantDepositItems: { insert: ["createMerchantPayout"] },
+  merchantSettlements: { insert: ["createMerchantSettlement"] },
+  merchantSettlementItems: { insert: ["createMerchantSettlement"] },
+  merchantSettlementCredits: { insert: ["createMerchantSettlement"] },
+  merchantDeposits: {}, // Only historical reservations can finish processing.
+  merchantDepositItems: {},
   merchantDepositEvents: { insert: ["processMerchantDeposit"] },
+};
+const moneyWriters = {
+  moneyAccounts: { insert: ["attachServiceMoneyAccount"] },
+  moneyAccountServices: { insert: ["attachServiceMoneyAccount"] },
+  moneyCommands: { insert: ["claimCommand"] },
+  moneyFundingIntents: { insert: ["prepareMoneyFunding"] },
+  moneyTopups: { insert: ["addFunds"] },
+  moneyWithdrawalIntents: { insert: ["prepareMoneyWithdrawal"] },
+  moneyWithdrawals: { insert: ["confirmMoneyWithdrawal"] },
+  moneyWithdrawalEvents: { insert: ["processMoneyWithdrawal"] },
+  moneyCutoverTransfers: {},
+};
+const disputeWriters = {
+  merchantDisputes: { insert: ["openPaymentDispute"], update: ["respondToTerminalDispute", "resolveMerchantDispute"] },
+  merchantDisputeMessages: { insert: ["openPaymentDispute", "respondToTerminalDispute", "resolveMerchantDispute"] },
+  merchantDisputeCommands: { insert: ["openPaymentDispute", "respondToTerminalDispute", "resolveMerchantDispute"] },
+};
+const terminalWriters = {
+  merchantTerminals: { insert: ["initializeMerchantTerminal", "createTerminal"], update: ["merchantStatusCommand"] },
+  merchantUnitCommands: { insert: ["createTerminal", "merchantStatusCommand"] },
+  merchantUnitEvents: { insert: ["createTerminal", "merchantStatusCommand"] },
+};
+const terminalAccessWriters = {
+  terminalAssignments: { insert: ["decideMerchantInvitation"], update: ["decideMerchantInvitation", "revokeMerchantAccess"] },
+  terminalInvitationTerms: { insert: ["createMerchantInvitation"] },
 };
 const ledgerWriters = { ledgerJournals: { insert: ["postJournal"] }, ledgerEntries: { insert: ["postJournal"] } };
 const guestWriters = {
   guestPublications:{insert:["publishGuestChannel"],update:["publishGuestChannel","revokeGuestPublication"]},
   guestPublicationCommands:{insert:["publishGuestChannel","revokeGuestPublication"]},
-  guestSessions:{insert:["ensureGuestSession"]},guestOrders:{insert:["createGuestOrder"]},guestAttempts:{insert:["prepareGuestAttempt"]},
+  guestSessions:{insert:["ensureGuestSession"]},guestOrders:{},guestAttempts:{}, // Historical order/attempt receipts are read-only.
   guestRequestBudgets:{insert:["consumeBudget"],update:["consumeBudget"],delete:["consumeBudget"]},
 };
 const writerOwners = {
@@ -160,7 +216,7 @@ const writerOwners = {
   notificationPreferences: { insert: ["saveNotificationPreferences"], update: ["saveNotificationPreferences"] },
   workspaceCommands: { insert: ["commandInTransaction"] },
 };
-const canonicalCommands = ["controlCard", "startCardRequest", "updateCardRequest", "submitCardRequest", "cancelCardRequest", "purchaseCard", "purchaseCardInTransaction", "addCardholderFunds", "prepareCardholderFunding", "confirmCardholderFunding", "setCardholderSpendingLimit", "saveNotificationPreferences"];
+const canonicalCommands = ["controlCard", "startCardRequest", "updateCardRequest", "submitCardRequest", "cancelCardRequest", "purchaseCard", "purchaseCardInTransaction", "addCardholderFunds", "prepareCardholderFunding", "confirmCardholderFunding", "setCardSpendingLimit", "writeCardLimit", "saveNotificationPreferences"];
 
 function functionChain(node) {
   const names = [];
@@ -213,8 +269,13 @@ function stringValues(file, node, seen = new Set()) {
   if (ts.isParenthesizedExpression(node) || ts.isAsExpression(node)) return stringValues(file, node.expression, next);
   if (ts.isConditionalExpression(node)) return [...new Set([...stringValues(file, node.whenTrue, next), ...stringValues(file, node.whenFalse, next)])];
   if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "encodeURIComponent") return [":id"];
-  if (ts.isPropertyAccessExpression(node) && /^(?:id|serviceId|requestId|cardId|merchantId|merchantUnitId|channelId|paymentId|publicationId|orderId|attemptId|intentId|depositId|personId|holderId)$/.test(node.name.text)) return [":id"];
+  if (ts.isPropertyAccessExpression(node) && /^(?:id|serviceId|requestId|cardId|merchantId|merchantUnitId|terminalId|moneyAccountId|withdrawalId|disputeId|channelId|paymentId|publicationId|orderId|attemptId|intentId|depositId|personId|holderId)$/.test(node.name.text)) return [":id"];
   if (ts.isIdentifier(node)) {
+    // Destructured component inputs may supply an opaque ID, never an arbitrary path.
+    if(/^(?:serviceId|cardId|terminalId|moneyAccountId|withdrawalId|disputeId|paymentId)$/.test(node.text)){
+      const parameter=visitNodes(file.tree,item=>ts.isParameter(item)&&ts.isObjectBindingPattern(item.name)&&item.name.elements.some(element=>ts.isIdentifier(element.name)&&element.name.text===node.text)&&scopeContains(item,node));
+      if(parameter.length)return [":id"];
+    }
     const declaration = localDeclaration(file, node);
     if (declaration?.initializer) return stringValues(file, declaration.initializer, next);
     if (declaration && ts.isParameter(declaration) && declaration.type) {
@@ -285,6 +346,9 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
   const connectedRouteStages = new Map();
   const connectedUiStages = new Map();
   const fundingStages = new Map();
+  const moneyUiStages = new Map();
+  const disputeUiStages = new Map();
+  const accessUiStages = new Map();
   let depositUiCalls = 0;
   for (const file of files.values()) {
     const name = relative(file.filename);
@@ -328,7 +392,8 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       if (importedModule === "src/modules/acquiring/fixtures" && name !== "src/modules/acquiring/fixtures.ts") emit(file, dependency.node, "FIXTURE_RUNTIME_IMPORT", "Merchant fixture approval is confined to explicit fixture preparation.");
       if (ts.isExportDeclaration(dependency.node) && importedModule === workspaceOwner.slice(0, -3)) emit(file, dependency.node, "WORKSPACE_COMMAND_REEXPORT", "Keep workspace service commands directly inspectable; do not add a parallel re-export entry point.");
       if (ts.isExportDeclaration(dependency.node) && importedModule === "src/platform/database/schema") emit(file, dependency.node, "WORKSPACE_TABLE_REEXPORT", "Import the canonical database schema directly so protected table writers remain inspectable.");
-      if (ts.isExportDeclaration(dependency.node) && ["src/modules/ledger/schema", "src/modules/acquiring/operations-schema", "src/modules/acquiring/settlement-schema", "src/modules/acquiring/card-checkout-schema", "src/modules/workspace/funding-schema"].includes(importedModule)) emit(file, dependency.node, "FINANCIAL_TABLE_REEXPORT", "Financial tables must be imported directly from their inspected schema owner.");
+      if (ts.isExportDeclaration(dependency.node) && ["src/modules/ledger/schema", "src/modules/acquiring/operations-schema", "src/modules/acquiring/settlement-schema", "src/modules/acquiring/card-checkout-schema", "src/modules/workspace/funding-schema", "src/modules/money/schema", "src/modules/disputes/schema", "src/modules/access/schema", "src/modules/acquiring/schema"].includes(importedModule)) emit(file, dependency.node, "FINANCIAL_TABLE_REEXPORT", "Financial and authority tables must be imported directly from their inspected schema owner.");
+      if (ts.isExportDeclaration(dependency.node) && [moneyOwner,disputeOwner,terminalAccessOwner].some(owner=>importedModule===owner.slice(0,-3))) emit(file,dependency.node,"DOMAIN_COMMAND_REEXPORT","Money, disputes and terminal access commands remain directly inspectable in their canonical owner.");
       if (ts.isExportDeclaration(dependency.node) && importedModule === checkoutOwner.slice(0, -3)) emit(file, dependency.node, "CHECKOUT_COMMAND_REEXPORT", "Connected checkout commands have one directly inspected owner.");
       if (ts.isExportDeclaration(dependency.node) && importedModule === operationsOwner.slice(0, -3)) emit(file, dependency.node, "OPERATION_COMMAND_REEXPORT", "Operation commands remain directly inspectable in their single owner.");
       if (ts.isExportDeclaration(dependency.node) && importedModule === ledgerOwner.slice(0, -3) && name !== "src/modules/ledger/index.ts") emit(file, dependency.node, "LEDGER_COMMAND_REEXPORT", "Only the ledger's own entry point may re-export its posting API.");
@@ -336,19 +401,19 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
     const apiPrefix = "src/app/api/v1/cardholder-services/[serviceId]/";
     if (name.startsWith(apiPrefix) && /^(?:cards|card-requests)\//.test(name.slice(apiPrefix.length))) {
       const route = name.slice(apiPrefix.length);
-      const allowedMethod = cardRoutes.get(route)?.[0] ?? null;
+      const allowedMethod = cardRoutes.get(route)?.[0] ?? connectedRoutes.find(([,path,,command])=>path===name&&command==="setCardSpendingLimit")?.[2] ?? null;
       for (const statement of file.tree.statements) {
         if (!statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) continue;
         const names = ts.isFunctionDeclaration(statement) && statement.name ? [statement.name.text] : ts.isVariableStatement(statement) ? statement.declarationList.declarations.filter(node => ts.isIdentifier(node.name)).map(node => node.name.text) : [];
         for (const method of names) if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && method !== allowedMethod) emit(file, statement, "PARALLEL_CARD_MUTATION_ROUTE", "Card writes use only canonical saved requests and card controls; purchases use the connected checkout owner.");
       }
     }
-    if (name.startsWith("src/app/api/v1/checkout/") || name.startsWith(apiPrefix) && /^(?:funds\/|cardholders\/[^/]+\/spending-limit\/)/.test(name.slice(apiPrefix.length))) {
+    if (name.startsWith("src/app/api/v1/checkout/") || name.startsWith("src/app/api/v1/money-accounts/") || /^src\/app\/api\/v1\/(?:operations\/(?:money-withdrawals|disputes)|payments\/[^/]+\/dispute|merchants\/[^/]+\/(?:terminals|disputes))\//.test(name) || name.startsWith(apiPrefix) && /^(?:funds\/|cards\/[^/]+\/spending-limit\/)/.test(name.slice(apiPrefix.length))) {
       const expectedMethods = connectedRoutes.filter(([, route]) => route === name).map(([, , method]) => method);
       for (const statement of file.tree.statements) {
         if (!statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) continue;
         const exported = ts.isFunctionDeclaration(statement) && statement.name ? [statement.name.text] : ts.isVariableStatement(statement) ? statement.declarationList.declarations.filter(node => ts.isIdentifier(node.name)).map(node => node.name.text) : [];
-        for (const method of exported) if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !expectedMethods.includes(method)) emit(file, statement, "PARALLEL_CONNECTED_MUTATION_ROUTE", "Funding, per-person limits and connected checkout use only the exact reviewed mutation routes.");
+        for (const method of exported) if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && !expectedMethods.includes(method)) emit(file, statement, "PARALLEL_CONNECTED_MUTATION_ROUTE", "Funding, per-card allowances and connected checkout use only the exact reviewed mutation routes.");
       }
     }
     for (const declaration of visitNodes(file.tree, node => ts.isFunctionDeclaration(node) && Boolean(node.name))) {
@@ -356,11 +421,12 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       if (canonicalCommands.includes(symbol) && name !== workspaceOwner && declaration.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) emit(file, declaration, "DUPLICATE_WORKSPACE_COMMAND", "The implemented workspace command has one owning service.");
       if ([...operationRoutes.values()].some(([, command]) => command === symbol) && name !== operationsOwner && declaration.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)) emit(file, declaration, "DUPLICATE_OPERATION_COMMAND", "Merchant operations have one canonical service.");
       if (symbol === "postJournal" && name !== ledgerOwner) emit(file, declaration, "DUPLICATE_LEDGER_COMMAND", "There is exactly one ledger posting owner.");
-      const serviceCommandOwner={createCardholderService:"src/modules/services/service.ts",createPrimaryMerchant:"src/modules/services/create-merchant.ts",createOwnedSubmerchant:channelOwner,pauseMerchant:channelOwner,resumeMerchant:channelOwner,respondToCase:"src/modules/operations/service.ts"}[symbol];
+      for(const owner of [moneyOwner,disputeOwner]) if(connectedRoutes.some(([declaredOwner,,,command])=>declaredOwner===owner&&command===symbol)&&name!==owner)emit(file,declaration,"DUPLICATE_DOMAIN_COMMAND","Money and dispute commands each have one owning service.");
+      const serviceCommandOwner={createCardholderService:"src/modules/services/service.ts",createPrimaryMerchant:"src/modules/services/create-merchant.ts",createTerminal:channelOwner,pauseMerchant:channelOwner,resumeMerchant:channelOwner,respondToCase:"src/modules/operations/service.ts"}[symbol];
       if(serviceCommandOwner&&name!==serviceCommandOwner&&declaration.modifiers?.some(modifier=>modifier.kind===ts.SyntaxKind.ExportKeyword))emit(file,declaration,"DUPLICATE_SERVICE_COMMAND","Service enrollment, merchant hierarchy and assigned support responses each have one owning command.");
       if (symbol === "getMerchantCheckout") emit(file, declaration, "RETIRED_CHANNEL_CHECKOUT_OWNER", "The retired raw-channel preview owner must not be recreated; publication owns the customer link.");
       if (["CardPurchaseForm", "MerchantCheckout", "guestRequest"].includes(symbol)) emit(file, declaration, "RETIRED_SIMULATOR_UI", "Customer purchase and outcome simulator forms are retired; use the connected checkout.");
-      const connectedUiOwner = { CardCheckout: checkoutUiOwner, CardholderFundsWorkspace: fundingUiOwner, SpendingLimit: fundingUiOwner, DepositProcessing: depositUiOwner, DepositRow: depositUiOwner }[symbol];
+      const connectedUiOwner = { CardCheckout: checkoutUiOwner, CardholderFundsWorkspace: fundingUiOwner, CardLimitControl: cardLimitUiOwner, DepositProcessing: depositUiOwner, DepositRow: depositUiOwner, MoneyAccountWorkspace:moneyUiOwner, moneyRequest:moneyUiOwner, MoneyWithdrawalProcessing:withdrawalUiOwner, WithdrawalRow:withdrawalUiOwner, PayerDispute:disputeUiOwner, MerchantDisputes:disputeUiOwner, DisputeRecord:disputeUiOwner }[symbol];
       if (connectedUiOwner && name !== connectedUiOwner) emit(file, declaration, "DUPLICATE_CONNECTED_UI", "Funding, spending limits, connected checkout and assigned deposit processing each have one UI owner.");
       if (["prepareCardCheckout", "confirmCardCheckout", "getCardCheckoutReview"].includes(symbol) && name !== checkoutOwner) emit(file, declaration, "DUPLICATE_CHECKOUT_COMMAND", "One service owns connected checkout review and confirmation.");
       if (symbol === "MerchantOperations" && name !== operationUiOwner) emit(file, declaration, "DUPLICATE_OPERATION_UI", "Merchant setup/payment commands and checkout have their canonical operation UI owner.");
@@ -378,6 +444,21 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       const chain = functionChain(call);
       const callee = namedCallee(call);
       const bound = boundName(file, call.expression, bindings);
+      const savedAccessOwner=name===peopleUiOwner?{component:"PeopleWorkspace",sender:"run",argument:"next",prefix:"/api/v1/cardholder-services/:id"}:name===terminalPeopleUiOwner?{component:"MerchantPeople",sender:"send",argument:"command",prefix:""}:null;
+      if(savedAccessOwner&&chain[0]===savedAccessOwner.component){
+        if(callee===savedAccessOwner.sender){
+          const input=call.arguments[0];
+          if(input&&ts.isObjectLiteralExpression(input)){
+            const paths=stringValues(file,propertyValue(input,"path"));
+            for(const value of paths){
+              const suffix=value.slice(savedAccessOwner.prefix.length);
+              if(!value.startsWith(savedAccessOwner.prefix)||!["/invitations","/invitations/:id/revoke","/people/:id/revoke"].includes(suffix))emit(file,call,"ACCESS_ATTEMPT_ROUTE","Access attempts use only fixed invitations and revocation routes.");
+              else {const key=`${name}:${suffix}`;accessUiStages.set(key,(accessUiStages.get(key)??0)+1);}
+            }
+          }else if(!identifierIs(input,"attempt"))emit(file,call,"ACCESS_ATTEMPT_SOURCE","Access retries must reuse the unchanged saved attempt.");
+        }
+        if(callee==="setAttempt"&&call.arguments[0]?.kind!==ts.SyntaxKind.NullKeyword&&!(chain.join("/")===`${savedAccessOwner.component}/${savedAccessOwner.sender}`&&identifierIs(call.arguments[0],savedAccessOwner.argument)))emit(file,call,"ACCESS_ATTEMPT_SOURCE","Only the reviewed access attempt may populate retry state.");
+      }
       if (name === operationUiOwner && chain[0] === "MerchantOperations") {
         if (callee === "send") {
           const argument = call.arguments[0];
@@ -395,11 +476,11 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       if (["insert", "update", "delete"].includes(callee)) {
         const table = boundName(file, call.arguments[0], bindings);
         const tableModule=table && sourceModule(file,table.specifier);
-        for (const [module, owner, definitions, code] of [["src/modules/ledger/schema", ledgerOwner, ledgerWriters, "LEDGER_WRITER_OWNERSHIP"], ["src/modules/acquiring/operations-schema", operationsOwner, operationWriters, "OPERATION_WRITER_OWNERSHIP"], ["src/modules/workspace/funding-schema", workspaceOwner, fundingWriters, "FUNDING_WRITER_OWNERSHIP"], ["src/modules/acquiring/card-checkout-schema", checkoutOwner, checkoutWriters, "CHECKOUT_WRITER_OWNERSHIP"], ["src/modules/acquiring/settlement-schema", operationsOwner, settlementWriters, "SETTLEMENT_WRITER_OWNERSHIP"]]) {
+        for (const [module, owner, definitions, code] of [["src/modules/ledger/schema", ledgerOwner, ledgerWriters, "LEDGER_WRITER_OWNERSHIP"], ["src/modules/acquiring/operations-schema", operationsOwner, operationWriters, "OPERATION_WRITER_OWNERSHIP"], ["src/modules/workspace/funding-schema", workspaceOwner, fundingWriters, "FUNDING_WRITER_OWNERSHIP"], ["src/modules/acquiring/card-checkout-schema", checkoutOwner, checkoutWriters, "CHECKOUT_WRITER_OWNERSHIP"], ["src/modules/acquiring/settlement-schema", operationsOwner, settlementWriters, "SETTLEMENT_WRITER_OWNERSHIP"], ["src/modules/money/schema",moneyOwner,moneyWriters,"MONEY_WRITER_OWNERSHIP"], ["src/modules/disputes/schema",disputeOwner,disputeWriters,"DISPUTE_WRITER_OWNERSHIP"], ["src/modules/acquiring/schema",channelOwner,terminalWriters,"TERMINAL_WRITER_OWNERSHIP"], ["src/modules/access/schema",terminalAccessOwner,terminalAccessWriters,"TERMINAL_ACCESS_WRITER_OWNERSHIP"]]) {
           if (tableModule !== module) continue;
+          if([terminalWriters,terminalAccessWriters].includes(definitions)&&!Object.hasOwn(definitions,table.imported))continue;
           counts.guardedWriters++;
-          const guestReceipt = tableModule === "src/modules/acquiring/operations-schema" && table.imported === "merchantOperationCommands" && callee === "insert" && name === guestOwner && chain[0] === "confirmGuestAttempt";
-          const allowed = guestReceipt || name === owner && definitions[table.imported]?.[callee]?.includes(chain[0]);
+          const allowed = name === owner && definitions[table.imported]?.[callee]?.includes(chain[0]);
           if (!allowed) emit(file, call, code, `${table.imported}.${callee} belongs only to its finite canonical posting/operation function.`);
           else {
             const key = `${table.imported}.${callee}:${chain[0]}`;
@@ -449,12 +530,13 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         const sqlTexts = stringValues(file, expression);
         if (sqlTexts.some(value => /\b(?:from|join|into|update|table)\s+(?:"?\w+"?\.)?["']?(?:disputes|dispute_timeline|settlements|workspace_balance_snapshots)\b/i.test(value))) emit(file, call, "RETIRED_WORKSPACE_TABLE", "Retired illustrative and dispute tables cannot be read or recreated by runtime SQL.");
         if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:services|service_members|cardholder_creation_commands|workspace_balance_snapshots|service_activity|settlements|cards|card_requests|disputes|dispute_timeline|notification_preferences|workspace_command_receipts)\b/i.test(value))) emit(file, call, "RAW_WORKSPACE_WRITE", "Workspace record writes must use the inspected typed canonical writers; raw SQL writes bypass ownership checks.");
-        if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:ledger_journals|ledger_entries|merchant_test_gateways|merchant_test_enrollments|merchant_channel_activations|merchant_test_payments|merchant_test_refunds|merchant_test_payouts|merchant_operation_commands|cardholder_topups|cardholder_funding_intents|cardholder_spending_limits|cardholder_limit_changes|card_checkout_attempts|merchant_settlements|merchant_settlement_items|merchant_deposits|merchant_deposit_items|merchant_deposit_events|prepaid_cutover)\b/i.test(value))) emit(file, call, "RAW_FINANCIAL_WRITE", "Ledger and operation writes must use their finite typed owners; migration SQL is reviewed separately.");
+        if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:ledger_journals|ledger_entries|merchant_test_gateways|merchant_test_enrollments|merchant_channel_activations|merchant_test_payments|merchant_test_refunds|merchant_test_payouts|merchant_operation_commands|cardholder_topups|cardholder_funding_intents|cardholder_spending_limits|cardholder_limit_changes|card_spending_limits|card_limit_changes|card_checkout_attempts|merchant_settlements|merchant_settlement_items|merchant_deposits|merchant_deposit_items|merchant_deposit_events|prepaid_cutover)\b/i.test(value))) emit(file, call, "RAW_FINANCIAL_WRITE", "Ledger and operation writes must use their finite typed owners; migration SQL is reviewed separately.");
+        if(sqlTexts.some(value=>/\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:money_\w+|merchant_settlement_credits|merchant_terminals|terminal_assignments|terminal_invitation_terms|merchant_disputes|merchant_dispute_messages|merchant_dispute_commands)\b/i.test(value)))emit(file,call,"RAW_MONEY_TERMINAL_WRITE","Money, terminal authority and dispute records must use their finite typed command owners.");
         if (sqlTexts.some(value => /\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?(?:support_cases|support_case_messages|support_case_commands|operator_service_access|operator_command_receipts)\b/i.test(value))) emit(file, call, "RAW_SUPPORT_WRITE", "Support writes use their typed customer or assigned-operator command; raw SQL cannot grant support authority.");
         if(sqlTexts.some(value=>/\b(?:insert\s+into|update|delete\s+from|truncate(?:\s+table)?)\s+(?:"?\w+"?\.)?["']?merchant_guest_\w+/i.test(value)))emit(file,call,"RAW_GUEST_WRITE","Guest records use their typed owning commands, never raw SQL writes.");
       }
       if(bound?.imported === "createCardholderService" && sourceModule(file,bound.specifier)==="src/modules/services/service" && (name !== "src/app/api/v1/cardholder-services/route.ts" || chain[0] !== "POST")) emit(file,call,"PARALLEL_CARDHOLDER_CREATION_ROUTE","Cardholder enrollment uses its one explicit service entry route.");
-      const merchantUnitRoutes={createOwnedSubmerchant:["submerchants","POST"],pauseMerchant:["pause","POST"],resumeMerchant:["resume","POST"]};
+      const merchantUnitRoutes={pauseMerchant:["pause","POST"],resumeMerchant:["resume","POST"]};
       if(bound && sourceModule(file,bound.specifier)===channelOwner.slice(0,-3) && Object.hasOwn(merchantUnitRoutes,bound.imported) && name.startsWith("src/app/api/")) {
         const [suffix,method]=merchantUnitRoutes[bound.imported];
         if(name!==`src/app/api/v1/merchants/[merchantId]/${suffix}/route.ts`||chain[0]!==method)emit(file,call,"PARALLEL_MERCHANT_UNIT_ROUTE","Submerchant creation and pause/resume use exact unit commands and routes.");
@@ -472,6 +554,11 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       if (bound && name.startsWith("src/app/") && (["purchaseCard", "simulateMerchantPayment", "ensureGuestSession", "createGuestOrder", "prepareGuestAttempt", "confirmGuestAttempt"].includes(bound.imported)) && [workspaceOwner, operationsOwner, guestOwner].some(owner => sourceModule(file, bound.specifier) === owner.slice(0, -3))) emit(file, call, "RETIRED_SIMULATOR_COMMAND", "Application routes and pages cannot invoke test-only purchase or guest outcome helpers.");
       const directFunding = callee === "addCardholderFunds" || bound?.imported === "addCardholderFunds";
       if (directFunding && !(name === workspaceOwner && chain[0] === "confirmCardholderFunding")) emit(file, call, "FUNDING_CONFIRMATION_BOUNDARY", "Only confirmation of a saved funding intent may invoke the group-funding writer.");
+      if(callee === "writeCardLimit" && !(name === workspaceOwner && ["setCardSpendingLimit","submitCardRequest"].includes(chain[0]))) emit(file,call,"CARD_ALLOWANCE_COMMAND_BOUNDARY","Only owner allowance changes and canonical issuance may set a card allowance.");
+      if((callee==="addMoneyFunds"||bound?.imported==="addMoneyFunds")&&!(name===workspaceOwner&&chain[0]==="addCardholderFunds"))emit(file,call,"DIRECT_MONEY_FUNDING_BOUNDARY","Direct funding is a domain preparation primitive; customer funding must confirm a saved intent.");
+      if(name===moneyOwner&&callee==="addFunds"&&!["addMoneyFunds","confirmMoneyFunding"].includes(chain[0]))emit(file,call,"MONEY_FUNDING_WRITER_BOUNDARY","Only saved funding confirmation or its explicit preparation wrapper calls the single funding writer.");
+      if(bound?.imported==="attachServiceMoneyAccount"&&sourceModule(file,bound.specifier)===moneyOwner.slice(0,-3)&&!((name==="src/modules/services/service.ts"&&chain[0]==="createCardholderService")||(name==="src/modules/services/create-merchant.ts"&&chain[0]==="createPrimaryMerchant")))emit(file,call,"MONEY_ACCOUNT_ENROLLMENT_BOUNDARY","Money account attachment belongs only to canonical service enrollment.");
+      if(bound?.imported==="initializeMerchantTerminal"&&sourceModule(file,bound.specifier)===channelOwner.slice(0,-3)&&!(name==="src/modules/services/create-merchant.ts"&&chain[0]==="createPrimaryMerchant"))emit(file,call,"TERMINAL_ENROLLMENT_BOUNDARY","The initial terminal is created only by canonical merchant enrollment.");
       const cardDebit = callee === "purchaseCardInTransaction" || bound?.imported === "purchaseCardInTransaction";
       if (cardDebit && !((name === workspaceOwner && chain[0] === "purchaseCard") || (name === checkoutOwner && chain[0] === "confirmCardCheckout" && sourceModule(file, bound?.specifier) === workspaceOwner.slice(0, -3)))) emit(file, call, "CONNECTED_CARD_DEBIT_BOUNDARY", "The card debit belongs only to connected checkout confirmation and its domain-test wrapper.");
       if (bound && name.startsWith("src/app/api/")) {
@@ -496,7 +583,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         else { counts.operationRouteCalls++; operationStages.set(bound.imported, (operationStages.get(bound.imported) ?? 0) + 1); }
       }
       if (bound?.imported === "postJournal" && ["src/modules/ledger", "src/modules/ledger/index", "src/modules/ledger/service"].includes(sourceModule(file, bound.specifier))) {
-        const allowed = (name === workspaceOwner && ["addCardholderFunds", "purchaseCardInTransaction"].includes(chain[0])) || (name === operationsOwner && ["recordMerchantSandboxPayment", "refundMerchantPayment", "createMerchantPayout", "processMerchantDeposit"].includes(chain[0]));
+        const allowed = (name === workspaceOwner && chain[0] === "purchaseCardInTransaction") || (name === operationsOwner && ["recordMerchantSandboxPayment", "refundMerchantPayment", "createMerchantSettlement", "processMerchantDeposit"].includes(chain[0])) || (name===moneyOwner&&["addFunds","confirmMoneyWithdrawal","processMoneyWithdrawal"].includes(chain[0]));
         if (!allowed) emit(file, call, "LEDGER_POSTING_BOUNDARY", "Only the reviewed card and Merchant economic commands post journals.");
       }
       if (bound && sourceModule(file, bound.specifier) === "src/modules/issuing/sandbox-adapter" && !(name === workspaceOwner && chain[0] === "submitCardRequest" && bound.imported === "issueSandboxCard")) emit(file, call, "ISSUING_ADAPTER_BOUNDARY", "Only canonical request submission invokes the sandbox issuer.");
@@ -505,8 +592,8 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         if (name !== operationsOwner || !owner || chain[0] !== owner) emit(file, call, "ACQUIRING_ADAPTER_BOUNDARY", "Only its canonical operation invokes each sandbox acquiring adapter.");
       }
       if(callee === "recordMerchantSandboxPayment" || bound?.imported === "recordMerchantSandboxPayment") {
-        const allowed = name === operationsOwner && chain[0] === "simulateMerchantPayment" || ((name === guestOwner && chain[0] === "confirmGuestAttempt") || (name === checkoutOwner && chain[0] === "confirmCardCheckout")) && sourceModule(file,bound?.specifier) === operationsOwner.slice(0,-3);
-        if(!allowed)emit(file,call,"PAYMENT_PERSISTENCE_BOUNDARY","Only connected checkout confirmation and the retained domain-test helpers may call the sole payment persistence owner.");
+        const allowed = name === checkoutOwner && chain[0] === "confirmCardCheckout" && sourceModule(file,bound?.specifier) === operationsOwner.slice(0,-3);
+        if(!allowed)emit(file,call,"PAYMENT_PERSISTENCE_BOUNDARY","Only connected Cardholder checkout confirmation calls the sole payment persistence owner.");
       }
       if (!isUi) continue;
       const workspaceCall = bound?.imported === "workspaceCommand" && sourceModule(file, bound.specifier) === workspaceTransport.slice(0, -4);
@@ -514,8 +601,9 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       const ownerWrapper = name === cardUiOwner && callee === "command";
       const localCommandCall = callee === "command";
       const fetchCall = callee === "fetch";
+      const moneyCall = callee === "moneyRequest" && name === moneyUiOwner || bound?.imported === "moneyRequest" && sourceModule(file,bound.specifier) === moneyUiOwner.slice(0,-4);
       const accessCall = bound?.imported === "accessFetch" && sourceModule(file,bound.specifier)==="src/ui/workspace/access-client";
-      if (!workspaceCall && !merchantCall && !localCommandCall && !fetchCall && !accessCall) continue;
+      if (!workspaceCall && !merchantCall && !localCommandCall && !fetchCall && !accessCall && !moneyCall) continue;
       const target = call.arguments[workspaceCall || merchantCall ? 1 : 0];
       const paths = stringValues(file, target);
       const allowedGeneric = (name === workspaceTransport && ["workspaceCommand", "merchantCommand"].includes(chain.join("/")) && fetchCall)
@@ -525,6 +613,10 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         || (name === "src/ui/workspace/merchant-people.tsx" && chain.join("/") === "MerchantPeople/send" && merchantCall)
         || (name === operationUiOwner && chain.join("/") === "MerchantOperations/send" && merchantCall)
         || (name === "src/ui/workspace/access-client.ts" && chain.join("/") === "accessFetch" && fetchCall)
+        || (name === peopleUiOwner && chain.join("/") === "PeopleWorkspace/run" && accessCall)
+        || (name === terminalPeopleUiOwner && chain.join("/") === "MerchantPeople/send" && fetchCall)
+        || (name === moneyUiOwner && chain.join("/") === "moneyRequest" && fetchCall)
+        || (name === disputeUiOwner && chain.join("/") === "command" && fetchCall)
         || (name === "src/ui/login-form.tsx" && chain.join("/") === "LoginForm/submit" && fetchCall);
       if (allowedGeneric) {
         if (name === workspaceTransport) {
@@ -551,6 +643,15 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
           if (!forwarded(call.arguments[1], "path") || !methodValid || !forwarded(call.arguments[3], "body")) emit(file, call, "MERCHANT_COMMAND_FORWARDING", "The canonical merchant form must forward the reviewed saved attempt unchanged.");
         }
         else if(name === "src/ui/workspace/access-client.ts" && !identifierIs(call.arguments[0],"path"))emit(file,call,"ACCESS_TRANSPORT_REWRITE","The reviewed access transport must forward the validated finite access path.");
+        else if(name === peopleUiOwner){
+          if(call.arguments[0]?.getText(file.tree)!=="next.path"||stringValues(file,call.arguments[1]).join()!=="POST"||call.arguments[2]?.getText(file.tree)!=="next.body")emit(file,call,"ACCESS_TRANSPORT_REWRITE","Forward the exact saved access path and body using POST.");
+        }
+        else if([moneyUiOwner,disputeUiOwner,terminalPeopleUiOwner].includes(name)){
+          const options=call.arguments[1],body=propertyValue(options,"body");
+          const validPath=name===terminalPeopleUiOwner?target?.getText(file.tree)==="`/api/v1/merchants/${access.terminalId}${command.path}`":identifierIs(target,"path");
+          const expectedBody=name===terminalPeopleUiOwner?"JSON.stringify(command.body)":"JSON.stringify(body)";
+          if(!validPath||stringValues(file,propertyValue(options,"method")).join()!=="POST"||body?.getText(file.tree)!==expectedBody)emit(file,call,"REVIEWED_TRANSPORT_REWRITE","The reviewed transport must forward its exact inspected path, POST method and saved body unchanged.");
+        }
         continue;
       }
       const options = fetchCall ? call.arguments[1] : null;
@@ -559,6 +660,16 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       const reviewedQuery = readOnly && ((name === "src/ui/workspace/reports.tsx" && paths.every(value=>/^\/api\/v1\/cardholder-services\/:id\/reports(?:\/export)?\?/.test(value))) || (name === "src/ui/workspace/cases.tsx" && paths.every(value=>/^\/api\/v1\/(?:cardholder-services|merchants)\/:id\/cases\?/.test(value))) || (name === "src/ui/workspace/member-code-picker.tsx" && paths.every(value=>value === "/api/v1/sandbox/recipient?code=:id")));
       if (paths.some(value => value.includes("?")) && !reviewedQuery) emit(file, call, "UNINSPECTABLE_UI_COMMAND_PATH", "The UI command path must resolve to a reviewed route; add an explicit inspected adapter for dynamic routing.");
       for (const targetPath of paths) {
+        if(moneyCall||/^\/api\/v1\/(?:money-accounts|operations\/money-withdrawals)\//.test(targetPath)&&!readOnly){
+          const expected=/^\/api\/v1\/money-accounts\/:id\/(?:funding|withdrawals)\/intents$/.test(targetPath)?[moneyUiOwner,"MoneyAccountWorkspace/prepare"]:/^\/api\/v1\/money-accounts\/:id\/(?:funding|withdrawals)\/intents\/:id$/.test(targetPath)?[moneyUiOwner,"MoneyAccountWorkspace/confirm"]:targetPath==="/api/v1/operations/money-withdrawals/:id"?[withdrawalUiOwner,"WithdrawalRow/confirm"]:null;
+          if(!moneyCall||!expected||name!==expected[0]||chain.join("/")!==expected[1])emit(file,call,"PARALLEL_MONEY_UI","Money funding, withdrawal and assigned outcomes use exact saved-review UI owners.");
+          else moneyUiStages.set(targetPath,(moneyUiStages.get(targetPath)??0)+1);
+        }
+        if(/\/(?:disputes?|respond)(?:\/|$)/.test(targetPath)&&!readOnly){
+          const expected=targetPath==="/api/v1/payments/:id/dispute"?"PayerDispute/send":["/api/v1/operations/disputes/:id","/api/v1/merchants/:id/disputes/:id/respond"].includes(targetPath)?"DisputeRecord/send":null;
+          if(name!==disputeUiOwner||!localCommandCall||chain.join("/")!==expected)emit(file,call,"PARALLEL_DISPUTE_UI","Payer reports, terminal responses and operator reviews use their one finite dispute UI.");
+          else disputeUiStages.set(targetPath,(disputeUiStages.get(targetPath)??0)+1);
+        }
         if(targetPath.startsWith("/api/v1/guest/")&&!readOnly){
           emit(file, call, "RETIRED_GUEST_SIMULATOR_UI", "Public offers are read-only; customer payments use authenticated connected Cardholder checkout.");
         }
@@ -566,7 +677,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         if (/\/cards\/[^/]+\/purchase$/.test(targetPath)) {
           emit(file, call, "PARALLEL_CARD_PURCHASE_UI", "Customer purchases must use connected merchant checkout; direct card purchase simulators are retired.");
         }
-        if (/(?:^|\/)(?:gateway|test-gateway|test-enrollment|payouts)$|\/channels\/[^/]+\/(?:activation|test-payments)$|\/payments\/[^/]+\/refund$/.test(targetPath)) {
+        if (/(?:^|\/)(?:gateway|test-gateway|test-enrollment|payouts|settlements)$|\/channels\/[^/]+\/(?:activation|test-payments)$|\/payments\/[^/]+\/refund$/.test(targetPath)) {
           emit(file, call, "PARALLEL_OPERATION_UI", "Merchant operations use only their reviewed saved-attempt owner; the old test-payment checkout is retired.");
         }
         if (/^\/api\/v1\/checkout\//.test(targetPath) && !readOnly) {
@@ -576,7 +687,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         }
         if (/(?:^|\/)funds(?:\/|$)|\/spending-limit$/.test(targetPath) && !readOnly) {
           const expected = fundingUiStages.get(targetPath);
-          if (!expected || name !== fundingUiOwner || chain.join("/") !== expected[0] || !workspaceCall || stringValues(file, call.arguments[2]).join() !== expected[1]) emit(file, call, "PARALLEL_FUNDING_UI", "Funding uses saved intent review and confirmation; per-person limits use their single reviewed form.");
+          if (!expected || name !== expected[2] || chain.join("/") !== expected[0] || !workspaceCall || stringValues(file, call.arguments[2]).join() !== expected[1]) emit(file, call, "PARALLEL_FUNDING_UI", "Funding uses saved intent review and confirmation; per-card allowances use their single reviewed form.");
           else fundingStages.set(targetPath, (fundingStages.get(targetPath) ?? 0) + 1);
         }
         if (/^\/api\/v1\/operations\/deposits\//.test(targetPath) && !readOnly) {
@@ -606,6 +717,9 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
     for (const name of ["CardsWorkspace", "CardRequestForm"]) if (ui.declarations.filter(symbol => symbol === name).length !== 1) emit(ui, null, "CARD_FORM_OWNER_MISSING", `Expected exactly one ${name} declaration in the canonical card UI.`);
     for (const route of ["/api/v1/checkout/:id/card", "/api/v1/checkout/:id/card/:id"]) if (connectedUiStages.get(route) !== 1) emit(ui, null, "CONNECTED_CHECKOUT_UI_CARDINALITY", `Expected exactly one connected checkout stage ${route}; found ${connectedUiStages.get(route) ?? 0}.`);
     for (const route of fundingUiStages.keys()) if (fundingStages.get(route) !== 1) emit(ui, null, "FUNDING_UI_CARDINALITY", `Expected exactly one funding/limit UI stage ${route}; found ${fundingStages.get(route) ?? 0}.`);
+    for(const route of ["/api/v1/money-accounts/:id/funding/intents","/api/v1/money-accounts/:id/withdrawals/intents","/api/v1/money-accounts/:id/funding/intents/:id","/api/v1/money-accounts/:id/withdrawals/intents/:id","/api/v1/operations/money-withdrawals/:id"])if(moneyUiStages.get(route)!==1)emit(ui,null,"MONEY_UI_CARDINALITY",`Expected one money review/confirmation/outcome stage ${route}; found ${moneyUiStages.get(route)??0}.`);
+    for(const route of ["/api/v1/payments/:id/dispute","/api/v1/operations/disputes/:id","/api/v1/merchants/:id/disputes/:id/respond"])if(disputeUiStages.get(route)!==1)emit(ui,null,"DISPUTE_UI_CARDINALITY",`Expected one dispute stage ${route}; found ${disputeUiStages.get(route)??0}.`);
+    for(const file of [peopleUiOwner,terminalPeopleUiOwner])for(const suffix of ["/invitations","/invitations/:id/revoke","/people/:id/revoke"]){const key=`${file}:${suffix}`;if(accessUiStages.get(key)!==1)emit(ui,null,"ACCESS_UI_CARDINALITY",`Expected one reviewed access attempt ${key}; found ${accessUiStages.get(key)??0}.`);}
     if (depositUiCalls !== 1) emit(ui, null, "DEPOSIT_UI_CARDINALITY", `Expected one assigned deposit-processing UI; found ${depositUiCalls}.`);
     for (const [, , , command] of connectedRoutes) if (connectedRouteStages.get(command) !== 1) emit(owner, null, "CONNECTED_ROUTE_CARDINALITY", `Expected exactly one HTTP invocation of ${command}; found ${connectedRouteStages.get(command) ?? 0}.`);
     const connectedOwnerFile = [...files.values()].find(file => relative(file.filename) === checkoutOwner);
@@ -620,7 +734,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
       const key = `${table}.${operation}:${command}`;
       if (!writerSites.has(key)) emit(owner, null, "WORKSPACE_WRITER_MISSING", `The currently implemented ${key} writer is absent from the inspected owning command.`);
     }
-    for (const definitions of [ledgerWriters, operationWriters, fundingWriters, checkoutWriters, settlementWriters]) for (const [table, operations] of Object.entries(definitions)) for (const [operation, commands] of Object.entries(operations)) for (const command of commands) {
+    for (const definitions of [ledgerWriters, operationWriters, fundingWriters, checkoutWriters, settlementWriters, moneyWriters,disputeWriters,terminalWriters,terminalAccessWriters]) for (const [table, operations] of Object.entries(definitions)) for (const [operation, commands] of Object.entries(operations)) for (const command of commands) {
       const key = `${table}.${operation}:${command}`;
       if (!writerSites.has(key)) emit(owner, null, "FINANCIAL_WRITER_MISSING", `The implemented ${key} writer is absent from its canonical owner.`);
     }
@@ -643,6 +757,20 @@ function selfTest() {
     inspectWorkspaceOwnership(new Map([[file.filename, file]]), (_file, _node, code) => findings.push(code), false);
     return findings;
   };
+  const moneyWrite='import {moneyTopups as receipts} from "@/modules/money/schema"; function addFunds(){tx.insert(receipts).values({});}';
+  assert.deepEqual(probe(moneyOwner,moneyWrite),[]);
+  assert.ok(probe(workspaceOwner,moneyWrite).includes("MONEY_WRITER_OWNERSHIP"));
+  assert.ok(probe(moneyOwner,moneyWrite.replace("function addFunds","function other")).includes("MONEY_WRITER_OWNERSHIP"));
+  assert.ok(probe(moneyOwner,moneyWrite.replace("tx.insert","tx.update")).includes("MONEY_WRITER_OWNERSHIP"));
+  assert.ok(probe(moneyOwner,'function unsafe(){tx.execute(sql`UPDATE money_accounts SET service_kind=MERCHANT`);}').includes("RAW_MONEY_TERMINAL_WRITE"));
+  assert.ok(probe(disputeOwner,'import {postJournal} from "../ledger/service";function resolveMerchantDispute(){postJournal(tx,input);}').includes("LEDGER_POSTING_BOUNDARY"));
+  assert.ok(probe(terminalAccessOwner,'import {terminalAssignments} from "./schema";function createMerchantInvitation(){tx.insert(terminalAssignments).values({});}').includes("TERMINAL_ACCESS_WRITER_OWNERSHIP"));
+  const moneyRoute='import {confirmMoneyFunding} from "@/modules/money/service";export function POST(){return confirmMoneyFunding();}';
+  assert.deepEqual(probe("src/app/api/v1/money-accounts/[moneyAccountId]/funding/intents/[intentId]/route.ts",moneyRoute),[]);
+  assert.ok(probe("src/app/api/v1/money-accounts/[moneyAccountId]/direct/route.ts",moneyRoute).includes("PARALLEL_CONNECTED_ROUTE"));
+  const moneyTransport='"use client";function moneyRequest(path,body){return fetch(path,{method:"POST",body:JSON.stringify(body)});}';
+  assert.deepEqual(probe(moneyUiOwner,moneyTransport),[]);
+  assert.ok(probe(moneyUiOwner,moneyTransport.replace('method:"POST"','method:"PUT"')).includes("REVIEWED_TRANSPORT_REWRITE"));
   const canonicalUi = `"use client";
     function CardsWorkspace() { return <CardRequestForm/>; }
     function CardRequestForm() {
@@ -714,6 +842,9 @@ function selfTest() {
   assert.ok(probe("src/app/api/v1/cardholder-services/[serviceId]/funds/top-ups/route.ts", 'export async function POST(){}').includes("RETIRED_SIMULATOR_ROUTE"));
   assert.ok(probe("src/modules/other/service.ts", 'import {cardholderTopups} from "@/modules/workspace/funding-schema"; function bypass(){tx.insert(cardholderTopups).values({});}').includes("FUNDING_WRITER_OWNERSHIP"));
   assert.ok(probe(workspaceOwner, 'import {postJournal} from "@/modules/ledger"; function submitCardRequest(){postJournal({});}').includes("LEDGER_POSTING_BOUNDARY"), "Issuing a card cannot create money.");
+  assert.ok(probe(workspaceOwner, 'function sideDoor(){writeCardLimit();}').includes("CARD_ALLOWANCE_COMMAND_BOUNDARY"));
+  assert.ok(probe("src/modules/other/service.ts", 'import {cardSpendingLimits} from "@/modules/workspace/funding-schema"; function bypass(){tx.insert(cardSpendingLimits).values({});}').includes("FUNDING_WRITER_OWNERSHIP"));
+  assert.deepEqual(probe(cardLimitUiOwner, '"use client"; import {workspaceCommand} from "./primitives"; function CardLimitControl(){function save(){workspaceCommand(id,`/cards/${input.cardId}/spending-limit`,"PUT",{});}}'), []);
   assert.ok(probe("src/app/api/add-money/route.ts", 'import {addCardholderFunds} from "@/modules/workspace/service"; function POST(){addCardholderFunds();}').includes("FUNDING_CONFIRMATION_BOUNDARY"));
   assert.ok(probe("src/modules/other/service.ts", 'import {cardCheckoutAttempts} from "@/modules/acquiring/card-checkout-schema"; function bypass(){tx.insert(cardCheckoutAttempts).values({});}').includes("CHECKOUT_WRITER_OWNERSHIP"));
   assert.ok(probe("src/modules/other/service.ts", 'import {merchantDeposits} from "@/modules/acquiring/settlement-schema"; function bypass(){tx.insert(merchantDeposits).values({});}').includes("SETTLEMENT_WRITER_OWNERSHIP"));

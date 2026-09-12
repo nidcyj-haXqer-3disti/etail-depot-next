@@ -1,4 +1,4 @@
-import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
+import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { eq,sql } from "drizzle-orm";
@@ -14,7 +14,7 @@ afterAll(closeDatabase);
 async function setup(){
  const primary=await cardPrimary("Restriction primary"),holder=await cardPerson("Restriction holder");
  await enrollCardholder(primary.personId,primary.serviceId,holder);
- const {card}=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"3000");await setPersonLimit(primary.personId,primary.serviceId,holder,"3000");return issuePracticeCard(primary.personId,primary.serviceId,holder,"Controlled card");})();
+ const {card}=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"3000");return issuePracticeCard(primary.personId, primary.serviceId, holder, "Controlled card", undefined, "3000");})();
  const journal=()=>getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId)).orderBy(ledgerEntries.id);
  return {...primary,holder,card,journal};
 }
@@ -25,7 +25,7 @@ describe("primary and holder card restriction ownership",()=>{
   expect(frozen).toMatchObject({status:"FROZEN",freeze:{primary:true,holder:false,reviewRequired:false}});
   const own=(await getWorkspace(f.holder,f.serviceId)).cards[0]!;
   expect(own).toMatchObject({canUnfreeze:false,canFreeze:true,canPurchase:false});
-  expect(own.freeze.description).toContain("primary cardholder");
+  expect(own.freeze.description).toContain("account owner");
   await expect(controlCard(f.holder,f.serviceId,f.card.id,{commandId:randomUUID(),expectedVersion:own.version,action:"unfreeze"})).rejects.toMatchObject({code:"PRIMARY_FREEZE_ACTIVE",status:422});
   await expect(purchaseCard(f.holder,f.serviceId,f.card.id,{commandId:randomUUID(),expectedVersion:own.version,amountMinor:"1",description:"Blocked by primary"})).rejects.toMatchObject({code:"CARD_FROZEN"});
   expect((await getWorkspace(f.holder,f.serviceId)).cards[0]).toMatchObject({version:frozen.version,available:{minor:"3000"},freeze:{primary:true}});

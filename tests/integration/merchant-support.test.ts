@@ -3,30 +3,23 @@ import {and,eq} from "drizzle-orm";
 import {afterAll,expect,it} from "vitest";
 import {getDb,closeDatabase} from "../../src/platform/database/client";
 import {serviceMembers} from "../../src/platform/database/schema";
-import {merchantAssignments,merchantPermissionGrants} from "../../src/modules/access/schema";
-import {createChannel,createOwnedSubmerchant,pauseMerchant} from "../../src/modules/acquiring/service";
-import {configureTestGateway,enrollTestMerchant,setChannelActivation,simulateMerchantPayment,refundMerchantPayment} from "../../src/modules/acquiring/operations-service";
+import {terminalAssignments} from "../../src/modules/access/schema";
+import {createTerminal,pauseMerchant} from "../../src/modules/acquiring/service";
+import {getMerchantOperations,refundMerchantPayment} from "../../src/modules/acquiring/operations-service";
 import {getMerchantSupportCase,listMerchantSupportCases,createMerchantSupportCase,addMerchantSupportMessage,withdrawMerchantSupportCase,getSupportCase,createSupportCase,getMerchantSupportPaymentPreview} from "../../src/modules/cases/service";
 import {supportCases,supportCaseMessages} from "../../src/modules/cases/schema";
 import {supportCaseDetailSchema,supportCaseListSchema} from "../../src/modules/cases/api-contracts";
 import {operatorCaseSchema} from "../../src/modules/operations/api-contracts";
 import {operatorServiceAccess} from "../../src/modules/operations/schema";
 import {getOperatorCase,getOperatorQueue,respondToCase} from "../../src/modules/operations/service";
-import {merchantAccessFixture} from "../helpers/merchant-access";
-import {acquiringPerson,paymentInput} from "../helpers/acquiring";
+import {acquiringPerson} from "../helpers/acquiring";
 import {ledgerEntries} from "../../src/modules/ledger/schema";
 
+import {terminalCheckoutFixture,payTerminal} from "../helpers/terminal-checkout";
 afterAll(closeDatabase);
 const question=(paymentId:string|null=null)=>({commandId:randomUUID(),topic:"PAYMENT" as const,subject:"Where is this payment?",message:"Please explain the payment and refund dates.",paymentId});
-async function fixture(){
- const f=await merchantAccessFixture();
- await configureTestGateway(f.merchant.personId,f.master.id,{commandId:randomUUID(),expectedVersion:0,enabled:true});
- await enrollTestMerchant(f.merchant.personId,f.unit.id,{commandId:randomUUID(),expectedVersion:0,enabled:true});
- const channel=await createChannel(f.merchant.personId,f.unit.id,{...paymentInput(),visibility:"ASSIGNED",presentations:["WEB","QR"]});
- await setChannelActivation(f.merchant.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedVersion:0,expectedChannelVersion:1,active:true});
- const payment=await simulateMerchantPayment(f.operator.personId,f.unit.id,channel.id,{commandId:randomUUID(),expectedChannelVersion:1,outcome:"APPROVED"});
- return {...f,payment,channel};
-}
+async function fixture(){const f=await terminalCheckoutFixture();const receipt=await payTerminal(f);const payment=(await getMerchantOperations(f.merchant.personId,f.unit.id)).payments.find(row=>row.id===receipt.paymentId)!;return {...f,payment};}
+
 it("supports a collector without granting service membership; private conversation follows an exact payment through assigned support",async()=>{
  const f=await fixture(),staff=await acquiringPerson();
  const before=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.merchantUnitId,f.unit.id));
@@ -51,7 +44,7 @@ it("supports a collector without granting service membership; private conversati
 });
 it("uses independent payment/refund timestamps and rejects sibling payment context",async()=>{
  const f=await fixture();
- const sibling=await createOwnedSubmerchant(f.merchant.personId,f.master.id,{commandId:randomUUID(),displayName:"Other collection point"});
+ const sibling=await createTerminal(f.merchant.personId,f.merchant.serviceId,{commandId:randomUUID(),displayName:"Other collection point"});
  await expect(createMerchantSupportCase(f.merchant.personId,sibling.id,question(f.payment.id))).rejects.toMatchObject({code:"RESOURCE_UNAVAILABLE"});
  await expect(getMerchantSupportPaymentPreview(f.operator.personId,sibling.id,f.payment.id)).rejects.toBeDefined();
  await refundMerchantPayment(f.merchant.personId,f.unit.id,f.payment.id,{commandId:randomUUID(),expectedVersion:1,reason:"Order canceled"});
@@ -66,24 +59,14 @@ it("rechecks collector revocation before reads and successful command replay; as
  const f=await fixture(),staff=await acquiringPerson(),command=question(f.payment.id);
  const ticket=await createMerchantSupportCase(f.operator.personId,f.unit.id,command);
  await getDb().insert(operatorServiceAccess).values({personId:staff.personId,serviceId:f.merchant.serviceId,state:"ACCEPTED",canRespond:true});
- await getDb().update(merchantAssignments).set({state:"REVOKED",version:2}).where(and(eq(merchantAssignments.merchantUnitId,f.unit.id),eq(merchantAssignments.personId,f.operator.personId)));
+ await getDb().update(terminalAssignments).set({state:"REVOKED",version:2,revokedAt:new Date()}).where(and(eq(terminalAssignments.terminalId,f.unit.id),eq(terminalAssignments.personId,f.operator.personId)));
  await expect(getMerchantSupportCase(f.operator.personId,f.unit.id,ticket.id)).rejects.toBeDefined();
  await expect(createMerchantSupportCase(f.operator.personId,f.unit.id,command)).rejects.toBeDefined();
  await expect(addMerchantSupportMessage(f.operator.personId,f.unit.id,ticket.id,{commandId:randomUUID(),expectedVersion:1,message:"Revoked"})).rejects.toBeDefined();
  expect((await getOperatorCase(staff.personId,ticket.id)).messages).toHaveLength(1);
  expect(await getDb().select().from(supportCaseMessages).where(eq(supportCaseMessages.caseId,ticket.id))).toHaveLength(1);
 });
-it("redacts linked payment data when that permission is removed without removing private support access",async()=>{
- const f=await fixture(),input=question(f.payment.id),ticket=await createMerchantSupportCase(f.operator.personId,f.unit.id,input);
- const [assignment]=await getDb().select().from(merchantAssignments).where(and(eq(merchantAssignments.merchantUnitId,f.unit.id),eq(merchantAssignments.personId,f.operator.personId),eq(merchantAssignments.state,"ACCEPTED")));
- await getDb().delete(merchantPermissionGrants).where(and(eq(merchantPermissionGrants.assignmentId,assignment!.id),eq(merchantPermissionGrants.action,"payments.read")));
- const redacted=await getMerchantSupportCase(f.operator.personId,f.unit.id,ticket.id);
- expect(redacted).toMatchObject({payment:null,paymentUnavailable:true,canUpdate:true});
- expect(await createMerchantSupportCase(f.operator.personId,f.unit.id,input)).toMatchObject({payment:null,paymentUnavailable:true});
- await expect(getMerchantSupportPaymentPreview(f.operator.personId,f.unit.id,f.payment.id)).rejects.toMatchObject({code:"RESOURCE_UNAVAILABLE"});
- await expect(createMerchantSupportCase(f.operator.personId,f.unit.id,question(f.payment.id))).rejects.toMatchObject({code:"ACTION_DENIED"});
- expect(await addMerchantSupportMessage(f.operator.personId,f.unit.id,ticket.id,{commandId:randomUUID(),expectedVersion:1,message:"I can still discuss my own question."})).toMatchObject({payment:null,paymentUnavailable:true});
-});
+
 it("keeps primary support available for a paused unit without restoring collector access",async()=>{
  const f=await fixture(),primary=await createMerchantSupportCase(f.merchant.personId,f.unit.id,question(f.payment.id));
  const collector=await createMerchantSupportCase(f.operator.personId,f.unit.id,question(f.payment.id));
@@ -102,7 +85,7 @@ it("deduplicates concurrent creation and rejects changed payloads and competing 
  expect((await getMerchantSupportCase(f.operator.personId,f.unit.id,a.id)).messages).toHaveLength(2);
 });
 it("keeps database context links typed and rejects cross-unit or wrong-service references",async()=>{
- const f=await fixture(),sibling=await createOwnedSubmerchant(f.merchant.personId,f.master.id,{commandId:randomUUID(),displayName:"Other unit"});
+ const f=await fixture(),sibling=await createTerminal(f.merchant.personId,f.merchant.serviceId,{commandId:randomUUID(),displayName:"Other unit"});
  const base={id:randomUUID(),creatorId:f.operator.personId,serviceId:f.merchant.serviceId,serviceKind:"MERCHANT" as const,merchantUnitId:sibling.id,paymentId:f.payment.id,reference:`CASE-${randomUUID()}`,topic:"PAYMENT" as const,subject:"Invalid context"};
  await expect(getDb().insert(supportCases).values(base)).rejects.toBeDefined();
  await expect(getDb().insert(supportCases).values({...base,id:randomUUID(),serviceKind:"CARDHOLDER",merchantUnitId:null,paymentId:null,topic:"SERVICE"})).rejects.toBeDefined();

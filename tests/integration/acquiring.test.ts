@@ -2,7 +2,7 @@ import {randomUUID} from "node:crypto";
 import {afterAll,expect,it} from "vitest";
 import {and,eq} from "drizzle-orm";
 import {closeDatabase,getDb} from "../../src/platform/database/client";
-import {permissionGrants,cards} from "../../src/platform/database/schema";
+import {permissionGrants,serviceMembers,cards} from "../../src/platform/database/schema";
 import {merchantApplications,merchantApplicationEvents,merchantApplicationCommands,paymentChannels,paymentChannelCommands} from "../../src/modules/acquiring/schema";
 import {getMerchantBusinessDetails,getMerchantWorkspace,startMerchantSetup,updateMerchantSetup,submitMerchantSetup,createChannel,updateChannel,cancelChannel} from "../../src/modules/acquiring/service";
 import {merchantBusinessDetailsProjectionSchema,merchantSetupProjectionSchema,paymentChannelSchema} from "../../src/modules/acquiring/api-contracts";
@@ -45,7 +45,9 @@ it("channel terms preserve exact money, one retry identity and current command p
  await expect(createChannel(f.personId,f.merchantId,{...input,description:"Changed retry"})).rejects.toMatchObject({code:"IDEMPOTENCY_CONFLICT"});
  const cancel={commandId:randomUUID(),expectedVersion:2};expect((await cancelChannel(f.personId,f.merchantId,first.id,cancel)).status).toBe("CANCELED");expect((await cancelChannel(f.personId,f.merchantId,first.id,cancel)).version).toBe(3);
  await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,f.serviceId),eq(permissionGrants.action,"channels.create")));
- await expect(createChannel(f.personId,f.merchantId,input)).rejects.toMatchObject({code:"ACTION_DENIED"});
+ expect((await createChannel(f.personId,f.merchantId,input)).id).toBe(first.id);
+ await getDb().update(serviceMembers).set({state:"REVOKED",version:2}).where(and(eq(serviceMembers.serviceId,f.serviceId),eq(serviceMembers.personId,f.personId)));
+ await expect(createChannel(f.personId,f.merchantId,input)).rejects.toMatchObject({code:"MERCHANT_UNAVAILABLE"});
  expect(await getDb().select().from(paymentChannelCommands).where(eq(paymentChannelCommands.serviceId,f.serviceId))).toHaveLength(3);
 });
 it("expiry uses database time and an expired channel may close without a payment effect",async()=>{

@@ -5,16 +5,17 @@ import { eq } from "drizzle-orm";
 import { afterAll, expect, it } from "vitest";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { services, serviceMembers, cards, cardRequests, people } from "../../src/platform/database/schema";
-import { cardPrimary, fundCardGroup, setPersonLimit, issuePracticeCard } from "../helpers/cardholder";
+import { cardPrimary, fundCardGroup, issuePracticeCard } from "../helpers/cardholder";
 import { merchantAccessFixture } from "../helpers/merchant-access";
 import { paymentInput } from "../helpers/acquiring";
 import { purchaseCard } from "../../src/modules/workspace/service";
 import { createChannel } from "../../src/modules/acquiring/service";
 import { publishGuestChannel } from "../../src/modules/acquiring/guest-service";
 import { prepareCardCheckout, confirmCardCheckout } from "../../src/modules/acquiring/card-checkout-service";
-import { configureTestGateway, enrollTestMerchant, setChannelActivation, getMerchantOperations, createMerchantPayout, refundMerchantPayment } from "../../src/modules/acquiring/operations-service";
-import { merchantDeposits, merchantSettlementItems } from "../../src/modules/acquiring/settlement-schema";
+import { configureTestGateway, enrollTestMerchant, setChannelActivation, getMerchantOperations, createMerchantSettlement, refundMerchantPayment } from "../../src/modules/acquiring/operations-service";
+import { merchantSettlements, merchantSettlementItems } from "../../src/modules/acquiring/settlement-schema";
 import { merchantTestRefunds } from "../../src/modules/acquiring/operations-schema";
+import {readServiceMoneyAvailable} from "../../src/modules/money/service";
 import { getBalance, postJournal, type PostJournalInput } from "../../src/modules/ledger/service";
 import { ledgerEntries, ledgerJournals } from "../../src/modules/ledger/schema";
 
@@ -131,9 +132,9 @@ async function overlapping(
 it("canonical overlapping purchases on separate cards cannot overspend the same prepaid group", async () => {
   const owner = await cardPrimary("Canonical ledger concurrency primary");
   await fundCardGroup(owner.personId, owner.serviceId, "10000");
-  await setPersonLimit(owner.personId, owner.serviceId, owner.personId, "20000");
-  const first = (await issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "First concurrent card")).card;
-  const second = (await issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "Second concurrent card")).card;
+
+  const first = (await issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "First concurrent card", undefined, "20000")).card;
+  const second = (await issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "Second concurrent card", undefined, "20000")).card;
   const firstInput = { commandId: randomUUID(), expectedVersion: first.version, amountMinor: "8000", description: "First concurrent purchase" };
   const secondInput = { commandId: randomUUID(), expectedVersion: second.version, amountMinor: "3000", description: "Second concurrent purchase" };
   const results = await overlapping('SELECT id FROM cards WHERE id=$1 FOR UPDATE', first.id,
@@ -141,7 +142,7 @@ it("canonical overlapping purchases on separate cards cannot overspend the same 
     () => purchaseCard(owner.personId, owner.serviceId, second.id, secondInput));
   expect(results[0]?.status).toBe("fulfilled");
   expect(results[1]).toMatchObject({ status: "rejected", reason: { code: "INSUFFICIENT_PRACTICE_FUNDS" } });
-  const available = await getDb().transaction(tx => getBalance(tx, { serviceId: owner.serviceId, bucket: "GROUP_AVAILABLE" }));
+  const available = await getDb().transaction(tx => readServiceMoneyAvailable(tx,owner.serviceId));
   const spent = await getDb().transaction(tx => getBalance(tx, { serviceId: owner.serviceId, cardId: first.id, bucket: "CARD_SPENT" }));
   expect(available).toBe(2000n); expect(spent).toBe(8000n); expect(available + spent).toBe(10000n);
   expect(await getDb().transaction(tx => getBalance(tx, { serviceId: owner.serviceId, cardId: second.id, bucket: "CARD_SPENT" }))).toBe(0n);
@@ -157,8 +158,8 @@ async function paidMerchant() {
   const publication = (await publishGuestChannel(m.operator.personId, m.unit.id, channel.id, { commandId: randomUUID(), expectedChannelVersion: channel.version })).publication!;
   const payer = await cardPrimary("Merchant race payer");
   await fundCardGroup(payer.personId, payer.serviceId, "10000");
-  await setPersonLimit(payer.personId, payer.serviceId, payer.personId, "10000");
-  const { card } = await issuePracticeCard(payer.personId, payer.serviceId, payer.personId, "Merchant race card");
+
+  const { card } = await issuePracticeCard(payer.personId, payer.serviceId, payer.personId, "Merchant race card", undefined, "10000");
   const review = await prepareCardCheckout(payer.personId, publication.id, { commandId: randomUUID(), cardServiceId: payer.serviceId, cardId: card.id, expectedCardVersion: card.version });
   const paid = await confirmCardCheckout(payer.personId, publication.id, review.id);
   if (!paid.receipt) throw new Error("Canonical checkout did not produce a payment receipt");
@@ -167,22 +168,21 @@ async function paidMerchant() {
   return { ...m, payer, paymentId: paid.receipt.paymentId, reviewToken: operations.depositReview.token };
 }
 
-it.each(["deposit", "refund"] as const)("serializes a real deposit and original-card refund when %s reaches the merchant lock first", async first => {
+it.each(["settlement", "refund"] as const)("serializes settlement and original-card refund when %s reaches the terminal lock first", async first => {
   const f = await paidMerchant();
-  const deposit = () => createMerchantPayout(f.merchant.personId, f.unit.id, { commandId: randomUUID(), reviewToken: f.reviewToken });
+  const settlement = () => createMerchantSettlement(f.merchant.personId, f.unit.id, { commandId: randomUUID(), reviewToken: f.reviewToken });
   const refund = () => refundMerchantPayment(f.merchant.personId, f.unit.id, f.paymentId, { commandId: randomUUID(), expectedVersion: 1, reason: "Concurrent original purchase refund" });
-  const results = await overlapping('SELECT id FROM merchant_units WHERE id=$1 FOR UPDATE', f.unit.id,
-    first === "deposit" ? deposit : refund,
-    first === "deposit" ? refund : deposit);
+  const results = await overlapping('SELECT id FROM merchant_terminals WHERE id=$1 FOR UPDATE', f.unit.id,
+    first === "settlement" ? settlement : refund,
+    first === "settlement" ? refund : settlement);
   expect(results[0]?.status).toBe("fulfilled");
-  expect(results[1]).toMatchObject({ status: "rejected", reason: { code: first === "deposit" ? "REFUND_DEPOSIT_RESERVED" : "NO_PAYMENTS_TO_DEPOSIT" } });
-  const available = await getDb().transaction(tx => getBalance(tx, { serviceId: f.merchant.serviceId, merchantUnitId: f.unit.id, bucket: "MERCHANT_AVAILABLE" }));
-  const pending = await getDb().transaction(tx => getBalance(tx, { serviceId: f.merchant.serviceId, merchantUnitId: f.unit.id, bucket: "MERCHANT_PAYOUT_PENDING" }));
-  const group = await getDb().transaction(tx => getBalance(tx, { serviceId: f.payer.serviceId, bucket: "GROUP_AVAILABLE" }));
-  expect(available).toBe(0n);
-  expect(pending).toBe(first === "deposit" ? 1250n : 0n);
-  expect(group).toBe(first === "deposit" ? 8750n : 10000n);
-  expect(await getDb().select().from(merchantDeposits).where(eq(merchantDeposits.merchantUnitId, f.unit.id))).toHaveLength(first === "deposit" ? 1 : 0);
-  expect(await getDb().select().from(merchantSettlementItems).where(eq(merchantSettlementItems.paymentId, f.paymentId))).toHaveLength(first === "deposit" ? 1 : 0);
-  expect(await getDb().select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId, f.paymentId))).toHaveLength(first === "refund" ? 1 : 0);
-}, 30_000);
+  if(first==="settlement")expect(results[1]?.status).toBe("fulfilled");
+  else expect(results[1]).toMatchObject({status:"rejected",reason:{code:"NO_PAYMENTS_TO_SETTLE"}});
+  const available=await getDb().transaction(tx=>getBalance(tx,{serviceId:f.merchant.serviceId,merchantUnitId:f.unit.id,bucket:"MERCHANT_AVAILABLE"}));
+  const merchantMoney=await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.merchant.serviceId));
+  const cardMoney=await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.payer.serviceId));
+  expect(available).toBe(0n);expect(merchantMoney).toBe(0n);expect(cardMoney).toBe(10000n);
+  expect(await getDb().select().from(merchantSettlements).where(eq(merchantSettlements.merchantUnitId,f.unit.id))).toHaveLength(first==="settlement"?1:0);
+  expect(await getDb().select().from(merchantSettlementItems).where(eq(merchantSettlementItems.paymentId,f.paymentId))).toHaveLength(first==="settlement"?1:0);
+  expect(await getDb().select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId,f.paymentId))).toHaveLength(1);
+},30_000);

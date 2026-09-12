@@ -11,6 +11,7 @@ export const operatorServiceAccess = pgTable("operator_service_access", {
   version: integer().notNull().default(1),
   canRespond: boolean().notNull().default(false),
   canProcessDeposits: boolean().notNull().default(false),
+  canResolveDisputes: boolean().notNull().default(false),
 }, t => [primaryKey({ columns: [t.serviceId, t.personId] }), check("operator_access_state", sql`${t.state} in ('ACCEPTED','REVOKED') and ${t.version}>0`)]);
 
 export const operatorCommands = pgTable("operator_command_receipts", {

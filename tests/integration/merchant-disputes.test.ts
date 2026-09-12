@@ -1,0 +1,35 @@
+import {randomUUID} from "node:crypto";
+import {eq} from "drizzle-orm";
+import {afterAll,expect,it} from "vitest";
+import {closeDatabase,getDb} from "../../src/platform/database/client";
+import {operatorServiceAccess} from "../../src/modules/operations/schema";
+import {merchantDisputes,merchantDisputeMessages} from "../../src/modules/disputes/schema";
+import {openPaymentDispute,getPayerDispute,listTerminalDisputes,respondToTerminalDispute,getOperatorDisputes,resolveMerchantDispute} from "../../src/modules/disputes/service";
+import {readServiceMoneyAvailable} from "../../src/modules/money/service";
+import {terminalAssignments} from "../../src/modules/access/schema";
+import {terminalCheckoutFixture,payTerminal} from "../helpers/terminal-checkout";
+afterAll(closeDatabase);
+it("payer opens, assigned terminal responds, explicit operator reviews, and a recommended refund moves no money",async()=>{
+ const f=await terminalCheckoutFixture(),paid=await payTerminal(f),input={commandId:randomUUID(),reason:"NOT_RECEIVED" as const,message:"My order has not arrived."};
+ const dispute=await openPaymentDispute(f.payer.personId,paid.paymentId,input);expect(await openPaymentDispute(f.payer.personId,paid.paymentId,input)).toEqual(dispute);
+ await expect(getPayerDispute(f.helper.personId,paid.paymentId)).rejects.toMatchObject({status:404});
+ expect(await listTerminalDisputes(f.merchant.personId,f.unit.id)).toHaveLength(1);expect(await listTerminalDisputes(f.operator.personId,f.unit.id)).toHaveLength(1);await expect(listTerminalDisputes(f.helper.personId,f.unit.id)).rejects.toMatchObject({status:404});
+ const response={commandId:randomUUID(),expectedVersion:dispute.version,message:"We dispatched your order.",evidence:"Dispatch record 804; tracking shows delayed delivery."};
+ const reviewed=await respondToTerminalDispute(f.operator.personId,f.unit.id,dispute.id,response);expect(reviewed.status).toBe("IN_REVIEW");expect(await respondToTerminalDispute(f.operator.personId,f.unit.id,dispute.id,response)).toEqual(reviewed);
+ await expect(getOperatorDisputes(f.merchant.personId)).rejects.toMatchObject({status:404});
+ await getDb().insert(operatorServiceAccess).values({serviceId:f.merchant.serviceId,personId:f.helper.personId,state:"ACCEPTED",canRespond:true});await expect(getOperatorDisputes(f.helper.personId)).rejects.toMatchObject({status:404});
+ await getDb().update(operatorServiceAccess).set({canResolveDisputes:true,version:2}).where(eq(operatorServiceAccess.personId,f.helper.personId));
+ const request={commandId:randomUUID(),expectedVersion:reviewed.version,outcome:"MORE_INFORMATION" as const,message:"Please supply the delivery date."};const waiting=await resolveMerchantDispute(f.helper.personId,dispute.id,request);expect(waiting.status).toBe("NEEDS_RESPONSE");
+ const second=await respondToTerminalDispute(f.operator.personId,f.unit.id,dispute.id,{...response,commandId:randomUUID(),expectedVersion:waiting.version,evidence:"Delivery has not completed. We can refund."});
+ const result=await resolveMerchantDispute(f.helper.personId,dispute.id,{commandId:randomUUID(),expectedVersion:second.version,outcome:"REFUND_RECOMMENDED",message:"Delivery was not completed. Please review a refund."});expect(result).toMatchObject({status:"RESOLVED",resolution:"REFUND_RECOMMENDED",version:5});
+ expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.payer.serviceId))).toBe(18750n);expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.merchant.serviceId))).toBe(0n);
+ expect(await getDb().select().from(merchantDisputeMessages).where(eq(merchantDisputeMessages.disputeId,dispute.id))).toHaveLength(5);
+ await expect(getDb().update(merchantDisputes).set({status:"NEEDS_RESPONSE",resolution:null,version:6}).where(eq(merchantDisputes.id,dispute.id))).rejects.toThrow();
+ await expect(getDb().update(merchantDisputeMessages).set({message:"Rewritten"}).where(eq(merchantDisputeMessages.disputeId,dispute.id))).rejects.toThrow();
+});
+it("revoked terminal access cannot respond to or reopen an earlier dispute",async()=>{
+ const f=await terminalCheckoutFixture(),paid=await payTerminal(f),dispute=await openPaymentDispute(f.payer.personId,paid.paymentId,{commandId:randomUUID(),reason:"OTHER",message:"Please check my payment."});
+ await getDb().update(terminalAssignments).set({state:"REVOKED",version:2,revokedAt:new Date()}).where(eq(terminalAssignments.personId,f.operator.personId));
+ await expect(respondToTerminalDispute(f.operator.personId,f.unit.id,dispute.id,{commandId:randomUUID(),expectedVersion:1,message:"Old user",evidence:"Old access"})).rejects.toMatchObject({status:404});
+ expect((await listTerminalDisputes(f.merchant.personId,f.unit.id))[0]?.version).toBe(1);
+});
