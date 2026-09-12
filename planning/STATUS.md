@@ -1,3 +1,9 @@
+# D70 — checkout and top-up navigation race corrected (12 September 2026)
+
+The reported PR14 GitHub failure was one desktop checkout-recovery case: 139 other browser cases and all preceding application/database gates passed. A fast confirmation could start before saved-review navigation changed the component key, allowing an older server projection to replace its receipt/recovery state. The same pattern was reproduced in Add money.
+
+Both confirmation handlers and controls now wait until saved-review navigation completes. Deterministic regressions fail against the preceding build and pass against the correction; all 18 targeted desktop/mobile/accessibility cases, types, lint, architecture, source security and production Next/offline Netlify packaging pass. [D70 evidence](../docs/CHECKOUT_NAVIGATION_FIX.md) identifies the original failed run, exact reproduction and unchanged financial rules. The existing PR14 carries the correction; current GitHub checks and `artifacts/d70-publication.json` identify remote acceptance for its exact SHA. No merge or deployment is part of this fix.
+
 # Current task — D69 prepaid replacement and connected money journeys (12 September 2026)
 
 The user approved a fresh prepaid replacement of both service experiences. [The active contract](../docs/FRESH_PREPAID_REBUILD.md) and [product design](../docs/PRODUCT_TECHNICAL_DESIGN.md) now separate explicit primary group funding, per-person monthly limits, zero-funding card issuance, own-card checkout and Merchant settlement/deposit operations. There is no global Invitations product, dashboard Try purchase, merchant-authored payment outcome, guest payment mutation or instant arbitrary transfer. Service-related access acceptance and existing role/privacy boundaries remain.
