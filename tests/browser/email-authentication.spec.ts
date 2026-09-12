@@ -114,6 +114,33 @@ test("registration, root confirmation callback and password sign-in persist a re
   expect(calls).toEqual(expect.arrayContaining(["POST /signup", "POST /verify", "POST /token", "GET /user"]));
 });
 
+test("a new recipient returns to the exact invitation after registration and root email confirmation", async ({ page }) => {
+  const email = `email-e2e-invite-${randomUUID()}@example.test`, invitationId = randomUUID();
+  const nextPath = `/invitations/${invitationId}`;
+  await page.goto(`/login?next=${encodeURIComponent(nextPath)}&mode=register`);
+  const form = page.getByRole("form", { name: "Create your login", exact: true });
+  await form.getByLabel("Email address", { exact: true }).fill(email);
+  await form.getByLabel("Password", { exact: true }).fill(password);
+  await form.getByLabel("Confirm password", { exact: true }).fill(password);
+  const registered = await submit(page, "register", form.getByRole("button", { name: "Create login", exact: true }));
+  expect(registered.status()).toBe(200);
+  expect(await registered.json()).toEqual({ registrationRequested: true });
+  const continuationCookie = (await page.context().cookies()).find(cookie => cookie.name === "etail_continue");
+  expect(continuationCookie).toMatchObject({ httpOnly: true, sameSite: "Lax", path: "/" });
+  expect(await page.evaluate(() => document.cookie.includes("etail_continue"))).toBe(false);
+  const fixture = await member(email);
+  await confirm(page, fixture.confirmation);
+  expect((await page.request.get("/api/v1/services")).status()).toBe(401);
+  const signedIn = await login(page, email, password);
+  expect(signedIn.status()).toBe(200);
+  await expect(page).toHaveURL(`${applicationOrigin}${nextPath}`);
+  const contacts = await pool.query(`SELECT c."emailNormalized",c.provenance FROM identity_verified_emails c JOIN identity_bindings b ON b.id=c."identityId" WHERE b.issuer=$1 AND b.subject=$2`, [pinnedIdentityEndpoint(), fixture.subject]);
+  expect(contacts.rows).toEqual([{ emailNormalized: email, provenance: "NETLIFY_USER_CONFIRMED" }]);
+  const grants = await pool.query(`SELECT count(*)::int AS count FROM service_members m JOIN identity_bindings b ON b."personId"=m."personId" WHERE b.issuer=$1 AND b.subject=$2`, [pinnedIdentityEndpoint(),fixture.subject]);
+  expect(grants.rows).toEqual([{ count: 0 }]);
+  expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+});
+
 test("unconfirmed and incorrect passwords receive actual route errors without creating a session", async ({ page }) => {
   const email = `email-e2e-${randomUUID()}@example.test`;
   const fixture = await register(page, email);

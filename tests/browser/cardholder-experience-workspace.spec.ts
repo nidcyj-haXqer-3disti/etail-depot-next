@@ -1,3 +1,4 @@
+import {prepareCardCheckout} from "../../src/modules/acquiring/card-checkout-service";
 import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
@@ -209,11 +210,10 @@ test("an owned card pays at a published checkout while another holder's card off
   await overview.getByRole("link", { name: "Card settings", exact: true }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toContainText("Jamie Ownership’s card");
-  await expect(dialog).toContainText("Jamie Ownership makes purchases when signed in to their own login");
+  await expect(dialog).toContainText("Only Jamie Ownership can use this card");
   await expect(dialog.getByRole("textbox", { name: "Purchase description", exact: true })).toHaveCount(0);
   await expect(dialog.getByRole("button", { name: "Freeze", exact: true })).toBeEnabled();
-  const denied = await page.request.post(`/api/v1/checkout/${merchant.publication.id}/card`, { headers: { Origin: origin, "Content-Type": "application/json" }, data: { commandId: randomUUID(), cardServiceId:primary.serviceId,cardId:managed.card.id,expectedCardVersion:managed.card.version } });
-  expect(denied.status()).toBe(404);
+  await expect(prepareCardCheckout(primary.personId,merchant.publication.id,{commandId:randomUUID(),cardServiceId:primary.serviceId,cardId:managed.card.id,expectedCardVersion:managed.card.version})).rejects.toMatchObject({status:404});
   const result = await dashboard(page);
   expect(result.cards.find(card => card.id === owned.card.id)).toMatchObject({ available: { minor: "0" }, status: "FROZEN", canPurchase: false });
   expect(result.cards.find(card => card.id === managed.card.id)).toMatchObject({ available: { minor: "1700" }, canPurchase: false, purchaseAvailability: { code: "OTHER_CARDHOLDER" } });

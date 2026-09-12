@@ -23,7 +23,7 @@ export async function signInWithPassword(email: string, password: string, cookie
   if (!verified.providerConfirmed || !verified.issuer || !verified.subject || verified.issuer === "urn:etail:isolated-fixture") throw new SecurityError("INVALID_VERIFIED_IDENTITY", 401);
   const identity = await dependencies.bind(verified.issuer, verified.subject);
   await dependencies.sessions.logout(cookie);
-  const issued = await dependencies.sessions.issue(identity);
+  const issued = await dependencies.sessions.issue(identity, { issuer: verified.issuer, subject: verified.subject, ...(verified.verifiedEmail ? { verifiedEmail: verified.verifiedEmail } : {}) });
   return issued.cookie;
 }
 function provider() { return new NetlifyIdentityAdapter(() => getPasswordIdentityConfiguration()); }

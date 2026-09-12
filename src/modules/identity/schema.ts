@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { pgTable, text, integer, timestamp, check, index, uuid } from "drizzle-orm/pg-core";
 import { identityBindings } from "../../platform/database/schema";
+export { identityVerifiedEmails, identityContinuations } from "./contact-schema";
 
 /** Bounded local password-attempt counters; no emails, passwords, IPs or provider tokens. */
 export const passwordLoginThrottle = pgTable("password_login_throttle", {

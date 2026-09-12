@@ -20,20 +20,40 @@ function setup(responses: Response[] = []) {
 }
 
 describe("Netlify Identity server adapter", () => {
-  it("verifies through the bound issuer and drops email, provider roles and credentials", async () => {
+  it("verifies the bound current email with confirmation-required settings and drops provider roles and credentials", async () => {
     const { adapter, fetcher } = setup([
       Response.json({ access_token: "server-only-test-token", refresh_token: "server-only-test-refresh" }),
       Response.json({ ...verifiedUser, app_metadata: { roles: ["admin"] }, user_metadata: { personId: "victim" } }),
+      Response.json({ external: { email: true }, autoconfirm: false }),
     ]);
     const identity = await adapter.verifyPassword("member@example.test", "  valid password  ");
-    expect(identity).toEqual({ issuer: endpoint, subject: verifiedUser.id, providerConfirmed: true });
-    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(identity).toEqual({ issuer: endpoint, subject: verifiedUser.id, providerConfirmed: true, verifiedEmail: { emailNormalized: verifiedUser.email, provenance: "NETLIFY_USER_CONFIRMED", verifiedAt: new Date(verifiedUser.confirmed_at).toISOString() } });
+    expect(fetcher).toHaveBeenCalledTimes(3);
     const [tokenUrl, tokenRequest] = fetcher.mock.calls[0]!;
     expect(tokenUrl).toBe(`${endpoint}/token`);
     expect(new URLSearchParams(tokenRequest!.body as string).get("password")).toBe("  valid password  ");
     expect(tokenRequest).toMatchObject({ redirect: "error", cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer" });
     expect(fetcher.mock.calls[1]).toEqual([`${endpoint}/user`, expect.objectContaining({ headers: { Authorization: "Bearer server-only-test-token" } })]);
+    expect(fetcher.mock.calls[2]?.[0]).toBe(`${endpoint}/settings`);
     expect(JSON.stringify(identity)).not.toMatch(/token|email@|admin|victim/);
+  });
+
+  it.each([
+    { external: { email: true }, autoconfirm: true }, { external: { email: false }, autoconfirm: false },
+    { external: { email: true } }, {},
+  ])("keeps login but supplies no invitation email proof when confirmation settings are not trusted %#", async settings => {
+    const { adapter } = setup([Response.json({ access_token: "test-token" }), Response.json(verifiedUser), Response.json(settings)]);
+    expect(await adapter.verifyPassword("different-browser-input@example.test", "password")).toEqual({ issuer: endpoint, subject: verifiedUser.id, providerConfirmed: true });
+  });
+
+  it("uses only the provider current email, never browser input, pending email or user metadata", async () => {
+    const { adapter } = setup([Response.json({ access_token: "test-token" }), Response.json({ ...verifiedUser, email: " Person+Card@Example.TEST ", new_email: "pending@example.test", user_metadata: { email: "forged@example.test", email_verified: true } }), Response.json({ external: { email: true }, autoconfirm: false })]);
+    expect((await adapter.verifyPassword("browser@example.test", "password")).verifiedEmail?.emailNormalized).toBe("person+card@example.test");
+  });
+
+  it.each([undefined, "invalid-address", "", null])("does not manufacture a verified contact when current provider email is %s", async email => {
+    const { adapter } = setup([Response.json({ access_token: "test-token" }), Response.json({ ...verifiedUser, email, new_email: "pending@example.test", user_metadata: { email: "forged@example.test", email_verified: true } })]);
+    expect((await adapter.verifyPassword("browser@example.test", "password")).verifiedEmail).toBeUndefined();
   });
 
   it("keeps the same email with a new subject a separate identity", async () => {

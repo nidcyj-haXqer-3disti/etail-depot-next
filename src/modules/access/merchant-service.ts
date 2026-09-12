@@ -1,3 +1,5 @@
+import {isInvitationRecipient} from "./recipient";
+import {getVerifiedEmails,normalizeVerifiedEmail} from "../identity/contact-service";
 import { createHash,randomUUID } from "node:crypto";
 import { and,desc,eq,inArray,sql } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
@@ -23,7 +25,7 @@ async function receipt(tx:ScopedTransaction,personId:string,terminalId:string,ki
  if(old){if(old.targetKind!=="MERCHANT_TERMINAL"||old.merchantUnitId!==terminalId||old.actorId!==personId||old.kind!==kind||old.digest!==digest)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return old.resourceId;}
  const resourceId=await run();await tx.insert(accessCommands).values({targetKind:"MERCHANT_TERMINAL",merchantUnitId:terminalId,actorId:personId,commandId:input.commandId,kind,resourceId,digest});return resourceId;
 }
-async function history(tx:ScopedTransaction,terminalId:string,actorId:string,personId:string,kind:string,invitationId?:string){await tx.insert(accessHistory).values({targetKind:"MERCHANT_TERMINAL",merchantUnitId:terminalId,actorId,personId,kind,invitationId,message:"Access to this terminal updated.",});}
+async function history(tx:ScopedTransaction,terminalId:string,actorId:string,personId:string|null,kind:string,invitationId?:string){await tx.insert(accessHistory).values({targetKind:"MERCHANT_TERMINAL",merchantUnitId:terminalId,actorId,personId,kind,invitationId,message:"Access to this terminal updated.",});}
 function sameOwner(scope:Scope,terms:typeof terminalInvitationTerms.$inferSelect){return scope.ownerAccess&&terms.grantedByPersonId===scope.policy.actorPersonId&&terms.ownerMembershipVersion===scope.ownerMember?.version;}
 async function personProjection(tx:ScopedTransaction,scope:Scope,row:typeof terminalAssignments.$inferSelect):Promise<MerchantAccessPerson>{
  const [person]=await tx.select().from(people).where(eq(people.id,row.personId));
@@ -36,13 +38,13 @@ export async function merchantInvitationProjection(tx:ScopedTransaction,row:Invi
  const [terminal]=await tx.select().from(merchantTerminals).where(eq(merchantTerminals.id,row.merchantUnitId));
  if(!terms||!terminal)throw new SecurityError("INVITATION_UNAVAILABLE",404);
  const [merchant]=await tx.select().from(services).where(eq(services.id,terminal.merchantServiceId));
- const persons=await tx.select().from(people).where(inArray(people.id,[row.inviterId,row.recipientId]));
+ const persons=await tx.select().from(people).where(inArray(people.id,row.recipientId?[row.inviterId,row.recipientId]:[row.inviterId]));
  const timestamp=scope?.now??await merchantNow(tx);
  const status=row.status==="PENDING"&&(row.expiresAt<=timestamp||!!terms.accessExpiresAt&&terms.accessExpiresAt<=timestamp)?"EXPIRED":row.status;
  let canRespond=false,hasMerchantAccess=false;
- if(viewerId===row.recipientId&&status==="PENDING")try{const inviter=await loadTerminalScope(tx,row.inviterId,terminal.id);action(inviter,"merchant.people.invite");canRespond=sameOwner(inviter,terms);}catch(error){if(!(error instanceof SecurityError))throw error;}
- if(viewerId===row.recipientId||scope)try{await loadTerminalScope(tx,row.recipientId,terminal.id);hasMerchantAccess=true;}catch(error){if(!(error instanceof SecurityError))throw error;}
- return {targetKind:"MERCHANT_TERMINAL",id:row.id,terminalId:terminal.id,terminalName:terminal.displayName,merchantServiceId:terminal.merchantServiceId,merchantName:merchant!.displayName,inviterName:persons.find(p=>p.id===row.inviterId)!.displayName,recipientId:row.recipientId,recipientName:persons.find(p=>p.id===row.recipientId)!.displayName,permissions:[...TERMINAL_PERMISSIONS],status,version:row.version,createdAt:row.createdAt.toISOString(),expiresAt:row.expiresAt.toISOString(),accessExpiresAt:terms.accessExpiresAt?.toISOString()??null,canRespond,canRevoke:status==="PENDING"&&!!scope&&evaluate(scope.policy,"merchant.people.revoke").allowed,hasMerchantAccess,href:`/merchants/${terminal.id}`};
+ if(await isInvitationRecipient(tx,row,viewerId)&&status==="PENDING")try{const inviter=await loadTerminalScope(tx,row.inviterId,terminal.id);action(inviter,"merchant.people.invite");canRespond=sameOwner(inviter,terms);}catch(error){if(!(error instanceof SecurityError))throw error;}
+ if(row.recipientId&&(viewerId===row.recipientId||scope))try{await loadTerminalScope(tx,row.recipientId,terminal.id);hasMerchantAccess=true;}catch(error){if(!(error instanceof SecurityError))throw error;}
+ return {targetKind:"MERCHANT_TERMINAL",id:row.id,terminalId:terminal.id,terminalName:terminal.displayName,merchantServiceId:terminal.merchantServiceId,merchantName:merchant!.displayName,inviterName:persons.find(p=>p.id===row.inviterId)!.displayName,recipientId:row.recipientId,recipientEmail:row.recipientEmail,recipientName:persons.find(p=>p.id===row.recipientId)?.displayName??row.recipientEmail??"Terminal user",permissions:[...TERMINAL_PERMISSIONS],status,version:row.version,createdAt:row.createdAt.toISOString(),expiresAt:row.expiresAt.toISOString(),accessExpiresAt:terms.accessExpiresAt?.toISOString()??null,canRespond,canRevoke:status==="PENDING"&&!!scope&&evaluate(scope.policy,"merchant.people.revoke").allowed,hasMerchantAccess,href:`/merchants/${terminal.id}`};
 }
 export async function getMerchantAccessOverview(personId:string,terminalId:string):Promise<MerchantAccessOverview>{return getDb().transaction(async tx=>{
  const scope=await loadTerminalScope(tx,personId,terminalId,false,{read:true});action(scope,"merchant.people.read");
@@ -54,40 +56,42 @@ export async function getMerchantAccessOverview(personId:string,terminalId:strin
  const [owner]=await tx.select().from(people).where(eq(people.id,scope.merchantService.primaryPersonId));
  return {terminalId,terminalName:scope.terminal.displayName,merchantName:scope.merchantService.displayName,canInvite:evaluate(scope.policy,"merchant.people.invite").allowed,invitationTotal:counts!.total,pendingInvitationCount:counts!.pending,invitationsTruncated:counts!.total>rows.length,controllers:[{personId:owner!.id,displayName:owner!.displayName,basis:"OWNER_MEMBER"}],people:persons,invitations,notice:"Terminal users can receive payments, view this terminal’s records and respond to disputes. Only the account owner manages money and access."};
 },{isolationLevel:"repeatable read"});}
-export async function createMerchantInvitation(personId:string,terminalId:string,raw:CreateMerchantInvitationInput):Promise<MerchantInvitationProjection>{const input=parse(createMerchantInvitationSchema,raw);return getDb().transaction(async tx=>{
+export async function createMerchantInvitation(personId:string,terminalId:string,raw:CreateMerchantInvitationInput):Promise<MerchantInvitationProjection>{const input=parse(createMerchantInvitationSchema,raw),recipientEmail=input.recipientEmail?normalizeVerifiedEmail(input.recipientEmail):null;return getDb().transaction(async tx=>{
  const scope=await loadTerminalScope(tx,personId,terminalId,true);action(scope,"merchant.people.invite");
  const id=await receipt(tx,personId,terminalId,"terminal.invitation.create",input,null,async()=>{
-  await requireMerchantParticipant(tx,input.recipientId);if(input.recipientId===personId)throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
+  if(input.recipientId)await requireMerchantParticipant(tx,input.recipientId);if(input.recipientId===personId||(recipientEmail&&(await getVerifiedEmails(tx,personId)).includes(recipientEmail)))throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
   if(scope.liveAssignments.some(row=>row.personId===input.recipientId))throw new SecurityError("ALREADY_MERCHANT_MEMBER",409);
   const timestamp=await merchantNow(tx),expiresAt=new Date(timestamp.getTime()+input.expiresInDays*86400000);
-  const pending=await tx.select({invitation:serviceInvitations,terms:terminalInvitationTerms}).from(serviceInvitations).leftJoin(terminalInvitationTerms,eq(terminalInvitationTerms.invitationId,serviceInvitations.id)).where(and(eq(serviceInvitations.merchantUnitId,terminalId),eq(serviceInvitations.recipientId,input.recipientId),eq(serviceInvitations.status,"PENDING")));
+  const pending=await tx.select({invitation:serviceInvitations,terms:terminalInvitationTerms}).from(serviceInvitations).leftJoin(terminalInvitationTerms,eq(terminalInvitationTerms.invitationId,serviceInvitations.id)).where(and(eq(serviceInvitations.merchantUnitId,terminalId),input.recipientId?eq(serviceInvitations.recipientId,input.recipientId):eq(serviceInvitations.recipientEmail,recipientEmail!),eq(serviceInvitations.status,"PENDING")));
   for(const {invitation:row,terms} of pending){if(row.expiresAt>timestamp&&(!terms?.accessExpiresAt||terms.accessExpiresAt>timestamp))throw new SecurityError("PENDING_INVITATION_EXISTS",409);await tx.update(serviceInvitations).set({status:"EXPIRED",version:row.version+1,decidedAt:timestamp}).where(eq(serviceInvitations.id,row.id));}
-  const createdId=randomUUID();await tx.insert(serviceInvitations).values({id:createdId,targetKind:"MERCHANT_TERMINAL",merchantUnitId:terminalId,inviterId:personId,recipientId:input.recipientId,createdAt:timestamp,expiresAt});
+  const createdId=randomUUID();await tx.insert(serviceInvitations).values({id:createdId,targetKind:"MERCHANT_TERMINAL",merchantUnitId:terminalId,inviterId:personId,recipientId:input.recipientId??null,recipientEmail,createdAt:timestamp,expiresAt});
   await tx.insert(terminalInvitationTerms).values({invitationId:createdId,terminalId,grantedByPersonId:personId,ownerMembershipVersion:scope.ownerMember!.version});
   for(const name of TERMINAL_PERMISSIONS)await tx.insert(invitationPermissions).values({invitationId:createdId,action:name,delegable:false});
-  await history(tx,terminalId,personId,input.recipientId,"TERMINAL_INVITED",createdId);return createdId;
+  await history(tx,terminalId,personId,input.recipientId??null,"TERMINAL_INVITED",createdId);return createdId;
  });
  const [row]=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.id,id));return merchantInvitationProjection(tx,row!,personId,scope);
 });}
 /** Only the persisted recipient may accept, and current owner authority is checked before replay. */
 export async function decideMerchantInvitation(tx:ScopedTransaction,personId:string,initial:Invite,input:InvitationDecisionInput,decision:"accept"|"decline"):Promise<void>{
- if(initial.targetKind!=="MERCHANT_TERMINAL"||!initial.merchantUnitId||initial.recipientId!==personId)throw new SecurityError("INVITATION_UNAVAILABLE",404);
+ if(initial.targetKind!=="MERCHANT_TERMINAL"||!initial.merchantUnitId||!await isInvitationRecipient(tx,initial,personId))throw new SecurityError("INVITATION_UNAVAILABLE",404);
  const terminalId=initial.merchantUnitId;
  const [terminal]=await tx.select().from(merchantTerminals).where(eq(merchantTerminals.id,terminalId));if(!terminal)throw new SecurityError("INVITATION_UNAVAILABLE",404);
  let inviter:Scope|undefined;
  if(decision==="accept")try{inviter=await loadTerminalScope(tx,initial.inviterId,terminalId,true);action(inviter,"merchant.people.invite");}catch(error){if(error instanceof SecurityError)throw new SecurityError("INVITER_ACCESS_CHANGED",409);throw error;}
  else {await lockMoneyAccountsForServices(tx,[terminal.merchantServiceId]);await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+terminal.merchantServiceId},0))`);await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"terminal:"+terminalId},0))`);}
  const [row]=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.id,initial.id)).for("update");const [terms]=await tx.select().from(terminalInvitationTerms).where(eq(terminalInvitationTerms.invitationId,initial.id));
- if(!row||!terms||row.recipientId!==personId)throw new SecurityError("INVITATION_UNAVAILABLE",404);
+ if(!row||!terms||!await isInvitationRecipient(tx,row,personId))throw new SecurityError("INVITATION_UNAVAILABLE",404);
+ if(row.inviterId===personId)throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
  if(inviter&&!sameOwner(inviter,terms))throw new SecurityError("INVITER_ACCESS_CHANGED",409);
  await receipt(tx,personId,terminalId,`terminal.invitation.${decision}`,input,row.id,async()=>{
   version(row.version,input.expectedVersion);const timestamp=await merchantNow(tx);if(row.status!=="PENDING")throw new SecurityError("INVITATION_ALREADY_USED",422);if(row.expiresAt<=timestamp||!!terms.accessExpiresAt&&terms.accessExpiresAt<=timestamp)throw new SecurityError("INVITATION_EXPIRED",422);
+  await tx.update(serviceInvitations).set({recipientId:personId,status:decision==="accept"?"ACCEPTED":"DECLINED",version:row.version+1,decidedAt:timestamp}).where(eq(serviceInvitations.id,row.id));
   if(decision==="accept"){
    if(inviter!.liveAssignments.some(item=>item.personId===personId))throw new SecurityError("ALREADY_MERCHANT_MEMBER",409);
    await tx.update(terminalAssignments).set({state:"REVOKED",version:sql`${terminalAssignments.version}+1`,revokedAt:timestamp}).where(and(eq(terminalAssignments.terminalId,terminalId),eq(terminalAssignments.personId,personId),eq(terminalAssignments.state,"ACCEPTED")));
    await tx.insert(terminalAssignments).values({terminalId,personId,grantedByPersonId:terms.grantedByPersonId,ownerMembershipVersion:terms.ownerMembershipVersion,expiresAt:terms.accessExpiresAt,createdAt:timestamp});
   }
-  await tx.update(serviceInvitations).set({status:decision==="accept"?"ACCEPTED":"DECLINED",version:row.version+1,decidedAt:timestamp}).where(eq(serviceInvitations.id,row.id));await history(tx,terminalId,personId,personId,`TERMINAL_INVITATION_${decision.toUpperCase()}`,row.id);return row.id;
+  await history(tx,terminalId,personId,personId,`TERMINAL_INVITATION_${decision.toUpperCase()}`,row.id);return row.id;
  });
 }
 export async function revokeMerchantInvitation(personId:string,terminalId:string,invitationId:string,raw:InvitationDecisionInput):Promise<MerchantInvitationProjection>{const input=parse(invitationDecisionSchema,raw);return getDb().transaction(async tx=>{

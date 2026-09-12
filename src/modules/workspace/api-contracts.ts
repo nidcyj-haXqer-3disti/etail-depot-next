@@ -1,7 +1,7 @@
 import {cardSpendingSchema,topupReceiptSchema,fundingIntentSchema} from "../../shared/funding-response";
 export {cardSpendingSchema} from "../../shared/funding-response";
 import {topupCommandSchema,spendingLimitCommandSchema} from "./funding-contracts";
-import {prepareCardCheckoutSchema,cardCheckoutReviewSchema} from "../acquiring/card-checkout-contracts";
+import {cardCheckoutReviewSchema} from "../acquiring/card-checkout-contracts";
 import { z } from "zod";
 import { cardControlCommandSchema, startCardRequestSchema, cardDraftCommandSchema, versionedCommandSchema, notificationCommandSchema } from "./contracts";
 
@@ -9,10 +9,10 @@ const id=z.uuid();
 const version=z.int().positive();
 const money=z.object({minor:z.string().regex(/^-?(0|[1-9][0-9]*)$/),currency:z.literal("USD"),formatted:z.string()}).strict();
 const service=z.object({id,kind:z.enum(["CARDHOLDER","MERCHANT"]),primaryPersonId:id,displayName:z.string(),role:z.enum(["OWNER","CARDHOLDER"]),status:z.enum(["DRAFT","ACTIVE","SUSPENDED","CLOSED"]),version,cardholderRole:z.enum(["OWNER","CARDHOLDER","NONE"])}).strict();
-export const workspaceCardSchema=z.object({id,serviceId:id,holderId:id,holderName:z.string(),relationship:z.enum(["OWNER","CARDHOLDER"]),nickname:z.string(),lastFour:z.string().regex(/^[0-9]{4}$/),format:z.enum(["VIRTUAL","PHYSICAL"]),status:z.enum(["ACTIVE","FROZEN"]),version,spending:cardSpendingSchema,available:money,canPurchase:z.boolean(),purchaseAvailability:z.object({code:z.enum(["READY","OTHER_CARDHOLDER","ACCESS_RESTRICTED","SETUP_REQUIRED","FROZEN","NO_FUNDS"]),title:z.string(),description:z.string()}).strict(),canFreeze:z.boolean(),canUnfreeze:z.boolean(),freeze:z.object({primary:z.boolean(),holder:z.boolean(),reviewRequired:z.boolean(),description:z.string(),freezeLabel:z.string(),unfreezeLabel:z.string(),unfreezeDescription:z.string()}).strict(),fictional:z.literal(true)}).strict();
+export const workspaceCardSchema=z.object({id,serviceId:id,holderId:id.nullable(),holderName:z.string(),assignmentState:z.enum(["UNASSIGNED","ACCEPTED","REVOKED"]),network:z.literal("VISA"),canInvite:z.boolean(),canRevokeAssignment:z.boolean(),relationship:z.enum(["OWNER","CARDHOLDER","UNASSIGNED"]),nickname:z.string(),lastFour:z.string().regex(/^[0-9]{4}$/),format:z.enum(["VIRTUAL","PHYSICAL"]),status:z.enum(["ACTIVE","FROZEN"]),version,spending:cardSpendingSchema,available:money,canPurchase:z.boolean(),purchaseAvailability:z.object({code:z.enum(["READY","UNASSIGNED","REVOKED","OTHER_CARDHOLDER","ACCESS_RESTRICTED","SETUP_REQUIRED","FROZEN","NO_FUNDS"]),title:z.string(),description:z.string()}).strict(),canFreeze:z.boolean(),canUnfreeze:z.boolean(),freeze:z.object({primary:z.boolean(),holder:z.boolean(),reviewRequired:z.boolean(),description:z.string(),freezeLabel:z.string(),unfreezeLabel:z.string(),unfreezeDescription:z.string()}).strict(),fictional:z.literal(true)}).strict();
 export const workspaceActivitySchema=z.object({id,serviceId:id,cardId:id.nullable(),title:z.string(),category:z.string(),occurredAt:z.iso.datetime(),status:z.enum(["POSTED","PENDING","DECLINED"]),direction:z.enum(["DEBIT","CREDIT"]),amount:money,description:z.string(),fictional:z.literal(true)}).strict();
 export const cardPurchaseResultSchema=z.object({card:workspaceCardSchema,activity:workspaceActivitySchema,journalId:id,fictional:z.literal(true)}).strict();
-export const cardRequestProjectionSchema=z.object({id,serviceId:id,holderId:id,holderName:z.string(),nickname:z.string(),format:z.enum(["VIRTUAL","PHYSICAL"]),currency:z.literal("USD"),allowance:money,status:z.enum(["DRAFT","BLOCKED","CANCELED","ISSUED"]),issuedCardId:id.nullable(),canSubmit:z.boolean(),version,updatedAt:z.iso.datetime(),prerequisites:z.array(z.object({code:z.string(),title:z.string(),detail:z.string()}).strict())}).strict();
+export const cardRequestProjectionSchema=z.object({id,serviceId:id,holderId:id.nullable(),holderName:z.string(),nickname:z.string(),format:z.enum(["VIRTUAL","PHYSICAL"]),currency:z.literal("USD"),allowance:money,status:z.enum(["DRAFT","BLOCKED","CANCELED","ISSUED"]),issuedCardId:id.nullable(),canSubmit:z.boolean(),version,updatedAt:z.iso.datetime(),prerequisites:z.array(z.object({code:z.string(),title:z.string(),detail:z.string()}).strict())}).strict();
 export const notificationPreferencesSchema=z.object({serviceActivity:z.boolean(),cardControls:z.boolean(),caseUpdates:z.boolean(),version,delivery:z.literal("SAVED_ONLY")}).strict();
 export const workspaceProjectionSchema=z.object({
   customerService:z.object({id,displayName:z.string(),primaryName:z.string()}).strict().optional(),
@@ -39,11 +39,11 @@ export const workspaceOperations=[
  {path:`${prefix}/funds/intents/{intentId}`,method:"post",request:z.object({}).strict(),response:topupReceiptSchema,status:200,authenticated:true},
  {path:`${prefix}/cards/{cardId}/spending-limit`,method:"get",response:cardSpendingSchema,status:200,authenticated:true},
  {path:`${prefix}/cards/{cardId}/spending-limit`,method:"put",request:spendingLimitCommandSchema,response:cardSpendingSchema,status:200,authenticated:true},
- {path:"/api/v1/checkout/{publicationId}/card",method:"post",request:prepareCardCheckoutSchema,response:checkoutReviewSchema,status:200,authenticated:true},
  {path:"/api/v1/checkout/{publicationId}/card/{attemptId}",method:"get",response:checkoutReviewSchema,status:200,authenticated:true},
  {path:"/api/v1/checkout/{publicationId}/card/{attemptId}",method:"post",request:z.object({}).strict(),response:checkoutReviewSchema,status:200,authenticated:true},
   {path:"/api/v1/cardholder-services",method:"get",query:cardholderDashboardQuerySchema,response:cardholderDashboardSchema,status:200,authenticated:true},
   {path:`${prefix}/workspace`,method:"get",response:workspaceProjectionSchema,status:200,authenticated:true},
+  {path:`${prefix}/cards/{cardId}/recipient/revoke`,method:"post",request:versionedCommandSchema,response:workspaceCardSchema,status:200,authenticated:true},
   {path:`${prefix}/cards/{cardId}/control`,method:"post",request:cardControlCommandSchema,response:workspaceCardSchema,status:200,authenticated:true},
   {path:`${prefix}/card-requests`,method:"post",request:startCardRequestSchema,response:cardRequestProjectionSchema,status:200,authenticated:true},
   {path:`${prefix}/card-requests/{requestId}`,method:"patch",request:cardDraftCommandSchema,response:cardRequestProjectionSchema,status:200,authenticated:true},

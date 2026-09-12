@@ -5,13 +5,15 @@ import type { ServiceSummary } from "../services/service";
 export interface Money { minor: string; currency: "USD"; formatted: string }
 export interface WorkspaceCapability { action: string; allowed: boolean; reason: string; reasonCode: string }
 export interface CardPurchaseAvailability {
-  code: "READY" | "OTHER_CARDHOLDER" | "ACCESS_RESTRICTED" | "SETUP_REQUIRED" | "FROZEN" | "NO_FUNDS";
+  code: "READY" | "UNASSIGNED" | "REVOKED" | "OTHER_CARDHOLDER" | "ACCESS_RESTRICTED" | "SETUP_REQUIRED" | "FROZEN" | "NO_FUNDS";
   title: string;
   description: string;
 }
 export interface WorkspaceCard {
-  id: string; serviceId: string; holderId: string; holderName: string; nickname: string;
-  relationship: "OWNER" | "CARDHOLDER";
+  id: string; serviceId: string; holderId: string | null; holderName: string; nickname: string;
+  assignmentState: "UNASSIGNED" | "ACCEPTED" | "REVOKED"; network: "VISA";
+  canInvite: boolean; canRevokeAssignment: boolean;
+  relationship: "OWNER" | "CARDHOLDER" | "UNASSIGNED";
   lastFour: string; format: "VIRTUAL" | "PHYSICAL"; status: "ACTIVE" | "FROZEN";
   version: number; spending: import("./funding-contracts").CardSpending; available: Money;
   canFreeze: boolean; canUnfreeze: boolean; canPurchase: boolean; fictional: true;
@@ -29,7 +31,7 @@ export interface WorkspacePerson {
   permissions: string[]; isCurrentPerson: boolean;
 }
 export interface CardRequestProjection {
-  id: string; serviceId: string; holderId: string; holderName: string; nickname: string;
+  id: string; serviceId: string; holderId: string | null; holderName: string; nickname: string;
   format: "VIRTUAL" | "PHYSICAL"; currency: "USD"; allowance: Money;
   status: "DRAFT" | "BLOCKED" | "CANCELED" | "ISSUED"; version: number; updatedAt: string;
   issuedCardId: string | null; canSubmit: boolean;
@@ -56,7 +58,7 @@ export const cardPurchaseCommandSchema = z.object({ commandId: z.uuid(), expecte
 export type CardPurchaseCommand = z.infer<typeof cardPurchaseCommandSchema>;
 export const startCardRequestSchema = z.object({ commandId: z.uuid() }).strict();
 export const cardDraftCommandSchema = z.object({
-  commandId: z.uuid(), expectedVersion: versionSchema, holderId: z.uuid(),
+  commandId: z.uuid(), expectedVersion: versionSchema, holderId: z.uuid().nullable(),
   allowanceMinor:z.string().regex(/^(0|[1-9][0-9]{0,11})$/),
   nickname: z.string().trim().min(1).max(60), format: z.enum(["VIRTUAL", "PHYSICAL"]),
 }).strict();

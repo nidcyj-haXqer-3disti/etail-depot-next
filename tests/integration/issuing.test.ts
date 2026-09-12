@@ -11,7 +11,7 @@ import { getBalance } from "../../src/modules/ledger";
 import { ledgerJournals, ledgerEntries } from "../../src/modules/ledger/schema";
 import { getWorkspace, controlCard, startCardRequest, updateCardRequest, submitCardRequest, purchaseCard } from "../../src/modules/workspace/service";
 import { cardPurchaseResultSchema } from "../../src/modules/workspace/api-contracts";
-import { fundCardGroup, setCardAllowance } from "../helpers/cardholder";
+import { assignPracticeCard, fundCardGroup, setCardAllowance } from "../helpers/cardholder";
 afterAll(closeDatabase);
 
 async function fixture() {
@@ -29,15 +29,16 @@ async function holder(serviceId: string, personaKind: "FICTIONAL_ADULT" | "FICTI
   await getDb().insert(permissionGrants).values(["cards.read", "cards.hold", "cards.purchase", "activity.read"].map(action => ({ serviceId, personId: person.personId, action })));
   return person.personId;
 }
-async function savedDraft(personId: string, serviceId: string, holderId = personId) {
+async function savedDraft(personId: string, serviceId: string, holderId: string|null = personId) {
   const draft = await startCardRequest(personId, serviceId, { commandId: randomUUID() });
   return updateCardRequest(personId, serviceId, draft.id, {allowanceMinor:"0", commandId: randomUUID(), expectedVersion: draft.version, holderId, nickname: "Practice groceries", format: "VIRTUAL" });
 }
 async function issue(personId: string, serviceId: string, holderId = personId) {
-  const draft = await savedDraft(personId, serviceId, holderId);
+  const draft = await savedDraft(personId, serviceId, holderId===personId?holderId:null);
   const input = { commandId: randomUUID(), expectedVersion: draft.version };
   const issued = await submitCardRequest(personId, serviceId, draft.id, input);
   expect(issued.status).toBe("ISSUED");
+  if(holderId!==personId)await assignPracticeCard(personId,serviceId,issued.issuedCardId!,holderId);
   const card = (await getWorkspace(personId, serviceId)).cards.find(card => card.id === issued.issuedCardId)!;
   return { draft, input, issued, card };
 }
@@ -73,15 +74,14 @@ describe("one sandbox issuance with independent group funding and card allowance
       expect.objectContaining({ bucket: "MONEY_SOURCE", cardId: null, deltaMinor: -12501n }),
     ]));
   });
-  it("allows an unfunded adult card but keeps supervised-holder requests blocked without a card or journal", async () => {
+  it("creates an unfunded card first but rejects a supervised recipient without assigning or funding it", async () => {
     const { personId, serviceId } = await fixture(); const supervised = await holder(serviceId, "FICTIONAL_SUPERVISED");
     const adult = await issue(personId, serviceId);
     expect(adult.card).toMatchObject({ available: { minor: "0" }, canPurchase: false });
-    const draft = await savedDraft(personId, serviceId, supervised);
-    expect(draft.canSubmit).toBe(false); expect(draft.prerequisites.map(item => item.code)).toContain("GUARDIAN_REQUIRED");
-    const blocked = await submitCardRequest(personId, serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version });
-    expect(blocked).toMatchObject({ status: "BLOCKED", issuedCardId: null, canSubmit: false });
-    expect(await getDb().select().from(cards).where(eq(cards.requestId, draft.id))).toEqual([]);
+    const draft = await savedDraft(personId, serviceId, null);
+    const created=await submitCardRequest(personId,serviceId,draft.id,{commandId:randomUUID(),expectedVersion:draft.version});
+    await expect(assignPracticeCard(personId,serviceId,created.issuedCardId!,supervised)).rejects.toMatchObject({code:"CARD_APPLICANT_REQUIRED"});
+    expect((await getWorkspace(personId,serviceId)).cards.find(row=>row.id===created.issuedCardId)).toMatchObject({assignmentState:"UNASSIGNED",holderId:null,canPurchase:false});
     expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId, serviceId))).toEqual([]);
   });
   it("requires current creation authority and adult eligibility before issuing", async () => {
@@ -106,16 +106,16 @@ describe("one sandbox issuance with independent group funding and card allowance
     expect((await getWorkspace(personId,serviceId)).cardholderOptions.map(item=>item.id)).toEqual([personId]);
     await expect(controlCard(personId,serviceId,card.id,{commandId:randomUUID(),expectedVersion:1,action:"freeze"})).rejects.toThrow("ACTION_DENIED");
     const draft=await startCardRequest(personId,serviceId,{commandId:randomUUID()});
-    await expect(updateCardRequest(personId,serviceId,draft.id,{allowanceMinor:"0",commandId:randomUUID(),expectedVersion:1,holderId:another,nickname:"Another card",format:"VIRTUAL"})).rejects.toThrow("ACTION_DENIED");
-    const purchase=await purchaseCard(another,serviceId,card.id,{commandId:randomUUID(),expectedVersion:1,amountMinor:"501",description:"Holder practice purchase"});
+    await expect(updateCardRequest(personId,serviceId,draft.id,{allowanceMinor:"0",commandId:randomUUID(),expectedVersion:1,holderId:another,nickname:"Another card",format:"VIRTUAL"})).rejects.toThrow("CARD_RECIPIENT_INVITATION_REQUIRED");
+    const purchase=await purchaseCard(another,serviceId,card.id,{commandId:randomUUID(),expectedVersion:card.version,amountMinor:"501",description:"Holder practice purchase"});
     expect(purchase.card.available.minor).toBe("9499");
   });
   it("permits invited holders and requires account ownership before issuing", async () => {
     const firstGroup=await fixture(); const outside=await holder(firstGroup.serviceId);
     await getDb().insert(permissionGrants).values({serviceId:firstGroup.serviceId,personId:firstGroup.personId,action:"cards.manageMembers"}).onConflictDoNothing();
     const draft=await startCardRequest(firstGroup.personId,firstGroup.serviceId,{commandId:randomUUID()});
-    expect(await updateCardRequest(firstGroup.personId,firstGroup.serviceId,draft.id,{allowanceMinor:"0",commandId:randomUUID(),expectedVersion:1,holderId:outside,nickname:"Named additional card",format:"VIRTUAL"})).toMatchObject({holderId:outside,canSubmit:true});
-    expect((await getWorkspace(firstGroup.personId,firstGroup.serviceId)).cardholderOptions.map(item=>item.id)).toEqual(expect.arrayContaining([firstGroup.personId,outside]));
+    await expect(updateCardRequest(firstGroup.personId,firstGroup.serviceId,draft.id,{allowanceMinor:"0",commandId:randomUUID(),expectedVersion:1,holderId:outside,nickname:"Named additional card",format:"VIRTUAL"})).rejects.toMatchObject({code:"CARD_RECIPIENT_INVITATION_REQUIRED"});
+    expect((await getWorkspace(firstGroup.personId,firstGroup.serviceId)).cardholderOptions.map(item=>item.id)).toEqual([firstGroup.personId]);
     const secondGroup=await fixture(); const manager=await holder(secondGroup.serviceId,"FICTIONAL_ADULT");
     await revoke(secondGroup.serviceId,manager,"cards.hold");await revoke(secondGroup.serviceId,manager,"cards.purchase");
     await getDb().insert(permissionGrants).values(["cards.request","cards.create","cards.manageMembers"].map(action=>({serviceId:secondGroup.serviceId,personId:manager,action})));

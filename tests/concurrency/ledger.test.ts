@@ -28,7 +28,7 @@ async function cardFixture() {
     // Structural legacy-ledger fixture with zero limits and no funding at issuance.
     // Only the legacy CARD_FUNDING primitive is used here; product races below use canonical commands.
     const [request] = await tx.insert(cardRequests).values({ serviceId: service!.id, creatorId: person!.id, holderId: person!.id, nickname: "Ledger fixture request", format: "VIRTUAL", requestedLimitMinor: 0n, status: "ISSUED" }).returning();
-    const [card] = await tx.insert(cards).values({ serviceId: service!.id, requestId: request!.id, holderId: person!.id, nickname: "Fictional concurrent card", lastFour: "0000", format: "VIRTUAL", limitMinor: 0n }).returning();
+    const [card] = await tx.insert(cards).values({ serviceId: service!.id, requestId: request!.id, holderId: person!.id, assignmentState:"ACCEPTED",assignedAt:new Date(), nickname: "Fictional concurrent card", lastFour: "0000", format: "VIRTUAL", limitMinor: 0n }).returning();
     return { serviceId: service!.id, cardId: card!.id };
   });
 }

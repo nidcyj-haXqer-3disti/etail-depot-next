@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { sandboxOverviewSchema } from "../../shared/sandbox-response";
+export { sandboxOverviewSchema } from "../../shared/sandbox-response";
 export const startSandboxSchema = z.object({ commandId:z.uuid(), displayName:z.string().trim().min(1).max(80).regex(/^[^\u0000-\u001f\u007f-\u009f]+$/), acknowledged:z.literal(true) }).strict();
-export const sandboxOverviewSchema = z.object({ joined:z.boolean(), displayName:z.string(), memberCode:z.string().nullable() }).strict();
 export type SandboxOverview = z.infer<typeof sandboxOverviewSchema>;
 export const sandboxRecipientQuerySchema=z.object({code:z.string().trim().toUpperCase().regex(/^ED-[A-F0-9]{20}$/)}).strict();
 export const sandboxOperations=[

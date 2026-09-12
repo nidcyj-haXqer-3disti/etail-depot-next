@@ -55,23 +55,18 @@ test("first service choice survives an unknown setup result without opening fina
   await expect(page.locator("main")).not.toContainText("Account support");
   await page.getByRole("navigation",{name:"Footer support",exact:true}).getByRole("link",{name:"Your profile",exact:true}).click();
   await expect(page).toHaveURL(/\/profile$/);
-  const memberCode=page.getByRole("complementary",{name:"Your member code",exact:true});
-  await expect(memberCode).toBeVisible();
-  await expect(memberCode.locator("code")).toHaveText(participants[0]!.memberCode);
-  // Intercept only clipboard transport: the isolated member's code is the
-  // expected value, and no other user data or OS clipboard is inspected.
-  await page.evaluate(()=>{
-   const copied:string[]=[];
-   Object.defineProperty(navigator.clipboard,"writeText",{configurable:true,value:async(value:string)=>{copied.push(value);}});
-   Object.defineProperty(window,"__copiedMemberCodes",{configurable:true,value:copied});
-  });
-  await memberCode.getByRole("button",{name:"Copy code",exact:true}).click();
-  await expect(memberCode.getByRole("button",{name:"Copied",exact:true})).toBeVisible();
-  expect(await page.evaluate(()=>Reflect.get(window,"__copiedMemberCodes"))).toEqual([participants[0]!.memberCode]);
+  await expect(page.getByRole("heading",{name:"Your profile",exact:true})).toBeVisible();
+  await expect(page.locator(".page-heading")).toContainText("Journey merchant");
+  await expect(page.getByRole("link",{name:"Sign-in & security",exact:true})).toHaveAttribute("href","/security");
+  await expect(page.getByRole("link",{name:"Help with invitations",exact:true})).toHaveAttribute("href","/help#access");
+  await expect(page.locator("main")).not.toContainText(participants[0]!.memberCode);
+  await expect(page.getByRole("button",{name:"Copy code",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("complementary",{name:"Your member code",exact:true})).toHaveCount(0);
+  expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
   expect(bodies).toHaveLength(2);
   await page.getByRole("link",{name:"← Your dashboard",exact:true}).click();
   await expect(page).toHaveURL(/\/services$/);
-  await expect(memberCode).not.toBeVisible();
+  await expect(page.getByRole("complementary",{name:"Your member code",exact:true})).toHaveCount(0);
   await expect(page.getByRole("heading",{name:"Invitations",exact:true})).toHaveCount(0);
  }finally{await sessions.logout(pair);}
 });

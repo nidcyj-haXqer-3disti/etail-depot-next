@@ -1,3 +1,4 @@
+import {prepareSavedCardReview} from "./helpers/prepaid";
 import {randomUUID} from "node:crypto";
 import {mkdir} from "node:fs/promises";
 import {and,eq} from "drizzle-orm";
@@ -130,22 +131,17 @@ async function accessible(page:Page,info:TestInfo,name:string){
   });
   expect(result.violations).toEqual([]);
 }
-async function payFromPublishedLink(
+async function payFromSavedCardCheckout(
   page:Page,
   merchant:Awaited<ReturnType<typeof publishedMerchant>>,
   cardId:string,
 ){
   await page.goto(merchant.publication.publicHref);
   await expect(page.getByRole("heading",{name:merchant.channel.description,level:1,exact:true})).toBeVisible();
-  await page.getByRole("link",{name:"Choose a card",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Choose a card",exact:true})).toBeVisible();
-  await page.getByRole("combobox",{name:"Your card",exact:true}).selectOption(cardId);
-  const prepared=responseFor(page,"/api/v1/checkout/"+merchant.publication.id+"/card");
-  await page.getByRole("button",{name:"Review payment",exact:true}).click();
-  const review=await successful(await prepared,value=>cardCheckoutReviewSchema.parse(value));
-  expect(review.receipt).toBeNull();
-  expect(review.amount.minor).toBe("1250");
-  await expect(page).toHaveURL(url=>url.searchParams.get("review")===review.id);
+  const review=await prepareSavedCardReview(page,merchant.publication.id,cardId);
+  expect(review.receipt).toBeNull();expect(review.amount.minor).toBe("1250");
+  await page.goto(`/checkout/${merchant.publication.id}/card?review=${review.id}`);
+  await expect(page.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();
   await page.reload();
   await expect(page.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();
   const confirmed=responseFor(page,"/api/v1/checkout/"+merchant.publication.id+"/card/"+review.id);
@@ -240,6 +236,8 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
     await expect(form).toBeVisible();
     await expect(form.getByRole("textbox",{name:/starting balance/i})).toHaveCount(0);
     await expect(form.getByLabel(/starting balance/i)).toHaveCount(0);
+    await expect(form.getByRole("radio",{name:/Someone else/})).toBeChecked();
+    await form.getByRole("radio",{name:/^Me /}).check();
     await form.getByRole("textbox",{name:"Card name",exact:true}).fill("Everyday browser card");
     await form.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill("50.00");
     await form.getByRole("button",{name:"Review card",exact:true}).click();
@@ -272,7 +270,7 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
   });
 
   const first=await test.step("pay the published merchant link using the card",async()=>{
-    const paid=await payFromPublishedLink(page,merchant,cardId);
+    const paid=await payFromSavedCardCheckout(page,merchant,cardId);
     expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("8750");
     expect(await getCardSpending(primary.personId,primary.serviceId,cardId)).toMatchObject({
       used:{minor:"1250"},remaining:{minor:"3750"},available:{minor:"3750"},
@@ -327,7 +325,7 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
   });
 
   const second=await test.step("make a separate payment from the same reusable link",async()=>{
-    const paid=await payFromPublishedLink(page,merchant,cardId);
+    const paid=await payFromSavedCardCheckout(page,merchant,cardId);
     expect(paid.id).not.toBe(first.id);
     expect(paid.receipt.paymentId).not.toBe(first.receipt.paymentId);
     expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("8750");

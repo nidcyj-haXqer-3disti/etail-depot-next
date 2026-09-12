@@ -24,7 +24,7 @@ export interface AccessOverview {
   invitationTotal:number; pendingInvitationCount:number; invitationsTruncated:boolean;
   recipients:{id:string;displayName:string}[]; permissionOptions:PermissionOption[]; roleOptions:InvitedRole[];
   notice:string;
-  history:{id:string;personId:string;personName:string;actorName:string;label:string;createdAt:string}[];
+  history:{id:string;personId:string|null;personName:string;actorName:string;label:string;createdAt:string}[];
   historyHasMore:boolean;
 }
 
@@ -32,3 +32,7 @@ export const createInvitationSchema=z.object({commandId:z.uuid(),recipientId:z.u
 export const invitationDecisionSchema=z.object({commandId:z.uuid(),expectedVersion:z.int().positive()}).strict();
 export type CreateInvitationInput=z.infer<typeof createInvitationSchema>;
 export type InvitationDecisionInput=z.infer<typeof invitationDecisionSchema>;
+
+export interface CardInvitationProjection extends Omit<InvitationProjection,"targetKind"|"recipientId"> {targetKind:"CARD";cardId:string;cardName:string;recipientId:string|null;recipientEmail:string|null;allowance:{amount:string;currency:string};href:string}
+export const createCardInvitationSchema=z.object({commandId:z.uuid(),recipientEmail:z.email().max(254),expiresInDays:z.union([z.literal(1),z.literal(3),z.literal(7)])}).strict();
+export type CreateCardInvitationInput=z.infer<typeof createCardInvitationSchema>;

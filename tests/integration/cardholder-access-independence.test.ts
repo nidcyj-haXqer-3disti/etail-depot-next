@@ -35,7 +35,7 @@ describe("explicit Cardholder member lifecycle", () => {
     expect((await getAccessOverview(f.personId,f.serviceId)).people.find(row=>row.id===f.secondary)?.version).toBe(member.version);
   });
 
-  it("keeps revoked history reviewable and requires fresh acceptance before restoring current access", async () => {
+  it("keeps revoked card history reviewable without reviving cards after fresh membership acceptance", async () => {
     const f = await fixture();
     const records = () => getDb().select().from(cards).where(eq(cards.serviceId, f.serviceId)).orderBy(cards.id);
     const before = await records();
@@ -55,11 +55,16 @@ describe("explicit Cardholder member lifecycle", () => {
     expect(await acceptInvitation(f.secondary, invitation.id, acceptance)).toEqual(accepted);
     const current = (await getAccessOverview(f.personId, f.serviceId)).people.find(row => row.id === f.secondary)!;
     expect(current.version).toBe(revoked.version + 1);
-    expect((await getWorkspace(f.secondary, f.serviceId)).cards.map(row => row.id)).toEqual([f.own.card.id]);
+    expect((await getWorkspace(f.secondary, f.serviceId)).cards).toEqual([]);
+    expect((await getWorkspace(f.secondary, f.serviceId)).activity).toEqual([]);
     await revokeMemberAccess(f.personId, f.serviceId, f.secondary, { commandId: randomUUID(), expectedVersion: current.version });
     expect(await acceptInvitation(f.secondary, invitation.id, acceptance)).toMatchObject({ status: "ACCEPTED", hasServiceAccess: false });
     expect((await getCardholderDirectory(f.secondary))).toEqual([]);
-    expect(await records()).toEqual(before);
+    const after = await records();
+    expect(after.find(row=>row.id===f.primaryCard.card.id)).toEqual(before.find(row=>row.id===f.primaryCard.card.id));
+    const original=before.find(row=>row.id===f.own.card.id)!;
+    expect(after.find(row=>row.id===f.own.card.id)).toMatchObject({...original,assignmentState:"REVOKED",assignmentRevokedAt:expect.any(Date),version:original.version+1});
+    expect((await getWorkspace(f.personId,f.serviceId)).activity.some(row=>row.id===f.own.activity!.id)).toBe(true);
   });
 
   it("keeps the lightweight card directory own-only, and removes the entire group after membership revocation", async () => {

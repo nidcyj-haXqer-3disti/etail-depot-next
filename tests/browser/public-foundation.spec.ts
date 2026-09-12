@@ -54,6 +54,13 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
 
 test("public pages have unique canonical metadata and no private data", async ({page,request}) => {
   const titles=new Set<string>();
+  const cardDisclosure = "The cards shown in this sandbox are not live Visa credentials.";
+  const approvedDisclosures: Record<string,string[]> = {
+    "/": [cardDisclosure],
+    "/card-services": [],
+    "/payment-services": ["Visa, Mastercard, American Express and Discover test cards are available in this sandbox."],
+    "/help": [cardDisclosure, "This sandbox uses clearly marked test cards and never asks for real card details."],
+  };
   for (const route of ["/","/card-services","/payment-services","/help"]) {
     await page.goto(route);
     titles.add(await page.title());
@@ -65,7 +72,14 @@ test("public pages have unique canonical metadata and no private data", async ({
     await expect(page.getByRole("heading",{level:1})).toHaveCount(1);
     const data=JSON.parse(await page.locator('script[type="application/ld+json"]').innerText());
     expect(data["@graph"].at(-1).url).toBe(`https://etail-depot-next.netlify.app${route}`);
-    await expect(page.locator("main")).not.toContainText(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice|fixture/i);
+    let editorialText = (await page.locator("main").textContent()) ?? "";
+    // Exact product disclosures prevent sample network cards being mistaken for live credentials.
+    // All other internal/fixture language and private data remain prohibited.
+    for (const disclosure of approvedDisclosures[route]!) {
+      expect(editorialText.split(disclosure)).toHaveLength(2);
+      editorialText = editorialText.replace(disclosure, "");
+    }
+    expect(editorialText).not.toMatch(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice|fixture/i);
     await expect(page.locator(".sandbox-badge")).toHaveCount(1);
     await expect(page.locator(".sandbox-badge")).toHaveText("Sandbox");
     await expect(page.getByRole("navigation", {name:"Footer support"}).getByRole("link", {name:"Help center"})).toBeVisible();

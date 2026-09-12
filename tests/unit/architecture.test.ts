@@ -207,7 +207,10 @@ describe("prepaid review, funding and settlement ownership",()=>{
   expect(probe("src/ui/workspace/people.tsx",access.replace("next.body","otherBody"))).toContain("ACCESS_TRANSPORT_REWRITE");
  });
  it("binds every connected checkout route to its exact method and owner",()=>{
-  for(const [command,suffix,method] of [["prepareCardCheckout","card","POST"],["getCardCheckoutReview","card/[attemptId]","GET"],["confirmCardCheckout","card/[attemptId]","POST"]]){
+  const retired='import {prepareCardCheckout} from "@/modules/acquiring/card-checkout-service";export async function POST(){return prepareCardCheckout();}';
+  expect(probe("src/app/api/v1/checkout/[publicationId]/card/route.ts",retired)).toContain("RETIRED_SIMULATOR_ROUTE");
+  expect(probe("src/app/api/v1/bypass/route.ts",retired)).toContain("RETIRED_SIMULATOR_COMMAND");
+  for(const [command,suffix,method] of [["getCardCheckoutReview","card/[attemptId]","GET"],["confirmCardCheckout","card/[attemptId]","POST"]]){
    const source=`import {${command}} from "@/modules/acquiring/card-checkout-service";export async function ${method}(){return ${command}();}`;
    expect(probe(`src/app/api/v1/checkout/[publicationId]/${suffix}/route.ts`,source)).toEqual([]);
    expect(probe("src/app/api/v1/bypass/route.ts",source)).toContain("PARALLEL_CONNECTED_ROUTE");

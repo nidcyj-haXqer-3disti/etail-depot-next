@@ -7,9 +7,9 @@ import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { identityBindings, permissionGrants } from "../../src/platform/database/schema";
 import { SessionService } from "../../src/modules/identity";
 import { sessionRepository } from "../../src/platform/database/session-repository";
-import { createInvitation, getAccessOverview, listInvitationsForPerson } from "../../src/modules/access/service";
+import { createCardInvitation, getAccessOverview, getCardInvitations, listInvitationsForPerson } from "../../src/modules/access/service";
 import { getWorkspace, startCardRequest, updateCardRequest } from "../../src/modules/workspace/service";
-import {startSandbox} from "../../src/modules/sandbox/service";
+import {createCardUI,signInVerified} from "./helpers/card-invitation";
 import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard } from "../helpers/cardholder";
 
 const origin="http://127.0.0.1:3100";
@@ -96,50 +96,58 @@ test("a lost cancellation survives revoked request access and confirmed retry cl
  expect(current.cardRequests.filter(item=>item.id===saved.id)).toMatchObject([{status:"CANCELED"}]);expect(current.cards).toHaveLength(0);
 });
 
-for(const operation of ["invite","revoke"] as const)test(`lost cardholder ${operation} result cannot change details or discard the original access command`,async({page})=>{
+test("lost exact-card invitation keeps its original email and command through a denied retry",async({page})=>{
  test.setTimeout(90_000);
- const primary=await cardPrimary(`People recovery ${operation} ${randomUUID().slice(0,8)}`);
- const recipient={id:await cardPerson(`Private ${operation} person`),displayName:`Private ${operation} person`};
- const joined=operation==="invite"?await startSandbox(recipient.id,{commandId:randomUUID(),displayName:recipient.displayName,acknowledged:true}):null;
- if(operation!=="invite")await enrollCardholder(primary.personId,primary.serviceId,recipient.id);
- await signIn(page,primary.personId);
- const suffix=operation==="invite"?"/invitations":`/people/${recipient.id}/revoke`;
+ const primary=await cardPrimary(`Invitation recovery ${randomUUID().slice(0,8)}`),email=`invite-recovery-${randomUUID()}@example.test`;
+ await signInVerified(page,primary.personId);const card=await createCardUI(page,"Private invitation recovery card");
  const attempts:unknown[]=[],statuses:number[]=[];
- await page.route(`**/api/v1/cardholder-services/${primary.serviceId}${suffix}`,async route=>{
+ await page.route(`**/api/v1/cardholder-services/${primary.serviceId}/cards/${card.id}/invitations`,async route=>{
   if(route.request().method()==="GET"){await route.continue();return;}
-  attempts.push(route.request().postDataJSON());const result=await route.fetch();statuses.push(result.status());
-  if(attempts.length===1){expect(result.status()).toBe(200);await route.abort("connectionfailed");}else await route.fulfill({response:result});
+  attempts.push(route.request().postDataJSON());const response=await route.fetch();statuses.push(response.status());
+  if(attempts.length===1){expect(response.status()).toBe(200);await route.abort("connectionfailed");}else await route.fulfill({response});
  });
- await page.goto(`/cardholder-services?view=cardholders&manage=${primary.serviceId}${operation==="invite"?"":`&person=${recipient.id}`}`);
- if(operation==="invite"){
-  await page.getByRole("button",{name:"Invite a person",exact:true}).click();
-  await page.getByRole("dialog").getByRole("textbox",{name:"Member code",exact:true}).fill(joined!.memberCode!);
-  await page.getByRole("dialog").getByRole("button",{name:"Find person",exact:true}).click();
-  await expect(page.getByRole("dialog")).toContainText(`Selected: ${recipient.displayName}`);
- }else await page.getByRole("button",{name:"Remove access",exact:true}).click();
- const dialog=page.getByRole("dialog"),retry=dialog.getByRole("button",{name:"Retry this change",exact:true});
- if(operation!=="revoke"){
-  await dialog.getByRole("button",{name:"Review invitation",exact:true}).click();
- }
- await dialog.getByRole("button",{name:operation==="invite"?"Create invitation":"Confirm removal",exact:true}).click();
- await expect(retry).toBeEnabled();await expect(dialog.getByRole("button",{name:operation==="revoke"?"Keep access":"Back",exact:true})).toBeDisabled();
- await page.keyboard.press("Escape");await expect(dialog).toBeVisible();
- const permission=operation==="invite"?"people.invite":"people.revoke";
- await setPermission(primary,permission,"REVOKED");await retry.click();await expect.poll(()=>statuses.length).toBe(2);expect(statuses[1]).toBe(403);
- await expect(page.getByRole("heading",{name:"People are unavailable",exact:true})).toBeVisible();await expect(page.locator("main")).not.toContainText(recipient.displayName);
- const recovery=page.getByRole("button",{name:"Retry this change",exact:true});await expect(recovery).toBeEnabled();
- await setPermission(primary,permission,"ACCEPTED");await recovery.click();await expect.poll(()=>statuses.length).toBe(3);await expect(page.getByRole("heading",{name:"People are unavailable",exact:true})).toHaveCount(0);await expect(recovery).toHaveCount(0);await expect(dialog).toHaveCount(0);
+ await page.goto(`/cards/${card.id}/invite`);await page.getByRole("textbox",{name:"Their email address",exact:true}).fill(email);
+ await page.getByRole("button",{name:"Create invitation",exact:true}).click();
+ const retry=page.getByRole("button",{name:"Check invitation request again",exact:true});await expect(retry).toBeEnabled();
+ await expect(page.getByRole("textbox",{name:"Their email address",exact:true})).toBeDisabled();await expect(page.getByRole("combobox",{name:"Accept within",exact:true})).toBeDisabled();
+ await setPermission(primary,"people.invite","REVOKED");await retry.click();await expect.poll(()=>statuses.length).toBe(2);expect(statuses[1]).toBe(403);
+ await expect(page.getByRole("heading",{name:"Card access is unavailable",exact:true})).toBeVisible();await expect(page.locator("main")).not.toContainText(card.nickname);await expect(page.locator("main")).not.toContainText(email);
+ await expect(retry).toBeEnabled();await setPermission(primary,"people.invite","ACCEPTED");await retry.click();
+ await expect(page.getByRole("region",{name:"Share invitation",exact:true})).toContainText(email);await expect(retry).toHaveCount(0);
  expect(statuses).toEqual([200,403,200]);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[2]).toEqual(attempts[0]);
- const after=await getAccessOverview(primary.personId,primary.serviceId);
- if(operation==="invite")expect(after.invitations.filter(item=>item.recipientId===recipient.id)).toHaveLength(1);
- else{const member=after.people.find(item=>item.id===recipient.id)!;expect(member.state).toBe("REVOKED");}
+ expect((await getCardInvitations(primary.personId,card.id)).invitations).toHaveLength(1);
+ expect((await getWorkspace(primary.personId,primary.serviceId)).cards.find(row=>row.id===card.id)).toMatchObject({holderId:null,assignmentState:"UNASSIGNED"});
 });
 
-for(const decision of ["accept","decline"] as const)test(`lost ${decision} decision survives a later denial and reload without switching invitation decisions`,async({page})=>{
+test("lost cardholder removal hides private details after denial and retries the original card version",async({page})=>{
  test.setTimeout(90_000);
- const primary=await cardPrimary(`Invitation recovery ${randomUUID().slice(0,8)}`),recipient=await cardPerson(`Private ${decision} recipient`);
- const invitation=await createInvitation(primary.personId,primary.serviceId,{commandId:randomUUID(),recipientId:recipient,expiresInDays:3});
- await signIn(page,recipient);const attempts:unknown[]=[];
+ const primary=await cardPrimary(`Removal recovery ${randomUUID().slice(0,8)}`),recipient=await cardPerson("Private removal recipient");
+ await enrollCardholder(primary.personId,primary.serviceId,recipient);
+ const own=await issuePracticeCard(primary.personId,primary.serviceId,recipient,"Private removed card",undefined,"900");await signInVerified(page,primary.personId);
+ const attempts:unknown[]=[],statuses:number[]=[];
+ await page.route(`**/api/v1/cardholder-services/${primary.serviceId}/cards/${own.card.id}/recipient/revoke`,async route=>{
+  attempts.push(route.request().postDataJSON());const response=await route.fetch();statuses.push(response.status());
+  if(attempts.length===1){expect(response.status()).toBe(200);await route.abort("connectionfailed");}else await route.fulfill({response});
+ });
+ await page.goto(`/cardholder-services?card=${own.card.id}`);const dialog=page.getByRole("dialog");
+ await dialog.getByRole("button",{name:"Remove cardholder",exact:true}).click();await dialog.getByRole("button",{name:"Remove cardholder",exact:true}).click();
+ const retry=dialog.getByRole("button",{name:"Retry same removal",exact:true});await expect(retry).toBeEnabled();await expect(dialog.getByRole("button",{name:"Keep cardholder",exact:true})).toBeDisabled();
+ await page.keyboard.press("Escape");await expect(dialog).toBeVisible();
+ await setPermission(primary,"people.revoke","REVOKED");await retry.click();await expect.poll(()=>statuses.length).toBe(2);expect(statuses[1]).toBe(403);
+ await expect(dialog).toHaveAccessibleName("Card access unavailable");await expect(dialog).not.toContainText(own.card.nickname);await expect(dialog).not.toContainText(own.card.holderName);await expect(dialog).not.toContainText(own.card.lastFour);
+ const recovery=dialog.getByRole("button",{name:"Retry saved card removal",exact:true});await expect(recovery).toBeEnabled();await accessibleRecovery(page);
+ await setPermission(primary,"people.revoke","ACCEPTED");await recovery.click();await expect(dialog).toHaveAccessibleName(own.card.nickname);await expect(dialog).toContainText("Card access removed");await expect(recovery).toHaveCount(0);
+ expect(statuses).toEqual([200,403,200]);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[2]).toEqual(attempts[0]);
+ const current=(await getWorkspace(primary.personId,primary.serviceId)).cards.find(row=>row.id===own.card.id)!;
+ expect(current).toMatchObject({holderId:recipient,assignmentState:"REVOKED",version:own.card.version+1});expect((await getWorkspace(recipient,primary.serviceId)).cards).toEqual([]);
+});
+
+for(const decision of ["accept","decline"] as const)test(`lost ${decision} decision survives a later denial and refresh without switching invitation decisions`,async({page})=>{
+ test.setTimeout(90_000);
+ const primary=await cardPrimary(`Invitation recovery ${randomUUID().slice(0,8)}`),recipient=await cardPerson(`Private ${decision} recipient`),email=`decision-${randomUUID()}@example.test`;
+ await signInVerified(page,primary.personId);const card=await createCardUI(page,`Private ${decision} offered card`);
+ const invitation=await createCardInvitation(primary.personId,primary.serviceId,card.id,{commandId:randomUUID(),recipientEmail:email,expiresInDays:3});
+ await signInVerified(page,recipient,email);const attempts:unknown[]=[];
  await page.route(`**/api/v1/invitations/${invitation.id}/${decision}`,async route=>{
   attempts.push(route.request().postDataJSON());
   if(attempts.length===1){const response=await route.fetch();expect(response.status()).toBe(200);await route.fulfill({status:200,contentType:"application/json",body:""});}
@@ -147,16 +155,16 @@ for(const decision of ["accept","decline"] as const)test(`lost ${decision} decis
   else if(attempts.length===2)await route.fulfill({status:403,contentType:"application/json",body:JSON.stringify({error:{code:"FORBIDDEN"}})});
   else await route.continue();
  });
- await page.goto("/shared-access");await page.locator(".ws-person-row").filter({hasText:`Reference ${invitation.id.slice(0,8).toUpperCase()}`}).getByRole("button",{name:"Review invitation",exact:true}).click();
- const dialog=page.getByRole("dialog"),retry=dialog.getByRole("button",{name:"Retry your response",exact:true});
- await dialog.getByRole("button",{name:decision==="accept"?"Accept invitation":"Decline invitation",exact:true}).click();await expect(retry).toBeEnabled();
- for(const name of ["Accept invitation","Decline invitation"])await expect(dialog.getByRole("button",{name,exact:true})).toBeDisabled();
+ await page.goto(`/invitations/${invitation.id}`);await expect(page.getByRole("heading",{name:"Your card invitation",exact:true})).toBeVisible();
+ const retry=page.getByRole("button",{name:"Check your response again",exact:true});
+ await page.getByRole("button",{name:decision==="accept"?"Accept invitation":"Decline invitation",exact:true}).click();await expect(retry).toBeEnabled();
+ for(const name of ["Accept invitation","Decline invitation"])await expect(page.getByRole("button",{name,exact:true})).toBeDisabled();
  await retry.click();await expect.poll(()=>attempts.length).toBe(2);await expect(retry).toBeEnabled();
- await dialog.getByRole("button",{name:"Refresh invitations",exact:true}).click();
- await expect(retry).toBeEnabled();await page.keyboard.press("Escape");await expect(dialog).toBeVisible();
- // The current list already contains the committed decision; retry still sends
- // the original version and command instead of accepting a new decision.
- await retry.click();await expect(dialog).toHaveCount(0);
+ await expect(page.getByRole("heading",{name:"Invitation unavailable",exact:true})).toBeVisible();await expect(page.locator("main")).not.toContainText(card.nickname);
+ await page.getByRole("button",{name:"Refresh invitation",exact:true}).click();await expect(page.getByRole("heading",{name:"Your card invitation",exact:true})).toBeVisible();
+ await expect(retry).toBeEnabled();await expect(page.getByRole("link",{name:"Open your card",exact:true})).toHaveCount(0);
+ // Refresh shows the committed decision but cannot replace the original retry.
+ await retry.click();await expect(retry).toHaveCount(0);
  expect(attempts).toHaveLength(3);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[2]).toEqual(attempts[0]);
  const current=(await listInvitationsForPerson(recipient)).find(item=>item.id===invitation.id)!;
  expect(current.status).toBe(decision==="accept"?"ACCEPTED":"DECLINED");

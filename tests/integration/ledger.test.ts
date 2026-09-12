@@ -22,7 +22,7 @@ async function fixture() {
     // Structural legacy-ledger fixture: explicit request/card provenance with zero limits and no funds.
     // CARD_FUNDING below is a legacy primitive fixture only; product issuance never calls it.
     const [request] = await tx.insert(cardRequests).values({ serviceId: service!.id, creatorId: person!.id, holderId: person!.id, nickname: "Ledger fixture request", format: "VIRTUAL", requestedLimitMinor: 0n, status: "ISSUED" }).returning();
-    const [card] = await tx.insert(cards).values({ serviceId: service!.id, requestId: request!.id, holderId: person!.id, nickname: "Fictional ledger card", lastFour: "0000", format: "VIRTUAL", limitMinor: 0n }).returning();
+    const [card] = await tx.insert(cards).values({ serviceId: service!.id, requestId: request!.id, holderId: person!.id, assignmentState:"ACCEPTED",assignedAt:new Date(), nickname: "Fictional ledger card", lastFour: "0000", format: "VIRTUAL", limitMinor: 0n }).returning();
     const [merchant] = await tx.insert(services).values({ kind: "MERCHANT", primaryPersonId: person!.id, displayName: "Fictional ledger merchant" }).returning();
     const [unit] = await tx.insert(merchantTerminals).values({ merchantServiceId: merchant!.id, displayName: "Fictional ledger master", status: "ACTIVE" }).returning();
     return { serviceId: service!.id, cardId: card!.id, merchantServiceId: merchant!.id, merchantUnitId: unit!.id };

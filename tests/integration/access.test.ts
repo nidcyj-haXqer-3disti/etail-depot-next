@@ -1,6 +1,6 @@
 import {randomUUID} from "node:crypto";
 import {afterAll,expect,it} from "vitest";
-import {and,eq} from "drizzle-orm";
+import {and,eq,sql} from "drizzle-orm";
 import {closeDatabase,getDb} from "../../src/platform/database/client";
 import {serviceMembers,permissionGrants} from "../../src/platform/database/schema";
 import {serviceInvitations,accessCommands} from "../../src/modules/access/schema";
@@ -21,7 +21,7 @@ it("rejects duplicate pending invitations, changed retries and unbound recipient
  const f=await accessFixture(),input=offer(f.recipient.personId);await createInvitation(f.owner.personId,f.serviceId,input);await expect(createInvitation(f.owner.personId,f.serviceId,offer(f.recipient.personId))).rejects.toMatchObject({code:"PENDING_INVITATION_EXISTS"});await expect(createInvitation(f.owner.personId,f.serviceId,{...input,expiresInDays:7})).rejects.toMatchObject({code:"IDEMPOTENCY_CONFLICT"});await expect(createInvitation(f.owner.personId,f.serviceId,offer(randomUUID()))).rejects.toMatchObject({code:"RECIPIENT_UNAVAILABLE"});
 });
 it("decline, sender revocation and exact expiry prevent membership",async()=>{
- for(const mode of ["decline","revoke","expire"] as const){const f=await accessFixture(),invite=await createInvitation(f.owner.personId,f.serviceId,offer(f.recipient.personId));if(mode==="decline")await declineInvitation(f.recipient.personId,invite.id,decision());if(mode==="revoke")await revokeInvitation(f.owner.personId,f.serviceId,invite.id,decision());if(mode==="expire")await getDb().update(serviceInvitations).set({createdAt:new Date("2000-01-01Z"),expiresAt:new Date("2000-01-02Z")}).where(eq(serviceInvitations.id,invite.id));await expect(acceptInvitation(f.recipient.personId,invite.id,decision(mode==="expire"?1:2))).rejects.toThrow();expect(await getDb().select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,f.serviceId),eq(serviceMembers.personId,f.recipient.personId)))).toEqual([]);expect((await createInvitation(f.owner.personId,f.serviceId,offer(f.recipient.personId))).id).not.toBe(invite.id);}
+ for(const mode of ["decline","revoke","expire"] as const){const f=await accessFixture(),invite=await createInvitation(f.owner.personId,f.serviceId,offer(f.recipient.personId));if(mode==="decline")await declineInvitation(f.recipient.personId,invite.id,decision());if(mode==="revoke")await revokeInvitation(f.owner.personId,f.serviceId,invite.id,decision());if(mode==="expire")await getDb().update(serviceInvitations).set({expiresAt:sql`"createdAt"+interval '1 microsecond'`}).where(eq(serviceInvitations.id,invite.id));await expect(acceptInvitation(f.recipient.personId,invite.id,decision(mode==="expire"?1:2))).rejects.toThrow();expect(await getDb().select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,f.serviceId),eq(serviceMembers.personId,f.recipient.personId)))).toEqual([]);expect((await createInvitation(f.owner.personId,f.serviceId,offer(f.recipient.personId))).id).not.toBe(invite.id);}
 });
 it("pending invitations cannot grant data access or carry injected governance settings",async()=>{
  const f=await accessFixture();await createInvitation(f.owner.personId,f.serviceId,offer(f.recipient.personId));

@@ -1,6 +1,8 @@
 import { z } from "zod";
-export const registrationSchema = z.object({ email: z.email().max(254), password: z.string().min(12).max(1024) }).strict();
-export const recoveryRequestSchema = z.object({ email: z.email().max(254) }).strict();
+import { invitationIdFromNextPath } from "../../shared/auth-continuation";
+const invitationNext = z.string().refine(value => invitationIdFromNextPath(value) !== null).optional();
+export const registrationSchema = z.object({ email: z.email().max(254), password: z.string().min(12).max(1024), nextPath: invitationNext }).strict();
+export const recoveryRequestSchema = z.object({ email: z.email().max(254), nextPath: invitationNext }).strict();
 export const emailTokenSchema = z.string().regex(/^[A-Za-z0-9_-]{1,2048}$/);
 export const emailConfirmationSchema = z.object({ token: emailTokenSchema }).strict();
 export const passwordResetSchema = z.object({ token: emailTokenSchema, password: z.string().min(12).max(1024) }).strict();

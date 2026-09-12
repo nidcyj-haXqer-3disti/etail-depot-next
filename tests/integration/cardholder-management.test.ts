@@ -2,6 +2,7 @@ import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import {merchantSetupEligibility} from "../../src/modules/services/schema";
+import {cardRequests} from "../../src/platform/database/schema";
 import {eq} from "drizzle-orm";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { getCardholderDashboard, getCardholderDashboardDetail } from "../../src/modules/workspace/dashboard-service";
@@ -9,7 +10,7 @@ import { cancelCardRequest, startCardRequest, submitCardRequest, updateCardReque
 import { createInvitation,getAccessOverview,revokeInvitation,revokeMemberAccess } from "../../src/modules/access/service";
 import { cardholderDashboardQuerySchema, cardholderDashboardSchema } from "../../src/modules/workspace/api-contracts";
 import { accessOverviewSchema } from "../../src/modules/access/api-contracts";
-import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard } from "../helpers/cardholder";
+import { assignPracticeCard, cardPerson, cardPrimary, enrollCardholder, issuePracticeCard } from "../helpers/cardholder";
 
 afterAll(closeDatabase);
 describe("complete Cardholder management projections", () => {
@@ -21,7 +22,9 @@ describe("complete Cardholder management projections", () => {
     const incomplete=await cardPerson("Incomplete holder");await enrollCardholder(primary.personId,primary.serviceId,incomplete);
     await getDb().delete(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId,incomplete));
     const blocked=await startCardRequest(primary.personId,primary.serviceId,{commandId:randomUUID()});
-    const blockedDetails=await updateCardRequest(primary.personId,primary.serviceId,blocked.id,{allowanceMinor:"0",commandId:randomUUID(),expectedVersion:blocked.version,holderId:incomplete,nickname:"Waiting for holder setup",format:"VIRTUAL"});
+    const blockedDetails=await updateCardRequest(primary.personId,primary.serviceId,blocked.id,{allowanceMinor:"0",commandId:randomUUID(),expectedVersion:blocked.version,holderId:null,nickname:"Waiting for holder setup",format:"VIRTUAL"});
+    // A saved request from before card-first assignment retains its historical holder and must be blocked for review.
+    await getDb().update(cardRequests).set({holderId:incomplete}).where(eq(cardRequests.id,blocked.id));
     await submitCardRequest(primary.personId,primary.serviceId,blocked.id,{commandId:randomUUID(),expectedVersion:blockedDetails.version});
     for(let n=0;n<21;n++)await startCardRequest(primary.personId,primary.serviceId,{commandId:randomUUID()});
     const foreign=await (async()=>{await fundCardGroup(stranger.personId,stranger.serviceId,"900");return issuePracticeCard(stranger.personId, stranger.serviceId, stranger.personId, "Travel 100% private", undefined, "900");})();
@@ -39,22 +42,24 @@ describe("complete Cardholder management projections", () => {
     expect(JSON.stringify(complete)).not.toContain(foreign.card.id);
     expect((await getCardholderDashboard(primary.personId,0,{requestSearch:"%"})).requestCount).toBe(1);
     expect((await getCardholderDashboard(primary.personId,0,{requestSearch:"not present"})).requestCount).toBe(0);
-    expect((await getCardholderDashboard(primary.personId,0,{requestSearch:"Request history primary",requestStatus:"CANCELED"})).requests).toMatchObject([{id:cancel.id,status:"CANCELED"}]);
+    expect((await getCardholderDashboard(primary.personId,0,{requestSearch:"Not assigned",requestStatus:"CANCELED"})).requests).toMatchObject([{id:cancel.id,status:"CANCELED"}]);
   },30_000);
 
   it("shows receipt-backed request history without inventing approval events or duplicating replayed commands", async () => {
     const primary=await cardPrimary("Timeline primary"),secondary=await cardPerson("Timeline secondary");
     await enrollCardholder(primary.personId,primary.serviceId,secondary);
     const draft=await startCardRequest(primary.personId,primary.serviceId,{commandId:randomUUID()});
-    const saved=await updateCardRequest(primary.personId,primary.serviceId,draft.id,{allowanceMinor:"0",commandId:randomUUID(),expectedVersion:draft.version,holderId:secondary,nickname:"Secondary timeline card",format:"VIRTUAL"});
+    const saved=await updateCardRequest(primary.personId,primary.serviceId,draft.id,{allowanceMinor:"0",commandId:randomUUID(),expectedVersion:draft.version,holderId:null,nickname:"Secondary timeline card",format:"VIRTUAL"});
     const command={commandId:randomUUID(),expectedVersion:saved.version};
     await submitCardRequest(primary.personId,primary.serviceId,saved.id,command);
     await submitCardRequest(primary.personId,primary.serviceId,saved.id,command);
+    const created=(await getCardholderDashboardDetail(primary.personId,{request:draft.id}))!.workspace.cardRequests.find(row=>row.id===draft.id)!;
+    await assignPracticeCard(primary.personId,primary.serviceId,created.issuedCardId!,secondary);
     const detail=await getCardholderDashboardDetail(primary.personId,{request:draft.id});
     expect(detail?.requestHistory?.events.map(event=>event.label)).toEqual(["Card creation checked","Card details saved","Request started"]);
     expect(detail?.requestHistory?.hasEarlierEvents).toBe(false);
     expect(detail?.requestHistory?.createdAt).toMatch(/^\d{4}-/);
-    expect(detail?.workspace.cardRequests.find(row=>row.id===draft.id)).toMatchObject({status:"ISSUED",holderId:secondary});
+    expect(detail?.workspace.cardRequests.find(row=>row.id===draft.id)).toMatchObject({status:"ISSUED",holderId:null});
     expect(JSON.stringify(detail?.requestHistory)).not.toMatch(/digest|password|approved|underwriting/);
     await expect(getCardholderDashboardDetail(secondary,{request:draft.id})).rejects.toMatchObject({status:404});
     expect((await getCardholderDashboard(secondary)).requests).toEqual([]);

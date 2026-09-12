@@ -1,7 +1,9 @@
 import { getIdentityConfig, type IdentityConfig } from "@netlify/identity";
 import { assertTrustedOrigin, SecurityError, type AppEnvironment } from "../../../platform/security/origin";
+import { normalizeVerifiedEmail } from "../../../shared/verified-email";
+import type { VerifiedEmailContact } from "../contact-service";
 
-export interface VerifiedIdentity { issuer: string; subject: string; providerConfirmed: true }
+export interface VerifiedIdentity { issuer: string; subject: string; providerConfirmed: true; verifiedEmail?: VerifiedEmailContact }
 export interface NetlifyIdentityConfiguration {
   appEnv: AppEnvironment;
   publicOrigin: string;
@@ -161,11 +163,24 @@ export class NetlifyIdentityAdapter {
     return token;
   }
 
-  private async verifiedUser(endpoint: string, accessToken: string): Promise<VerifiedIdentity> {
+  private async verifiedUser(endpoint: string, accessToken: string, verifyContact = false): Promise<VerifiedIdentity> {
     const user = await this.request(`${endpoint}/user`, { method: "GET", headers: { Authorization: `Bearer ${accessToken}` } }, true);
     if (typeof user.id !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(user.id) || typeof user.confirmed_at !== "string" || !Number.isFinite(Date.parse(user.confirmed_at))) throw new SecurityError("INVALID_CREDENTIALS", 401);
-    // This is provider confirmation, not KYC or independent proof of a formerly auto-confirmed email.
-    return { issuer: endpoint, subject: user.id, providerConfirmed: true };
+    const identity: VerifiedIdentity = { issuer: endpoint, subject: user.id, providerConfirmed: true };
+    const email = normalizeVerifiedEmail(user.email);
+    if (verifyContact && email && Date.parse(user.confirmed_at) <= Date.now()) {
+      // Netlify Identity 2.0.0 maps /user.confirmed_at to its documented email
+      // confirmation field. Trust the bound authenticated /user response and the
+      // current confirmation-required provider policy, never browser email,
+      // user_metadata, new_email or a decoded JWT. This remains IdP attestation.
+      try {
+        const settings = await this.request(`${endpoint}/settings`, { method: "GET" });
+        if (settings.autoconfirm === false && settings.external && typeof settings.external === "object" && (settings.external as Record<string, unknown>).email === true) {
+          identity.verifiedEmail = { emailNormalized: email, provenance: "NETLIFY_USER_CONFIRMED", verifiedAt: new Date(user.confirmed_at).toISOString() };
+        }
+      } catch { /* Login remains available; invitation contact proof fails closed. */ }
+    }
+    return identity;
   }
 
   /** Existing passwords are verified by the provider; enrollment password-strength rules do not apply at login. */
@@ -176,6 +191,6 @@ export class NetlifyIdentityAdapter {
       method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ grant_type: "password", username: email, password }).toString(),
     }, true);
-    return this.verifiedUser(endpoint, this.accessToken(tokens));
+    return this.verifiedUser(endpoint, this.accessToken(tokens), true);
   }
 }

@@ -5,7 +5,9 @@ import {eq,inArray} from "drizzle-orm";
 import {closeDatabase,getDb} from "../../src/platform/database/client";
 import {merchantTestPayments,merchantTestRefunds} from "../../src/modules/acquiring/operations-schema";
 import {guestOrders} from "../../src/modules/acquiring/guest-schema";
+import {networkPaymentOperations} from "../../src/modules/acquiring/network-schema";
 import {cardCheckoutAttempts} from "../../src/modules/acquiring/card-checkout-schema";
+import {prepareCardCheckout} from "../../src/modules/acquiring/card-checkout-service";
 import {cardCheckoutReviewSchema} from "../../src/modules/acquiring/card-checkout-contracts";
 import {ledgerEntries} from "../../src/modules/ledger/schema";
 import {readServiceMoneyAvailable} from "../../src/modules/money/service";
@@ -33,10 +35,12 @@ test("connected checkout and full refund replay exactly once and preserve gross 
  const m=await freshPublishedPayment("1250"),payer=await freshPrepaidCard("10000","10000");
  await signInPerson(page,payer.primary.personId);
  const path=`/api/v1/checkout/${m.publication.id}/card`,input={commandId:randomUUID(),cardServiceId:payer.primary.serviceId,cardId:payer.card.id,expectedCardVersion:payer.card.version};
- for(const origin of [undefined,"https://example.invalid"]){const denied=await page.request.post(path,{headers:{"Content-Type":"application/json",...(origin?{Origin:origin}:{})},data:input});expect(denied.status()).toBe(403);}
+ expect((await page.request.post(path,{headers,data:input})).status()).toBe(404);
  expect(await getDb().select().from(cardCheckoutAttempts).where(eq(cardCheckoutAttempts.publicationId,m.publication.id))).toHaveLength(0);
- const prepared=await page.request.post(path,{headers,data:input});expect(prepared.status()).toBe(200);const review=cardCheckoutReviewSchema.parse(await prepared.json());expect(review.receipt).toBeNull();
- expect(await(await page.request.post(path,{headers,data:input})).json()).toEqual(review);
+ const review=await prepareCardCheckout(payer.primary.personId,m.publication.id,input);expect(review.receipt).toBeNull();
+ expect(await prepareCardCheckout(payer.primary.personId,m.publication.id,input)).toEqual(review);
+ for(const origin of [undefined,"https://example.invalid"]){const denied=await page.request.post(`${path}/${review.id}`,{headers:{"Content-Type":"application/json",...(origin?{Origin:origin}:{})},data:{}});expect(denied.status()).toBe(403);}
+ expect(await getDb().select().from(merchantTestPayments).where(eq(merchantTestPayments.cardCheckoutId,review.id))).toHaveLength(0);
  const paid=await page.request.post(`${path}/${review.id}`,{headers,data:{}});expect(paid.status()).toBe(200);const receipt=cardCheckoutReviewSchema.parse(await paid.json());expect(receipt.receipt).not.toBeNull();
  const replay=await page.request.post(`${path}/${review.id}`,{headers,data:{}});expect(replay.status()).toBe(200);expect(await replay.json()).toEqual(receipt);
  expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,payer.primary.serviceId))).toBe(8750n);
@@ -54,26 +58,34 @@ test("connected checkout and full refund replay exactly once and preserve gross 
  const current=cardCheckoutReviewSchema.parse(await(await page.request.get(`${path}/${review.id}`)).json());expect(current.receipt?.refundedAt).not.toBeNull();
 });
 
-test("retired merchant and guest payment mutations return 404 and cannot create any money or order effects",async({page})=>{
+test("retired payment mutations return 404 and a current guest session creates no money or order effects",async({page,playwright})=>{
  const m=await freshPublishedPayment("1250"),payer=await freshPrepaidCard("10000","10000");await signInPerson(page,m.merchant.personId);
  const scope=[m.merchant.serviceId,payer.primary.serviceId],orderId=randomUUID(),attemptId=randomUUID();
  const before=await getDb().select().from(ledgerEntries).where(inArray(ledgerEntries.serviceId,scope)).orderBy(ledgerEntries.journalId,ledgerEntries.lineNumber);
+ const beforeBalances=await getDb().transaction(async tx=>({card:await readServiceMoneyAvailable(tx,payer.primary.serviceId),merchant:await readServiceMoneyAvailable(tx,m.merchant.serviceId)}));
  const oldMutations=[
   {path:`/api/v1/cardholder-services/${payer.primary.serviceId}/cards/${payer.card.id}/purchase`,data:{commandId:randomUUID(),amountMinor:"100",description:"Retired purchase"}},
   {path:`/api/v1/cardholder-services/${payer.primary.serviceId}/funds/top-ups`,data:{commandId:randomUUID(),amountMinor:"100",currency:"USD",source:"SANDBOX_BANK"}},
   {path:`/api/v1/merchants/${m.unit.id}/channels/${m.channel.id}/test-payments`,data:{commandId:randomUUID(),expectedChannelVersion:m.channel.version,outcome:"APPROVED"}},
-  {path:"/api/v1/guest/session",data:{}},
   {path:`/api/v1/guest/publications/${m.publication.id}/orders`,data:{commandId:randomUUID()}},
   {path:`/api/v1/guest/orders/${orderId}/attempts`,data:{commandId:randomUUID(),outcome:"APPROVED"}},
   {path:`/api/v1/guest/orders/${orderId}/attempts/${attemptId}/confirm`,data:{}},
  ];
  for(const {path,data} of oldMutations)expect((await page.request.post(path,{headers,data})).status(),path).toBe(404);
+ const guest=await playwright.request.newContext({baseURL:"http://127.0.0.1:3100"});
+ try{
+  expect((await guest.post("/api/v1/guest/session",{data:{}})).status()).toBe(403);
+  for(let i=0;i<2;i++){const session=await guest.post("/api/v1/guest/session",{headers,data:{}});expect(session.status()).toBe(200);expect(await session.json()).toEqual({ready:true});}
+  expect((await guest.get("/api/v1/services")).status()).toBe(401);
+ }finally{await guest.dispose();}
  expect((await page.request.get(`/pay/${m.channel.id}`)).status()).toBe(404);
  expect([401,404]).toContain((await page.request.get(`/api/v1/guest/orders/${orderId}`)).status());
  expect(await getDb().select().from(ledgerEntries).where(inArray(ledgerEntries.serviceId,scope)).orderBy(ledgerEntries.journalId,ledgerEntries.lineNumber)).toEqual(before);
  expect(await getDb().select().from(merchantTestPayments).where(eq(merchantTestPayments.merchantUnitId,m.unit.id))).toEqual([]);
  expect(await getDb().select().from(guestOrders).where(eq(guestOrders.merchantUnitId,m.unit.id))).toEqual([]);
  expect(await getDb().select().from(cardCheckoutAttempts).where(eq(cardCheckoutAttempts.publicationId,m.publication.id))).toEqual([]);
+ expect(await getDb().select().from(networkPaymentOperations).where(eq(networkPaymentOperations.publicationId,m.publication.id))).toEqual([]);
+ expect(await getDb().transaction(async tx=>({card:await readServiceMoneyAvailable(tx,payer.primary.serviceId),merchant:await readServiceMoneyAvailable(tx,m.merchant.serviceId)}))).toEqual(beforeBalances);
  expect(await merchantOperations(page,m.unit.id)).toMatchObject({availableFunds:{minor:"0"},pendingDeposits:{minor:"0"},bankFunds:{minor:"0"},payments:[],payouts:[]});
 });
 

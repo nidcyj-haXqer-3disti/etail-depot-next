@@ -11,6 +11,8 @@ import {publishGuestChannel} from "../../../src/modules/acquiring/guest-service"
 import {cardPrimary,fundCardGroup,issuePracticeCard} from "../../helpers/cardholder";
 import {merchantAccessFixture} from "../../helpers/merchant-access";
 import {paymentInput} from "../../helpers/acquiring";
+import {cardholderDashboardSchema} from "../../../src/modules/workspace/api-contracts";
+import {prepareCardCheckout} from "../../../src/modules/acquiring/card-checkout-service";
 
 export const prepaidOrigin="http://127.0.0.1:3100";
 export async function signInPerson(page:Page,personId:string){
@@ -37,16 +39,17 @@ export async function freshPublishedPayment(amountMinor:string,description=`Brow
  if(!publication)throw new Error("Canonical publication missing");
  return {...m,channel,publication};
 }
+/** Historical review fixtures use the canonical command; the customer-facing chooser is retired. */
+export async function prepareSavedCardReview(page:Page,publicationId:string,cardId:string){
+ const response=await page.request.get("/api/v1/cardholder-services?cardScope=OWN");expect(response.status()).toBe(200);
+ const dashboard=cardholderDashboardSchema.parse(await response.json()),card=dashboard.cards.find(row=>row.id===cardId);
+ if(!card||card.holderId!==dashboard.person.id)throw new Error("Historical review needs this session's exact authorized own card");
+ return prepareCardCheckout(dashboard.person.id,publicationId,{commandId:randomUUID(),cardServiceId:card.serviceId,cardId,expectedCardVersion:card.version});
+}
 export async function openSavedCardReview(page:Page,publicationId:string,cardId:string){
- await page.goto(`/checkout/${publicationId}/card`);
- await expect(page.getByRole("heading",{name:"Choose a card",exact:true})).toBeVisible();
- await page.getByRole("combobox",{name:"Your card",exact:true}).selectOption(cardId);
- await page.getByRole("button",{name:"Review payment",exact:true}).click();
- await expect(page.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();
- await expect(page).toHaveURL(/review=[0-9a-f-]{36}/);
- const reviewId=new URL(page.url()).searchParams.get("review");
- if(!reviewId)throw new Error("Review must have a durable URL before confirmation");
- return {reviewId,url:page.url(),confirmPath:`/api/v1/checkout/${publicationId}/card/${reviewId}`};
+ const review=await prepareSavedCardReview(page,publicationId,cardId),url=`http://127.0.0.1:3100/checkout/${publicationId}/card?review=${review.id}`;
+ await page.goto(url);await expect(page.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();
+ return {reviewId:review.id,url,confirmPath:`/api/v1/checkout/${publicationId}/card/${review.id}`};
 }
 
 /** Test setup uses the same paired checkout command as the customer endpoint. */

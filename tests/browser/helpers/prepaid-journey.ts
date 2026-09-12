@@ -16,6 +16,7 @@ import {merchantOperationsProjectionSchema,merchantTestPaymentProjectionSchema,m
 import {cardPrimary} from "../../helpers/cardholder";
 import {acquiringFixture,completeSetup} from "../../helpers/acquiring";
 import {cardDashboard} from "./fresh";
+import {prepareSavedCardReview} from "./prepaid";
 
 export const origin="http://127.0.0.1:3100";
 export function requireFictionalTestDatabase(){
@@ -97,13 +98,13 @@ export async function setCardAllowance(page:Page,serviceId:string,cardId:string,
   expect((await saving).status()).toBe(200);
   await expect(control.locator(".funds-limit-value")).toHaveText("$"+amount);
 }
-export async function addUnfundedCard(page:Page,name:string,holderName:string,allowance="0.00"){
+export async function addUnfundedCard(page:Page,name:string,allowance="0.00"){
   if(!(await page.getByRole("dialog").count())){
     await page.getByRole("link",{name:/^(Add card|Create your first card)$/}).click();
   }
   const dialog=page.getByRole("dialog");
-  const holder=dialog.getByRole("radio",{name:new RegExp(holderName)});
-  if(await holder.count())await holder.check();
+  await expect(dialog.getByRole("radio",{name:/Someone else/})).toBeChecked();
+  await dialog.getByRole("radio",{name:/^Me /}).check();
   await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);
   await dialog.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill(allowance);
   await expect(dialog.getByRole("textbox",{name:"Starting balance (USD)",exact:true})).toHaveCount(0);
@@ -123,7 +124,7 @@ export async function prepaidPayer(page:Page,name:string){
   await addMoney(page,primary.serviceId,"50.00");
   await page.goto("/cardholder-services");
   const before=await getCardholderFunds(primary.personId,primary.serviceId);
-  const card=await addUnfundedCard(page,"Prepaid checkout card",name,"50.00");
+  const card=await addUnfundedCard(page,"Prepaid checkout card","50.00");
   expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe(before.available.minor);
   expect(card.available.minor).toBe("5000");
   return {...primary,card,close:session.close};
@@ -144,14 +145,9 @@ export async function publishCustomerLink(page:Page,merchantId:string,channelId:
 export async function payPublished(page:Page,publication:GuestPublication,cardId:string){
   await page.goto(publication.publicHref);
   await expect(page.getByRole("heading",{name:publication.description,level:1,exact:true})).toBeVisible();
-  await page.getByRole("link",{name:"Choose a card",exact:true}).click();
-  await page.getByRole("combobox",{name:"Your card",exact:true}).selectOption(cardId);
-  const preparing=responseFor(page,`/api/v1/checkout/${publication.id}/card`);
-  await page.getByRole("button",{name:"Review payment",exact:true}).click();
-  const prepared=await preparing;expect(prepared.status()).toBe(200);
-  const review=cardCheckoutReviewSchema.parse(await prepared.json());
-  expect(review.receipt).toBeNull();
-  await expect(page).toHaveURL(url=>url.searchParams.get("review")===review.id);
+  const review=await prepareSavedCardReview(page,publication.id,cardId);expect(review.receipt).toBeNull();
+  await page.goto(`/checkout/${publication.id}/card?review=${review.id}`);
+  await expect(page.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();
   await page.reload();
   await expect(page.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();
   const confirming=responseFor(page,`/api/v1/checkout/${publication.id}/card/${review.id}`);

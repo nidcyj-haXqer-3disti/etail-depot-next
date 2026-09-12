@@ -1,4 +1,5 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
+import type { ProviderContactObservation } from "./contact-service";
 import {
   assertTrustedOrigin,
   SecurityError,
@@ -16,7 +17,7 @@ export interface SessionRecord {
 }
 
 export interface SessionRepository {
-  insert(record: SessionRecord): Promise<void>;
+  insert(record: SessionRecord, contact?: ProviderContactObservation): Promise<void>;
   findByTokenHash(hash: string): Promise<SessionRecord | null>;
   /** Revoke this browser session's entire rotation family, including replacements. */
   revokeByTokenHash(hash: string, at: Date): Promise<void>;
@@ -96,9 +97,9 @@ export class SessionService {
   }
 
   /** Call only after provider verification and application identity binding. */
-  async issue(identity: Pick<SessionRecord, "identityId" | "personId">): Promise<IssuedSession> {
+  async issue(identity: Pick<SessionRecord, "identityId" | "personId">, contact?: ProviderContactObservation): Promise<IssuedSession> {
     const { token, record } = this.makeSession(identity, this.clock());
-    await this.repository.insert(record);
+    await this.repository.insert(record, contact);
     return { record, cookie: this.cookie(token, this.ttlSeconds) };
   }
 

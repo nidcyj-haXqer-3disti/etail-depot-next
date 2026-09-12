@@ -44,11 +44,12 @@ test("one card form starts only on review and safely retries lost start, save an
   expect((await workspace()).cardRequests).toEqual(before.cardRequests);
   expect(attempts.start).toEqual([]);
   const self = dialog.getByRole("radio", { name: new RegExp(data.person.displayName) });
-  await expect(dialog).toContainText("That cardholder isn’t available");
+  await expect(dialog.getByRole("radio",{name:/Someone else/})).toBeChecked();
+  await expect(dialog).not.toContainText("That cardholder isn’t available");
   await expect(self).not.toBeChecked();
-  // Choosing the only permitted holder replaces the picker with its selected summary.
+  // Choosing Me explicitly assigns the owner; the URL never chooses a recipient.
   await self.click();
-  await expect(dialog.locator(".consumer-cardholder-selected")).toContainText(data.person.displayName);
+  await expect(self).toBeChecked();
   await cardName.fill(name);
   await dialog.getByLabel("Total spending limit (USD)",{exact:true}).fill("16.00");
   await initialReview.click();

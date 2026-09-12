@@ -1,12 +1,13 @@
-import {and,eq,inArray} from "drizzle-orm";
+import {and,eq,inArray,sql} from "drizzle-orm";
 import {permissionGrants} from "../../src/platform/database/schema";
 import { randomUUID } from "node:crypto";
+import {lockMoneyAccountsForServices} from "../../src/modules/money/service";
 import { getDb } from "../../src/platform/database/client";
 import { merchantSetupEligibility } from "../../src/modules/services/schema";
 import { bindIdentity, createCardholderService } from "../../src/modules/services/service";
 import { acceptInvitation, createInvitation } from "../../src/modules/access/service";
 import type { AccessPermission } from "../../src/modules/access/contracts";
-import { getWorkspace,addCardholderFunds,getCardSpending,setCardSpendingLimit,purchaseCard, startCardRequest, submitCardRequest, updateCardRequest } from "../../src/modules/workspace/service";
+import { bindCreatedCardRecipient,getWorkspace,addCardholderFunds,getCardSpending,setCardSpendingLimit,purchaseCard, startCardRequest, submitCardRequest, updateCardRequest } from "../../src/modules/workspace/service";
 
 export const secondaryPermissions: AccessPermission[] = ["cards.read", "cards.hold", "cards.purchase", "cards.freeze", "cards.unfreeze", "activity.read", "notifications.manage"];
 export async function cardPerson(displayName: string) {
@@ -26,12 +27,21 @@ export async function enrollCardholder(primaryId: string, serviceId: string, per
   if(testGrants){await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,serviceId),eq(permissionGrants.personId,personId),inArray(permissionGrants.action,secondaryPermissions)));for(const action of testGrants)await getDb().insert(permissionGrants).values({serviceId,personId,action,state:"ACCEPTED"}).onConflictDoUpdate({target:[permissionGrants.serviceId,permissionGrants.personId,permissionGrants.action],set:{state:"ACCEPTED"}});}
   return accepted;
 }
+/** Explicit fixture consent is enrolled separately; this helper does not redeem customer invitations. */
+export async function assignPracticeCard(primaryId:string,serviceId:string,cardId:string,holderId:string){
+ return getDb().transaction(async tx=>{
+  await lockMoneyAccountsForServices(tx,[serviceId]);
+  await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+serviceId},0))`);
+  return bindCreatedCardRecipient(tx,primaryId,serviceId,cardId,holderId);
+ });
+}
 export async function issuePracticeCardRequest(primaryId: string, serviceId: string, holderId: string, nickname: string, allowanceMinor="0") {
   const draft = await startCardRequest(primaryId, serviceId, { commandId: randomUUID() });
-  const saved = await updateCardRequest(primaryId, serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId, nickname, format: "VIRTUAL", allowanceMinor });
+  const saved = await updateCardRequest(primaryId, serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId:holderId===primaryId?holderId:null, nickname, format: "VIRTUAL", allowanceMinor });
   const submit = { commandId: randomUUID(), expectedVersion: saved.version };
   const request = await submitCardRequest(primaryId, serviceId, saved.id, submit);
   if (request.status !== "ISSUED" || !request.issuedCardId) throw new Error("Fixture card was not issued by the canonical command");
+  if(holderId!==primaryId)await assignPracticeCard(primaryId,serviceId,request.issuedCardId,holderId);
   return { request, submit };
 }
 export async function issuePracticeCard(primaryId: string, serviceId: string, holderId: string, nickname: string, spend?: string, allowanceMinor="0") {

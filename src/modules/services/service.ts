@@ -70,7 +70,7 @@ export async function getCardholderDirectory(personId:string):Promise<Cardholder
   const result:CardholderDirectoryEntry[]=[];
   for(const context of await getCardholderContextPolicies(tx,personId)){
    const scope=await loadServiceScope(tx,personId,context.serviceId),role=cardholderRole(scope.policy);
-   const rows=evaluate(scope.policy,"cards.read").allowed?await tx.select().from(cards).where(and(eq(cards.serviceId,context.serviceId),role==="OWNER"?undefined:eq(cards.holderId,personId))).orderBy(cards.nickname,cards.id).limit(3):[];
+   const rows=evaluate(scope.policy,"cards.read").allowed?await tx.select().from(cards).where(and(eq(cards.serviceId,context.serviceId),role==="OWNER"?undefined:and(eq(cards.holderId,personId),eq(cards.assignmentState,"ACCEPTED")))).orderBy(cards.nickname,cards.id).limit(3):[];
    result.push({id:context.serviceId,displayName:scope.service.displayName,cardholderRole:role,cards:rows.map(card=>({id:card.id,nickname:card.nickname,lastFour:card.lastFour,relationship:card.holderId===scope.service.primaryPersonId?"OWNER":"CARDHOLDER"}))});
   }return result;
  });

@@ -64,9 +64,12 @@ CREATE TRIGGER limit_history_origin BEFORE INSERT ON cardholder_limit_changes FO
 --> statement-breakpoint
 CREATE TRIGGER limit_no_reset BEFORE DELETE OR TRUNCATE ON cardholder_spending_limits FOR EACH STATEMENT EXECUTE FUNCTION guard_merchant_operation_history();
 --> statement-breakpoint
-CREATE FUNCTION guard_card_identity() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION guard_card_identity() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
- IF ROW(NEW.id,NEW."serviceId",NEW."serviceKind",NEW."holderId",NEW."requestId",NEW."issuerReference",NEW."lastFour",NEW.format,NEW.currency) IS DISTINCT FROM ROW(OLD.id,OLD."serviceId",OLD."serviceKind",OLD."holderId",OLD."requestId",OLD."issuerReference",OLD."lastFour",OLD.format,OLD.currency) THEN RAISE EXCEPTION 'Card identity is immutable' USING ERRCODE='23514'; END IF;
+ IF ROW(NEW.id,NEW."serviceId",NEW."serviceKind",NEW."requestId",NEW."issuerReference",NEW."lastFour",NEW.format,NEW.currency,NEW.network) IS DISTINCT FROM ROW(OLD.id,OLD."serviceId",OLD."serviceKind",OLD."requestId",OLD."issuerReference",OLD."lastFour",OLD.format,OLD.currency,OLD.network) THEN RAISE EXCEPTION 'Card identity is immutable' USING ERRCODE='23514'; END IF;
+ IF ROW(NEW."holderId",NEW."assignmentState",NEW."assignedAt",NEW."assignmentRevokedAt") IS DISTINCT FROM ROW(OLD."holderId",OLD."assignmentState",OLD."assignedAt",OLD."assignmentRevokedAt") THEN
+  IF NOT ((OLD."assignmentState"='UNASSIGNED' AND NEW."assignmentState"='ACCEPTED' AND OLD."holderId" IS NULL AND NEW."holderId" IS NOT NULL AND EXISTS(SELECT 1 FROM service_members m WHERE m."serviceId"=NEW."serviceId" AND m."personId"=NEW."holderId" AND m.state='ACCEPTED')) OR (OLD."assignmentState"='ACCEPTED' AND NEW."assignmentState"='REVOKED' AND NEW."holderId"=OLD."holderId" AND NEW."assignedAt"=OLD."assignedAt")) OR NEW.version<>OLD.version+1 THEN RAISE EXCEPTION 'Card recipient can accept once and cannot be reassigned' USING ERRCODE='23514'; END IF;
+ END IF;
  RETURN NEW;
 END $$;
 --> statement-breakpoint

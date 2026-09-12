@@ -6,6 +6,6 @@ export function cardholderRole(scope:PolicyScope):CardholderRole {
  if(scope.serviceKind!=="CARDHOLDER"||scope.status!=="ACTIVE"||scope.membershipState!=="ACCEPTED"||scope.primaryMembershipState!=="ACCEPTED"||scope.actorPersonId!==scope.membershipPersonId||scope.serviceId!==scope.membershipServiceId||scope.serviceId!==scope.resourceServiceId)return "NONE";
  return scope.primaryPersonId===scope.actorPersonId?"OWNER":"CARDHOLDER";
 }
-export function canReadCardholderData(scope:PolicyScope,holderId:string|null|undefined):boolean {
- const role=cardholderRole(scope);return role==="OWNER"||(role==="CARDHOLDER"&&holderId===scope.actorPersonId);
+export function canReadCardholderData(scope:PolicyScope,holderId:string|null|undefined,assignmentState:"UNASSIGNED"|"ACCEPTED"|"REVOKED"|null):boolean {
+ const role=cardholderRole(scope);return role==="OWNER"||(role==="CARDHOLDER"&&assignmentState==="ACCEPTED"&&holderId===scope.actorPersonId);
 }

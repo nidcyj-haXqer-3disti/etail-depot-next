@@ -2,7 +2,7 @@
 import {prepareSeedMarker} from "./fresh-seed-marker";
 import {createHash} from "node:crypto";
 import pg from "pg";
-import {sql} from "drizzle-orm";
+import {eq,sql} from "drizzle-orm";
 import {getDb,closeDatabase} from "../src/platform/database/client";
 import {cards,serviceActivity} from "../src/platform/database/schema";
 import {getRuntimeConfig} from "../src/platform/config";
@@ -14,7 +14,8 @@ import {merchantSetupEligibility} from "../src/modules/services/schema";
 import {createPrimaryMerchant} from "../src/modules/services/create-merchant";
 import {createInvitation,acceptInvitation} from "../src/modules/access/service";
 import {createMerchantInvitation} from "../src/modules/access/merchant-service";
-import {startCardRequest,updateCardRequest,submitCardRequest,addCardholderFunds} from "../src/modules/workspace/service";
+import {lockMoneyAccountsForServices} from "../src/modules/money/service";
+import {bindCreatedCardRecipient,startCardRequest,updateCardRequest,submitCardRequest,addCardholderFunds} from "../src/modules/workspace/service";
 import {getCardholderDashboard} from "../src/modules/workspace/dashboard-service";
 import {createTerminal,createChannel,getMerchantWorkspace,startMerchantSetup,updateMerchantSetup,submitMerchantSetup} from "../src/modules/acquiring/service";
 import {configureTestGateway,enrollTestMerchant,setChannelActivation,refundMerchantPayment,createMerchantSettlement,getMerchantOperations} from "../src/modules/acquiring/operations-service";
@@ -63,9 +64,17 @@ async function bootstrap() {
 async function issueCard(primaryId:string,serviceId:string,holderId:string,label:string,nickname:string,allowanceMinor:string) {
   const request=await startCardRequest(primaryId,serviceId,{commandId:command(`${label}-start`)});
   // Replay uses the original payload, including the original reviewed versions.
-  await updateCardRequest(primaryId,serviceId,request.id,{commandId:command(`${label}-save`),expectedVersion:1,holderId,nickname,format:"VIRTUAL",allowanceMinor});
+  await updateCardRequest(primaryId,serviceId,request.id,{commandId:command(`${label}-save`),expectedVersion:1,holderId:holderId===primaryId?holderId:null,nickname,format:"VIRTUAL",allowanceMinor});
   const issued=await submitCardRequest(primaryId,serviceId,request.id,{commandId:command(`${label}-issue`),expectedVersion:2});
   assert(issued.status==="ISSUED"&&issued.issuedCardId,"Canonical sandbox issuance did not complete.");
+  if(holderId!==primaryId)await getDb().transaction(async tx=>{
+    await lockMoneyAccountsForServices(tx,[serviceId]);
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+serviceId},0))`);
+    const [card]=await tx.select().from(cards).where(eq(cards.id,issued.issuedCardId!)).for("update");
+    assert(card?.serviceId===serviceId,"Seed card must belong to its exact card account.");
+    if(card.assignmentState==="UNASSIGNED")await bindCreatedCardRecipient(tx,primaryId,serviceId,card.id,holderId);
+    else assert(card.assignmentState==="ACCEPTED"&&card.holderId===holderId,"Seed card assignment cannot be changed or reopened.");
+  });
   return issued.issuedCardId;
 }
 
@@ -110,7 +119,7 @@ async function seed(client:pg.Client,databaseName:string) {
   const onlinePayment=await pay("online-sale",primaryId,primaryCardId,onlineChannel.publicationId,2);
   const returned=await pay("online-return",primaryId,primaryCardId,onlineChannel.publicationId,3);
   await refundMerchantPayment(primaryId,online.id,returned,{commandId:command("online-refund"),expectedVersion:1,reason:"Customer returned the order"});
-  await pay("popup-sale",secondaryId,secondaryCardId,popupChannel.publicationId,1);
+  await pay("popup-sale",secondaryId,secondaryCardId,popupChannel.publicationId,2);
   await getDb().transaction(async tx=>{
     for(const assignedServiceId of [serviceId,merchantServiceId])await tx.insert(operatorServiceAccess).values({serviceId:assignedServiceId,personId:operatorId,state:"ACCEPTED",canRespond:true,canProcessDeposits:assignedServiceId===merchantServiceId,canResolveDisputes:assignedServiceId===merchantServiceId}).onConflictDoNothing();
   });
