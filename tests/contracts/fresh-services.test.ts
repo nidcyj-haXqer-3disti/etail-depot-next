@@ -19,7 +19,7 @@ it("operator projections include explicit authors and refuse credentials or unde
   const item={id,reference:"CASE-example",subject:"Card question",status:"OPEN",serviceName:"My cards",serviceKind:"CARDHOLDER",customer:"Jamie",updatedAt:"2026-09-10T00:00:00.000Z"};
   expect(operatorQueueSchema.safeParse([item]).success).toBe(true);
   expect(operatorQueueSchema.safeParse(Array.from({length:101},()=>item)).success).toBe(false);
-  const detail={id,serviceId:id,reference:"CASE-example",subject:"Card question",status:"OPEN",version:1,serviceName:"My cards",customer:"Jamie",canRespond:true,messages:[{id,body:"Please help.",author:"CUSTOMER",createdAt:"2026-09-10T00:00:00.000Z"}]};
+  const detail={id,serviceId:id,reference:"CASE-example",subject:"Card question",status:"OPEN",version:1,serviceName:"My cards",customer:"Jamie",canRespond:true,payment:null,paymentUnavailable:false,messages:[{id,body:"Please help.",author:"CUSTOMER",createdAt:"2026-09-10T00:00:00.000Z"}]};
   expect(operatorCaseSchema.safeParse(detail).success).toBe(true);
   expect(operatorCaseSchema.safeParse({...detail,token:"not-a-real-token"}).success).toBe(false);
 });

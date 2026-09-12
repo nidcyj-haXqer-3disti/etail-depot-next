@@ -7,6 +7,7 @@ import { SecurityError } from "../../platform/security/origin";
 import { evaluate } from "../policy/evaluate";
 import type { ScopedTransaction } from "../access/scope";
 import { supportCases, supportCaseMessages } from "../cases/schema";
+import { readSupportPayment } from "../cases/payment-context";
 import { operatorCommands, operatorServiceAccess } from "./schema";
 
 import {operatorResponseSchema,type OperatorResponse} from "./contracts";
@@ -57,11 +58,12 @@ async function caseDetail(tx: ScopedTransaction, personId: string, caseId: strin
   const [customer] = await tx.select({ name: people.displayName }).from(people).where(eq(people.id, row.creatorId));
   if (!customer) throw new SecurityError("RESOURCE_UNAVAILABLE", 404);
   const messages = await tx.select().from(supportCaseMessages).where(and(eq(supportCaseMessages.caseId, caseId), eq(supportCaseMessages.serviceId, row.serviceId))).orderBy(asc(supportCaseMessages.sequence));
-  return { row, access, messages, customer: customer.name };
+  const payment=row.paymentId&&row.merchantUnitId?await readSupportPayment(tx,row.paymentId,row.merchantUnitId,row.serviceId):null;
+  return { row, access, messages, customer: customer.name, payment };
 }
 
 function project(detail: Awaited<ReturnType<typeof caseDetail>>) {
-  return { id: detail.row.id, serviceId: detail.row.serviceId, reference: detail.row.reference, subject: detail.row.subject, status: detail.row.status, version: detail.row.version, serviceName: detail.access.service.displayName, customer: detail.customer, canRespond: detail.access.canRespond && detail.row.status === "OPEN", messages: detail.messages.map(message => ({ id: message.id, body: message.body, author: message.authorKind, createdAt: message.createdAt.toISOString() })) };
+  return { id: detail.row.id, serviceId: detail.row.serviceId, reference: detail.row.reference, subject: detail.row.subject, status: detail.row.status, version: detail.row.version, serviceName: detail.access.service.displayName, customer: detail.customer, payment:detail.payment, paymentUnavailable:Boolean(detail.row.paymentId&&!detail.payment), canRespond: detail.access.canRespond && detail.row.status === "OPEN", messages: detail.messages.map(message => ({ id: message.id, body: message.body, author: message.authorKind, createdAt: message.createdAt.toISOString() })) };
 }
 export async function getOperatorCase(personId: string, caseId: string) {
   return getDb().transaction(async tx => project(await caseDetail(tx, personId, caseId)), { isolationLevel: "repeatable read" });

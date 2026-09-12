@@ -1,6 +1,6 @@
 import {cardholderRole} from "./cardholder-scope";
 export const WORKSPACE_ACTIONS = ["cards.read", "cards.hold", "cards.freeze", "cards.unfreeze", "cards.request", "activity.read", "notifications.manage"] as const;
-export const ACTIONS = ["service.read","people.read","people.invite","people.changeRole","people.revoke","support.cases.read","support.cases.manage","acquiring.read","acquiring.setup","merchant.read","merchant.people.read","merchant.people.invite","merchant.people.revoke","merchant.units.create","merchant.units.pause","channels.read","channels.create","channels.update","channels.close","channels.share","cards.create","cards.manageMembers","cards.purchase","gateway.manage","payments.read","payments.simulate","payments.refund","payouts.manage","spend.authorize", ...WORKSPACE_ACTIONS] as const;
+export const ACTIONS = ["cardholder.funds.read","cardholder.funds.add","cardholder.limits.manage","service.read","people.read","people.invite","people.changeRole","people.revoke","support.cases.read","support.cases.manage","acquiring.read","acquiring.setup","merchant.read","merchant.people.read","merchant.people.invite","merchant.people.revoke","merchant.units.create","merchant.units.pause","channels.read","channels.create","channels.update","channels.close","channels.share","cards.create","cards.manageMembers","cards.purchase","gateway.manage","payments.read","payments.simulate","payments.refund","payouts.manage","spend.authorize", ...WORKSPACE_ACTIONS] as const;
 export type Action = typeof ACTIONS[number];
 export type ServiceKind = "CARDHOLDER"|"MERCHANT";
 export type Role = "PRIMARY"|"SECONDARY";
@@ -26,8 +26,8 @@ export interface OperatorPolicyScope {
 }
 export function evaluate(scope:PolicyScope|MerchantPolicyScope|OperatorPolicyScope, action:string) {
   if(scope.targetKind==="OPERATOR_SERVICE") {
-    const allowed=scope.actorPersonId===scope.assignmentPersonId&&scope.serviceId===scope.resourceServiceId&&scope.state==="ACCEPTED"&&scope.serviceStatus!=="CLOSED"&&["support.operator.read","support.operator.respond"].includes(action)&&scope.grants.includes("support.operator.read")&&scope.grants.includes(action);
-    return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available through your explicit operator assignment.":"An accepted operator assignment is required in this exact service.",remediation:null,scope:{serviceId:scope.serviceId},policyVersion:9};
+    const allowed=scope.actorPersonId===scope.assignmentPersonId&&scope.serviceId===scope.resourceServiceId&&scope.state==="ACCEPTED"&&scope.serviceStatus!=="CLOSED"&&["support.operator.read","support.operator.respond","payments.operator.process"].includes(action)&&scope.grants.includes("support.operator.read")&&scope.grants.includes(action);
+    return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available through your explicit operator assignment.":"An accepted operator assignment is required in this exact service.",remediation:null,scope:{serviceId:scope.serviceId},policyVersion:10};
   }
   if(scope.targetKind==="MERCHANT_UNIT") {
     const same=scope.merchantUnitId===scope.resourceMerchantUnitId&&scope.serviceId===scope.masterServiceId;
@@ -43,7 +43,7 @@ export function evaluate(scope:PolicyScope|MerchantPolicyScope|OperatorPolicySco
         if(["payments.refund","payouts.manage","gateway.manage","merchant.units.create","merchant.units.pause"].includes(action)&&!scope.primaryAccess)allowed=false;
       }
     }
-    return {action,allowed,reasonCode:allowed?"ALLOWED":"MERCHANT_ACTION_UNAVAILABLE",reason:allowed?"Available within this merchant.":"Current permission in this merchant is required.",remediation:null,scope:{serviceId:scope.serviceId,merchantUnitId:scope.merchantUnitId},policyVersion:9};
+    return {action,allowed,reasonCode:allowed?"ALLOWED":"MERCHANT_ACTION_UNAVAILABLE",reason:allowed?"Available within this merchant.":"Current permission in this merchant is required.",remediation:null,scope:{serviceId:scope.serviceId,merchantUnitId:scope.merchantUnitId},policyVersion:10};
   }
 
   let allowed=false;
@@ -60,7 +60,7 @@ export function evaluate(scope:PolicyScope|MerchantPolicyScope|OperatorPolicySco
     if(action==="service.read")allowed=true;
     else if(action==="support.cases.read"||action==="support.cases.manage")allowed=true;
     else if(scope.serviceKind==="CARDHOLDER"&&card!=="NONE") {
-      if(["people.read","people.invite","people.changeRole","people.revoke","cards.request","cards.create","cards.manageMembers"].includes(action))allowed=primary&&has(action);
+      if(["cardholder.funds.read","cardholder.funds.add","cardholder.limits.manage","people.read","people.invite","people.changeRole","people.revoke","cards.request","cards.create","cards.manageMembers"].includes(action))allowed=primary&&has(action);
       else if(["cards.read","cards.hold","activity.read","notifications.manage"].includes(action))allowed=has(action);
       else if(["cards.freeze","cards.unfreeze"].includes(action))allowed=has(action)&&has("cards.read");
       else if(action==="cards.purchase")allowed=has(action)&&has("cards.read")&&has("cards.hold");
@@ -74,5 +74,5 @@ export function evaluate(scope:PolicyScope|MerchantPolicyScope|OperatorPolicySco
       else if(action.startsWith("channels."))allowed=has(action)&&has("acquiring.read")&&(action==="channels.read"||has("channels.read"));
     }
   }
-  return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available within your current service permission.":"This action requires current permission in this exact service.",remediation:null,scope:{serviceId:scope.serviceId},policyVersion:9};
+  return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available within your current service permission.":"This action requires current permission in this exact service.",remediation:null,scope:{serviceId:scope.serviceId},policyVersion:10};
 }

@@ -1,7 +1,10 @@
-# New domain and PostgreSQL architecture
+# Domain and PostgreSQL architecture — historical specification
 
-Current override: [Two-service design](TWO_SERVICE_DESIGN.md) governs customer navigation, named primary/secondary card scope and primary/submerchant scope. Conflicting three-tier and broad secondary visibility rules below are historical. Financial invariants and unrelated requirements remain.
+> **Superseded for active domain design — 11 September 2026.** Use [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) for current ownership, schema boundaries and implementation sequencing. The table families, host-account relationships and migration instructions below record earlier proposals and delivery stages. They are not instructions to restore retired accounts, rebuild the current database or apply historical migrations.
+>
+> Exact money, immutable accounting, explicit responsibility and scoped authority remain requirements. Preserve their meanings under the current two-service model; a historical table name or proposed lifecycle is not evidence of current implementation.
 
+Earlier design reference: [Two-service design](TWO_SERVICE_DESIGN.md). Its conflicting three-tier and broad secondary visibility provisions were superseded by the fresh service model.
 
 ## Architecture choice
 

@@ -1,5 +1,9 @@
 # Test strategy and evidence contract
 
+> **Original test inventory and historical implementation baseline.** Use [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) for the current two-service scenarios and acceptance sequence. The initial handoff status and Personal/Household/Seller scripts below are historical requirements, not today's model or test results.
+>
+> Evidence integrity, security, privacy, financial invariants, release approval and commercial obligations remain required. This notice changes model/status authority only; it does not waive tests or convert preserved plans and old counts into current completion evidence.
+
 ## What has and has not been tested
 
 The supplied Python tests validate the handoff's structure, target restrictions, fixture arithmetic and planning helper with mocked GitHub responses. They do not compile a new application, create a remote repository, exercise PostgreSQL, send an email, create a card, or deploy to Netlify. Every application acceptance case starts `not-implemented`.

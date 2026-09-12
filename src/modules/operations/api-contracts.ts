@@ -1,5 +1,6 @@
 import {z} from "zod";
 import {operatorResponseSchema} from "./contracts";
+import {supportPaymentContextSchema} from "../cases/api-contracts";
 
 const status=z.enum(["OPEN","WITHDRAWN","RESOLVED"]);
 export const operatorQueueSchema=z.array(z.object({
@@ -8,7 +9,7 @@ export const operatorQueueSchema=z.array(z.object({
 }).strict()).max(100);
 export const operatorCaseSchema=z.object({
   id:z.uuid(),serviceId:z.uuid(),reference:z.string(),subject:z.string(),status,version:z.int().positive(),
-  serviceName:z.string(),customer:z.string(),canRespond:z.boolean(),messages:z.array(z.object({
+  serviceName:z.string(),customer:z.string(),payment:supportPaymentContextSchema.nullable(),paymentUnavailable:z.boolean(),canRespond:z.boolean(),messages:z.array(z.object({
     id:z.uuid(),body:z.string(),author:z.enum(["CUSTOMER","SUPPORT"]),createdAt:z.iso.datetime(),
   }).strict()),
 }).strict();

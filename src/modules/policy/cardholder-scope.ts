@@ -1,5 +1,5 @@
 import type { PolicyScope } from "./evaluate";
-export const CARDHOLDER_PERMISSION_ACTIONS=["cards.read","cards.hold","cards.request","cards.create","cards.purchase","cards.freeze","cards.unfreeze","cards.manageMembers","activity.read","people.read","people.invite","people.changeRole","people.revoke","notifications.manage"] as const;
+export const CARDHOLDER_PERMISSION_ACTIONS=["cardholder.funds.read","cardholder.funds.add","cardholder.limits.manage","cards.read","cards.hold","cards.request","cards.create","cards.purchase","cards.freeze","cards.unfreeze","cards.manageMembers","activity.read","people.read","people.invite","people.changeRole","people.revoke","notifications.manage"] as const;
 export function isCardholderPermission(action:string):boolean{return (CARDHOLDER_PERMISSION_ACTIONS as readonly string[]).includes(action);}
 export type CardholderRole="PRIMARY"|"SECONDARY"|"NONE";
 export function cardholderRole(scope:PolicyScope):CardholderRole {

@@ -11,7 +11,7 @@ const browser = await chromium.launch();
 let checkpoint = "provider settings availability";
 try {
   const context = await browser.newContext({ serviceWorkers: "block" });
-  await context.route("**/*", route => ["GET", "HEAD"].includes(route.request().method()) ? route.continue() : route.abort());
+  await context.route("**/*", route => new URL(route.request().url()).origin === origin && ["GET", "HEAD"].includes(route.request().method()) ? route.continue() : route.abort());
   const response = await context.request.get(`${origin}/.netlify/identity/settings`, { timeout: 20_000, maxRedirects: 0 });
   assert.equal(response.status(), 200, "The email provider settings must be available.");
   assert.equal(response.url(), `${origin}/.netlify/identity/settings`);
@@ -30,13 +30,36 @@ try {
   const login = page.getByRole("form", { name: "Sign in with email", exact: true });
   await login.waitFor();
   assert.equal(await login.getByRole("button", { name: "Sign in", exact: true }).isEnabled(), true, "Sign in must be usable.");
+  checkpoint = "hosted fixture login absent";
+  assert.equal(await page.locator(".fixture-panel").count(), 0, "Hosted sign-in must not offer fixture identities.");
   checkpoint = "enabled registration form";
   await page.getByRole("button", { name: "Create a login", exact: true }).click();
   const registration = page.getByRole("form", { name: "Create your login", exact: true });
   await registration.waitFor();
   assert.equal(await registration.getByLabel("Email address", { exact: true }).isEnabled(), true, "Registration email input must be usable.");
   assert.equal(await registration.getByRole("button", { name: "Create login", exact: true }).isEnabled(), true, "Create login must be usable.");
-  console.log(JSON.stringify({ checkedAt: new Date().toISOString(), siteId: targets.netlify.site_id, origin, emailEnabled: true, registrationOpen: true, confirmationRequired: true, signInControlsEnabled: true, registrationControlsEnabled: true, scope: "Read-only availability; does not verify mailbox delivery or a real password login." }));
+  checkpoint = "enabled password recovery form";
+  await page.getByRole("button", { name: "Back to sign in", exact: true }).click();
+  await page.getByRole("button", { name: "Forgot your password?", exact: true }).click();
+  const recovery = page.getByRole("form", { name: "Reset your password", exact: true });
+  await recovery.waitFor();
+  assert.equal(await recovery.getByRole("button", { name: "Send reset email", exact: true }).isEnabled(), true);
+  const protectedApis = ["/api/v1/services", "/api/v1/cardholder-services", "/api/v1/merchants/dashboard", "/api/v1/auth/sessions"];
+  for (const path of protectedApis) {
+    checkpoint = `unauthenticated boundary ${path}`;
+    const result = await context.request.get(`${origin}${path}`, { timeout: 20_000, maxRedirects: 0 });
+    assert.equal(result.status(), 401, "Private service APIs must require a session.");
+    assert.equal(result.url(), `${origin}${path}`);
+  }
+  const protectedPages = ["/services", "/cardholder-services", "/merchant-services"];
+  for (const path of protectedPages) {
+    checkpoint = `protected page ${path}`;
+    await page.goto(`${origin}${path}`, { waitUntil: "networkidle" });
+    assert.equal(new URL(page.url()).origin, origin);
+    assert.equal(new URL(page.url()).pathname, "/login");
+    await page.getByRole("form", { name: "Sign in with email", exact: true }).waitFor();
+  }
+  console.log(JSON.stringify({ checkedAt: new Date().toISOString(), siteId: targets.netlify.site_id, origin, emailEnabled: true, registrationOpen: true, confirmationRequired: true, signInControlsEnabled: true, registrationControlsEnabled: true, recoveryControlsEnabled: true, hostedFixtureLoginAbsent: true, protectedApis, protectedPages, scope: "Read-only availability and unauthenticated boundaries; does not verify mailbox delivery or a real password login." }));
 } catch {
   // Never emit assertion diffs, provider response bodies or browser state.
   console.error(`Hosted email acceptance failed: ${checkpoint}.`);

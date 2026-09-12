@@ -25,7 +25,7 @@ export function TaskSearch({workspace:w,primaryService,selectedCardId}:{workspac
     {label:"Compare memberships",detail:"Explore Select, Premier and an annual cost estimate",path:cardholderTaskHref("membership",selection),icon:"overview",allowed:!!w,keywords:"plans pricing fees cashback bonus benefits rewards calculator"},
     {label:"Notification settings",detail:"Choose which card updates you want",path:cardholderTaskHref("settings",selection),icon:"bell",allowed:!!w,keywords:"alerts email preferences"},
     {label:"Get help",detail:"Ask a question and read support replies",path:cardholderTaskHref("help",selection),icon:"help",allowed:!!w,keywords:"question support fraud problem cases contact"},
-    {label:"Services & invitations",detail:"Review access offered to you",path:"/services#invitation-heading",icon:"bell",allowed:true,keywords:"accept decline invitation"},
+    {label:"Shared access",detail:"Review access offered to you",path:"/shared-access",icon:"bell",allowed:true,keywords:"accept decline invitation"},
     {label:"Merchant services",detail:"Manage payments and your merchants",path:"/merchant-services",icon:"merchant",allowed:true,keywords:"collections payments channels gateway"},
   ];
   const results=tasks.filter(task=>task.allowed&&`${task.label} ${task.detail} ${task.keywords}`.toLowerCase().includes(query.trim().toLowerCase()));

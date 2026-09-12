@@ -1,0 +1,3 @@
+import {z} from "zod";
+const money=z.object({minor:z.string().regex(/^(0|[1-9][0-9]*)$/),currency:z.literal("USD"),formatted:z.string().min(1)}).strict();
+export const merchantTestPayoutProjectionSchema=z.object({id:z.uuid(),merchantUnitId:z.uuid(),amount:money,status:z.enum(["PENDING","COMPLETED","FAILED"]),testReference:z.string(),destination:z.literal("TEST_DESTINATION"),createdAt:z.iso.datetime(),settlementId:z.uuid(),processedAt:z.iso.datetime().nullable(),retryReview:z.object({amount:money,token:z.string(),paymentCount:z.int()}).strict().nullable(),payments:z.array(z.object({id:z.uuid(),description:z.string(),reference:z.string(),amount:money,refundedAmount:money}).strict())}).strict();

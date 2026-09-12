@@ -1,0 +1,198 @@
+import {randomUUID} from "node:crypto";
+import {eq} from "drizzle-orm";
+import AxeBuilder from "@axe-core/playwright";
+import {expect,test,type Page} from "@playwright/test";
+import {closeDatabase,getDb} from "../../src/platform/database/client";
+import {merchantTestRefunds} from "../../src/modules/acquiring/operations-schema";
+import {merchantDeposits,merchantDepositEvents,merchantSettlementItems} from "../../src/modules/acquiring/settlement-schema";
+import {getBalance} from "../../src/modules/ledger/service";
+import {cardCheckoutReviewSchema} from "../../src/modules/acquiring/card-checkout-contracts";
+import {cardDashboard,headers} from "./helpers/fresh";
+import {signInPerson} from "./helpers/prepaid";
+import {additionalPublishedPayment,explicitDepositOperator,freshConnectedPayment,merchantOperations,payPublishedMerchant,recordDepositOutcome} from "./helpers/merchant-payments";
+
+test.afterAll(closeDatabase);
+
+async function reviewDeposit(page:Page,amount:string,count:number){
+ await page.getByRole("button",{name:"Request deposit",exact:true}).click();
+ const details=page.getByRole("dialog",{name:"Request deposit",exact:true});
+ await expect(details).toContainText(amount);
+ await expect(details.locator("dl>div").filter({has:page.getByText("Payments included",{exact:true})})).toContainText(String(count));
+ await expect(details.getByRole("textbox")).toHaveCount(0);
+ await details.getByRole("button",{name:"Review deposit",exact:true}).click();
+ const review=page.getByRole("dialog",{name:"Review deposit",exact:true});
+ await expect(review).toContainText("Funds are held while processing");
+ return review;
+}
+
+test("a connected payment and full refund keep exact receipts and one atomic refund through a lost result",async({page})=>{
+ test.setTimeout(90_000);
+ const f=await freshConnectedPayment(page),m=f.merchant;
+ expect((await merchantOperations(page,m.unit.id)).availableFunds?.minor).toBe("1250");
+ await page.goto(`/merchants/${m.unit.id}?tab=payments&payment=${f.payment.id}`);
+ const receipt=page.getByRole("dialog",{name:"Payment details",exact:true});
+ await expect(receipt).toContainText(f.review.receipt!.reference);
+ await receipt.getByRole("button",{name:"Refund payment",exact:true}).click();
+ const details=page.getByRole("dialog",{name:"Refund this payment",exact:true});
+ await details.getByRole("textbox",{name:"Reason for refund",exact:true}).fill("Customer canceled this fictional order");
+ await details.getByRole("button",{name:"Review refund",exact:true}).click();
+ const review=page.getByRole("dialog",{name:"Review full refund",exact:true}),bodies:unknown[]=[];
+ const path=`/api/v1/merchants/${m.unit.id}/payments/${f.payment.id}/refund`;
+ await page.route(`**${path}`,async route=>{
+  bodies.push(route.request().postDataJSON());const response=await route.fetch();expect(response.status()).toBe(200);
+  if(bodies.length===1)await route.abort("failed");else await route.fulfill({response});
+ });
+ await review.getByRole("button",{name:"Confirm full refund",exact:true}).click();
+ await expect(review.getByRole("button",{name:"Retry same request",exact:true})).toBeEnabled();
+ await page.keyboard.press("Escape");await expect(review).toBeVisible();
+ const pendingUrl=page.url();await page.locator("header a[href]").first().dispatchEvent("click");expect(page.url()).toBe(pendingUrl);
+ await review.getByRole("button",{name:"Retry same request",exact:true}).click();
+ await expect(review).toBeHidden();expect(bodies).toHaveLength(2);expect(bodies[1]).toEqual(bodies[0]);
+ const after=await merchantOperations(page,m.unit.id);
+ expect(after.availableFunds?.minor).toBe("0");expect(after.payments).toHaveLength(1);
+ expect(after.payments[0]).toMatchObject({id:f.payment.id,status:"REFUNDED",refund:{amount:{minor:"1250"}}});
+ expect(await getDb().select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId,f.payment.id))).toHaveLength(1);
+ await page.goto(`/merchants/${m.unit.id}?tab=payments&activity=refunds&q=${f.payment.testReference}&payment=${f.payment.id}`);
+ await expect(receipt).toContainText("Customer canceled this fictional order");
+ await page.reload();await expect(receipt).toContainText(after.payments[0]!.refund!.testReference);
+ await signInPerson(page,f.payer.primary.personId);
+ expect(await getDb().transaction(tx=>getBalance(tx,{serviceId:f.payer.primary.serviceId,bucket:"GROUP_AVAILABLE"}))).toBe(10000n);
+ expect((await cardDashboard(page.request)).cards.find(card=>card.id===f.payer.card.id)?.available.minor).toBe("8750");
+ // Group funds are restored, while the gross monthly spending allowance remains consumed.
+ const payerReview=cardCheckoutReviewSchema.parse(await(await page.request.get(f.confirmPath)).json());
+ expect(payerReview.receipt?.refundedAt).not.toBeNull();
+ await page.goto(f.url);await expect(page.getByRole("heading",{name:"Payment refunded",exact:true})).toBeVisible();
+ await expect(page.locator("main")).toContainText("returned to your original card group");
+});
+
+test("a full reviewed deposit survives a lost result and stays pending until an explicitly assigned operator completes it",async({page})=>{
+ test.setTimeout(120_000);
+ const f=await freshConnectedPayment(page),m=f.merchant;
+ const second=await payPublishedMerchant(page,await additionalPublishedPayment(m,"750"),f.payer);
+ const before=await merchantOperations(page,m.unit.id);
+ expect(before.depositReview).toMatchObject({amount:{minor:"2000"},paymentCount:2});
+ await page.goto(`/merchants/${m.unit.id}?tab=payments`);
+ const review=await reviewDeposit(page,"$20.00",2),bodies:unknown[]=[];
+ await page.route(`**/api/v1/merchants/${m.unit.id}/payouts`,async route=>{
+  bodies.push(route.request().postDataJSON());const response=await route.fetch();expect(response.status()).toBe(200);
+  if(bodies.length===1)await route.abort("failed");else await route.fulfill({response});
+ });
+ await review.getByRole("button",{name:"Request deposit",exact:true}).click();
+ await expect(review.getByRole("button",{name:"Retry same request",exact:true})).toBeEnabled();
+ await page.keyboard.press("Escape");await expect(review).toBeVisible();
+ const pendingUrl=page.url();await page.locator("header a[href]").first().dispatchEvent("click");expect(page.url()).toBe(pendingUrl);
+ await review.getByRole("button",{name:"Retry same request",exact:true}).click();
+ await expect(review).toBeHidden();expect(bodies).toHaveLength(2);expect(bodies[1]).toEqual(bodies[0]);
+ expect(bodies[0]).toMatchObject({reviewToken:before.depositReview!.token});
+ expect(bodies[0]).not.toHaveProperty("amountMinor");
+ let operations=await merchantOperations(page,m.unit.id);const deposit=operations.payouts[0]!;
+ expect(operations).toMatchObject({availableFunds:{minor:"0"},pendingDeposits:{minor:"2000"},bankFunds:{minor:"0"},depositReview:null});
+ expect(deposit).toMatchObject({status:"PENDING",amount:{minor:"2000"},processedAt:null});
+ expect(new Set(deposit.payments.map(row=>row.id))).toEqual(new Set([f.payment.id,second.payment.id]));
+ expect(await getDb().select().from(merchantDeposits).where(eq(merchantDeposits.merchantUnitId,m.unit.id))).toHaveLength(1);
+ expect(await getDb().select().from(merchantSettlementItems).where(eq(merchantSettlementItems.settlementId,deposit.settlementId))).toHaveLength(2);
+ await page.goto(`/merchants/${m.unit.id}?tab=payments&activity=transfers&transfer=${deposit.id}`);
+ const detail=page.getByRole("dialog",{name:"Deposit details",exact:true});
+ await expect(detail).toContainText("pending");await expect(detail.getByRole("heading",{name:"Payments in this deposit",exact:true})).toBeVisible();
+ await expect(detail.locator("dl>div").filter({has:page.getByText("Requested",{exact:true})}).locator("time")).toHaveAttribute("datetime",deposit.createdAt);
+ await expect(detail.getByText("Completed",{exact:true})).toHaveCount(0);await expect(detail.getByText("Returned",{exact:true})).toHaveCount(0);
+ await expect(page.locator(".mop-table tbody tr").filter({hasText:deposit.testReference}).locator("time")).toHaveAttribute("datetime",deposit.createdAt);
+ await expect(detail.getByRole("link",{name:new RegExp(f.payment.testReference)})).toBeVisible();
+ await expect(page.getByRole("button",{name:/simulate|mark.*complete|complete deposit/i})).toHaveCount(0);
+ await page.reload();await expect(detail).toContainText(deposit.testReference);await expect(detail).toContainText("pending");
+ await page.setViewportSize({width:320,height:900});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+ expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
+ const refund=await page.request.post(`/api/v1/merchants/${m.unit.id}/payments/${f.payment.id}/refund`,{headers,data:{commandId:randomUUID(),expectedVersion:1,reason:"Refund while processing"}});
+ expect(refund.status()).toBe(409);expect((await refund.json()).error.code).toBe("REFUND_DEPOSIT_RESERVED");
+ const denied=await page.request.post(`/api/v1/operations/deposits/${deposit.id}`,{headers,data:{commandId:randomUUID(),outcome:"COMPLETED"}});
+ expect([403,404]).toContain(denied.status());
+ const supportOnly=await explicitDepositOperator(m.merchant.serviceId,false);await signInPerson(page,supportOnly);
+ expect((await page.request.post(`/api/v1/operations/deposits/${deposit.id}`,{headers,data:{commandId:randomUUID(),outcome:"COMPLETED"}})).status()).toBe(403);
+ expect(await getDb().select().from(merchantDepositEvents).where(eq(merchantDepositEvents.depositId,deposit.id))).toEqual([]);
+ const operatorId=await explicitDepositOperator(m.merchant.serviceId);
+ await recordDepositOutcome(page,operatorId,deposit.id,"COMPLETED");
+ await signInPerson(page,m.merchant.personId);await page.reload();
+ await expect(detail).toContainText("completed");await expect(detail).toContainText(deposit.testReference);
+ operations=await merchantOperations(page,m.unit.id);
+ expect(operations).toMatchObject({availableFunds:{minor:"0"},pendingDeposits:{minor:"0"},bankFunds:{minor:"2000"}});
+ const completed=operations.payouts.find(row=>row.id===deposit.id)!;
+ expect(completed.processedAt).not.toBeNull();expect(completed.processedAt).not.toBe(deposit.createdAt);
+ await expect(detail.locator("dl>div").filter({has:page.getByText("Requested",{exact:true})}).locator("time")).toHaveAttribute("datetime",deposit.createdAt);
+ const completedTime=detail.locator("dl>div").filter({has:page.getByText("Completed",{exact:true})}).locator("time");
+ await expect(completedTime).toHaveAttribute("datetime",completed.processedAt!);await expect(completedTime).toContainText("UTC");
+ await expect(page.locator(".mop-table tbody tr").filter({hasText:deposit.testReference}).locator("time")).toHaveAttribute("datetime",completed.processedAt!);
+ expect(await getDb().select().from(merchantDepositEvents).where(eq(merchantDepositEvents.depositId,deposit.id))).toHaveLength(1);
+ await detail.getByRole("link",{name:new RegExp(f.payment.testReference)}).click();
+ await expect(page.getByRole("dialog",{name:"Payment details",exact:true})).toContainText(f.payment.testReference);
+});
+
+test("a returned deposit needs an explicit new review of its saved payments and cannot include later collections",async({page})=>{
+ test.setTimeout(120_000);
+ const f=await freshConnectedPayment(page),m=f.merchant;
+ await page.goto(`/merchants/${m.unit.id}?tab=payments`);
+ let review=await reviewDeposit(page,"$12.50",1);
+ await review.getByRole("button",{name:"Request deposit",exact:true}).click();await expect(review).toBeHidden();
+ const first=(await merchantOperations(page,m.unit.id)).payouts[0]!;
+ const operatorId=await explicitDepositOperator(m.merchant.serviceId);
+ const failure=await recordDepositOutcome(page,operatorId,first.id,"FAILED");
+ await signInPerson(page,m.merchant.personId);
+ expect(await merchantOperations(page,m.unit.id)).toMatchObject({settledFunds:{minor:"1250"},pendingDeposits:{minor:"0"},bankFunds:{minor:"0"}});
+ const later=await payPublishedMerchant(page,await additionalPublishedPayment(m,"750"),f.payer);
+ await page.goto(`/merchants/${m.unit.id}?tab=payments&activity=transfers&transfer=${first.id}`);
+ const detail=page.getByRole("dialog",{name:"Deposit details",exact:true});
+ await expect(detail).toContainText("failed");await expect(detail).toContainText("$12.50");
+ expect(failure.result.processedAt).not.toBeNull();
+ await expect(detail.locator("dl>div").filter({has:page.getByText("Requested",{exact:true})}).locator("time")).toHaveAttribute("datetime",first.createdAt);
+ const returnedTime=detail.locator("dl>div").filter({has:page.getByText("Returned",{exact:true})}).locator("time");
+ await expect(returnedTime).toHaveAttribute("datetime",failure.result.processedAt!);await expect(returnedTime).toContainText("UTC");
+ await expect(page.locator(".mop-table tbody tr").filter({hasText:first.testReference}).locator("time")).toHaveAttribute("datetime",failure.result.processedAt!);
+ await expect(detail).not.toContainText(later.payment.testReference);
+ await detail.getByRole("button",{name:"Review new deposit",exact:true}).click();
+ const details=page.getByRole("dialog",{name:"Request deposit",exact:true});
+ await expect(details).toContainText("$12.50");await expect(details).not.toContainText("$20.00");
+ await details.getByRole("button",{name:"Review deposit",exact:true}).click();
+ review=page.getByRole("dialog",{name:"Review deposit",exact:true});
+ await review.getByRole("button",{name:"Request deposit",exact:true}).click();await expect(review).toBeHidden();
+ const operations=await merchantOperations(page,m.unit.id),retry=operations.payouts.find(row=>row.id!==first.id)!;
+ expect(retry).toMatchObject({settlementId:first.settlementId,status:"PENDING",amount:{minor:"1250"}});
+ expect(retry.payments.map(row=>row.id)).toEqual([f.payment.id]);
+ expect(operations).toMatchObject({availableFunds:{minor:"750"},settledFunds:{minor:"0"},pendingDeposits:{minor:"1250"},bankFunds:{minor:"0"},depositReview:{amount:{minor:"750"},paymentCount:1}});
+ expect(operations.payouts.find(row=>row.id===first.id)).toMatchObject({status:"FAILED",retryReview:null});
+ await signInPerson(page,operatorId);
+ const reused=await page.request.post(`/api/v1/operations/deposits/${retry.id}`,{headers,data:failure.input});
+ expect(reused.status()).toBe(409);expect((await reused.json()).error.code).toBe("IDEMPOTENCY_CONFLICT");
+ await recordDepositOutcome(page,operatorId,retry.id,"COMPLETED");
+ await signInPerson(page,m.merchant.personId);
+ expect(await merchantOperations(page,m.unit.id)).toMatchObject({availableFunds:{minor:"750"},pendingDeposits:{minor:"0"},bankFunds:{minor:"1250"}});
+ await page.goto(`/merchants/${m.unit.id}?tab=payments&activity=transfers&transfer=${first.id}`);
+ await expect(detail).toContainText("failed");await expect(detail.getByRole("button",{name:"Review new deposit",exact:true})).toHaveCount(0);
+});
+
+test("new collections invalidate an open deposit review and require the updated full batch",async({page,browser})=>{
+ test.setTimeout(120_000);
+ const f=await freshConnectedPayment(page),m=f.merchant,before=await merchantOperations(page,m.unit.id);
+ await page.goto(`/merchants/${m.unit.id}?tab=payments`);
+ const review=await reviewDeposit(page,"$12.50",1);
+ const other=await browser.newContext({baseURL:"http://127.0.0.1:3100"});
+ try{
+  const payerPage=await other.newPage();
+  await payPublishedMerchant(payerPage,await additionalPublishedPayment(m,"500"),f.payer);
+ }finally{await other.close();}
+ const requests:{commandId:string;reviewToken:string}[]=[],statuses:number[]=[];
+ await page.route(`**/api/v1/merchants/${m.unit.id}/payouts`,async route=>{
+  requests.push(route.request().postDataJSON());const response=await route.fetch();statuses.push(response.status());await route.fulfill({response});
+ });
+ await review.getByRole("button",{name:"Request deposit",exact:true}).click();
+ await expect(review).toContainText("New activity changed this deposit");
+ await expect(review.getByRole("button",{name:"Request deposit",exact:true})).toBeDisabled();
+ expect(statuses).toEqual([409]);expect(requests[0]!.reviewToken).toBe(before.depositReview!.token);
+ expect(await getDb().select().from(merchantDeposits).where(eq(merchantDeposits.merchantUnitId,m.unit.id))).toEqual([]);
+ expect(await merchantOperations(page,m.unit.id)).toMatchObject({availableFunds:{minor:"1750"},pendingDeposits:{minor:"0"},bankFunds:{minor:"0"},depositReview:{amount:{minor:"1750"},paymentCount:2}});
+ await review.getByRole("button",{name:"Reload payment status",exact:true}).click();
+ await expect(review).toContainText("$17.50");
+ await expect(review.locator("dl>div").filter({has:page.getByText("Payments included",{exact:true})})).toContainText("2");
+ await review.getByRole("button",{name:"Request deposit",exact:true}).click();await expect(review).toBeHidden();
+ expect(statuses).toEqual([409,200]);expect(requests[1]!.commandId).not.toBe(requests[0]!.commandId);expect(requests[1]!.reviewToken).not.toBe(requests[0]!.reviewToken);
+ const after=await merchantOperations(page,m.unit.id);expect(after.payouts).toHaveLength(1);expect(after.payouts[0]).toMatchObject({status:"PENDING",amount:{minor:"1750"}});expect(after.payouts[0]!.payments).toHaveLength(2);
+});

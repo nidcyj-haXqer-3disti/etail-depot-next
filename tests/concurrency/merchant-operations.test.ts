@@ -4,8 +4,9 @@ import { afterAll, expect, it } from "vitest";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { createChannel } from "../../src/modules/acquiring/service";
 import { merchantUnits } from "../../src/modules/acquiring/schema";
-import { merchantOperationCommands, merchantTestPayments, merchantTestPayouts, merchantTestRefunds } from "../../src/modules/acquiring/operations-schema";
+import { merchantOperationCommands, merchantTestPayments, merchantTestRefunds } from "../../src/modules/acquiring/operations-schema";
 import { configureTestGateway, createMerchantPayout, enrollTestMerchant, getMerchantOperations, refundMerchantPayment, setChannelActivation, simulateMerchantPayment } from "../../src/modules/acquiring/operations-service";
+import {merchantDeposits} from "../../src/modules/acquiring/settlement-schema";
 import { ledgerEntries } from "../../src/modules/ledger/schema";
 import { acquiringFixture, paymentInput } from "../helpers/acquiring";
 afterAll(closeDatabase);
@@ -41,23 +42,26 @@ it("concurrent retries share one payment, refund and balanced journal pair per e
 });
 it("competing transfers cannot overdraw available funds", async () => {
   const f = await ready(); await simulateMerchantPayment(f.personId, f.unit.id, f.channel.id, { commandId: randomUUID(), expectedChannelVersion: 1, outcome: "APPROVED" });
-  const transfers = await Promise.allSettled(Array.from({ length: 2 }, () => createMerchantPayout(f.personId, f.unit.id, { commandId: randomUUID(), amountMinor: "800", currency: "USD" })));
+  const reviewToken=(await getMerchantOperations(f.personId,f.unit.id)).depositReview!.token;
+  const transfers = await Promise.allSettled(Array.from({ length: 2 }, () => createMerchantPayout(f.personId, f.unit.id, {commandId: randomUUID(),reviewToken})));
   expect(transfers.filter(row => row.status === "fulfilled")).toHaveLength(1);
-  expect(transfers.find(row => row.status === "rejected")).toMatchObject({ reason: { code: "INSUFFICIENT_LEDGER_FUNDS" } });
-  expect((await getMerchantOperations(f.personId, f.unit.id)).availableFunds?.minor).toBe("450");
-  expect(await getDb().select().from(merchantTestPayouts).where(eq(merchantTestPayouts.merchantUnitId, f.unit.id))).toHaveLength(1);
+  expect(transfers.find(row => row.status === "rejected")).toMatchObject({ reason: { code: "NO_PAYMENTS_TO_DEPOSIT" } });
+  expect((await getMerchantOperations(f.personId, f.unit.id)).availableFunds?.minor).toBe("0");
+  expect(await getDb().select().from(merchantDeposits).where(eq(merchantDeposits.merchantUnitId, f.unit.id))).toHaveLength(1);
 });
 it("a full refund racing a full transfer commits only one debit", async () => {
   const f = await ready(), paid = await simulateMerchantPayment(f.personId, f.unit.id, f.channel.id, { commandId: randomUUID(), expectedChannelVersion: 1, outcome: "APPROVED" });
+  const reviewToken=(await getMerchantOperations(f.personId,f.unit.id)).depositReview!.token;
   const outcomes = await Promise.allSettled([
     refundMerchantPayment(f.personId, f.unit.id, paid.id, { commandId: randomUUID(), expectedVersion: 1, reason: "Fictional race return" }),
-    createMerchantPayout(f.personId, f.unit.id, { commandId: randomUUID(), amountMinor: "1250", currency: "USD" }),
+    createMerchantPayout(f.personId, f.unit.id, {commandId: randomUUID(),reviewToken}),
   ]);
   expect(outcomes.filter(row => row.status === "fulfilled")).toHaveLength(1);
-  expect(outcomes.find(row => row.status === "rejected")).toMatchObject({ reason: { code: "INSUFFICIENT_LEDGER_FUNDS" } });
+  const failure=outcomes.find(row=>row.status==="rejected");
+  expect(failure?.status==="rejected"&&["NO_PAYMENTS_TO_DEPOSIT","REFUND_DEPOSIT_RESERVED"].includes(failure.reason.code)).toBe(true);
   const refunds = await getDb().select().from(merchantTestRefunds).where(eq(merchantTestRefunds.merchantUnitId, f.unit.id));
-  const payouts = await getDb().select().from(merchantTestPayouts).where(eq(merchantTestPayouts.merchantUnitId, f.unit.id));
+  const payouts = await getDb().select().from(merchantDeposits).where(eq(merchantDeposits.merchantUnitId, f.unit.id));
   expect(refunds.length + payouts.length).toBe(1);
   expect((await getMerchantOperations(f.personId, f.unit.id)).availableFunds?.minor).toBe("0");
-  expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.merchantUnitId, f.unit.id))).toHaveLength(4);
+  expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.merchantUnitId, f.unit.id))).toHaveLength(refunds.length?4:6);
 });

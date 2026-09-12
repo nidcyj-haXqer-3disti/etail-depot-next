@@ -45,6 +45,14 @@ describe("first-time email lifecycle", () => {
     const { adapter } = setup([new Response("private provider detail", { status: 404 })]);
     await expect(adapter.confirmEmail("spent-test-token")).rejects.toMatchObject({ code: "INVALID_EMAIL_LINK", status: 401 });
   });
+  it("distinguishes an expired recovery link before reset revocation or password update begins", async () => {
+    const { adapter, fetcher } = setup([new Response("private provider detail", { status: 404 })]);
+    const begin = vi.fn(async () => undefined), complete = vi.fn(async () => undefined);
+    await expect(adapter.resetPassword("expired-recovery-token", "new long password", begin, complete)).rejects.toMatchObject({ code: "INVALID_EMAIL_LINK", status: 401 });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(fetcher.mock.calls[0]?.[1]?.body as string)).toEqual({ type: "recovery", token: "expired-recovery-token" });
+    expect(begin).not.toHaveBeenCalled(); expect(complete).not.toHaveBeenCalled();
+  });
   it("requests recovery generically without exposing whether an email exists", async () => {
     const { adapter, fetcher } = setup([Response.json({})]);
     expect(await adapter.requestRecovery("person@example.test")).toBeUndefined();

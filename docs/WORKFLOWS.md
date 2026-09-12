@@ -1,5 +1,9 @@
 # Canonical workflows and business effects
 
+> **Historical workflow specification — superseded for active sequencing and model.** Follow [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md). Earlier account-based steps, creation introductions and statements about hosted or implemented behavior below retain their original context; they are not the current journey or capability inventory.
+>
+> Security, scoped authority, exact money, unique business effects, recovery, release approval and commercial obligations remain required unless explicitly superseded by an authorized decision. Keeping a future workflow here does not establish that it works today.
+
 Current authority: [Service dashboard design](SERVICE_DASHBOARD_DESIGN.md) governs customer navigation and creation, with the [two-service privacy rules](TWO_SERVICE_DESIGN.md). Financial invariants and unrelated future requirements remain.
 
 

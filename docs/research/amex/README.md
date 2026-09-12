@@ -1,18 +1,22 @@
 # American Express as Etail's primary business and product reference
 
+> **Research archive and comparison reference — active design superseded on 11 September 2026.** Use [Product and technical design](../../PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../../../planning/DELIVERY_PLAN.md) for current product decisions, scope and acceptance. Dated observations and proposals below preserve their original evidence limits; old account models and historical implementation instructions do not govern new work. The current ambition is **100% of the retained public-workflow inventory**, recorded as `amex-public-v2`, not the original 90% threshold. No parity or completion score is awarded here.
+
+Latest D69 screen/workflow refresh (12 September 2026): [Prepaid replacement reference findings](../../FRESH_PREPAID_REBUILD.md#reference-findings), including current official cardholder/merchant guides, the historical Amex UK merchant walkthrough and MagnifiedMoney cardholder video. The record distinguishes complete available transcripts from inspected player moments, market/date limitations and Etail's explicit prepaid adaptation. It does not claim private portal access or parity.
+
 Latest marketing refresh (10 September 2026): [Amex people and card positioning](MARKETING_POSITIONING_2026_09_10.md) and [delegated collection research](MERCHANT_MARKETING_FIT_2026_09_10.md). These support [the redesigned landing page](../../MARKETING_REFRESH.md); proposed audience jobs remain hypotheses for customer testing.
 
 Latest dashboard/role refresh: [Cardholder dashboards](CARDHOLDER_DASHBOARD_ROLES.md) and [Merchant dashboards](MERCHANT_DASHBOARD_ROLES.md), with official sources, observed illustrations, historical video and evidence limits. These inform [the implemented service design](../../SERVICE_DASHBOARD_DESIGN.md).
 
 **Latest correction: front-end experience. Start with [the actual screen and interaction reference](FRONTEND_EXPERIENCE.md).** The user wants the Amex layouts, navigation, controls, page sequences and visible feedback for issuing, account management and merchant servicing. This supersedes the business-audit emphasis below. The front-end reference includes visually inspected official screenshots and identifies missing visual evidence.
 
-Research date: 8 September 2026. **Latest user direction:** focus the 360° check on issuing, account control and merchant operations: product behavior, management responsibilities, customer experience and complete operating workflows. Amex remains the primary reference with the user's 90%+ target. Technical supplier/architecture research is retained as background and is not the focus of this business review.
+Research date: 8 September 2026. **Direction for that research pass:** focus the 360° check on issuing, account control and merchant operations: product behavior, management responsibilities, customer experience and complete operating workflows. Amex was the primary reference with the user's original 90%+ target. The user raised the ambition to 100% on 9 September; the retained inventory is now `amex-public-v2`. Technical supplier/architecture research remains background, not the focus of the customer experience review.
 
-**Research is complete for this documented pass; implementation parity is not assessed.** This is a broad relevant-source review, not a claim to have found every resource or inspected all Amex products. The existing local account/session foundation remains partial. No new financial feature, Amex integration, dependency installation or deployment was performed in this research task.
+**Research is complete for this documented pass; implementation parity is not assessed.** This is a broad relevant-source review, not a claim to have found every resource or inspected all Amex products. The local account/session foundation was partial at the time of that pass; this is not a current application assessment. No new financial feature, Amex integration, dependency installation or deployment was performed in that research task.
 
 ## Read the findings
 
-**Start with the [360° business review](BUSINESS_360_REVIEW.md).** It follows each relationship from application and setup through daily use, payment, exception handling, change and closure. The issuing, account-control and merchant reviews identify actors, decisions, normal paths, exceptions, handoffs, evidence gaps and practical acceptance scenarios. Twelve connected walkthroughs join the three areas.
+The earlier [360° business review](BUSINESS_360_REVIEW.md) follows each relationship from application and setup through daily use, payment, exception handling, change and closure. It is supporting context after the front-end references above. The issuing, account-control and merchant reviews identify actors, decisions, normal paths, exceptions, handoffs, evidence gaps and practical acceptance scenarios. Twelve connected walkthroughs join the three areas.
 
 | Document | What it answers |
 |---|---|
@@ -36,7 +40,7 @@ The earlier workflow/component pass contains **137 records representing 135 dist
 
 The deeper architecture pass adds **46 included records across four registers**, with provenance-only and limited-adoption sources clearly marked; these are not 46 independently verified deployments. Excluded/failed leads do not count. See [architecture validation](ARCHITECTURE_VALIDATION.md) for deduplicated counts, review corrections and the new proposed gates. Every register records direct URLs, access date, scope, evidence and limitations.
 
-## Conclusions that change the build
+## Historical conclusions that informed the build
 
 **The current review is about completing the business relationship.** Use the [business findings and walkthroughs](BUSINESS_360_REVIEW.md) before the background technology material. A feature name or available screen is insufficient when a customer cannot finish the task, the wrong person can act, money status is unclear or an exception has no owner.
 
@@ -50,9 +54,9 @@ The deeper architecture pass adds **46 included records across four registers**,
 
 **GitHub should supply focused implementation help.** Evaluate upstream code for the specific missing component, with license, compatibility, security and operational fit checked at the selected revision. A general ledger, switch, billing system or web framework is not by itself an Amex-like product. Read the component assessment before introducing any dependency or replacing an existing single owner.
 
-## What “90%+” means in the build
+## Retained comparison inventory and the current 100% target
 
-The user's similarity target is accepted. This is the **proposed measurement method**, not a claim that the user has approved every new capability or that the project already reaches the target.
+The original `amex-public-v1` research used a 90%+ target. The user's 9 September update raised both overall and per-domain targets to 100%, recorded in [the `amex-public-v2` inventory](../../../planning/amex-comparison.json). The denominator remains the same 90 public comparison tasks. This is the **proposed measurement method**, not a claim that the user has approved every researched capability or that the project reaches the target.
 
 The initial denominator is 90 documented, relevant comparison tasks: 18 each for issuing, account controls, consumer experience, merchant servicing and management. Each task has equal weight. For a task to earn one verified point, it must pass all five dimensions:
 
@@ -62,11 +66,11 @@ The initial denominator is 90 documented, relevant comparison tasks: 18 each for
 4. **Status and recovery:** pending, rejected, failed, expired and uncertain outcomes have truthful, usable next steps.
 5. **Desktop, mobile and accessibility:** the task works at supported widths with keyboard and assistive access, with visual review and actual user walkthrough evidence.
 
-Future score = verified complete tasks / 90 × 100. Require at least 90% overall **and in each domain**, all 71 critical tasks, and all 20 mandatory Etail gates. With 18 tasks per domain, the domain threshold needs at least 17 completed tasks per area. All mandatory product acceptance remains required even if the comparison threshold is met. A static mock, implementation plan, successful HTTP response without a durable effect, unsupported button, or inaccessible-source assumption receives no completion credit.
+Future score = verified complete tasks / 90 × 100. The current target is all 90 tasks, including all 18 tasks in each domain and all 71 critical tasks, plus all 20 mandatory Etail gates. The historical v1 threshold was at least 90% overall and in each domain, requiring at least 17 of 18 per domain; it is no longer the target. All mandatory product acceptance remains required. A static mock, implementation plan, successful HTTP response without a durable effect, unsupported button, or inaccessible-source assumption receives no completion credit.
 
 Evidence for a completed row must record exact source revision/SHA, test names/results, role fixtures, desktop/mobile views, recovery exercise and reviewer/date. Reuse existing foundation evidence only after mapping its precise coverage; this pass does not automatically award it whole-workflow credit. **No implementation percentage is asserted now.**
 
-Freeze this inventory as `amex-public-v1` for implementation review. New discoveries become versioned additions with a documented rationale; never drop a hard or unsupported task just to increase the score. Unsupported features such as unproven Identity passkey integration remain visible gaps. Benefit enrollment must have an actual specified Etail benefit before implementation; research does not invent a travel/offers business.
+Keep the current `amex-public-v2` inventory and its historical v1 provenance explicit. New discoveries become versioned additions with a documented rationale; never drop a hard or unsupported task just to increase the score. Unsupported features such as unproven Identity passkey integration remain visible gaps. Benefit enrollment must have an actual specified Etail benefit before implementation; research does not invent a travel/offers business.
 
 The target concerns observable product/workflow and experience fidelity. Pixel similarity, Amex branding and private architecture cannot honestly share this percentage. Visual hierarchy and interaction fidelity remain in the rubric, using original Etail assets. Architecture is reviewed against explicit relationship, ownership, safety and recovery gates instead of an invented percentage of private Amex systems.
 
@@ -82,12 +86,12 @@ Before each financial slice, revisit the relevant current public sources, resolv
 
 ## Deliberate Etail differences and retained obligations
 
-Exactly PERSONAL, HOUSEHOLD and SELLER remain the account types. Select/Premier terms, the shared Premier cap, responsible-party relationships, funded minors, Household privacy and source-defined repayment policies remain in force. Amex public examples do not silently decide fees, liability, age, interest, automatic unfreeze or rewards values. D14–D17 stay unresolved for their affected writes. Comparison gaps caused by these differences are documented, not hidden by importing incompatible economics.
+The original research assumed PERSONAL, HOUSEHOLD and SELLER account types; that model is superseded by Cardholder and Merchant services. Family and team relationships do not create additional account types. Select/Premier terms, the shared Premier cap, responsible-party relationships, guardian-funded supervised spending, personal privacy and source-defined repayment policies remain obligations unless explicitly changed. Amex public examples do not silently decide fees, liability, age, interest, automatic unfreeze or rewards values. D14–D17 retain their recorded decision status for affected writes; this research does not resolve them. Comparison gaps caused by deliberate product differences must remain visible rather than importing incompatible economics.
 
 Etail's guest checkout, QR/payment links, invoices, recurring mock collection, membership cost model and partner portal remain in the existing backlog even where they are not comparable Amex merchant-portal tasks. Travel, lounges, deposits, investment products and unrelated Amex businesses are outside this comparison inventory. Financial integrity, accessible operation, fresh resources and real-money-disabled simulation are mandatory gates, never optional tradeoffs within the remaining percentage.
 
-## Next implementation
+## Historical implementation handoff
 
-Finish M0/M1 identity/account/responsibility/invitation/grant work using this control model. Then build M2's one application/card lifecycle and M3's backed transaction/statement/repayment lifecycle, followed by M4's merchant settlement/dispute/payout journey. Design the corresponding operator projections within each slice and complete M5 management workflows through those same commands. M6/M7 verify the catalog, retained product scope and hosted release gates. [Detailed implementation sequence](ARCHITECTURE_AND_MANAGEMENT.md#implementation-order-and-review-gates)
+The original handoff proposed M0/M1 identity/account/responsibility/invitation/grant work, then M2's one application/card lifecycle and M3's backed transaction/statement/repayment lifecycle, followed by M4's merchant settlement/dispute/payout journey. It proposed corresponding operator projections within each slice and M5 management workflows through the same commands, with M6/M7 verification of the catalog and hosted release gates. [Historical implementation sequence](ARCHITECTURE_AND_MANAGEMENT.md#implementation-order-and-review-gates). Use the current [Delivery plan](../../../planning/DELIVERY_PLAN.md) to choose the next work; this paragraph is not a current backlog or instruction to restart completed foundations.
 
-The branch stays on the existing feature work; no remote push, merge, visitor-setting change or public release occurred. The earlier workbook-export decision is independent of this local research and remains as recorded in project status.
+During the original research handoff, the branch stayed on the existing feature work; no remote push, merge, visitor-setting change or public release occurred as part of that research. The earlier workbook-export decision was independent of the research. Consult current delivery evidence for later publication and approval history.

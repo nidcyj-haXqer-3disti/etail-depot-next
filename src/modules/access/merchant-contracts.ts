@@ -20,6 +20,8 @@ export interface MerchantAccessPerson {
 }
 export interface MerchantAccessOverview {
   merchantUnitId:string;merchantName:string;masterName:string;canInvite:boolean;
+  invitationTotal:number;pendingInvitationCount:number;invitationsTruncated:boolean;
+  invitationOptions:{invitationDays:(1|3|7)[];accessDays:(1|7|30)[];accessExpiresAt:string|null};
   controllers:{personId:string;displayName:string;basis:"PRIMARY_MEMBER"}[];
   people:MerchantAccessPerson[];invitations:MerchantInvitationProjection[];recipients:{id:string;displayName:string}[];
   permissionOptions:{action:MerchantPermission;label:string;description:string;canDelegate:boolean}[];notice:string;

@@ -10,10 +10,10 @@ describe("local workspace contracts and exact display money", () => {
     expect(formatMoney(-1n).formatted).toBe("-$0.01");
     expect(formatMoney(0n).formatted).toBe("$0.00");
   });
-  it("rejects injected permissions, unsupported formats, fractional amounts and unbounded responses", () => {
-    const base = {commandId:randomUUID(),expectedVersion:1,holderId:randomUUID(),nickname:"Saved sample",format:"VIRTUAL",requestedLimitMinor:"10000"};
+  it("keeps card creation separate from money, limits and permissions", () => {
+    const base = {commandId:randomUUID(),expectedVersion:1,holderId:randomUUID(),nickname:"Saved sample",format:"VIRTUAL"};
     expect(cardDraftCommandSchema.safeParse(base).success).toBe(true);
-    for (const delta of [{role:"PRIMARY"},{format:"REAL"},{requestedLimitMinor:"12.50"},{requestedLimitMinor:"1000000000"},{requestedLimitMinor:"-1"},{nickname:""}]) expect(cardDraftCommandSchema.safeParse({...base,...delta}).success).toBe(false);
+    for (const delta of [{role:"PRIMARY"},{format:"REAL"},{requestedLimitMinor:"10000"},{monthlyLimitMinor:"10000"},{amountMinor:"10000"},{balanceMinor:"10000"},{nickname:""},{nickname:"x".repeat(61)}]) expect(cardDraftCommandSchema.safeParse({...base,...delta}).success).toBe(false);
     expect(cardControlCommandSchema.safeParse({commandId:randomUUID(),expectedVersion:1,action:"issue"}).success).toBe(false);
     expect(notificationCommandSchema.safeParse({commandId:randomUUID(),expectedVersion:1,serviceActivity:true,cardControls:true,caseUpdates:true,personId:randomUUID()}).success).toBe(false);
   });

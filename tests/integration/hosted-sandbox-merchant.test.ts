@@ -1,3 +1,4 @@
+import {publishGuestChannel,getPublicGuestRequest} from "../../src/modules/acquiring/guest-service";
 import { randomUUID } from "node:crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { afterAll, beforeAll, expect, it, vi } from "vitest";
@@ -8,7 +9,7 @@ import { bindIdentity, listServicesForPerson } from "../../src/modules/services/
 import { createPrimaryMerchant } from "../../src/modules/services/create-merchant";
 import { startSandbox } from "../../src/modules/sandbox/service";
 import { createChannel, createOwnedSubmerchant, getMerchantBusinessDetails, getMerchantDirectory, getMerchantWorkspace, pauseMerchant, submitMerchantSetup, updateMerchantSetup } from "../../src/modules/acquiring/service";
-import { configureTestGateway, createMerchantPayout, enrollTestMerchant, getMerchantCheckout, getMerchantNetwork, getMerchantOperations, refundMerchantPayment, setChannelActivation, simulateMerchantPayment } from "../../src/modules/acquiring/operations-service";
+import { configureTestGateway, createMerchantPayout, enrollTestMerchant, getMerchantNetwork, getMerchantOperations, refundMerchantPayment, setChannelActivation, simulateMerchantPayment } from "../../src/modules/acquiring/operations-service";
 import { channelPresentationSchema } from "../../src/modules/acquiring/contracts";
 import { merchantTestPayments } from "../../src/modules/acquiring/operations-schema";
 import { getMerchantDashboard } from "../../src/modules/acquiring/dashboard-service";
@@ -62,25 +63,25 @@ it("runs a hosted email participant through merchant setup, seven formats, recei
   const sub = await createOwnedSubmerchant(f.personId, f.merchantId, { commandId: randomUUID(), displayName: "Practice pop-up shop" });
   const channel = await readyChannel(f.personId, sub.id);
   expect(channel.presentations).toEqual(channelPresentationSchema.options);
-  const checkout = await getMerchantCheckout(f.personId, channel.id);
-  expect(checkout).toMatchObject({ previewUrl: `${targets.netlify.canonical_origin}/pay/${channel.id}`, activation: { canSimulate: true, state: "ACTIVE" } });
-  expect(checkout.qrDataUrl).toMatch(/^data:image\/png;base64,/);
+  const published=await publishGuestChannel(f.personId,sub.id,channel.id,{commandId:randomUUID(),expectedChannelVersion:channel.version});
+  expect(published.publication?.publicHref).toBe(`${targets.netlify.canonical_origin}/checkout/${published.publication!.id}`);
+  expect(await getPublicGuestRequest(published.publication!.id)).toMatchObject({canStart:true,publication:{amount:{minor:"1250"}}});
 
   const declined = await simulateMerchantPayment(f.personId, sub.id, channel.id, payment("DECLINED"));
   expect(declined).toMatchObject({ status: "DECLINED", canRefund: false });
   const first = await simulateMerchantPayment(f.personId, sub.id, channel.id, payment());
   const second = await simulateMerchantPayment(f.personId, sub.id, channel.id, payment());
   expect((await refundMerchantPayment(f.personId, sub.id, first.id, { commandId: randomUUID(), expectedVersion: 1, reason: "Practice return" })).status).toBe("REFUNDED");
-  const transfer = await createMerchantPayout(f.personId, sub.id, { commandId: randomUUID(), amountMinor: "250", currency: "USD" });
-  expect(transfer).toMatchObject({ status: "COMPLETED", destination: "TEST_DESTINATION" });
+  const transfer = await createMerchantPayout(f.personId, sub.id, {commandId: randomUUID(),reviewToken:(await getMerchantOperations(f.personId,sub.id)).depositReview?.token});
+  expect(transfer).toMatchObject({ status: "PENDING", destination: "TEST_DESTINATION" });
   const operations = await getMerchantOperations(f.personId, sub.id);
-  expect(operations).toMatchObject({ liveEnabled: false, feeStatus: "NOT_APPLIED", availableFunds: { minor: "1000" }, canConfigureGateway: true, canPayout: true });
+  expect(operations).toMatchObject({ liveEnabled: false, feeStatus: "NOT_APPLIED", availableFunds: { minor: "0" },pendingDeposits:{minor:"1250"}, canConfigureGateway: true, canPayout: true });
   expect(operations.payments.map(row => row.id).sort()).toEqual([first.id, second.id, declined.id].sort());
   expect((await getMerchantNetwork(f.personId, f.merchantId)).units.map(row => row.id).sort()).toEqual([f.merchantId, sub.id].sort());
   expect((await getMerchantDashboard(f.personId)).units).toHaveLength(2);
 
   const journals = await getDb().select({ journalId: ledgerEntries.journalId, total: sql<string>`sum(${ledgerEntries.deltaMinor})::text` }).from(ledgerEntries).where(eq(ledgerEntries.serviceId, f.serviceId)).groupBy(ledgerEntries.journalId);
-  expect(journals).toHaveLength(4);
+  expect(journals).toHaveLength(5);
   expect(journals.every(row => row.total === "0")).toBe(true);
   expect(await getDb().select().from(identityBindings).where(eq(identityBindings.personId, f.personId))).toMatchObject([{ issuer }]);
   expect((await listServicesForPerson(f.personId)).map(row => row.kind)).toEqual(["MERCHANT"]);
@@ -114,7 +115,7 @@ it("keeps invited email helpers inside their exact submerchant and revokes autho
   await expect(getMerchantNetwork(helper.personId, sub.id)).rejects.toMatchObject({ status: 404 });
   await expect(configureTestGateway(helper.personId, sub.id, { commandId: randomUUID(), expectedVersion: 1, enabled: false })).rejects.toMatchObject({ status: 404 });
   await expect(refundMerchantPayment(helper.personId, sub.id, paid.id, { commandId: randomUUID(), expectedVersion: 1, reason: "Forbidden return" })).rejects.toMatchObject({ status: 403 });
-  await expect(createMerchantPayout(helper.personId, sub.id, { commandId: randomUUID(), amountMinor: "100", currency: "USD" })).rejects.toMatchObject({ status: 403 });
+  await expect(createMerchantPayout(helper.personId, sub.id, {commandId: randomUUID(),reviewToken:(await getMerchantOperations(helper.personId,sub.id)).depositReview?.token})).rejects.toMatchObject({ status: 403 });
   expect(await listServicesForPerson(helper.personId)).toEqual([]);
   const assignment = (await getMerchantAccessOverview(f.personId, sub.id)).people.find(row => row.personId === helper.personId)!;
   await revokeMerchantAccess(f.personId, sub.id, assignment.id, { commandId: randomUUID(), expectedVersion: assignment.version });
@@ -128,11 +129,12 @@ it("preserves retry uniqueness, atomic funds and exact permissions for opted-in 
   const results = await Promise.all(Array.from({ length: 4 }, () => simulateMerchantPayment(f.personId, f.merchantId, channel.id, input)));
   expect(new Set(results.map(row => row.id)).size).toBe(1);
   expect(await getDb().select().from(merchantTestPayments).where(eq(merchantTestPayments.channelId, channel.id))).toHaveLength(1);
-  await expect(createMerchantPayout(f.personId, f.merchantId, { commandId: randomUUID(), amountMinor: "1251", currency: "USD" })).rejects.toMatchObject({ code: "INSUFFICIENT_LEDGER_FUNDS" });
-  const transfers = await Promise.allSettled(Array.from({ length: 2 }, () => createMerchantPayout(f.personId, f.merchantId, { commandId: randomUUID(), amountMinor: "1000", currency: "USD" })));
+  await expect(createMerchantPayout(f.personId,f.merchantId,{commandId:randomUUID(),reviewToken:"0".repeat(64)})).rejects.toMatchObject({code:"DEPOSIT_REVIEW_CHANGED"});
+  const reviewedToken=(await getMerchantOperations(f.personId,f.merchantId)).depositReview!.token;
+  const transfers = await Promise.allSettled(Array.from({ length: 2 }, () => createMerchantPayout(f.personId, f.merchantId, {commandId: randomUUID(),reviewToken:reviewedToken})));
   expect(transfers.filter(result => result.status === "fulfilled")).toHaveLength(1);
   expect(transfers.filter(result => result.status === "rejected")).toHaveLength(1);
-  expect((await getMerchantOperations(f.personId, f.merchantId)).availableFunds?.minor).toBe("250");
+  expect((await getMerchantOperations(f.personId, f.merchantId)).availableFunds?.minor).toBe("0");
   await getDb().update(permissionGrants).set({ state: "REVOKED" }).where(and(eq(permissionGrants.serviceId, f.serviceId), eq(permissionGrants.action, "payments.simulate")));
   await expect(simulateMerchantPayment(f.personId, f.merchantId, channel.id, input)).rejects.toMatchObject({ code: "ACTION_DENIED" });
   await pauseMerchant(f.personId, f.merchantId, { commandId: randomUUID(), expectedVersion: 1, reason: "Practice pause" });

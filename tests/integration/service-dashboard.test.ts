@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
@@ -15,12 +16,12 @@ async function fixture() {
   await enrollCardholder(actor.personId, actor.serviceId, additional);
   await enrollCardholder(otherPrimary.personId, otherPrimary.serviceId, actor.personId);
   await enrollCardholder(otherPrimary.personId, otherPrimary.serviceId, additional);
-  const ownPrimary = await issuePracticeCard(actor.personId, actor.serviceId, actor.personId, "Own primary card", "10000", "123");
-  const managedAdditional = await issuePracticeCard(actor.personId, actor.serviceId, additional, "Managed secondary card", "10000", "222");
-  const ownSecondary = await issuePracticeCard(otherPrimary.personId, otherPrimary.serviceId, actor.personId, "Own secondary card", "10000", "111");
-  const hiddenPrimary = await issuePracticeCard(otherPrimary.personId, otherPrimary.serviceId, otherPrimary.personId, "Hidden primary card", "10000", "333");
-  const hiddenAdditional = await issuePracticeCard(otherPrimary.personId, otherPrimary.serviceId, additional, "Hidden secondary card", "10000", "444");
-  const foreignCard = await issuePracticeCard(foreign.personId, foreign.serviceId, foreign.personId, "Unrelated card", "10000", "55");
+  const ownPrimary = await (async()=>{await fundCardGroup(actor.personId,actor.serviceId,"20000");await setPersonLimit(actor.personId,actor.serviceId,actor.personId,"10000");return issuePracticeCard(actor.personId,actor.serviceId,actor.personId,"Own primary card","123");})();
+  const managedAdditional = await (async()=>{await setPersonLimit(actor.personId,actor.serviceId,additional,"10000");return issuePracticeCard(actor.personId,actor.serviceId,additional,"Managed secondary card","222");})();
+  const ownSecondary = await (async()=>{await fundCardGroup(otherPrimary.personId,otherPrimary.serviceId,"30000");await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,actor.personId,"10000");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,actor.personId,"Own secondary card","111");})();
+  const hiddenPrimary = await (async()=>{await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,otherPrimary.personId,"10000");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,otherPrimary.personId,"Hidden primary card","333");})();
+  const hiddenAdditional = await (async()=>{await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,additional,"10000");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,additional,"Hidden secondary card","444");})();
+  const foreignCard = await (async()=>{await fundCardGroup(foreign.personId,foreign.serviceId,"10000");await setPersonLimit(foreign.personId,foreign.serviceId,foreign.personId,"10000");return issuePracticeCard(foreign.personId,foreign.serviceId,foreign.personId,"Unrelated card","55");})();
   const pendingOwned = await startCardRequest(actor.personId, actor.serviceId, { commandId: randomUUID() });
   const pendingOther = await startCardRequest(otherPrimary.personId, otherPrimary.serviceId, { commandId: randomUUID() });
   const pendingForeign = await startCardRequest(foreign.personId, foreign.serviceId, { commandId: randomUUID() });
@@ -40,13 +41,32 @@ describe("service-first Cardholder dashboard", () => {
     const f = await fixture(), before = await f.snapshot();
     const dashboard = await getCardholderDashboard(f.actor.personId);
     expect(dashboard.profiles).toHaveLength(2);
+    expect(dashboard).toMatchObject({cardCount:3,ownCardCount:2,managedCardCount:1,cardMatchCount:3,cardScope:"ALL",cardSearch:""});
     expect(dashboard.primaryService).toMatchObject({ id: f.actor.serviceId, primaryPersonId: f.actor.personId, relationship: "PRIMARY" });
     expect(dashboard.cards.filter(card => card.accessRole === "PRIMARY").map(card => card.id).sort()).toEqual([f.ownPrimary.card.id, f.managedAdditional.card.id].sort());
     expect(dashboard.cards.filter(card => card.accessRole === "SECONDARY")).toMatchObject([{ id: f.ownSecondary.card.id, serviceId: f.otherPrimary.serviceId, holderId: f.actor.personId, canPurchase: false, canManageAccess: false, available: { minor: "9889" } }]);
     expect(dashboard.activity.map(row => row.id).sort()).toEqual([f.ownPrimary.activity!.id, f.managedAdditional.activity!.id, f.ownSecondary.activity!.id].sort());
-    expect(dashboard.requests.map(row => row.id)).toEqual([f.pendingOwned.id]);
+    expect(dashboard.requests.map(row => row.id).sort()).toEqual([f.pendingOwned.id,f.ownPrimary.request.id,f.managedAdditional.request.id].sort());
     for (const hidden of [f.hiddenPrimary.card.id, f.hiddenAdditional.card.id, f.hiddenPrimary.activity!.id, f.hiddenAdditional.activity!.id, f.pendingOther.id, f.pendingForeign.id, f.foreignCard.card.id]) expect(JSON.stringify(dashboard)).not.toContain(hidden);
     await expect(purchaseCard(f.actor.personId, f.otherPrimary.serviceId, f.ownSecondary.card.id, { commandId: randomUUID(), expectedVersion: f.ownSecondary.card.version, amountMinor: "1", description: "No cross-service grants" })).rejects.toMatchObject({ status: 403 });
+    expect(await f.snapshot()).toEqual(before);
+  });
+
+  it("separates cards named to the signed-in person from cards they manage without widening authority", async () => {
+    const f=await fixture(),before=await f.snapshot();
+    const own=await getCardholderDashboard(f.actor.personId,0,{cardScope:"OWN"});
+    expect(own).toMatchObject({cardCount:3,ownCardCount:2,managedCardCount:1,cardMatchCount:2,cardScope:"OWN"});
+    expect(own.cards.map(card=>card.id).sort()).toEqual([f.ownPrimary.card.id,f.ownSecondary.card.id].sort());
+    const managed=await getCardholderDashboard(f.actor.personId,0,{cardScope:"MANAGED"});
+    expect(managed).toMatchObject({cardCount:3,ownCardCount:2,managedCardCount:1,cardMatchCount:1,cardScope:"MANAGED"});
+    expect(managed.cards.map(card=>card.id)).toEqual([f.managedAdditional.card.id]);
+    expect(managed.cards[0]).toMatchObject({canPurchase:false,purchaseAvailability:{code:"OTHER_CARDHOLDER"}});
+    const secondary=await getCardholderDashboard(f.additional,0,{cardScope:"MANAGED"});
+    expect(secondary).toMatchObject({cardCount:2,ownCardCount:2,managedCardCount:0,cardMatchCount:0,cards:[]});
+    for(const cardScope of ["ALL","OWN","MANAGED"] as const){
+      const hiddenSearch=await getCardholderDashboard(f.actor.personId,0,{cardScope,cardSearch:"Hidden"});
+      expect(hiddenSearch).toMatchObject({cardCount:3,ownCardCount:2,managedCardCount:1,cardMatchCount:0,cards:[]});
+    }
     expect(await f.snapshot()).toEqual(before);
   });
 
@@ -121,8 +141,8 @@ describe("service-first Cardholder dashboard", () => {
   it("paginates the authorized card set without duplicates or hidden-holder counts", async () => {
     const primary = await cardPrimary(), secondary = await cardPerson("Paginated secondary");
     await enrollCardholder(primary.personId, primary.serviceId, secondary);
-    for (let n = 0; n < 31; n++) await issuePracticeCard(primary.personId, primary.serviceId, primary.personId, `Primary card ${String(n).padStart(2, "0")}`, "1");
-    const own = await issuePracticeCard(primary.personId, primary.serviceId, secondary, "Secondary card", "1");
+    for (let n = 0; n < 31; n++) await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,`Primary card ${String(n).padStart(2, "0")}${n===30?" %_":""}`);
+    const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"1");await setPersonLimit(primary.personId,primary.serviceId,secondary,"1");return issuePracticeCard(primary.personId,primary.serviceId,secondary,"Secondary card");})();
     const first = await getCardholderDashboard(primary.personId), second = await getCardholderDashboard(primary.personId, 1);
     expect(first).toMatchObject({ cardCount: 32, cardsPage: 0, cardsHasMore: true });
     expect(first.cards).toHaveLength(30); expect(second.cards).toHaveLength(2); expect(second.cardsHasMore).toBe(false);
@@ -130,6 +150,20 @@ describe("service-first Cardholder dashboard", () => {
     const secondaryPage = await getCardholderDashboard(secondary);
     expect(secondaryPage).toMatchObject({ cardCount: 1, cardsHasMore: false });
     expect(secondaryPage.cards.map(card => card.id)).toEqual([own.card.id]);
+    const lastCard=await getCardholderDashboard(primary.personId,0,{cardScope:"OWN",cardSearch:"  %_  "});
+    expect(lastCard).toMatchObject({cardCount:32,ownCardCount:31,managedCardCount:1,cardMatchCount:1,cardSearch:"%_",cardsHasMore:false});
+    expect(lastCard.cards.map(card=>card.nickname)).toEqual(["Primary card 30 %_"]);
+    const holder=await getCardholderDashboard(primary.personId,0,{cardScope:"MANAGED",cardSearch:"paginated SECONDARY"});
+    expect(holder).toMatchObject({cardCount:32,cardMatchCount:1,cardsHasMore:false});
+    expect(holder.cards.map(card=>card.id)).toEqual([own.card.id]);
+    expect((await getCardholderDashboard(primary.personId,0,{cardSearch:own.card.lastFour})).cards.map(card=>card.id)).toContain(own.card.id);
+    const ownFirst=await getCardholderDashboard(primary.personId,0,{cardScope:"OWN"}),ownSecond=await getCardholderDashboard(primary.personId,1,{cardScope:"OWN"});
+    expect(ownFirst).toMatchObject({cardMatchCount:31,cardsHasMore:true});
+    expect(ownSecond).toMatchObject({cardMatchCount:31,cardsHasMore:false});
+    expect(new Set([...ownFirst.cards,...ownSecond.cards].map(card=>card.id)).size).toBe(31);
+    expect(ownFirst.cards.concat(ownSecond.cards).every(card=>card.holderId===primary.personId)).toBe(true);
     await expect(getCardholderDashboard(primary.personId, -1)).rejects.toMatchObject({ status: 422 });
+    await expect(getCardholderDashboard(primary.personId,0,{cardScope:"invalid" as "OWN"})).rejects.toMatchObject({status:422});
+    await expect(getCardholderDashboard(primary.personId,0,{cardSearch:"x".repeat(101)})).rejects.toMatchObject({status:422});
   });
 });

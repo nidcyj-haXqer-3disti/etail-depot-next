@@ -19,8 +19,11 @@ export interface AccessPerson {
 export interface AccessOverview {
   serviceId:string; serviceName:string; serviceKind:"CARDHOLDER";
   canInvite:boolean; canManage:boolean; people:AccessPerson[]; invitations:InvitationProjection[];
+  invitationTotal:number; pendingInvitationCount:number; invitationsTruncated:boolean;
   recipients:{id:string;displayName:string}[]; permissionOptions:PermissionOption[]; roleOptions:InvitedRole[];
   notice:string;
+  history:{id:string;personId:string;personName:string;actorName:string;label:string;createdAt:string}[];
+  historyHasMore:boolean;
 }
 const permissions = z.array(z.enum(ACCESS_PERMISSIONS)).max(ACCESS_PERMISSIONS.length).refine(values=>new Set(values).size===values.length,"Permissions must be unique");
 export const createInvitationSchema=z.object({commandId:z.uuid(),recipientId:z.uuid(),role:z.literal("SECONDARY"),permissions,delegablePermissions:permissions,expiresInDays:z.union([z.literal(1),z.literal(3),z.literal(7)])}).strict();

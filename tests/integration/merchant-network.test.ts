@@ -40,7 +40,7 @@ it("Cardholder membership revocation cannot revoke merchant-specific access or a
 it("primary hierarchy visibility never invents a payment read grant",async()=>{
  const f=await merchantAccessFixture();await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,f.merchant.serviceId),eq(permissionGrants.action,"payments.read")));
  const network=await getMerchantNetwork(f.merchant.personId,f.master.id);expect(network).toMatchObject({canReadPayments:false,availableFunds:null,payments:[],payouts:[]});expect(network.units).toHaveLength(2);
- const dashboard=await getMerchantDashboard(f.merchant.personId);expect(dashboard.views.every(view=>view.totals.available===null)).toBe(true);
+ const dashboard=await getMerchantDashboard(f.merchant.personId);for(const entry of [...dashboard.units,...dashboard.views])expect(entry.totals).toMatchObject({available:null,settled:null,pending:null,bank:null});
 });
 
 it("resume restores only current explicit submerchant authority and keeps independently paused children stopped",async()=>{

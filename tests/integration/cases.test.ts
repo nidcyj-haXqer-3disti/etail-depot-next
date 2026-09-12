@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
@@ -10,7 +11,7 @@ import { createSupportCase, listSupportCases, getSupportCase, addSupportMessage,
 import { supportCaseDetailSchema, supportCaseListSchema } from "../../src/modules/cases/api-contracts";
 import { supportCases, supportCaseMessages } from "../../src/modules/cases/schema";
 afterAll(closeDatabase);
-async function fixture() {const primary=await cardPrimary("Support tester");await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Support card","10000","1251");return {...primary,workspace:await getWorkspace(primary.personId,primary.serviceId)};}
+async function fixture() {const primary=await cardPrimary("Support tester");await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"10000");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"10000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Support card","1251");})();return {...primary,workspace:await getWorkspace(primary.personId,primary.serviceId)};}
 async function viewer(serviceId:string) {
   const actor=await bindIdentity("urn:etail:isolated-fixture",randomUUID(),"Fictional private support viewer");
   await getDb().insert(serviceMembers).values({serviceId,personId:actor.personId,state:"ACCEPTED"});

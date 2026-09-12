@@ -1,17 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { CardholderEnrollment } from "./cardholder-enrollment";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import type {CardholderFunds} from "@/modules/workspace/funding-contracts";
+import type { WorkspaceProjection } from "@/modules/workspace/contracts";
 import type { AccessOverview } from "@/modules/access/contracts";
 import type { CardholderDashboardDetail, CardholderDashboardFocus, CardholderDashboardProjection, DashboardCard } from "@/modules/workspace/dashboard-contracts";
+import { CardholderEnrollment } from "./cardholder-enrollment";
 import { CardsWorkspace } from "./workspace/cards";
 import { ActivityDetails } from "./workspace/activity";
 import { PeopleWorkspace } from "./workspace/people";
 import { CardPreview } from "./workspace/card-art";
 import { Button, EmptyState, StatusBadge, WorkspaceDialog, formatDate } from "./workspace/primitives";
-import { CardholderNavigation } from "./cardholder-navigation";
+import { CardholderNavigation, cardholderViewLabels, type CardholderView } from "./cardholder-navigation";
 import { cardholderTaskHref } from "./cardholder-routing";
 import { WorkspaceIcon } from "./workspace/navigation";
 import { TaskSearch } from "./workspace/task-search";
@@ -20,142 +22,128 @@ import "./cardholder-dashboard.css";
 
 const base = "/cardholder-services";
 const views = ["overview", "cards", "activity", "cardholders", "requests"] as const;
-type View = typeof views[number];
-const viewLabels: Record<View, string> = { overview: "Overview", cards: "Cards", activity: "Activity", cardholders: "Cardholders", requests: "Saved requests" };
+const detailKeys = ["card", "request", "new", "manage", "transaction", "holder", "review", "cardTask"];
 
-export function CardholderDashboard({ dashboard, detail, access, selectionUnavailable = false, focusedCard = null, focusedWorkspace = null, focusUnavailable = false }: {
-  dashboard: CardholderDashboardProjection;
-  detail: CardholderDashboardDetail | null;
-  access?: AccessOverview;
-  selectionUnavailable?: boolean;
-  focusedCard?: DashboardCard | null;
-  focusedWorkspace?: CardholderDashboardFocus["workspace"] | null;
-  focusUnavailable?: boolean;
+export function CardholderDashboard({ funds=null,dashboard, detail, access, managementWorkspace, selectedPersonId, personUnavailable = false, selectionUnavailable = false, focusedCard = null, focusedWorkspace = null, focusUnavailable = false }: {
+  funds?:CardholderFunds|null;dashboard: CardholderDashboardProjection; detail: CardholderDashboardDetail | null; access?: AccessOverview;
+  managementWorkspace?: WorkspaceProjection; selectedPersonId?: string; personUnavailable?: boolean;
+  selectionUnavailable?: boolean; focusedCard?: DashboardCard | null;
+  focusedWorkspace?: CardholderDashboardFocus["workspace"] | null; focusUnavailable?: boolean;
 }) {
-  const router = useRouter();
-  const params = useSearchParams();
+  const router = useRouter(), params = useSearchParams();
   const requestedView = params.get("view");
-  const view: View = views.includes(requestedView as View) ? requestedView as View : params.has("activityCard") ? "activity" : params.has("page") ? "cards" : "overview";
-  const [cardSearch, setCardSearch] = useState("");
-  const [controlIntent, setControlIntent] = useState<string | null>(null);
+  const view: CardholderView = detail?.kind === "PEOPLE" ? "cardholders" : views.includes(requestedView as CardholderView) ? requestedView as CardholderView : params.has("activityCard") ? "activity" : params.has("page") ? "cards" : "overview";
+  const [controlIntent, setControlIntent] = useState<{ id: string; action: "freeze" | "unfreeze" } | null>(null);
   const primary = dashboard.primaryService;
-  const hasPrimary = Boolean(primary || dashboard.cards.some(card => card.accessRole === "PRIMARY"));
-  const hasSecondary = dashboard.profiles.some(profile => profile.relationship === "SECONDARY") || dashboard.cards.some(card => card.accessRole === "SECONDARY");
-  const cards = dashboard.cards.filter(card => `${card.nickname} ${card.holderName} ${card.lastFour}`.toLowerCase().includes(cardSearch.trim().toLowerCase()));
-  const managed = cards.filter(card => card.accessRole === "PRIMARY");
-  const secondary = cards.filter(card => card.accessRole === "SECONDARY");
+  const hasPrimary = Boolean(primary || dashboard.profiles.some(profile => profile.relationship === "PRIMARY"));
+  const secondaryProfiles = dashboard.profiles.filter(profile => profile.relationship === "SECONDARY");
+  const waitingForFirstCard = dashboard.cardCount === 0 && secondaryProfiles.length > 0;
+  const owns = (card: DashboardCard) => card.holderId === dashboard.person.id;
+  const ownCards = dashboard.cards.filter(owns), managedCards = dashboard.cards.filter(card => !owns(card));
   const rawFocus = params.has("focus") ? params.getAll("focus") : focusUnavailable ? params.getAll("activityCard") : [];
   const focus = !focusUnavailable && focusedCard && focusedWorkspace?.cards.some(card => card.id === focusedCard.id) ? focusedCard : null;
-  const choices = dashboard.cards.some(card => card.id === focus?.id) || !focus ? dashboard.cards : [focus, ...dashboard.cards];
+  const choices = !focus || dashboard.cards.some(card => card.id === focus.id) ? dashboard.cards : [focus, ...dashboard.cards];
   const focusedActivity = focus && focusedWorkspace ? focusedWorkspace.activity.filter(item => item.cardId === focus.id).map(item => ({ ...item, cardNickname: focus.nickname, lastFour: focus.lastFour, holderName: focus.holderName })) : [];
   const selectedActivity = detail?.kind === "ACTIVITY" ? detail.workspace.activity.find(item => item.id === params.get("transaction")?.toLowerCase()) : undefined;
 
   function preserveFocus(query: URLSearchParams) {
-    // An unavailable repeated/empty selection stays unavailable until a deliberate choice.
     if (rawFocus.length) for (const value of rawFocus) query.append("focus", value.toLowerCase());
     else if (focus) query.set("focus", focus.id);
   }
-  function viewHref(next: View, page = 0) {
+  function viewHref(next: CardholderView, page = dashboard.cardsPage) {
     const query = new URLSearchParams();
     if (!["overview", "activity"].includes(next)) query.set("view", next);
-    if (page > 0) query.set("page", String(page));
+    if (next === "cards") {
+      if (page > 0) query.set("page", String(page));
+      if (dashboard.cardScope !== "ALL") query.set("cardScope", dashboard.cardScope);
+      if (dashboard.cardSearch) query.set("cardSearch", dashboard.cardSearch);
+    }
     preserveFocus(query);
     return `${next === "activity" ? `${base}/activity` : base}${query.size ? `?${query}` : ""}`;
   }
-  function href(key: string, value: string) {
-    const query = new URLSearchParams();
+  function href(key: string, value: string, task?: "controls") {
+    const query = new URLSearchParams(params.toString());
+    for (const item of [...detailKeys, "focus"]) query.delete(item);
     if (view !== "overview") query.set("view", view);
-    if (dashboard.cardsPage > 0 && ["cards", "cardholders"].includes(view)) query.set("page", String(dashboard.cardsPage));
-    preserveFocus(query);
-    query.set(key, value);
+    preserveFocus(query); query.set(key, value);
+    if (task) query.set("cardTask", task);
     return `${base}?${query}`;
   }
   function closeDetail() {
     const query = new URLSearchParams(params.toString());
-    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review"]) query.delete(key);
+    for (const key of detailKeys) query.delete(key);
     router.replace(`${base}${query.size ? `?${query}` : ""}`, { scroll: false });
+  }
+  function focusHref(cardId: string) {
+    const query = new URLSearchParams({ view: "overview", focus: cardId });
+    if (dashboard.cardScope !== "ALL") query.set("cardScope", dashboard.cardScope);
+    if (dashboard.cardSearch) query.set("cardSearch", dashboard.cardSearch);
+    if (dashboard.cardsPage > 0) query.set("page", String(dashboard.cardsPage));
+    return `${base}?${query}`;
   }
   function chooseCard(cardId: string) {
     if (!cardId) return;
     const query = new URLSearchParams(params.toString());
-    for (const key of ["card", "request", "new", "manage", "transaction", "activityCard", "holder", "review"]) query.delete(key);
+    for (const key of [...detailKeys, "activityCard"]) query.delete(key);
     query.set("focus", cardId);
     router.push(`${base}?${query}`, { scroll: false });
   }
-  function focusHref(cardId: string) {
-    const query = new URLSearchParams();
-    query.set("focus", cardId);
-    return `${base}?${query}`;
+  function cardScopeHref(scope: "ALL" | "OWN" | "MANAGED") {
+    const query = new URLSearchParams({ view: "cards", cardScope: scope });
+    if (dashboard.cardSearch) query.set("cardSearch", dashboard.cardSearch);
+    preserveFocus(query); return `${base}?${query}`;
   }
-  const scopeKey = detail ? JSON.stringify([detail.kind, detail.workspace.service.id, detail.workspace.cardholderRole, detail.workspace.capabilities.filter(item => item.allowed).map(item => item.action), detail.workspace.cards.map(card => card.id)]) : "none";
-
-  function cardSection(title: string, description: string, values: DashboardCard[], id: string) {
-    return <section className="ch-section" aria-labelledby={id}>
-      <div className="ch-section-heading"><div><h3 id={id}>{title}</h3><p>{description}</p></div></div>
-      {values.length ? <div className="ch-card-grid">{values.map(card => <article className="ch-card" key={card.id}>
-        <Link className="ch-card-open" href={href("card", card.id)} scroll={false} aria-label={`Manage ${card.nickname}, ending ${card.lastFour}, ${card.status.toLowerCase()}`}>
-          <CardPreview card={card}/><div className="ch-card-title"><h4>{card.nickname}</h4><StatusBadge status={card.status}/></div>
-          <p className="ch-card-holder">{card.holderName}<span>{card.relationship === "PRIMARY" ? "Primary card" : "Secondary card"}</span></p>
-          {card.accessRole === "SECONDARY" && <p className="ch-card-primary">Primary cardholder: {card.primaryName}</p>}
-          <div className="ch-card-balance"><span>Available to spend</span><strong>{card.available.formatted}</strong></div>
-          <span className="ch-card-action">Manage card <WorkspaceIcon name="arrow"/></span>
-        </Link>
-        {card.canManageAccess && <Link className="ch-card-access" href={href("manage", card.serviceId)} scroll={false}>Review cardholder access <WorkspaceIcon name="people"/></Link>}
-      </article>)}</div> : <EmptyState title={cardSearch ? "No matching cards" : id === "managed-cards" ? "Ready for your first card?" : "No secondary cards yet"} description={cardSearch ? "Try a different card name, cardholder or last four digits." : id === "managed-cards" ? "Add a card for yourself or an invited cardholder." : "Cards assigned to you will appear here after you accept an invitation."}>{cardSearch && <Button variant="secondary" onClick={() => setCardSearch("")}>Clear search</Button>}</EmptyState>}
-    </section>;
+  function requestPageHref(page: number) {
+    const query = new URLSearchParams({ view: "requests", requestStatus: dashboard.requestStatus });
+    if (dashboard.requestSearch) query.set("requestSearch", dashboard.requestSearch);
+    if (page > 0) query.set("requestPage", String(page));
+    preserveFocus(query); return `${base}?${query}`;
   }
   function activityList(rows: typeof dashboard.activity) {
-    return <div className="ch-activity-list">{rows.map(item => <Link className="ch-activity-row" href={href("transaction", item.id)} key={item.id} scroll={false}><span className="ch-transaction-icon"><WorkspaceIcon name="activity"/></span><span className="ch-transaction-name"><strong>{item.title}</strong><span>{item.cardNickname} · {item.lastFour}</span><small>{item.holderName} · {formatDate(item.occurredAt)}</small></span><span className="ch-transaction-value"><strong>{item.direction === "CREDIT" ? "+" : ""}{item.amount.formatted}</strong><StatusBadge status={item.status}/></span><WorkspaceIcon name="chevron"/></Link>)}</div>;
+    return <div className="ch-activity-list">{rows.map(item => <Link className="ch-activity-row" href={href("transaction", item.id)} key={item.id} scroll={false}><span className="ch-transaction-icon"><WorkspaceIcon name="activity"/></span><span className="ch-transaction-name"><strong>{item.title}</strong><span>{item.cardNickname} · {item.lastFour}</span><small>{item.holderName} · {formatDate(item.occurredAt)}</small></span><span className="ch-transaction-value"><strong>{item.direction === "CREDIT" ? "+" : ""}{item.amount.formatted}</strong><StatusBadge status={item.status}/></span></Link>)}</div>;
   }
-  function requestList(rows: typeof dashboard.requests) {
-    return <div className="ch-request-list">{rows.map(request => <Link href={href("request", request.id)} scroll={false} className="ch-request-row" key={request.id}><span className="ch-transaction-icon"><WorkspaceIcon name="cards"/></span><span><strong>{request.nickname || "New card request"}</strong><small>{request.holderName} · Saved {formatDate(request.updatedAt)}</small></span><StatusBadge status={request.status} label={request.status === "BLOCKED" ? "Needs attention" : undefined}/><WorkspaceIcon name="arrow"/></Link>)}</div>;
+  function summaryCards(rows: DashboardCard[]) {
+    return <div className="ch-card-summary-list">{rows.map(card => <Link className="ch-card-summary" href={focusHref(card.id)} key={card.id} scroll={false}><span className="ch-summary-art"><CardPreview card={card}/></span><span className="ch-summary-name"><strong>{card.nickname}</strong><small>{card.holderName} · {card.lastFour}</small><small>{owns(card) ? "Your card" : "Managed by you"}</small></span><span className="ch-summary-amount"><strong>{card.available.formatted}</strong><StatusBadge status={card.status}/></span><WorkspaceIcon name="arrow"/></Link>)}</div>;
   }
-  function cardSummary(rows: DashboardCard[]) {
-    return <div className="ch-card-summary-list">{rows.map(card => <Link className="ch-card-summary" href={focusHref(card.id)} key={card.id} scroll={false}><span className="ch-summary-art"><CardPreview card={card}/></span><span><strong>{card.nickname}</strong><small>{card.holderName} · {card.lastFour}</small><small>{card.relationship === "PRIMARY" ? "Primary card" : "Secondary card"}</small></span><span className="ch-summary-amount"><strong>{card.available.formatted}</strong><small>Available to spend</small><StatusBadge status={card.status}/></span><WorkspaceIcon name="chevron"/></Link>)}</div>;
+  function cardSection(title: string, description: string, cards: DashboardCard[], id: string) {
+    if (!cards.length) return null;
+    return <section className="ch-section" aria-labelledby={id}><div className="ch-section-heading"><div><h3 id={id}>{title}</h3><p>{description}</p></div></div><div className="ch-card-grid">{cards.map(card => <article className="ch-card" key={card.id}><Link className="ch-card-open" href={focusHref(card.id)} aria-label={`Open ${card.nickname}, ending ${card.lastFour}, ${card.holderName}`}><div className="ch-card-ownership"><span>{owns(card) ? "Your card" : "Managed by you"}</span><StatusBadge status={card.status}/></div><CardPreview card={card}/><h4>{card.nickname}</h4><p>{card.holderName} · Ending {card.lastFour}</p><div className="ch-card-balance"><span>{owns(card) ? "Available to spend" : "Available within their limit"}</span><strong>{card.available.formatted}</strong></div><span className="ch-card-action">{owns(card) ? "View your card" : "Manage this card"}<WorkspaceIcon name="arrow"/></span></Link><div className="ch-card-foot"><span>{owns(card) ? card.purchaseAvailability.title : `Purchases by ${card.holderName}`}</span>{card.canManageAccess && !owns(card) && <Link href={`${base}?view=cardholders&person=${card.holderId}`}>Cardholder access</Link>}</div></article>)}</div></section>;
   }
-  function pagination(next: "cards" | "cardholders") {
-    const hasMore = next === "cardholders" ? dashboard.cardholdersHasMore : dashboard.cardsHasMore;
-    return (dashboard.cardsPage > 0 || hasMore) && <nav className="ch-pagination" aria-label={next === "cardholders" ? "Cardholder pages" : "Card pages"}>{dashboard.cardsPage > 0 && <Link className="consumer-button consumer-button-secondary" href={viewHref(next, dashboard.cardsPage - 1)}>{next === "cardholders" ? "Previous cardholders" : "Previous cards"}</Link>}<span>Page {dashboard.cardsPage + 1}</span>{hasMore && <Link className="consumer-button consumer-button-secondary" href={viewHref(next, dashboard.cardsPage + 1)}>{next === "cardholders" ? "Next cardholders" : "Next cards"}</Link>}</nav>;
+  function requests() {
+    return <div className="ch-request-list">{dashboard.requests.map(request => <article className="ch-request-record" key={request.id}><Link href={href("request", request.id)} scroll={false} className="ch-request-row"><span className="ch-transaction-icon"><WorkspaceIcon name="cards"/></span><span className="ch-request-name"><strong>{request.nickname || "New card request"}</strong><small>{request.holderName} · {request.format === "VIRTUAL" ? "Virtual" : "Physical preview"}</small><small>Updated {formatDate(request.updatedAt)}</small><span className="ch-request-next">{request.status === "BLOCKED" ? request.prerequisites[0]?.title ?? "Review what’s needed" : request.status === "DRAFT" ? "Continue your saved request" : request.status === "ISSUED" ? "Card created · View request details" : "Canceled · No card created"}</span></span><StatusBadge status={request.status} label={request.status === "BLOCKED" ? "Needs attention" : undefined}/><WorkspaceIcon name="arrow"/></Link>{request.issuedCardId && <Link className="ch-request-issued" href={focusHref(request.issuedCardId)}>Open issued card <WorkspaceIcon name="arrow"/></Link>}</article>)}</div>;
   }
+  const scopeKey = detail ? JSON.stringify([dashboard.person.id, detail.kind, detail.workspace.service.id, detail.workspace.cardholderRole, detail.workspace.capabilities.filter(item => item.allowed).map(item => item.action), detail.workspace.cards.map(card => card.id)]) : "none";
+  const descriptions = { overview: hasPrimary ? "Your balance, cards and recent activity." : "Your cards and purchases, in one place.", cards: "Find a card by its name, cardholder or last four digits.", activity: "Follow purchases and find the details you need.", cardholders: "Manage cardholders, cards and spending limits.", requests: "Pick up where you left off, or find a card you created." };
 
   return <div className="ch-dashboard">
     <CardholderNavigation active={view} primary={hasPrimary} hrefFor={viewHref}/>
     <div className="ch-content">
-      <header className="ch-heading"><div><p className="consumer-eyebrow">WELCOME, {dashboard.person.displayName}</p><h1>Cardholder services</h1><p>{hasPrimary ? "Manage your cards and the people who use them." : "Your cards and purchases, together."}</p></div><TaskSearch workspace={detail?.workspace ?? focusedWorkspace ?? undefined} primaryService={primary} selectedCardId={focus?.id}/></header>
-      {!primary && dashboard.cardCount === 0 && dashboard.canCreatePrimary && <CardholderEnrollment/>}
-      {dashboard.cardCount > 0 && <div className="ch-card-choice"><label htmlFor="ch-selected-card">Selected card</label><div><select id="ch-selected-card" value={focus?.id ?? ""} onChange={event => chooseCard(event.target.value)}><option value="" disabled>{focusUnavailable ? "Choose another card" : "Choose a card"}</option>{(["PRIMARY", "SECONDARY"] as const).map(role => <optgroup key={role} label={role === "PRIMARY" ? "Cards you manage" : "Your secondary cards"}>{choices.filter(card => card.accessRole === role).map(card => <option key={card.id} value={card.id}>{card.nickname} · {card.holderName} · {card.lastFour}</option>)}</optgroup>)}</select>{(dashboard.cardsHasMore || dashboard.cardsPage > 0) && <Link href={viewHref("cards",dashboard.cardsPage)}>Browse card pages</Link>}</div>{focus && <p>{focus.accessRole === "PRIMARY" ? `Primary cardholder: ${focus.primaryName}` : `Your secondary card · Primary cardholder: ${focus.primaryName}`}</p>}</div>}
-      <div className="ch-view-heading"><h2>{viewLabels[view]}</h2><div className="ch-primary-actions">{primary?.canAddCard && <Link className={`consumer-button ${view === "overview" ? "consumer-button-secondary" : "consumer-button-primary"}`} href={href("new", "1")} scroll={false}><WorkspaceIcon name="plus"/>{dashboard.cardCount ? "Add card" : "Create your first card"}</Link>}{primary?.canInvite && ["cards", "cardholders"].includes(view) && <Link className="consumer-button consumer-button-secondary" href={href("manage", primary.id)} scroll={false}><WorkspaceIcon name="people"/>Add cardholder</Link>}</div></div>
-      {focusUnavailable && <section className="ch-selection-notice" role="alert"><h2>This card is unavailable</h2><p>You may no longer have access. Choose an available card above to continue.</p></section>}
+      <header className="ch-heading"><div><p className="consumer-eyebrow">WELCOME, {dashboard.person.displayName}</p><h1>Cardholder services</h1><p>{descriptions[view]}</p></div><TaskSearch workspace={detail?.workspace ?? focusedWorkspace ?? undefined} primaryService={primary} selectedCardId={focus?.id}/></header>
+      <div className="ch-view-heading"><h2>{cardholderViewLabels[view]}</h2>{primary?.canAddCard && view !== "cardholders" && <Link className="consumer-button consumer-button-primary" href={href("new", "1")} scroll={false}><WorkspaceIcon name="plus"/>{dashboard.cardCount ? "Add card" : "Create your first card"}</Link>}</div>
+      {!primary && !dashboard.cardCount && !waitingForFirstCard && dashboard.canCreatePrimary && <CardholderEnrollment/>}
+      {waitingForFirstCard && <section className="ch-secondary-waiting" aria-labelledby="secondary-waiting-title"><span className="ch-feature-icon"><WorkspaceIcon name="cards"/></span><p className="consumer-eyebrow">INVITATION ACCEPTED</p><h2 id="secondary-waiting-title">Your primary is preparing your card</h2><p>You’re connected. Your card will appear here when your primary cardholder creates it. You’ll see only your own cards and purchases.</p><ul>{secondaryProfiles.map(profile => <li key={profile.id}><strong>{profile.displayName}</strong><span>Primary cardholder: {profile.primaryName}</span></li>)}</ul><Link className="consumer-button consumer-button-secondary" href="/shared-access">View your cardholder access</Link></section>}
+      {focusUnavailable && <section className="ch-selection-notice" role="alert"><h2>This card is unavailable</h2><p>You may no longer have access. Choose an available card to continue.</p><Link href={cardScopeHref("ALL")}>Browse your available cards</Link></section>}
       {selectionUnavailable && <section className="ch-selection-notice" role="alert"><h2>This cardholder view is unavailable</h2><p>You may no longer have access, or this item may have changed.</p><Button variant="secondary" onClick={closeDetail}>Return to your cards</Button></section>}
-      {detail?.kind === "PEOPLE" ? <section className="ch-access-panel" aria-label="Selected cardholder access"><div className="ch-access-back"><Button variant="quiet" onClick={closeDetail}>← Back</Button></div>{params.get("manage") === primary?.id && <div className="ch-invite-context"><h2>Invite a cardholder for new cards</h2><p>After they accept, you can add a card for them. To change access to an existing card, open its cardholder below.</p><Link href={viewHref("cardholders")}>Review existing cardholders</Link></div>}<PeopleWorkspace key={JSON.stringify([scopeKey,access?.people.map(person=>[person.id,person.state,person.version,person.permissions])])} workspace={detail.workspace} access={access}/></section> : <>
-        {view === "overview" && <div className="ch-overview">
-          {focus && focusedWorkspace ? <>
-            <section className="ch-focused-card" aria-label="Selected card overview">
-              <div className="ch-focus-art"><CardPreview card={focus}/></div>
-              <div className="ch-focus-info"><div className="ch-focus-title"><h3>{focus.nickname}</h3><StatusBadge status={focus.status}/></div><p>{focus.holderName} · Ending {focus.lastFour}</p><p className="ch-focus-relationship">{focus.relationship === "PRIMARY" ? "Primary card" : "Secondary card"}</p><dl className="ch-focus-balance"><dt>Available to spend</dt><dd>{focus.available.formatted}</dd></dl>
-                <div className="ch-focus-actions">{focus.canPurchase && <Link className="consumer-button consumer-button-primary" href={href("card",focus.id)} onClick={() => setControlIntent(null)} scroll={false}>Try a purchase</Link>}{(focus.status === "FROZEN" ? focus.canUnfreeze : focus.canFreeze) && <Button onClick={() => {setControlIntent(focus.id);router.push(href("card",focus.id),{scroll:false});}}>{focus.status === "FROZEN" ? "Unfreeze card" : "Freeze card"}</Button>}<Link className="consumer-button consumer-button-secondary" href={href("card",focus.id)} onClick={() => setControlIntent(null)} scroll={false}>Card controls <WorkspaceIcon name="cards"/></Link><Link className="ch-section-link" href={cardholderTaskHref("activity",{cardId:focus.id})}>View this card’s activity <WorkspaceIcon name="arrow"/></Link></div>
-              </div>
-              <div className="ch-focus-services" aria-label="Selected card services">{focusedWorkspace.capabilities.some(item => item.action === "activity.read" && item.allowed) && <Link href={cardholderTaskHref("reports",{cardId:focus.id})}><WorkspaceIcon name="reports"/><span><strong>Statements & reports</strong><small>Reports for the cards you can view in this service</small></span><WorkspaceIcon name="chevron"/></Link>}<Link href={cardholderTaskHref("settings",{cardId:focus.id})}><WorkspaceIcon name="bell"/><span><strong>Notification preferences</strong><small>Choose your card updates</small></span><WorkspaceIcon name="chevron"/></Link><Link href={cardholderTaskHref("help",{cardId:focus.id})}><WorkspaceIcon name="help"/><span><strong>Help & support</strong><small>Find answers or save a question</small></span><WorkspaceIcon name="chevron"/></Link></div>
-            </section>
-            <section className="ch-focus-activity" aria-labelledby="ch-overview-activity-title"><div className="ch-section-heading"><div><h3 id="ch-overview-activity-title">Recent activity</h3><p>{focus.nickname} · Ending {focus.lastFour}</p></div><Link className="ch-section-link" href={viewHref("activity")}>View activity <WorkspaceIcon name="arrow"/></Link></div>{focusedActivity.length ? activityList(focusedActivity.slice(0,5)) : <div className="ch-empty">No purchases on this card yet.</div>}</section>
-          </> : !focusUnavailable && (primary || !dashboard.canCreatePrimary) && <section className="ch-focus-empty">{dashboard.cardCount ? <><WorkspaceIcon name="cards"/><h3>Choose the card you want to manage</h3><p>See its balance, activity and available controls together.</p></> : <EmptyState title={primary?.canAddCard ? "Ready for your first card?" : "Your cards will appear here"} description={primary?.canAddCard ? "Name your card and choose a practice balance. You’ll review both before it is created." : dashboard.canCreatePrimary ? "Set up your cardholder service above, or review an invitation to join an existing card group." : "Complete sandbox setup to create practice cards, or review an invitation to join a card group."}>{!primary?.canAddCard && <Link className="consumer-button consumer-button-secondary" href="/services">{dashboard.canCreatePrimary ? "Review invitations" : "Open services"}</Link>}</EmptyState>}</section>}
-          {hasPrimary && dashboard.cards.some(card => card.accessRole === "PRIMARY" && card.id !== focus?.id) && <section className="ch-overview-cards" aria-labelledby="ch-overview-cards-title"><div className="ch-section-heading"><div><h3 id="ch-overview-cards-title">{focus ? "Other cards you manage" : "Cards you manage"}</h3><p>Your cards and connected secondary cards.</p></div><Link className="ch-section-link" href={viewHref("cards")}>View all cards <WorkspaceIcon name="arrow"/></Link></div>{cardSummary(dashboard.cards.filter(card => card.accessRole === "PRIMARY" && card.id !== focus?.id).slice(0,3))}</section>}
-          {dashboard.cards.some(card => card.accessRole === "SECONDARY" && card.id !== focus?.id) && <section className="ch-overview-cards" aria-labelledby="ch-overview-secondary-title"><div className="ch-section-heading"><h3 id="ch-overview-secondary-title">Your secondary cards</h3><Link className="ch-section-link" href={viewHref("cards")}>View all cards <WorkspaceIcon name="arrow"/></Link></div>{cardSummary(dashboard.cards.filter(card => card.accessRole === "SECONDARY" && card.id !== focus?.id).slice(0,3))}</section>}
-          {hasPrimary && dashboard.requests.length > 0 && <aside className="ch-request-attention"><WorkspaceIcon name="cards"/><div><strong>You have a saved card request</strong><p>Continue when you’re ready to finish.</p></div><Link href={viewHref("requests")}>View saved requests <WorkspaceIcon name="arrow"/></Link></aside>}
-        </div>}
-        {view === "cards" && <section id="cards" className="ch-cards" aria-label="Your cards"><div className="ch-card-tools"><label><WorkspaceIcon name="search"/><span className="consumer-sr-only">Search your cards</span><input type="search" value={cardSearch} onChange={event => setCardSearch(event.target.value)} placeholder="Card name, cardholder or last four" maxLength={100}/></label><p>{dashboard.cardCount} {dashboard.cardCount === 1 ? "card" : "cards"}{dashboard.cardsHasMore || dashboard.cardsPage > 0 ? ` · Search covers page ${dashboard.cardsPage + 1}` : ""}</p></div>
-          {hasPrimary && cardSection("Cards you manage", `Primary cardholder: ${primary?.primaryName ?? dashboard.person.displayName}`, managed, "managed-cards")}
-          {hasSecondary && cardSection("Your secondary cards", "Cards assigned to you. Each card names its primary cardholder.", secondary, "secondary-cards")}
-          {!dashboard.cards.length && !hasPrimary && !hasSecondary && <EmptyState title="Your cards will appear here" description="Review your invitations to get started."><Link className="consumer-button consumer-button-secondary" href="/services#invitation-heading">Review invitations</Link></EmptyState>}
-          {pagination("cards")}
-        </section>}
-        {view === "cardholders" && <section id="cardholders" className="ch-section" aria-labelledby="ch-cardholders-title"><div className="ch-section-heading"><div><h3 id="ch-cardholders-title">Secondary cardholders</h3><p>Everyone who has accepted your invitation. Add their first card or review their access.</p></div></div>{dashboard.cardholders.length ? <div className="ch-cardholder-list">{dashboard.cardholders.map(holder => <article className="ch-cardholder" key={holder.id}><span className="ch-transaction-icon"><WorkspaceIcon name="people"/></span><div><h4>{holder.displayName}</h4><p>{holder.cardCount === null ? "Cardholder access accepted" : holder.cardCount === 0 ? "Ready for their first card" : `${holder.cardCount} ${holder.cardCount === 1 ? "card" : "cards"}`}</p><div className="ch-cardholder-actions">{holder.canAddCard && <Link className="consumer-button consumer-button-secondary" href={`${href("new","1")}&holder=${holder.id}`} scroll={false} aria-label={`Add card for ${holder.displayName}`}>Add card</Link>}<Link className="ch-section-link" href={href("manage",holder.serviceId)} scroll={false}>Review cardholder access <WorkspaceIcon name="arrow"/></Link></div></div></article>)}</div> : <EmptyState title={hasPrimary ? "No secondary cardholders yet" : "Cardholder management is unavailable"} description={hasPrimary ? "Invite someone, then add a card after they accept." : "Your primary cardholder manages access to your cards."}/>}{hasPrimary && pagination("cardholders")}</section>}
-
-        {view === "requests" && <section id="requests" className="ch-section" aria-labelledby="ch-requests-title"><div className="ch-section-heading"><div><h3 id="ch-requests-title">Saved card requests</h3><p>Your 20 most recent unfinished requests.</p></div></div>{dashboard.requests.length ? requestList(dashboard.requests) : <EmptyState title="No saved requests" description={primary?.canAddCard ? "Start with Add card. Your progress is saved until you’re ready to finish." : "Requests are managed by the primary cardholder."}/>}</section>}
-      </>}
-      {!primary && dashboard.cardCount > 0 && dashboard.canCreatePrimary && <CardholderEnrollment/>}
+      {view==="overview"&&funds&&<section className="ch-money-summary" aria-label="Your card group"><div><span>Group balance</span><strong>{funds.available.formatted}</strong><small>Money shared by your cards</small></div><div><span>People in your group</span><strong>{funds.people.length}</strong><Link href={`/cardholder-services/funds?service=${funds.serviceId}#limits-title`}>Manage monthly limits →</Link></div><Link className="consumer-button consumer-button-primary" href={`/cardholder-services/funds?service=${funds.serviceId}`}>Add money</Link></section>}
+      {view === "overview" && !waitingForFirstCard && <div className="ch-home-layout"><div className="ch-home-main">
+        {dashboard.cardCount > 0 && <div className="ch-card-choice"><label htmlFor="ch-selected-card">Selected card</label><select id="ch-selected-card" value={focus?.id ?? ""} onChange={event => chooseCard(event.target.value)}><option value="" disabled>{focusUnavailable ? "Choose another card" : "Choose a card"}</option>{[{label:"Your cards",cards:choices.filter(owns)},{label:"Cards you manage",cards:choices.filter(card=>!owns(card))}].filter(group=>group.cards.length).map(group=><optgroup key={group.label} label={group.label}>{group.cards.map(card=><option key={card.id} value={card.id}>{card.nickname} · {card.holderName} · {card.lastFour}</option>)}</optgroup>)}</select>{(dashboard.cardsHasMore || dashboard.cardsPage > 0) && <Link href={cardScopeHref("ALL")}>Browse all card pages</Link>}</div>}
+        {focus && focusedWorkspace ? <>
+          <section className={`ch-focused-card ${owns(focus) ? "is-own" : "is-managed"}`} aria-label="Selected card overview"><div className="ch-focus-topline"><span><WorkspaceIcon name={owns(focus)?"cards":"people"}/>{owns(focus)?"YOUR CARD":"CARD YOU MANAGE"}</span><StatusBadge status={focus.status}/></div><div className="ch-focus-identity"><div className="ch-focus-art"><CardPreview card={focus}/></div><div className="ch-focus-info"><h3>{focus.nickname}</h3><p>{focus.holderName} · Ending {focus.lastFour}</p><p>{focus.relationship === "PRIMARY" ? "Primary card" : `Secondary card · Primary: ${focus.primaryName}`}</p><dl className="ch-focus-balance"><dt>{owns(focus)?"Available to spend":`${focus.holderName}’s available to spend`}</dt><dd>{focus.available.formatted}</dd></dl><div className="ch-person-allowance"><span>Spent this month<strong>{focus.spending.spentThisMonth.formatted}</strong></span><span>Monthly limit<strong>{focus.spending.monthlyLimit.formatted}</strong></span></div><p>Shared across this person’s cards. Subject to group funds.</p></div></div>
+            {(!owns(focus)||!focus.canPurchase) && <div className="ch-availability" role="status"><WorkspaceIcon name={owns(focus)?"shield":"people"}/><div><strong>{focus.purchaseAvailability.title}</strong><p>{focus.purchaseAvailability.description}</p>{focus.status === "FROZEN" && <p>{focus.freeze.description}</p>}</div></div>}
+            <div className="ch-focus-actions">{(focus.canUnfreeze||focus.canFreeze)&&<Button variant="secondary" onClick={()=>{setControlIntent({id:focus.id,action:focus.canUnfreeze?"unfreeze":"freeze"});router.push(href("card",focus.id,"controls"),{scroll:false});}}>{focus.canUnfreeze?focus.freeze.unfreezeLabel:focus.freeze.freezeLabel}</Button>}<Link className="consumer-button consumer-button-secondary" href={href("card",focus.id,"controls")} onClick={()=>setControlIntent(null)} scroll={false}>Card controls<WorkspaceIcon name="settings"/></Link></div>
+            <div className="ch-focus-footer"><Link href={cardholderTaskHref("activity",{cardId:focus.id})}>View this card’s activity<WorkspaceIcon name="arrow"/></Link>{focus.canManageAccess&&!owns(focus)&&<Link href={`${base}?view=cardholders&person=${focus.holderId}`}>Manage {focus.holderName}’s access</Link>}</div>
+          </section>
+          <section className="ch-focus-activity" aria-labelledby="ch-overview-activity-title"><div className="ch-section-heading"><div><h3 id="ch-overview-activity-title">Recent activity</h3><p>{focus.nickname} · Ending {focus.lastFour}</p></div><Link className="ch-section-link" href={viewHref("activity")}>View activity<WorkspaceIcon name="arrow"/></Link></div>{focusedActivity.length ? activityList(focusedActivity.slice(0,5)) : <div className="ch-empty">No purchases on this card yet.</div>}</section>
+        </> : !focusUnavailable && (primary || !dashboard.canCreatePrimary) && <section className="ch-focus-empty"><span className="ch-feature-icon"><WorkspaceIcon name="cards"/></span><h3>{dashboard.ownCardCount ? "Choose your card" : "No cards in your name yet"}</h3><p>{dashboard.ownCardCount ? "Choose a card to see spending availability, purchases and controls together." : dashboard.managedCardCount ? "You can manage your cardholders’ cards below. Add a card for yourself when you’re ready." : "Start with a card for yourself. You can invite your people whenever you’re ready."}</p>{dashboard.ownCardCount>0&&<Link href={cardScopeHref("OWN")}>Browse your cards<WorkspaceIcon name="arrow"/></Link>}</section>}
+        {!!ownCards.filter(card=>card.id!==focus?.id).length && <section className="ch-overview-cards"><div className="ch-section-heading"><div><h3>{focus&&owns(focus)?"Your other cards":"Your cards"}</h3><p>Cards in your name, ready to find in one place.</p></div><Link href={cardScopeHref("OWN")}>View your cards<WorkspaceIcon name="arrow"/></Link></div>{summaryCards(ownCards.filter(card=>card.id!==focus?.id).slice(0,4))}</section>}
+        {dashboard.managedCardCount>0 && <section className="ch-overview-cards"><div className="ch-section-heading"><div><h3>Cards you manage</h3><p>Your cardholders make purchases. You stay in control.</p></div><Link href={cardScopeHref("MANAGED")}>View managed cards<WorkspaceIcon name="arrow"/></Link></div>{managedCards.length?summaryCards(managedCards.slice(0,4)):<p className="ch-empty">Browse managed cards to find your cardholders’ cards.</p>}</section>}
+      </div></div>}
+      {view === "cards" && <div className="ch-cards"><nav className="ch-card-scopes" aria-label="Card ownership"><Link aria-current={dashboard.cardScope==="ALL"?"page":undefined} href={cardScopeHref("ALL")}>All cards<span>{dashboard.cardCount}</span></Link><Link aria-current={dashboard.cardScope==="OWN"?"page":undefined} href={cardScopeHref("OWN")}>Your cards<span>{dashboard.ownCardCount}</span></Link>{hasPrimary&&<Link aria-current={dashboard.cardScope==="MANAGED"?"page":undefined} href={cardScopeHref("MANAGED")}>Cards you manage<span>{dashboard.managedCardCount}</span></Link>}</nav><form className="ch-card-tools" action={base}><input type="hidden" name="view" value="cards"/><input type="hidden" name="cardScope" value={dashboard.cardScope}/>{focus&&<input type="hidden" name="focus" value={focus.id}/>}<label>Search your cards<input type="search" name="cardSearch" key={dashboard.cardSearch} defaultValue={dashboard.cardSearch} maxLength={100} placeholder="Card name, person or last four digits"/></label><Button type="submit" variant="secondary">Search cards</Button>{dashboard.cardSearch&&<Link href={`${base}?view=cards&cardScope=${dashboard.cardScope}`}>Clear search</Link>}</form><p className="ch-request-count">{dashboard.cardMatchCount} matching {dashboard.cardMatchCount===1?"card":"cards"} · Page {dashboard.cardsPage+1}</p>{cardSection("Your cards","Cards in your name. Your purchases and card controls live here.",ownCards,"own-cards")}{cardSection("Cards you manage","Other people’s cards. Review their spending and manage their access.",managedCards,"managed-cards")}{!dashboard.cards.length&&<EmptyState title={dashboard.cardSearch?"No matching cards":dashboard.cardScope==="MANAGED"?"No managed cards on this page":dashboard.cardScope==="OWN"?"No cards in your name on this page":"No cards on this page"} description="Change your filters, return to an earlier page or add a card when you’re ready."/>}{(dashboard.cardsPage>0||dashboard.cardsHasMore)&&<nav className="ch-pagination" aria-label="Card pages">{dashboard.cardsPage>0&&<Link className="consumer-button consumer-button-secondary" href={viewHref("cards",dashboard.cardsPage-1)}>Previous cards</Link>}<span>Page {dashboard.cardsPage+1}</span>{dashboard.cardsHasMore&&<Link className="consumer-button consumer-button-secondary" href={viewHref("cards",dashboard.cardsPage+1)}>Next cards</Link>}</nav>}</div>}
+      {(detail?.kind==="PEOPLE"||view==="cardholders")&&<section className="ch-access-panel" aria-label="Cardholder management">{managementWorkspace&&access?<PeopleWorkspace key={JSON.stringify([managementWorkspace.service.id,selectedPersonId,personUnavailable,...["peopleTab","peopleSearch","peopleStatus","invitationStatus"].map(key=>params.get(key)),access.people.map(person=>[person.id,person.state,person.version])])} workspace={managementWorkspace} access={access} selectedPersonId={selectedPersonId} personUnavailable={personUnavailable}/>:<EmptyState title="Cardholder management is unavailable" description="Your primary cardholder manages access to your cards."/>}</section>}
+      {view==="requests"&&<section id="requests" className="ch-section" aria-labelledby="ch-requests-title"><div className="ch-request-intro"><span className="ch-feature-icon"><WorkspaceIcon name="reports"/></span><div><h3 id="ch-requests-title">Card requests</h3><p>One place for saved requests, cards you’ve created and canceled requests.</p></div>{dashboard.unfinishedRequestCount>0&&<span className="ch-request-tally">{dashboard.unfinishedRequestCount} to finish</span>}</div><form className="ch-request-filters" action={base}><input type="hidden" name="view" value="requests"/>{focus&&<input type="hidden" name="focus" value={focus.id}/>}<label>Search requests<input key={dashboard.requestSearch} type="search" name="requestSearch" defaultValue={dashboard.requestSearch} maxLength={100} placeholder="Card name or cardholder"/></label><label>Status<select key={dashboard.requestStatus} name="requestStatus" defaultValue={dashboard.requestStatus}><option value="ALL">All requests</option><option value="DRAFT">Drafts</option><option value="BLOCKED">Needs attention</option><option value="ISSUED">Cards created</option><option value="CANCELED">Canceled</option></select></label><Button type="submit" variant="secondary">Apply filters</Button>{(dashboard.requestSearch||dashboard.requestStatus!=="ALL")&&<Link href={`${base}?view=requests`}>Clear filters</Link>}</form><p className="ch-request-count">{dashboard.requestCount} matching {dashboard.requestCount===1?"request":"requests"}</p>{dashboard.requests.length?requests():<EmptyState title={dashboard.requestSearch||dashboard.requestStatus!=="ALL"?"No matching requests":"No card requests yet"} description={primary?.canAddCard?"Start with Add card, or change your filters. Saved and completed requests stay here.":"Requests are managed by the primary cardholder."}/>}{(dashboard.requestPage>0||dashboard.requestsHasMore)&&<nav className="ch-pagination" aria-label="Request pages">{dashboard.requestPage>0&&<Link className="consumer-button consumer-button-secondary" href={requestPageHref(dashboard.requestPage-1)}>Previous requests</Link>}<span>Page {dashboard.requestPage+1}</span>{dashboard.requestsHasMore&&<Link className="consumer-button consumer-button-secondary" href={requestPageHref(dashboard.requestPage+1)}>Next requests</Link>}</nav>}</section>}
+      {!primary&&dashboard.canCreatePrimary&&(waitingForFirstCard||dashboard.cardCount>0)&&<details className="ch-optional-enrollment"><summary>Optional: start your own card group</summary><p>A separate card group lets you become a primary. You can keep using the cards shared with you without starting one.</p><CardholderEnrollment/></details>}
     </div>
-    {detail && ["CARD", "REQUEST", "NEW"].includes(detail.kind) && <CardsWorkspace key={scopeKey} workspace={detail.workspace} routeBase={base} initialControl={Boolean(controlIntent && controlIntent === params.get("card"))} onClose={() => setControlIntent(null)}/>}
-    {detail?.kind === "ACTIVITY" && selectedActivity && <WorkspaceDialog open title="Transaction details" serviceName={detail.workspace.customerService?.displayName ?? "Cardholder services"} onClose={closeDetail}><ActivityDetails item={selectedActivity} workspace={detail.workspace}/><div className="consumer-action-row"><Button variant="secondary" onClick={closeDetail}>Back to activity</Button></div></WorkspaceDialog>}
+    {detail&&["CARD","REQUEST","NEW"].includes(detail.kind)&&<CardsWorkspace key={scopeKey} workspace={detail.workspace} requestHistory={detail.requestHistory} cardHistory={detail.cardHistory} routeBase={base} initialControlAction={controlIntent?.id===params.get("card")?controlIntent.action:undefined} onClose={()=>setControlIntent(null)}/>}
+    {detail?.kind==="ACTIVITY"&&selectedActivity&&<WorkspaceDialog open title="Transaction details" serviceName={detail.workspace.customerService?.displayName??"Cardholder services"} onClose={closeDetail}><ActivityDetails item={selectedActivity} workspace={detail.workspace}/><div className="consumer-action-row"><Button variant="secondary" onClick={closeDetail}>Back to activity</Button></div></WorkspaceDialog>}
   </div>;
 }

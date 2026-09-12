@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
@@ -13,7 +14,7 @@ import type { ReportFilters } from "../../src/modules/reports/contracts";
 
 afterAll(closeDatabase);
 const activityFilters: ReportFilters = { source: "ACTIVITY", status: "ALL", from: "2026-09-01", to: "2026-09-30", query: "" };
-async function fixture() {const primary=await cardPrimary("Report tester");await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Report card","10000","1251");return primary;}
+async function fixture() {const primary=await cardPrimary("Report tester");await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"10000");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"10000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Report card","1251");})();return primary;}
 async function member(serviceId: string, actions = ["activity.read"]) {
   const identity = await bindIdentity("urn:etail:isolated-fixture", randomUUID(), "Fictional report viewer");
   await getDb().insert(serviceMembers).values({ serviceId, personId: identity.personId, state: "ACCEPTED" });

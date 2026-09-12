@@ -17,4 +17,90 @@
   .access-form select { font-size: 16px; }
 }
 
-.access-presets{margin-top:2px!important}.access-preset{display:flex;align-items:flex-start;gap:12px;padding:16px;border:1px solid #cbd8cf;border-radius:10px;background:#fff;cursor:pointer}.access-preset.is-selected{border-color:#326c53;background:#f0f7ee;box-shadow:inset 0 0 0 1px #326c53}.access-preset input{width:20px;height:20px;flex:0 0 20px;margin:2px 0 0;accent-color:#236548}.access-preset>span{display:grid;gap:6px}.access-preset strong{font-size:14px;line-height:1.4;color:#234a43}.access-preset small{font-size:12px;font-weight:400;line-height:1.6;color:#4c6259}.access-customize{border-top:1px solid #d9e4dc;border-bottom:1px solid #d9e4dc;padding:0 0 2px}.access-customize>summary{min-height:46px;padding:14px 0;cursor:pointer;font-size:13px;font-weight:600;color:#234a43}.access-customize>summary:focus-visible{outline:3px solid #417c72;outline-offset:3px}.access-customize>p{font-size:13px;line-height:1.6;color:#4c6259;margin:0 0 16px}.access-customize>fieldset{padding-bottom:14px}.access-review-summary{padding:16px;background:#f3f7ef;border-radius:9px;margin:16px 0}.access-review-summary>strong{font-size:15px}.access-review-summary>p{font-size:13px;line-height:1.6;margin:7px 0 0;color:#4c6259}
+.access-customize{border-top:1px solid #d9e4dc;border-bottom:1px solid #d9e4dc;padding:0 0 2px}.access-customize>summary{min-height:46px;padding:14px 0;cursor:pointer;font-size:13px;font-weight:600;color:#234a43}.access-customize>summary:focus-visible{outline:3px solid #417c72;outline-offset:3px}.access-customize>p{font-size:13px;line-height:1.6;color:#4c6259;margin:0 0 16px}.access-customize>fieldset{padding-bottom:14px}
+
+.access-management-tabs{display:flex;gap:8px;overflow:auto;margin:0 0 20px;padding-bottom:3px}.access-management-tabs button{flex:0 0 auto;min-height:44px;padding:10px 15px;border:1px solid #d2dfd5;border-radius:8px;background:#fff;color:#234a43;font:inherit;font-size:13px;cursor:pointer}.access-management-tabs button[aria-pressed=true]{background:#e8f0e5;border-color:#729177;font-weight:600}.access-directory-tools{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:22px}.access-directory-tools>label{display:grid;gap:7px;flex:1;min-width:150px;font-size:12px;color:#34574e}.access-directory-tools input,.access-directory-tools select{width:100%;min-width:0;min-height:44px;padding:10px 12px;border:1px solid #bdccc2;border-radius:8px;background:#fff;color:#073b3f;font:inherit;font-size:14px}.access-person-heading{display:grid;gap:14px;margin-bottom:24px}.access-person-heading>button{justify-self:start}.access-person-heading h2{font-size:27px;line-height:1.2;overflow-wrap:anywhere;margin:0 0 8px}.access-person-heading p,.access-person-cards p,.access-history p,.access-invitation-card p{font-size:13px;line-height:1.65;color:#52644e}.access-owned-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.access-owned-cards article{min-width:0;padding:20px;border:1px solid #d9e4dc;border-radius:12px;background:#fbfcf8}.access-owned-cards h4,.access-invitation-card h4{font-size:17px;line-height:1.4;overflow-wrap:anywhere;margin:0}.access-owned-cards dl{margin:20px 0}.access-owned-cards dt{font-size:12px;color:#52644e}.access-owned-cards dd{font-size:27px;margin:7px 0 0;letter-spacing:-.025em;font-weight:600}.access-owned-cards .consumer-action-row{gap:8px}.access-owned-cards a{white-space:normal;overflow-wrap:anywhere}.access-permission-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-left:20px;font-size:13px;line-height:1.6}.access-invitation-card{padding:22px 0;border-top:1px solid #d9e4dc}.access-invitation-card>div:first-child{display:flex;gap:16px;align-items:center;justify-content:space-between}.access-history ol{margin:20px 0 0;padding:0;list-style:none}.access-history li{display:flex;justify-content:space-between;gap:16px;padding:16px 0;border-top:1px solid #d9e4dc;font-size:13px;line-height:1.6}.access-history li>div{display:grid;gap:5px;min-width:0;overflow-wrap:anywhere}.access-history li span,.access-history time{font-size:12px;color:#52644e}.access-history time{flex-shrink:0}.access-management-tabs button:focus-visible,.access-directory-tools input:focus-visible,.access-directory-tools select:focus-visible{outline:3px solid #417c72;outline-offset:3px}
+@media(max-width:650px){.access-owned-cards,.access-permission-summary{grid-template-columns:1fr}.access-directory-tools{gap:12px}.access-directory-tools>label{min-width:100%}.access-history li{flex-direction:column;gap:7px}.access-person-heading h2{font-size:23px}.access-owned-cards article{padding:16px}.access-person-heading .consumer-action-row{flex-direction:column;align-items:stretch}.access-management-tabs{max-width:100%}.access-directory-tools input,.access-directory-tools select{font-size:16px}.access-invitation-card>div:first-child{align-items:flex-start;flex-wrap:wrap}}
+
+/* Cardholder management stays visually separate from merchant access forms. */
+.access-group-note { display: flex; align-items: flex-start; gap: 13px; margin: 0 0 24px; padding: 18px 20px; border: 1px solid #d5e2da; border-radius: 12px; background: #edf4ee; }
+.access-group-note > svg { flex: 0 0 23px; width: 23px; height: 23px; margin-top: 1px; color: #166052; }
+.access-group-note p { margin: 0; color: #355b50; font-size: 13px; line-height: 1.7; }
+.access-group-note strong { color: #174b42; }
+.access-cardholder-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.access-cardholder { min-width: 0; overflow: hidden; border: 1px solid #ceded4; border-radius: 14px; background: #fff; }
+.access-cardholder .access-cardholder-person { min-height: 92px; gap: 13px; padding: 21px; border: 0; border-bottom: 1px solid #dce7df; background: #f5f8f2; cursor: pointer; flex-wrap: nowrap; }
+.access-cardholder .access-cardholder-person:hover { background: #edf4e9; }
+.access-cardholder .access-cardholder-person:focus-visible { outline-offset: -4px; }
+.access-cardholder-person .ws-person-name strong { font-size: 17px; font-weight: 600; line-height: 1.45; }
+.access-cardholder-person .ws-person-name small { font-size: 12px; line-height: 1.5; }
+.access-cardholder .ws-person-avatar { width: 43px; height: 43px; background: #e1ecdd; color: #255443; font-size: 17px; }
+.access-cardholder .access-cardholder-person > svg { display: block; flex: 0 0 19px; width: 19px; height: 19px; }
+.access-cardholder-body { padding: 19px 21px 13px; }
+.access-cardholder-status { display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+.access-cardholder-status > span:last-child { color: #506a5f; font-size: 12px; }
+.access-person-permission-line { margin: 14px 0 19px; font-size: 13px; line-height: 1.6; color: #34584d; }
+.access-person-card-list { margin: 0; padding: 0; list-style: none; }
+.access-person-card-list > li { padding: 17px 0; border-top: 1px solid #dde7df; }
+.access-person-card-list > li > div:first-child { display: grid; gap: 5px; margin-bottom: 13px; overflow-wrap: anywhere; }
+.access-person-card-list strong { font-size: 14px; line-height: 1.5; color: #21483e; }
+.access-person-card-list span { font-size: 12px; color: #52695e; }
+.access-person-card-list .consumer-action-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
+.access-person-card-list .consumer-button { padding: 9px 12px; font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+.access-person-card-list .consumer-text-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; }
+.access-person-details { display: flex; width: 100%; min-height: 49px; padding: 13px 0; justify-content: space-between; align-items: center; gap: 13px; border: 0; border-top: 1px solid #dde7df; background: transparent; color: #166453; text-align: left; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600; }
+.access-person-next { padding: 18px; margin-bottom: 17px; border: 1px dashed #afc5b7; border-radius: 9px; background: #f8faf5; }
+.access-person-next strong { color: #2d5547; font-size: 14px; }
+.access-person-next p { margin: 7px 0 11px; color: #52695e; font-size: 13px; line-height: 1.6; }
+.access-person-next a { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; overflow-wrap: anywhere; }
+.access-profile-title { display: flex; align-items: center; gap: 18px; }
+.access-profile-title > .ws-person-avatar { width: 64px; height: 64px; flex: 0 0 64px; background: #e6efe0; color: #2a5847; font-size: 26px; }
+.access-profile-title > div { min-width: 0; }
+.access-role-label, .access-person-heading .access-role-label { margin: 0 0 7px; color: #547064; font-size: 11px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; }
+.access-card-title { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 15px; }
+.access-card-title > div { min-width: 0; }
+.access-card-title p { margin: 6px 0 0; }
+.access-card-symbol { display: flex; align-items: center; justify-content: center; flex: 0 0 42px; width: 42px; height: 42px; border: 1px solid #c9dcd1; border-radius: 10px; background: #ecf4ed; color: #235e4e; }
+.access-card-symbol > svg { width: 23px; height: 23px; }
+.access-waiting-card { padding: 25px; border: 1px dashed #b5cabc; border-radius: 11px; background: #f7faf3; }
+.access-waiting-card > svg { width: 27px; height: 27px; margin-bottom: 12px; color: #336851; }
+.access-waiting-card h4 { margin: 0; color: #244f42; font-size: 18px; }
+.access-waiting-card p { margin: 9px 0 13px; max-width: 560px; }
+.access-waiting-card a { display: inline-flex; align-items: center; min-height: 44px; }
+.access-current-summary { margin: 12px 0 17px; padding: 18px 20px; border: 1px solid #cedfd2; border-radius: 11px; background: #f3f7ee; }
+.access-current-summary > strong { color: #1e5142; font-size: 15px; line-height: 1.5; }
+.access-current-summary > p { margin: 7px 0 0; color: #486353; font-size: 13px; line-height: 1.65; }
+.access-person-permissions > p { color: #52695e; font-size: 13px; line-height: 1.65; }
+.access-invite-intro { display: flex; align-items: flex-start; gap: 14px; }
+.access-invite-intro h3 { margin: 0 0 9px; color: #174c40; font-size: 19px; line-height: 1.4; }
+.access-invite-intro p { margin: 0; color: #52695e; font-size: 13px; line-height: 1.7; }
+.access-invite-recipient h3 { margin: 0 0 8px; color: #174c40; font-size: 23px; overflow-wrap: anywhere; }
+.access-invite-recipient > p:last-child { margin: 0; color: #52695e; font-size: 12px; line-height: 1.7; }
+.access-cardholder-form .access-selection-note { margin: -6px 0 0; color: #52695e; font-size: 12px; line-height: 1.6; }
+.access-cardholder-form .access-customize > summary { font-size: 14px; }
+.access-permission-unavailable { background: #f5f5f1; }
+.access-permission-unavailable label { cursor: default; }
+.access-invitation-permissions { color: #456453; font-size: 13px; line-height: 1.7; }
+.access-invitation-permissions summary { min-height: 44px; padding: 10px 0; cursor: pointer; color: #17604c; font-weight: 600; }
+.access-invitation-permissions ul { margin: 5px 0 12px; padding-left: 21px; }
+.access-customize > ul { padding-left: 21px; color: #456453; font-size: 13px; line-height: 1.8; }
+@media (max-width: 960px) {
+ .access-cardholder-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+ .ws-people > .ws-welcome > .consumer-button { margin-top: 18px; }
+ .access-group-note { gap: 10px; padding: 15px; }
+ .access-directory-panel.ws-panel { padding: 17px; }
+ .access-cardholder .access-cardholder-person { padding: 18px 15px; }
+ .access-cardholder-body { padding: 16px 15px 9px; }
+ .access-cardholder-person .ws-person-name strong { font-size: 16px; }
+ .access-cardholder .ws-person-avatar { width: 38px; height: 38px; flex-basis: 38px; }
+ .access-profile-title { gap: 14px; }
+ .access-profile-title > .ws-person-avatar { width: 53px; height: 53px; flex-basis: 53px; font-size: 22px; }
+ .access-current-summary { padding: 16px; }
+ .access-waiting-card { padding: 20px 16px; }
+ .access-owned-cards .consumer-action-row { align-items: stretch; }
+ .access-owned-cards .consumer-button { width: 100%; }
+ .access-owned-cards .consumer-text-link { display: inline-flex; align-items: center; min-height: 44px; }
+ .access-invite-intro .access-card-symbol { display: none; }
+}

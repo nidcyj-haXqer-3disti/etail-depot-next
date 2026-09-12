@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
@@ -12,8 +13,8 @@ afterAll(closeDatabase);
 async function fixture() {
   const primary = await cardPrimary(), secondary = await cardPerson("Secondary with own history");
   await enrollCardholder(primary.personId, primary.serviceId, secondary);
-  const own = await issuePracticeCard(primary.personId, primary.serviceId, secondary, "Secondary private card", "1000", "123");
-  const primaryCard = await issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Primary private card", "1000", "456");
+  const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2000");await setPersonLimit(primary.personId,primary.serviceId,secondary,"1000");return issuePracticeCard(primary.personId,primary.serviceId,secondary,"Secondary private card","123");})();
+  const primaryCard = await (async()=>{await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"1000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Primary private card","456");})();
   return { ...primary, secondary, own, primaryCard };
 }
 

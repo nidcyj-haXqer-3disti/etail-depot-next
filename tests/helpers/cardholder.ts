@@ -4,7 +4,7 @@ import { merchantSetupEligibility } from "../../src/modules/services/schema";
 import { bindIdentity, createCardholderService } from "../../src/modules/services/service";
 import { acceptInvitation, createInvitation } from "../../src/modules/access/service";
 import type { AccessPermission } from "../../src/modules/access/contracts";
-import { getWorkspace, purchaseCard, startCardRequest, submitCardRequest, updateCardRequest } from "../../src/modules/workspace/service";
+import { getWorkspace,addCardholderFunds,getPersonSpending,setCardholderSpendingLimit,purchaseCard, startCardRequest, submitCardRequest, updateCardRequest } from "../../src/modules/workspace/service";
 
 export const secondaryPermissions: AccessPermission[] = ["cards.read", "cards.hold", "cards.purchase", "cards.freeze", "cards.unfreeze", "activity.read", "notifications.manage"];
 export async function cardPerson(displayName: string) {
@@ -21,9 +21,9 @@ export async function enrollCardholder(primaryId: string, serviceId: string, per
   const invitation = await createInvitation(primaryId, serviceId, { commandId: randomUUID(), recipientId: personId, role: "SECONDARY", permissions, delegablePermissions: [], expiresInDays: 3 });
   return acceptInvitation(personId, invitation.id, { commandId: randomUUID(), expectedVersion: invitation.version });
 }
-export async function issuePracticeCard(primaryId: string, serviceId: string, holderId: string, nickname: string, allocation = "10000", spend?: string) {
+export async function issuePracticeCard(primaryId: string, serviceId: string, holderId: string, nickname: string, spend?: string) {
   const draft = await startCardRequest(primaryId, serviceId, { commandId: randomUUID() });
-  const saved = await updateCardRequest(primaryId, serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId, nickname, format: "VIRTUAL", requestedLimitMinor: allocation });
+  const saved = await updateCardRequest(primaryId, serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId, nickname, format: "VIRTUAL" });
   const submit = { commandId: randomUUID(), expectedVersion: saved.version };
   const request = await submitCardRequest(primaryId, serviceId, saved.id, submit);
   if (request.status !== "ISSUED" || !request.issuedCardId) throw new Error("Fixture card was not issued by the canonical command");
@@ -32,3 +32,6 @@ export async function issuePracticeCard(primaryId: string, serviceId: string, ho
   const purchase = spend ? await purchaseCard(holderId, serviceId, card.id, { commandId: randomUUID(), expectedVersion: card.version, amountMinor: spend, description: `${nickname} purchase` }) : null;
   return { card: purchase?.card ?? card, activity: purchase?.activity ?? null, request, submit };
 }
+
+export async function fundCardGroup(primaryId:string,serviceId:string,amountMinor:string){return addCardholderFunds(primaryId,serviceId,{commandId:randomUUID(),amountMinor,currency:"USD",source:"SANDBOX_BANK"});}
+export async function setPersonLimit(primaryId:string,serviceId:string,personId:string,monthlyLimitMinor:string){const current=await getPersonSpending(primaryId,serviceId,personId);return setCardholderSpendingLimit(primaryId,serviceId,personId,{commandId:randomUUID(),expectedVersion:current.version,monthlyLimitMinor});}

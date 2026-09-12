@@ -1,3 +1,4 @@
+import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
@@ -46,7 +47,7 @@ describe("Cardholder people belong only to the explicit Cardholder service", () 
   it("retains a revoked actual cardholder for review but excludes them from new card selection", async () => {
     const f = await cardPrimary(), secondary = await cardPerson("Retained secondary history");
     await enrollCardholder(f.personId, f.serviceId, secondary);
-    const card = await issuePracticeCard(f.personId, f.serviceId, secondary, "Retained card", "100", "10");
+    const card = await (async()=>{await fundCardGroup(f.personId,f.serviceId,"100");await setPersonLimit(f.personId,f.serviceId,secondary,"100");return issuePracticeCard(f.personId,f.serviceId,secondary,"Retained card","10");})();
     const member = (await getAccessOverview(f.personId, f.serviceId)).people.find(row => row.id === secondary)!;
     await revokeMemberAccess(f.personId, f.serviceId, secondary, { commandId: randomUUID(), expectedVersion: member.version });
     const access = await getAccessOverview(f.personId, f.serviceId), workspace = await getWorkspace(f.personId, f.serviceId);

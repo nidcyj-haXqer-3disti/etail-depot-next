@@ -1,0 +1,80 @@
+import {and,eq} from "drizzle-orm";
+import AxeBuilder from "@axe-core/playwright";
+import {expect,test} from "@playwright/test";
+import {closeDatabase,getDb} from "../../src/platform/database/client";
+import {permissionGrants} from "../../src/platform/database/schema";
+import {getCardholderFunds,getPersonSpending} from "../../src/modules/workspace/service";
+import {cardholderFundingIntents,cardholderLimitChanges,cardholderTopups} from "../../src/modules/workspace/funding-schema";
+import {ledgerEntries} from "../../src/modules/ledger/schema";
+import {personSpendingSchema} from "../../src/shared/funding-response";
+import {freshPrepaidCard,signInPerson} from "./helpers/prepaid";
+
+test.afterAll(closeDatabase);
+
+test("a lost spending-limit result hides funding details after denial and retries the limit without any funding command",async({page})=>{
+ test.setTimeout(90_000);
+ const {primary}=await freshPrepaidCard("2500","1000");
+ const before=await getCardholderFunds(primary.personId,primary.serviceId),person=before.people.find(row=>row.id===primary.personId)!;
+ expect(person.spending).toMatchObject({monthlyLimit:{minor:"1000"},version:1});
+ const linesBefore=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId)).orderBy(ledgerEntries.id);
+ const historyBefore=await getDb().select().from(cardholderLimitChanges).where(and(eq(cardholderLimitChanges.serviceId,primary.serviceId),eq(cardholderLimitChanges.personId,primary.personId))).orderBy(cardholderLimitChanges.version);
+ const prefix=`/api/v1/cardholder-services/${primary.serviceId}`;
+ const path=`${prefix}/cardholders/${primary.personId}/spending-limit`;
+ const attempts:Array<{path:string;body:unknown}>=[],statuses:number[]=[],fundingWrites:string[]=[];
+ page.on("request",request=>{
+  const pathname=new URL(request.url()).pathname;
+  if(!["GET","HEAD"].includes(request.method())&&pathname.startsWith(`${prefix}/funds`))fundingWrites.push(pathname);
+ });
+ await signInPerson(page,primary.personId);
+ await page.goto(`/cardholder-services/funds?service=${primary.serviceId}`);
+ const row=page.locator(".funds-person").filter({has:page.getByRole("heading",{name:person.name,exact:true})});
+ await row.getByRole("button",{name:`Change limit for ${person.name}`,exact:true}).click();
+ await row.getByRole("textbox",{name:`New monthly limit for ${person.name}`,exact:true}).fill("17.23");
+ await row.getByRole("button",{name:"Review limit",exact:true}).click();
+ await expect(row).toContainText("$17.23");
+ await page.route(`**${path}`,async route=>{
+  if(route.request().method()!=="PUT"){await route.continue();return;}
+  attempts.push({path:new URL(route.request().url()).pathname,body:route.request().postDataJSON()});
+  const response=await route.fetch();statuses.push(response.status());
+  if(attempts.length===1){
+   expect(response.status()).toBe(200);
+   const saved=personSpendingSchema.parse(await response.json());
+   expect(saved).toMatchObject({personId:primary.personId,monthlyLimit:{minor:"1723"},version:2});
+   await route.fulfill({status:200,json:{}});
+  }else await route.fulfill({response});
+ });
+ await row.getByRole("button",{name:"Save limit",exact:true}).click();
+ await expect(row.getByRole("button",{name:"Retry saved limit",exact:true})).toBeEnabled();
+ await expect(row.getByRole("button",{name:"Cancel",exact:true})).toHaveCount(0);
+ expect(await getPersonSpending(primary.personId,primary.serviceId,primary.personId)).toMatchObject({monthlyLimit:{minor:"1723"},version:2});
+ const grant=and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),eq(permissionGrants.action,"cardholder.limits.manage"));
+ expect(await getDb().update(permissionGrants).set({state:"REVOKED"}).where(grant).returning({action:permissionGrants.action})).toEqual([{action:"cardholder.limits.manage"}]);
+ await row.getByRole("button",{name:"Retry saved limit",exact:true}).click();
+ await expect.poll(()=>statuses.length).toBe(2);expect(statuses).toEqual([200,403]);
+ await expect(page.getByRole("heading",{name:"Funding access unavailable",exact:true})).toBeVisible();
+ const main=page.locator("main");
+ for(const privateText of [before.serviceName,person.name,"$25.00","$17.23",before.topups[0]!.reference])await expect(main).not.toContainText(privateText);
+ await expect(page.locator(".funds-balance,.funds-person,.funds-history")).toHaveCount(0);
+ await expect(page.getByRole("textbox")).toHaveCount(0);
+ await expect(page.getByRole("button",{name:"Retry saved funding request",exact:true})).toHaveCount(0);
+ const retry=page.getByRole("button",{name:"Retry saved spending limit",exact:true});await expect(retry).toBeEnabled();
+ const viewport=page.viewportSize();await page.setViewportSize({width:320,height:568});
+ expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
+ if(viewport)await page.setViewportSize(viewport);
+ expect(await getDb().update(permissionGrants).set({state:"ACCEPTED"}).where(grant).returning({action:permissionGrants.action})).toEqual([{action:"cardholder.limits.manage"}]);
+ await retry.click();
+ await expect(row.getByRole("button",{name:`Change limit for ${person.name}`,exact:true})).toBeVisible();
+ await expect(row.locator(".funds-limit-value")).toHaveText("$17.23");
+ expect(statuses).toEqual([200,403,200]);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[2]).toEqual(attempts[0]);
+ expect(attempts[0]!.path).toBe(path);expect(attempts[0]!.body).toMatchObject({expectedVersion:1,monthlyLimitMinor:"1723"});
+ expect(fundingWrites).toEqual([]);
+ expect(await getPersonSpending(primary.personId,primary.serviceId,primary.personId)).toMatchObject({monthlyLimit:{minor:"1723"},version:2});
+ const history=await getDb().select().from(cardholderLimitChanges).where(and(eq(cardholderLimitChanges.serviceId,primary.serviceId),eq(cardholderLimitChanges.personId,primary.personId))).orderBy(cardholderLimitChanges.version);
+ expect(history).toHaveLength(historyBefore.length+1);expect(history.at(-1)).toMatchObject({version:2,monthlyLimitMinor:1723n});
+ expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId)).orderBy(ledgerEntries.id)).toEqual(linesBefore);
+ expect(await getDb().select().from(cardholderTopups).where(eq(cardholderTopups.serviceId,primary.serviceId))).toHaveLength(1);
+ expect(await getDb().select().from(cardholderFundingIntents).where(eq(cardholderFundingIntents.serviceId,primary.serviceId))).toEqual([]);
+ expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("2500");
+ await page.reload();await expect(row.locator(".funds-limit-value")).toHaveText("$17.23");await expect(page.locator(".funds-balance")).toContainText("$25.00");
+});

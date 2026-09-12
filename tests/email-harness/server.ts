@@ -5,6 +5,8 @@ import { applicationOrigin, fixtureHeader, fixtureOrigin, pinnedIdentityEndpoint
 
 await verifyEmailHarnessDatabase();
 pinnedIdentityEndpoint();
+const nextMode = process.env.ETAIL_EMAIL_TEST_SERVER ?? "start";
+if (nextMode !== "start" && nextMode !== "dev") throw new Error("Unrecognized isolated email test server mode.");
 type Member = { subject: string; email: string; digest: string; confirmed: boolean; confirmation: string; recovery: string };
 const members = new Map<string, Member>();
 const accessTokens = new Map<string, Member>();
@@ -101,7 +103,7 @@ const server = createServer((request, response) => {
   })().catch(() => respond(response, 500, { error: "Isolated fixture request failed" }));
 });
 await new Promise<void>((resolve, reject) => { server.once("error", reject); server.listen(3102, "127.0.0.1", resolve); });
-const child = spawn(process.execPath, ["--import", "tsx", "--import", "./tests/email-harness/provider-preload.ts", "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "3101"], {
+const child = spawn(process.execPath, ["--import", "./tests/email-harness/runtime-preload.mjs", "node_modules/next/dist/bin/next", nextMode, "--hostname", "127.0.0.1", "--port", "3101"], {
   stdio: "inherit", env: { ...process.env, APP_ENV: "local", ETAIL_PUBLIC_ORIGIN: applicationOrigin, ENABLE_LOCAL_FIXTURE_IDENTITY: "false" },
 });
 let stopping = false;
