@@ -87,13 +87,13 @@ export async function addMoney(page:Page,serviceId:string,amount="50.00"){
 }
 export async function setCardAllowance(page:Page,serviceId:string,cardId:string,name:string,amount="25.00"){
   await page.goto(`/cardholder-services?card=${cardId}`);
-  const control=page.getByRole("dialog").getByRole("article",{name:"Card allowance",exact:true});
-  await control.getByRole("button",{name:"Change allowance for "+name,exact:true}).click();
-  await control.getByRole("textbox",{name:"New total allowance for "+name,exact:true}).fill(amount);
-  await control.getByRole("button",{name:"Review allowance",exact:true}).click();
-  await expect(control).toContainText("This does not add money or reset previous spending.");
+  const control=page.getByRole("dialog").getByRole("article",{name:"Card spending limit",exact:true});
+  await control.getByRole("button",{name:"Change spending limit for "+name,exact:true}).click();
+  await control.getByRole("textbox",{name:"New total spending limit for "+name,exact:true}).fill(amount);
+  await control.getByRole("button",{name:"Review spending limit",exact:true}).click();
+  await expect(control).toContainText("It does not add money or reset past spending, including refunded purchases.");
   const saving=responseFor(page,`/api/v1/cardholder-services/${serviceId}/cards/${cardId}/spending-limit`,"PUT");
-  await control.getByRole("button",{name:"Save allowance",exact:true}).click();
+  await control.getByRole("button",{name:"Save spending limit",exact:true}).click();
   expect((await saving).status()).toBe(200);
   await expect(control.locator(".funds-limit-value")).toHaveText("$"+amount);
 }
@@ -105,7 +105,7 @@ export async function addUnfundedCard(page:Page,name:string,holderName:string,al
   const holder=dialog.getByRole("radio",{name:new RegExp(holderName)});
   if(await holder.count())await holder.check();
   await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);
-  await dialog.getByRole("textbox",{name:"Total card allowance (USD)",exact:true}).fill(allowance);
+  await dialog.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill(allowance);
   await expect(dialog.getByRole("textbox",{name:"Starting balance (USD)",exact:true})).toHaveCount(0);
   await dialog.getByRole("button",{name:"Review card",exact:true}).click();
   await expect(dialog).toContainText("Creating a card does not add money.");
@@ -129,22 +129,22 @@ export async function prepaidPayer(page:Page,name:string){
   return {...primary,card,close:session.close};
 }
 export async function publishCustomerLink(page:Page,merchantId:string,channelId:string){
-  const details=page.getByRole("dialog",{name:"Payment channel details",exact:true});
-  await details.getByRole("button",{name:"Publish payment link",exact:true}).click();
+  const details=page.getByRole("dialog",{name:"Payment request details",exact:true});
+  await details.getByRole("button",{name:"Create payment link",exact:true}).click();
   const publishing=responseFor(page,`/api/v1/merchants/${merchantId}/channels/${channelId}/publication`);
-  await details.getByRole("button",{name:"Confirm publication",exact:true}).click();
+  await details.getByRole("button",{name:"Create payment link",exact:true}).click();
   const result=await publishing;expect(result.status()).toBe(200);
   const management=guestPublicationManagementSchema.parse(await result.json());
   expect(management.publication?.state).toBe("AVAILABLE");
   const publication=management.publication!;
-  await expect(details.getByRole("textbox",{name:"Customer payment URL",exact:true})).toHaveValue(publication.publicHref);
-  await expect(details.getByRole("link",{name:"Open customer checkout",exact:true})).toHaveAttribute("href",publication.publicHref);
+  await expect(details.getByRole("textbox",{name:"Payment link",exact:true})).toHaveValue(publication.publicHref);
+  await expect(details.getByRole("link",{name:"Preview payment page",exact:true})).toHaveAttribute("href",publication.publicHref);
   return publication;
 }
 export async function payPublished(page:Page,publication:GuestPublication,cardId:string){
   await page.goto(publication.publicHref);
   await expect(page.getByRole("heading",{name:publication.description,level:1,exact:true})).toBeVisible();
-  await page.getByRole("link",{name:"Continue to payment",exact:true}).click();
+  await page.getByRole("link",{name:"Choose a card",exact:true}).click();
   await page.getByRole("combobox",{name:"Your card",exact:true}).selectOption(cardId);
   const preparing=responseFor(page,`/api/v1/checkout/${publication.id}/card`);
   await page.getByRole("button",{name:"Review payment",exact:true}).click();
@@ -187,13 +187,13 @@ export async function refundPayment(page:Page,merchantId:string,paymentId:string
 }
 export async function settleExactPayment(page:Page,merchantId:string,paymentId:string){
   await page.goto(`/merchants/${merchantId}?tab=payments`);
-  await page.getByRole("button",{name:"Settle payments",exact:true}).click();
-  await page.getByRole("dialog",{name:"Settle payments",exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();
-  const review=page.getByRole("dialog",{name:"Review settlement",exact:true});
-  await expect(review).toContainText("Merchant money");
-  await expect(review).toContainText("Card money stays separate.");
+  await page.getByRole("button",{name:"Move to balance",exact:true}).click();
+  await page.getByRole("dialog",{name:"Move received payments",exact:true}).getByRole("button",{name:"Review received payments",exact:true}).click();
+  const review=page.getByRole("dialog",{name:"Review received payments",exact:true});
+  await expect(review).toContainText("Payment balance");
+  await expect(review).toContainText("It does not send money to a bank or add money to your card balance.");
   const requesting=responseFor(page,`/api/v1/merchants/${merchantId}/settlements`);
-  await review.getByRole("button",{name:"Settle payments",exact:true}).click();
+  await review.getByRole("button",{name:"Move to balance",exact:true}).click();
   const result=await requesting;expect(result.status()).toBe(200);
   const receipt=merchantSettlementReceiptSchema.parse(await result.json());
   expect(receipt.terminalId).toBe(merchantId);

@@ -20,19 +20,19 @@ test("a new visitor can compare services before signing in", async ({ page }) =>
   await page.goto("/");
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Shared spending\.\s*Simple payments\.\s*You’re in control\.$/);
   const mainNavigation = page.getByRole("navigation", {name:"Main navigation"});
-  await mainNavigation.getByRole("link", {name:"Cards for your people",exact:true}).click();
+  await mainNavigation.getByRole("link", {name:"Cards & spending",exact:true}).click();
   await expect(page).toHaveURL(/\/card-services$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Their own card\.\s*Your peace of mind\.$/);
-  await expect(mainNavigation.getByRole("link",{name:"Cards for your people"})).toHaveAttribute("aria-current","page");
+  await expect(mainNavigation.getByRole("link",{name:"Cards & spending"})).toHaveAttribute("aria-current","page");
   await expect(page.getByRole("heading",{name:"Cardholder",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Account owner",exact:true})).toBeVisible();
-  await mainNavigation.getByRole("link",{name:"Get paid together",exact:true}).click();
+  await mainNavigation.getByRole("link",{name:"Accept payments",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-services$/);
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Get paid\.\s*Together\.$/);
-  await expect(mainNavigation.getByRole("link",{name:"Get paid together",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Get paid\.\s*Keep it simple\.$/);
+  await expect(mainNavigation.getByRole("link",{name:"Accept payments",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.getByRole("heading",{name:"Account owner",exact:true})).toBeVisible();
-  await expect(page.getByRole("heading",{name:"Terminal user",exact:true})).toBeVisible();
-  await page.getByRole("link",{name:"Open merchant services",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"People you invite",exact:true})).toBeVisible();
+  await page.getByRole("link",{name:"Open your payments",exact:true}).click();
   await expect(page).toHaveURL(/\/login$/);
   expect(errors).toEqual([]);
 });
@@ -45,7 +45,7 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
   await question.focus();await page.keyboard.press("Enter");
   await expect(question.locator("..")).toHaveAttribute("open","");
   await expect(question.locator("..")).toContainText("A cardholder can freeze their own card.");
-  await expect(question.locator("..")).toContainText("A card frozen by its owner stays frozen until the owner releases that restriction.");
+  await expect(question.locator("..")).toContainText("If the account owner freezes it, only the owner can remove that restriction.");
   await page.keyboard.press("Enter");
   await expect(question.locator("..")).not.toHaveAttribute("open","");
   await page.getByRole("banner").getByRole("link",{name:"Sign in",exact:true}).click();
@@ -97,7 +97,7 @@ test("all seven payment examples work by keyboard without sending changes", asyn
     }
   });
   await page.goto("/");
-  const tablist = page.getByRole("tablist", {name:"Payment channel examples"});
+  const tablist = page.getByRole("tablist", {name:"Ways to share a payment request"});
   const examples = [
     {name:"Text", context:/^Text message$/},
     {name:"Email", context:/^Email ·/},

@@ -21,7 +21,7 @@ async function signIn(page:Page,personId:string){
 async function fillCard(page:Page,name:string){
  const dialog=page.getByRole("dialog");
  await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);
- await dialog.getByRole("textbox",{name:"Total card allowance (USD)",exact:true}).fill("25.00");
+ await dialog.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill("25.00");
  return dialog;
 }
 async function accessible(page:Page){
@@ -62,10 +62,10 @@ test("multiple drafts retain their own details and created/canceled requests rem
  const result=await getWorkspace(primary.personId,primary.serviceId),issued=result.cards[0]!;
  expect(result.cardRequests).toHaveLength(2);
  expect(result.cards).toHaveLength(1);
- await page.getByRole("navigation",{name:"Cardholder navigation",exact:true}).getByText("More",{exact:true}).click();
- await page.getByRole("navigation",{name:"Cardholder navigation",exact:true}).getByRole("link",{name:"Requests",exact:true}).click();
+ await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByText("More",{exact:true}).click();
+ await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Card requests",exact:true}).click();
  await expect(page).toHaveURL(/view=requests/);
- await expect(page.getByRole("heading",{name:"Requests",exact:true})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Card requests",level:2,exact:true})).toBeVisible();
  await page.reload();
  const canceled=page.locator(".ch-request-record").filter({hasText:"Travel request"});
  const created=page.locator(".ch-request-record").filter({hasText:"Everyday request"});
@@ -107,11 +107,11 @@ test("an owner sees a person's cards and history while holders cannot open manag
  await page.getByRole("searchbox",{name:"Search people",exact:true}).fill("Jordan");await page.getByRole("button",{name:"Search",exact:true}).click();await page.reload();
  await expect(page.getByRole("searchbox",{name:"Search people",exact:true})).toHaveValue("Jordan");await expect(profile).toHaveCount(1);
  await profile.getByRole("link",{name:"Jordan Sample",exact:true}).click();await expect(profile.locator(".access-person-card-list li")).toHaveCount(2);
- await profile.locator("li").filter({hasText:"Jordan travel"}).getByRole("link",{name:"Card controls",exact:true}).click();
- await expect(page.getByRole("dialog")).toContainText("Jordan Sample makes purchases when signed in to their own login");await expect(page.getByRole("dialog").getByRole("article",{name:"Card allowance"})).toContainText("$25.00");await page.keyboard.press("Escape");
+ await profile.locator("li").filter({hasText:"Jordan travel"}).getByRole("link",{name:"Card settings",exact:true}).click();
+ await expect(page.getByRole("dialog")).toContainText("Jordan Sample makes purchases when signed in to their own login");await expect(page.getByRole("dialog").getByRole("article",{name:"Card spending limit"})).toContainText("$25.00");await page.keyboard.press("Escape");
  await page.getByRole("link",{name:"All people",exact:true}).click();await page.getByRole("button",{name:"History",exact:true}).click();await expect(page.locator(".access-history")).toContainText("Invitation accepted");
  const context=await browser.newContext({viewport:page.viewportSize()??undefined});
- try{const holderPage=await context.newPage();await signIn(holderPage,secondary);await holderPage.goto(`${origin}/cardholder-services?view=cardholders&person=${primary.personId}`);await expect(holderPage.getByRole("heading",{name:"Cardholder management is unavailable",exact:true})).toBeVisible();await expect(holderPage.getByRole("button",{name:"Remove access",exact:true})).toHaveCount(0);await holderPage.goto(`${origin}/cardholder-services?view=requests`);await expect(holderPage.locator(".ch-request-record")).toHaveCount(0);}finally{await context.close();}
+ try{const holderPage=await context.newPage();await signIn(holderPage,secondary);await holderPage.goto(`${origin}/cardholder-services?view=cardholders&person=${primary.personId}`);await expect(holderPage.getByRole("heading",{name:"People are managed by the account owner",exact:true})).toBeVisible();await expect(holderPage.getByRole("button",{name:"Remove access",exact:true})).toHaveCount(0);await holderPage.goto(`${origin}/cardholder-services?view=requests`);await expect(holderPage.locator(".ch-request-record")).toHaveCount(0);}finally{await context.close();}
  await page.goto(`${origin}/cardholder-services?view=cardholders&person=${randomUUID()}`);await expect(page.getByRole("heading",{name:"This person is unavailable",exact:true})).toBeVisible();await expect(profile).toHaveCount(0);
 });
 

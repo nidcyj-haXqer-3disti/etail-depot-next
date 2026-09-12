@@ -22,5 +22,5 @@ export default async function Page() {
     return null;
   });
   if (!overview) return <PageNotice title="Your sessions couldn’t load" authenticated><p>Please try again. No sessions were signed out.</p><Link href="/security">Reload security</Link></PageNotice>;
-  return <Shell authenticated><div className="page-container security-page"><div className="security-page-heading"><div><Link className="service-back" href="/services">← Your services</Link><h1>Sign-in &amp; security</h1></div><TaskSearch/></div><SecurityWorkspace initial={overview}/></div></Shell>;
+  return <Shell authenticated><div className="page-container security-page"><div className="security-page-heading"><div><Link className="service-back" href="/services">← Your dashboard</Link><h1>Sign-in &amp; security</h1></div><TaskSearch/></div><SecurityWorkspace initial={overview}/></div></Shell>;
 }

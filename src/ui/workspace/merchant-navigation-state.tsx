@@ -18,7 +18,7 @@ export function MerchantNavigationBoundary({children}:{children:ReactNode}) {
   if(!locked||!(event.target instanceof Element))return;
   if(event.target.closest("a[href], .logout-control button")){event.preventDefault();event.stopPropagation();}
  }
- return <MerchantNavigationContext.Provider value={register}><div className="mn-navigation-boundary" data-pending={locked||undefined} onClickCapture={protectNavigation} onAuxClickCapture={protectNavigation}>{children}{locked&&<p className="mn-navigation-status" role="status">Finish or retry your current request before switching merchants or services.</p>}</div></MerchantNavigationContext.Provider>;
+ return <MerchantNavigationContext.Provider value={register}><div className="mn-navigation-boundary" data-pending={locked||undefined} onClickCapture={protectNavigation} onAuxClickCapture={protectNavigation}>{children}{locked&&<p className="mn-navigation-status" role="status">Finish or check your current request before switching payment terminals or services.</p>}</div></MerchantNavigationContext.Provider>;
 }
 
 export function useMerchantNavigationLock(locked:boolean){

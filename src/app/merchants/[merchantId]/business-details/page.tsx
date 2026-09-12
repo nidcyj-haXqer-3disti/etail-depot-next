@@ -7,7 +7,7 @@ import {MerchantBusinessDetails} from "@/ui/workspace/merchant-entry";
 import {MerchantShell} from "@/ui/workspace/merchant-shell";
 import {PageNotice} from "@/ui/shell";
 export const dynamic="force-dynamic";
-export const metadata={title:"Merchant business details"};
+export const metadata={title:"Business details"};
 export default async function Page({params}:{params:Promise<{merchantId:string}>}) {
  const session=await getRequestSession().catch(()=>undefined);
  if(session===undefined)return <PageNotice title="We couldn’t load your session"><p>Please retry.</p></PageNotice>;
@@ -16,7 +16,7 @@ export default async function Page({params}:{params:Promise<{merchantId:string}>
   const {merchantId}=await params;if(!z.uuid().safeParse(merchantId).success)throw new Error("Invalid merchant");
   return await getMerchantBusinessDetails(session.personId,merchantId);
  }catch(error){unstable_rethrow(error);return null;} })();
- if(!data)return <PageNotice title="Merchant setup is unavailable" authenticated><p>Check your merchant access or retry.</p><Link href="/merchant-services">Return to Merchant overview</Link></PageNotice>;
+ if(!data)return <PageNotice title="Business details are unavailable" authenticated><p>Check your business access or reload this page.</p><Link href="/merchant-services">Return to payment overview</Link></PageNotice>;
  const {merchantId}=data;
  return <MerchantShell merchantId={merchantId} name={data.name} showSettings tab="verification"><Link href={`/merchants/${merchantId}?tab=verification`}>Back to payment setup</Link><MerchantBusinessDetails initial={data}/></MerchantShell>;
 }

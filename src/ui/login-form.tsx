@@ -175,7 +175,7 @@ export function LoginForm({ nextPath="/services",initialMode="login",localEmailL
     if (mode === "reset") void submit("/api/v1/auth/reset-password", { token: link!.token, password }, mode);
   }
 
-  if (signedIn) return <div className="login-forms"><p className="form-note" role="status">You’re signed in. Opening your services…</p><a className="button primary full-width" href={nextPath}>Continue<Icon name="arrow" /></a></div>;
+  if (signedIn) return <div className="login-forms"><p className="form-note" role="status">You’re signed in. Opening your dashboard…</p><a className="button primary full-width" href={nextPath}>Continue<Icon name="arrow" /></a></div>;
 
   const busy = pending !== null || checking;
   const disabled = busy || !emailSignIn.available || (mode === "register" && !emailSignIn.registrationAvailable);
@@ -189,7 +189,7 @@ export function LoginForm({ nextPath="/services",initialMode="login",localEmailL
       {waitingForLink && <p className="form-note">{mode === "confirm" ? "For a new login, open the confirmation email in your inbox or spam folder and follow its link." : "Check your inbox and spam folder. Open the link in your latest password reset email to choose a new password."}{localEmailLinkBridge && " Then return here to sign in."}</p>}
       {(mode === "login" || mode === "register" || (mode === "reset" && linkReady)) && <div className="field"><label htmlFor="password">{mode === "reset" ? "New password" : "Password"}</label><input type="password" name="password" id="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={mode === "login" ? undefined : 12} maxLength={1024} required disabled={disabled} />{mode !== "login" && <p className="form-note">Use at least 12 characters.</p>}</div>}
       {(mode === "register" || (mode === "reset" && linkReady)) && <div className="field"><label htmlFor="confirm-password">Confirm password</label><input type="password" name="confirmPassword" id="confirm-password" autoComplete="new-password" minLength={12} maxLength={1024} required disabled={disabled} /></div>}
-      {mode === "register" && <p className="form-note">We will email you a confirmation link. Creating a login does not automatically open card or merchant services.</p>}
+      {mode === "register" && <p className="form-note">We will email you a confirmation link. You can set up cards or payment tools after confirming your email.</p>}
       {!emailSignIn.available && <p className="form-note" id="identity-readiness" role="status"><Icon name="info" />Email sign-in is temporarily unavailable. Check availability to try again.</p>}
       {mode === "register" && emailSignIn.available && !emailSignIn.registrationAvailable && <p className="form-note" id="registration-readiness" role="status">Creating a login is temporarily unavailable. If you already have a login, return to sign in.</p>}
       {!waitingForLink && <button type="submit" className="button primary full-width" disabled={disabled}>{pending === mode ? "Please wait…" : actions[mode]}<Icon name="arrow" /></button>}

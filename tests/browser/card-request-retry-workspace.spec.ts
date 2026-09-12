@@ -50,7 +50,7 @@ test("one card form starts only on review and safely retries lost start, save an
   await self.click();
   await expect(dialog.locator(".consumer-cardholder-selected")).toContainText(data.person.displayName);
   await cardName.fill(name);
-  await dialog.getByLabel("Total card allowance (USD)",{exact:true}).fill("16.00");
+  await dialog.getByLabel("Total spending limit (USD)",{exact:true}).fill("16.00");
   await initialReview.click();
   const retry = dialog.getByRole("button", { name: "Retry the same request", exact: true });
   await expect(retry).toBeEnabled();

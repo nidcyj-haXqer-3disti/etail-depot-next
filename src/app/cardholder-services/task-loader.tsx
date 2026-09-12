@@ -28,7 +28,7 @@ export async function renderCardholderTask(task: CardholderTask, searchParams: P
   if (session === undefined) return <PageNotice title="We couldn’t load your session"><p>Please try signing in again.</p></PageNotice>;
   if (!session) redirect("/login");
   const query = await searchParams;
-  if (query.focus === undefined && query.context === undefined) return <PageNotice title="Choose a card to continue" authenticated><p>Open a card, then choose the service you need.</p><Link href="/cardholder-services?view=cards">Choose a card</Link></PageNotice>;
+  if (query.focus === undefined && query.context === undefined) return <PageNotice title="Choose a card to continue" authenticated><p>Open a card, then choose what you want to do.</p><Link href="/cardholder-services?view=cards">Choose a card</Link></PageNotice>;
   try {
     const focusId = query.focus !== undefined ? exactId(query.focus) : undefined;
     const contextId = query.context !== undefined ? exactId(query.context) : undefined;
@@ -45,7 +45,7 @@ export async function renderCardholderTask(task: CardholderTask, searchParams: P
     const scopeKey = JSON.stringify([serviceId, workspace.cardholderRole, workspace.capabilities, workspace.cards.map(card => card.id), focusId]);
     let content;
     if (task === "activity") content = <ActivityWorkspace key={scopeKey} workspace={workspace} selectedCardId={focusId}/>;
-    else if (task === "reports") content = workspace.capabilities.some(item => item.action === "activity.read" && item.allowed) ? <><p className="consumer-muted">{workspace.cardholderRole === "OWNER" ? "Reports include the cards you manage in this group." : "Reports include only your own card activity."}</p><ReportsWorkspace key={scopeKey} workspace={workspace} report={await getHistoricalReport(session.personId, serviceId)}/></> : <EmptyState title="Report access is restricted" description="Your permissions do not include these reports."/>;
+    else if (task === "reports") content = workspace.capabilities.some(item => item.action === "activity.read" && item.allowed) ? <><p className="consumer-muted">{workspace.cardholderRole === "OWNER" ? "Reports include the cards you manage in this account." : "Reports include only your own card activity."}</p><ReportsWorkspace key={scopeKey} workspace={workspace} report={await getHistoricalReport(session.personId, serviceId)}/></> : <EmptyState title="Report access is restricted" description="You can’t view these reports with your current account access."/>;
     else if (task === "settings") content = <SettingsWorkspace key={scopeKey} workspace={workspace}/>;
     else if (task === "membership") content = <MembershipWorkspace initial={estimateMembership(sampleMembershipInput)}/>;
     else content = <HelpWorkspace key={scopeKey} workspace={workspace} selectedCardId={focusId}/>;
@@ -54,6 +54,6 @@ export async function renderCardholderTask(task: CardholderTask, searchParams: P
   } catch (error) {
     unstable_rethrow(error);
     const unavailable = error instanceof SecurityError && [403, 404, 422].includes(error.status);
-    return <PageNotice title={unavailable ? "This cardholder view is unavailable" : "We couldn’t load this cardholder service"} authenticated><p>{unavailable ? "Your access or the selected item may have changed. No other card has been selected." : "Your saved records have not changed. Please try again."}</p><Link href="/cardholder-services?view=cards">Return to your cards</Link></PageNotice>;
+    return <PageNotice title={unavailable ? "This card view is unavailable" : "We couldn’t load this card account"} authenticated><p>{unavailable ? "Your access or the selected item may have changed. No other card has been selected." : "Your saved records have not changed. Please try again."}</p><Link href="/cardholder-services?view=cards">Return to your cards</Link></PageNotice>;
   }
 }

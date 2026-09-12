@@ -26,23 +26,23 @@ test("a lost merchant status change remains owned after closing its dialog and h
  });
  await review.getByRole("button",{name:"Confirm pause",exact:true}).click();
  await expect(review.getByRole("button",{name:"Retry saved change",exact:true})).toBeVisible();
- await expect(page.getByRole("button",{name:"Leave unconfirmed request",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("button",{name:"Leave for now",exact:true})).toHaveCount(0);
  await review.getByRole("button",{name:"Cancel",exact:true}).click();await expect(review).toBeHidden();
  await expect(page.locator(".mn-navigation-boundary")).toHaveAttribute("data-pending","true");
  const before=page.url();await page.locator("header a[href]").first().dispatchEvent("click");expect(page.url()).toBe(before);
  await page.getByRole("button",{name:"Continue status change",exact:true}).click();
  await review.getByRole("button",{name:"Retry saved change",exact:true}).click();
- const recovery=page.getByRole("region",{name:"Terminal status recovery",exact:true});
+ const recovery=page.getByRole("region",{name:"Payment terminal status",exact:true});
  await expect(recovery).toContainText("Leaving does not cancel or confirm the change.");
  await expect(recovery).not.toContainText(reason);await expect(recovery.getByRole("textbox")).toHaveCount(0);
  await recovery.getByRole("button",{name:"Retry saved change",exact:true}).click();
- await expect(recovery.getByRole("button",{name:"Leave unconfirmed request",exact:true})).toBeEnabled();
+ await expect(recovery.getByRole("button",{name:"Leave for now",exact:true})).toBeEnabled();
  expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
  const saved=await page.request.get(`/api/v1/merchants/${merchant.merchantId}`).then(response=>response.json());
  expect(saved.merchant).toMatchObject({status:"PAUSED",version:savedVersion});
  await accessibleRecovery(page);
- await recovery.getByRole("button",{name:"Leave unconfirmed request",exact:true}).click();
- await expect(page).toHaveURL(url=>url.pathname==="/services");await expect(page.getByRole("heading",{name:"Your services",exact:true})).toBeVisible();
+ await recovery.getByRole("button",{name:"Leave for now",exact:true}).click();
+ await expect(page).toHaveURL(url=>url.pathname==="/services");await expect(page.getByRole("heading",{name:"Your dashboard",exact:true})).toBeVisible();
 });
 
 for(const service of ["merchant","cardholder"] as const){

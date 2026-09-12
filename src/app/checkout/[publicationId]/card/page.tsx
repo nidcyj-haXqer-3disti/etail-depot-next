@@ -8,7 +8,7 @@ import {CardCheckout} from "@/ui/card-checkout";
 import {Shell, PageNotice} from "@/ui/shell";
 
 export const dynamic = "force-dynamic";
-export const metadata = {title:"Pay with your Etail card",robots:{index:false,follow:false}};
+export const metadata = {title:"Choose a card",robots:{index:false,follow:false}};
 export default async function Page({params,searchParams}:{params:Promise<{publicationId:string}>;searchParams:Promise<Record<string,string|string[]|undefined>>}) {
   const {publicationId} = await params, query = await searchParams, session = await getRequestSession();
   if (!session) {

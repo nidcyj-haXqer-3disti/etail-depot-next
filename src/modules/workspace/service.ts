@@ -152,7 +152,7 @@ async function requireAdultCreator(tx: Transaction, scope: Scope) {
 async function requestPrerequisites(tx: Transaction, scope: Scope, row: typeof cardRequests.$inferSelect) {
   const result: CardRequestProjection["prerequisites"] = [];
   if (!permits(scope, "cards.create")) result.push({ code: "CARD_CREATE_PERMISSION_REQUIRED", title: "Card creation permission is required", detail: "You can save this request, but you need permission to create the card." });
-  if (await sandboxPersona(tx, scope.actor.id) !== "FICTIONAL_ADULT") result.push({ code: "ADULT_APPLICANT_REQUIRED", title: "Cardholder setup is required", detail: "Complete the required cardholder setup before creating a card." });
+  if (await sandboxPersona(tx, scope.actor.id) !== "FICTIONAL_ADULT") result.push({ code: "ADULT_APPLICANT_REQUIRED", title: "Cardholder setup is required", detail: "Complete the required card account setup before creating a card." });
   const holder = await holderReadiness(tx, row.serviceId, row.holderId);
   if (!holder.allowed) result.push({ code: "CARDHOLDER_UNAVAILABLE", title: "Cardholder access needs attention", detail: "The person named on this card needs active cardholder access and permission to use a card." });
   if (!canManageHolder(scope, row.holderId)) result.push({ code: "MEMBER_MANAGEMENT_REQUIRED", title: "Permission to manage other people’s cards is required", detail: "The account owner needs permission to manage other people’s cards." });
@@ -176,20 +176,20 @@ export async function getCardProjection(tx: Transaction, scope: Scope, row: type
   // Explain the same current gates that permit a purchase. Management authority
   // never substitutes for being the person named on the card.
   const purchaseAvailability:WorkspaceCard["purchaseAvailability"]=row.holderId!==scope.actor.id
-    ?{code:"OTHER_CARDHOLDER",title:`${holder!.displayName}’s card`,description:`${holder!.displayName} makes purchases when signed in to their own login. You can review this card and use the controls available to you.`}
+    ?{code:"OTHER_CARDHOLDER",title:`${holder!.displayName}’s card`,description:`${holder!.displayName} makes purchases when signed in to their own login. You can view its purchases and manage its settings.`}
     :!readiness.allowed||!permits(scope,"cards.purchase")
-      ?{code:"ACCESS_RESTRICTED",title:"Purchases are not enabled for your access",description:primary?"Review your card access or contact support before making a purchase.":"Ask your account owner to review your card access before making a purchase."}
+      ?{code:"ACCESS_RESTRICTED",title:"You can’t make purchases with this card yet",description:primary?"Review your card access or contact support before making a purchase.":"Ask your account owner to review your card access before making a purchase."}
       :readiness.persona!=="FICTIONAL_ADULT"
-        ?{code:"SETUP_REQUIRED",title:"Cardholder setup needs attention",description:readiness.persona==="FICTIONAL_SUPERVISED"?"This card needs guardian funding before purchases can be enabled. That setup is not available yet.":"Complete your account setup before making a purchase."}
+        ?{code:"SETUP_REQUIRED",title:"Card setup needs attention",description:readiness.persona==="FICTIONAL_SUPERVISED"?"This card needs guardian funding before purchases can be enabled. That setup is not available yet.":"Complete your account setup before making a purchase."}
         :row.status==="FROZEN"
           ?{code:"FROZEN",title:"This card is frozen",description:!primary&&primaryRestriction?"Ask your account owner to review the freeze before making a purchase.":canUnfreeze?"Unfreeze this card when you are ready to use it again.":"Ask your account owner or support to review the freeze before making a purchase."}
           :available<=0n
-            ?{code:"NO_FUNDS",title:"No spending available",description:"Your account owner can add money to the group or review your total allowance."}
-            :{code:"READY",title:"Ready to use",description:"Use this card at checkout within your total allowance and the group’s available funds."};
+            ?{code:"NO_FUNDS",title:"No spending available",description:"Ask the account owner to add money to the card balance or review this card’s total spending limit."}
+            :{code:"READY",title:"Ready to use",description:"Use this card at checkout within your total spending limit and the available card balance."};
   return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder!.displayName, nickname: row.nickname,
     relationship: row.holderId === scope.policy.primaryPersonId ? "OWNER" : "CARDHOLDER",
     lastFour: row.lastFour, format: row.format, status: row.status, version: row.version, spending, available: formatMoney(available),
-    freeze:{primary:row.primaryFrozen,holder:row.holderFrozen,reviewRequired:row.freezeReviewRequired,description:reasons.join(" ")||"No freezes are active.",freezeLabel:row.status==="ACTIVE"?"Freeze card":primary?"Keep card frozen":"Add your freeze",unfreezeLabel:!primary&&primaryRestriction?"Remove your freeze":"Unfreeze card",unfreezeDescription:primary?"This removes all current freezes on this card. New purchases will be available to the named cardholder, within their permissions and available funds.":primaryRestriction?"Your own freeze will be removed. The card will stay frozen until the account owner removes the remaining restriction.":"Your freeze will be removed. New purchases will be available within your permissions and available funds."},
+    freeze:{primary:row.primaryFrozen,holder:row.holderFrozen,reviewRequired:row.freezeReviewRequired,description:reasons.join(" ")||"No freezes are active.",freezeLabel:row.status==="ACTIVE"?"Freeze card":primary?"Keep card frozen":"Add your freeze",unfreezeLabel:!primary&&primaryRestriction?"Remove your freeze":"Unfreeze card",unfreezeDescription:primary?"This removes all current freezes on this card. New purchases will be available to the named cardholder, within their spending limit and the available card balance.":primaryRestriction?"Your own freeze will be removed. The card will stay frozen until the account owner removes the remaining restriction.":"Your freeze will be removed. New purchases will be available within your spending limit and the available card balance."},
     canFreeze: manageable && !(primary?row.primaryFrozen:row.holderFrozen) && permits(scope, "cards.freeze"), canUnfreeze,
     canPurchase: purchaseAvailability.code==="READY", purchaseAvailability, fictional: true };
 }
@@ -235,8 +235,8 @@ export async function getWorkspaceInTransaction(tx: Transaction, personId: strin
     const result: WorkspaceProjection = {
       service: { id: service.id, kind: service.kind, primaryPersonId:service.primaryPersonId, displayName: service.displayName, status: service.status, version: service.version, role: membership.role, cardholderRole: relationship },
       member: { id: actor.id, displayName: actor.displayName }, services: directory, cardholderRole: relationship, fictional: true,
-      customerService:{id:service.id,primaryName:primary!.primaryName,displayName:relationship==="OWNER"?"Your cardholder service":`Cards with ${primary!.primaryName}`},
-      notice: "Your cards use the group’s available funds and each card’s total allowance.",
+      customerService:{id:service.id,primaryName:primary!.primaryName,displayName:relationship==="OWNER"?"Your card account":`Cards with ${primary!.primaryName}`},
+      notice: "Your cards use the available card balance and each card’s total spending limit.",
       capabilities: ACTIONS.map(action => { const {allowed,reasonCode,reason}=evaluate(scope.policy,action);return {action,allowed,reasonCode,reason}; }), cards: [], cardRequests: [], cardholderOptions: [], activity: [], people: [], preferences: preferenceProjection(),
     };
     if (permits(scope, "cards.read")) {

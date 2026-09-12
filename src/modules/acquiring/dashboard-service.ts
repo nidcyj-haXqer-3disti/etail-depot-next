@@ -47,26 +47,26 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
    const canCreateChannel=eligible&&evaluate(scope.policy,"channels.create").allowed;
    const helpAction={label:"Open help",href:`/merchants/${unit.id}?tab=help`};
    const setupAction={label:"Review payment setup",href:`/merchants/${unit.id}?tab=verification`};
-   const channelAction={label:"View payment channels",href:`/merchants/${unit.id}?tab=channels`};
+   const channelAction={label:"View payment requests",href:`/merchants/${unit.id}?tab=channels`};
    // This suggests an existing scoped page, never supplies command authority.
    // Payment setup alone is not a ready channel, or a published customer checkout.
    const collectionAvailability:MerchantCollectionAvailability=!scope.policy.operating
-    ?{code:"PAUSED",title:"Payments are unavailable",description:"Review this merchant’s status and payment setup. Existing records remain available within your access.",action:setupAction}
+    ?{code:"PAUSED",title:"Payments are unavailable",description:"Review this payment terminal’s status and settings. Existing records remain available within your access.",action:setupAction}
     :setupState!=="READY"
       ?scope.ownerAccess
-        ?{code:"SETUP_REQUIRED",title:"Payment setup needs attention",description:"Review payment setup before using a channel to receive payments.",action:setupAction}
-        :{code:"OWNER_ACTION_REQUIRED",title:"Your account owner needs to finish setup",description:`Ask ${scope.merchantService.displayName} to review payment setup for this merchant. Your access does not let you enable payments.`,action:helpAction}
+        ?{code:"SETUP_REQUIRED",title:"Payment setup needs attention",description:"Review payment settings before creating a request to receive payments.",action:setupAction}
+        :{code:"OWNER_ACTION_REQUIRED",title:"Your account owner needs to finish setup",description:`Ask ${scope.merchantService.displayName} to review payment settings for this terminal. Your access does not let you enable payments.`,action:helpAction}
       :!eligible
-        ?{code:"ACCESS_RESTRICTED",title:"Payment access needs attention",description:"Creating payment channels is not available for this setup. Open Help to review your access.",action:helpAction}
+        ?{code:"ACCESS_RESTRICTED",title:"Payment access needs attention",description:"Creating payment requests is not available for this setup. Open Help to review your access.",action:helpAction}
         :!canReadChannels
-          ?{code:"ACCESS_RESTRICTED",title:"Payment channels are not shared with you",description:scope.ownerAccess?"Your current access does not include payment channels. Open Help to review your access.":`Ask ${scope.merchantService.displayName} to review your payment channel access. You can still use the records shared with you.`,action:helpAction}
+          ?{code:"ACCESS_RESTRICTED",title:"Payment requests are not shared with you",description:scope.ownerAccess?"Your current access does not include payment requests. Open Help to review your access.":`Ask ${scope.merchantService.displayName} to review your payment request access. You can still use the records shared with you.`,action:helpAction}
           :!visibleChannels.length
             ?canCreateChannel
-              ?{code:"CHANNEL_REQUIRED",title:"Create a payment channel",description:"Payment setup is ready. Create a channel to choose how you receive payments.",action:{label:"Create payment channel",href:`/merchants/${unit.id}?tab=channels&new=1`}}
-              :{code:"ACCESS_RESTRICTED",title:"No payment channels are available to you",description:scope.ownerAccess?"Open Help to review your available payment tools.":`Ask ${scope.merchantService.displayName} to create or share a payment channel with you.`,action:helpAction}
+              ?{code:"CHANNEL_REQUIRED",title:"Create a payment request",description:"Payments are ready. Choose an amount and create a payment request.",action:{label:"Create payment request",href:`/merchants/${unit.id}?tab=channels&new=1`}}
+              :{code:"ACCESS_RESTRICTED",title:"No payment requests are available to you",description:scope.ownerAccess?"Open Help to review your available payment tools.":`Ask ${scope.merchantService.displayName} to create or share a payment request with you.`,action:helpAction}
             :!activeChannelCount
-              ?{code:"CHANNEL_REVIEW_REQUIRED",title:"Your payment channels need attention",description:"Your saved channels are not currently ready for a payment. Open them to review the next step.",action:channelAction}
-              :{code:"READY",title:"A payment channel is ready",description:"An active payment channel is available. Open channels to review and share its payment link.",action:channelAction};
+              ?{code:"CHANNEL_REVIEW_REQUIRED",title:"Your payment requests need attention",description:"Your saved payment requests cannot accept payments right now. Open a request to see what needs attention.",action:channelAction}
+              :{code:"READY",title:"A payment request is ready",description:"A payment request is ready. Open it to review and share its payment link.",action:channelAction};
    const total=(values:{amountMinor:bigint}[])=>formatMoney(values.reduce((sum,row)=>sum+row.amountMinor,0n));
    units.push({id:unit.id,name:unit.displayName,merchantServiceId:scope.merchantService.id,merchantName:scope.merchantService.displayName,ownerAccess:scope.ownerAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddTerminal:evaluate(scope.policy,"merchant.terminals.create").allowed&&scope.policy.operating&&eligible,canCreateChannel,canReadPeople:evaluate(scope.policy,"merchant.people.read").allowed,setupState,collectionAvailability,totals:{
     collected:canReadPayments?total(payments.filter(row=>row.merchantUnitId===unit.id&&row.outcome==="APPROVED")):null,
@@ -98,7 +98,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
    const recentPayments=paymentRows.filter(row=>ids.includes(row.merchantId)),recentTransfers=transferRows.filter(row=>ids.includes(row.merchantId));
    return {id,name,description,unitIds:ids,totals,payments:recentPayments.slice(0,12),transfers:recentTransfers.slice(0,6),paymentsHasMore:recentPayments.length>12,transfersHasMore:recentTransfers.length>6};
   }
-  const views=[view("all","All terminals","Payment activity from your available terminals.",unitIds),...merchants.map(merchant=>view(`merchant:${merchant.serviceId}`,merchant.name,"All terminals in this merchant.",merchant.unitIds)),...units.map(unit=>view(`unit:${unit.id}`,unit.name,`Terminal at ${unit.merchantName}.`,[unit.id]))];
+  const views=[view("all","All payment terminals","Payments from the terminals you can access.",unitIds),...merchants.map(merchant=>view(`merchant:${merchant.serviceId}`,merchant.name,"Payments from every terminal in this business.",merchant.unitIds)),...units.map(unit=>view(`unit:${unit.id}`,unit.name,`Payment terminal for ${unit.merchantName}.`,[unit.id]))];
   const activityRecords:Omit<MerchantActivityRow,"href">[]=[
    ...paymentRows.map(row=>({...row,kind:"payment" as const,paymentId:row.id,paymentReference:row.reference})),
    ...refunds.map(row=>({id:row.id,kind:"refund" as const,merchantId:row.merchantUnitId,merchantName:units.find(unit=>unit.id===row.merchantUnitId)!.name,description:payments.find(payment=>payment.id===row.paymentId)!.description,amount:formatMoney(row.amountMinor),status:"COMPLETED" as const,reference:row.testReference,at:row.createdAt.toISOString(),paymentId:row.paymentId,paymentReference:payments.find(payment=>payment.id===row.paymentId)!.testReference})),
