@@ -114,12 +114,16 @@ describe("service-first Cardholder dashboard", () => {
     const before = await f.snapshot();
     const focus = await getCardholderDashboardFocus(f.actor.personId, card.id.toUpperCase());
     expect(focus.workspace.cards).toHaveLength(1);
+    expect(focus.workspace.capabilities.find(item=>item.action==="cardholder.limits.manage")).toMatchObject({allowed:true});
+    expect((await getCardholderDashboardFocus(f.actor.personId,f.ownSecondary.card.id)).workspace.capabilities.find(item=>item.action==="cardholder.limits.manage")).toMatchObject({allowed:false});
     expect(focus.workspace.activity).toHaveLength(25);
     expect(focus.workspace.activity.every(item => item.cardId === card.id && item.serviceId === f.actor.serviceId)).toBe(true);
     expect(focus.workspace).not.toHaveProperty("people");
     expect(focus.workspace).not.toHaveProperty("cardRequests");
     for (const id of [f.hiddenPrimary.card.id, f.hiddenAdditional.card.id, f.foreignCard.card.id, randomUUID(), "invalid"]) await expect(getCardholderDashboardFocus(f.actor.personId, id)).rejects.toMatchObject({ status: 404 });
     expect(await f.snapshot()).toEqual(before);
+    await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,f.actor.serviceId),eq(permissionGrants.personId,f.actor.personId),eq(permissionGrants.action,"cardholder.limits.manage")));
+    expect((await getCardholderDashboardFocus(f.actor.personId,card.id)).workspace.capabilities.find(item=>item.action==="cardholder.limits.manage")).toMatchObject({allowed:false});
     await getDb().update(permissionGrants).set({ state: "REVOKED" }).where(and(eq(permissionGrants.serviceId, f.otherPrimary.serviceId), eq(permissionGrants.personId, f.actor.personId), eq(permissionGrants.action, "activity.read")));
     expect((await getCardholderDashboardFocus(f.actor.personId, f.ownSecondary.card.id)).workspace.activity.map(row=>row.id)).toEqual([f.ownSecondary.activity!.id]);
     await getDb().update(permissionGrants).set({ state: "REVOKED" }).where(and(eq(permissionGrants.serviceId, f.otherPrimary.serviceId), eq(permissionGrants.personId, f.actor.personId), eq(permissionGrants.action, "cards.read")));

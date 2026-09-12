@@ -28,7 +28,7 @@ export function MerchantShell({ merchantId, name, tab = "channels", showPeople =
     {id:"help",label:"Help",icon:"help"},
    ] as const).filter(item=>(item.id!=="people"||showPeople)&&(item.id!=="verification"||showSettings)).map(item=><Link key={item.id} href={unitHref(item.id)} aria-current={tab===item.id?"page":undefined}><WorkspaceIcon name={item.icon}/>{item.label}</Link>):<>
     {showMoney&&<Link href={dashboardHref("funds")} aria-current={dashboardQuery?.section==="funds"?"page":undefined}><WorkspaceIcon name="reports"/>Payment balance</Link>}
-    <Link href={dashboardHref("merchants")} aria-current={dashboardQuery?.section==="merchants"?"page":undefined}><WorkspaceIcon name="people"/>Payment terminals & people</Link>
+    <Link href={dashboardHref("merchants")} aria-current={dashboardQuery?.section==="merchants"?"page":undefined}><WorkspaceIcon name="people"/>Terminals & people</Link>
    </>}
   </MerchantNavigation>
  </aside><main id="main-content" className="mn-main">{children}</main></div><Footer authenticated/></div></MerchantNavigationBoundary>;

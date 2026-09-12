@@ -42,7 +42,7 @@ export async function getCardholderDashboardFocus(personId:string,cardId:string)
   if(role==="NONE"||!evaluate(scope.policy,"cards.read").allowed||(role==="CARDHOLDER"&&row.holderId!==personId))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
   const [profile]=await tx.select({id:services.id,primaryName:people.displayName}).from(services).innerJoin(people,eq(people.id,services.primaryPersonId)).where(eq(services.id,scope.service.id));
   if(!profile)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-  const capabilities=["cards.read","people.read","activity.read"].map(action=>evaluate(scope.policy,action));
+  const capabilities=["cards.read","people.read","activity.read","cardholder.limits.manage"].map(action=>evaluate(scope.policy,action));
   const card={...await getCardProjection(tx,scope,row),serviceId:profile.id,primaryName:profile.primaryName,accessRole:role,canManageAccess:role==="OWNER"&&evaluate(scope.policy,"people.read").allowed};
   const activity=evaluate(scope.policy,"activity.read").allowed?(await tx.select().from(serviceActivity).where(and(eq(serviceActivity.serviceId,row.serviceId),eq(serviceActivity.cardId,id))).orderBy(desc(serviceActivity.occurredAt),serviceActivity.id).limit(25)).map(activityProjection):[];
   return {card,workspace:{service:{id:scope.service.id,kind:scope.service.kind,primaryPersonId:scope.service.primaryPersonId,displayName:scope.service.displayName,status:scope.service.status,version:scope.service.version,role:scope.membership.role,cardholderRole:role},customerService:{...profile,displayName:role==="OWNER"?"Your cardholder service":`Cards with ${profile.primaryName}`},cardholderRole:role,capabilities,cards:[card],activity}};

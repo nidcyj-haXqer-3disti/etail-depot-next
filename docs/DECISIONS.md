@@ -1,5 +1,13 @@
 # Decision register
 
+## D75 — Practical service entry and preserved dashboard context (2026-09-12)
+
+The user rejected clutter and speculative experience. [The source-to-task review](PRACTICAL_DASHBOARD_REVIEW.md) grounds a bounded correction in Amex public account-switching, card-control and merchant-reconciliation screens. `/services` is a compact service selector; profile/security and authorized customer care stay reachable through shared account navigation. Cards expose exact spending limits and useful authorized choices; payment records retain search, dates, status, terminal scope and detail returns. The selected-card reader supplies the existing evaluated limit capability; it never infers authority from ownership alone.
+
+D73 owner/cards/flat terminals, separate money and total allowance semantics remain unchanged. Current balance and individual unsettled terminal amounts are distinguished from historical filters. No database reset, new financial workflow, provider automation or measured Amex-parity claim is introduced. Release requires verification/review for the final source tree on the existing GitHub/Netlify targets.
+
+D75 CI synchronization: the people-management browser test must await the submitted native GET document before reloading it. Wait for the exact search URL through `domcontentloaded`, then preserve the original persistence and authority assertions. No application change, retry or deadline increase is justified by the reload protocol failure. Keep the failed PR run and successful comparison push evidence; require the corrected PR run before merge.
+
 ## D69 — Prepaid group funding and connected customer payments (2026-09-12)
 
 The user rejected the old payment demo and approved a fresh rebuild of both services using Amex public workflows as reference. They explicitly chose prepaid cards with one primary-funded group and per-person limits. [The prepaid contract](FRESH_PREPAID_REBUILD.md) overrides earlier charge-card, starting-allocation, simulator and preservation-only instructions for this active sandbox. Retain one policy, card-request/issuance owner, command receipt system and immutable ledger; no provider/authentication replacement is implied.

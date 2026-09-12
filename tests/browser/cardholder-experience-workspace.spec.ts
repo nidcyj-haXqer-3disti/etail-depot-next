@@ -51,10 +51,11 @@ test("simple cardholder home keeps money clear and supporting tools scoped under
   await expect(group.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`/cardholder-services/funds?service=${primary.serviceId}`);
   const totalAllowance=overview.getByText(/^Total spending limit/);
   await expect(totalAllowance).toHaveCount(1);
-  await expect(totalAllowance).toBeHidden();
-  await overview.getByText("Spending details",{exact:true}).click();
   await expect(totalAllowance).toBeVisible();
-  await expect(totalAllowance.locator("strong")).toHaveText("$40.00");
+  await expect(overview.locator(".ch-limit-summary>div").filter({hasText:"Total spending limit"}).locator("dd")).toHaveText("$40.00");
+  await overview.getByRole("link",{name:"Change spending limit",exact:true}).click();
+  await expect(page.getByRole("dialog").getByRole("article",{name:"Card spending limit",exact:true})).toContainText("$40.00");
+  await page.keyboard.press("Escape");
   await expect(page.getByRole("heading",{name:"Recent activity",exact:true})).toBeVisible();
   await navigation.getByText("More",{exact:true}).click();
   await expect(navigation.getByRole("link",{name:"Card requests",exact:true})).toHaveAttribute("href",new RegExp(`focus=${own.card.id}`));
@@ -81,6 +82,7 @@ test("simple cardholder home keeps money clear and supporting tools scoped under
   await expect(overview.locator(".ch-focus-balance")).toContainText("$25.00");
   await expect(page.locator("main")).not.toContainText(own.card.nickname);
   await expect(group).toHaveCount(0);
+  await expect(overview.getByRole("link",{name:"Change spending limit",exact:true})).toHaveCount(0);
   await expect(navigation.getByRole("link",{name:"People",exact:true})).toHaveCount(0);
   await navigation.getByText("More",{exact:true}).click();
   await expect(navigation.getByRole("link",{name:"Card requests",exact:true})).toHaveCount(0);
@@ -103,6 +105,14 @@ test("your cards and cards you manage remain distinct through server filters, se
   const managed = await (async()=>{return issuePracticeCard(primary.personId, primary.serviceId, managedHolder, "Jordan daily card", undefined, "1800");})();
   await signIn(page, primary.personId);
 
+  await page.goto("/cardholder-services");
+  const picker=page.getByRole("region",{name:"Choose a card",exact:true});
+  await expect(picker).toBeVisible();
+  await expect(page.getByRole("region",{name:"Selected card overview",exact:true})).toHaveCount(0);
+  for(const card of [own.card,received.card,managed.card])await expect(picker.getByRole("link",{name:new RegExp(`^Open ${card.nickname},`)})).toBeVisible();
+  await picker.getByRole("link",{name:new RegExp(`^Open ${own.card.nickname},`)}).click();
+  await expect(page).toHaveURL(url=>url.searchParams.get("focus")===own.card.id);
+
   await page.goto(`/cardholder-services?focus=${own.card.id}`);
   const groupBalance=page.getByRole("region",{name:"Your card balance",exact:true});
   await expect(groupBalance).toContainText("$42.00");
@@ -117,7 +127,7 @@ test("your cards and cards you manage remain distinct through server filters, se
   await page.locator(".ch-group-details > summary").filter({hasText:"Your card account"}).click();
   const ownGroup=page.getByRole("region",{name:"Your card account",exact:true});
   await expect(ownGroup).toContainText("$42.00");
-  await expect(ownGroup.getByRole("link",{name:/Change card spending limits/})).toHaveAttribute("href","/cardholder-services?view=cards");
+  await expect(ownGroup.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`/cardholder-services/funds?service=${primary.serviceId}`);
   await expect(page.locator("main")).not.toContainText("$73.00");
   await page.getByLabel("Selected card",{exact:true}).selectOption(managed.card.id);
   await expect(selected).toContainText(managed.card.nickname);
