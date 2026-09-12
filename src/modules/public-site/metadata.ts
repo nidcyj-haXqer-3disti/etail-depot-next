@@ -2,10 +2,10 @@ import type { Metadata, MetadataRoute } from "next";
 import targets from "../../../project-targets.json" with { type: "json" };
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Cards for family and teams, shared payment tools", description: "Explore cards for adult family members and teams, plus shared payment tools by text, email, invoice, QR code and more. Try the Etail Depot sandbox." },
-  "/card-services": { title: "Cards for your family, team and trusted people", description: "Explore one prepaid card group for trusted adults, monthly spending limits for each person, private card activity and shared oversight in the Etail Depot sandbox." },
-  "/payment-services": { title: "Get paid together with shared merchant payment tools", description: "Give family, teams and helpers payment tools for your merchant. Explore text, email, invoice, bill, social, QR and web payment requests in the sandbox." },
-  "/help": { title: "Help with cards and payments", description: "Learn how Etail Depot card controls, payment tools and shared access work. Find help with the demo and what is available today." },
+  "/": { title: "Prepaid cards for your people and business payment tools", description: "Add money, set personal spending limits and manage cards for your family or team. Explore shared merchant payment requests and receipts with Etail Depot." },
+  "/card-services": { title: "Cards for your family, team and trusted people", description: "Explore one prepaid card group for trusted adults, monthly spending limits for each person, private card activity and shared oversight with Etail Depot." },
+  "/payment-services": { title: "Get paid together with shared merchant payment tools", description: "Give family, teams and helpers payment tools for your merchant. Explore text, email, invoice, bill, social, QR and web payment requests for your customers." },
+  "/help": { title: "Help with cards and payments", description: "Learn how Etail Depot card controls, payment tools and shared access work. Find clear answers about your services and account." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 

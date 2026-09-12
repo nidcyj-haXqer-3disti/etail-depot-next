@@ -61,7 +61,7 @@ describe("report filter and CSV boundaries", () => {
     const csv = historicalReportCsv(deriveHistoricalReport(workspace, filters));
     expect(csv).toContain('"Tea, ""large""\nrecord"');
     expect(csv).toContain('"90071992547409.93"');
-    expect(csv).toContain("Sandbox card activity.");
+    expect(csv).toContain("Card activity report.");
     expect(csv.endsWith("\r\n")).toBe(true);
   });
   it("an empty CSV carries the disclaimer without inventing a financial row", () => {

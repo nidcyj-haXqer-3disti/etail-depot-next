@@ -18,7 +18,7 @@ test("a new visitor can compare services before signing in", async ({ page }) =>
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.goto("/");
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Cards for\s*your people\.\s*More ways\s*to get paid\.$/);
+  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Shared spending\.\s*Simple payments\.\s*You’re in control\.$/);
   const mainNavigation = page.getByRole("navigation", {name:"Main navigation"});
   await mainNavigation.getByRole("link", {name:"Cards for your people",exact:true}).click();
   await expect(page).toHaveURL(/\/card-services$/);
@@ -62,7 +62,10 @@ test("public pages have unique canonical metadata and no private data", async ({
     await expect(page.getByRole("heading",{level:1})).toHaveCount(1);
     const data=JSON.parse(await page.locator('script[type="application/ld+json"]').innerText());
     expect(data["@graph"].at(-1).url).toBe(`https://etail-depot-next.netlify.app${route}`);
-    await expect(page.locator("main")).not.toContainText(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency/);
+    await expect(page.locator("main")).not.toContainText(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice|fixture/i);
+    await expect(page.locator(".sandbox-badge")).toHaveCount(1);
+    await expect(page.locator(".sandbox-badge")).toHaveText("Sandbox");
+    await expect(page.getByRole("navigation", {name:"Footer support"}).getByRole("link", {name:"Help center"})).toBeVisible();
   }
   expect(titles.size).toBe(4);
   const sitemap=await request.get("/sitemap.xml");expect(sitemap.ok()).toBe(true);
@@ -138,7 +141,7 @@ test("all seven payment examples work by keyboard without sending changes", asyn
   expect(errors).toEqual([]);
 });
 
-test("a first-time visitor can find registration, confirmation and password recovery without sending email", async ({page}) => {
+test("a first-time visitor uses emailed callbacks instead of manual link entry without sending email", async ({page}) => {
   const mutations = await preventMutationRequests(page);
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
@@ -148,6 +151,8 @@ test("a first-time visitor can find registration, confirmation and password reco
   await expect(signIn).toBeVisible();
   await expect(signIn.getByLabel("Email address", {exact:true})).toBeDisabled();
   await expect(signIn.getByLabel("Password", {exact:true})).toBeDisabled();
+  await expect(page.getByRole("button", {name:"I have a confirmation email", exact:true})).toHaveCount(0);
+  await expect(page.locator('input[name="emailLink"]')).toHaveCount(0);
 
   await page.getByRole("button", {name:"Create a login", exact:true}).click();
   const register = page.getByRole("form", {name:"Create your login", exact:true});
@@ -167,10 +172,15 @@ test("a first-time visitor can find registration, confirmation and password reco
   await expect(recover.getByLabel("Email address", {exact:true})).toBeDisabled();
   await expect(recover.getByLabel("Password", {exact:true})).toHaveCount(0);
   await expect(recover.getByRole("button", {name:"Send reset email", exact:true})).toBeDisabled();
-  await page.getByRole("button", {name:"I have a reset email", exact:true}).click();
+  await expect(page.getByRole("button", {name:"I have a reset email", exact:true})).toHaveCount(0);
+  // A synthetic callback supplies the link privately; unavailable email access
+  // still prevents confirmation/reset writes. Nothing is pasted or submitted.
+  await page.goto("/login#recovery_token=synthetic-public-callback");
   const reset = page.getByRole("form", {name:"Choose a new password", exact:true});
   await expect(reset).toBeVisible();
-  for (const name of ["Password reset link", "New password", "Confirm password"]) {
+  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.hash==="");
+  await expect(reset.getByLabel("Password reset link", {exact:true})).toHaveCount(0);
+  for (const name of ["New password", "Confirm password"]) {
     await expect(reset.getByLabel(name, {exact:true})).toBeVisible();
     await expect(reset.getByLabel(name, {exact:true})).toBeDisabled();
   }
@@ -179,10 +189,11 @@ test("a first-time visitor can find registration, confirmation and password reco
   await expect(recover).toBeVisible();
   await page.getByRole("button", {name:"Back to sign in", exact:true}).click();
 
-  await page.getByRole("button", {name:"I have a confirmation email", exact:true}).click();
+  await page.goto("/login#confirmation_token=synthetic-public-callback");
   const confirmation = page.getByRole("form", {name:"Confirm your email", exact:true});
   await expect(confirmation).toBeVisible();
-  await expect(confirmation.getByLabel("Confirmation link", {exact:true})).toBeDisabled();
+  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.hash==="");
+  await expect(confirmation.getByLabel("Confirmation link", {exact:true})).toHaveCount(0);
   await expect(confirmation.getByRole("button", {name:"Confirm email", exact:true})).toBeDisabled();
   await page.getByRole("button", {name:"Back to registration", exact:true}).click();
   await expect(register).toBeVisible();
@@ -204,7 +215,7 @@ test("an invalid email callback is removed before login and shows a recoverable 
   await expect(page).toHaveURL(url => url.pathname === "/login" && url.hash === "");
   await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
   const alert = page.getByRole("main").getByRole("alert");
-  await expect(alert).toHaveText("This email link is not supported. Copy the confirmation or reset link from your latest email.");
+  await expect(alert).toHaveText("This email link is not supported. Open the link in your latest confirmation or password reset email.");
   await expect(alert).toBeFocused();
   await page.getByRole("button", {name:"Forgot your password?", exact:true}).click();
   await expect(page.getByRole("form", {name:"Reset your password", exact:true})).toBeVisible();
@@ -212,4 +223,44 @@ test("an invalid email callback is removed before login and shows a recoverable 
   expect(requests.every(url => !url.includes("invalid-public-test") && !url.includes("confirmation_token"))).toBe(true);
   expect(mutations).toEqual([]);
   expect(errors).toEqual([]);
+});
+
+test("header sign-in and history update the idle registration form without authentication requests", async ({page}) => {
+  const mutations = await preventMutationRequests(page);
+  await page.goto("/login?mode=register");
+  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toBeVisible();
+  await page.getByRole("banner").getByRole("link", {name:"Sign in", exact:true}).click();
+  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.search==="");
+  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
+  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toHaveCount(0);
+  await page.goBack();
+  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.search==="?mode=register");
+  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toBeVisible();
+  await page.goForward();
+  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
+  expect(mutations).toEqual([]);
+});
+
+test("registration links only choose the initial form and emailed callbacks take precedence", async ({page}) => {
+  const mutations = await preventMutationRequests(page);
+  await page.goto("/login?mode=register");
+  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toBeVisible();
+  await expect(page.locator('input[name="emailLink"]')).toHaveCount(0);
+  for (const query of ["mode=confirm", "mode=reset", "mode=unexpected", "mode=register&mode=register"]) {
+    await page.goto(`/login?${query}`);
+    await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
+  }
+  await page.goto("/login?mode=register#confirmation_token=synthetic-public-mode-callback");
+  await expect(page.getByRole("form", {name:"Confirm your email", exact:true})).toBeVisible();
+  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.search==="?mode=register"&&url.hash==="");
+  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toHaveCount(0);
+  await page.getByRole("banner").getByRole("link", {name:"Sign in", exact:true}).click();
+  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.search===""&&url.hash==="");
+  await expect(page.getByRole("form", {name:"Confirm your email", exact:true})).toBeVisible();
+  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toHaveCount(0);
+  await page.getByRole("button", {name:"Back to sign in", exact:true}).click();
+  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
+  await expect(page.locator('input[name="emailLink"]')).toHaveCount(0);
+  expect(await page.evaluate(()=>localStorage.length+sessionStorage.length)).toBe(0);
+  expect(mutations).toEqual([]);
 });

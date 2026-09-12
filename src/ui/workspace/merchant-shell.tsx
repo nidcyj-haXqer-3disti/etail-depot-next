@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Header } from "../shell";
+import { Footer, Header } from "../shell";
 import { WorkspaceIcon } from "./navigation";
 import {MerchantNavigationBoundary} from "./merchant-navigation-state";
 import {merchantActivityHref,type MerchantActivityQuery} from "@/shared/merchant-activity";
@@ -8,8 +8,8 @@ import "../services.css";
 
 export type MerchantTab = "channels" | "payments" | "people" | "verification" | "help";
 export function MerchantShell({ merchantId, name, kind, tab = "channels", showPeople = true, dashboardQuery, overviewHref, children }: {
- merchantId?: string; name?: string; kind?: "MASTER" | "SUB"; sponsor?: string;
- tab?: MerchantTab; showPeople?: boolean; primaryAccess?: boolean; dashboardQuery?:MerchantActivityQuery; overviewHref?:string; children: React.ReactNode;
+ merchantId?: string; name?: string; kind?: "MASTER" | "SUB";
+ tab?: MerchantTab; showPeople?: boolean; dashboardQuery?:MerchantActivityQuery; overviewHref?:string; children: React.ReactNode;
 }) {
  const hierarchy=kind==="MASTER"?"Primary merchant":kind==="SUB"?"Submerchant":"Merchant";
  const overview=overviewHref??"/merchant-services";
@@ -31,5 +31,5 @@ export function MerchantShell({ merchantId, name, kind, tab = "channels", showPe
     <Link href={dashboardHref("merchants")} aria-current={dashboardQuery?.section==="merchants"?"page":undefined}><WorkspaceIcon name="people"/>Merchants & people</Link>
    </>}
   </nav>
- </aside><main id="main-content" className="mn-main">{children}<footer className="mn-footer">Sandbox · No real money moves.</footer></main></div></div></MerchantNavigationBoundary>;
+ </aside><main id="main-content" className="mn-main">{children}</main></div><Footer authenticated/></div></MerchantNavigationBoundary>;
 }

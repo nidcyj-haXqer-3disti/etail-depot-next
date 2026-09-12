@@ -48,7 +48,7 @@ it("keeps holder setup and card-holding permission explicit without creating gua
   expect((await focus()).purchaseAvailability.description).toContain("guardian funding");
   await expect(purchaseCard(primary.personId,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:issued.card.version,amountMinor:"1",description:"No invented supervised authority"})).rejects.toMatchObject({status:403});
   await getDb().delete(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId,primary.personId));
-  expect(await focus()).toMatchObject({canPurchase:false,purchaseAvailability:{code:"SETUP_REQUIRED",description:"Complete your sandbox setup before making a purchase."}});
+  expect(await focus()).toMatchObject({canPurchase:false,purchaseAvailability:{code:"SETUP_REQUIRED",description:"Complete your account setup before making a purchase."}});
   await getDb().insert(merchantSetupEligibility).values({personId:primary.personId,personaKind:"FICTIONAL_ADULT"});
   await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),eq(permissionGrants.action,"cards.hold")));
   expect(await focus()).toMatchObject({canPurchase:false,purchaseAvailability:{code:"ACCESS_RESTRICTED"}});

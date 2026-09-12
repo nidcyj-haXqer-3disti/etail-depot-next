@@ -40,6 +40,7 @@ test("ordinary merchant collection access is reviewed, recovers one invitation, 
   await page.getByRole("button",{name:"Invite person",exact:true}).click();
   const invite=page.getByRole("dialog",{name:"Invite a person",exact:true});
   await expect(invite.getByRole("radio")).toHaveCount(0);
+  await expect(invite.getByRole("combobox",{name:"Person",exact:true})).toHaveCount(0);
   await expect(invite.getByRole("button",{name:/View records|Manage people/})).toHaveCount(0);
   await invite.getByRole("textbox",{name:"Member code",exact:true}).fill(member.memberCode!);
   await invite.getByRole("button",{name:"Find member",exact:true}).click();
@@ -60,7 +61,7 @@ test("ordinary merchant collection access is reviewed, recovers one invitation, 
   await expect(review.getByRole("button",{name:"Retry same access request",exact:true})).toBeVisible();
   await expect(page.locator(".mn-navigation-boundary")).toHaveAttribute("data-pending","true");
   await review.getByRole("button",{name:"Retry same access request",exact:true}).click();
-  await expect(review).toBeHidden();expect(bodies).toHaveLength(2);expect(bodies[0]).toBe(bodies[1]);
+  await expect(review).toBeHidden();expect(bodies).toHaveLength(2);expect(bodies[0]).toBe(bodies[1]);expect(JSON.parse(bodies[0]).recipientId).toBe(f.helper.personId);
   const saved=await getMerchantAccessOverview(f.merchant.personId,f.unit.id),offer=saved.invitations.find(item=>item.recipientId===f.helper.personId)!;
   expect(saved.pendingInvitationCount).toBe(1);expect(offer.permissions).toEqual(expect.arrayContaining(["merchant.read","channels.read","channels.create","channels.update","channels.share","payments.read"]));expect(offer.delegablePermissions).toEqual([]);
   expect(saved.people.some(person=>person.personId===f.helper.personId)).toBe(false);
@@ -83,6 +84,13 @@ test("ordinary merchant collection access is reviewed, recovers one invitation, 
   await page.getByRole("button",{name:/^Past access/}).click();
   await expect(page.locator(".mp-person").filter({hasText:name})).toContainText("Access removed");
   await expect(page.locator(".mp-person").filter({hasText:name}).getByRole("button",{name:"Invite again",exact:true})).toBeVisible();
+  await page.locator(".mp-person").filter({hasText:name}).getByRole("button",{name:"Invite again",exact:true}).click();
+  await expect(invite).toContainText(`Selected person: ${name}`);
+  await expect(invite.getByRole("combobox",{name:"Person",exact:true})).toHaveCount(0);
+  await invite.getByRole("button",{name:"Review invitation",exact:true}).click();
+  await expect(review.getByRole("heading",{name,exact:true})).toBeVisible();
+  await review.getByRole("button",{name:"Back to permissions",exact:true}).click();
+  await invite.getByRole("button",{name:"Cancel",exact:true}).click();
   expect((await recipientPage.request.get(`/api/v1/merchants/${f.unit.id}`)).status()).toBe(404);
  }finally{await recipientContext.close();}
 });
@@ -121,7 +129,7 @@ test("business details starts with saved progress, recovers its exact draft and 
  await setup.getByRole("textbox",{name:"Legal name",exact:true}).fill("Fictional garden shop");
  await setup.getByRole("textbox",{name:"Selling name",exact:true}).fill("Sample plants");
  await setup.getByRole("textbox",{name:"What will you sell?",exact:true}).fill("Fictional plants and garden supplies");
- await setup.getByRole("checkbox",{name:"I’m using sample information in this sandbox.",exact:true}).check();
+ await expect(setup.getByRole("checkbox")).toHaveCount(0);
  const bodies:string[]=[];
  await page.route(`**/api/v1/merchants/${f.merchantId}/business-details/application/${f.setup.id}`,async route=>{
   if(route.request().method()!=="PATCH"){await route.continue();return;}
@@ -133,7 +141,7 @@ test("business details starts with saved progress, recovers its exact draft and 
  await setup.getByRole("button",{name:"Close Merchant setup",exact:true}).click();await expect(setup).toBeVisible();
  await setup.getByRole("button",{name:"Retry same save",exact:true}).click();
  await expect(setup.getByRole("heading",{name:"Review your merchant setup",exact:true})).toBeVisible();
- expect(bodies).toHaveLength(2);expect(bodies[0]).toBe(bodies[1]);
+ expect(bodies).toHaveLength(2);expect(bodies[0]).toBe(bodies[1]);expect(JSON.parse(bodies[0]).fictionalDetailsConfirmed).toBe(true);
  await setup.getByRole("button",{name:"Submit for review",exact:true}).click();
  await expect(setup.getByRole("heading",{name:"Saved for review",exact:true})).toBeVisible();
  expect((await getMerchantBusinessDetails(f.personId,f.merchantId)).merchantStatus).toBe("PENDING_LOCAL_REVIEW");

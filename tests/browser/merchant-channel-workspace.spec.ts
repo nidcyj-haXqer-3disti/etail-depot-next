@@ -109,7 +109,7 @@ test("seven sharing formats keep one published channel and exact prepaid receipt
     await expect(depositDetails).not.toContainText(first.reference);
     expect((await operations(page,merchantId)).bankFunds?.minor).toBe("0");
     await page.goto("/operations/deposits");
-    await expect(page.getByRole("heading",{name:"Operator access required",exact:true})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Access required",exact:true})).toBeVisible();
     await completeDeposit(operatorPage,deposit.id,deposit.testReference);
     await page.goto(`/merchants/${merchantId}?tab=payments`);
     const final=await operations(page,merchantId);

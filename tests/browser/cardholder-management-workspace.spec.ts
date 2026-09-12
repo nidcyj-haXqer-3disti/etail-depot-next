@@ -61,6 +61,7 @@ test("multiple drafts retain their own details and created/canceled requests rem
  const result=await getWorkspace(primary.personId,primary.serviceId),issued=result.cards[0]!;
  expect(result.cardRequests).toHaveLength(2);
  expect(result.cards).toHaveLength(1);
+ await page.getByRole("navigation",{name:"Cardholder navigation",exact:true}).getByText("More",{exact:true}).click();
  await page.getByRole("navigation",{name:"Cardholder navigation",exact:true}).getByRole("link",{name:"Requests",exact:true}).click();
  await expect(page).toHaveURL(/view=requests/);
  await expect(page.getByRole("heading",{name:"Requests",exact:true})).toBeVisible();

@@ -77,7 +77,7 @@ for(const phase of ["review","confirmation"] as const)test(`malformed funding ${
  await expect(page.getByRole("heading",{name:"Funding access unavailable",exact:true})).toBeVisible();
  const main=page.locator("main");
  await expect(main).not.toContainText(name);await expect(main).not.toContainText("$42.37");
- await expect(main).not.toContainText("Sandbox bank");await expect(main).not.toContainText("Monthly spending limits");
+ await expect(main).not.toContainText("Funding balance");await expect(main).not.toContainText("Monthly spending limits");
  await expect(page.locator(".funds-balance,.funds-history")).toHaveCount(0);
  await expect(page.getByRole("textbox",{name:"Amount (USD)",exact:true})).toHaveCount(0);
  await expect(page.getByRole("link",{name:"Change amount",exact:true})).toHaveCount(0);

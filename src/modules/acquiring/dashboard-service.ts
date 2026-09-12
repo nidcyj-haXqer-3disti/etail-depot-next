@@ -52,7 +52,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
     ?{code:"PAUSED",title:"Payments are unavailable",description:"Review this merchant’s status and payment setup. Existing records remain available within your access.",action:setupAction}
     :setupState!=="READY"
       ?scope.primaryAccess
-        ?{code:"SETUP_REQUIRED",title:"Payment setup needs attention",description:"Review payment setup before using a channel to receive sandbox payments.",action:setupAction}
+        ?{code:"SETUP_REQUIRED",title:"Payment setup needs attention",description:"Review payment setup before using a channel to receive payments.",action:setupAction}
         :{code:"PRIMARY_ACTION_REQUIRED",title:"Your primary merchant needs to finish setup",description:`Ask ${scope.master.displayName} to review payment setup for this merchant. Your access does not let you enable payments.`,action:helpAction}
       :!eligible
         ?{code:"ACCESS_RESTRICTED",title:"Payment access needs attention",description:"Creating payment channels is not available for this setup. Open Help to review your access.",action:helpAction}
@@ -60,11 +60,11 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
           ?{code:"ACCESS_RESTRICTED",title:"Payment channels are not shared with you",description:scope.primaryAccess?"Your current access does not include payment channels. Open Help to review your access.":`Ask ${scope.master.displayName} to review your payment channel access. You can still use the records shared with you.`,action:helpAction}
           :!visibleChannels.length
             ?canCreateChannel
-              ?{code:"CHANNEL_REQUIRED",title:"Create a payment channel",description:"Payment setup is ready. Create a channel to choose how you receive a sandbox payment.",action:{label:"Create payment channel",href:`/merchants/${unit.id}?tab=channels&new=1`}}
+              ?{code:"CHANNEL_REQUIRED",title:"Create a payment channel",description:"Payment setup is ready. Create a channel to choose how you receive payments.",action:{label:"Create payment channel",href:`/merchants/${unit.id}?tab=channels&new=1`}}
               :{code:"ACCESS_RESTRICTED",title:"No payment channels are available to you",description:scope.primaryAccess?"Open Help to review your available payment tools.":`Ask ${scope.master.displayName} to create or share a payment channel with you.`,action:helpAction}
             :!activeChannelCount
               ?{code:"CHANNEL_REVIEW_REQUIRED",title:"Your payment channels need attention",description:"Your saved channels are not currently ready for a payment. Open them to review the next step.",action:channelAction}
-              :{code:"READY",title:"A payment channel is ready",description:"An active sandbox channel is available. Open channels to see the payment options available to you.",action:channelAction};
+              :{code:"READY",title:"A payment channel is ready",description:"An active payment channel is available. Open channels to review and share its payment link.",action:channelAction};
    const total=(values:{amountMinor:bigint}[])=>formatMoney(values.reduce((sum,row)=>sum+row.amountMinor,0n));
    units.push({id:unit.id,name:unit.displayName,kind:unit.kind,primaryId:scope.master.id,primaryName:scope.master.displayName,primaryAccess:scope.primaryAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddSubmerchant:unit.kind==="MASTER"&&evaluate(scope.policy,"merchant.units.create").allowed&&scope.policy.operating&&eligible,canCreateChannel,canReadPeople:evaluate(scope.policy,"merchant.people.read").allowed,setupState,collectionAvailability,totals:{
     collected:canReadPayments?total(payments.filter(row=>row.merchantUnitId===unit.id&&row.outcome==="APPROVED")):null,
@@ -95,7 +95,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
   const activityRecords:Omit<MerchantActivityRow,"href">[]=[
    ...paymentRows.map(row=>({...row,kind:"payment" as const,paymentId:row.id,paymentReference:row.reference})),
    ...refunds.map(row=>({id:row.id,kind:"refund" as const,merchantId:row.merchantUnitId,merchantName:units.find(unit=>unit.id===row.merchantUnitId)!.name,description:payments.find(payment=>payment.id===row.paymentId)!.description,amount:formatMoney(row.amountMinor),status:"COMPLETED" as const,reference:row.testReference,at:row.createdAt.toISOString(),paymentId:row.paymentId,paymentReference:payments.find(payment=>payment.id===row.paymentId)!.testReference})),
-   ...transferRows.map(row=>({...row,kind:"transfer" as const,description:"Deposit to Sandbox bank",status:row.status,paymentId:null,paymentReference:null})),
+   ...transferRows.map(row=>({...row,kind:"transfer" as const,description:"Deposit",status:row.status,paymentId:null,paymentReference:null})),
   ];
   return {mode:"TEST",canCreatePrimary,primaryNetworks,delegatedUnitIds,units,views,activity:projectMerchantActivity(query,views.find(view=>view.id===query.view),activityRecords,now,options.exportRows)};
  },{isolationLevel:"repeatable read"});

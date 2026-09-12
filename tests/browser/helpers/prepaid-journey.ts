@@ -190,7 +190,7 @@ export async function requestExactDeposit(page:Page,merchantId:string,paymentId:
   await page.getByRole("region",{name:"Current available balance",exact:true}).getByRole("button",{name:"Request deposit",exact:true}).click();
   await page.getByRole("dialog",{name:"Request deposit",exact:true}).getByRole("button",{name:"Review deposit",exact:true}).click();
   const review=page.getByRole("dialog",{name:"Review deposit",exact:true});
-  await expect(review).toContainText("Sandbox bank");
+  await expect(review).toContainText("Deposited balance");
   const requesting=responseFor(page,`/api/v1/merchants/${merchantId}/payouts`);
   await review.getByRole("button",{name:"Request deposit",exact:true}).click();
   const result=await requesting;expect(result.status()).toBe(200);

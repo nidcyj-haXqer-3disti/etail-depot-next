@@ -5,11 +5,12 @@ import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
-import { identityBindings, people, services, serviceMembers, permissionGrants } from "../../src/platform/database/schema";
+import { identityBindings, services, serviceMembers, permissionGrants } from "../../src/platform/database/schema";
 import { SessionService } from "../../src/modules/identity";
 import { sessionRepository } from "../../src/platform/database/session-repository";
 import { getAccessOverview, revokeInvitation, revokeMemberAccess } from "../../src/modules/access/service";
-import { cardPrimary, issuePracticeCard } from "../helpers/cardholder";
+import { cardPerson, cardPrimary, issuePracticeCard } from "../helpers/cardholder";
+import { startSandbox } from "../../src/modules/sandbox/service";
 import type { WorkspaceProjection } from "../../src/modules/workspace/contracts";
 
 const origin = "http://127.0.0.1:3100";
@@ -26,12 +27,18 @@ test("ordinary cardholder access respects the current permission ceiling and req
   const primary = await cardPrimary(`Limited UI primary ${randomUUID().slice(0, 8)}`);
   await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),inArray(permissionGrants.action,["cards.purchase","cards.freeze","cards.unfreeze"])));
   await signIn(page.context(),primary.personId);
-  const initial=await getAccessOverview(primary.personId,primary.serviceId), recipient=initial.recipients[0]!;
+  const initial=await getAccessOverview(primary.personId,primary.serviceId);
+  const recipient={id:await cardPerson("Limited access recipient"),name:"Limited access recipient"};
+  const joined=await startSandbox(recipient.id,{commandId:randomUUID(),displayName:recipient.name,acknowledged:true});
+  expect(joined.memberCode).toBeTruthy();
   await page.goto(`${origin}/cardholder-services?manage=${primary.serviceId}`);
   await page.getByRole("button",{name:"Invite a person",exact:true}).click();
   const dialog=page.getByRole("dialog",{name:"Invite a person",exact:true});
   await expect(dialog.getByRole("button",{name:"Review access",exact:true})).toBeDisabled();
-  await dialog.getByRole("combobox",{name:"Named recipient",exact:true}).selectOption(recipient.id);
+  await expect(dialog.getByRole("combobox",{name:"Named recipient",exact:true})).toHaveCount(0);
+  await dialog.getByRole("textbox",{name:"Member code",exact:true}).fill(joined.memberCode!);
+  await dialog.getByRole("button",{name:"Find member",exact:true}).click();
+  await expect(dialog.getByRole("status")).toContainText(recipient.name);
   await expect(dialog.getByRole("radio")).toHaveCount(0);
   await expect(dialog).toContainText("Purchasing is turned off");
   await dialog.getByText("Customize access",{exact:true}).click();
@@ -57,10 +64,12 @@ test("ordinary cardholder access respects the current permission ceiling and req
 
 test("primary invitation, intended acceptance, permission changes and revocation stay in one new Cardholder service", async ({ page, browser }) => {
   const primary = await cardPrimary(`UI primary ${randomUUID().slice(0, 8)}`);
-  // The picker intentionally contains only the named demo recipients. Enroll Alex solely
-  // in this new test service; never change Alex's existing primary service or its grants.
-  const [recipient] = await getDb().select({ id: people.id, name: people.displayName }).from(identityBindings).innerJoin(people, eq(people.id, identityBindings.personId)).where(and(eq(identityBindings.issuer, "urn:etail:isolated-fixture"), eq(identityBindings.subject, "owner")));
-  if (!recipient) throw new Error("Expected the named primary demo recipient");
+  // Invite a member by their shared code. Their separately owned card group
+  // and its grants must remain unchanged throughout this relationship.
+  const recipientName=`Invited primary ${randomUUID().slice(0,8)}`;
+  const recipientPrimary=await cardPrimary(recipientName),recipient={id:recipientPrimary.personId,name:recipientName};
+  const joined=await startSandbox(recipient.id,{commandId:randomUUID(),displayName:recipient.name,acknowledged:true});
+  expect(joined.memberCode).toBeTruthy();
   const preservedIds = (await getDb().select({ id: services.id }).from(services).where(eq(services.primaryPersonId, recipient.id))).map(row => row.id);
   const preserved = async () => ({
     services: await getDb().select().from(services).where(inArray(services.id, preservedIds)).orderBy(services.id),
@@ -78,7 +87,10 @@ test("primary invitation, intended acceptance, permission changes and revocation
     await page.goto(accessUrl);
     await page.getByRole("button", { name: "Invite a person", exact: true }).click();
     const invite = page.getByRole("dialog", { name: "Invite a person", exact: true });
-    await invite.getByRole("combobox", { name: "Named recipient" }).selectOption(recipient.id);
+    await expect(invite.getByRole("combobox", { name: "Named recipient" })).toHaveCount(0);
+    await invite.getByRole("textbox",{name:"Member code",exact:true}).fill(joined.memberCode!);
+    await invite.getByRole("button",{name:"Find member",exact:true}).click();
+    await expect(invite.getByRole("status")).toContainText(recipient.name);
     await expect(invite).toContainText("Purchases allowed on their own cards");
     await expect(invite.getByRole("radio")).toHaveCount(0);
     await invite.getByRole("button", { name: "Review access", exact: true }).click();

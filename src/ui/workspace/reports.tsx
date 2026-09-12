@@ -137,7 +137,7 @@ function ReportsWorkspaceState({ workspace, report: initialReport }: ReportsWork
             </section>}
 
           </>}
-          <footer className="reports-statement-footer"><span>Prepared {formatDate(report.generatedAt)} · USD</span><span>Sandbox report · Not a billing statement</span></footer>
+          <footer className="reports-statement-footer"><span>Prepared {formatDate(report.generatedAt)} · USD</span><span>Activity report · Not a billing statement</span></footer>
         </article>
       </div>
       <aside className="reports-saved consumer-panel reports-screen-only" aria-labelledby="saved-reports-title"><span className="reports-bookmark" aria-hidden="true">▱</span><p className="consumer-eyebrow">Made for your routine</p><h3 id="saved-reports-title">Your saved reports</h3><p>Save these filters for next time. Each report includes only activity you can view.</p><Button variant="secondary" disabled={!!busy} onClick={() => openSave()}>Save current filters</Button><p className="reports-private">Private to you in {(workspace.customerService?.displayName ?? "Cardholder services")}.</p>
