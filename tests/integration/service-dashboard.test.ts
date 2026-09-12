@@ -1,7 +1,7 @@
 import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { cards, cardRequests, serviceActivity, permissionGrants } from "../../src/platform/database/schema";
 import { ledgerEntries } from "../../src/modules/ledger/schema";
@@ -138,13 +138,20 @@ describe("service-first Cardholder dashboard", () => {
     expect((await getWorkspace(f.actor.personId, f.actor.serviceId)).cards).toHaveLength(2);
   });
 
-  it("paginates the authorized card set without duplicates or hidden-holder counts", async () => {
-    const primary = await cardPrimary(), secondary = await cardPerson("Paginated secondary");
-    await enrollCardholder(primary.personId, primary.serviceId, secondary);
-    // Create through the same canonical request lifecycle, without re-reading
-    // every prior card after each addition. The complete set is asserted below.
-    for (let n = 0; n < 31; n++) await issuePracticeCardRequest(primary.personId,primary.serviceId,primary.personId,`Primary card ${String(n).padStart(2, "0")}${n===30?" %_":""}`);
-    const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"1");return issuePracticeCard(primary.personId, primary.serviceId, secondary, "Secondary card", undefined, "1");})();
+  describe("with a complete pagination fixture", () => {
+   let primary:Awaited<ReturnType<typeof cardPrimary>>,secondary:string,own:Awaited<ReturnType<typeof issuePracticeCard>>;
+   beforeAll(async()=>{
+    const started=performance.now();
+    primary=await cardPrimary();secondary=await cardPerson("Paginated secondary");
+    await enrollCardholder(primary.personId,primary.serviceId,secondary);
+    // Thirty-two real issuance workflows are setup, with their own bounded
+    // budget. Dashboard reads and every assertion retain the global 15 seconds.
+    for(let n=0;n<31;n++)await issuePracticeCardRequest(primary.personId,primary.serviceId,primary.personId,`Primary card ${String(n).padStart(2,"0")}${n===30?" %_":""}`);
+    await fundCardGroup(primary.personId,primary.serviceId,"1");
+    own=await issuePracticeCard(primary.personId,primary.serviceId,secondary,"Secondary card",undefined,"1");
+    console.info(JSON.stringify({fixture:"card-pagination",issuedCards:32,setupDurationMs:Math.round(performance.now()-started),setupBudgetMs:60000}));
+   },60000);
+   it("paginates the authorized card set without duplicates or hidden-holder counts", async () => {
     const first = await getCardholderDashboard(primary.personId), second = await getCardholderDashboard(primary.personId, 1);
     expect(first).toMatchObject({ cardCount: 32, cardsPage: 0, cardsHasMore: true });
     expect(first.cards).toHaveLength(30); expect(second.cards).toHaveLength(2); expect(second.cardsHasMore).toBe(false);
@@ -167,5 +174,6 @@ describe("service-first Cardholder dashboard", () => {
     await expect(getCardholderDashboard(primary.personId, -1)).rejects.toMatchObject({ status: 422 });
     await expect(getCardholderDashboard(primary.personId,0,{cardScope:"invalid" as "OWN"})).rejects.toMatchObject({status:422});
     await expect(getCardholderDashboard(primary.personId,0,{cardSearch:"x".repeat(101)})).rejects.toMatchObject({status:422});
+   });
   });
 });

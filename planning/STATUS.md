@@ -8,7 +8,7 @@ Four additive migrations are verified on the marked test and preserved preview d
 
 Branch `codex/group-money-cards-terminals` is based on local D72 `4fe3d06d671f7a34f6158b418608dda5d88d6d71`, whose tree matches remote D72 main `f287fa8db69606e003a74db9f1b36d7d4b54108f`. GitHub publication, exact-revision CI, reviewed merge and canonical Netlify deployment are tracked in the release pull request; local verification alone is not hosted acceptance. Release receipt: `artifacts/d73-publication.json`. Existing visitor access stays unchanged and real money stays disabled.
 
-The first PR16 CI run passed402 unit and219 integration cases, but its32-card pagination setup exceeded the15-second budget. A test-only correction removes repeated unused full-workspace reads while retaining canonical issuance, all pagination/privacy assertions and the original timeout. The final exact-head workflow outcome is recorded in the release receipt and PR.
+PR16 CI runs34684370525 and34684850901 each passed219 of220 integration cases, but the32-card pagination setup exceeded the15-second test budget. Removing unused repeated full-workspace reads passed locally but did not resolve the second CI timeout. Setup now runs through the same32 canonical issuance workflows in a nested `beforeAll` with an explicit60-second budget; dashboard reads and every unchanged pagination/privacy/search assertion retain the global15-second test limit. Focused local verification passes8 cases: setup4585ms, pagination assertions231ms, with lint and TypeScript passing. No global timeout, retry, application or SQL change was made. New exact-head CI remains pending; outcomes are recorded in the release receipt and PR.
 
 # D72 — verified customer interface cleanup (12 September 2026)
 
