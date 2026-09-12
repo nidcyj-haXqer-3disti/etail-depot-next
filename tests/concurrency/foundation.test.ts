@@ -30,7 +30,7 @@ it("concurrent explicit Cardholder enrollment retries produce one service and on
  const personId=await cardPerson("Concurrent Cardholder applicant"),input={commandId:randomUUID(),displayName:"My cards"};
  const deliveries=await Promise.all(Array.from({length:8},()=>createCardholderService(personId,input)));
  expect(new Set(deliveries.map(row=>row.serviceId)).size).toBe(1);
- expect(await listServicesForPerson(personId)).toMatchObject([{id:deliveries[0]!.serviceId,kind:"CARDHOLDER",cardholderRole:"PRIMARY"}]);
+ expect(await listServicesForPerson(personId)).toMatchObject([{id:deliveries[0]!.serviceId,kind:"CARDHOLDER",cardholderRole:"OWNER"}]);
  expect(await getDb().select().from(cardholderCreationCommands).where(eq(cardholderCreationCommands.commandId,input.commandId))).toHaveLength(1);
  expect(await getDb().select().from(cards).where(eq(cards.serviceId,deliveries[0]!.serviceId))).toEqual([]);
 });

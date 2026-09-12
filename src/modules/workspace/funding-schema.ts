@@ -1,6 +1,6 @@
 import {sql} from "drizzle-orm";
-import {pgTable,uuid,text,bigint,integer,timestamp,primaryKey,foreignKey,check,index,unique} from "drizzle-orm/pg-core";
-import {services,serviceMembers,people} from "../../platform/database/schema";
+import {pgTable,uuid,text,boolean,bigint,integer,timestamp,primaryKey,foreignKey,check,index,unique} from "drizzle-orm/pg-core";
+import {services,serviceMembers,people,cards} from "../../platform/database/schema";
 import {ledgerJournals} from "../ledger/schema";
 
 export const cardholderFundingIntents=pgTable("cardholder_funding_intents",{
@@ -23,3 +23,14 @@ export const cardholderLimitChanges=pgTable("cardholder_limit_changes",{
  id:uuid().primaryKey().defaultRandom(),serviceId:uuid().notNull(),personId:uuid().notNull(),actorId:uuid().notNull().references(()=>people.id),
  previousMinor:bigint({mode:"bigint"}).notNull(),monthlyLimitMinor:bigint({mode:"bigint"}).notNull(),version:integer().notNull(),createdAt:timestamp({withTimezone:true}).notNull(),
 },t=>[unique("cardholder_limit_history_version").on(t.serviceId,t.personId,t.version),foreignKey({columns:[t.serviceId,t.personId],foreignColumns:[cardholderSpendingLimits.serviceId,cardholderSpendingLimits.personId]}),check("cardholder_limit_change_values",sql`${t.previousMinor} between 0 and 999999999999 and ${t.monthlyLimitMinor} between 0 and 999999999999 and ${t.version}>0`)]);
+
+/** The sole active spending ceiling: one independently versioned limit per card. */
+export const cardSpendingLimits=pgTable("card_spending_limits",{
+ serviceId:uuid().notNull(),cardId:uuid().notNull(),allowanceMinor:bigint({mode:"bigint"}).notNull(),
+ version:integer().notNull().default(1),updatedBy:uuid().notNull().references(()=>people.id),updatedAt:timestamp({withTimezone:true}).notNull(),
+ reviewRequired: boolean().notNull().default(false),
+},t=>[primaryKey({columns:[t.serviceId,t.cardId]}),foreignKey({columns:[t.cardId,t.serviceId],foreignColumns:[cards.id,cards.serviceId]}),check("card_allowance",sql`${t.allowanceMinor} between 0 and 999999999999 and ${t.version}>0`)]);
+export const cardLimitChanges=pgTable("card_limit_changes",{
+ id:uuid().primaryKey().defaultRandom(),serviceId:uuid().notNull(),cardId:uuid().notNull(),actorId:uuid().notNull().references(()=>people.id),
+ previousMinor:bigint({mode:"bigint"}).notNull(),allowanceMinor:bigint({mode:"bigint"}).notNull(),version:integer().notNull(),createdAt:timestamp({withTimezone:true}).notNull(),
+},t=>[unique("card_limit_history_version").on(t.serviceId,t.cardId,t.version),foreignKey({columns:[t.serviceId,t.cardId],foreignColumns:[cardSpendingLimits.serviceId,cardSpendingLimits.cardId]}),check("card_limit_change_values",sql`${t.previousMinor} between 0 and 999999999999 and ${t.allowanceMinor} between 0 and 999999999999 and ${t.version}>0`)]);

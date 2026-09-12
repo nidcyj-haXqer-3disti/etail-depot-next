@@ -7,5 +7,5 @@ export async function createMerchantViaApi(request:APIRequestContext,displayName
   const {merchantId}=await response.json() as {merchantId:string};
   const workspace=await request.get(`/api/v1/merchants/${merchantId}`);expect(workspace.status()).toBe(200);
   const {merchant}=await workspace.json();
-  return {merchantId,serviceId:merchant.master.serviceId as string};
+  return {merchantId,serviceId:merchant.merchant.serviceId as string};
 }

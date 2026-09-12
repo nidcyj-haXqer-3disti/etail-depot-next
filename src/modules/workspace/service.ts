@@ -7,108 +7,101 @@ import { SecurityError } from "../../platform/security/origin";
 import { ACTIONS, evaluate, type PolicyScope } from "../policy/evaluate";
 import { cardholderRole, canReadCardholderData, isCardholderPermission } from "../policy/cardholder-scope";
 import { loadServiceScope } from "../access/scope";
+import { CARDHOLDER_ACCESS_PERMISSIONS } from "../access/contracts";
 import { requireServiceReader } from "../services/service-reader";
 import { requireSandboxAdult, requireSandboxParticipant, sandboxPersona } from "../sandbox/service";
-import { getBalance, postJournal } from "../ledger";
+import { postJournal } from "../ledger";
+import {getServiceMoneyAccount,readServiceMoneyAvailable,lockMoneyAccountsForServices,moneyPosition,prepareMoneyFunding,getMoneyFundingIntent,confirmMoneyFunding,addMoneyFunds,getMoneyTopup,getMoneyTopups} from "../money/service";
 import { ledgerJournals } from "../ledger/schema";
 import { issueSandboxCard } from "../issuing/sandbox-adapter";
 import { listServicesForPersonInTransaction } from "../services/service";
-import {cardholderFundingIntents,cardholderTopups,cardholderSpendingLimits,cardholderLimitChanges} from "./funding-schema";
-import {readPersonSpending} from "./funding-reader";
-import {topupCommandSchema,spendingLimitCommandSchema,type TopupCommand,type SpendingLimitCommand,type FundingIntent,type TopupReceipt,type CardholderFunds,type PersonSpending} from "./funding-contracts";
-import { cardControlCommandSchema, cardPurchaseCommandSchema, startCardRequestSchema, cardDraftCommandSchema, versionedCommandSchema, notificationCommandSchema, type Money, type WorkspaceProjection, type WorkspaceCard, type WorkspaceActivity, type CardRequestProjection, type NotificationPreferences, type CardControlCommand, type CardPurchaseCommand, type CardPurchaseResult, type StartCardRequestCommand, type CardDraftCommand, type VersionedCommand, type NotificationCommand } from "./contracts";
+import {cardSpendingLimits,cardLimitChanges} from "./funding-schema";
+import {readCardSpending} from "./funding-reader";
+import {topupCommandSchema,spendingLimitCommandSchema,type TopupCommand,type SpendingLimitCommand,type FundingIntent,type TopupReceipt,type CardholderFunds,type CardSpending} from "./funding-contracts";
+import { cardControlCommandSchema, cardPurchaseCommandSchema, startCardRequestSchema, cardDraftCommandSchema, versionedCommandSchema, notificationCommandSchema, type WorkspaceProjection, type WorkspaceCard, type WorkspaceActivity, type CardRequestProjection, type NotificationPreferences, type CardControlCommand, type CardPurchaseCommand, type CardPurchaseResult, type StartCardRequestCommand, type CardDraftCommand, type VersionedCommand, type NotificationCommand } from "./contracts";
 
 type Transaction = Parameters<Parameters<ReturnType<typeof getDb>["transaction"]>[0]>[0];
 type Scope = Awaited<ReturnType<typeof loadServiceScope>> & { actor: typeof people.$inferSelect };
 
-export function formatMoney(minor: bigint): Money {
-  const magnitude = minor < 0n ? -minor : minor;
-  const dollars = (magnitude / 100n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return { minor: minor.toString(), currency: "USD", formatted: `${minor < 0n ? "-" : ""}$${dollars}.${(magnitude % 100n).toString().padStart(2, "0")}` };
-}
+import {formatMoney} from "../money/format";
+export {formatMoney} from "../money/format";
+import type {MoneyTopupReceipt,MoneyFundingIntent} from "../money/contracts";
 
-function spendingProjection(row:Awaited<ReturnType<typeof readPersonSpending>>):PersonSpending {
- return {personId:row.personId,monthlyLimit:formatMoney(row.monthlyLimit),spentThisMonth:formatMoney(row.spent),remainingThisMonth:formatMoney(row.remaining),available:formatMoney(row.available),version:row.version,periodStart:row.start.toISOString(),periodEnd:row.end.toISOString(),timeZone:"UTC"};
+function spendingProjection(row:Awaited<ReturnType<typeof readCardSpending>>):CardSpending {
+ return {cardId:row.cardId,reviewRequired:row.reviewRequired,allowance:formatMoney(row.allowance),used:formatMoney(row.spent),remaining:formatMoney(row.remaining),available:formatMoney(row.available),version:row.version};
 }
 function requireFundingPrimary(scope:Scope,action:string){
  if(scope.service.kind!=="CARDHOLDER"||scope.service.primaryPersonId!==scope.actor.id)throw new SecurityError("ACTION_DENIED",403);
  requireAction(scope,action);
 }
-function topupProjection(row:typeof cardholderTopups.$inferSelect):TopupReceipt {
- return {id:row.id,serviceId:row.serviceId,amount:formatMoney(row.amountMinor),source:"SANDBOX_BANK",sourceLabel:"Funding balance",status:"COMPLETED",createdAt:row.createdAt.toISOString(),reference:`ADD-${row.id.slice(0,8).toUpperCase()}`};
+function topupProjection(row:MoneyTopupReceipt,serviceId:string):TopupReceipt {
+ return {id:row.id,serviceId,amount:row.amount,source:row.source,sourceLabel:row.sourceLabel,status:row.status,createdAt:row.createdAt,reference:row.reference};
+}
+function fundingProjection(row:MoneyFundingIntent,serviceId:string):FundingIntent {
+ return {id:row.id,receiptId:row.receiptId,serviceId,amount:row.amount,sourceLabel:row.sourceLabel,createdAt:row.createdAt,receipt:row.receipt?topupProjection(row.receipt,serviceId):null};
+}
+async function requireFundingAccount(personId:string,serviceId:string,action:string){
+ return getDb().transaction(async tx=>{const scope=await loadScope(tx,personId,serviceId);requireFundingPrimary(scope,action);requireAction(scope,"cardholder.funds.read");return getServiceMoneyAccount(tx,serviceId);});
 }
 export async function getCardholderFunds(personId:string,serviceId:string,page=0):Promise<CardholderFunds>{
  if(!Number.isInteger(page)||page<0||page>10000)throw new SecurityError("INVALID_REQUEST",422);
+ const account=await requireFundingAccount(personId,serviceId,"cardholder.funds.read"),history=await getMoneyTopups(personId,account.id,page);
  return getDb().transaction(async tx=>{
   const scope=await loadScope(tx,personId,serviceId);requireFundingPrimary(scope,"cardholder.funds.read");
-  const now=await databaseNow(tx),members=permits(scope,"people.read")&&permits(scope,"cards.read")?await peopleInService(tx,serviceId):[];
-  const topups=await tx.select().from(cardholderTopups).where(eq(cardholderTopups.serviceId,serviceId)).orderBy(desc(cardholderTopups.createdAt),cardholderTopups.id).limit(101).offset(page*100);
-  const result:CardholderFunds={serviceId,serviceName:scope.service.displayName,available:formatMoney(await getBalance(tx,{serviceId,bucket:"GROUP_AVAILABLE"})),source:"SANDBOX_BANK",sourceLabel:"Funding balance",topups:topups.slice(0,100).map(topupProjection),page,hasMore:topups.length>100,people:[]};
-  for(const {person,membership} of members)if(membership.state==="ACCEPTED")result.people.push({id:person.id,name:person.displayName,spending:spendingProjection(await readPersonSpending(tx,serviceId,person.id,now))});
+  const ownedCards=permits(scope,"cards.read")?await tx.select({card:cards,holderName:people.displayName}).from(cards).innerJoin(people,eq(people.id,cards.holderId)).where(eq(cards.serviceId,serviceId)).orderBy(cards.nickname,cards.id):[];
+  const result:CardholderFunds={serviceId,moneyAccountId:account.id,serviceName:account.displayName,available:formatMoney(await readServiceMoneyAvailable(tx,serviceId)),source:"SANDBOX_BANK",sourceLabel:"Funding balance",topups:history.topups.map(row=>topupProjection(row,serviceId)),page:history.page,hasMore:history.hasMore,cards:[]};
+  for(const {card,holderName} of ownedCards)result.cards.push({id:card.id,name:card.nickname,holderName,spending:spendingProjection(await readCardSpending(tx,serviceId,card.id))});
   return result;
  },{isolationLevel:"repeatable read"});
 }
 export async function getCardholderTopup(personId:string,serviceId:string,topupId:string):Promise<TopupReceipt>{
- return getDb().transaction(async tx=>{
-  const scope=await loadScope(tx,personId,serviceId);requireFundingPrimary(scope,"cardholder.funds.read");
-  const [row]=await tx.select().from(cardholderTopups).where(and(eq(cardholderTopups.serviceId,serviceId),eq(cardholderTopups.id,topupId)));
-  if(!row)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return topupProjection(row);
- });
+ const account=await requireFundingAccount(personId,serviceId,"cardholder.funds.read");
+ return topupProjection(await getMoneyTopup(personId,account.id,topupId),serviceId);
 }
 export async function addCardholderFunds(personId:string,serviceId:string,raw:TopupCommand):Promise<TopupReceipt>{
- const input=validate(topupCommandSchema,raw);
- const id=await command(personId,serviceId,"funds.add","cardholder.funds.add",null,input,async tx=>{
-  const id=input.commandId,now=await databaseNow(tx),amount=BigInt(input.amountMinor);
-  const journalId=await postJournal(tx,{businessKey:`group-funding:${input.commandId}`,kind:"GROUP_FUNDING",referenceId:id,occurredAt:now,lines:[{serviceId,bucket:"PRACTICE_SOURCE",deltaMinor:-amount},{serviceId,bucket:"GROUP_AVAILABLE",deltaMinor:amount}]});
-  await tx.insert(cardholderTopups).values({id,serviceId,actorId:personId,amountMinor:amount,journalId,createdAt:now});return id;
- },async(tx,scope)=>{requireFundingPrimary(scope,"cardholder.funds.add");requireAction(scope,"cardholder.funds.read");await requireAdultCreator(tx,scope);});
- return getCardholderTopup(personId,serviceId,id);
+ const input=validate(topupCommandSchema,raw),account=await requireFundingAccount(personId,serviceId,"cardholder.funds.add");
+ return topupProjection(await addMoneyFunds(personId,account.id,{commandId:input.commandId,amountMinor:input.amountMinor}),serviceId);
 }
 export async function prepareCardholderFunding(personId:string,serviceId:string,raw:TopupCommand):Promise<FundingIntent>{
- const input=validate(topupCommandSchema,raw);
- const id=await command(personId,serviceId,"funds.prepare","cardholder.funds.add",null,input,async tx=>{
-  await tx.insert(cardholderFundingIntents).values({id:input.commandId,serviceId,actorId:personId,amountMinor:BigInt(input.amountMinor),confirmCommandId:randomUUID(),createdAt:await databaseNow(tx)});return input.commandId;
- },async(tx,scope)=>{requireFundingPrimary(scope,"cardholder.funds.add");requireAction(scope,"cardholder.funds.read");await requireAdultCreator(tx,scope);});
- return getCardholderFundingIntent(personId,serviceId,id);
+ const input=validate(topupCommandSchema,raw),account=await requireFundingAccount(personId,serviceId,"cardholder.funds.add");
+ return fundingProjection(await prepareMoneyFunding(personId,account.id,{commandId:input.commandId,amountMinor:input.amountMinor}),serviceId);
 }
 export async function getCardholderFundingIntent(personId:string,serviceId:string,intentId:string):Promise<FundingIntent>{
- return getDb().transaction(async tx=>{
-  const scope=await loadScope(tx,personId,serviceId);requireFundingPrimary(scope,"cardholder.funds.read");
-  const [row]=await tx.select().from(cardholderFundingIntents).where(and(eq(cardholderFundingIntents.id,intentId),eq(cardholderFundingIntents.serviceId,serviceId),eq(cardholderFundingIntents.actorId,personId)));
-  if(!row)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-  const [receipt]=await tx.select().from(cardholderTopups).where(and(eq(cardholderTopups.id,row.confirmCommandId),eq(cardholderTopups.serviceId,serviceId)));
-  return {id:row.id,serviceId,amount:formatMoney(row.amountMinor),sourceLabel:"Funding balance",createdAt:row.createdAt.toISOString(),receipt:receipt?topupProjection(receipt):null};
- });
+ const account=await requireFundingAccount(personId,serviceId,"cardholder.funds.read");
+ return fundingProjection(await getMoneyFundingIntent(personId,account.id,intentId),serviceId);
 }
 export async function confirmCardholderFunding(personId:string,serviceId:string,intentId:string):Promise<TopupReceipt>{
- const input=await getDb().transaction(async tx=>{
-  const scope=await loadScope(tx,personId,serviceId);requireFundingPrimary(scope,"cardholder.funds.add");
-  const [row]=await tx.select().from(cardholderFundingIntents).where(and(eq(cardholderFundingIntents.id,intentId),eq(cardholderFundingIntents.serviceId,serviceId),eq(cardholderFundingIntents.actorId,personId)));
-  if(!row)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-  return {commandId:row.confirmCommandId,amountMinor:row.amountMinor.toString(),currency:"USD" as const,source:"SANDBOX_BANK" as const};
- });
- return addCardholderFunds(personId,serviceId,input);
+ const account=await requireFundingAccount(personId,serviceId,"cardholder.funds.add");
+ return topupProjection(await confirmMoneyFunding(personId,account.id,intentId),serviceId);
 }
-export async function getPersonSpending(personId:string,serviceId:string,holderId:string):Promise<PersonSpending>{
+
+export async function getCardSpending(personId:string,serviceId:string,cardId:string):Promise<CardSpending>{
  return getDb().transaction(async tx=>{
   const scope=await loadScope(tx,personId,serviceId);requireAction(scope,"cards.read");
-  if(!canReadCardholderData(scope.policy,holderId))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-  const [member]=await tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,serviceId),eq(serviceMembers.personId,holderId),eq(serviceMembers.state,"ACCEPTED")));
-  if(!member)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-  return spendingProjection(await readPersonSpending(tx,serviceId,holderId,await databaseNow(tx)));
+  const [card]=await tx.select().from(cards).where(and(eq(cards.serviceId,serviceId),eq(cards.id,cardId)));
+  if(!card||!canReadCardholderData(scope.policy,card.holderId))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+  return spendingProjection(await readCardSpending(tx,serviceId,cardId));
  });
 }
-export async function setCardholderSpendingLimit(personId:string,serviceId:string,holderId:string,raw:SpendingLimitCommand):Promise<PersonSpending>{
+async function writeCardLimit(tx:Transaction,personId:string,serviceId:string,cardId:string,allowanceMinor:bigint,now:Date,expectedVersion:number){
+ const [previous]=await tx.select().from(cardSpendingLimits).where(and(eq(cardSpendingLimits.serviceId,serviceId),eq(cardSpendingLimits.cardId,cardId))).for("update");
+ requireVersion(previous?.version??0,expectedVersion);
+ const version=(previous?.version??0)+1;
+ if(previous)await tx.update(cardSpendingLimits).set({allowanceMinor,version,updatedBy:personId,updatedAt:now,reviewRequired:false}).where(and(eq(cardSpendingLimits.serviceId,serviceId),eq(cardSpendingLimits.cardId,cardId)));
+ else await tx.insert(cardSpendingLimits).values({serviceId,cardId,allowanceMinor,version,updatedBy:personId,updatedAt:now,reviewRequired:false});
+ await tx.insert(cardLimitChanges).values({serviceId,cardId,actorId:personId,previousMinor:previous?.allowanceMinor??0n,allowanceMinor,version,createdAt:now});
+}
+export async function setCardSpendingLimit(personId:string,serviceId:string,cardId:string,raw:SpendingLimitCommand):Promise<CardSpending>{
  const input=validate(spendingLimitCommandSchema,raw);
- await command(personId,serviceId,"spending-limit.set","cardholder.limits.manage",holderId,input,async tx=>{
-  const [previous]=await tx.select().from(cardholderSpendingLimits).where(and(eq(cardholderSpendingLimits.serviceId,serviceId),eq(cardholderSpendingLimits.personId,holderId))).for("update");
-  requireVersion(previous?.version??0,input.expectedVersion);
-  const now=await databaseNow(tx),version=(previous?.version??0)+1,monthlyLimitMinor=BigInt(input.monthlyLimitMinor);
-  if(previous)await tx.update(cardholderSpendingLimits).set({monthlyLimitMinor,version,updatedBy:personId,updatedAt:now}).where(and(eq(cardholderSpendingLimits.serviceId,serviceId),eq(cardholderSpendingLimits.personId,holderId)));else await tx.insert(cardholderSpendingLimits).values({serviceId,personId:holderId,monthlyLimitMinor,version,updatedBy:personId,updatedAt:now});
-  await tx.insert(cardholderLimitChanges).values({serviceId,personId:holderId,actorId:personId,previousMinor:previous?.monthlyLimitMinor??0n,monthlyLimitMinor,version,createdAt:now});
-  return holderId;
- },async(tx,scope)=>{requireFundingPrimary(scope,"cardholder.limits.manage");requireAction(scope,"cards.read");await requireHolder(tx,serviceId,holderId);});
- return getPersonSpending(personId,serviceId,holderId);
+ await command(personId,serviceId,"card-limit.set","cardholder.limits.manage",cardId,input,async tx=>{
+  await writeCardLimit(tx,personId,serviceId,cardId,BigInt(input.allowanceMinor),await databaseNow(tx),input.expectedVersion);
+  return cardId;
+ },async(tx,scope)=>{
+  requireFundingPrimary(scope,"cardholder.limits.manage");requireAction(scope,"cards.read");
+  const [card]=await tx.select().from(cards).where(and(eq(cards.serviceId,serviceId),eq(cards.id,cardId))).for("update");
+  if(!card)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+ });
+ return getCardSpending(personId,serviceId,cardId);
 }
 
 export async function loadCardholderWorkspaceScope(tx: Transaction, personId: string, serviceId: string, mutation = false): Promise<Scope> {
@@ -141,11 +134,16 @@ function requireManageHolder(scope: Scope, holderId: string) {
 }
 async function holderReadiness(tx: Transaction, serviceId: string, holderId: string, lock = false) {
   const membershipQuery = tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId, serviceId), eq(serviceMembers.personId, holderId)));
-  const grantQuery = tx.select().from(permissionGrants).where(and(eq(permissionGrants.serviceId, serviceId), eq(permissionGrants.personId, holderId), eq(permissionGrants.action, "cards.hold"), eq(permissionGrants.state, "ACCEPTED")));
   const [membership] = lock ? await membershipQuery.for("share") : await membershipQuery;
-  const [grant] = lock ? await grantQuery.for("share") : await grantQuery;
   const persona = await sandboxPersona(tx, holderId);
-  return { allowed: membership?.state === "ACCEPTED" && Boolean(grant), persona };
+  if (membership?.state !== "ACCEPTED") return { allowed: false, persona };
+  try {
+    const scope = await loadServiceScope(tx, holderId, serviceId);
+    return { allowed: evaluate(scope.policy, "cards.hold").allowed, persona };
+  } catch (error) {
+    if (error instanceof SecurityError && error.status === 404) return { allowed: false, persona };
+    throw error;
+  }
 }
 async function requireAdultCreator(tx: Transaction, scope: Scope) {
   if (await sandboxPersona(tx, scope.actor.id) !== "FICTIONAL_ADULT") throw new SecurityError("CARD_APPLICANT_REQUIRED", 403);
@@ -157,7 +155,7 @@ async function requestPrerequisites(tx: Transaction, scope: Scope, row: typeof c
   if (await sandboxPersona(tx, scope.actor.id) !== "FICTIONAL_ADULT") result.push({ code: "ADULT_APPLICANT_REQUIRED", title: "Cardholder setup is required", detail: "Complete the required cardholder setup before creating a card." });
   const holder = await holderReadiness(tx, row.serviceId, row.holderId);
   if (!holder.allowed) result.push({ code: "CARDHOLDER_UNAVAILABLE", title: "Cardholder access needs attention", detail: "The person named on this card needs active cardholder access and permission to use a card." });
-  if (!canManageHolder(scope, row.holderId)) result.push({ code: "MEMBER_MANAGEMENT_REQUIRED", title: "Permission to manage secondary cards is required", detail: "The primary cardholder needs permission to manage secondary cards." });
+  if (!canManageHolder(scope, row.holderId)) result.push({ code: "MEMBER_MANAGEMENT_REQUIRED", title: "Permission to manage other people’s cards is required", detail: "The account owner needs permission to manage other people’s cards." });
   if (holder.persona !== "FICTIONAL_ADULT") result.push(holder.persona === "FICTIONAL_SUPERVISED" ? { code: "GUARDIAN_REQUIRED", title: "Guardian setup is required", detail: "A supervised card needs a named guardian and funding arrangement. That setup is not available yet." } : { code: "HOLDER_ELIGIBILITY_REQUIRED", title: "Cardholder setup is required", detail: "The person named on this card needs to complete their account setup." });
   return result;
 }
@@ -167,31 +165,31 @@ async function peopleInService(tx: Transaction, serviceId: string) {
 }
 export async function getCardProjection(tx: Transaction, scope: Scope, row: typeof cards.$inferSelect): Promise<WorkspaceCard> {
   const [holder] = await tx.select().from(people).where(eq(people.id, row.holderId));
-  const spending=spendingProjection(await readPersonSpending(tx,row.serviceId,row.holderId,await databaseNow(tx)));
+  const spending=spendingProjection(await readCardSpending(tx,row.serviceId,row.id));
   const available=BigInt(spending.available.minor);
   const readiness = await holderReadiness(tx, row.serviceId, row.holderId);
   const manageable = canManageHolder(scope, row.holderId);
   const primary=scope.actor.id===scope.policy.primaryPersonId;
   const primaryRestriction=row.primaryFrozen||row.freezeReviewRequired;
-  const reasons=[row.primaryFrozen?"Paused by the primary cardholder.":"",row.holderFrozen?"Paused by the person named on the card.":"",row.freezeReviewRequired?"An earlier freeze needs review by the primary cardholder.":""].filter(Boolean);
+  const reasons=[row.primaryFrozen?"Paused by the account owner.":"",row.holderFrozen?"Paused by the person named on the card.":"",row.freezeReviewRequired?"An earlier freeze needs review by the account owner.":""].filter(Boolean);
   const canUnfreeze=manageable && (primary?row.status === "FROZEN":row.holderFrozen) && permits(scope, "cards.unfreeze");
   // Explain the same current gates that permit a purchase. Management authority
   // never substitutes for being the person named on the card.
   const purchaseAvailability:WorkspaceCard["purchaseAvailability"]=row.holderId!==scope.actor.id
     ?{code:"OTHER_CARDHOLDER",title:`${holder!.displayName}’s card`,description:`${holder!.displayName} makes purchases when signed in to their own login. You can review this card and use the controls available to you.`}
     :!readiness.allowed||!permits(scope,"cards.purchase")
-      ?{code:"ACCESS_RESTRICTED",title:"Purchases are not enabled for your access",description:primary?"Review your card access or contact support before making a purchase.":"Ask your primary cardholder to review your card access before making a purchase."}
+      ?{code:"ACCESS_RESTRICTED",title:"Purchases are not enabled for your access",description:primary?"Review your card access or contact support before making a purchase.":"Ask your account owner to review your card access before making a purchase."}
       :readiness.persona!=="FICTIONAL_ADULT"
         ?{code:"SETUP_REQUIRED",title:"Cardholder setup needs attention",description:readiness.persona==="FICTIONAL_SUPERVISED"?"This card needs guardian funding before purchases can be enabled. That setup is not available yet.":"Complete your account setup before making a purchase."}
         :row.status==="FROZEN"
-          ?{code:"FROZEN",title:"This card is frozen",description:!primary&&primaryRestriction?"Ask your primary cardholder to review the freeze before making a purchase.":canUnfreeze?"Unfreeze this card when you are ready to use it again.":"Ask your primary cardholder or support to review the freeze before making a purchase."}
+          ?{code:"FROZEN",title:"This card is frozen",description:!primary&&primaryRestriction?"Ask your account owner to review the freeze before making a purchase.":canUnfreeze?"Unfreeze this card when you are ready to use it again.":"Ask your account owner or support to review the freeze before making a purchase."}
           :available<=0n
-            ?{code:"NO_FUNDS",title:"No spending available",description:"Your primary can add money to the group or review your monthly spending limit."}
-            :{code:"READY",title:"Ready to use",description:"Use this card at checkout within your monthly spending limit and the group’s available funds."};
+            ?{code:"NO_FUNDS",title:"No spending available",description:"Your account owner can add money to the group or review your total allowance."}
+            :{code:"READY",title:"Ready to use",description:"Use this card at checkout within your total allowance and the group’s available funds."};
   return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder!.displayName, nickname: row.nickname,
-    relationship: row.holderId === scope.policy.primaryPersonId ? "PRIMARY" : "SECONDARY",
+    relationship: row.holderId === scope.policy.primaryPersonId ? "OWNER" : "CARDHOLDER",
     lastFour: row.lastFour, format: row.format, status: row.status, version: row.version, spending, available: formatMoney(available),
-    freeze:{primary:row.primaryFrozen,holder:row.holderFrozen,reviewRequired:row.freezeReviewRequired,description:reasons.join(" ")||"No freezes are active.",freezeLabel:row.status==="ACTIVE"?"Freeze card":primary?"Keep card frozen":"Add your freeze",unfreezeLabel:!primary&&primaryRestriction?"Remove your freeze":"Unfreeze card",unfreezeDescription:primary?"This removes all current freezes on this card. New purchases will be available to the named cardholder, within their permissions and available funds.":primaryRestriction?"Your own freeze will be removed. The card will stay frozen until the primary cardholder removes the remaining restriction.":"Your freeze will be removed. New purchases will be available within your permissions and available funds."},
+    freeze:{primary:row.primaryFrozen,holder:row.holderFrozen,reviewRequired:row.freezeReviewRequired,description:reasons.join(" ")||"No freezes are active.",freezeLabel:row.status==="ACTIVE"?"Freeze card":primary?"Keep card frozen":"Add your freeze",unfreezeLabel:!primary&&primaryRestriction?"Remove your freeze":"Unfreeze card",unfreezeDescription:primary?"This removes all current freezes on this card. New purchases will be available to the named cardholder, within their permissions and available funds.":primaryRestriction?"Your own freeze will be removed. The card will stay frozen until the account owner removes the remaining restriction.":"Your freeze will be removed. New purchases will be available within your permissions and available funds."},
     canFreeze: manageable && !(primary?row.primaryFrozen:row.holderFrozen) && permits(scope, "cards.freeze"), canUnfreeze,
     canPurchase: purchaseAvailability.code==="READY", purchaseAvailability, fictional: true };
 }
@@ -209,7 +207,7 @@ export async function requestProjection(tx: Transaction, scope: Scope, row: type
   const [issued] = await tx.select({ id: cards.id }).from(cards).where(and(eq(cards.requestId, row.id), eq(cards.serviceId, row.serviceId)));
   const prerequisites = row.status === "CANCELED" || row.status === "ISSUED" ? [] : await requestPrerequisites(tx, scope, row);
   return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder!.displayName, nickname: row.nickname, format: row.format,
-    currency: "USD", status: row.status, version: row.version, issuedCardId: issued?.id ?? null,
+    currency: "USD", allowance:formatMoney(row.requestedLimitMinor), status: row.status, version: row.version, issuedCardId: issued?.id ?? null,
     canSubmit: (row.status === "DRAFT" || row.status === "BLOCKED") && prerequisites.length === 0,
     updatedAt: row.updatedAt.toISOString(), prerequisites };
 }
@@ -237,29 +235,29 @@ export async function getWorkspaceInTransaction(tx: Transaction, personId: strin
     const result: WorkspaceProjection = {
       service: { id: service.id, kind: service.kind, primaryPersonId:service.primaryPersonId, displayName: service.displayName, status: service.status, version: service.version, role: membership.role, cardholderRole: relationship },
       member: { id: actor.id, displayName: actor.displayName }, services: directory, cardholderRole: relationship, fictional: true,
-      customerService:{id:service.id,primaryName:primary!.primaryName,displayName:relationship==="PRIMARY"?"Your cardholder service":`Cards with ${primary!.primaryName}`},
-      notice: "Your cards use the group’s available funds and each cardholder’s monthly spending limit.",
+      customerService:{id:service.id,primaryName:primary!.primaryName,displayName:relationship==="OWNER"?"Your cardholder service":`Cards with ${primary!.primaryName}`},
+      notice: "Your cards use the group’s available funds and each card’s total allowance.",
       capabilities: ACTIONS.map(action => { const {allowed,reasonCode,reason}=evaluate(scope.policy,action);return {action,allowed,reasonCode,reason}; }), cards: [], cardRequests: [], cardholderOptions: [], activity: [], people: [], preferences: preferenceProjection(),
     };
     if (permits(scope, "cards.read")) {
-      const rows = await tx.select().from(cards).where(and(eq(cards.serviceId, serviceId), relationship === "PRIMARY" ? undefined : eq(cards.holderId, personId))).orderBy(cards.nickname, cards.id);
+      const rows = await tx.select().from(cards).where(and(eq(cards.serviceId, serviceId), relationship === "OWNER" ? undefined : eq(cards.holderId, personId))).orderBy(cards.nickname, cards.id);
       for (const row of rows) if (canReadCardholderData(scope.policy, row.holderId)) result.cards.push(await getCardProjection(tx, scope, row));
     }
     if (permits(scope, "activity.read")) {
-      const rows = await tx.select({ activity: serviceActivity, holderId: cards.holderId }).from(serviceActivity).leftJoin(cards, and(eq(cards.id, serviceActivity.cardId), eq(cards.serviceId, serviceActivity.serviceId))).where(and(eq(serviceActivity.serviceId, serviceId), relationship === "PRIMARY" ? undefined : eq(cards.holderId, personId))).orderBy(desc(serviceActivity.occurredAt), serviceActivity.id);
+      const rows = await tx.select({ activity: serviceActivity, holderId: cards.holderId }).from(serviceActivity).leftJoin(cards, and(eq(cards.id, serviceActivity.cardId), eq(cards.serviceId, serviceActivity.serviceId))).where(and(eq(serviceActivity.serviceId, serviceId), relationship === "OWNER" ? undefined : eq(cards.holderId, personId))).orderBy(desc(serviceActivity.occurredAt), serviceActivity.id);
       result.activity = rows.filter(row => canReadCardholderActivity(scope.policy, { cardId: row.activity.cardId, holderId: row.holderId })).map(row => activityProjection(row.activity));
     }
     if (permits(scope, "people.read") || permits(scope, "cards.request")) {
       const members = await peopleInService(tx, serviceId);
       const grants = await tx.select().from(permissionGrants).where(and(eq(permissionGrants.serviceId, serviceId), eq(permissionGrants.state, "ACCEPTED")));
-      if (permits(scope, "people.read")) result.people = members.filter(({person}) => relationship !== "SECONDARY" || person.id === personId).map(({ person, membership: member }) => {
-        const role=person.id===scope.policy.primaryPersonId?"PRIMARY":"SECONDARY";
-        const memberPolicy:PolicyScope = {...scope.policy,actorPersonId:person.id,membershipPersonId:person.id,membershipState:member.state,role,grants:grants.filter(grant=>grant.personId===person.id).map(grant=>grant.action)};
+      if (permits(scope, "people.read")) result.people = members.filter(({person}) => relationship !== "CARDHOLDER" || person.id === personId).map(({ person, membership: member }) => {
+        const role=person.id===scope.policy.primaryPersonId?"OWNER":"CARDHOLDER";
+        const memberPolicy:PolicyScope = {...scope.policy,actorPersonId:person.id,membershipPersonId:person.id,membershipState:member.state,role,grants:role==="CARDHOLDER"?[...CARDHOLDER_ACCESS_PERMISSIONS]:grants.filter(grant=>grant.personId===person.id).map(grant=>grant.action)};
         return { id: person.id, displayName: person.displayName, role,state:member.state,
           permissions: ACTIONS.filter(action=>isCardholderPermission(action)&&evaluate(memberPolicy,action).allowed), isCurrentPerson: person.id === personId };
       });
       if (permits(scope, "cards.request")) {
-        result.cardholderOptions = members.filter(({person, membership:member}) => member.state === "ACCEPTED" && grants.some(grant => grant.personId === person.id && grant.action === "cards.hold") && canManageHolder(scope, person.id))
+        result.cardholderOptions = members.filter(({person, membership:member}) => member.state === "ACCEPTED" && (person.id !== scope.policy.primaryPersonId || grants.some(grant => grant.personId === person.id && grant.action === "cards.hold")) && canManageHolder(scope, person.id))
           .map(({person}) => ({id:person.id,displayName:person.displayName,description:"Current cardholding access. Eligibility is checked before creation."}));
         const requests = await tx.select().from(cardRequests).where(eq(cardRequests.serviceId, serviceId)).orderBy(desc(cardRequests.updatedAt), cardRequests.id);
         for (const request of requests) result.cardRequests.push(await requestProjection(tx, scope, request));
@@ -276,6 +274,7 @@ async function command<T extends {commandId:string}>(personId:string,serviceId:s
 async function commandInTransaction<T extends {commandId:string}>(tx:Transaction, personId: string, serviceId: string, kind: string, action: string, targetId: string | null, input: T,
   mutate: (tx: Transaction, scope: Scope) => Promise<string>, authorize?: (tx: Transaction, scope: Scope) => Promise<void>): Promise<string> {
     // One service lock orders commands before actor/holder locks and avoids cross-holder deadlocks.
+    await lockMoneyAccountsForServices(tx,[serviceId]);
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:" + serviceId}, 0))`);
     const scope = await loadScope(tx, personId, serviceId, true);
     requireAction(scope, action);
@@ -324,9 +323,7 @@ export async function controlCard(personId: string, serviceId: string, cardId: s
 }
 
 async function requireHolder(tx: Transaction, serviceId: string, holderId: string) {
-  const [holder] = await tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId, serviceId), eq(serviceMembers.personId, holderId), eq(serviceMembers.state, "ACCEPTED"))).for("share");
-  const [grant] = await tx.select().from(permissionGrants).where(and(eq(permissionGrants.serviceId, serviceId), eq(permissionGrants.personId, holderId), eq(permissionGrants.action, "cards.hold"), eq(permissionGrants.state, "ACCEPTED"))).for("share");
-  if (!holder || !grant) throw new SecurityError("CARDHOLDER_UNAVAILABLE", 422);
+  if (!(await holderReadiness(tx, serviceId, holderId, true)).allowed) throw new SecurityError("CARDHOLDER_UNAVAILABLE", 422);
 }
 async function managedRequest(tx: Transaction, serviceId: string, requestId: string) {
   // Every caller first requires the primary-only request/create capability. Creator remains audit provenance.
@@ -344,7 +341,7 @@ export async function startCardRequest(personId: string, serviceId: string, raw:
   const requestId = await command(personId, serviceId, "card-request.start", "cards.request", null, input, async (tx, scope) => {
     const members = await peopleInService(tx, serviceId);
     const grants = await tx.select().from(permissionGrants).where(and(eq(permissionGrants.serviceId,serviceId),eq(permissionGrants.action,"cards.hold"),eq(permissionGrants.state,"ACCEPTED")));
-    const eligible = members.filter(({person,membership})=>membership.state === "ACCEPTED" && grants.some(grant=>grant.personId === person.id) && canManageHolder(scope, person.id));
+    const eligible = members.filter(({person,membership})=>membership.state === "ACCEPTED" && (person.id !== scope.policy.primaryPersonId || grants.some(grant=>grant.personId === person.id)) && canManageHolder(scope, person.id));
     const holderId = eligible.find(({person})=>person.id === personId)?.person.id ?? eligible[0]?.person.id;
     if (!holderId) throw new SecurityError("CARDHOLDER_UNAVAILABLE",422);
     await requireHolder(tx, serviceId, holderId);
@@ -362,7 +359,7 @@ export async function updateCardRequest(personId: string, serviceId: string, req
     if (request.status === "CANCELED" || request.status === "ISSUED") throw new SecurityError("INVALID_STATE", 422);
     await requireHolder(tx, serviceId, input.holderId);
     requireManageHolder(scope, input.holderId);
-    await tx.update(cardRequests).set({ holderId: input.holderId, nickname: input.nickname, format: input.format, status: "DRAFT", version: request.version + 1, updatedAt: await databaseNow(tx) }).where(eq(cardRequests.id, requestId));
+    await tx.update(cardRequests).set({ holderId: input.holderId, nickname: input.nickname, format: input.format, requestedLimitMinor:BigInt(input.allowanceMinor), status: "DRAFT", version: request.version + 1, updatedAt: await databaseNow(tx) }).where(eq(cardRequests.id, requestId));
     return requestId;
   });
   return updatedRequest(personId, serviceId, requestId);
@@ -380,6 +377,7 @@ export async function submitCardRequest(personId: string, serviceId: string, req
     }
     const issued = issueSandboxCard(requestId);
     await tx.insert(cards).values({ ...issued, requestId, serviceId, holderId: request.holderId, nickname: request.nickname, format: request.format, status: "ACTIVE", limitMinor: 0n });
+    await writeCardLimit(tx,personId,serviceId,issued.id,request.requestedLimitMinor,await databaseNow(tx),0);
     await tx.update(cardRequests).set({ status: "ISSUED", version: request.version + 1, updatedAt: await databaseNow(tx) }).where(eq(cardRequests.id, requestId));
     return requestId;
   }, async (tx, scope) => {
@@ -405,15 +403,16 @@ export async function purchaseCardInTransaction(tx:Transaction,personId: string,
     requireVersion(card.version, input.expectedVersion);
     if (card.status !== "ACTIVE") throw new SecurityError("CARD_FROZEN", 422);
     const amount = BigInt(input.amountMinor);
-    const now=await databaseNow(tx),spending=await readPersonSpending(tx,serviceId,card.holderId,now);
+    const now=await databaseNow(tx),spending=await readCardSpending(tx,serviceId,card.id);
     if(spending.remaining<amount)throw new SecurityError("SPENDING_LIMIT_EXCEEDED",422);
     if(spending.available<amount)throw new SecurityError("INSUFFICIENT_PRACTICE_FUNDS",422);
-    const id = randomUUID();
+    const id = randomUUID(),account=await getServiceMoneyAccount(tx,serviceId);
+    if(account.status!=="ACTIVE")throw new SecurityError("SERVICE_UNAVAILABLE",404);
     await postJournal(tx, { businessKey: `card-purchase:${input.commandId}`, kind: "CARD_PURCHASE", referenceId: id, occurredAt:now, lines: [
-      { serviceId, bucket: "GROUP_AVAILABLE", deltaMinor: -amount },
+      { ...moneyPosition(account.id), deltaMinor: -amount },
       { serviceId, bucket: "CARD_SPENT", cardId, deltaMinor: amount },
     ] });
-    await tx.insert(serviceActivity).values({ id, serviceId, cardId, title: input.description, category: "Card purchase", occurredAt: now, status: "POSTED", direction: "DEBIT", amountMinor: amount, description: "Paid from your card group’s prepaid balance." });
+    await tx.insert(serviceActivity).values({ id, serviceId, cardId, title: input.description, category: "Card purchase", occurredAt: now, status: "POSTED", direction: "DEBIT", amountMinor: amount, description: "Paid from your shared money account." });
     await tx.update(cards).set({ version: card.version + 1 }).where(eq(cards.id, cardId));
     return id;
   }, async (tx, scope) => {

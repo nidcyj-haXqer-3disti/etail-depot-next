@@ -24,12 +24,14 @@ test("a new visitor can compare services before signing in", async ({ page }) =>
   await expect(page).toHaveURL(/\/card-services$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Their own card\.\s*Your peace of mind\.$/);
   await expect(mainNavigation.getByRole("link",{name:"Cards for your people"})).toHaveAttribute("aria-current","page");
-  await expect(page.getByRole("heading",{name:"Additional cardholder",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Cardholder",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Account owner",exact:true})).toBeVisible();
   await mainNavigation.getByRole("link",{name:"Get paid together",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-services$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Get paid\.\s*Together\.$/);
   await expect(mainNavigation.getByRole("link",{name:"Get paid together",exact:true})).toHaveAttribute("aria-current","page");
-  await expect(page.getByRole("heading",{name:"Primary merchant",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Account owner",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Terminal user",exact:true})).toBeVisible();
   await page.getByRole("link",{name:"Open merchant services",exact:true}).click();
   await expect(page).toHaveURL(/\/login$/);
   expect(errors).toEqual([]);
@@ -42,10 +44,11 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
   const question=page.locator("summary").filter({hasText:"How do I freeze a card?"});
   await question.focus();await page.keyboard.press("Enter");
   await expect(question.locator("..")).toHaveAttribute("open","");
-  await expect(question.locator("..")).toContainText("Only controls available to you are shown.");
+  await expect(question.locator("..")).toContainText("A cardholder can freeze their own card.");
+  await expect(question.locator("..")).toContainText("A card frozen by its owner stays frozen until the owner releases that restriction.");
   await page.keyboard.press("Enter");
   await expect(question.locator("..")).not.toHaveAttribute("open","");
-  await page.getByRole("link",{name:"Go to sign in",exact:true}).click();
+  await page.getByRole("banner").getByRole("link",{name:"Sign in",exact:true}).click();
   await expect(page).toHaveURL(/\/login$/);
 });
 

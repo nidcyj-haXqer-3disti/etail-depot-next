@@ -1,69 +1,53 @@
-import { and,eq,inArray,sql } from "drizzle-orm";
+import { and,eq,sql } from "drizzle-orm";
 import { z } from "zod";
-import { services,serviceMembers,permissionGrants } from "../../platform/database/schema";
+import { services,serviceMembers } from "../../platform/database/schema";
 import { SecurityError } from "../../platform/security/origin";
 import { requireSandboxParticipant } from "../sandbox/service";
-import { merchantProfiles,merchantUnits } from "../acquiring/schema";
+import { merchantProfiles,merchantTerminals } from "../acquiring/schema";
 import { MERCHANT_ACTIONS,evaluate,type MerchantPolicyScope } from "../policy/evaluate";
-import { merchantAssignments,merchantPermissionGrants } from "./schema";
+import { terminalAssignments } from "./schema";
+import { TERMINAL_PERMISSIONS } from "./merchant-contracts";
 import { requireServiceReader } from "../services/service-reader";
+import { getServiceMoneyAccount,lockMoneyAccountsForServices } from "../money/service";
 import type { ScopedTransaction } from "./scope";
 
-export async function requireMerchantParticipant(tx:ScopedTransaction,personId:string) {
-  await requireSandboxParticipant(tx,personId);
-}
+export async function requireMerchantParticipant(tx:ScopedTransaction,personId:string) {await requireSandboxParticipant(tx,personId);}
 export async function merchantNow(tx:ScopedTransaction) {const result=await tx.execute(sql`select clock_timestamp() as now`);return new Date(result.rows[0]!.now as string|Date);}
-export async function listMerchantAssignmentUnitIds(tx:ScopedTransaction,personId:string) {
-  await requireServiceReader(tx,personId);
-  const rows=await tx.select({id:merchantAssignments.merchantUnitId}).from(merchantAssignments).where(and(eq(merchantAssignments.personId,personId),eq(merchantAssignments.state,"ACCEPTED"))).orderBy(merchantAssignments.merchantUnitId);
-  return rows.map(row=>row.id);
+export async function listTerminalAssignmentIds(tx:ScopedTransaction,personId:string) {
+ await requireServiceReader(tx,personId);
+ const rows=await tx.select({id:terminalAssignments.terminalId}).from(terminalAssignments).where(and(eq(terminalAssignments.personId,personId),eq(terminalAssignments.state,"ACCEPTED"))).orderBy(terminalAssignments.terminalId);
+ return rows.map(row=>row.id);
 }
-/** Merchant service lock precedes primary, unit, assignment and financial locks. */
-export async function loadMerchantUnitScope(tx:ScopedTransaction,personId:string,unitId:string,forWrite=false,options:{mode?:"OPERATING"|"OVERSIGHT";read?:boolean}={}) {
-  if(!z.uuid().safeParse(unitId).success)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-  unitId=unitId.toLowerCase();
-  if(forWrite)await requireMerchantParticipant(tx,personId);else await requireServiceReader(tx,personId);
-  const [hint]=await tx.select().from(merchantUnits).where(eq(merchantUnits.id,unitId));
-  if(!hint)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-  if(forWrite)await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+hint.masterServiceId},0))`);
-  const rootId=hint.masterId??hint.id;
-  if(forWrite)for(const id of [...new Set([rootId,unitId])])await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"merchant:"+id},0))`);
-  const unitQuery=tx.select().from(merchantUnits).where(inArray(merchantUnits.id,[rootId,unitId])).orderBy(merchantUnits.id);
-  const units=forWrite?await unitQuery.for("update"):await unitQuery;
-  const unit=units.find(row=>row.id===unitId),master=units.find(row=>row.id===rootId);
-  if(!unit||!master||master.kind!=="MASTER"||master.masterServiceId!==unit.masterServiceId||unit.masterServiceId!==hint.masterServiceId)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-  const [masterService]=await tx.select().from(services).where(and(eq(services.id,unit.masterServiceId),eq(services.kind,"MERCHANT")));
-  if(!masterService)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-  const [primaryMember]=await tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,masterService.id),eq(serviceMembers.personId,masterService.primaryPersonId),eq(serviceMembers.state,"ACCEPTED")));
-  const serviceGrants=await tx.select().from(permissionGrants).where(and(eq(permissionGrants.serviceId,masterService.id),eq(permissionGrants.personId,masterService.primaryPersonId),eq(permissionGrants.state,"ACCEPTED")));
-  const [profile]=await tx.select().from(merchantProfiles).where(eq(merchantProfiles.serviceId,masterService.id));
-  const primaryGrants=serviceGrants.map(row=>row.action).filter(action=>(MERCHANT_ACTIONS as readonly string[]).includes(action));
-  const primaryAccess=!!primaryMember&&masterService.primaryPersonId===personId&&primaryGrants.includes("merchant.read");
-  const available=!["SUSPENDED","CLOSED"].includes(masterService.status)&&!!profile&&!["RESTRICTED","DECLINED","CLOSED"].includes(profile.status)&&unit.status!=="CLOSED";
-  const operating=available&&unit.status==="ACTIVE"&&master.status==="ACTIVE"&&!!primaryMember&&primaryGrants.includes("merchant.read");
-  const assignmentQuery=tx.select().from(merchantAssignments).where(eq(merchantAssignments.merchantUnitId,unitId)).orderBy(merchantAssignments.id);
-  const assignments=forWrite?await assignmentQuery.for("update"):await assignmentQuery;
-  const allGrants=assignments.length?await tx.select().from(merchantPermissionGrants).where(inArray(merchantPermissionGrants.assignmentId,assignments.map(row=>row.id))):[];
-  const timestamp=await merchantNow(tx);
-  function active(row:typeof merchantAssignments.$inferSelect,seen:Set<string>=new Set()):boolean {
-    if(!operating||row.state!=="ACCEPTED"||row.expiresAt<=timestamp||seen.has(row.id)||seen.size>=4)return false;
-    seen.add(row.id);
-    const grants=allGrants.filter(grant=>grant.assignmentId===row.id);
-    if(row.sourceAssignmentId) {
-      const parent=assignments.find(item=>item.id===row.sourceAssignmentId);
-      if(!parent||row.expiresAt>parent.expiresAt||!active(parent,seen))return false;
-      const ceiling=allGrants.filter(grant=>grant.assignmentId===parent.id&&grant.delegable).map(grant=>grant.action);
-      return grants.every(grant=>ceiling.includes(grant.action));
-    }
-    return !!primaryMember&&row.sourcePrimaryPersonId===masterService.primaryPersonId&&row.sourceMembershipVersion===primaryMember.version&&grants.every(grant=>serviceGrants.some(source=>source.action===grant.action&&source.delegable));
-  }
-  const liveAssignments=assignments.filter(row=>active(row)),direct=liveAssignments.find(row=>row.personId===personId)??null;
-  let authority:MerchantPolicyScope["authority"]=null,grants:string[]=[],delegableActions:string[]=[];
-  if(primaryAccess){authority={kind:"PRIMARY_MEMBER",personId,membershipVersion:primaryMember!.version};grants=primaryGrants;delegableActions=serviceGrants.filter(row=>row.delegable).map(row=>row.action);}
-  else if(direct){authority={kind:"MERCHANT_ASSIGNMENT",personId,membershipVersion:null};grants=allGrants.filter(row=>row.assignmentId===direct.id).map(row=>row.action);delegableActions=allGrants.filter(row=>row.assignmentId===direct.id&&row.delegable).map(row=>row.action);}
-  const mode=options.mode??(options.read&&primaryAccess&&!operating?"OVERSIGHT":"OPERATING");
-  if(mode==="OVERSIGHT"&&!primaryAccess)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-  const policy:MerchantPolicyScope={targetKind:"MERCHANT_UNIT",actorPersonId:personId,merchantUnitId:unitId,resourceMerchantUnitId:unitId,serviceId:masterService.id,masterServiceId:masterService.id,unitKind:unit.kind,mode,available:mode==="OVERSIGHT"?primaryAccess&&masterService.status!=="CLOSED"&&!!profile:available,operating,canManageFunds:primaryAccess,primaryAccess,authority,grants,delegableActions};
-  if(!evaluate(policy,"merchant.read").allowed)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-  return {unit,master,masterService,policy,primaryAccess,primaryMember,assignment:authority?.kind==="MERCHANT_ASSIGNMENT"?direct:null,grants,assignments,liveAssignments,allGrants,now:timestamp};
+/** One money-account lock, then service and terminal locks. Scope is rechecked on every operation. */
+export async function loadTerminalScope(tx:ScopedTransaction,personId:string,terminalId:string,forWrite=false,options:{mode?:"OPERATING"|"OVERSIGHT";read?:boolean}={}) {
+ if(!z.uuid().safeParse(terminalId).success)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ terminalId=terminalId.toLowerCase();
+ if(forWrite)await requireMerchantParticipant(tx,personId);else await requireServiceReader(tx,personId);
+ const [hint]=await tx.select().from(merchantTerminals).where(eq(merchantTerminals.id,terminalId));
+ if(!hint)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ if(forWrite){await lockMoneyAccountsForServices(tx,[hint.merchantServiceId]);await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+hint.merchantServiceId},0))`);await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"terminal:"+terminalId},0))`);}
+ const tq=tx.select().from(merchantTerminals).where(eq(merchantTerminals.id,terminalId));
+ const [terminal]=forWrite?await tq.for("update"):await tq;
+ if(!terminal||terminal.merchantServiceId!==hint.merchantServiceId)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ const [merchantService]=await tx.select().from(services).where(and(eq(services.id,terminal.merchantServiceId),eq(services.kind,"MERCHANT")));
+ if(!merchantService)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ const account=await getServiceMoneyAccount(tx,merchantService.id);
+ if(account.ownerPersonId!==merchantService.primaryPersonId)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ const [ownerMember]=await tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,merchantService.id),eq(serviceMembers.personId,account.ownerPersonId),eq(serviceMembers.state,"ACCEPTED")));
+ const [profile]=await tx.select().from(merchantProfiles).where(eq(merchantProfiles.serviceId,merchantService.id));
+ const ownerAccess=!!ownerMember&&account.ownerPersonId===personId;
+ const available=account.status==="ACTIVE"&&!["SUSPENDED","CLOSED"].includes(merchantService.status)&&!!profile&&!["RESTRICTED","DECLINED","CLOSED"].includes(profile.status)&&terminal.status!=="CLOSED";
+ const operating=available&&terminal.status==="ACTIVE"&&!!ownerMember;
+ const aq=tx.select().from(terminalAssignments).where(eq(terminalAssignments.terminalId,terminalId)).orderBy(terminalAssignments.id);
+ const assignments=forWrite?await aq.for("update"):await aq;
+ const timestamp=await merchantNow(tx);
+ const liveAssignments=assignments.filter(row=>operating&&row.state==="ACCEPTED"&&(!row.expiresAt||row.expiresAt>timestamp)&&row.grantedByPersonId===account.ownerPersonId&&row.ownerMembershipVersion===ownerMember?.version);
+ const direct=liveAssignments.find(row=>row.personId===personId)??null;
+ const authority:MerchantPolicyScope["authority"]=ownerAccess?{kind:"OWNER_MEMBER",personId,membershipVersion:ownerMember!.version}:direct?{kind:"TERMINAL_ASSIGNMENT",personId,membershipVersion:null}:null;
+ const grants:string[]=ownerAccess?[...MERCHANT_ACTIONS,"disputes.read","disputes.respond"]:direct?[...TERMINAL_PERMISSIONS]:[];
+ const mode=options.mode??(options.read&&ownerAccess&&!operating?"OVERSIGHT":"OPERATING");
+ if(mode==="OVERSIGHT"&&!ownerAccess)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ const policy:MerchantPolicyScope={targetKind:"MERCHANT_TERMINAL",actorPersonId:personId,terminalId,resourceTerminalId:terminalId,serviceId:merchantService.id,resourceServiceId:merchantService.id,mode,available:mode==="OVERSIGHT"?ownerAccess&&merchantService.status!=="CLOSED"&&account.status!=="CLOSED"&&!!profile:available,operating,canManageFunds:ownerAccess,ownerAccess,authority,grants,delegableActions:[]};
+ if(!evaluate(policy,"merchant.read").allowed)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ return {terminal,merchantService,policy,ownerAccess,ownerMember,assignment:direct,grants,assignments,liveAssignments,now:timestamp};
 }

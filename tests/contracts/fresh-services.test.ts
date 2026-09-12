@@ -29,6 +29,9 @@ it("declares two explicit enrollment commands and assigned support paths without
   expect(paths["/api/v1/merchants"]).toHaveProperty("post");
   expect(paths["/api/v1/operations/cases/{caseId}/responses"]).toHaveProperty("post");
   expect(paths["/api/v1/merchants/{merchantId}/gateway"]).toHaveProperty("put");
-  expect(Object.keys(paths).some(path=>path.includes("/accounts/")||path.includes("relationship")||path.includes("disputes")||path.includes("/services/{serviceId}/test-gateway"))).toBe(false);
+  expect(Object.keys(paths).some(path=>path.includes("/accounts/")||path.includes("relationship")||path.includes("/submerchants")||path.endsWith("/network")||path.includes("/cardholders/{holderId}/spending-limit")||path.includes("/services/{serviceId}/test-gateway"))).toBe(false);
+  expect(paths["/api/v1/merchants/{merchantId}/terminals"]).toHaveProperty("post");
+  expect(paths["/api/v1/merchants/{merchantId}/disputes/{disputeId}/respond"]).toHaveProperty("post");
+  expect(paths["/api/v1/money-accounts/{moneyAccountId}/withdrawals/intents"]).toHaveProperty("post");
   expect(fixtureLoginSchema.safeParse({persona:"operator"}).success).toBe(true);
 });

@@ -2,9 +2,9 @@ import type { Metadata, MetadataRoute } from "next";
 import targets from "../../../project-targets.json" with { type: "json" };
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Prepaid cards for your people and business payment tools", description: "Add money, set personal spending limits and manage cards for your family or team. Explore shared merchant payment requests and receipts with Etail Depot." },
-  "/card-services": { title: "Cards for your family, team and trusted people", description: "Explore one prepaid card group for trusted adults, monthly spending limits for each person, private card activity and shared oversight with Etail Depot." },
-  "/payment-services": { title: "Get paid together with shared merchant payment tools", description: "Give family, teams and helpers payment tools for your merchant. Explore text, email, invoice, bill, social, QR and web payment requests for your customers." },
+  "/": { title: "Prepaid cards for your people and business payment tools", description: "Fund cards for family or teams with a total allowance for every card. Give your team payment terminals, manage receipts and keep card and merchant money separate." },
+  "/card-services": { title: "Cards for your family, team and trusted people", description: "One prepaid card balance, a total allowance per card, and private access for every cardholder. Manage your people’s cards with Etail Depot." },
+  "/payment-services": { title: "Get paid together with shared merchant payment tools", description: "One merchant, terminals for your people and one merchant balance. Collect by text, email, invoice, bill, social, QR or website link with Etail Depot." },
   "/help": { title: "Help with cards and payments", description: "Learn how Etail Depot card controls, payment tools and shared access work. Find clear answers about your services and account." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;

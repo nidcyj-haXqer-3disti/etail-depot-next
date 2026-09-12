@@ -45,11 +45,11 @@ describe("explicit Cardholder services", () => {
     await enrollCardholder(primary.personId, primary.serviceId, secondary);
     await getDb().insert(permissionGrants).values(["people.read", "people.invite", "cards.create", "cards.request", "cards.manageMembers"].map(action => ({ serviceId: primary.serviceId, personId: secondary, action })));
     const policy = (await scope(secondary, primary.serviceId)).policy;
-    expect(cardholderRole(policy)).toBe("SECONDARY");
+    expect(cardholderRole(policy)).toBe("CARDHOLDER");
     expect(canReadCardholderData(policy, primary.personId)).toBe(false);
     expect(canReadCardholderData(policy, secondary)).toBe(true);
     for (const action of ["people.read", "people.invite", "cards.create", "cards.request", "cards.manageMembers"]) expect(evaluate(policy, action).allowed).toBe(false);
-    expect(await listServicesForPerson(secondary)).toMatchObject([{ id: primary.serviceId, cardholderRole: "SECONDARY" }]);
+    expect(await listServicesForPerson(secondary)).toMatchObject([{ id: primary.serviceId, cardholderRole: "CARDHOLDER" }]);
     expect(await getDb().select().from(services).where(eq(services.primaryPersonId, secondary))).toEqual([]);
   });
 

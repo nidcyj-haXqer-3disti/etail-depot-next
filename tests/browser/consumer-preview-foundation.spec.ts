@@ -8,7 +8,7 @@ test("a visitor can explore both example dashboards without changing an account"
  const services=page.getByRole("group",{name:"Service dashboard preview",exact:true});
  const cardholder=page.getByRole("region",{name:"Cardholder dashboard example",exact:true});
  await expect(cardholder).toBeVisible();
- await expect(page.getByText("Illustrative primary view · Sample figures, not your balance.",{exact:true})).toBeVisible();
+ await expect(page.getByText("Illustrative owner view · Sample figures, not your balance.",{exact:true})).toBeVisible();
  const liam=cardholder.getByRole("button",{name:"Liam’s card",exact:true});
  await liam.focus();await page.keyboard.press("Enter");
  await expect(liam).toHaveAttribute("aria-pressed","true");
@@ -21,7 +21,7 @@ test("a visitor can explore both example dashboards without changing an account"
  const example=page.getByRole("region",{name:"Merchant dashboard example",exact:true});
  await expect(example).toBeVisible();
  await expect(example.getByText("Awaiting settlement",{exact:true})).toBeVisible();
- await expect(example.getByText("Processing",{exact:true})).toBeVisible();
+ await expect(example.getByText("Merchant money",{exact:true})).toBeVisible();
  await expect(example.getByRole("listitem")).toHaveCount(3);
  await example.getByRole("link",{name:"Open Merchant services",exact:true}).click();
  await expect(page).toHaveURL(/\/login$/);

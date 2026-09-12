@@ -1,11 +1,10 @@
-import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
+import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { serviceMembers, permissionGrants } from "../../src/platform/database/schema";
-import { bindIdentity } from "../../src/modules/services/service";
-import {cardPrimary,issuePracticeCard} from "../helpers/cardholder";
+import {cardPrimary,cardPerson,enrollCardholder,issuePracticeCard} from "../helpers/cardholder";
 import { getWorkspace } from "../../src/modules/workspace/service";
 import { getHistoricalReport, exportHistoricalReport, createReportDefinition, updateReportDefinition, deleteReportDefinition } from "../../src/modules/reports/service";
 import { reportDefinitionCommands, savedReportDefinitions } from "../../src/modules/reports/schema";
@@ -14,12 +13,11 @@ import type { ReportFilters } from "../../src/modules/reports/contracts";
 
 afterAll(closeDatabase);
 const activityFilters: ReportFilters = { source: "ACTIVITY", status: "ALL", from: "2026-09-01", to: "2026-09-30", query: "" };
-async function fixture() {const primary=await cardPrimary("Report tester");await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"10000");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"10000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Report card","1251");})();return primary;}
-async function member(serviceId: string, actions = ["activity.read"]) {
-  const identity = await bindIdentity("urn:etail:isolated-fixture", randomUUID(), "Fictional report viewer");
-  await getDb().insert(serviceMembers).values({ serviceId, personId: identity.personId, state: "ACCEPTED" });
-  for (const action of actions) await getDb().insert(permissionGrants).values({ serviceId, personId: identity.personId, action, state: "ACCEPTED" });
-  return identity.personId;
+async function fixture() {const primary=await cardPrimary("Report tester");await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"10000");return issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Report card", "1251", "10000");})();return primary;}
+async function member(ownerId:string,serviceId:string) {
+  const personId=await cardPerson("Report cardholder");
+  await enrollCardholder(ownerId,serviceId,personId);
+  return personId;
 }
 
 describe("scoped historical reports and private definitions", () => {
@@ -39,19 +37,19 @@ describe("scoped historical reports and private definitions", () => {
     await deleteReportDefinition(personId, serviceId, saved.id, { commandId: randomUUID(), expectedVersion: saved.version });
     const after = await getWorkspace(personId, serviceId); expect(after.activity).toEqual(before.activity); expect(after.cards).toEqual(before.cards);
   });
-  it("rejects cross-service reads/exports/definitions and never exposes a primary history to an accepted secondary", async () => {
+  it("rejects cross-service reads/exports/definitions and never exposes owner history to an accepted cardholder", async () => {
     const owner = await fixture(), foreign = await fixture();
     await expect(getHistoricalReport(foreign.personId, owner.serviceId)).rejects.toMatchObject({ status: 404 });
     await expect(exportHistoricalReport(foreign.personId, owner.serviceId)).rejects.toMatchObject({ status: 404 });
     await expect(createReportDefinition(foreign.personId, owner.serviceId, { commandId: randomUUID(), name: "Denied", filters: activityFilters })).rejects.toMatchObject({ status: 404 });
-    const granted = await member(owner.serviceId, ["activity.read"]);
+    const granted = await member(owner.personId,owner.serviceId);
     expect((await getHistoricalReport(granted, owner.serviceId)).activity).toEqual([]);
     const exported = await exportHistoricalReport(granted, owner.serviceId);
     expect(exported.csv).toContain("NO_MATCHING_RECORDS");
     expect(exported.csv).not.toContain("Sample Market");
   });
-  it("persists own named filters, retries once, rejects stale edits and isolates definitions within a shared Merchant", async () => {
-    const { personId, serviceId } = await fixture(), viewerId = await member(serviceId);
+  it("persists own named filters, retries once, rejects stale edits and isolates definitions within a card group", async () => {
+    const { personId, serviceId } = await fixture(), viewerId = await member(personId,serviceId);
     const input = { commandId: randomUUID(), name: "My September", filters: activityFilters };
     const [first, duplicate] = await Promise.all([createReportDefinition(personId, serviceId, input), createReportDefinition(personId, serviceId, input)]);
     savedReportDefinitionSchema.parse(first); expect(duplicate).toEqual(first);
@@ -71,18 +69,20 @@ describe("scoped historical reports and private definitions", () => {
     expect((await getHistoricalReport(personId, serviceId)).definitions).toEqual([]);
     expect(await getDb().select().from(reportDefinitionCommands).where(eq(reportDefinitionCommands.serviceId, serviceId))).toHaveLength(3);
   });
-  it("rechecks the source permission on every rerun/export and cannot save a broader source", async () => {
-    const { serviceId } = await fixture(), viewerId = await member(serviceId);
-    const saved = await createReportDefinition(viewerId, serviceId, { commandId: randomUUID(), name: "My activity", filters: activityFilters });
-    await getDb().update(permissionGrants).set({ state: "REVOKED" }).where(and(eq(permissionGrants.serviceId, serviceId), eq(permissionGrants.personId, viewerId), eq(permissionGrants.action, "activity.read")));
-    await expect(getHistoricalReport(viewerId, serviceId)).rejects.toMatchObject({code:"ACTION_DENIED"});
-    // A secondary cannot fall back to service-wide merchant settlement data after own activity access is revoked.
-    await expect(getHistoricalReport(viewerId, serviceId, saved.filters)).rejects.toMatchObject({ code: "ACTION_DENIED" });
-    await expect(exportHistoricalReport(viewerId, serviceId, saved.filters)).rejects.toMatchObject({ code: "ACTION_DENIED" });
-    await expect(createReportDefinition(viewerId, serviceId, { commandId: randomUUID(), name: "No read access", filters: activityFilters })).rejects.toMatchObject({ code: "ACTION_DENIED" });
-    expect(await getDb().select().from(savedReportDefinitions).where(eq(savedReportDefinitions.personId, viewerId))).toHaveLength(1);
-    await getDb().update(serviceMembers).set({ state: "REVOKED" }).where(and(eq(serviceMembers.serviceId, serviceId), eq(serviceMembers.personId, viewerId)));
-    await expect(deleteReportDefinition(viewerId, serviceId, saved.id, { commandId: randomUUID(), expectedVersion: saved.version })).rejects.toMatchObject({ status: 404 });
+  it("uses fixed cardholder access and rechecks accepted membership on every read, export and saved filter", async () => {
+    const {personId,serviceId}=await fixture(),viewerId=await member(personId,serviceId);
+    const saved=await createReportDefinition(viewerId,serviceId,{commandId:randomUUID(),name:"My activity",filters:activityFilters});
+    await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,serviceId),eq(permissionGrants.personId,viewerId),eq(permissionGrants.action,"activity.read")));
+    // Legacy grant rows cannot narrow or widen a holder's fixed own-card access.
+    expect((await getHistoricalReport(viewerId,serviceId,saved.filters)).activity).toEqual([]);
+    expect((await exportHistoricalReport(viewerId,serviceId,saved.filters)).csv).toContain("NO_MATCHING_RECORDS");
+    await getDb().update(serviceMembers).set({state:"REVOKED"}).where(and(eq(serviceMembers.serviceId,serviceId),eq(serviceMembers.personId,viewerId)));
+    await expect(getHistoricalReport(viewerId,serviceId)).rejects.toMatchObject({status:404});
+    await expect(getHistoricalReport(viewerId,serviceId,saved.filters)).rejects.toMatchObject({status:404});
+    await expect(exportHistoricalReport(viewerId,serviceId,saved.filters)).rejects.toMatchObject({status:404});
+    await expect(createReportDefinition(viewerId,serviceId,{commandId:randomUUID(),name:"No access",filters:activityFilters})).rejects.toMatchObject({status:404});
+    await expect(deleteReportDefinition(viewerId,serviceId,saved.id,{commandId:randomUUID(),expectedVersion:saved.version})).rejects.toMatchObject({status:404});
+    expect(await getDb().select().from(savedReportDefinitions).where(eq(savedReportDefinitions.personId,viewerId))).toHaveLength(1);
   });
   it("validates filter-only payloads at the service boundary and rejects authority/data injection", async () => {
     const { personId, serviceId } = await fixture();

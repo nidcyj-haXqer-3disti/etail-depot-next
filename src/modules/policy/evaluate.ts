@@ -1,9 +1,9 @@
 import {cardholderRole} from "./cardholder-scope";
 export const WORKSPACE_ACTIONS = ["cards.read", "cards.hold", "cards.freeze", "cards.unfreeze", "cards.request", "activity.read", "notifications.manage"] as const;
-export const ACTIONS = ["cardholder.funds.read","cardholder.funds.add","cardholder.limits.manage","service.read","people.read","people.invite","people.changeRole","people.revoke","support.cases.read","support.cases.manage","acquiring.read","acquiring.setup","merchant.read","merchant.people.read","merchant.people.invite","merchant.people.revoke","merchant.units.create","merchant.units.pause","channels.read","channels.create","channels.update","channels.close","channels.share","cards.create","cards.manageMembers","cards.purchase","gateway.manage","payments.read","payments.simulate","payments.refund","payouts.manage","spend.authorize", ...WORKSPACE_ACTIONS] as const;
+export const ACTIONS = ["money.read","money.add","money.withdraw","cardholder.funds.read","cardholder.funds.add","cardholder.limits.manage","service.read","people.read","people.invite","people.changeRole","people.revoke","support.cases.read","support.cases.manage","acquiring.read","acquiring.setup","merchant.read","merchant.people.read","merchant.people.invite","merchant.people.revoke","merchant.terminals.create","merchant.terminals.pause","channels.read","channels.create","channels.update","channels.close","channels.share","cards.create","cards.manageMembers","cards.purchase","gateway.manage","payments.read","payments.refund","payouts.manage","disputes.read","disputes.respond","disputes.resolve", ...WORKSPACE_ACTIONS] as const;
 export type Action = typeof ACTIONS[number];
 export type ServiceKind = "CARDHOLDER"|"MERCHANT";
-export type Role = "PRIMARY"|"SECONDARY";
+export type Role = "OWNER"|"CARDHOLDER";
 export interface PolicyScope {
   targetKind?:"SERVICE";
   actorPersonId:string; serviceId:string; resourceServiceId:string;
@@ -12,38 +12,47 @@ export interface PolicyScope {
   grants?:readonly string[]; delegableActions?:readonly string[];
   invitation?:{recipientPersonId:string;status:string;expiresAt:Date;now:Date};
 }
-export const MERCHANT_ACTIONS = ["merchant.units.create","merchant.units.pause","gateway.manage","merchant.read","merchant.people.read","merchant.people.invite","merchant.people.revoke","channels.read","channels.create","channels.update","channels.close","channels.share","payments.read","payments.simulate","payments.refund","payouts.manage"] as const;
+export const MERCHANT_ACTIONS = ["merchant.terminals.create","merchant.terminals.pause","gateway.manage","merchant.read","merchant.people.read","merchant.people.invite","merchant.people.revoke","channels.read","channels.create","channels.update","channels.close","channels.share","payments.read","payments.refund","payouts.manage"] as const;
 export interface MerchantPolicyScope {
-  targetKind:"MERCHANT_UNIT"; actorPersonId:string; merchantUnitId:string; resourceMerchantUnitId:string;
-  serviceId:string; masterServiceId:string; unitKind:"MASTER"|"SUB";
-  mode:"OPERATING"|"OVERSIGHT"|"INVITATION_RECIPIENT"; primaryAccess:boolean;
-  invitation?:{recipientPersonId:string;status:string;expiresAt:Date;accessExpiresAt:Date;now:Date};available:boolean;operating:boolean;canManageFunds:boolean;
-  authority:{kind:"PRIMARY_MEMBER"|"MERCHANT_ASSIGNMENT";personId:string;membershipVersion:number|null}|null;
+  targetKind:"MERCHANT_TERMINAL"; actorPersonId:string; terminalId:string; resourceTerminalId:string;
+  serviceId:string; resourceServiceId:string;
+  mode:"OPERATING"|"OVERSIGHT"|"INVITATION_RECIPIENT"; ownerAccess:boolean;
+  invitation?:{recipientPersonId:string;status:string;expiresAt:Date;now:Date};available:boolean;operating:boolean;canManageFunds:boolean;
+  authority:{kind:"OWNER_MEMBER"|"TERMINAL_ASSIGNMENT";personId:string;membershipVersion:number|null}|null;
   grants:readonly string[];delegableActions:readonly string[];
 }
 export interface OperatorPolicyScope {
  targetKind:"OPERATOR_SERVICE";actorPersonId:string;assignmentPersonId:string;serviceId:string;resourceServiceId:string;state:"ACCEPTED"|"REVOKED";serviceStatus:string;grants:readonly string[];
 }
-export function evaluate(scope:PolicyScope|MerchantPolicyScope|OperatorPolicyScope, action:string) {
-  if(scope.targetKind==="OPERATOR_SERVICE") {
-    const allowed=scope.actorPersonId===scope.assignmentPersonId&&scope.serviceId===scope.resourceServiceId&&scope.state==="ACCEPTED"&&scope.serviceStatus!=="CLOSED"&&["support.operator.read","support.operator.respond","payments.operator.process"].includes(action)&&scope.grants.includes("support.operator.read")&&scope.grants.includes(action);
-    return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available through your explicit operator assignment.":"An accepted operator assignment is required in this exact service.",remediation:null,scope:{serviceId:scope.serviceId},policyVersion:10};
+export interface MoneyPolicyScope {
+ targetKind:"MONEY_ACCOUNT";actorPersonId:string;ownerPersonId:string;moneyAccountId:string;resourceMoneyAccountId:string;status:string;
+}
+export function evaluate(scope:PolicyScope|MerchantPolicyScope|OperatorPolicyScope|MoneyPolicyScope, action:string) {
+  if(scope.targetKind==="MONEY_ACCOUNT") {
+    const same=scope.actorPersonId===scope.ownerPersonId&&scope.moneyAccountId===scope.resourceMoneyAccountId;
+    const allowed=same&&(action==="money.read"?scope.status!=="CLOSED":["money.add","money.withdraw"].includes(action)&&scope.status==="ACTIVE");
+    return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available to the account owner.":"Only the account owner can manage this money.",remediation:null,scope:{moneyAccountId:scope.moneyAccountId},policyVersion:11};
   }
-  if(scope.targetKind==="MERCHANT_UNIT") {
-    const same=scope.merchantUnitId===scope.resourceMerchantUnitId&&scope.serviceId===scope.masterServiceId;
+  if(scope.targetKind==="OPERATOR_SERVICE") {
+    const allowed=scope.actorPersonId===scope.assignmentPersonId&&scope.serviceId===scope.resourceServiceId&&scope.state==="ACCEPTED"&&scope.serviceStatus!=="CLOSED"&&["support.operator.read","support.operator.respond","payments.operator.process","disputes.operator.read","disputes.operator.resolve"].includes(action)&&scope.grants.includes("support.operator.read")&&scope.grants.includes(action);
+    return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available through your explicit operator assignment.":"An accepted operator assignment is required in this exact service.",remediation:null,scope:{serviceId:scope.serviceId},policyVersion:11};
+  }
+  if(scope.targetKind==="MERCHANT_TERMINAL") {
+    const same=scope.terminalId===scope.resourceTerminalId&&scope.serviceId===scope.resourceServiceId;
     let allowed=false;
     if(same&&scope.mode==="INVITATION_RECIPIENT") {
       const invitation=scope.invitation;
-      allowed=!!invitation&&invitation.recipientPersonId===scope.actorPersonId&&invitation.status==="PENDING"&&invitation.expiresAt>invitation.now&&invitation.accessExpiresAt>invitation.now&&(action==="invitation.decline"||(action==="invitation.accept"&&scope.available&&scope.operating));
+      allowed=!!invitation&&invitation.recipientPersonId===scope.actorPersonId&&invitation.status==="PENDING"&&invitation.expiresAt>invitation.now&&(action==="invitation.decline"||(action==="invitation.accept"&&scope.available&&scope.operating));
     } else if(same&&scope.available&&scope.authority?.personId===scope.actorPersonId&&scope.grants.includes("merchant.read")&&scope.grants.includes(action)) {
-      if(scope.mode==="OVERSIGHT")allowed=scope.primaryAccess&&scope.authority.kind==="PRIMARY_MEMBER"&&["merchant.read","channels.read","payments.read","merchant.people.read"].includes(action);
-      else if(scope.operating&&(MERCHANT_ACTIONS as readonly string[]).includes(action)) {
-        allowed=(!action.startsWith("channels.")||action==="channels.read"||scope.grants.includes("channels.read"))&&(!action.startsWith("merchant.people.")||action==="merchant.people.read"||scope.grants.includes("merchant.people.read"));
-        if(["payments.simulate","payments.refund","payouts.manage"].includes(action)&&!scope.grants.includes("payments.read"))allowed=false;
-        if(["payments.refund","payouts.manage","gateway.manage","merchant.units.create","merchant.units.pause"].includes(action)&&!scope.primaryAccess)allowed=false;
-      }
+      const ownerOnly=["merchant.people.read","merchant.people.invite","merchant.people.revoke","merchant.terminals.create","merchant.terminals.pause","gateway.manage","payments.refund","payouts.manage"];
+      const terminalTasks=["merchant.read","channels.read","channels.create","channels.update","channels.close","channels.share","payments.read","disputes.read","disputes.respond"];
+      if(scope.mode==="OVERSIGHT") allowed=scope.ownerAccess&&scope.authority.kind==="OWNER_MEMBER"&&["merchant.read","channels.read","payments.read","merchant.people.read","merchant.people.revoke","disputes.read"].includes(action);
+      else if(scope.operating) allowed=scope.ownerAccess?([...MERCHANT_ACTIONS,"disputes.read","disputes.respond"] as readonly string[]).includes(action):terminalTasks.includes(action);
+      if(action.startsWith("channels.")&&action!=="channels.read")allowed=allowed&&scope.grants.includes("channels.read");
+      if(["payments.refund","payouts.manage"].includes(action))allowed=allowed&&scope.canManageFunds&&scope.grants.includes("payments.read");
+      if(ownerOnly.includes(action)) allowed=allowed&&scope.ownerAccess&&scope.authority.kind==="OWNER_MEMBER";
     }
-    return {action,allowed,reasonCode:allowed?"ALLOWED":"MERCHANT_ACTION_UNAVAILABLE",reason:allowed?"Available within this merchant.":"Current permission in this merchant is required.",remediation:null,scope:{serviceId:scope.serviceId,merchantUnitId:scope.merchantUnitId},policyVersion:10};
+    return {action,allowed,reasonCode:allowed?"ALLOWED":"TERMINAL_ACTION_UNAVAILABLE",reason:allowed?"Available for this terminal.":"You do not have access to this terminal task.",remediation:null,scope:{serviceId:scope.serviceId,terminalId:scope.terminalId},policyVersion:11};
   }
 
   let allowed=false;
@@ -68,11 +77,11 @@ export function evaluate(scope:PolicyScope|MerchantPolicyScope|OperatorPolicySco
       if(action==="cards.manageMembers")allowed=allowed&&has("cards.read");
     } else if(scope.serviceKind==="MERCHANT") {
       if(action==="acquiring.read")allowed=has(action);
-      else if(["acquiring.setup","gateway.manage","merchant.units.create","merchant.units.pause"].includes(action))allowed=primary&&has(action)&&has("acquiring.read");
+      else if(["acquiring.setup","gateway.manage","merchant.terminals.create","merchant.terminals.pause"].includes(action))allowed=primary&&has(action)&&has("acquiring.read");
       else if(["payments.read"].includes(action))allowed=has(action)&&has("acquiring.read");
-      else if(["payments.simulate","payments.refund","payouts.manage"].includes(action))allowed=primary&&has(action)&&has("acquiring.read")&&has("payments.read");
+      else if(["payments.refund","payouts.manage"].includes(action))allowed=primary&&has(action)&&has("acquiring.read")&&has("payments.read");
       else if(action.startsWith("channels."))allowed=has(action)&&has("acquiring.read")&&(action==="channels.read"||has("channels.read"));
     }
   }
-  return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available within your current service permission.":"This action requires current permission in this exact service.",remediation:null,scope:{serviceId:scope.serviceId},policyVersion:10};
+  return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available within your current service permission.":"This action requires current permission in this exact service.",remediation:null,scope:{serviceId:scope.serviceId},policyVersion:11};
 }

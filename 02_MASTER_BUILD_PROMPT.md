@@ -1,5 +1,8 @@
 # Etail Depot — current project prompt
 
+> **D73 active override — 12 September 2026:** [Owner, cards and terminals](docs/OWNER_CARDS_TERMINALS_DESIGN.md) governs the current rebuild. The user explicitly chose **separate card and merchant money** and **per-card total allowances with no monthly reset**. Owners manage cards and one merchant’s flat terminals; invited holders/users have only their own resource access. Primary/secondary customer tiers, per-person monthly limits, submerchant responsibility and shared card/merchant balances are superseded. The text below retains the dated D69–D72 baseline for migration and review history; it does not override D73.
+
+
 Updated 12 September 2026 · D69. This is Etail's project prompt, not a transcription of a reference video's prompt.
 
 ## Current assignment

@@ -1,4 +1,4 @@
-import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
+import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
 import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
@@ -17,7 +17,7 @@ import { getWorkspace, startCardRequest } from "../../src/modules/workspace/serv
 import { getMerchantDashboard } from "../../src/modules/acquiring/dashboard-service";
 import { getMerchantWorkspace } from "../../src/modules/acquiring/service";
 import { listInvitationsForPerson } from "../../src/modules/access/service";
-import { merchantAssignments } from "../../src/modules/access/schema";
+import { terminalAssignments } from "../../src/modules/access/schema";
 import { hasOperatorAccess } from "../../src/modules/operations/service";
 import { operatorServiceAccess } from "../../src/modules/operations/schema";
 import { ledgerEntries } from "../../src/modules/ledger/schema";
@@ -42,7 +42,7 @@ async function expectNoEnrollment(personId: string) {
   expect(await getDb().select().from(services).where(eq(services.primaryPersonId, personId))).toEqual([]);
   expect(await getDb().select().from(serviceMembers).where(eq(serviceMembers.personId, personId))).toEqual([]);
   expect(await getDb().select().from(permissionGrants).where(eq(permissionGrants.personId, personId))).toEqual([]);
-  expect(await getDb().select().from(merchantAssignments).where(eq(merchantAssignments.personId, personId))).toEqual([]);
+  expect(await getDb().select().from(terminalAssignments).where(eq(terminalAssignments.personId, personId))).toEqual([]);
   expect(await getDb().select().from(operatorServiceAccess).where(eq(operatorServiceAccess.personId, personId))).toEqual([]);
   expect(await getDb().select().from(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId, personId))).toEqual([]);
   expect(await getDb().select().from(cards).where(eq(cards.holderId, personId))).toEqual([]);
@@ -70,7 +70,7 @@ describe("verified-provider service dashboard reads", () => {
       expect(await getCardholderDashboard(personId)).toMatchObject({ person: { id: personId }, canCreatePrimary: false, profiles: [], primaryService: null, cards: [], cardCount: 0, activity: [], requests: [], cardsHasMore: false });
       expect(await getCardholderDashboardDetail(personId, {})).toBeNull();
       const merchant = await getMerchantDashboard(personId);
-      expect(merchant).toMatchObject({ canCreatePrimary: false, primaryNetworks: [], delegatedUnitIds: [], units: [] });
+      expect(merchant).toMatchObject({ canCreateMerchant: false, merchants: [], moneyAccounts: [], units: [] });
       expect(merchant.views.every(view => view.payments.length === 0 && view.transfers.length === 0)).toBe(true);
       expect(await listInvitationsForPerson(personId)).toEqual([]);
       expect(await hasOperatorAccess(personId)).toBe(false);
@@ -96,7 +96,7 @@ describe("verified-provider service dashboard reads", () => {
 
   it("keeps another person's cards, merchants and commands unavailable to the new provider member", async () => {
     const primary = await cardPrimary("Protected synthetic cardholder");
-    const issued = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"1000");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"1000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Protected synthetic card");})();
+    const issued = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"1000");return issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Protected synthetic card", undefined, "1000");})();
     const merchant = await acquiringFixture();
     const member = await bindIdentity(issuer, randomUUID());
     const serviceIds = [primary.serviceId, merchant.serviceId];

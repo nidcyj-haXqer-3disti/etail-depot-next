@@ -25,7 +25,7 @@ async function dialogKeyboard(page:Page,dialog:Locator) {
 
 for(const width of [1440,320]) {
  for(const persona of ["owner","viewer"] as const) {
-  test(`${persona === "owner" ? "primary" : "secondary"} Cardholder dashboard, controls and activity are accessible at ${width}px`,async({page})=>{
+  test(`${persona === "owner" ? "owner" : "cardholder"} Cardholder dashboard, controls and activity are accessible at ${width}px`,async({page})=>{
    test.setTimeout(90_000);await page.setViewportSize({width,height:900});
    const {card}=await openCardholder(page,persona);
    await expect(page.getByRole("region",{name:"Selected card overview"})).toContainText(card.nickname);
@@ -41,13 +41,13 @@ for(const width of [1440,320]) {
    await expect(page.getByRole("heading",{name:"Card activity",exact:true})).toBeVisible();
    await accessible(page,"Exact card activity");
   });
-  test(`${persona === "owner" ? "primary Merchant" : "assigned submerchant"} overview, payment views and setup are accessible at ${width}px`,async({page})=>{
+  test(`${persona === "owner" ? "merchant owner" : "assigned terminal"} overview, payment views and setup are accessible at ${width}px`,async({page})=>{
    test.setTimeout(120_000);await page.setViewportSize({width,height:900});await signIn(page.request,persona);
    const dashboard=await merchantDashboard(page.request);
-   const unit=dashboard.units.find(row=>persona==="owner"?row.kind==="SUB"&&row.primaryAccess&&row.name==="Online store":row.kind==="SUB"&&!row.primaryAccess);
-   expect(unit).toBeTruthy();expect(unit!.primaryAccess).toBe(persona==="owner");
+   const unit=dashboard.units.find(row=>persona==="owner"?row.ownerAccess&&row.name==="Online store":!row.ownerAccess);
+   expect(unit).toBeTruthy();expect(unit!.ownerAccess).toBe(persona==="owner");
    await page.goto(`/merchant-services?view=unit:${unit!.id}`);
-   await expect(page.getByRole("heading",{name:"Merchant overview",exact:true})).toBeVisible();
+   await expect(page.getByRole("heading",{name:persona==="owner"?"Your merchant":"Your terminals",exact:true})).toBeVisible();
    await accessible(page,"Authorized Merchant overview");
    const response=await page.request.get(`/api/v1/merchants/${unit!.id}/operations`);expect(response.status()).toBe(200);
    const operations=merchantOperationsProjectionSchema.parse(await response.json());
@@ -64,17 +64,20 @@ for(const width of [1440,320]) {
    await dialogKeyboard(page,dialog);await expect(dialog).toContainText(payment.testReference);
    await accessible(page,"Exact payment receipt dialog");
    await page.keyboard.press("Escape");await expect(dialog).toBeHidden();await expect(opener).toBeFocused();
-   for(const view of ["Refunds","Deposits"]) {
+   for(const view of persona==="owner"?["Refunds","Deposits"]:["Refunds"]) {
     await page.getByRole("navigation",{name:"Payment activity views"}).getByRole("button",{name:view,exact:true}).click();
     await expect(page.getByRole("searchbox",{name:`Search ${view.toLowerCase()}`,exact:true})).toBeVisible();
     await accessible(page,`Merchant ${view.toLowerCase()}`);
    }
-   await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Account services",exact:true}).click();
-   await expect(page.getByRole("heading",{name:"Your payments are ready",exact:true})).toBeVisible();
-   await accessible(page,"Merchant payment setup");
-   if(persona==="viewer") {
-    await expect(page.getByRole("button",{name:"Request deposit",exact:true})).toHaveCount(0);
-    await expect(page.getByRole("button",{name:"Pause merchant",exact:true})).toHaveCount(0);
+   if(persona==="owner") {
+    await page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Settings",exact:true}).click();
+    await expect(page.getByRole("heading",{name:"Your payments are ready",exact:true})).toBeVisible();
+    await accessible(page,"Merchant payment setup");
+   } else {
+    await expect(page.getByRole("navigation",{name:"Payment activity views"}).getByRole("button",{name:"Deposits",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Settings",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("button",{name:"Settle payments",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("region",{name:"Current available balance",exact:true})).toHaveCount(0);
    }
   });
  }

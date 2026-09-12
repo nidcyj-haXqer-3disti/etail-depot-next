@@ -36,11 +36,12 @@ for(const kind of ["setup","payment"] as const)it(`${kind} mutation waits for gr
   await locker.connect();await observer.connect();await locker.query("BEGIN");open=true;
   await locker.query("select pg_advisory_xact_lock(hashtextextended($1,0))",["workspace:"+f.serviceId]);
   const {rows:[owner]}=await locker.query("select pg_backend_pid() as pid");
-  await locker.query('update permission_grants set state=\'REVOKED\' where "serviceId"=$1 and "personId"=$2 and action=$3',[f.serviceId,f.personId,kind==="setup"?"acquiring.setup":"channels.create"]);
+  if(kind==="setup")await locker.query('update permission_grants set state=\'REVOKED\' where "serviceId"=$1 and "personId"=$2 and action=\'acquiring.setup\'',[f.serviceId,f.personId]);
+  else await locker.query('update service_members set state=\'REVOKED\',version=version+1 where "serviceId"=$1 and "personId"=$2',[f.serviceId,f.personId]);
   pending=kind==="setup"?updateMerchantSetup(f.personId,f.merchantId,f.setup.id,input as ReturnType<typeof completeSetup>):createChannel(f.personId,f.merchantId,input as ReturnType<typeof channelInput>);
   void pending.catch(()=>undefined);await blockedBy(observer,owner.pid);
   await locker.query("COMMIT");open=false;
-  await expect(pending).rejects.toMatchObject({status:403,code:"ACTION_DENIED"});
+  await expect(pending).rejects.toMatchObject(kind==="setup"?{status:403,code:"ACTION_DENIED"}:{status:404,code:"MERCHANT_UNAVAILABLE"});
   if(kind==="setup") {expect((await getDb().select().from(merchantApplications).where(eq(merchantApplications.serviceId,f.serviceId)))[0]!.version).toBe(2);expect(await getDb().select().from(merchantApplicationCommands).where(eq(merchantApplicationCommands.serviceId,f.serviceId))).toHaveLength(1);}
   else expect(await getDb().select().from(paymentChannelCommands).where(eq(paymentChannelCommands.serviceId,f.serviceId))).toHaveLength(1);
  } finally {if(open)await locker.query("ROLLBACK");if(pending)await Promise.allSettled([pending]);await Promise.all([locker.end(),observer.end()]);}

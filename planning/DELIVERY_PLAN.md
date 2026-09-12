@@ -1,5 +1,8 @@
 # Etail Depot — active delivery plan
 
+> **D73 active override — 12 September 2026:** [Owner, cards and terminals](../docs/OWNER_CARDS_TERMINALS_DESIGN.md) governs the current rebuild. The user explicitly chose **separate card and merchant money** and **per-card total allowances with no monthly reset**. Owners manage cards and one merchant’s flat terminals; invited holders/users have only their own resource access. Primary/secondary customer tiers, per-person monthly limits, submerchant responsibility and shared card/merchant balances are superseded. The text below retains the dated D69–D72 baseline for migration and review history; it does not override D73.
+
+
 12 September 2026 · D72: the user accepted D71 and requests customer-copy/dead-code cleanup, full verification and deployment. Follow [D72 release evidence](../docs/PRODUCTION_UI_CLEANUP.md) for the exact candidate. Preserve current schema, saved data, two-service permissions and disabled real-money controls.
 
 12 September 2026 · D71 experience refinement: [simpler consumer entry and dashboards](../docs/CONSUMER_ENTRY_REDESIGN.md) are implemented and locally verified on the existing prepaid slice. Review the revised desktop/mobile customer experience next; the financial contract and remaining release/product sequence below remain in force. D71 changes no schema or hosted resource and does not constitute a deployment.

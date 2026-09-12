@@ -21,7 +21,7 @@ export interface MerchantSetupProjection {
   requirements:SetupRequirement[];timelineHasMore:boolean;timeline:{id:string;label:string;at:string}[];
 }
 export interface MerchantBusinessDetailsProjection {
-  merchantId:string;name:string;primaryAccess:boolean;merchantStatus:MerchantStatus;statusDetail:string;
+  merchantId:string;name:string;ownerAccess:boolean;merchantStatus:MerchantStatus;statusDetail:string;
   canStartSetup:boolean;canManageSetup:boolean;setup:MerchantSetupProjection|null;
 }
 
@@ -34,8 +34,8 @@ export const channelFieldsSchema=paymentChannelFieldsSchema.extend({
 export const createChannelSchema=channelFieldsSchema.extend({commandId:z.uuid()});
 export const updateChannelSchema=channelFieldsSchema.extend({commandId:z.uuid(),expectedVersion:z.int().positive()});
 export const cancelChannelSchema=z.object({commandId:z.uuid(),expectedVersion:z.int().positive()}).strict();
-export const createSubmerchantSchema=z.object({commandId:z.uuid(),displayName:plain(80).min(1)}).strict();
-export type CreateSubmerchantInput=z.infer<typeof createSubmerchantSchema>;
+export const createTerminalSchema=z.object({commandId:z.uuid(),displayName:plain(80).min(1)}).strict();
+export type CreateTerminalInput=z.infer<typeof createTerminalSchema>;
 export const pauseMerchantSchema=z.object({commandId:z.uuid(),expectedVersion:z.int().positive(),reason:plain(300).min(1)}).strict();
 export type CreateChannelInput=z.infer<typeof createChannelSchema>;
 export type UpdateChannelInput=z.infer<typeof updateChannelSchema>;
@@ -49,21 +49,21 @@ export interface PaymentChannel {
   merchantUnitId:string;creatorId:string;presentations:ChannelPresentation[];visibility:z.infer<typeof channelVisibilitySchema>;canShare:boolean;
 }
 export interface MerchantUnitSummary {
-  id:string;kind:"MASTER"|"SUB";displayName:string;
-  master:{id:string;serviceId:string;displayName:string};
+  id:string;displayName:string;
+  merchant:{serviceId:string;displayName:string};
   status:"ACTIVE"|"PAUSED"|"CLOSED";version:number;createdAt:string;updatedAt:string;
   canPause:boolean;canResume:boolean;canOpen:boolean;href:string;
 }
 export interface MerchantReadiness {
-  responsibility:"MASTER_RESPONSIBLE";verification:"NOT_VERIFIED";gateway:"NOT_CONNECTED";externalMid:null;
+  responsibility:"OWNER_RESPONSIBLE";verification:"NOT_VERIFIED";gateway:"NOT_CONNECTED";externalMid:null;
   paymentAcceptance:false;payouts:false;commercialSpending:"NOT_ASSESSED";requirements:SetupRequirement[];
 }
 export interface MerchantDirectoryProjection {units:MerchantUnitSummary[];hasMore:boolean}
 export interface MerchantWorkspaceProjection {
   /** Selected merchant hierarchy; never an authorization grant. */
-  serviceRole:"PRIMARY"|"SUB";
+  serviceRole:"OWNER"|"TERMINAL_USER";
   /** Current actor has explicit oversight in the responsible primary merchant. */
-  primaryAccess:boolean;
+  ownerAccess:boolean;
   allowedPresentations:ChannelPresentation[];merchant:MerchantUnitSummary;readiness:MerchantReadiness;channels:PaymentChannel[];channelsHasMore:boolean;
   canCreateChannel:boolean;canShareChannel:boolean;canReadPeople:boolean;canInvitePeople:boolean;
   setupHref:string|null;

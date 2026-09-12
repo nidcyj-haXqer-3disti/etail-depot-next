@@ -25,5 +25,5 @@ export default async function Page({searchParams}:{searchParams:Promise<Record<s
   dashboard=null;
  }
  if(!dashboard)return <PageNotice title="Merchant services couldn’t load" authenticated><p>Please retry. Your selected merchant and saved records have not changed.</p></PageNotice>;
- return <MerchantShell dashboardQuery={dashboard.activity.query}><MerchantDashboard initial={dashboard}/></MerchantShell>;
+ return <MerchantShell dashboardQuery={dashboard.activity.query} showMoney={dashboard.moneyAccounts.length>0}><MerchantDashboard initial={dashboard}/></MerchantShell>;
 }

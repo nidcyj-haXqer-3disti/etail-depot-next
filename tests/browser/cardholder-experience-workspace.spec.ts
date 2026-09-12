@@ -1,4 +1,4 @@
-import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
+import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import AxeBuilder from "@axe-core/playwright";
@@ -7,9 +7,9 @@ import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { identityBindings, permissionGrants } from "../../src/platform/database/schema";
 import { SessionService } from "../../src/modules/identity";
 import { sessionRepository } from "../../src/platform/database/session-repository";
-import { getAccessOverview, updateMemberAccess } from "../../src/modules/access/service";
+import { controlCard } from "../../src/modules/workspace/service";
 import { cardholderDashboardSchema } from "../../src/modules/workspace/api-contracts";
-import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard, secondaryPermissions } from "../helpers/cardholder";
+import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard } from "../helpers/cardholder";
 import {freshPublishedPayment,openSavedCardReview} from "./helpers/prepaid";
 
 const origin = "http://127.0.0.1:3100";
@@ -34,10 +34,10 @@ test("simple cardholder home keeps money clear and supporting tools scoped under
   const primary=await cardPrimary(`Simple primary ${randomUUID().slice(0,8)}`),holder=await cardPerson("Simple secondary");
   await enrollCardholder(primary.personId,primary.serviceId,holder);
   await fundCardGroup(primary.personId,primary.serviceId,"8500");
-  await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"4000");
-  await setPersonLimit(primary.personId,primary.serviceId,holder,"2500");
-  const own=await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Simple everyday card");
-  const shared=await issuePracticeCard(primary.personId,primary.serviceId,holder,"Simple shared card");
+
+
+  const own=await issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Simple everyday card", undefined, "4000");
+  const shared=await issuePracticeCard(primary.personId, primary.serviceId, holder, "Simple shared card", undefined, "2500");
   await signIn(page,primary.personId);
   await page.goto(`/cardholder-services?focus=${own.card.id}`);
   const navigation=page.getByRole("navigation",{name:"Cardholder navigation",exact:true});
@@ -47,14 +47,14 @@ test("simple cardholder home keeps money clear and supporting tools scoped under
   await expect(overview.locator(".ch-focus-balance")).toContainText("$40.00");
   await expect(overview.getByRole("button",{name:/Freeze/})).toBeVisible();
   const group=page.getByRole("region",{name:"Your group balance",exact:true});
-  await expect(group).toContainText("Group balance");await expect(group).toContainText("$85.00");
+  await expect(group).toContainText("Group money");await expect(group).toContainText("$85.00");
   await expect(group.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`/cardholder-services/funds?service=${primary.serviceId}`);
-  const monthlyLimit=overview.getByText(/^Monthly limit/);
-  await expect(monthlyLimit).toHaveCount(1);
-  await expect(monthlyLimit).toBeHidden();
+  const totalAllowance=overview.getByText(/^Total allowance/);
+  await expect(totalAllowance).toHaveCount(1);
+  await expect(totalAllowance).toBeHidden();
   await overview.getByText("Spending details",{exact:true}).click();
-  await expect(monthlyLimit).toBeVisible();
-  await expect(monthlyLimit.locator("strong")).toHaveText("$40.00");
+  await expect(totalAllowance).toBeVisible();
+  await expect(totalAllowance.locator("strong")).toHaveText("$40.00");
   await expect(page.getByRole("heading",{name:"Recent activity",exact:true})).toBeVisible();
   await navigation.getByText("More",{exact:true}).click();
   await expect(navigation.getByRole("link",{name:"Requests",exact:true})).toHaveAttribute("href",new RegExp(`focus=${own.card.id}`));
@@ -68,18 +68,14 @@ test("simple cardholder home keeps money clear and supporting tools scoped under
   await expect(overview).toContainText(own.card.nickname);
   await expect(navigation.getByRole("link",{name:"Requests",exact:true})).not.toBeVisible();
 
-  await navigation.getByRole("link",{name:"People",exact:true}).click();
-  const spendingLimits=page.getByRole("link",{name:"Spending limits",exact:true});
-  const limitsHref=`/cardholder-services/funds?service=${primary.serviceId}#limits-title`;
-  await expect(spendingLimits).toHaveAttribute("href",limitsHref);
+  await page.goto(`/cardholder-services?card=${shared.card.id}`);
+  const allowance=page.getByRole("dialog").getByRole("article",{name:"Card allowance",exact:true});
+  await expect(allowance).toContainText("$25.00");
   const limitGrant=and(eq(permissionGrants.personId,primary.personId),eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.action,"cardholder.limits.manage"));
   expect(await getDb().update(permissionGrants).set({state:"REVOKED"}).where(limitGrant).returning({action:permissionGrants.action})).toHaveLength(1);
-  await page.reload();await expect(spendingLimits).toHaveCount(0);
+  await page.reload();await expect(allowance).toHaveCount(0);
   expect(await getDb().update(permissionGrants).set({state:"ACCEPTED"}).where(limitGrant).returning({action:permissionGrants.action})).toHaveLength(1);
-  await page.reload();await expect(spendingLimits).toHaveAttribute("href",limitsHref);
-  await spendingLimits.click();
-  await expect(page).toHaveURL(`${origin}${limitsHref}`);
-  await expect(page.getByRole("heading",{name:"Monthly spending limits",exact:true})).toBeVisible();
+  await page.reload();await expect(allowance).toBeVisible();
 
   await signIn(page,holder);await page.goto(`/cardholder-services?focus=${shared.card.id}`);
   await expect(overview.locator(".ch-focus-balance")).toContainText("$25.00");
@@ -102,9 +98,9 @@ test("your cards and cards you manage remain distinct through server filters, se
   const managedHolder = await cardPerson("Jordan Filters");
   await enrollCardholder(primary.personId, primary.serviceId, managedHolder);
   await enrollCardholder(otherPrimary.personId, otherPrimary.serviceId, primary.personId);
-  const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"4200");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"2400");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Everyday in my name");})();
-  const received = await (async()=>{await fundCardGroup(otherPrimary.personId,otherPrimary.serviceId,"7300");await setPersonLimit(otherPrimary.personId,otherPrimary.serviceId,primary.personId,"3100");return issuePracticeCard(otherPrimary.personId,otherPrimary.serviceId,primary.personId,"Shared travel in my name");})();
-  const managed = await (async()=>{await setPersonLimit(primary.personId,primary.serviceId,managedHolder,"1800");return issuePracticeCard(primary.personId,primary.serviceId,managedHolder,"Jordan daily card");})();
+  const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"4200");return issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Everyday in my name", undefined, "2400");})();
+  const received = await (async()=>{await fundCardGroup(otherPrimary.personId,otherPrimary.serviceId,"7300");return issuePracticeCard(otherPrimary.personId, otherPrimary.serviceId, primary.personId, "Shared travel in my name", undefined, "3100");})();
+  const managed = await (async()=>{return issuePracticeCard(primary.personId, primary.serviceId, managedHolder, "Jordan daily card", undefined, "1800");})();
   await signIn(page, primary.personId);
 
   await page.goto(`/cardholder-services?focus=${own.card.id}`);
@@ -118,10 +114,10 @@ test("your cards and cards you manage remain distinct through server filters, se
   await expect(groupBalance).toHaveCount(0);
   await expect(page.locator("main")).not.toContainText("$73.00");
   await page.reload();await expect(groupBalance).toHaveCount(0);
-  await page.locator(".ch-group-details > summary").filter({hasText:"Manage your primary card group"}).click();
+  await page.locator(".ch-group-details > summary").filter({hasText:"Your card group"}).click();
   const ownGroup=page.getByRole("region",{name:"Your card group",exact:true});
   await expect(ownGroup).toContainText("$42.00");
-  await expect(ownGroup.getByRole("link",{name:/Manage monthly limits/})).toHaveAttribute("href",`/cardholder-services/funds?service=${primary.serviceId}#limits-title`);
+  await expect(ownGroup.getByRole("link",{name:/Manage card allowances/})).toHaveAttribute("href","/cardholder-services?view=cards");
   await expect(page.locator("main")).not.toContainText("$73.00");
   await page.getByLabel("Selected card",{exact:true}).selectOption(managed.card.id);
   await expect(selected).toContainText(managed.card.nickname);
@@ -173,8 +169,8 @@ test("your cards and cards you manage remain distinct through server filters, se
 test("an owned card pays at a published checkout while another holder's card offers named oversight", async ({ page }) => {
   const primary = await cardPrimary(`Morgan ${randomUUID().slice(0, 8)}`), holder = await cardPerson("Jamie Ownership");
   await enrollCardholder(primary.personId, primary.serviceId, holder);
-  const owned = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"4000");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"2300");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Z My own card");})();
-  const managed = await (async()=>{await setPersonLimit(primary.personId,primary.serviceId,holder,"1700");return issuePracticeCard(primary.personId,primary.serviceId,holder,"A Jamie card");})();
+  const owned = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"4000");return issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Z My own card", undefined, "2300");})();
+  const managed = await (async()=>{return issuePracticeCard(primary.personId, primary.serviceId, holder, "A Jamie card", undefined, "1700");})();
   await signIn(page, primary.personId);
   await page.goto("/cardholder-services");
   const overview = page.getByRole("region", { name: "Selected card overview", exact: true });
@@ -182,13 +178,13 @@ test("an owned card pays at a published checkout while another holder's card off
   await expect(overview).toContainText(owned.card.nickname);
   await expect(overview.getByText("YOUR CARD", { exact: true })).toBeVisible();
   await expect(overview.getByRole("link", { name: "Try a purchase", exact: true })).toHaveCount(0);
-  const merchant=await freshPublishedPayment("2300","Use the exact remaining monthly allowance");
+  const merchant=await freshPublishedPayment("2300","Use the exact remaining card allowance");
   await openSavedCardReview(page,merchant.publication.id,owned.card.id);
   await page.getByRole("button",{name:"Pay $23.00",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();
   await page.goto(`/cardholder-services?focus=${owned.card.id}`);
   await expect(overview).toContainText("No spending available");
-  // Reaching the person's limit never strands them in a removed purchase task.
+  // Reaching the card's allowance never strands them in a removed purchase task.
   await overview.getByRole("link",{name:"Card controls",exact:true}).click();
   const ownDialog=page.getByRole("dialog");
   await expect(ownDialog.getByRole("textbox",{name:"Purchase description",exact:true})).toHaveCount(0);
@@ -213,32 +209,31 @@ test("an owned card pays at a published checkout while another holder's card off
   expect(result.cards.find(card => card.id === managed.card.id)).toMatchObject({ available: { minor: "1700" }, canPurchase: false, purchaseAvailability: { code: "OTHER_CARDHOLDER" } });
 });
 
-test("restricted secondary cards stay their own with an accurate explanation and no foreign data at 320px", async ({ page }) => {
+test("owner-frozen holder cards stay their own with an accurate explanation and no foreign data at 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   const primary = await cardPrimary(`Restricted primary ${randomUUID().slice(0, 8)}`), holder = await cardPerson("Riley Restricted");
   await enrollCardholder(primary.personId, primary.serviceId, holder);
-  const foreign = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"3600");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"1500");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Private primary card","200");})();
-  const own = await (async()=>{await setPersonLimit(primary.personId,primary.serviceId,holder,"2100");return issuePracticeCard(primary.personId,primary.serviceId,holder,"Riley travel card","100");})();
-  const access = await getAccessOverview(primary.personId, primary.serviceId), member = access.people.find(person => person.id === holder)!;
-  await updateMemberAccess(primary.personId, primary.serviceId, holder, { commandId: randomUUID(), expectedVersion: member.version, role: "SECONDARY", permissions: secondaryPermissions.filter(action => action !== "cards.purchase"), delegablePermissions: [] });
+  const foreign = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"3600");return issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Private primary card", "200", "1500");})();
+  const own = await (async()=>{return issuePracticeCard(primary.personId, primary.serviceId, holder, "Riley travel card", "100", "2100");})();
+  await controlCard(primary.personId,primary.serviceId,own.card.id,{commandId:randomUUID(),expectedVersion:own.card.version,action:"freeze"});
   await signIn(page, holder);
   await page.goto("/cardholder-services");
   const overview = page.getByRole("region", { name: "Selected card overview", exact: true });
   await expect(overview).toContainText(own.card.nickname);
   await expect(overview.getByText("YOUR CARD", { exact: true })).toBeVisible();
-  await expect(overview).toContainText("Purchases are not enabled for your access");
+  await expect(overview).toContainText("This card is frozen");
   await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
   await expect(page.getByRole("link", { name: "People", exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Try a purchase", exact: true })).toHaveCount(0);
   await overview.getByRole("link", { name: "Card controls", exact: true }).click();
-  await expect(page.getByRole("dialog")).toContainText("Ask your primary cardholder to review your card access");
+  await expect(page.getByRole("dialog")).toContainText("Ask your account owner to review the freeze");
   await expect(page.getByRole("dialog")).not.toContainText("Only the person named on this card");
   expect((await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   const result = await dashboard(page, "OWN");
   expect(result).toMatchObject({ ownCardCount: 1, managedCardCount: 0, cardMatchCount: 1 });
   expect(result.cards.map(card => card.id)).toEqual([own.card.id]);
-  expect(result.cards[0]).toMatchObject({ canPurchase: false, purchaseAvailability: { code: "ACCESS_RESTRICTED" } });
+  expect(result.cards[0]).toMatchObject({ canPurchase: false, purchaseAvailability: { code: "FROZEN" } });
   expect((await dashboard(page, "MANAGED")).cards).toEqual([]);
   await page.goto(`/cardholder-services?focus=${foreign.card.id}`);
   await expect(page.getByRole("heading", { name: "This card is unavailable", exact: true })).toBeVisible();
@@ -249,8 +244,8 @@ test("a lost checkout response keeps the exact saved review and recovers one mat
   test.setTimeout(90_000);
   const primary=await cardPrimary(`Recovery ${randomUUID().slice(0,8)}`);
   await fundCardGroup(primary.personId,primary.serviceId,"900");
-  await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"900");
-  const own=await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Purchase recovery card");
+
+  const own=await issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Purchase recovery card", undefined, "900");
   const merchant=await freshPublishedPayment("325","One purchase despite an interrupted connection");
   await signIn(page,primary.personId);
   const saved=await openSavedCardReview(page,merchant.publication.id,own.card.id);

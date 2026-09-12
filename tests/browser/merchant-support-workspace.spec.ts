@@ -8,7 +8,7 @@ import {merchantDashboard,signIn} from "./helpers/fresh";
 async function merchantPayment(page:Page,persona:"owner"|"viewer") {
   await signIn(page.request,persona);
   const dashboard=await merchantDashboard(page.request);
-  const unit=dashboard.units.find(row=>persona==="owner"?row.primaryAccess&&row.name==="Online store":!row.primaryAccess&&row.name==="Pop-up shop");
+  const unit=dashboard.units.find(row=>persona==="owner"?row.ownerAccess&&row.name==="Online store":!row.ownerAccess&&row.name==="Pop-up shop");
   expect(unit).toBeTruthy();
   const response=await page.request.get(`/api/v1/merchants/${unit!.id}/operations`);expect(response.status()).toBe(200);
   const operations=merchantOperationsProjectionSchema.parse(await response.json());
@@ -39,7 +39,7 @@ test("a payment question carries exact refund dates through assigned support and
   await expect(page.getByRole("navigation",{name:"Merchant navigation"}).getByRole("link",{name:"Help",exact:true})).toHaveAttribute("aria-current","page");
   await explain(page,subject);
   const context=page.getByRole("region",{name:"Related payment",exact:true});
-  await expect(context).toContainText(unit.name);await expect(context).toContainText(unit.primaryName);await expect(context).toContainText(payment.testReference);
+  await expect(context).toContainText(unit.name);await expect(context).toContainText(unit.merchantName);await expect(context).toContainText(payment.testReference);
   await expect(context).toContainText(formatDate(payment.createdAt));await expect(context).toContainText(formatDate(payment.refund!.createdAt));
   const ticket=await savedCase(page,unit.id,()=>page.getByRole("button",{name:"Create case",exact:true}).click());
   expect(ticket.payment?.id).toBe(payment.id);expect(ticket.nextActor).toBe("SUPPORT");
@@ -92,7 +92,7 @@ test("a collector recovers one saved case after a lost response, keeps it privat
 });
 
 test("a payment from another merchant is never substituted into the case form",async({page})=>{
-  const {payment}=await merchantPayment(page,"owner");const dashboard=await merchantDashboard(page.request),other=dashboard.units.find(unit=>unit.primaryAccess&&unit.name==="Pop-up shop")!;
+  const {payment}=await merchantPayment(page,"owner");const dashboard=await merchantDashboard(page.request),other=dashboard.units.find(unit=>unit.ownerAccess&&unit.name==="Pop-up shop")!;
   await page.goto(`/merchants/${other.id}?tab=help&new=1&payment=${payment.id}`);
   await expect(page.getByRole("heading",{level:1,name:other.name,exact:true})).toBeVisible();
   await expect(page.getByText("That payment is unavailable with your current access. It will not be attached to this case.",{exact:true})).toBeVisible();

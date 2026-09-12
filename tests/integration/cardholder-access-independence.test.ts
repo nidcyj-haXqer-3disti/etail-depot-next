@@ -1,38 +1,38 @@
-import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
+import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
-import { serviceMembers, cards, permissionGrants } from "../../src/platform/database/schema";
-import { getAccessOverview, updateMemberAccess, revokeMemberAccess, createInvitation, acceptInvitation } from "../../src/modules/access/service";
+import { serviceMembers, cards } from "../../src/platform/database/schema";
+import { getAccessOverview, revokeMemberAccess, createInvitation, acceptInvitation } from "../../src/modules/access/service";
 import { getWorkspace, controlCard } from "../../src/modules/workspace/service";
 import { getCardholderDirectory } from "../../src/modules/services/service";
-import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard, secondaryPermissions } from "../helpers/cardholder";
+import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard } from "../helpers/cardholder";
 
 afterAll(closeDatabase);
 async function fixture() {
   const primary = await cardPrimary(), secondary = await cardPerson("Secondary with own history");
   await enrollCardholder(primary.personId, primary.serviceId, secondary);
-  const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2000");await setPersonLimit(primary.personId,primary.serviceId,secondary,"1000");return issuePracticeCard(primary.personId,primary.serviceId,secondary,"Secondary private card","123");})();
-  const primaryCard = await (async()=>{await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"1000");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Primary private card","456");})();
+  const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"2000");return issuePracticeCard(primary.personId, primary.serviceId, secondary, "Secondary private card", "123", "1000");})();
+  const primaryCard = await (async()=>{return issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Primary private card", "456", "1000");})();
   return { ...primary, secondary, own, primaryCard };
 }
 
 describe("explicit Cardholder member lifecycle", () => {
-  it("edits one secondary's explicit grants with retry and optimistic version checks", async () => {
+  it("gives named holders fixed own-card controls while keeping owner cards and money private", async () => {
     const f = await fixture();
     const member = (await getAccessOverview(f.personId, f.serviceId)).people.find(row => row.id === f.secondary)!;
-    const input = { commandId: randomUUID(), expectedVersion: member.version, role: "SECONDARY" as const, permissions: ["cards.read", "activity.read"] as const, delegablePermissions: [] };
-    const command = { ...input, permissions: [...input.permissions] };
-    const edited = await updateMemberAccess(f.personId, f.serviceId, f.secondary, command);
-    expect(edited).toMatchObject({ role: "SECONDARY", state: "ACCEPTED", version: member.version + 1 });
-    expect(await updateMemberAccess(f.personId, f.serviceId, f.secondary, command)).toEqual(edited);
-    await expect(updateMemberAccess(f.personId, f.serviceId, f.secondary, { ...command, commandId: randomUUID() })).rejects.toMatchObject({ code: "STALE_VERSION", status: 409 });
+    expect(member).toMatchObject({role:"CARDHOLDER",state:"ACCEPTED",canManage:false,delegablePermissions:[]});
     const own = await getWorkspace(f.secondary, f.serviceId);
     expect(own.cards.map(row => row.id)).toEqual([f.own.card.id]);
-    expect(own.cards[0]!.canFreeze).toBe(false);
+    expect(own.cards[0]!.canFreeze).toBe(true);
     expect(own.activity.map(row => row.id)).toEqual([f.own.activity!.id]);
-    await expect(controlCard(f.secondary, f.serviceId, f.own.card.id, { commandId: randomUUID(), expectedVersion: f.own.card.version, action: "freeze" })).rejects.toMatchObject({ status: 403 });
+    const frozen=await controlCard(f.secondary,f.serviceId,f.own.card.id,{commandId:randomUUID(),expectedVersion:f.own.card.version,action:"freeze"});
+    expect(frozen.status).toBe("FROZEN");
+    await controlCard(f.secondary,f.serviceId,f.own.card.id,{commandId:randomUUID(),expectedVersion:frozen.version,action:"unfreeze"});
+    await expect(controlCard(f.secondary,f.serviceId,f.primaryCard.card.id,{commandId:randomUUID(),expectedVersion:f.primaryCard.card.version,action:"freeze"})).rejects.toMatchObject({status:403,code:"ACTION_DENIED"});
+    await expect(createInvitation(f.secondary,f.serviceId,{commandId:randomUUID(),recipientId:f.personId,expiresInDays:3})).rejects.toMatchObject({status:403});
+    expect((await getAccessOverview(f.personId,f.serviceId)).people.find(row=>row.id===f.secondary)?.version).toBe(member.version);
   });
 
   it("keeps revoked history reviewable and requires fresh acceptance before restoring current access", async () => {
@@ -46,7 +46,7 @@ describe("explicit Cardholder member lifecycle", () => {
     expect(await revokeMemberAccess(f.personId, f.serviceId, f.secondary, revoke)).toEqual(revoked);
     expect((await getCardholderDirectory(f.secondary))).toEqual([]);
     await expect(getWorkspace(f.secondary, f.serviceId)).rejects.toMatchObject({ status: 404 });
-    const invitation = await createInvitation(f.personId, f.serviceId, { commandId: randomUUID(), recipientId: f.secondary, role: "SECONDARY", permissions: secondaryPermissions, delegablePermissions: [], expiresInDays: 3 });
+    const invitation = await createInvitation(f.personId, f.serviceId, { commandId: randomUUID(), recipientId: f.secondary, expiresInDays: 3 });
     expect(invitation).toMatchObject({ status: "PENDING", hasServiceAccess: false });
     await expect(getWorkspace(f.secondary, f.serviceId)).rejects.toMatchObject({ status: 404 });
     const acceptance = { commandId: randomUUID(), expectedVersion: invitation.version };
@@ -62,14 +62,15 @@ describe("explicit Cardholder member lifecycle", () => {
     expect(await records()).toEqual(before);
   });
 
-  it("keeps the lightweight card directory own-only, including after card-read revocation", async () => {
+  it("keeps the lightweight card directory own-only, and removes the entire group after membership revocation", async () => {
     const f = await fixture();
     const directory = await getCardholderDirectory(f.secondary);
     expect(directory).toHaveLength(1);
     expect(directory[0]!.cards.map(row => row.id)).toEqual([f.own.card.id]);
     for (const value of [f.personId, f.primaryCard.card.id, f.primaryCard.card.nickname, f.primaryCard.activity!.id]) expect(JSON.stringify(directory)).not.toContain(value);
-    await getDb().update(permissionGrants).set({ state: "REVOKED" }).where(and(eq(permissionGrants.serviceId, f.serviceId), eq(permissionGrants.personId, f.secondary), eq(permissionGrants.action, "cards.read")));
-    expect((await getCardholderDirectory(f.secondary))[0]!.cards).toEqual([]);
-    expect((await getDb().select().from(serviceMembers).where(and(eq(serviceMembers.serviceId, f.serviceId), eq(serviceMembers.personId, f.secondary))))[0]!.state).toBe("ACCEPTED");
+    const member=(await getAccessOverview(f.personId,f.serviceId)).people.find(row=>row.id===f.secondary)!;
+    await revokeMemberAccess(f.personId,f.serviceId,f.secondary,{commandId:randomUUID(),expectedVersion:member.version});
+    expect(await getCardholderDirectory(f.secondary)).toEqual([]);
+    expect((await getDb().select().from(serviceMembers).where(and(eq(serviceMembers.serviceId, f.serviceId), eq(serviceMembers.personId, f.secondary))))[0]!.state).toBe("REVOKED");
   });
 });

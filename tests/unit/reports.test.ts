@@ -8,7 +8,7 @@ import { csvCell, deriveHistoricalReport, historicalReportCsv } from "../../src/
 const filters: ReportFilters = { source: "ACTIVITY", status: "ALL", from: "2026-09-01", to: "2026-09-30", query: "" };
 function sample(): WorkspaceProjection {
   const serviceId = randomUUID();
-  return { service: { id: serviceId, kind: "CARDHOLDER", primaryPersonId:randomUUID(), role: "PRIMARY", cardholderRole: "PRIMARY", displayName: "Fictional shop", status: "ACTIVE", version: 1 }, member: { id: randomUUID(), displayName: "Fictional tester" }, services: [], cardholderRole: "PRIMARY", fictional: true, notice: "Fictional",  cards: [], cardRequests: [], cardholderOptions: [], people: [],
+  return { service: { id: serviceId, kind: "CARDHOLDER", primaryPersonId:randomUUID(), role: "OWNER", cardholderRole: "OWNER", displayName: "Fictional shop", status: "ACTIVE", version: 1 }, member: { id: randomUUID(), displayName: "Fictional tester" }, services: [], cardholderRole: "OWNER", fictional: true, notice: "Fictional",  cards: [], cardRequests: [], cardholderOptions: [], people: [],
     preferences: { serviceActivity: true, cardControls: true, caseUpdates: true, version: 1, delivery: "SAVED_ONLY" },
     capabilities: ["activity.read"].map(action => ({ action, allowed: true, reason: "Explicit", reasonCode: "GRANTED" })),
     activity: [

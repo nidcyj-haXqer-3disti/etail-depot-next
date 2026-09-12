@@ -2,13 +2,13 @@ import {randomUUID} from "node:crypto";
 import {eq} from "drizzle-orm";
 import {afterAll,expect,it} from "vitest";
 import {getDb,closeDatabase} from "../../src/platform/database/client";
-import {merchantUnits,paymentChannelCommands} from "../../src/modules/acquiring/schema";
-import {createOwnedSubmerchant,createChannel,updateChannel} from "../../src/modules/acquiring/service";
+import {merchantTerminals,paymentChannelCommands} from "../../src/modules/acquiring/schema";
+import {createTerminal,createChannel,updateChannel} from "../../src/modules/acquiring/service";
 import {acquiringFixture,paymentInput} from "../helpers/acquiring";
 afterAll(closeDatabase);
-it("concurrent direct submerchant retries share one child without a host lock or consent phase",async()=>{
- const f=await acquiringFixture(),input={commandId:randomUUID(),displayName:"One concurrent child"};const results=await Promise.all(Array.from({length:5},()=>createOwnedSubmerchant(f.personId,f.merchantId,input)));
- expect(new Set(results.map(row=>row.id)).size).toBe(1);expect(results.every(row=>row.status==="ACTIVE")).toBe(true);expect(await getDb().select().from(merchantUnits).where(eq(merchantUnits.masterId,f.merchantId))).toHaveLength(1);
+it("concurrent terminal retries create one flat collection point",async()=>{
+ const f=await acquiringFixture(),input={commandId:randomUUID(),displayName:"One concurrent terminal"};const results=await Promise.all(Array.from({length:5},()=>createTerminal(f.personId,f.serviceId,input)));
+ expect(new Set(results.map(row=>row.id)).size).toBe(1);expect(results.every(row=>row.status==="ACTIVE")).toBe(true);expect(await getDb().select().from(merchantTerminals).where(eq(merchantTerminals.merchantServiceId,f.serviceId))).toHaveLength(2);
 });
 it("concurrent channel creation has one effect and competing optimistic edits have one winner",async()=>{
  const f=await acquiringFixture(),input={...paymentInput(),presentations:["WEB"] as ["WEB"],visibility:"CREATOR_PRIVATE" as const};const channels=await Promise.all(Array.from({length:5},()=>createChannel(f.personId,f.merchantId,input)));expect(new Set(channels.map(row=>row.id)).size).toBe(1);

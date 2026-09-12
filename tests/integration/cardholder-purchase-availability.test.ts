@@ -1,4 +1,4 @@
-import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
+import {fundCardGroup} from "../helpers/cardholder";
 import {randomUUID} from "node:crypto";
 import {and,eq} from "drizzle-orm";
 import {afterAll,expect,it} from "vitest";
@@ -15,7 +15,7 @@ afterAll(closeDatabase);
 it("explains the current purchase gate without allowing a primary to spend as another cardholder",async()=>{
   const primary=await cardPrimary("Primary manager"),secondary=await cardPerson("Named spender");
   await enrollCardholder(primary.personId,primary.serviceId,secondary);
-  const issued=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"100");await setPersonLimit(primary.personId,primary.serviceId,secondary,"100");return issuePracticeCard(primary.personId,primary.serviceId,secondary,"Everyday");})();
+  const issued=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"100");return issuePracticeCard(primary.personId, primary.serviceId, secondary, "Everyday", undefined, "100");})();
   const focus=async(personId=secondary)=>(await getCardholderDashboardFocus(personId,issued.card.id)).card;
   const beforeRead=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId));
   expect(await focus()).toMatchObject({canPurchase:true,purchaseAvailability:{code:"READY"}});
@@ -24,13 +24,13 @@ it("explains the current purchase gate without allowing a primary to spend as an
   expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId))).toEqual(beforeRead);
 
   const frozen=await controlCard(primary.personId,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:issued.card.version,action:"freeze"});
-  expect(await focus()).toMatchObject({canPurchase:false,purchaseAvailability:{code:"FROZEN",description:"Ask your primary cardholder to review the freeze before making a purchase."}});
+  expect(await focus()).toMatchObject({canPurchase:false,purchaseAvailability:{code:"FROZEN",description:"Ask your account owner to review the freeze before making a purchase."}});
   expect(await focus(primary.personId)).toMatchObject({canPurchase:false,purchaseAvailability:{code:"OTHER_CARDHOLDER"}});
   await expect(purchaseCard(secondary,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:frozen.version,amountMinor:"1",description:"Frozen remains denied"})).rejects.toMatchObject({code:"CARD_FROZEN"});
 
   await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,secondary),eq(permissionGrants.action,"cards.purchase")));
-  expect(await focus()).toMatchObject({canPurchase:false,purchaseAvailability:{code:"ACCESS_RESTRICTED"}});
-  await expect(purchaseCard(secondary,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:frozen.version,amountMinor:"1",description:"Revoked access remains denied"})).rejects.toMatchObject({status:403});
+  expect(await focus()).toMatchObject({canPurchase:false,purchaseAvailability:{code:"FROZEN"}});
+  await expect(purchaseCard(secondary,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:frozen.version,amountMinor:"1",description:"A raw grant cannot remove fixed holder rights or override a freeze"})).rejects.toMatchObject({code:"CARD_FROZEN"});
   await getDb().update(permissionGrants).set({state:"ACCEPTED"}).where(and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,secondary),eq(permissionGrants.action,"cards.purchase")));
   const active=await controlCard(primary.personId,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:frozen.version,action:"unfreeze"});
   const spent=await purchaseCard(secondary,primary.serviceId,issued.card.id,{commandId:randomUUID(),expectedVersion:active.version,amountMinor:"100",description:"Spend exact available funds"});
@@ -40,7 +40,7 @@ it("explains the current purchase gate without allowing a primary to spend as an
 });
 
 it("keeps holder setup and card-holding permission explicit without creating guardian funding or changing cards",async()=>{
-  const primary=await cardPrimary(),issued=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"100");await setPersonLimit(primary.personId,primary.serviceId,primary.personId,"100");return issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Setup card");})();
+  const primary=await cardPrimary(),issued=await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"100");return issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Setup card", undefined, "100");})();
   const focus=async()=>(await getCardholderDashboardFocus(primary.personId,issued.card.id)).card;
   const before=await getDb().select().from(cards).where(eq(cards.id,issued.card.id));
   await getDb().update(merchantSetupEligibility).set({personaKind:"FICTIONAL_SUPERVISED"}).where(eq(merchantSetupEligibility.personId,primary.personId));

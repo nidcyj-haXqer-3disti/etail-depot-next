@@ -2,15 +2,19 @@ import type pg from "pg";
 const {verifyPrepaidSeedConfig}=await import(new URL("./prepaid-seed-config.mjs",import.meta.url).href) as {
   verifyPrepaidSeedConfig:(client:pg.Client)=>Promise<void>;
 };
+const {verifyMoneySeedConfig}=await import(new URL("./money-seed-config.mjs",import.meta.url).href) as {
+  verifyMoneySeedConfig:(client:pg.Client)=>Promise<void>;
+};
 function assert(value:unknown,message:string):asserts value {if(!value)throw new Error(message);}
 
 export async function prepareSeedMarker(client:pg.Client,seedKey:string) {
   assert(seedKey==="fresh-services-d69","Unexpected prepaid seed generation.");
   await verifyPrepaidSeedConfig(client);
+  await verifyMoneySeedConfig(client);
   const marker=await client.query("SELECT to_regclass('public._etail_preview_seed') AS name");
   if(!marker.rows[0]?.name) {
-    // Only the verified migration-owned cutover row is allowed alongside migration receipts.
-    const tables=await client.query<{tablename:string}>("SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename NOT IN ('_etail_local_migrations','prepaid_cutover')");
+    // Only the two exactly verified migration-owned rows are allowed alongside migration receipts.
+    const tables=await client.query<{tablename:string}>("SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename NOT IN ('_etail_local_migrations','prepaid_cutover','money_model_cutover')");
     for(const {tablename} of tables.rows) {
       const identifier='"'+tablename.replaceAll('"','""')+'"';
       const rows=await client.query(`SELECT EXISTS (SELECT 1 FROM public.${identifier}) AS populated`);

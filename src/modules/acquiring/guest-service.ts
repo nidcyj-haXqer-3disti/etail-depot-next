@@ -4,19 +4,17 @@ import {z} from "zod";
 import {getDb} from "../../platform/database/client";
 import {getRuntimeConfig} from "../../platform/config";
 import {SecurityError} from "../../platform/security/origin";
-import {loadMerchantUnitScope,merchantNow} from "../access/merchant-scope";
+import {loadTerminalScope,merchantNow} from "../access/merchant-scope";
 import type {ScopedTransaction} from "../access/scope";
 import {requireMerchantApplicant} from "../services/merchant-eligibility";
 import {evaluate} from "../policy/evaluate";
 import {formatMoney} from "../workspace/service";
 import {paymentChannels} from "./schema";
-import {merchantChannelVisible} from "./service";
 import {channelActivations,testGateways,testMerchantEnrollments,merchantTestPayments,merchantTestRefunds,merchantOperationCommands} from "./operations-schema";
-import {recordMerchantSandboxPayment} from "./operations-service";
 import {guestPublications,guestPublicationCommands,guestSessions,guestOrders,guestAttempts,guestRequestBudgets} from "./guest-schema";
-import {publishGuestChannelSchema,revokeGuestPublicationSchema,createGuestOrderSchema,prepareGuestAttemptSchema,type PublishGuestChannelInput,type RevokeGuestPublicationInput,type CreateGuestOrderInput,type PrepareGuestAttemptInput,type GuestPublication,type GuestPublicationManagement,type PublicGuestRequest,type GuestOrderProjection} from "./guest-contracts";
+import {publishGuestChannelSchema,revokeGuestPublicationSchema,type PublishGuestChannelInput,type RevokeGuestPublicationInput,type GuestPublication,type GuestPublicationManagement,type PublicGuestRequest,type GuestOrderProjection} from "./guest-contracts";
 
-type Scope=Awaited<ReturnType<typeof loadMerchantUnitScope>>;
+type Scope=Awaited<ReturnType<typeof loadTerminalScope>>;
 type Publication=typeof guestPublications.$inferSelect;
 type Order=typeof guestOrders.$inferSelect;
 type GuestSession=typeof guestSessions.$inferSelect;
@@ -59,17 +57,15 @@ export async function ensureGuestSession(cookieHeader:string|null):Promise<{setC
  return {setCookie:`${guestCookieName()}=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400${getRuntimeConfig().publicOrigin.startsWith("https:")?"; Secure":""}`};
 }
 function lineage(scope:Scope){
- const chain=[];let assignment=scope.assignment;
- while(assignment){chain.push({id:assignment.id,version:assignment.version,source:assignment.sourceAssignmentId,sourceVersion:assignment.sourceMembershipVersion,expiresAt:assignment.expiresAt.toISOString(),grants:scope.allGrants.filter(grant=>grant.assignmentId===assignment!.id).map(grant=>({action:grant.action,delegable:grant.delegable})).sort((a,b)=>a.action.localeCompare(b.action))});assignment=assignment.sourceAssignmentId?scope.assignments.find(row=>row.id===assignment!.sourceAssignmentId)??null:null;}
- return digest({primaryPersonId:scope.masterService.primaryPersonId,membershipVersion:scope.primaryMember?.version,unitId:scope.unit.id,unitVersion:scope.unit.version,primaryUnitVersion:scope.master.version,serviceVersion:scope.masterService.version,primary:scope.primaryAccess,grants:[...scope.grants].sort(),chain});
+ return digest({ownerPersonId:scope.merchantService.primaryPersonId,ownerMembershipVersion:scope.ownerMember?.version,terminalId:scope.terminal.id,terminalVersion:scope.terminal.version,serviceVersion:scope.merchantService.version,owner:scope.ownerAccess,grants:[...scope.grants].sort(),assignment:scope.assignment?{id:scope.assignment.id,version:scope.assignment.version,ownerMembershipVersion:scope.assignment.ownerMembershipVersion,expiresAt:scope.assignment.expiresAt?.toISOString()??null}:null});
 }
 async function merchantContext(tx:ScopedTransaction,personId:string,merchantId:string,channelId:string,forWrite=false){
- const scope=await loadMerchantUnitScope(tx,personId,merchantId,forWrite,{read:!forWrite});
+ const scope=await loadTerminalScope(tx,personId,merchantId,forWrite,{read:!forWrite});
  if(!evaluate(scope.policy,"channels.read").allowed)throw new SecurityError("ACTION_DENIED",403);
- const query=tx.select().from(paymentChannels).where(and(eq(paymentChannels.id,channelId),eq(paymentChannels.merchantUnitId,merchantId),eq(paymentChannels.serviceId,scope.masterService.id)));
+ const query=tx.select().from(paymentChannels).where(and(eq(paymentChannels.id,channelId),eq(paymentChannels.merchantUnitId,merchantId),eq(paymentChannels.serviceId,scope.merchantService.id)));
  const [channel]=forWrite?await query.for("update"):await query;
- if(!channel||!merchantChannelVisible(channel,personId,scope.primaryAccess))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
- const [gateway]=await tx.select().from(testGateways).where(eq(testGateways.serviceId,scope.masterService.id));
+ if(!channel)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+ const [gateway]=await tx.select().from(testGateways).where(eq(testGateways.serviceId,scope.merchantService.id));
  const [enrollment]=await tx.select().from(testMerchantEnrollments).where(eq(testMerchantEnrollments.merchantUnitId,merchantId));
  const [activation]=await tx.select().from(channelActivations).where(eq(channelActivations.channelId,channelId));
  const [used]=channel.usage==="ONE_TIME"?await tx.select({id:merchantTestPayments.id}).from(merchantTestPayments).where(and(eq(merchantTestPayments.channelId,channelId),eq(merchantTestPayments.outcome,"APPROVED"))).limit(1):[];
@@ -106,7 +102,7 @@ export async function publishGuestChannel(personId:string,merchantId:string,chan
   if(old&&(await publicationContext(tx,old))?.ready)throw new SecurityError("CHANNEL_ALREADY_PUBLISHED",409);
   if(old)await tx.update(guestPublications).set({revokedAt:current.now,version:old.version+1}).where(eq(guestPublications.id,old.id));
   const publicationId=randomUUID();
-  await tx.insert(guestPublications).values({id:publicationId,channelId,merchantUnitId:merchantId,serviceId:current.scope.masterService.id,publisherId:personId,authorityDigest:lineage(current.scope),requestDigest,channelVersion:current.channel.version,activationVersion:current.activation!.version,gatewayVersion:current.gateway!.version,enrollmentVersion:current.enrollment!.version,merchantName:current.scope.unit.displayName,primaryMerchantName:current.scope.master.displayName,description:current.channel.description,amountMinor:current.channel.amountMinor,currency:"USD",usage:current.channel.usage,createdAt:current.now,expiresAt:current.channel.expiresAt});
+  await tx.insert(guestPublications).values({id:publicationId,channelId,merchantUnitId:merchantId,serviceId:current.scope.merchantService.id,publisherId:personId,authorityDigest:lineage(current.scope),requestDigest,channelVersion:current.channel.version,activationVersion:current.activation!.version,gatewayVersion:current.gateway!.version,enrollmentVersion:current.enrollment!.version,merchantName:current.scope.terminal.displayName,primaryMerchantName:current.scope.merchantService.displayName,description:current.channel.description,amountMinor:current.channel.amountMinor,currency:"USD",usage:current.channel.usage,createdAt:current.now,expiresAt:current.channel.expiresAt});
   await tx.insert(guestPublicationCommands).values({commandId:input.commandId,publicationId,actorId:personId,kind:"PUBLISH",digest:requestDigest,createdAt:current.now});
   return managementProjection(tx,personId,merchantId,channelId);
  });
@@ -139,49 +135,6 @@ async function orderProjection(tx:ScopedTransaction,guest:GuestSession,order:Ord
  const [publication]=await tx.select().from(guestPublications).where(eq(guestPublications.id,order.publicationId));const now=await merchantNow(tx);
  const ready=order.expiresAt>now&&!!publication&&(await publicationContext(tx,publication))?.ready===true;
  const status=payment?(refund?"REFUNDED":payment.outcome):!ready?"UNAVAILABLE":attempt?"REVIEW":"READY";
- return {id:order.id,version:attempts.length+1,publicationId:order.publicationId,merchantName:order.merchantName,primaryMerchantName:order.primaryMerchantName,description:order.description,amount:formatMoney(order.amountMinor),expiresAt:order.expiresAt.toISOString(),receiptAccessExpiresAt:guest.expiresAt.toISOString(),createdAt:order.createdAt.toISOString(),status,canPrepare:ready&&attempts.length<20&&(!attempt||payment?.outcome==="DECLINED"),canConfirm:ready&&!!attempt&&!payment,freshRequestHref:`/checkout/${order.publicationId}`,mode:"SANDBOX",feeStatus:"NOT_APPLIED",attempt:attempt?{id:attempt.id,outcome:attempt.outcome,createdAt:attempt.createdAt.toISOString()}:null,receipt:payment?{paymentId:payment.id,reference:payment.testReference,status:refund?"REFUNDED":payment.outcome,amount:formatMoney(payment.amountMinor),createdAt:payment.createdAt.toISOString(),refund:refund?{amount:formatMoney(refund.amountMinor),reference:refund.testReference,createdAt:refund.createdAt.toISOString()}:null}:null};
+ return {id:order.id,version:attempts.length+1,publicationId:order.publicationId,merchantName:order.merchantName,primaryMerchantName:order.primaryMerchantName,description:order.description,amount:formatMoney(order.amountMinor),expiresAt:order.expiresAt.toISOString(),receiptAccessExpiresAt:guest.expiresAt.toISOString(),createdAt:order.createdAt.toISOString(),status,canPrepare:false,canConfirm:false,freshRequestHref:`/checkout/${order.publicationId}`,mode:"SANDBOX",feeStatus:"NOT_APPLIED",attempt:attempt?{id:attempt.id,outcome:attempt.outcome,createdAt:attempt.createdAt.toISOString()}:null,receipt:payment?{paymentId:payment.id,reference:payment.testReference,status:refund?"REFUNDED":payment.outcome,amount:formatMoney(payment.amountMinor),createdAt:payment.createdAt.toISOString(),refund:refund?{amount:formatMoney(refund.amountMinor),reference:refund.testReference,createdAt:refund.createdAt.toISOString()}:null}:null};
 }
 export async function getGuestOrder(cookieHeader:string|null,orderId:string){orderId=id(orderId);return getDb().transaction(async tx=>{const guest=await session(tx,cookieHeader);return orderProjection(tx,guest,await ownedOrder(tx,guest,orderId));},{isolationLevel:"repeatable read"});}
-export async function createGuestOrder(cookieHeader:string|null,publicationId:string,raw:CreateGuestOrderInput){
- publicationId=id(publicationId);const input=parse(createGuestOrderSchema,raw);await consumeBudget([`publication:${publicationId}`,`session:${cookieToken(cookieHeader)??"missing"}`]);
- return getDb().transaction(async tx=>{
-  const guest=await session(tx,cookieHeader);const [publication]=await tx.select().from(guestPublications).where(eq(guestPublications.id,publicationId));if(!publication)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-  // Use the same service/unit/channel lock order as every merchant financial command.
-  const current=await publicationContext(tx,publication,true);
-  await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"guest-order:"+input.commandId},0))`);
-  const [old]=await tx.select().from(guestOrders).where(eq(guestOrders.id,input.commandId));
-  if(old){if(old.guestSessionId!==guest.id||old.publicationId!==publicationId)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return orderProjection(tx,guest,old);}
-  if(!current?.ready)throw denied();
-  const [order]=await tx.insert(guestOrders).values({id:input.commandId,guestSessionId:guest.id,publicationId,channelId:publication.channelId,merchantUnitId:publication.merchantUnitId,serviceId:publication.serviceId,channelVersion:publication.channelVersion,description:publication.description,merchantName:publication.merchantName,primaryMerchantName:publication.primaryMerchantName,amountMinor:publication.amountMinor,currency:"USD",usage:publication.usage,createdAt:current.now,expiresAt:new Date(Math.min(current.now.getTime()+1800000,publication.expiresAt.getTime(),guest.expiresAt.getTime()))}).returning();return orderProjection(tx,guest,order!);
- });
-}
-export async function prepareGuestAttempt(cookieHeader:string|null,orderId:string,raw:PrepareGuestAttemptInput){
- orderId=id(orderId);const input=parse(prepareGuestAttemptSchema,raw),requestDigest=digest({orderId,input});await consumeBudget([`order:${orderId}`]);
- return getDb().transaction(async tx=>{
-  const guest=await session(tx,cookieHeader),hint=await ownedOrder(tx,guest,orderId);const [publication]=await tx.select().from(guestPublications).where(eq(guestPublications.id,hint.publicationId));const current=await publicationContext(tx,publication!,true);
-  const order=await ownedOrder(tx,guest,orderId,true);
-  await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"merchant-operation:"+input.commandId},0))`);
-  const [old]=await tx.select().from(guestAttempts).where(eq(guestAttempts.id,input.commandId));
-  if(old){if(old.orderId!==orderId||old.requestDigest!==requestDigest)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return orderProjection(tx,guest,order);}
-  const [usedCommand]=await tx.select({id:merchantOperationCommands.commandId}).from(merchantOperationCommands).where(eq(merchantOperationCommands.commandId,input.commandId));
-  if(usedCommand)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);
-  const projection=await orderProjection(tx,guest,order);
-  if(projection.version!==input.expectedVersion)throw new SecurityError("STALE_VERSION",409);if(!current?.ready||!projection.canPrepare)throw denied();
-  await tx.insert(guestAttempts).values({id:input.commandId,orderId,sequence:projection.version,outcome:input.outcome,requestDigest,createdAt:current.now});return orderProjection(tx,guest,order);
- });
-}
-export async function confirmGuestAttempt(cookieHeader:string|null,orderId:string,attemptId:string){
- orderId=id(orderId);attemptId=id(attemptId);await consumeBudget([`order:${orderId}`]);
- return getDb().transaction(async tx=>{
-  const guest=await session(tx,cookieHeader),hint=await ownedOrder(tx,guest,orderId);const [publication]=await tx.select().from(guestPublications).where(eq(guestPublications.id,hint.publicationId));const current=await publicationContext(tx,publication!,true);
-  const order=await ownedOrder(tx,guest,orderId,true);
-  await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"merchant-operation:"+attemptId},0))`);
-  const [attempt]=await tx.select().from(guestAttempts).where(and(eq(guestAttempts.id,attemptId),eq(guestAttempts.orderId,orderId)));if(!attempt)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
-  const [receipt]=await tx.select().from(merchantOperationCommands).where(eq(merchantOperationCommands.commandId,attemptId));
-  if(receipt){if(receipt.guestOrderId!==orderId||receipt.kind!=="PAYMENT"||receipt.actorId!==null||receipt.digest!==attempt.requestDigest)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return orderProjection(tx,guest,order);}
-  const projection=await orderProjection(tx,guest,order);
-  if(!current?.ready||!projection.canConfirm||projection.attempt?.id!==attemptId||order.channelVersion!==current.channel.version)throw denied();
-  const payment=await recordMerchantSandboxPayment(tx,current.channel,{kind:"GUEST_ORDER",actorId:null,guestOrderId:order.id},attempt.outcome,current.gateway!.version,current.enrollment!.version,current.now);
-  await tx.insert(merchantOperationCommands).values({commandId:attemptId,actorId:null,guestOrderId:order.id,scopeKey:`guest-order:${order.id}`,kind:"PAYMENT",digest:attempt.requestDigest,resultId:payment.id,createdAt:current.now});return orderProjection(tx,guest,order);
- });
-}

@@ -1,3 +1,4 @@
+import {listTerminalDisputes} from "@/modules/disputes/service";
 import {getMerchantSupportPaymentPreview,listMerchantSupportCases} from "@/modules/cases/service";
 import type { MerchantSupportContext } from "@/ui/workspace/cases";
 import {getMerchantOperations} from "@/modules/acquiring/operations-service";
@@ -23,14 +24,14 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   if (!session) redirect("/login");
   const { merchantId } = await params;
   const query = await searchParams;
-  const tab: MerchantTab = query.tab === "payments" || query.tab === "people" || query.tab === "verification" || query.tab === "help" ? query.tab : "channels";
+  const tab: MerchantTab = query.tab === "payments" || query.tab === "people" || query.tab === "verification" || query.tab === "help" || query.tab === "disputes" ? query.tab : "channels";
   const retryNotice = <PageNotice title="We couldn’t load this merchant" authenticated><p>Your saved records and selected merchant have not changed. Retry this page when the service is available.</p><Link href={`/merchants/${merchantId}?tab=${tab}`}>Retry this merchant</Link></PageNotice>;
   let workspace: MerchantWorkspaceProjection | null = null;
   if (z.uuid().safeParse(merchantId).success) {
     try { workspace = await getMerchantWorkspace(session.personId, merchantId); }
     catch (error) { if (!(error instanceof SecurityError && [403,404].includes(error.status))) return retryNotice; }
   }
-  if (!workspace) return <MerchantShell><h1>Merchant unavailable</h1><div className="mn-panel"><EmptyState title="This merchant is not available to you" description="Your access or the merchant status may have changed. No other merchant has been selected."><Link className="consumer-button consumer-button-secondary" href="/merchant-services">Choose an available merchant</Link></EmptyState></div></MerchantShell>;
+  if (!workspace) return <MerchantShell><h1>Terminal unavailable</h1><div className="mn-panel"><EmptyState title="This terminal is not available to you" description="Your access or the terminal status may have changed. Choose a terminal you can use."><Link className="consumer-button consumer-button-secondary" href="/merchant-services">Choose a terminal</Link></EmptyState></div></MerchantShell>;
   const access = tab === "people" && workspace.canReadPeople ? await getMerchantAccessOverview(session.personId, merchantId).catch(() => undefined) : undefined;
   const support:MerchantSupportContext|undefined=tab==="help"?await(async()=>{
     try {
@@ -41,9 +42,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         try {linkedPayment=await getMerchantSupportPaymentPreview(session.personId,merchantId,query.payment.toLowerCase());paymentUnavailable=false;}
         catch(error){if(!(error instanceof SecurityError&&[403,404].includes(error.status)))throw error;}
       }
-      return {kind:"MERCHANT",merchantId,serviceId:workspace.merchant.master.serviceId,merchantName:workspace.merchant.displayName,primaryName:workspace.merchant.master.displayName,initialCases,linkedPayment,paymentUnavailable};
+      return {kind:"MERCHANT",merchantId,serviceId:workspace.merchant.merchant.serviceId,merchantName:workspace.merchant.displayName,primaryName:workspace.merchant.merchant.displayName,initialCases,linkedPayment,paymentUnavailable};
     }catch{return undefined;}
   })():undefined;
   const overviewHref=merchantActivityReturn(typeof query.returnTo==="string"?query.returnTo:null)??undefined;
-  return <MerchantWorkspace overviewHref={overviewHref} support={support} workspace={workspace} tab={tab} access={access} operations={tab!=="help"&&(workspace.primaryAccess || workspace.merchant.status === "ACTIVE") ? await getMerchantOperations(session.personId,merchantId).catch(()=>undefined) : undefined} />;
+  const disputes=tab==="disputes"?await listTerminalDisputes(session.personId,merchantId).catch(()=>undefined):undefined;
+  return <MerchantWorkspace disputes={disputes} overviewHref={overviewHref} support={support} workspace={workspace} tab={tab} access={access} operations={tab!=="help"&&(workspace.ownerAccess || workspace.merchant.status === "ACTIVE") ? await getMerchantOperations(session.personId,merchantId).catch(()=>undefined) : undefined} />;
 }

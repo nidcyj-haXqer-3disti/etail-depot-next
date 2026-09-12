@@ -5,12 +5,12 @@ import { closeDatabase, getDb } from "../../src/platform/database/client";
 import {
   cards,
   serviceActivity,
-  serviceMembers,
   workspaceCommands,
 } from "../../src/platform/database/schema";
+import {readServiceMoneyAvailable,getServiceMoneyAccount} from "../../src/modules/money/service";
+import * as ledgerService from "../../src/modules/ledger/service";
 import { getBalance, type LedgerPosition } from "../../src/modules/ledger/service";
 import { ledgerEntries, ledgerJournals } from "../../src/modules/ledger/schema";
-import { operatorServiceAccess } from "../../src/modules/operations/schema";
 import { cardCheckoutAttempts } from "../../src/modules/acquiring/card-checkout-schema";
 import {
   confirmCardCheckout,
@@ -23,9 +23,6 @@ import {
   merchantTestRefunds,
 } from "../../src/modules/acquiring/operations-schema";
 import {
-  merchantDepositItems,
-  merchantDepositEvents,
-  merchantDeposits,
   merchantSettlementItems,
   merchantSettlements,
 } from "../../src/modules/acquiring/settlement-schema";
@@ -35,9 +32,9 @@ import { publishGuestChannel } from "../../src/modules/acquiring/guest-service";
 import {
   addCardholderFunds,
   controlCard,
-  getPersonSpending,
+  getCardSpending,
   getWorkspace,
-  setCardholderSpendingLimit,
+  setCardSpendingLimit,
   startCardRequest,
   submitCardRequest,
   updateCardRequest,
@@ -50,7 +47,7 @@ afterAll(closeDatabase);
 afterEach(() => vi.restoreAllMocks());
 
 async function balance(position: LedgerPosition) {
-  return getDb().transaction(tx => getBalance(tx, position));
+  return getDb().transaction(tx => position.bucket === "GROUP_AVAILABLE" && position.serviceId ? readServiceMoneyAvailable(tx,position.serviceId) : getBalance(tx, position));
 }
 
 /** Deliberately avoids the retired allocation-based issuePracticeCard helper. */
@@ -63,7 +60,7 @@ async function bareCard(
   const draft = await startCardRequest(primaryId, serviceId, {
     commandId: randomUUID(),
   });
-  const saved = await updateCardRequest(primaryId, serviceId, draft.id, {
+  const saved = await updateCardRequest(primaryId, serviceId, draft.id, {allowanceMinor:"0",
     commandId: randomUUID(),
     expectedVersion: draft.version,
     holderId,
@@ -85,8 +82,8 @@ async function bareCard(
 }
 
 async function fundedGroup(funds = "10000", limit = "5000") {
-  const primary = await cardPrimary("D69 funding primary");
-  const holderId = await cardPerson("D69 secondary cardholder");
+  const primary = await cardPrimary("Card account owner");
+  const holderId = await cardPerson("Invited cardholder");
   await enrollCardholder(primary.personId, primary.serviceId, holderId);
   const card = await bareCard(
     primary.personId,
@@ -95,7 +92,7 @@ async function fundedGroup(funds = "10000", limit = "5000") {
     "Everyday card",
   );
 
-  // Issuance must not create funds or a person limit.
+  // Issuance must not create funds or an allowance.
   expect(
     await balance({ serviceId: primary.serviceId, bucket: "GROUP_AVAILABLE" }),
   ).toBe(0n);
@@ -107,10 +104,10 @@ async function fundedGroup(funds = "10000", limit = "5000") {
     currency: "USD",
     source: "SANDBOX_BANK",
   });
-  await setCardholderSpendingLimit(primary.personId, primary.serviceId, holderId, {
+  await setCardSpendingLimit(primary.personId, primary.serviceId, card.id, {
     commandId: randomUUID(),
-    expectedVersion: 0,
-    monthlyLimitMinor: limit,
+    expectedVersion: 1,
+    allowanceMinor: limit,
   });
   return { primary, holderId, card };
 }
@@ -191,10 +188,7 @@ async function money(m: Merchant, g: Group) {
       merchantUnitId: m.unit.id,
     };
     return {
-      group: await getBalance(tx, {
-        serviceId: g.primary.serviceId,
-        bucket: "GROUP_AVAILABLE",
-      }),
+      group: await readServiceMoneyAvailable(tx,g.primary.serviceId),
       spent: await getBalance(tx, {
         serviceId: g.primary.serviceId,
         cardId: g.card.id,
@@ -220,19 +214,7 @@ async function money(m: Merchant, g: Group) {
   });
 }
 
-async function processor(serviceId: string, canProcessDeposits = true) {
-  const personId = await cardPerson("D69 explicit deposit operator");
-  await getDb().insert(operatorServiceAccess).values({
-    serviceId,
-    personId,
-    state: "ACCEPTED",
-    canRespond: true,
-    canProcessDeposits,
-  });
-  return personId;
-}
-
-async function requestDeposit(m: Merchant) {
+async function requestSettlement(m: Merchant) {
   const operations = await merchantOperations.getMerchantOperations(
     m.merchant.personId,
     m.unit.id,
@@ -242,7 +224,7 @@ async function requestDeposit(m: Merchant) {
     commandId: randomUUID(),
     reviewToken: operations.depositReview.token,
   };
-  const deposit = await merchantOperations.createMerchantPayout(
+  const deposit = await merchantOperations.createMerchantSettlement(
     m.merchant.personId,
     m.unit.id,
     input,
@@ -253,7 +235,8 @@ async function requestDeposit(m: Merchant) {
 async function assertJournal(
   journalId: string,
   expected: Array<{
-    serviceId: string;
+    serviceId: string | null;
+    moneyAccountId?: string;
     cardId: string | null;
     merchantUnitId: string | null;
     bucket: string;
@@ -340,10 +323,11 @@ it("commits one card debit and one merchant credit under concurrent same-attempt
 
   await assertJournal(cardJournal!.id, [
     {
-      serviceId: g.primary.serviceId,
+      serviceId: null,
+      moneyAccountId:(await getDb().transaction(tx=>getServiceMoneyAccount(tx,g.primary.serviceId))).id,
       cardId: null,
       merchantUnitId: null,
-      bucket: "GROUP_AVAILABLE",
+      bucket: "MONEY_AVAILABLE",
       deltaMinor: -1250n,
     },
     {
@@ -551,14 +535,14 @@ it("refunds the original group once while preserving gross monthly usage and car
     paidOut: 0n,
   });
 
-  const spending = await getPersonSpending(
+  const spending = await getCardSpending(
     g.primary.personId,
     g.primary.serviceId,
-    g.holderId,
+    g.card.id,
   );
   expect(spending).toMatchObject({
-    spentThisMonth: { minor: "1250" },
-    remainingThisMonth: { minor: "3750" },
+    used: { minor: "1250" },
+    remaining: { minor: "3750" },
     available: { minor: "3750" },
   });
   const [card] = await getDb()
@@ -603,10 +587,11 @@ it("refunds the original group once while preserving gross monthly usage and car
       deltaMinor: -1250n,
     },
     {
-      serviceId: g.primary.serviceId,
+      serviceId: null,
+      moneyAccountId:(await getDb().transaction(tx=>getServiceMoneyAccount(tx,g.primary.serviceId))).id,
       cardId: null,
       merchantUnitId: null,
-      bucket: "GROUP_AVAILABLE",
+      bucket: "MONEY_AVAILABLE",
       deltaMinor: 1250n,
     },
   ]);
@@ -621,456 +606,38 @@ it("refunds the original group once while preserving gross monthly usage and car
   ).not.toBeNull();
 }, 30_000);
 
-it("requires a fresh exact deposit review when another payment arrives", async () => {
-  const m = await readyMerchant();
-  const g = await fundedGroup();
-  const first = await pay(m, g);
-  const old = await merchantOperations.getMerchantOperations(
-    m.merchant.personId,
-    m.unit.id,
-  );
-  expect(old.depositReview).toMatchObject({
-    amount: { minor: "1250" },
-    paymentCount: 1,
-  });
-  const second = await pay(m, g);
-  const staleInput = {
-    commandId: randomUUID(),
-    reviewToken: old.depositReview!.token,
-  };
-  await expect(
-    merchantOperations.createMerchantPayout(
-      m.merchant.personId,
-      m.unit.id,
-      staleInput,
-    ),
-  ).rejects.toMatchObject({ code: "DEPOSIT_REVIEW_CHANGED" });
-  expect(
-    await getDb()
-      .select()
-      .from(merchantOperationCommands)
-      .where(eq(merchantOperationCommands.commandId, staleInput.commandId)),
-  ).toHaveLength(0);
-  expect(
-    await getDb()
-      .select()
-      .from(merchantSettlements)
-      .where(eq(merchantSettlements.merchantUnitId, m.unit.id)),
-  ).toHaveLength(0);
-  expect((await money(m, g)).available).toBe(2500n);
-
-  const requested = await requestDeposit(m);
-  expect(requested.deposit).toMatchObject({
-    status: "PENDING",
-    amount: { minor: "2500" },
-    processedAt: null,
-  });
-  expect(requested.deposit.payments.map(row => row.id).sort()).toEqual(
-    [first.paymentId, second.paymentId].sort(),
-  );
-  const items = await getDb()
-    .select()
-    .from(merchantSettlementItems)
-    .where(
-      eq(merchantSettlementItems.settlementId, requested.deposit.settlementId),
-    );
-  expect(items).toHaveLength(2);
-  expect(items.reduce((sum, row) => sum + row.amountMinor, 0n)).toBe(2500n);
-  expect(
-    await merchantOperations.createMerchantPayout(
-      m.merchant.personId,
-      m.unit.id,
-      requested.input,
-    ),
-  ).toEqual(requested.deposit);
-  expect(await money(m, g)).toMatchObject({
-    available: 0n,
-    settled: 0n,
-    pending: 2500n,
-    paidOut: 0n,
-  });
-}, 30_000);
-
-it("keeps deposits pending until an explicitly assigned operator records one terminal result", async () => {
-  const m = await readyMerchant();
-  const g = await fundedGroup();
-  const paid = await pay(m, g);
-  const requested = await requestDeposit(m);
-  const supportOnly = await processor(m.merchant.serviceId, false);
-  const operatorId = await processor(m.merchant.serviceId);
-
-  // Processing assignment grants no customer service membership.
-  expect(
-    await getDb()
-      .select()
-      .from(serviceMembers)
-      .where(eq(serviceMembers.personId, operatorId)),
-  ).toHaveLength(0);
-  for (const deniedPerson of [
-    m.merchant.personId,
-    m.operator.personId,
-    supportOnly,
-  ]) {
-    await expect(
-      merchantOperations.processMerchantDeposit(
-        deniedPerson,
-        requested.deposit.id,
-        { commandId: randomUUID(), outcome: "COMPLETED" },
-      ),
-    ).rejects.toMatchObject({ code: "ACTION_DENIED" });
-  }
-  expect(await merchantOperations.getDepositProcessingQueue(supportOnly)).toEqual(
-    [],
-  );
-  expect(
-    (await merchantOperations.getDepositProcessingQueue(operatorId)).map(
-      row => row.id,
-    ),
-  ).toContain(requested.deposit.id);
-
-  const blockedRefund = {
-    commandId: randomUUID(),
-    expectedVersion: 1,
-    reason: "Cannot use reserved money for a refund",
-  };
-  await expect(
-    merchantOperations.refundMerchantPayment(
-      m.merchant.personId,
-      m.unit.id,
-      paid.paymentId,
-      blockedRefund,
-    ),
-  ).rejects.toMatchObject({ code: "REFUND_DEPOSIT_RESERVED" });
-  expect((await money(m, g)).group).toBe(8750n);
-
-  const event = { commandId: randomUUID(), outcome: "COMPLETED" as const };
-  const completed = await merchantOperations.processMerchantDeposit(
-    operatorId,
-    requested.deposit.id,
-    event,
-  );
-  expect(completed.status).toBe("COMPLETED");
-  expect(completed.processedAt).not.toBeNull();
-  expect(
-    await merchantOperations.processMerchantDeposit(
-      operatorId,
-      requested.deposit.id,
-      event,
-    ),
-  ).toEqual(completed);
-  expect(
-    await merchantOperations.createMerchantPayout(
-      m.merchant.personId,
-      m.unit.id,
-      requested.input,
-    ),
-  ).toEqual(completed);
-  await expect(
-    merchantOperations.processMerchantDeposit(operatorId, requested.deposit.id, {
-      ...event,
-      outcome: "FAILED",
-    }),
-  ).rejects.toMatchObject({ code: "IDEMPOTENCY_CONFLICT" });
-
-  expect(await money(m, g)).toMatchObject({
-    pending: 0n,
-    settled: 0n,
-    paidOut: 1250n,
-  });
-  expect(
-    (await merchantOperations.getDepositProcessingQueue(operatorId)).map(
-      row => row.id,
-    ),
-  ).not.toContain(requested.deposit.id);
-  expect(
-    await getDb()
-      .select()
-      .from(merchantDepositEvents)
-      .where(eq(merchantDepositEvents.depositId, requested.deposit.id)),
-  ).toHaveLength(1);
-
-  const refunded = await merchantOperations.refundMerchantPayment(m.merchant.personId, m.unit.id, paid.paymentId, blockedRefund);
-  expect(refunded.status).toBe("REFUNDED");
-  expect(await money(m, g)).toMatchObject({group: 10000n, paidOut: 0n});
-  expect(await getDb().select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId, paid.paymentId))).toHaveLength(1);
-}, 30_000);
-
-it("releases a failed deposit once and requires a new exact-batch deposit command", async () => {
-  const m = await readyMerchant();
-  const g = await fundedGroup();
-  await pay(m, g);
-  const requested = await requestDeposit(m);
-  const operatorId = await processor(m.merchant.serviceId);
-  const failure = { commandId: randomUUID(), outcome: "FAILED" as const };
-  const failed = await merchantOperations.processMerchantDeposit(
-    operatorId,
-    requested.deposit.id,
-    failure,
-  );
-  expect(failed.status).toBe("FAILED");
-  expect(
-    await merchantOperations.processMerchantDeposit(
-      operatorId,
-      requested.deposit.id,
-      failure,
-    ),
-  ).toEqual(failed);
-  expect(await money(m, g)).toMatchObject({
-    available: 0n,
-    settled: 1250n,
-    pending: 0n,
-    paidOut: 0n,
-  });
-
-  // Replaying the original command reports its failure; it does not requeue.
-  expect(
-    await merchantOperations.createMerchantPayout(
-      m.merchant.personId,
-      m.unit.id,
-      requested.input,
-    ),
-  ).toMatchObject({...failed, retryReview: expect.objectContaining({amount: {minor:"1250",currency:"USD",formatted:"$12.50"}})});
-  const retryInput = {
-    commandId: randomUUID(),
-    settlementId: requested.deposit.settlementId,
-    reviewToken: (await merchantOperations.getMerchantOperations(m.merchant.personId, m.unit.id)).payouts.find(row => row.id === requested.deposit.id)!.retryReview!.token,
-  };
-  const retried = await merchantOperations.createMerchantPayout(
-    m.merchant.personId,
-    m.unit.id,
-    retryInput,
-  );
-  expect(retried).toMatchObject({
-    status: "PENDING",
-    settlementId: requested.deposit.settlementId,
-    amount: { minor: "1250" },
-  });
-  expect(retried.id).not.toBe(requested.deposit.id);
-  expect(
-    await merchantOperations.createMerchantPayout(
-      m.merchant.personId,
-      m.unit.id,
-      retryInput,
-    ),
-  ).toEqual(retried);
-  await expect(
-    merchantOperations.createMerchantPayout(m.merchant.personId, m.unit.id, {
-      ...retryInput,
-      commandId: randomUUID(),
-    }),
-  ).rejects.toMatchObject({ code: "DEPOSIT_ALREADY_REQUESTED" });
-
-  // An event ID cannot be reused to process a different deposit.
-  await expect(
-    merchantOperations.processMerchantDeposit(operatorId, retried.id, failure),
-  ).rejects.toMatchObject({ code: "IDEMPOTENCY_CONFLICT" });
-  await expect(
-    merchantOperations.processMerchantDeposit(operatorId, requested.deposit.id, {
-      commandId: randomUUID(),
-      outcome: "COMPLETED",
-    }),
-  ).rejects.toMatchObject({ code: "IDEMPOTENCY_CONFLICT" });
-
-  await merchantOperations.processMerchantDeposit(operatorId, retried.id, {
-    commandId: randomUUID(),
-    outcome: "COMPLETED",
-  });
-  expect(await money(m, g)).toMatchObject({
-    settled: 0n,
-    pending: 0n,
-    paidOut: 1250n,
-  });
-  expect(
-    await getDb()
-      .select()
-      .from(merchantSettlements)
-      .where(eq(merchantSettlements.merchantUnitId, m.unit.id)),
-  ).toHaveLength(1);
-  expect(
-    await getDb()
-      .select()
-      .from(merchantDeposits)
-      .where(eq(merchantDeposits.settlementId, retried.settlementId)),
-  ).toHaveLength(2);
-  expect(
-    await getDb()
-      .select()
-      .from(merchantDepositEvents)
-      .where(
-        inArray(merchantDepositEvents.depositId, [
-          requested.deposit.id,
-          retried.id,
-        ]),
-      ),
-  ).toHaveLength(2);
-}, 30_000);
-
-it("blocks retrying a failed batch at its old amount after one included payment is refunded", async () => {
-  const m = await readyMerchant();
-  const g = await fundedGroup();
-  const first = await pay(m, g);
-  await pay(m, g);
-  const requested = await requestDeposit(m);
-  const operatorId = await processor(m.merchant.serviceId);
-  await merchantOperations.processMerchantDeposit(
-    operatorId,
-    requested.deposit.id,
-    { commandId: randomUUID(), outcome: "FAILED" },
-  );
-  const staleReview = (await merchantOperations.getMerchantOperations(m.merchant.personId, m.unit.id)).payouts.find(row => row.id === requested.deposit.id)!.retryReview!;
-  await merchantOperations.refundMerchantPayment(
-    m.merchant.personId,
-    m.unit.id,
-    first.paymentId,
-    {
-      commandId: randomUUID(),
-      expectedVersion: 1,
-      reason: "One item returned after deposit failure",
-    },
-  );
-  const before = await money(m, g);
-  expect(before).toMatchObject({
-    group: 8750n,
-    settled: 1250n,
-    pending: 0n,
-    paidOut: 0n,
-  });
-  const retryInput = {
-    commandId: randomUUID(),
-    settlementId: requested.deposit.settlementId,
-    reviewToken: staleReview.token,
-  };
-  await expect(
-    merchantOperations.createMerchantPayout(
-      m.merchant.personId,
-      m.unit.id,
-      retryInput,
-    ),
-  ).rejects.toMatchObject({ code: "DEPOSIT_REVIEW_CHANGED" });
-  expect(await money(m, g)).toEqual(before);
-  expect(
-    await getDb()
-      .select()
-      .from(merchantOperationCommands)
-      .where(eq(merchantOperationCommands.commandId, retryInput.commandId)),
-  ).toHaveLength(0);
-  expect(
-    await getDb()
-      .select()
-      .from(merchantDeposits)
-      .where(
-        eq(merchantDeposits.settlementId, requested.deposit.settlementId),
-      ),
-  ).toHaveLength(1);
-  // Historical settlement membership remains exact and immutable.
-  expect(
-    await getDb()
-      .select()
-      .from(merchantSettlementItems)
-      .where(
-        eq(merchantSettlementItems.settlementId, requested.deposit.settlementId),
-      ),
-  ).toHaveLength(2);
-}, 30_000);
-
-// Append to tests/integration/prepaid-connected-checkout.test.ts.
-// Add merchantDepositItems to its existing settlement-schema named import.
-// These tests reuse that file's existing real domain helpers, not HTTP simulators.
-
-it("refunds a completed deposit from its own Sandbox bank once without rewriting deposit principal", async () => {
-  const m = await readyMerchant();
-  const g = await fundedGroup();
-  const first = await pay(m, g);
-  const second = await pay(m, g);
-  const { deposit } = await requestDeposit(m);
-  const operatorId = await processor(m.merchant.serviceId);
-  const processing = { commandId: randomUUID().toUpperCase(), outcome: "COMPLETED" as const };
-
-  const completed = await merchantOperations.processMerchantDeposit(operatorId, deposit.id, processing);
-  expect(completed).toMatchObject({ status: "COMPLETED", amount: { minor: "2500" }, retryReview: null });
-  // UUID spelling must not make the original processing result unrecoverable.
-  expect(await merchantOperations.processMerchantDeposit(operatorId, deposit.id, processing)).toEqual(completed);
-  expect(await money(m, g)).toEqual({ group: 7500n, spent: 2500n, available: 0n, settled: 0n, pending: 0n, paidOut: 2500n });
-
-  const beforeRefund = await merchantOperations.getMerchantOperations(m.merchant.personId, m.unit.id);
-  expect(beforeRefund.payments.find(row => row.id === first.paymentId)).toMatchObject({ canRefund: true, refundSource: "SANDBOX_BANK", refundUnavailableReason: null });
-  const refundInput = { commandId: randomUUID(), expectedVersion: 1, reason: "Fictional order returned after deposit" };
-  const refunded = await Promise.all(Array.from({ length: 3 }, () => merchantOperations.refundMerchantPayment(m.merchant.personId, m.unit.id, first.paymentId, refundInput)));
-  expect(new Set(refunded.map(row => row.refund?.id)).size).toBe(1);
-  expect(refunded[0]).toMatchObject({ status: "REFUNDED", refund: { amount: { minor: "1250" } } });
-  expect(await money(m, g)).toEqual({ group: 8750n, spent: 1250n, available: 0n, settled: 0n, pending: 0n, paidOut: 1250n });
-  expect(await getPersonSpending(g.holderId, g.primary.serviceId, g.holderId)).toMatchObject({ spentThisMonth: { minor: "2500" }, remainingThisMonth: { minor: "2500" } });
-
-  const [refund] = await getDb().select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId, first.paymentId));
-  await assertJournal(refund!.journalId, [
-    { serviceId: m.merchant.serviceId, merchantUnitId: m.unit.id, cardId: null, bucket: "PAYOUT_CLEARING", deltaMinor: -1250n },
-    { serviceId: m.merchant.serviceId, merchantUnitId: m.unit.id, cardId: null, bucket: "GATEWAY_CLEARING", deltaMinor: 1250n },
-  ]);
-  const cardRefunds = await getDb().select().from(ledgerJournals).where(and(eq(ledgerJournals.kind, "CARD_REFUND"), eq(ledgerJournals.referenceId, refund!.id)));
-  expect(cardRefunds).toHaveLength(1);
-  await assertJournal(cardRefunds[0]!.id, [
-    { serviceId: g.primary.serviceId, merchantUnitId: null, cardId: g.card.id, bucket: "CARD_SPENT", deltaMinor: -1250n },
-    { serviceId: g.primary.serviceId, merchantUnitId: null, cardId: null, bucket: "GROUP_AVAILABLE", deltaMinor: 1250n },
-  ]);
-  const after = await merchantOperations.getMerchantOperations(m.merchant.personId, m.unit.id);
-  const receipt = after.payouts.find(row => row.id === deposit.id)!;
-  expect(receipt).toMatchObject({ status: "COMPLETED", amount: { minor: "2500" }, retryReview: null });
-  expect(receipt.payments).toEqual(expect.arrayContaining([
-    expect.objectContaining({ id: first.paymentId, amount: expect.objectContaining({ minor: "1250" }), refundedAmount: expect.objectContaining({ minor: "1250" }) }),
-    expect.objectContaining({ id: second.paymentId, amount: expect.objectContaining({ minor: "1250" }), refundedAmount: expect.objectContaining({ minor: "0" }) }),
-  ]));
-  expect(after.bankFunds?.minor).toBe("1250");
-  expect(after.depositReview).toBeNull();
-  await expect(merchantOperations.createMerchantPayout(m.merchant.personId, m.unit.id, { commandId: randomUUID(), settlementId: deposit.settlementId, reviewToken: "a".repeat(64) })).rejects.toMatchObject({ code: "DEPOSIT_ALREADY_REQUESTED" });
-  expect(await money(m, g)).toEqual({ group: 8750n, spent: 1250n, available: 0n, settled: 0n, pending: 0n, paidOut: 1250n });
-}, 30_000);
-
-it("retries only unrefunded original-batch principal and preserves separate new collections", async () => {
-  const m = await readyMerchant();
-  const g = await fundedGroup();
-  const first = await pay(m, g);
-  const second = await pay(m, g);
-  const third = await pay(m, g);
-  const { deposit: original } = await requestDeposit(m);
-  const operatorId = await processor(m.merchant.serviceId);
-  await merchantOperations.processMerchantDeposit(operatorId, original.id, { commandId: randomUUID(), outcome: "FAILED" });
-  const beforeRefund = await merchantOperations.getMerchantOperations(m.merchant.personId, m.unit.id);
-  const staleReview = beforeRefund.payouts.find(row => row.id === original.id)!.retryReview!;
-  expect(staleReview.amount.minor).toBe("3750");
-
-  await merchantOperations.refundMerchantPayment(m.merchant.personId, m.unit.id, first.paymentId, { commandId: randomUUID(), expectedVersion: 1, reason: "Fictional returned order before retry" });
-  const fourth = await pay(m, g);
-  const beforeRetry = await merchantOperations.getMerchantOperations(m.merchant.personId, m.unit.id);
-  const review = beforeRetry.payouts.find(row => row.id === original.id)!.retryReview!;
-  expect(review).toMatchObject({ amount: { minor: "2500" }, paymentCount: 2 });
-  expect(review.token).not.toBe(staleReview.token);
-  expect(beforeRetry.depositReview).toMatchObject({ amount: { minor: "1250" }, paymentCount: 1 });
-  const originalRows = await getDb().select().from(merchantDepositItems).where(eq(merchantDepositItems.depositId, original.id)).orderBy(merchantDepositItems.paymentId);
-  expect(originalRows.map(row => row.paymentId).sort()).toEqual([first.paymentId, second.paymentId, third.paymentId].sort());
-  expect(originalRows.reduce((sum, row) => sum + row.amountMinor, 0n)).toBe(3750n);
-
-  await expect(merchantOperations.createMerchantPayout(m.merchant.personId, m.unit.id, { commandId: randomUUID(), settlementId: original.settlementId, reviewToken: staleReview.token })).rejects.toMatchObject({ code: "DEPOSIT_REVIEW_CHANGED" });
-  expect(await money(m, g)).toEqual({ group: 6250n, spent: 3750n, available: 1250n, settled: 2500n, pending: 0n, paidOut: 0n });
-  const input = { commandId: randomUUID(), settlementId: original.settlementId, reviewToken: review.token };
-  const retries = await Promise.all(Array.from({ length: 3 }, () => merchantOperations.createMerchantPayout(m.merchant.personId, m.unit.id, input)));
-  expect(new Set(retries.map(row => row.id)).size).toBe(1);
-  const retry = retries[0]!;
-  expect(retry).toMatchObject({ status: "PENDING", settlementId: original.settlementId, amount: { minor: "2500" }, retryReview: null });
-  expect(retry.payments.map(row => row.id).sort()).toEqual([second.paymentId, third.paymentId].sort());
-  expect(await money(m, g)).toEqual({ group: 6250n, spent: 3750n, available: 1250n, settled: 0n, pending: 2500n, paidOut: 0n });
-  const pending = await merchantOperations.getMerchantOperations(m.merchant.personId, m.unit.id);
-  expect(pending.payments.find(row => row.id === second.paymentId)).toMatchObject({ canRefund: false, refundSource: null });
-  await expect(merchantOperations.refundMerchantPayment(m.merchant.personId, m.unit.id, second.paymentId, { commandId: randomUUID(), expectedVersion: 1, reason: "Fictional refund while processing" })).rejects.toMatchObject({ code: "REFUND_DEPOSIT_RESERVED" });
-  await expect(getDb().insert(merchantDepositItems).values({ depositId: retry.id, paymentId: fourth.paymentId, amountMinor: 1250n })).rejects.toMatchObject({ cause: { code: "23514" } });
-
-  await merchantOperations.processMerchantDeposit(operatorId, retry.id, { commandId: randomUUID(), outcome: "COMPLETED" });
-  await merchantOperations.refundMerchantPayment(m.merchant.personId, m.unit.id, second.paymentId, { commandId: randomUUID(), expectedVersion: 1, reason: "Fictional return after net retry completed" });
-  expect(await money(m, g)).toEqual({ group: 7500n, spent: 2500n, available: 1250n, settled: 0n, pending: 0n, paidOut: 1250n });
-  const final = await merchantOperations.getMerchantOperations(m.merchant.personId, m.unit.id);
-  expect(final.payouts.find(row => row.id === original.id)).toMatchObject({ status: "FAILED", amount: { minor: "3750" }, retryReview: null });
-  expect(final.payouts.find(row => row.id === retry.id)).toMatchObject({ status: "COMPLETED", amount: { minor: "2500" }, retryReview: null });
-  expect(final.depositReview).toMatchObject({ amount: { minor: "1250" }, paymentCount: 1 });
-  expect(final.payments.find(row => row.id === fourth.paymentId)).toMatchObject({ status: "APPROVED", canRefund: true, refundSource: "COLLECTION_BALANCE" });
-  expect(await getDb().select().from(merchantDepositItems).where(eq(merchantDepositItems.depositId, original.id)).orderBy(merchantDepositItems.paymentId)).toEqual(originalRows);
-  expect(await getPersonSpending(g.holderId, g.primary.serviceId, g.holderId)).toMatchObject({ spentThisMonth: { minor: "5000" }, remainingThisMonth: { minor: "0" } });
-}, 30_000);
+it("requires a fresh exact settlement review when another payment arrives",async()=>{
+ const m=await readyMerchant(),g=await fundedGroup(),first=await pay(m,g);
+ const old=await merchantOperations.getMerchantOperations(m.merchant.personId,m.unit.id);const second=await pay(m,g);
+ const stale={commandId:randomUUID(),reviewToken:old.depositReview!.token};
+ await expect(merchantOperations.createMerchantSettlement(m.merchant.personId,m.unit.id,stale)).rejects.toMatchObject({code:"DEPOSIT_REVIEW_CHANGED"});
+ expect(await getDb().select().from(merchantOperationCommands).where(eq(merchantOperationCommands.commandId,stale.commandId))).toHaveLength(0);
+ const requested=await requestSettlement(m);expect(requested.deposit.amount.minor).toBe("2500");
+ const items=await getDb().select().from(merchantSettlementItems).where(eq(merchantSettlementItems.settlementId,requested.deposit.settlementId));
+ expect(items.map(row=>row.paymentId).sort()).toEqual([first.paymentId,second.paymentId].sort());
+ expect(await merchantOperations.createMerchantSettlement(m.merchant.personId,m.unit.id,requested.input)).toEqual(requested.deposit);
+ expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,m.merchant.serviceId))).toBe(2500n);expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,g.primary.serviceId))).toBe(7500n);
+ expect(await money(m,g)).toMatchObject({available:0n,pending:0n,settled:0n});
+});
+it("settlement journal debits exact terminal pending principal and credits only Merchant money",async()=>{
+ const m=await readyMerchant(),g=await fundedGroup();await pay(m,g);const requested=await requestSettlement(m);
+ const [batch]=await getDb().select().from(merchantSettlements).where(eq(merchantSettlements.id,requested.deposit.settlementId));
+ const account=await getDb().transaction(tx=>getServiceMoneyAccount(tx,m.merchant.serviceId));
+ expect(batch?.moneyAccountId).toBe(account.id);await assertJournal(batch!.journalId,[{serviceId:m.merchant.serviceId,merchantUnitId:m.unit.id,cardId:null,bucket:"MERCHANT_AVAILABLE",deltaMinor:-1250n},{serviceId:null,moneyAccountId:account.id,merchantUnitId:null,cardId:null,bucket:"MONEY_AVAILABLE",deltaMinor:1250n}]);
+ await expect(getDb().update(merchantSettlements).set({amountMinor:1n}).where(eq(merchantSettlements.id,batch!.id))).rejects.toThrow();
+ await expect(merchantOperations.createMerchantSettlement(m.operator.personId,m.unit.id,requested.input)).rejects.toMatchObject({status:403});
+});
+it("refund after settlement restores the separate card account once without rewriting settled principal",async()=>{
+ const m=await readyMerchant(),g=await fundedGroup(),paid=await pay(m,g),requested=await requestSettlement(m);
+ const command={commandId:randomUUID(),expectedVersion:1,reason:"Order returned"};
+ const results=await Promise.all(Array.from({length:4},()=>merchantOperations.refundMerchantPayment(m.merchant.personId,m.unit.id,paid.paymentId,command)));expect(new Set(results.map(row=>row.refund?.id)).size).toBe(1);
+ expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,m.merchant.serviceId))).toBe(0n);expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,g.primary.serviceId))).toBe(10000n);
+ const [batch]=await getDb().select().from(merchantSettlements).where(eq(merchantSettlements.id,requested.deposit.settlementId));expect(batch?.amountMinor).toBe(1250n);
+ expect((await getCardSpending(g.primary.personId,g.primary.serviceId,g.card.id)).used.minor).toBe("1250");
+});
+it("late settlement failure rolls back both journal lines, batch membership and command receipt",async()=>{
+ const m=await readyMerchant(),g=await fundedGroup();await pay(m,g);const before=await money(m,g),operations=await merchantOperations.getMerchantOperations(m.merchant.personId,m.unit.id),input={commandId:randomUUID(),reviewToken:operations.depositReview!.token};
+ const original=ledgerService.postJournal;const injected=vi.spyOn(ledgerService,"postJournal").mockImplementationOnce(async(...args)=>{await original(...args);throw new Error("Injected settlement journal failure");});
+ await expect(merchantOperations.createMerchantSettlement(m.merchant.personId,m.unit.id,input)).rejects.toThrow("Injected settlement journal failure");expect(injected).toHaveBeenCalledTimes(1);injected.mockRestore();
+ expect(await money(m,g)).toEqual(before);expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,m.merchant.serviceId))).toBe(0n);expect(await getDb().select().from(merchantSettlements).where(eq(merchantSettlements.merchantUnitId,m.unit.id))).toHaveLength(0);
+});

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { ACTIONS, evaluate, type PolicyScope } from "../../src/modules/policy/evaluate";
 import { getRuntimeConfig } from "../../src/platform/config";
-const base:PolicyScope={actorPersonId:"person-a",serviceId:"service-a",resourceServiceId:"service-a",membershipServiceId:"service-a",membershipPersonId:"person-a",membershipState:"ACCEPTED",primaryPersonId:"person-a",primaryMembershipState:"ACCEPTED",role:"PRIMARY",serviceKind:"CARDHOLDER",status:"ACTIVE"};
+const base:PolicyScope={actorPersonId:"person-a",serviceId:"service-a",resourceServiceId:"service-a",membershipServiceId:"service-a",membershipPersonId:"person-a",membershipState:"ACCEPTED",primaryPersonId:"person-a",primaryMembershipState:"ACCEPTED",role:"OWNER",serviceKind:"CARDHOLDER",status:"ACTIVE"};
 describe("one deny-by-default policy",()=>{
-  it.each(["PRIMARY","SECONDARY"] as const)("%s can read its accepted service summary but cannot spend or issue",role=>{
+  it.each(["OWNER","CARDHOLDER"] as const)("%s can read its accepted service summary but cannot spend or issue",role=>{
     expect(evaluate({...base,role},"service.read").allowed).toBe(true);
     for(const action of ["cards.create","spend.authorize","invented.action"]) expect(evaluate({...base,role},action).allowed).toBe(false);
   });
@@ -14,8 +14,8 @@ describe("one deny-by-default policy",()=>{
     expect(evaluate({...base,serviceKind:"CARDHOLDER",membershipState:"REVOKED"},"service.read").allowed).toBe(false);
     expect(evaluate({...base,serviceKind:"CARDHOLDER"},"service.read").allowed).toBe(true);
   });
-  it("only the named primary has cardholder governance",()=>{
-    expect(evaluate({...base,role:"SECONDARY",primaryPersonId:"other"},"people.read").allowed).toBe(false);
+  it("only the account owner has cardholder governance",()=>{
+    expect(evaluate({...base,role:"CARDHOLDER",primaryPersonId:"other"},"people.read").allowed).toBe(false);
     expect(evaluate({...base,grants:["people.read"]},"people.read").allowed).toBe(true);
   });
 });

@@ -8,7 +8,7 @@ import {sessionRepository} from "../../../src/platform/database/session-reposito
 import {createChannel} from "../../../src/modules/acquiring/service";
 import {configureTestGateway,enrollTestMerchant,setChannelActivation} from "../../../src/modules/acquiring/operations-service";
 import {publishGuestChannel} from "../../../src/modules/acquiring/guest-service";
-import {cardPrimary,fundCardGroup,setPersonLimit,issuePracticeCard} from "../../helpers/cardholder";
+import {cardPrimary,fundCardGroup,issuePracticeCard} from "../../helpers/cardholder";
 import {merchantAccessFixture} from "../../helpers/merchant-access";
 import {paymentInput} from "../../helpers/acquiring";
 
@@ -23,8 +23,8 @@ export async function signInPerson(page:Page,personId:string){
 export async function freshPrepaidCard(funds="2500",limit=funds){
  const primary=await cardPrimary(`Browser primary ${randomUUID().slice(0,8)}`);
  await fundCardGroup(primary.personId,primary.serviceId,funds);
- await setPersonLimit(primary.personId,primary.serviceId,primary.personId,limit);
- const {card}=await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,"Fresh prepaid card");
+
+ const {card}=await issuePracticeCard(primary.personId, primary.serviceId, primary.personId, "Fresh prepaid card", undefined, limit);
  return {primary,card};
 }
 export async function freshPublishedPayment(amountMinor:string,description=`Browser order ${randomUUID().slice(0,8)}`){

@@ -6,7 +6,7 @@ import type {MerchantDashboardView} from "../../src/modules/acquiring/dashboard-
 
 const money=(minor:string)=>({minor,currency:"USD" as const,formatted:`$${(Number(minor)/100).toFixed(2)}`});
 const unit=randomUUID(),foreign=randomUUID(),now=new Date("2026-09-11T12:00:00Z");
-const view:MerchantDashboardView={id:`network:${randomUUID()}`,name:"Primary network",description:"",unitIds:[unit],totals:{collected:money("5000"),refunded:money("5000"),transferred:money("0"),available:money("0"),settled:money("0"),pending:money("0"),bank:money("0"),channelCount:1,activeChannelCount:0},payments:[],transfers:[],paymentsHasMore:false,transfersHasMore:false};
+const view:MerchantDashboardView={id:`merchant:${randomUUID()}`,name:"Primary network",description:"",unitIds:[unit],totals:{collected:money("5000"),refunded:money("5000"),transferred:money("0"),available:money("0"),settled:money("0"),pending:money("0"),bank:money("0"),channelCount:1,activeChannelCount:0},payments:[],transfers:[],paymentsHasMore:false,transfersHasMore:false};
 function row(patch:Partial<Omit<MerchantActivityRow,"href">>={}):Omit<MerchantActivityRow,"href"> {const id=randomUUID();return {id,kind:"payment",merchantId:unit,merchantName:"Market",description:"Order",amount:money("5000"),status:"REFUNDED",reference:"test-payment",at:"2026-09-06T23:59:59.000Z",paymentId:id,paymentReference:"test-payment",...patch};}
 
 describe("merchant activity filters and projections",()=>{
@@ -39,7 +39,7 @@ describe("merchant activity filters and projections",()=>{
   expect(()=>projectMerchantActivity(query,{...view,totals:{...view.totals,collected:null}},[],now,true)).toThrow("MERCHANT_ACTIVITY_UNAVAILABLE");
  });
  it("checks strict calendar dates, duplicate fields and local-only return destinations",()=>{
-  for(const raw of [{from:"2026-02-30"},{period:"custom"},{from:"2026-09-11",to:"2026-09-10"},{page:"0"},{view:"network:wrong"},new URLSearchParams("view=all&view=all")])expect(()=>parseMerchantActivityQuery(raw)).toThrow("INVALID_ACTIVITY_FILTER");
+  for(const raw of [{from:"2026-02-30"},{period:"custom"},{from:"2026-09-11",to:"2026-09-10"},{page:"0"},{view:"merchant:wrong"},new URLSearchParams("view=all&view=all")])expect(()=>parseMerchantActivityQuery(raw)).toThrow("INVALID_ACTIVITY_FILTER");
   expect(merchantActivityReturn("https://example.test/merchant-services")).toBeNull();
   expect(merchantActivityReturn("//example.test/merchant-services")).toBeNull();
   expect(merchantActivityReturn("/merchant-services-other")).toBeNull();

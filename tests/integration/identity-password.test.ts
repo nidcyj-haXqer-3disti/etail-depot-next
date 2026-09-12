@@ -12,7 +12,7 @@ import { passwordAttemptLimiter } from "../../src/modules/identity/password-thro
 import { passwordLoginThrottle } from "../../src/modules/identity/schema";
 import { withPasswordAuthentication } from "../../src/modules/identity/password-boundary";
 import { SecurityError } from "../../src/platform/security/origin";
-import { merchantAssignments } from "../../src/modules/access/schema";
+import { terminalAssignments } from "../../src/modules/access/schema";
 import { operatorServiceAccess } from "../../src/modules/operations/schema";
 
 afterAll(closeDatabase);
@@ -123,7 +123,7 @@ describe("persistent password login boundaries", () => {
       expect(await listServicesForPerson(current!.personId)).toEqual([]);
       expect(await getDb().select().from(serviceMembers).where(eq(serviceMembers.personId, current!.personId))).toEqual([]);
       expect(await getDb().select().from(permissionGrants).where(eq(permissionGrants.personId, current!.personId))).toEqual([]);
-      expect(await getDb().select().from(merchantAssignments).where(eq(merchantAssignments.personId, current!.personId))).toEqual([]);
+      expect(await getDb().select().from(terminalAssignments).where(eq(terminalAssignments.personId, current!.personId))).toEqual([]);
       expect(await getDb().select().from(operatorServiceAccess).where(eq(operatorServiceAccess.personId, current!.personId))).toEqual([]);
       expect(await getDb().select().from(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId, current!.personId))).toEqual([]);
     } finally {

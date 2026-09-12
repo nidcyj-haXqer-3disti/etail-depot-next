@@ -13,9 +13,9 @@ import { cancelCardRequest, controlCard, getWorkspace, purchaseCard, saveNotific
 import { createReportDefinition, exportHistoricalReport, getHistoricalReport } from "../../src/modules/reports/service";
 import { addSupportMessage, createSupportCase, getSupportCase, listSupportCases, withdrawSupportCase } from "../../src/modules/cases/service";
 import { ledgerEntries, ledgerJournals } from "../../src/modules/ledger/schema";
-import { merchantAssignments } from "../../src/modules/access/schema";
+import { terminalAssignments } from "../../src/modules/access/schema";
 import { operatorServiceAccess } from "../../src/modules/operations/schema";
-import { fundCardGroup, setPersonLimit, issuePracticeCard, secondaryPermissions } from "../helpers/cardholder";
+import { fundCardGroup, issuePracticeCard, setCardAllowance } from "../helpers/cardholder";
 
 const issuer = `${targets.netlify.canonical_origin}/.netlify/identity`;
 afterEach(() => vi.unstubAllEnvs());
@@ -55,18 +55,19 @@ describe("hosted sandbox Cardholder commands", () => {
     expect(empty.capabilities.filter(row => row.allowed).map(row => row.action)).toEqual(expect.arrayContaining(["cards.request", "cards.create", "cards.purchase", "cards.freeze", "cards.unfreeze", "notifications.manage", "support.cases.manage"]));
 
     const draft = await startCardRequest(personId, serviceId, { commandId: randomUUID() });
-    const saved = await updateCardRequest(personId, serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId: personId, nickname: "Hosted practice card", format: "VIRTUAL" });
+    const saved = await updateCardRequest(personId, serviceId, draft.id, {allowanceMinor:"0", commandId: randomUUID(), expectedVersion: draft.version, holderId: personId, nickname: "Hosted practice card", format: "VIRTUAL" });
     expect(saved).toMatchObject({ canSubmit: true, prerequisites: [] });
     const submit = { commandId: randomUUID(), expectedVersion: saved.version };
     const issued = await submitCardRequest(personId, serviceId, saved.id, submit);
     expect(await submitCardRequest(personId, serviceId, saved.id, submit)).toEqual(issued);
     const unfunded = (await getWorkspace(personId, serviceId)).cards[0]!;
-    expect(unfunded).toMatchObject({ id: issued.issuedCardId, relationship: "PRIMARY", available: { minor: "0" }, spending: { monthlyLimit: { minor: "0" } }, canPurchase: false, fictional: true });
+    expect(unfunded).toMatchObject({ id: issued.issuedCardId, relationship: "OWNER", available: { minor: "0" }, spending: { allowance: { minor: "0" } }, canPurchase: false, fictional: true });
     expect(await getDb().select().from(cards).where(eq(cards.requestId, saved.id))).toHaveLength(1);
     expect(await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.businessKey, `card-funding:${saved.id}`))).toHaveLength(0);
     expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId, serviceId))).toEqual([]);
     await fundCardGroup(personId, serviceId, "12501");
-    await setPersonLimit(personId, serviceId, personId, "20000");
+    await setCardAllowance(personId,serviceId,unfunded.id,"20000");
+
     const card = (await getWorkspace(personId, serviceId)).cards[0]!;
     expect(card).toMatchObject({ id: issued.issuedCardId, available: { minor: "12501" }, canPurchase: true });
 
@@ -80,7 +81,7 @@ describe("hosted sandbox Cardholder commands", () => {
     expect(bought.card.available.minor).toBe("10000");
     expect(await purchaseCard(personId, serviceId, card.id, purchase)).toEqual(bought);
     expect(await getDb().select().from(serviceActivity).where(eq(serviceActivity.cardId, card.id))).toHaveLength(1);
-    const ledger = await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId, serviceId));
+    const ledger = await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.journalId, bought.journalId));
     expect(ledger.reduce((sum, row) => sum + row.deltaMinor, 0n)).toBe(0n);
 
     const filters = { source: "ACTIVITY" as const, status: "POSTED" as const, from: bought.activity.occurredAt.slice(0, 10), to: bought.activity.occurredAt.slice(0, 10), query: "groceries" };
@@ -102,7 +103,7 @@ describe("hosted sandbox Cardholder commands", () => {
     expect(await cancelCardRequest(personId, serviceId, canceled.id, { commandId: randomUUID(), expectedVersion: canceled.version })).toMatchObject({ status: "CANCELED", issuedCardId: null });
     expect((await getCardholderDashboard(personId)).cardCount).toBe(1);
     expect(await getDb().select().from(services).where(and(eq(services.primaryPersonId, personId), eq(services.kind, "MERCHANT")))).toEqual([]);
-    expect(await getDb().select().from(merchantAssignments).where(eq(merchantAssignments.personId, personId))).toEqual([]);
+    expect(await getDb().select().from(terminalAssignments).where(eq(terminalAssignments.personId, personId))).toEqual([]);
     expect(await getDb().select().from(operatorServiceAccess).where(eq(operatorServiceAccess.personId, personId))).toEqual([]);
     expect(await getDb().select().from(merchantSetupEligibility).where(eq(merchantSetupEligibility.personId, personId))).toEqual([]);
     expect(await getDb().select().from(identityBindings).where(and(eq(identityBindings.personId, personId), eq(identityBindings.issuer, "urn:etail:isolated-fixture")))).toEqual([]);
@@ -112,10 +113,10 @@ describe("hosted sandbox Cardholder commands", () => {
     hostedRuntime();
     const owner = await primary();
     const second = await participant("Synthetic hosted secondary");
-    const invitation = await createInvitation(owner.personId, owner.serviceId, { commandId: randomUUID(), recipientId: second, role: "SECONDARY", permissions: secondaryPermissions, delegablePermissions: [], expiresInDays: 3 });
+    const invitation = await createInvitation(owner.personId, owner.serviceId, { commandId: randomUUID(), recipientId: second, expiresInDays: 3 });
     await acceptInvitation(second, invitation.id, { commandId: randomUUID(), expectedVersion: invitation.version });
-    const own = await (async()=>{await fundCardGroup(owner.personId,owner.serviceId,"5000");await setPersonLimit(owner.personId,owner.serviceId,owner.personId,"2000");return issuePracticeCard(owner.personId,owner.serviceId,owner.personId,"Primary private card","201");})();
-    const secondary = await (async()=>{await setPersonLimit(owner.personId,owner.serviceId,second,"3000");return issuePracticeCard(owner.personId,owner.serviceId,second,"Secondary private card");})();
+    const own = await (async()=>{await fundCardGroup(owner.personId,owner.serviceId,"5000");return issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "Primary private card", "201", "2000");})();
+    const secondary = await (async()=>{return issuePracticeCard(owner.personId, owner.serviceId, second, "Secondary private card", undefined, "3000");})();
     const purchase = { commandId: randomUUID(), expectedVersion: secondary.card.version, amountMinor: "101", description: "Secondary purchase" };
     const bought = await purchaseCard(second, owner.serviceId, secondary.card.id, purchase);
     const view = await getWorkspace(second, owner.serviceId);
@@ -141,7 +142,7 @@ describe("hosted sandbox Cardholder commands", () => {
   it("denies strangers and unstarted members without changing existing cards, requests or money", async () => {
     hostedRuntime();
     const owner = await primary();
-    const issued = await (async()=>{await fundCardGroup(owner.personId,owner.serviceId,"1000");await setPersonLimit(owner.personId,owner.serviceId,owner.personId,"1000");return issuePracticeCard(owner.personId,owner.serviceId,owner.personId,"Protected hosted card");})();
+    const issued = await (async()=>{await fundCardGroup(owner.personId,owner.serviceId,"1000");return issuePracticeCard(owner.personId, owner.serviceId, owner.personId, "Protected hosted card", undefined, "1000");})();
     const stranger = await participant("Synthetic independent sandbox");
     const notStarted = await bindIdentity(issuer, randomUUID());
     const records = async () => ({

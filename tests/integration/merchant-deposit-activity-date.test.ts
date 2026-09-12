@@ -1,84 +1,54 @@
 import {randomUUID} from "node:crypto";
-import {eq} from "drizzle-orm";
-import {afterAll,expect,it,vi} from "vitest";
+import {eq,sql} from "drizzle-orm";
+import {afterAll,expect,it} from "vitest";
 import {closeDatabase,getDb} from "../../src/platform/database/client";
-import * as merchantClock from "../../src/modules/access/merchant-scope";
 import {operatorServiceAccess} from "../../src/modules/operations/schema";
-import {createChannel} from "../../src/modules/acquiring/service";
-import {
-  configureTestGateway,enrollTestMerchant,setChannelActivation,simulateMerchantPayment,
-  getMerchantOperations,createMerchantPayout,processMerchantDeposit,
-} from "../../src/modules/acquiring/operations-service";
-import {merchantDeposits,merchantDepositEvents} from "../../src/modules/acquiring/settlement-schema";
-import {getMerchantDashboard} from "../../src/modules/acquiring/dashboard-service";
-import {merchantActivityCsv} from "../../src/modules/acquiring/activity-service";
-import {merchantDashboardProjectionSchema} from "../../src/modules/acquiring/dashboard-contracts";
-import {merchantAccessFixture} from "../helpers/merchant-access";
-import {paymentInput} from "../helpers/acquiring";
+import {moneyWithdrawals,moneyWithdrawalEvents} from "../../src/modules/money/schema";
+import {ledgerJournals} from "../../src/modules/ledger/schema";
+import {getServiceMoneyAccount,addMoneyFunds,prepareMoneyFunding,confirmMoneyFunding,getMoneyFundingIntent,prepareMoneyWithdrawal,confirmMoneyWithdrawal,processMoneyWithdrawal,getMoneyWithdrawalIntent,getMoneyAccountOverview} from "../../src/modules/money/service";
+import {moneyOverviewSchema,moneyWithdrawalReceiptSchema} from "../../src/shared/money-response";
+import {cardPerson,cardPrimary} from "../helpers/cardholder";
 
 afterAll(closeDatabase);
-
-it.each(["COMPLETED","FAILED"] as const)("dates a %s deposit by its processing event, retaining the original request and exact filtered export",async(outcome)=>{
-  const f=await merchantAccessFixture();
-  await configureTestGateway(f.merchant.personId,f.master.id,{commandId:randomUUID(),expectedVersion:0,enabled:true});
-  await enrollTestMerchant(f.merchant.personId,f.unit.id,{commandId:randomUUID(),expectedVersion:0,enabled:true});
-  const channel=await createChannel(f.operator.personId,f.unit.id,{
-    ...paymentInput(),usage:"REUSABLE",description:"Deposit date regression",
-    presentations:["WEB"],visibility:"CREATOR_PRIVATE",
-  });
-  await setChannelActivation(f.operator.personId,f.unit.id,channel.id,{
-    commandId:randomUUID(),expectedVersion:0,expectedChannelVersion:channel.version,active:true,
-  });
-  await simulateMerchantPayment(f.operator.personId,f.unit.id,channel.id,{
-    commandId:randomUUID(),expectedChannelVersion:channel.version,outcome:"APPROVED",
-  });
-  const review=(await getMerchantOperations(f.merchant.personId,f.unit.id)).depositReview!;
-  const deposit=await createMerchantPayout(f.merchant.personId,f.unit.id,{commandId:randomUUID(),reviewToken:review.token});
-  const requestDay=deposit.createdAt.slice(0,10);
-  const eventTime=new Date(requestDay+"T12:00:00.000Z");
-  eventTime.setUTCDate(eventTime.getUTCDate()+1);
-  const eventDay=eventTime.toISOString().slice(0,10),view=`network:${f.master.id}`;
-  const query=(day:string)=>({view,activity:"transfers",period:"custom",from:day,to:day,q:deposit.testReference});
-  const request=await getDb().select().from(merchantDeposits).where(eq(merchantDeposits.id,deposit.id));
-  const pending=await getMerchantDashboard(f.merchant.personId,query(requestDay));
-  expect(pending.activity.rows).toHaveLength(1);
-  expect(pending.activity.rows[0]).toMatchObject({id:deposit.id,status:"PENDING",at:deposit.createdAt});
-  expect(pending.activity.periodTotals.transferred?.minor).toBe("0");
-  expect((await getMerchantDashboard(f.merchant.personId,query(eventDay))).activity.rows).toEqual([]);
-
-  // The setup fixture's operator has no processing right until this separate explicit assignment.
-  await getDb().insert(operatorServiceAccess).values({
-    serviceId:f.merchant.serviceId,personId:f.operator.personId,state:"ACCEPTED",
-    canRespond:false,canProcessDeposits:true,
-  });
-  // Advance only the command's clock seam. Both immutable event and journal are created
-  // through the canonical processor; no historical timestamps or records are rewritten.
-  const clock=vi.spyOn(merchantClock,"merchantNow").mockResolvedValue(eventTime);
-  try{
-    const processed=await processMerchantDeposit(f.operator.personId,deposit.id,{commandId:randomUUID(),outcome});
-    expect(processed).toMatchObject({id:deposit.id,status:outcome,createdAt:deposit.createdAt,processedAt:eventTime.toISOString()});
-  }finally{clock.mockRestore();}
-
-  expect(await getDb().select().from(merchantDeposits).where(eq(merchantDeposits.id,deposit.id))).toEqual(request);
-  const events=await getDb().select().from(merchantDepositEvents).where(eq(merchantDepositEvents.depositId,deposit.id));
-  expect(events).toHaveLength(1);expect(events[0]).toMatchObject({outcome,createdAt:eventTime});
-  const originalDay=await getMerchantDashboard(f.merchant.personId,query(requestDay));
-  expect(originalDay.activity.rows).toEqual([]);
-  expect(originalDay.activity.periodTotals.transferred?.minor).toBe("0");
-  const onEventDay=merchantDashboardProjectionSchema.parse(await getMerchantDashboard(f.merchant.personId,query(eventDay)));
-  expect(onEventDay.activity.rows).toHaveLength(1);
-  expect(onEventDay.activity.rows[0]).toMatchObject({id:deposit.id,merchantId:f.unit.id,status:outcome,at:eventTime.toISOString(),amount:{minor:"1250"}});
-  expect(onEventDay.activity.periodTotals.transferred?.minor).toBe(outcome==="COMPLETED"?"1250":"0");
-  const summary=onEventDay.views.find(row=>row.id===view)!.transfers.find(row=>row.id===deposit.id)!;
-  expect(summary).toMatchObject({status:outcome,at:eventTime.toISOString()});
-  const exact=new URL(onEventDay.activity.rows[0]!.href,"https://etail.invalid");
-  expect(exact.pathname).toBe(`/merchants/${f.unit.id}`);
-  expect(exact.searchParams.get("transfer")).toBe(deposit.id);
-  const exported=await getMerchantDashboard(f.merchant.personId,query(eventDay),{exportRows:true});
-  expect(exported.activity.rows).toHaveLength(1);
-  const csv=merchantActivityCsv(exported.activity);
-  expect(csv).toContain(`"${eventTime.toISOString()}"`);
-  expect(csv).toContain(`"${deposit.testReference}"`);
-  expect(csv).not.toContain(`"${deposit.createdAt}"`);
-  expect(await getDb().select().from(merchantDepositEvents).where(eq(merchantDepositEvents.depositId,deposit.id))).toEqual(events);
+it.each(["COMPLETED","FAILED"] as const)("dates a %s withdrawal outcome at its real processing event while preserving its original request and exact review link",async(outcome)=>{
+ const owner=await cardPrimary("Withdrawal date owner"),operator=await cardPerson("Withdrawal date processor");
+ const account=await getDb().transaction(tx=>getServiceMoneyAccount(tx,owner.serviceId));
+ await addMoneyFunds(owner.personId,account.id,{commandId:randomUUID(),amountMinor:"3000"});
+ const intent=await prepareMoneyWithdrawal(owner.personId,account.id,{commandId:randomUUID(),amountMinor:"1250"});
+ const pending=await confirmMoneyWithdrawal(owner.personId,account.id,intent.id),href=`/money-accounts/${account.id}?task=withdraw&review=${intent.id}`;
+ const requests=await getDb().select().from(moneyWithdrawals).where(eq(moneyWithdrawals.id,pending.id));
+ const originalJournal=await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.id,requests[0]!.journalId));
+ expect(pending).toMatchObject({status:"PENDING",completedAt:null,createdAt:requests[0]!.createdAt.toISOString()});
+ const before=moneyOverviewSchema.parse(await getMoneyAccountOverview(owner.personId,account.id));
+ expect(before.history.find(row=>row.referenceId===pending.id)).toMatchObject({kind:"MONEY_WITHDRAWAL_RESERVE",createdAt:pending.createdAt,amount:{minor:"-1250"},href});
+ await getDb().insert(operatorServiceAccess).values({serviceId:owner.serviceId,personId:operator,state:"ACCEPTED",canProcessDeposits:true});
+ // Wait only for actual clock separation; no clock mock or posted timestamp rewrite.
+ await getDb().execute(sql`select pg_sleep(0.005)`);
+ const command={commandId:randomUUID(),outcome},processed=moneyWithdrawalReceiptSchema.parse(await processMoneyWithdrawal(operator,pending.id,command));
+ expect(processed).toMatchObject({id:pending.id,intentId:intent.id,createdAt:pending.createdAt,status:outcome});
+ expect(Date.parse(processed.completedAt!)).toBeGreaterThan(Date.parse(pending.createdAt));
+ const events=await getDb().select().from(moneyWithdrawalEvents).where(eq(moneyWithdrawalEvents.withdrawalId,pending.id));
+ expect(events).toHaveLength(1);expect(events[0]).toMatchObject({outcome,createdAt:new Date(processed.completedAt!)});
+ const [eventJournal]=await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.id,events[0]!.journalId));
+ expect(eventJournal).toMatchObject({kind:outcome==="COMPLETED"?"MONEY_WITHDRAWAL_COMPLETE":"MONEY_WITHDRAWAL_RELEASE",referenceId:pending.id,createdAt:events[0]!.createdAt});
+ expect(await processMoneyWithdrawal(operator,pending.id,command)).toEqual(processed);
+ expect((await getMoneyWithdrawalIntent(owner.personId,account.id,intent.id)).receipt).toEqual(processed);
+ expect(await getDb().select().from(moneyWithdrawals).where(eq(moneyWithdrawals.id,pending.id))).toEqual(requests);
+ expect(await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.id,requests[0]!.journalId))).toEqual(originalJournal);
+ expect(await getDb().select().from(moneyWithdrawalEvents).where(eq(moneyWithdrawalEvents.withdrawalId,pending.id))).toEqual(events);
+ const after=moneyOverviewSchema.parse(await getMoneyAccountOverview(owner.personId,account.id));
+ expect(after.pendingWithdrawals.minor).toBe("0");expect(after.available.minor).toBe(outcome==="COMPLETED"?"1750":"3000");
+ expect(after.history.find(row=>row.kind==="MONEY_WITHDRAWAL_RESERVE")).toMatchObject({createdAt:pending.createdAt,href});
+ const returned=after.history.filter(row=>row.kind==="MONEY_WITHDRAWAL_RELEASE");
+ if(outcome==="FAILED")expect(returned).toMatchObject([{referenceId:pending.id,createdAt:processed.completedAt,amount:{minor:"1250"},href}]);else expect(returned).toEqual([]);
+});
+it("links funding only to its exact saved review and keeps direct funding without a review unlinked",async()=>{
+ const owner=await cardPrimary("Exact funding receipt owner"),other=await cardPrimary("Other funding owner");const account=await getDb().transaction(tx=>getServiceMoneyAccount(tx,owner.serviceId));
+ const direct=await addMoneyFunds(owner.personId,account.id,{commandId:randomUUID(),amountMinor:"500"});
+ const review=await prepareMoneyFunding(owner.personId,account.id,{commandId:randomUUID(),amountMinor:"750"}),receipt=await confirmMoneyFunding(owner.personId,account.id,review.id);
+ const history=moneyOverviewSchema.parse(await getMoneyAccountOverview(owner.personId,account.id)).history;
+ expect(history.find(row=>row.referenceId===direct.id)?.href).toBeNull();
+ const link=history.find(row=>row.referenceId===receipt.id)!.href!;expect(link).toBe(`/money-accounts/${account.id}?task=add&review=${review.id}`);
+ const exact=new URL(link,"https://etail.invalid");expect((await getMoneyFundingIntent(owner.personId,account.id,exact.searchParams.get("review")!)).receipt).toEqual(receipt);
+ await expect(getMoneyFundingIntent(other.personId,account.id,review.id)).rejects.toMatchObject({status:404,code:"MONEY_ACCOUNT_UNAVAILABLE"});
 });

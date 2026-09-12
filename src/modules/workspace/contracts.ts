@@ -11,9 +11,9 @@ export interface CardPurchaseAvailability {
 }
 export interface WorkspaceCard {
   id: string; serviceId: string; holderId: string; holderName: string; nickname: string;
-  relationship: "PRIMARY" | "SECONDARY";
+  relationship: "OWNER" | "CARDHOLDER";
   lastFour: string; format: "VIRTUAL" | "PHYSICAL"; status: "ACTIVE" | "FROZEN";
-  version: number; spending: import("./funding-contracts").PersonSpending; available: Money;
+  version: number; spending: import("./funding-contracts").CardSpending; available: Money;
   canFreeze: boolean; canUnfreeze: boolean; canPurchase: boolean; fictional: true;
   purchaseAvailability: CardPurchaseAvailability;
   freeze:{primary:boolean;holder:boolean;reviewRequired:boolean;description:string;freezeLabel:string;unfreezeLabel:string;unfreezeDescription:string};
@@ -30,7 +30,7 @@ export interface WorkspacePerson {
 }
 export interface CardRequestProjection {
   id: string; serviceId: string; holderId: string; holderName: string; nickname: string;
-  format: "VIRTUAL" | "PHYSICAL"; currency: "USD";
+  format: "VIRTUAL" | "PHYSICAL"; currency: "USD"; allowance: Money;
   status: "DRAFT" | "BLOCKED" | "CANCELED" | "ISSUED"; version: number; updatedAt: string;
   issuedCardId: string | null; canSubmit: boolean;
   prerequisites: { code: string; title: string; detail: string }[];
@@ -42,7 +42,7 @@ export interface NotificationPreferences {
 export interface WorkspaceProjection {
   customerService?:{id:string;displayName:string;primaryName:string};
   service: ServiceSummary; member: { id: string; displayName: string }; services: ServiceSummary[];
-  cardholderRole: "PRIMARY" | "SECONDARY" | "NONE";
+  cardholderRole: "OWNER" | "CARDHOLDER" | "NONE";
   fictional: true; notice: string; capabilities: WorkspaceCapability[];
   cards: WorkspaceCard[]; cardRequests: CardRequestProjection[];
   cardholderOptions: { id: string; displayName: string; description: string }[];
@@ -57,6 +57,7 @@ export type CardPurchaseCommand = z.infer<typeof cardPurchaseCommandSchema>;
 export const startCardRequestSchema = z.object({ commandId: z.uuid() }).strict();
 export const cardDraftCommandSchema = z.object({
   commandId: z.uuid(), expectedVersion: versionSchema, holderId: z.uuid(),
+  allowanceMinor:z.string().regex(/^(0|[1-9][0-9]{0,11})$/),
   nickname: z.string().trim().min(1).max(60), format: z.enum(["VIRTUAL", "PHYSICAL"]),
 }).strict();
 export const versionedCommandSchema = z.object({ commandId: z.uuid(), expectedVersion: versionSchema }).strict();

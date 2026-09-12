@@ -12,13 +12,13 @@ const operations = "src/modules/acquiring/operations-service.ts";
 const ui = "src/ui/workspace/merchant-operations.tsx";
 
 describe("fresh service enrollment and support boundaries",()=>{
-  it("keeps guest authority separate while sharing the single payment writer",()=>{
+  it("keeps historical guest receipts read-only and reserves the payment writer for card checkout",()=>{
     const guest="src/modules/acquiring/guest-service.ts";
     const call='import {recordMerchantSandboxPayment as record} from "./operations-service"; async function confirmGuestAttempt(){return record(tx,input);}';
-    expect(probe(guest,call)).toEqual([]);
+    expect(probe(guest,call)).toContain("PAYMENT_PERSISTENCE_BOUNDARY");
     expect(probe(guest,call.replace("confirmGuestAttempt","bypass"))).toContain("PAYMENT_PERSISTENCE_BOUNDARY");
     expect(probe(guest,'import {postJournal} from "../ledger/service"; function confirmGuestAttempt(){return postJournal(tx,input);}')).toContain("LEDGER_POSTING_BOUNDARY");
-    expect(probe(guest,'import {guestOrders} from "./guest-schema"; function createGuestOrder(){tx.insert(guestOrders).values({});}')).toEqual([]);
+    expect(probe(guest,'import {guestOrders} from "./guest-schema"; function createGuestOrder(){tx.insert(guestOrders).values({});}')).toContain("GUEST_WRITER_OWNERSHIP");
     expect(probe(guest,'import {guestOrders} from "./guest-schema"; function createGuestOrder(){tx.update(guestOrders).set({});}')).toContain("GUEST_WRITER_OWNERSHIP");
     expect(probe(guest,'function bypass(){tx.execute(sql`UPDATE merchant_guest_orders SET amount=1`);}')).toContain("RAW_GUEST_WRITE");
     const route='import {confirmGuestAttempt} from "@/modules/acquiring/guest-service"; export async function POST(){return confirmGuestAttempt();}';
@@ -59,11 +59,11 @@ describe("fresh service enrollment and support boundaries",()=>{
     expect(probe(owner,'function bypass(){tx.execute(sql`UPDATE operator_service_access SET state=accepted`);}')).toContain("RAW_SUPPORT_WRITE");
     expect(probe(owner,'import {postJournal} from "../ledger"; function respondToCase(){return postJournal(tx,input);}')).toContain("LEDGER_POSTING_BOUNDARY");
   });
-  it("pins submerchant, pause/resume and support response endpoints",()=>{
-    for(const [command,suffix] of [["createOwnedSubmerchant","submerchants"],["pauseMerchant","pause"],["resumeMerchant","resume"]]){
+  it("pins terminal creation, pause/resume and support response endpoints",()=>{
+    for(const [command,suffix] of [["createTerminal","terminals"],["pauseMerchant","pause"],["resumeMerchant","resume"]]){
       const source=`import {${command}} from "@/modules/acquiring/service"; export async function POST(){return ${command}();}`;
       expect(probe(`src/app/api/v1/merchants/[merchantId]/${suffix}/route.ts`,source)).toEqual([]);
-      expect(probe(`src/app/api/v1/cardholder-services/[serviceId]/${suffix}/route.ts`,source)).toContain("PARALLEL_MERCHANT_UNIT_ROUTE");
+      expect(probe(`src/app/api/v1/cardholder-services/[serviceId]/${suffix}/route.ts`,source)).toContain(command==="createTerminal"?"PARALLEL_CONNECTED_ROUTE":"PARALLEL_MERCHANT_UNIT_ROUTE");
     }
     const support='import {respondToCase} from "@/modules/operations/service"; export async function POST(){return respondToCase();}';
     expect(probe("src/app/api/v1/operations/cases/[caseId]/responses/route.ts",support)).toEqual([]);
@@ -133,7 +133,7 @@ describe("financial source ownership mutation probes", () => {
       ["merchants/[merchantId]/channels/[channelId]/activation", "PUT", "setChannelActivation"],
       ["operations/deposits/[depositId]", "POST", "processMerchantDeposit"],
       ["merchants/[merchantId]/payments/[paymentId]/refund", "POST", "refundMerchantPayment"],
-      ["merchants/[merchantId]/payouts", "POST", "createMerchantPayout"],
+      ["merchants/[merchantId]/settlements", "POST", "createMerchantSettlement"],
       ["merchants/[merchantId]/operations", "GET", "getMerchantOperations"],
     ];
     for (const [route, method, command] of cases) {
@@ -175,6 +175,37 @@ describe("finite operation and purchase UI mutation probes", () => {
 
 
 describe("prepaid review, funding and settlement ownership",()=>{
+ it("keeps money funding, withdrawal, terminal authority and dispute writers finite",()=>{
+  const money="src/modules/money/service.ts";
+  for(const [table,command] of [["moneyAccounts","attachServiceMoneyAccount"],["moneyAccountServices","attachServiceMoneyAccount"],["moneyTopups","addFunds"],["moneyCommands","claimCommand"],["moneyFundingIntents","prepareMoneyFunding"],["moneyWithdrawalIntents","prepareMoneyWithdrawal"],["moneyWithdrawals","confirmMoneyWithdrawal"],["moneyWithdrawalEvents","processMoneyWithdrawal"]]){
+   const source=`import {${table} as rows} from "@/modules/money/schema";async function ${command}(){tx.insert(rows).values({});}`;
+   expect(probe(money,source)).toEqual([]);
+   expect(probe(money,source.replace(`function ${command}`,"function bypass"))).toContain("MONEY_WRITER_OWNERSHIP");
+   expect(probe(money,source.replace("tx.insert","tx.update"))).toContain("MONEY_WRITER_OWNERSHIP");
+   expect(probe(workspace,source)).toContain("MONEY_WRITER_OWNERSHIP");
+  }
+  const assignment='import {terminalAssignments as rows} from "@/modules/access/schema";async function decideMerchantInvitation(){tx.insert(rows).values({});}';
+  expect(probe("src/modules/access/merchant-service.ts",assignment)).toEqual([]);
+  expect(probe("src/modules/access/service.ts",assignment)).toContain("TERMINAL_ACCESS_WRITER_OWNERSHIP");
+  const dispute='import {merchantDisputeMessages as rows} from "@/modules/disputes/schema";async function respondToTerminalDispute(){tx.insert(rows).values({});}';
+  expect(probe("src/modules/disputes/service.ts",dispute)).toEqual([]);
+  expect(probe("src/modules/disputes/service.ts",dispute.replace("tx.insert","tx.update"))).toContain("DISPUTE_WRITER_OWNERSHIP");
+  expect(probe("src/modules/disputes/service.ts",'import {postJournal} from "../ledger/service";async function resolveMerchantDispute(){postJournal(tx,input);}')).toContain("LEDGER_POSTING_BOUNDARY");
+  for(const table of ["money_accounts","money_topups","terminal_assignments","merchant_disputes"])expect(probe(money,`function bypass(){tx.execute(sql\`UPDATE ${table} SET status='ACTIVE'\`);}`)).toContain("RAW_MONEY_TERMINAL_WRITE");
+ });
+ it("pins money and dispute route ownership and rejects a second funding UI",()=>{
+  const route='import {confirmMoneyFunding as confirm} from "@/modules/money/service";export async function POST(){return confirm();}';
+  expect(probe("src/app/api/v1/money-accounts/[moneyAccountId]/funding/intents/[intentId]/route.ts",route)).toEqual([]);
+  expect(probe("src/app/api/v1/money-accounts/[moneyAccountId]/fund-now/route.ts",route)).toContain("PARALLEL_CONNECTED_ROUTE");
+  const moneyUi='"use client";import {moneyRequest as send} from "./money-account";function Bypass(){send(`/api/v1/money-accounts/${account.id}/funding/intents`,{});}';
+  expect(probe("src/ui/other-funding.tsx",moneyUi)).toContain("PARALLEL_MONEY_UI");
+  const transport='"use client";function moneyRequest(path,body){return fetch(path,{method:"POST",body:JSON.stringify(body)});}';
+  expect(probe("src/ui/money-account.tsx",transport)).toEqual([]);
+  expect(probe("src/ui/money-account.tsx",transport.replace('fetch(path','fetch("/bypass"'))).toContain("REVIEWED_TRANSPORT_REWRITE");
+  const access='"use client";import {accessFetch} from "./access-client";function PeopleWorkspace(){function run(next){return accessFetch(next.path,"POST",next.body);}}';
+  expect(probe("src/ui/workspace/people.tsx",access)).toEqual([]);
+  expect(probe("src/ui/workspace/people.tsx",access.replace("next.body","otherBody"))).toContain("ACCESS_TRANSPORT_REWRITE");
+ });
  it("binds every connected checkout route to its exact method and owner",()=>{
   for(const [command,suffix,method] of [["prepareCardCheckout","card","POST"],["getCardCheckoutReview","card/[attemptId]","GET"],["confirmCardCheckout","card/[attemptId]","POST"]]){
    const source=`import {${command}} from "@/modules/acquiring/card-checkout-service";export async function ${method}(){return ${command}();}`;
@@ -184,15 +215,16 @@ describe("prepaid review, funding and settlement ownership",()=>{
   }
  });
  it("allows one explicit funding owner and rejects issuance funding or a direct HTTP top-up",()=>{
-  const funding='import {cardholderTopups} from "./funding-schema";export async function addCardholderFunds(){tx.insert(cardholderTopups).values({});}';
-  expect(probe(workspace,funding)).toEqual([]);
-  expect(probe(workspace,funding.replace("addCardholderFunds","submitCardRequest"))).toContain("FUNDING_WRITER_OWNERSHIP");
+  const funding='import {moneyTopups} from "./schema";async function addFunds(){tx.insert(moneyTopups).values({});}';
+  expect(probe("src/modules/money/service.ts",funding)).toEqual([]);
+  expect(probe("src/modules/money/service.ts",funding.replace("addFunds","submitCardRequest"))).toContain("MONEY_WRITER_OWNERSHIP");
+  expect(probe(workspace,'import {cardholderTopups} from "./funding-schema";export async function addCardholderFunds(){tx.insert(cardholderTopups).values({});}')).toContain("FUNDING_WRITER_OWNERSHIP");
   expect(probe(workspace,'import {postJournal} from "../ledger";function submitCardRequest(){postJournal(tx,input);}')).toContain("LEDGER_POSTING_BOUNDARY");
   const direct='import {addCardholderFunds} from "@/modules/workspace/service";export async function POST(){addCardholderFunds();}';
   expect(probe("src/app/api/v1/add-money/route.ts",direct)).toContain("FUNDING_CONFIRMATION_BOUNDARY");
  });
- it("makes exact deposit snapshots and event writes exclusive and immutable",()=>{
-  for(const [table,owner] of [["merchantDeposits","createMerchantPayout"],["merchantDepositItems","createMerchantPayout"],["merchantDepositEvents","processMerchantDeposit"]]){
+ it("makes settlement snapshots and historical deposit outcomes exclusive and immutable",()=>{
+  for(const [table,owner] of [["merchantSettlements","createMerchantSettlement"],["merchantSettlementItems","createMerchantSettlement"],["merchantSettlementCredits","createMerchantSettlement"],["merchantDepositEvents","processMerchantDeposit"]]){
    const source=`import {${table}} from "./settlement-schema";export async function ${owner}(){tx.insert(${table}).values({});}`;
    expect(probe(operations,source)).toEqual([]);
    expect(probe(operations,source.replace('tx.insert','tx.update'))).toContain("SETTLEMENT_WRITER_OWNERSHIP");

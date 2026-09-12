@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { pgTable, uuid, text, timestamp, integer, unique, check, foreignKey, index } from "drizzle-orm/pg-core";
 import { services, people, serviceMembers, serviceActivity, serviceKind } from "../../platform/database/schema";
-import { merchantUnits } from "../acquiring/schema";
+import { merchantTerminals } from "../acquiring/schema";
 import { merchantTestPayments } from "../acquiring/operations-schema";
 
 export const supportCases = pgTable("support_cases", {
@@ -17,7 +17,7 @@ export const supportCases = pgTable("support_cases", {
   foreignKey({name:"support_case_service_kind_scope",columns:[t.serviceId,t.serviceKind],foreignColumns:[services.id,services.kind]}),
   foreignKey({name:"support_case_cardholder_creator_scope",columns:[t.serviceId,t.cardholderCreatorId],foreignColumns:[serviceMembers.serviceId,serviceMembers.personId]}),
   foreignKey({columns:[t.transactionId,t.serviceId],foreignColumns:[serviceActivity.id,serviceActivity.serviceId]}),
-  foreignKey({name:"support_case_merchant_scope",columns:[t.merchantUnitId,t.serviceId],foreignColumns:[merchantUnits.id,merchantUnits.masterServiceId]}),
+  foreignKey({name:"support_case_merchant_scope",columns:[t.merchantUnitId,t.serviceId],foreignColumns:[merchantTerminals.id,merchantTerminals.merchantServiceId]}),
   foreignKey({name:"support_case_payment_scope",columns:[t.paymentId,t.merchantUnitId,t.serviceId],foreignColumns:[merchantTestPayments.id,merchantTestPayments.merchantUnitId,merchantTestPayments.serviceId]}),
   check("support_case_context",sql`(${t.serviceKind}='CARDHOLDER' and ${t.merchantUnitId} is null and ${t.paymentId} is null and ${t.topic}<>'PAYMENT') or (${t.serviceKind}='MERCHANT' and ${t.merchantUnitId} is not null and ${t.transactionId} is null and ${t.topic} in ('SERVICE','ACCESS','PAYMENT'))`),
   check("support_case_status",sql`${t.status} in ('OPEN','WITHDRAWN','RESOLVED')`), check("support_case_topic",sql`${t.topic} in ('SERVICE','ACCESS','CARD','TRANSACTION','PAYMENT')`), check("support_case_version",sql`${t.version}>0`), check("support_case_subject",sql`char_length(trim(${t.subject})) between 1 and 100`), index("support_cases_creator_list").on(t.serviceId,t.creatorId,t.createdAt), index("support_cases_merchant_creator_list").on(t.merchantUnitId,t.creatorId,t.createdAt)]);

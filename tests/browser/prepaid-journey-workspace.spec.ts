@@ -8,17 +8,18 @@ import {identityBindings,serviceActivity} from "../../src/platform/database/sche
 import {sessionRepository} from "../../src/platform/database/session-repository";
 import {SessionService} from "../../src/modules/identity";
 import {operatorServiceAccess} from "../../src/modules/operations/schema";
-import {cardholderTopups} from "../../src/modules/workspace/funding-schema";
-import {getCardholderFunds,getPersonSpending} from "../../src/modules/workspace/service";
+import {moneyTopups} from "../../src/modules/money/schema";
+import {getServiceMoneyAccount} from "../../src/modules/money/service";
+import {getCardholderFunds,getCardSpending} from "../../src/modules/workspace/service";
 import type {TopupReceipt} from "../../src/modules/workspace/funding-contracts";
 import {cardholderDashboardSchema,cardRequestProjectionSchema} from "../../src/modules/workspace/api-contracts";
 import {createChannel,updateMerchantSetup,submitMerchantSetup,getMerchantWorkspace} from "../../src/modules/acquiring/service";
 import {configureTestGateway,enrollTestMerchant,setChannelActivation,getMerchantOperations} from "../../src/modules/acquiring/operations-service";
 import {publishGuestChannel} from "../../src/modules/acquiring/guest-service";
 import {cardCheckoutReviewSchema,type CardCheckoutReview} from "../../src/modules/acquiring/card-checkout-contracts";
-import {merchantOperationsProjectionSchema,merchantTestPaymentProjectionSchema,merchantTestPayoutProjectionSchema} from "../../src/modules/acquiring/operations-api-contracts";
+import {merchantOperationsProjectionSchema,merchantTestPaymentProjectionSchema,merchantSettlementReceiptSchema} from "../../src/modules/acquiring/operations-api-contracts";
 import {merchantTestPayments,merchantTestRefunds} from "../../src/modules/acquiring/operations-schema";
-import {merchantDeposits,merchantDepositItems,merchantDepositEvents} from "../../src/modules/acquiring/settlement-schema";
+import {merchantSettlements,merchantSettlementItems} from "../../src/modules/acquiring/settlement-schema";
 import {cardPerson,cardPrimary} from "../helpers/cardholder";
 import {acquiringFixture,completeSetup} from "../helpers/acquiring";
 
@@ -160,11 +161,12 @@ async function payFromPublishedLink(
   return paid as CardCheckoutReview&{receipt:NonNullable<CardCheckoutReview["receipt"]>};
 }
 
-test("a prepaid group funds a real checkout, refund and operator-completed merchant deposit",async({page},info)=>{
+test("a prepaid group funds a connected checkout, refund and separate Merchant settlement",async({page},info)=>{
   test.setTimeout(180_000);
   const primaryName="Taylor Prepaid "+randomUUID().slice(0,8);
   const primary=await cardPrimary(primaryName);
   const merchant=await publishedMerchant();
+  const account=await getDb().transaction(tx=>getServiceMoneyAccount(tx,primary.serviceId));
   await signIn(page,primary.personId);
   expect((await cardDashboard(page)).cards).toEqual([]);
   const fundsPath="/api/v1/cardholder-services/"+primary.serviceId;
@@ -174,7 +176,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     await page.getByRole("navigation",{name:"Cardholder navigation"}).getByText("More",{exact:true}).click();
     await page.getByRole("navigation",{name:"Cardholder navigation"})
       .getByRole("link",{name:"Add money",exact:true}).click();
-    await expect(page.getByRole("heading",{name:"Add money & spending limits",exact:true})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
     await expect(page.locator(".funds-balance")).toContainText("$0.00");
     await page.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill("100.00");
     await page.getByRole("button",{name:"Continue",exact:true}).click();
@@ -209,7 +211,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
       await expect(page.getByRole("button",{name:"Retry this top-up",exact:true})).toBeVisible();
       expect(page.url()).toBe(reviewUrl);
       expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("10000");
-      expect(await getDb().select().from(cardholderTopups).where(eq(cardholderTopups.serviceId,primary.serviceId))).toHaveLength(1);
+      expect(await getDb().select().from(moneyTopups).where(eq(moneyTopups.moneyAccountId,account.id))).toHaveLength(1);
       await page.getByRole("button",{name:"Retry this top-up",exact:true}).click();
       const confirmation=page.locator('section[aria-labelledby="funding-title"]');
       await expect(confirmation.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
@@ -229,26 +231,6 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     await capture(page,info,"01-top-up-confirmed");
   });
 
-  await test.step("set one monthly person limit without moving group money",async()=>{
-    const person=page.locator(".funds-person").filter({
-      has:page.getByRole("heading",{name:primaryName,exact:true}),
-    });
-    await person.getByRole("button",{name:"Change limit for "+primaryName,exact:true}).click();
-    await person.getByRole("textbox",{name:"New monthly limit for "+primaryName,exact:true}).fill("50.00");
-    await person.getByRole("button",{name:"Review limit",exact:true}).click();
-    await expect(person).toContainText("This does not add money or reset spending already recorded.");
-    const saved=responseFor(page,fundsPath+"/cardholders/"+primary.personId+"/spending-limit","PUT");
-    await person.getByRole("button",{name:"Save limit",exact:true}).click();
-    expect((await saved).status()).toBe(200);
-    await expect(person.getByRole("button",{name:"Change limit for "+primaryName,exact:true})).toBeVisible();
-    await expect(person.locator(".funds-limit-value")).toHaveText("$50.00");
-    expect(await getPersonSpending(primary.personId,primary.serviceId,primary.personId)).toMatchObject({
-      version:1,monthlyLimit:{minor:"5000"},spentThisMonth:{minor:"0"},available:{minor:"5000"},
-    });
-    expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("10000");
-    await accessible(page,info,"funding-and-person-limits");
-  });
-
   let cardId="";
   await test.step("create a card through the UI with no starting-balance field or funding effect",async()=>{
     const before=await getCardholderFunds(primary.personId,primary.serviceId);
@@ -259,6 +241,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     await expect(form.getByRole("textbox",{name:/starting balance/i})).toHaveCount(0);
     await expect(form.getByLabel(/starting balance/i)).toHaveCount(0);
     await form.getByRole("textbox",{name:"Card name",exact:true}).fill("Everyday browser card");
+    await form.getByRole("textbox",{name:"Total card allowance (USD)",exact:true}).fill("50.00");
     await form.getByRole("button",{name:"Review card",exact:true}).click();
     await expect(form.getByRole("heading",{name:"Review your card",exact:true})).toBeVisible();
     await expect(form).toContainText("Creating a card does not add money.");
@@ -271,6 +254,7 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     expect(issued).toMatchObject({status:"ISSUED",holderId:primary.personId});
     expect(issued.issuedCardId).not.toBeNull();
     cardId=issued.issuedCardId!;
+    expect(await getCardSpending(primary.personId,primary.serviceId,cardId)).toMatchObject({version:1,allowance:{minor:"5000"},used:{minor:"0"},available:{minor:"5000"}});
     await expect(form).toBeHidden();
     await expect(page.getByRole("region",{name:"Selected card overview",exact:true})).toContainText("Everyday browser card");
     await expect(page.getByRole("link",{name:"Try a purchase",exact:true})).toHaveCount(0);
@@ -279,15 +263,19 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     const dashboard=await cardDashboard(page);
     expect(dashboard.cards).toHaveLength(1);
     expect(dashboard.cards[0]).toMatchObject({id:cardId,holderId:primary.personId,available:{minor:"5000"}});
-    expect(await getCardholderFunds(primary.personId,primary.serviceId)).toEqual(before);
+    const after=await getCardholderFunds(primary.personId,primary.serviceId);
+    expect(after.available).toEqual(before.available);
+    expect(after.topups).toEqual(before.topups);
+    expect(after.moneyAccountId).toBe(before.moneyAccountId);
+    expect(after.cards.map(card=>card.id)).toEqual([cardId]);
     await capture(page,info,"02-card-created-with-existing-funds");
   });
 
   const first=await test.step("pay the published merchant link using the card",async()=>{
     const paid=await payFromPublishedLink(page,merchant,cardId);
     expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("8750");
-    expect(await getPersonSpending(primary.personId,primary.serviceId,primary.personId)).toMatchObject({
-      spentThisMonth:{minor:"1250"},remainingThisMonth:{minor:"3750"},available:{minor:"3750"},
+    expect(await getCardSpending(primary.personId,primary.serviceId,cardId)).toMatchObject({
+      used:{minor:"1250"},remaining:{minor:"3750"},available:{minor:"3750"},
     });
     const operations=await getMerchantOperations(merchant.personId,merchant.merchantId);
     expect(operations.availableFunds?.minor).toBe("1250");
@@ -323,8 +311,8 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     });
     await expect(review).toBeHidden();
     expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("10000");
-    expect(await getPersonSpending(primary.personId,primary.serviceId,primary.personId)).toMatchObject({
-      spentThisMonth:{minor:"1250"},remainingThisMonth:{minor:"3750"},available:{minor:"3750"},
+    expect(await getCardSpending(primary.personId,primary.serviceId,cardId)).toMatchObject({
+      used:{minor:"1250"},remaining:{minor:"3750"},available:{minor:"3750"},
     });
     const operations=await merchantProjection(page,merchant.merchantId);
     expect(operations).toMatchObject({
@@ -343,112 +331,50 @@ test("a prepaid group funds a real checkout, refund and operator-completed merch
     expect(paid.id).not.toBe(first.id);
     expect(paid.receipt.paymentId).not.toBe(first.receipt.paymentId);
     expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("8750");
-    expect(await getPersonSpending(primary.personId,primary.serviceId,primary.personId)).toMatchObject({
-      monthlyLimit:{minor:"5000"},spentThisMonth:{minor:"2500"},remainingThisMonth:{minor:"2500"},available:{minor:"2500"},
+    expect(await getCardSpending(primary.personId,primary.serviceId,cardId)).toMatchObject({
+      allowance:{minor:"5000"},used:{minor:"2500"},remaining:{minor:"2500"},available:{minor:"2500"},
     });
     return paid;
   });
 
-  const deposit=await test.step("review a deposit containing only the unrefunded payment and leave it pending",async()=>{
+  const settlement=await test.step("settle only the unrefunded payment into separate merchant money",async()=>{
     await signIn(page,merchant.personId);
     await page.goto("/merchants/"+merchant.merchantId+"?tab=payments");
     await expect(moneyCard(page,"Awaiting settlement")).toContainText("$12.50");
-    await expect(moneyCard(page,"Deposited balance")).toContainText("$0.00");
     const operations=await merchantProjection(page,merchant.merchantId);
     expect(operations.depositReview).toMatchObject({amount:{minor:"1250"},paymentCount:1});
-    await page.getByRole("region",{name:"Current available balance",exact:true})
-      .getByRole("button",{name:"Request deposit",exact:true}).click();
-    const request=page.getByRole("dialog",{name:"Request deposit",exact:true});
+    await page.getByRole("button",{name:"Settle payments",exact:true}).click();
+    const request=page.getByRole("dialog",{name:"Settle payments",exact:true});
     await expect(request).toContainText("$12.50");
-    await request.getByRole("button",{name:"Review deposit",exact:true}).click();
-    const review=page.getByRole("dialog",{name:"Review deposit",exact:true});
-    await expect(review).toContainText("Deposited balance");
-    const response=responseFor(page,"/api/v1/merchants/"+merchant.merchantId+"/payouts");
-    await review.getByRole("button",{name:"Request deposit",exact:true}).click();
-    const saved=await successful(await response,value=>merchantTestPayoutProjectionSchema.parse(value));
-    expect(saved).toMatchObject({
-      status:"PENDING",amount:{minor:"1250"},processedAt:null,retryReview:null,
-    });
-    expect(saved.payments.map(payment=>payment.id)).toEqual([second.receipt.paymentId]);
-    expect(saved.payments[0]).toMatchObject({amount:{minor:"1250"},refundedAmount:{minor:"0"}});
+    await request.getByRole("button",{name:"Review settlement",exact:true}).click();
+    const review=page.getByRole("dialog",{name:"Review settlement",exact:true});
+    await expect(review).toContainText("Merchant money");
+    await expect(review).toContainText("Card money stays separate.");
+    await capture(page,info,"05-owner-reviews-exact-settlement");
+    const response=responseFor(page,"/api/v1/merchants/"+merchant.merchantId+"/settlements");
+    await review.getByRole("button",{name:"Settle payments",exact:true}).click();
+    const saved=await successful(await response,value=>merchantSettlementReceiptSchema.parse(value));
+    expect(saved).toMatchObject({terminalId:merchant.merchantId,amount:{minor:"1250"}});
     await expect(review).toBeHidden();
     const after=await merchantProjection(page,merchant.merchantId);
-    expect(after).toMatchObject({
-      availableFunds:{minor:"0"},settledFunds:{minor:"0"},pendingDeposits:{minor:"1250"},bankFunds:{minor:"0"},
-    });
-    await page.getByRole("navigation",{name:"Payment activity views"})
-      .getByRole("button",{name:"Deposits",exact:true}).click();
-    await page.getByRole("button",{name:"View deposit "+saved.testReference,exact:true}).click();
-    const detail=page.getByRole("dialog",{name:"Deposit details",exact:true});
-    await expect(detail).toContainText(saved.testReference);
-    await expect(detail.getByText("pending",{exact:true})).toBeVisible();
-    const included=detail.getByRole("link",{name:merchant.channel.description+" · "+second.receipt.reference,exact:true});
-    await expect(included).toHaveAttribute("href","/merchants/"+merchant.merchantId+"?tab=payments&payment="+second.receipt.paymentId);
-    await expect(detail).not.toContainText(first.receipt.reference);
-    await expect(detail.getByRole("button",{name:"Review new deposit",exact:true})).toHaveCount(0);
-    await capture(page,info,"05-deposit-pending-with-exact-payment");
-    await page.goto("/operations/deposits");
-    await expect(page.getByRole("heading",{name:"Access required",exact:true})).toBeVisible();
-    await expect(page.getByRole("button",{name:"Complete deposit",exact:true})).toHaveCount(0);
+    expect(after).toMatchObject({availableFunds:{minor:"0"},settledFunds:{minor:"0"},pendingDeposits:{minor:"0"},bankFunds:{minor:"1250"},depositReview:null,payouts:[]});
+    expect(after.settlements).toHaveLength(1);
+    expect(after.settlements[0]).toMatchObject({id:saved.id,reference:saved.reference});
+    await page.reload();
+    await expect(moneyCard(page,"Merchant money")).toContainText("$12.50");
+    await capture(page,info,"06-merchant-money-settled");
+    await accessible(page,info,"merchant-money-settled");
     return saved;
   });
 
-  await test.step("an explicitly assigned operator records the bank outcome through the UI",async()=>{
-    await signIn(page,merchant.operatorId);
-    await page.goto("/operations/deposits");
-    await expect(page.getByRole("heading",{name:"Deposit processing",exact:true})).toBeVisible();
-    const row=page.locator("article").filter({hasText:deposit.testReference});
-    await expect(row).toHaveCount(1);
-    await row.getByText("Included payments",{exact:true}).click();
-    await expect(row).toContainText(second.receipt.reference);
-    await expect(row).not.toContainText(first.receipt.reference);
-    await row.getByRole("button",{name:"Complete deposit",exact:true}).click();
-    await expect(row).toContainText("Record this deposit as completed?");
-    await capture(page,info,"06-assigned-operator-reviews-completion");
-    const processed=responseFor(page,"/api/v1/operations/deposits/"+deposit.id);
-    await row.getByRole("button",{name:"Confirm result",exact:true}).click();
-    const outcome=await successful(await processed,value=>merchantTestPayoutProjectionSchema.parse(value));
-    expect(outcome).toMatchObject({
-      id:deposit.id,status:"COMPLETED",amount:{minor:"1250"},retryReview:null,
-    });
-    expect(outcome.processedAt).not.toBeNull();
-    expect(outcome.payments.map(payment=>payment.id)).toEqual([second.receipt.paymentId]);
-    await expect(row).toHaveCount(0);
-    await expect(page.getByText("No pending deposits for your assigned merchants.",{exact:true})).toBeVisible();
-  });
-
-  await test.step("the merchant sees its saved bank balance and matching completed deposit",async()=>{
-    await signIn(page,merchant.personId);
-    await page.goto("/merchants/"+merchant.merchantId+"?tab=payments&activity=transfers");
-    await expect(moneyCard(page,"Deposited balance")).toContainText("$12.50");
-    await expect(moneyCard(page,"Processing")).toContainText("$0.00");
-    const row=page.getByRole("row").filter({hasText:deposit.testReference});
-    await expect(row).toContainText("Completed");
-    await expect(row).toContainText("$12.50");
-    await page.reload();
-    await expect(moneyCard(page,"Deposited balance")).toContainText("$12.50");
-    const operations=await merchantProjection(page,merchant.merchantId);
-    expect(operations).toMatchObject({
-      availableFunds:{minor:"0"},settledFunds:{minor:"0"},pendingDeposits:{minor:"0"},bankFunds:{minor:"1250"},depositReview:null,
-    });
-    expect(operations.payouts).toHaveLength(1);
-    expect(operations.payouts[0]).toMatchObject({id:deposit.id,status:"COMPLETED",retryReview:null});
-    expect(operations.payouts[0]!.payments.map(payment=>payment.id)).toEqual([second.receipt.paymentId]);
-    await capture(page,info,"07-merchant-completed-bank-deposit");
-    await accessible(page,info,"merchant-completed-deposit");
-  });
-
   // End-to-end cardinality proof: customer actions above cannot create hidden duplicate money.
-  expect(await getDb().select().from(cardholderTopups).where(eq(cardholderTopups.serviceId,primary.serviceId))).toHaveLength(1);
+  expect(await getDb().select().from(moneyTopups).where(eq(moneyTopups.moneyAccountId,account.id))).toHaveLength(1);
   const payments=await getDb().select().from(merchantTestPayments).where(eq(merchantTestPayments.merchantUnitId,merchant.merchantId));
   expect(payments.map(payment=>payment.id).sort()).toEqual([first.receipt.paymentId,second.receipt.paymentId].sort());
   expect(await getDb().select().from(merchantTestRefunds).where(eq(merchantTestRefunds.paymentId,first.receipt.paymentId))).toHaveLength(1);
-  expect(await getDb().select().from(merchantDeposits).where(eq(merchantDeposits.merchantUnitId,merchant.merchantId))).toHaveLength(1);
-  expect(await getDb().select().from(merchantDepositItems).where(eq(merchantDepositItems.depositId,deposit.id))).toMatchObject([
+  expect(await getDb().select().from(merchantSettlements).where(eq(merchantSettlements.merchantUnitId,merchant.merchantId))).toHaveLength(1);
+  expect(await getDb().select().from(merchantSettlementItems).where(eq(merchantSettlementItems.settlementId,settlement.settlementId))).toMatchObject([
     {paymentId:second.receipt.paymentId,amountMinor:1250n},
-  ]);
-  expect(await getDb().select().from(merchantDepositEvents).where(eq(merchantDepositEvents.depositId,deposit.id))).toMatchObject([
-    {actorId:merchant.operatorId,outcome:"COMPLETED"},
   ]);
   const activity=await getDb().select().from(serviceActivity).where(eq(serviceActivity.cardId,cardId));
   expect(activity.filter(row=>row.direction==="DEBIT")).toHaveLength(2);

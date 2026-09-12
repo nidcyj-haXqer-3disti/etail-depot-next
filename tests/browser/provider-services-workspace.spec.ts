@@ -39,7 +39,7 @@ test("a newly signed-in provider member gets a clear service choice without auto
     await expect(page.getByRole("heading", { name: "More ways to get paid", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Merchant services couldn’t load", exact: true })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Create merchant", exact: true })).toHaveCount(0);
-    expect(await merchantDashboard(page.request)).toMatchObject({ canCreatePrimary: false, units: [] });
+    expect(await merchantDashboard(page.request)).toMatchObject({ canCreateMerchant: false, units: [], moneyAccounts: [] });
     await page.reload();
     await expect(page.getByRole("heading", { name: "More ways to get paid", exact: true })).toBeVisible();
     expect(await getDb().select().from(services).where(eq(services.primaryPersonId, identity.personId))).toEqual([]);

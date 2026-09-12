@@ -1,29 +1,28 @@
-import {randomUUID} from "node:crypto";
 import {eq} from "drizzle-orm";
 import {expect,test} from "@playwright/test";
 import {closeDatabase,getDb} from "../../src/platform/database/client";
-import {createMerchantPayout,getMerchantOperations} from "../../src/modules/acquiring/operations-service";
+import {getMerchantOperations} from "../../src/modules/acquiring/operations-service";
 import {merchantDepositEvents,merchantDeposits} from "../../src/modules/acquiring/settlement-schema";
 import {ledgerJournals} from "../../src/modules/ledger/schema";
 import {merchantTestPayoutProjectionSchema} from "../../src/shared/deposit-response";
-import {freshPrepaidCard,freshPublishedPayment,payPublishedWithCard,signInPerson} from "./helpers/prepaid";
-import {explicitDepositOperator} from "./helpers/merchant-payments";
+import {startHistoricalDepositBrowser,type HistoricalDepositBrowser} from "./helpers/historical-deposit";
 
-test.afterAll(closeDatabase);
+let fixture:HistoricalDepositBrowser;
+test.beforeAll(async()=>{test.setTimeout(90_000);fixture=await startHistoricalDepositBrowser();});
+test.afterAll(async()=>{await closeDatabase();await fixture?.close();});
 
 test("an operator retries a committed deposit result after valid JSON with a malformed success shape",async({page})=>{
  test.setTimeout(90_000);
- const m=await freshPublishedPayment("1250"),payer=await freshPrepaidCard("10000");
- const paid=await payPublishedWithCard(m.publication.id,payer);expect(paid.receipt).not.toBeNull();
+ const m={merchant:{personId:fixture.ownerId,serviceId:fixture.serviceId},unit:{id:fixture.terminalId}};
  const before=await getMerchantOperations(m.merchant.personId,m.unit.id);
- const deposit=await createMerchantPayout(m.merchant.personId,m.unit.id,{commandId:randomUUID(),reviewToken:before.depositReview!.token});
+ const deposit=before.payouts.find(row=>row.id===fixture.depositId)!;
  expect(deposit).toMatchObject({status:"PENDING",amount:{minor:"1250"}});
- const operatorId=await explicitDepositOperator(m.merchant.serviceId);await signInPerson(page,operatorId);
- await page.goto("/operations/deposits");
+ await fixture.signIn(page);
+ await page.goto(`${fixture.origin}/operations/deposits`);
  await expect(page.getByRole("heading",{name:"Deposit processing",exact:true})).toBeVisible();
  const row=page.getByRole("article").filter({hasText:deposit.testReference});
  await expect(row).toBeVisible();await expect(row).toContainText("$12.50");
- await row.getByText("Included payments",{exact:true}).click();await expect(row).toContainText(paid.receipt!.reference);
+ await row.getByText("Included payments",{exact:true}).click();await expect(row).toContainText(fixture.paymentReference);
  await row.getByRole("button",{name:"Complete deposit",exact:true}).click();
  await expect(row).toContainText("Record this deposit as completed?");
  const attempts:Array<{path:string;body:unknown}>=[],statuses:number[]=[];

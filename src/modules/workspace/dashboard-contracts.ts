@@ -5,14 +5,14 @@ export interface CardholderServiceProfile {
  primaryPersonId:string;
  primaryName:string;
  displayName:string;
- relationship:"PRIMARY"|"SECONDARY";
+ relationship:"OWNER"|"CARDHOLDER";
  canAddCard:boolean;
  canInvite:boolean;
 }
 export interface DashboardCard extends WorkspaceCard {
  serviceId:string;
  primaryName:string;
- accessRole:"PRIMARY"|"SECONDARY";
+ accessRole:"OWNER"|"CARDHOLDER";
  canManageAccess:boolean;
 }
 export interface DashboardActivity extends WorkspaceActivity {

@@ -1,10 +1,11 @@
-import {fundCardGroup,setPersonLimit} from "../helpers/cardholder";
+import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
 import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { serviceActivity, services, serviceMembers, permissionGrants } from "../../src/platform/database/schema";
 import { ledgerEntries } from "../../src/modules/ledger/schema";
+import {attachServiceMoneyAccount} from "../../src/modules/money/service";
 import { getWorkspace, getActivity, searchActivity, startCardRequest, cancelCardRequest, controlCard, purchaseCard, updateCardRequest } from "../../src/modules/workspace/service";
 import { createReportDefinition, exportHistoricalReport, getHistoricalReport } from "../../src/modules/reports/service";
 import { createSupportCase, getSupportCase } from "../../src/modules/cases/service";
@@ -17,9 +18,9 @@ const filters: ReportFilters = { source: "ACTIVITY", status: "ALL", from: "2020-
 async function fixture() {
   const p = await cardPrimary("Named primary holder"), secondary = await cardPerson("Own secondary holder"), other = await cardPerson("Other secondary holder");
   for (const holder of [secondary, other]) await enrollCardholder(p.personId, p.serviceId, holder);
-  const primaryCard = await (async()=>{await fundCardGroup(p.personId,p.serviceId,"30000");await setPersonLimit(p.personId,p.serviceId,p.personId,"10000");return issuePracticeCard(p.personId,p.serviceId,p.personId,"Private primary card","701");})();
-  const ownCard = await (async()=>{await setPersonLimit(p.personId,p.serviceId,secondary,"10000");return issuePracticeCard(p.personId,p.serviceId,secondary,"Secondary own card","123");})();
-  const otherCard = await (async()=>{await setPersonLimit(p.personId,p.serviceId,other,"10000");return issuePracticeCard(p.personId,p.serviceId,other,"Other person's card","999");})();
+  const primaryCard = await (async()=>{await fundCardGroup(p.personId,p.serviceId,"30000");return issuePracticeCard(p.personId, p.serviceId, p.personId, "Private primary card", "701", "10000");})();
+  const ownCard = await (async()=>{return issuePracticeCard(p.personId, p.serviceId, secondary, "Secondary own card", "123", "10000");})();
+  const otherCard = await (async()=>{return issuePracticeCard(p.personId, p.serviceId, other, "Other person's card", "999", "10000");})();
   const [unassigned] = await getDb().insert(serviceActivity).values({ serviceId: p.serviceId, title: "Unattributed service row", category: "Service", occurredAt: new Date(), status: "POSTED", direction: "CREDIT", amountMinor: 111n, description: "Not linked to any card" }).returning();
   return { serviceId: p.serviceId, primary: p.personId, secondary, other, primaryCard, ownCard, otherCard, unassigned: unassigned! };
 }
@@ -28,16 +29,16 @@ describe("primary oversight and secondary own-card privacy", () => {
   it("scopes every card, amount, transaction detail and search by the holder relationship", async () => {
     const f = await fixture();
     const primary = await getWorkspace(f.primary, f.serviceId);
-    expect(primary.cardholderRole).toBe("PRIMARY");
+    expect(primary.cardholderRole).toBe("OWNER");
     expect(primary.cards.map(row => row.id).sort()).toEqual([f.primaryCard.card.id, f.ownCard.card.id, f.otherCard.card.id].sort());
-    expect(primary.cards.find(row => row.id === f.primaryCard.card.id)!.relationship).toBe("PRIMARY");
-    expect(primary.cards.find(row => row.id === f.ownCard.card.id)!.relationship).toBe("SECONDARY");
+    expect(primary.cards.find(row => row.id === f.primaryCard.card.id)!.relationship).toBe("OWNER");
+    expect(primary.cards.find(row => row.id === f.ownCard.card.id)!.relationship).toBe("CARDHOLDER");
     expect(primary.activity.map(row => row.id)).not.toContain(f.unassigned.id);
     const own = await getWorkspace(f.secondary, f.serviceId);
     expect(own).not.toHaveProperty("balances");expect(own).not.toHaveProperty("settlements");expect(own).not.toHaveProperty("disputes");
-    expect(own).toMatchObject({ cardholderRole: "SECONDARY", cardRequests: [], cardholderOptions: [],  });
+    expect(own).toMatchObject({ cardholderRole: "CARDHOLDER", cardRequests: [], cardholderOptions: [],  });
     expect(own.cards.map(row => row.id)).toEqual([f.ownCard.card.id]);
-    expect(own.cards[0]).toMatchObject({ holderId: f.secondary, relationship: "SECONDARY", available: { minor: "9877" }, canPurchase: true });
+    expect(own.cards[0]).toMatchObject({ holderId: f.secondary, relationship: "CARDHOLDER", available: { minor: "9877" }, canPurchase: true });
     expect(own.activity.map(row => row.id)).toEqual([f.ownCard.activity!.id]);
     expect(own.people.every(row => row.id === f.secondary)).toBe(true);
     for (const value of [f.primaryCard.card.nickname, f.otherCard.card.nickname, f.primaryCard.activity!.title, f.otherCard.activity!.title, f.unassigned.title]) expect(JSON.stringify(own)).not.toContain(value);
@@ -88,7 +89,7 @@ describe("primary oversight and secondary own-card privacy", () => {
     await getDb().update(serviceMembers).set({ state: "REVOKED", version: 2 }).where(and(eq(serviceMembers.serviceId, f.serviceId), eq(serviceMembers.personId, f.secondary)));
     expect((await getDb().select().from(permissionGrants).where(and(eq(permissionGrants.serviceId, f.serviceId), eq(permissionGrants.personId, f.secondary), eq(permissionGrants.action, "cards.hold"))))[0]!.state).toBe("ACCEPTED");
     expect((await getWorkspace(f.primary, f.serviceId)).cardholderOptions.map(row => row.id)).not.toContain(f.secondary);
-    await expect(updateCardRequest(f.primary, f.serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId: f.secondary, nickname: "Unavailable holder", format: "VIRTUAL" })).rejects.toMatchObject({ status: 422 });
+    await expect(updateCardRequest(f.primary, f.serviceId, draft.id, {allowanceMinor:"0", commandId: randomUUID(), expectedVersion: draft.version, holderId: f.secondary, nickname: "Unavailable holder", format: "VIRTUAL" })).rejects.toMatchObject({ status: 422 });
     await expect(purchaseCard(f.secondary, f.serviceId, f.ownCard.card.id, { commandId: randomUUID(), expectedVersion: f.ownCard.card.version, amountMinor: "1", description: "Revoked purchase" })).rejects.toMatchObject({ status: 404 });
   });
 
@@ -96,6 +97,7 @@ describe("primary oversight and secondary own-card privacy", () => {
     const p = await cardPrimary();
     const [merchant] = await getDb().insert(services).values({ kind: "MERCHANT", primaryPersonId: p.personId, displayName: "Independent merchant" }).returning();
     await getDb().insert(serviceMembers).values({ serviceId: merchant!.id, personId: p.personId, state: "ACCEPTED" });
+    await getDb().transaction(tx=>attachServiceMoneyAccount(tx,merchant!.id,p.personId,"MERCHANT","Independent merchant money"));
     await getDb().insert(permissionGrants).values(["cards.read", "cards.request", "cards.create", "activity.read", "people.read"].map(action => ({ serviceId: merchant!.id, personId: p.personId, action })));
     await expect(getWorkspace(p.personId, merchant!.id)).rejects.toMatchObject({ status: 404 });
     await expect(startCardRequest(p.personId, merchant!.id, { commandId: randomUUID() })).rejects.toMatchObject({ status: 403 });

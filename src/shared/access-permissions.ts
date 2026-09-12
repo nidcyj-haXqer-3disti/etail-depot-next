@@ -1,0 +1,3 @@
+export const ACCESS_PERMISSIONS = ["cards.read","cards.hold","cards.request","cards.create","cards.purchase","cards.freeze","cards.unfreeze","cards.manageMembers","activity.read","people.read","people.invite","people.changeRole","people.revoke","notifications.manage"] as const;
+export const CARDHOLDER_ACCESS_PERMISSIONS = ["cards.read","cards.hold","cards.purchase","cards.freeze","cards.unfreeze","activity.read","notifications.manage"] as const;
+export const TERMINAL_PERMISSIONS=["merchant.read","channels.read","channels.create","channels.update","channels.close","channels.share","payments.read","disputes.read","disputes.respond"] as const;
