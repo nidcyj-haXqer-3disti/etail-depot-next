@@ -1,9 +1,13 @@
 import { requireSandboxParticipant } from "../sandbox/service";
+import {getVerifiedEmails,normalizeVerifiedEmail} from "../identity/contact-service";
+import {bindCreatedCardRecipient,revokeCreatedCardRecipient} from "../workspace/service";
+import {readCardSpending} from "../workspace/funding-reader";
+import {isInvitationRecipient} from "./recipient";
 import { requireServiceReader } from "../services/service-reader";
 import { createHash,randomUUID } from "node:crypto";
-import { and,desc,eq,inArray,lte,or,sql } from "drizzle-orm";
+import { and,desc,eq,inArray,isNull,lte,or,sql } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
-import { services,serviceMembers,people,permissionGrants } from "../../platform/database/schema";
+import { services,serviceMembers,people,permissionGrants,cards } from "../../platform/database/schema";
 import { SecurityError } from "../../platform/security/origin";
 import {isCardholderPermission} from "../policy/cardholder-scope";
 import { ACTIONS,evaluate,type PolicyScope } from "../policy/evaluate";
@@ -12,11 +16,11 @@ import type {AnyInvitationProjection} from "./merchant-contracts";
 import { lockMoneyAccountsForServices } from "../money/service";
 import { loadServiceScope,type ScopedTransaction } from "./scope";
 import { serviceInvitations,invitationPermissions,accessCommands,accessHistory } from "./schema";
-import { ACCESS_PERMISSIONS,CARDHOLDER_ACCESS_PERMISSIONS,createInvitationSchema,invitationDecisionSchema,type AccessPermission,type AccessOverview,type AccessPerson,type InvitationProjection,type InvitedRole,type CreateInvitationInput,type InvitationDecisionInput } from "./contracts";
+import { ACCESS_PERMISSIONS,CARDHOLDER_ACCESS_PERMISSIONS,createInvitationSchema,invitationDecisionSchema,type AccessPermission,type AccessOverview,type AccessPerson,type InvitationProjection,type InvitedRole,type CreateInvitationInput,type InvitationDecisionInput,createCardInvitationSchema,type CreateCardInvitationInput,type CardInvitationProjection } from "./contracts";
 
 type Scope=Awaited<ReturnType<typeof loadServiceScope>>;
 type Invitation=typeof serviceInvitations.$inferSelect;
-function serviceTarget(row:Invitation):asserts row is Invitation&{serviceId:string;role:InvitedRole} {if(row.targetKind!=="SERVICE"||!row.serviceId||!row.role)throw new SecurityError("INVITATION_UNAVAILABLE",404);}
+function serviceTarget(row:Invitation):asserts row is Invitation&{serviceId:string;role:InvitedRole;recipientId:string} {if(row.targetKind!=="SERVICE"||!row.serviceId||!row.role||!row.recipientId)throw new SecurityError("INVITATION_UNAVAILABLE",404);}
 const cardServicePermissions:readonly AccessPermission[]=ACCESS_PERMISSIONS.filter(isCardholderPermission);
 async function sandboxPerson(tx:ScopedTransaction,personId:string) {
   try {await requireSandboxParticipant(tx,personId);}
@@ -71,17 +75,17 @@ export async function getAccessOverview(personId:string,serviceId:string):Promis
     const peopleRows:AccessPerson[]=[];for(const member of members) peopleRows.push(await personProjection(tx,scope,member));
     peopleRows.sort((a,b)=>a.displayName.localeCompare(b.displayName)||a.id.localeCompare(b.id));
     const timestamp=await now(tx),pending=and(eq(serviceInvitations.status,"PENDING"),sql`${serviceInvitations.expiresAt}>${timestamp}`);
-    const [counts]=await tx.select({total:sql<number>`count(*)::integer`,pending:sql<number>`count(*) filter (where ${pending})::integer`}).from(serviceInvitations).where(eq(serviceInvitations.serviceId,serviceId));
-    const rows=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.serviceId,serviceId)).orderBy(sql`case when ${pending} then 0 else 1 end`,desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
+    const [counts]=await tx.select({total:sql<number>`count(*)::integer`,pending:sql<number>`count(*) filter (where ${pending})::integer`}).from(serviceInvitations).where(and(eq(serviceInvitations.serviceId,serviceId),eq(serviceInvitations.targetKind,"SERVICE")));
+    const rows=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.serviceId,serviceId),eq(serviceInvitations.targetKind,"SERVICE"))).orderBy(sql`case when ${pending} then 0 else 1 end`,desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
     const invitations:InvitationProjection[]=[];for(const row of rows)invitations.push(await invitationProjection(tx,row,personId,scope,timestamp));
     const canInvite=evaluate(scope.policy,"people.invite").allowed;
     const recipients:{id:string;displayName:string}[]=[];
     const historyLabels:Record<string,string>={INVITED:"Invitation created",INVITATION_ACCEPTED:"Invitation accepted",INVITATION_DECLINED:"Invitation declined",INVITATION_REVOKED:"Invitation canceled",INVITATION_EXPIRED:"Invitation expired",ACCESS_CHANGED:"Access changed",ACCESS_REVOKED:"Cardholder access removed"};
     const changes=await tx.select().from(accessHistory).where(and(eq(accessHistory.targetKind,"SERVICE"),eq(accessHistory.serviceId,serviceId))).orderBy(desc(accessHistory.createdAt),accessHistory.id).limit(101);
-    const names=changes.length?await tx.select({id:people.id,name:people.displayName}).from(people).where(inArray(people.id,[...new Set(changes.flatMap(change=>[change.personId,change.actorId]))])):[];
+    const names=changes.length?await tx.select({id:people.id,name:people.displayName}).from(people).where(inArray(people.id,[...new Set(changes.flatMap(change=>change.personId?[change.personId,change.actorId]:[change.actorId]))])):[];
     const nameById=new Map(names.map(person=>[person.id,person.name]));
     return {serviceId,serviceName:"Cardholder access",serviceKind:"CARDHOLDER",canInvite,canManage:false,people:peopleRows,invitations,invitationTotal:counts!.total,pendingInvitationCount:counts!.pending,invitationsTruncated:counts!.total>rows.length,recipients,
-      history:changes.slice(0,100).map(change=>({id:change.id,personId:change.personId,personName:nameById.get(change.personId)??"Cardholder",actorName:nameById.get(change.actorId)??"Cardholder",label:historyLabels[change.kind]??"Access updated",createdAt:change.createdAt.toISOString()})),historyHasMore:changes.length>100,
+      history:changes.slice(0,100).map(change=>({id:change.id,personId:change.personId,personName:nameById.get(change.personId??"")??"Cardholder",actorName:nameById.get(change.actorId)??"Cardholder",label:historyLabels[change.kind]??"Access updated",createdAt:change.createdAt.toISOString()})),historyHasMore:changes.length>100,
       permissionOptions:[],roleOptions:[],
       notice:"Invite someone to use a card. You manage the card balance and each card’s total spending limit."};
   },{isolationLevel:"repeatable read"});
@@ -89,9 +93,12 @@ export async function getAccessOverview(personId:string,serviceId:string):Promis
 export async function listInvitationsForPerson(personId:string):Promise<AnyInvitationProjection[]> {
   return getDb().transaction(async tx=>{
     await requireServiceReader(tx,personId);
-    const rows=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.recipientId,personId)).orderBy(desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
+    const emails=await getVerifiedEmails(tx,personId);
+    const rows=await tx.select().from(serviceInvitations).where(or(eq(serviceInvitations.recipientId,personId),emails.length?and(isNull(serviceInvitations.recipientId),inArray(serviceInvitations.recipientEmail,emails)):undefined)).orderBy(desc(serviceInvitations.createdAt),serviceInvitations.id).limit(100);
     const result:AnyInvitationProjection[]=[];for(const row of rows){
-      if(row.targetKind==="MERCHANT_TERMINAL")result.push(await merchantInvitationProjection(tx,row,personId));
+      if(!await isInvitationRecipient(tx,row,personId))continue;
+      if(row.targetKind==="CARD")result.push(await cardInvitationProjection(tx,row,personId));
+      else if(row.targetKind==="MERCHANT_TERMINAL")result.push(await merchantInvitationProjection(tx,row,personId));
       else {serviceTarget(row);result.push(await invitationProjection(tx,row,personId));}
     }return result;
   });
@@ -107,7 +114,7 @@ async function receipt(tx:ScopedTransaction,personId:string,serviceId:string,kin
   }
   const resourceId=await mutate();await tx.insert(accessCommands).values({commandId:input.commandId,serviceId,actorId:personId,kind,resourceId,digest});return resourceId;
 }
-async function history(tx:ScopedTransaction,serviceId:string,actorId:string,personId:string,kind:string,message:string,invitationId?:string) {
+async function history(tx:ScopedTransaction,serviceId:string,actorId:string,personId:string|null,kind:string,message:string,invitationId?:string) {
   await tx.insert(accessHistory).values({serviceId,actorId,personId,kind,message,invitationId});
 }
 async function writePermissions(tx:ScopedTransaction,serviceId:string,personId:string,permissions:readonly string[],delegable:readonly string[]) {
@@ -124,7 +131,7 @@ async function serviceInvitation(personId:string,serviceId:string,invitationId:s
   return getDb().transaction(async tx=>{
     await sandboxPerson(tx,personId);const scope=await loadServiceScope(tx,personId,serviceId);requireAction(scope,"people.read");
     const [row]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,invitationId),eq(serviceInvitations.serviceId,serviceId)));
-    if(!row)throw new SecurityError("INVITATION_UNAVAILABLE",404);return invitationProjection(tx,row,personId,scope);
+    if(!row)throw new SecurityError("INVITATION_UNAVAILABLE",404);return row.targetKind==="CARD"?cardInvitationProjection(tx,row,personId,scope):invitationProjection(tx,row,personId,scope);
   });
 }
 export async function createInvitation(personId:string,serviceId:string,raw:CreateInvitationInput):Promise<InvitationProjection> {
@@ -143,14 +150,15 @@ export async function createInvitation(personId:string,serviceId:string,raw:Crea
     for(const action of CARDHOLDER_ACCESS_PERMISSIONS)await tx.insert(invitationPermissions).values({invitationId:id,action,delegable:false});
     await history(tx,serviceId,personId,input.recipientId,"INVITED","Invitation created for the named cardholder.",id);return id;
   });
-  return serviceInvitation(personId,serviceId,invitationId);
+  return await serviceInvitation(personId,serviceId,invitationId) as InvitationProjection;
 }
 async function decideInvitation(personId:string,invitationId:string,raw:InvitationDecisionInput,decision:"accept"|"decline"):Promise<AnyInvitationProjection> {
   const input=parse(invitationDecisionSchema,raw);
   await getDb().transaction(async tx=>{
     await sandboxPerson(tx,personId);
-    const [initial]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,invitationId),eq(serviceInvitations.recipientId,personId)));
-    if(!initial)throw new SecurityError("INVITATION_UNAVAILABLE",404);
+    const [initial]=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.id,invitationId));
+    if(!initial||!await isInvitationRecipient(tx,initial,personId))throw new SecurityError("INVITATION_UNAVAILABLE",404);
+    if(initial.targetKind==="CARD")return decideCardInvitation(tx,personId,initial,input,decision);
     if(initial.targetKind==="MERCHANT_TERMINAL")return decideMerchantInvitation(tx,personId,initial,input,decision);
     serviceTarget(initial);
     await lockMoneyAccountsForServices(tx,[initial.serviceId]);
@@ -180,12 +188,12 @@ async function decideInvitation(personId:string,invitationId:string,raw:Invitati
       await history(tx,invitation.serviceId,personId,personId,decision==="accept"?"INVITATION_ACCEPTED":"INVITATION_DECLINED",decision==="accept"?"Named recipient accepted the exact offered service access. No financial product was approved.":"Named recipient declined the invitation.",invitationId);return invitationId;
     });
   });
-  return getDb().transaction(async tx=>{await sandboxPerson(tx,personId);const [row]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,invitationId),eq(serviceInvitations.recipientId,personId)));if(!row)throw new SecurityError("INVITATION_UNAVAILABLE",404);return row.targetKind==="MERCHANT_TERMINAL"?merchantInvitationProjection(tx,row,personId):invitationProjection(tx,row,personId);});
+  return getInvitationForPerson(personId,invitationId);
 }
 export const acceptInvitation=(personId:string,id:string,input:InvitationDecisionInput)=>decideInvitation(personId,id,input,"accept");
 export const declineInvitation=(personId:string,id:string,input:InvitationDecisionInput)=>decideInvitation(personId,id,input,"decline");
 
-export async function revokeInvitation(personId:string,serviceId:string,invitationId:string,raw:InvitationDecisionInput):Promise<InvitationProjection> {
+export async function revokeInvitation(personId:string,serviceId:string,invitationId:string,raw:InvitationDecisionInput):Promise<InvitationProjection|CardInvitationProjection> {
   const input=parse(invitationDecisionSchema,raw);
   await getDb().transaction(async tx=>{
     await sandboxPerson(tx,personId);const scope=await loadServiceScope(tx,personId,serviceId,true);requireAction(scope,"people.read");
@@ -211,9 +219,83 @@ export async function revokeMemberAccess(personId:string,serviceId:string,target
     const [target]=await tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,serviceId),eq(serviceMembers.personId,targetId))).for("update");
     if(!target)throw new SecurityError("PERSON_UNAVAILABLE",404);
     requireVersion(target.version,input.expectedVersion);if(!canManageTarget(scope,target,await memberGrants(tx,serviceId,targetId),"people.revoke"))throw new SecurityError("TARGET_ACCESS_PROTECTED",403);
+    const assigned=await tx.select({id:cards.id}).from(cards).where(and(eq(cards.serviceId,serviceId),eq(cards.holderId,targetId),eq(cards.assignmentState,"ACCEPTED")));
+    for(const card of assigned)await revokeCreatedCardRecipient(tx,personId,serviceId,card.id);
     await tx.update(serviceMembers).set({state:"REVOKED",version:target.version+1}).where(and(eq(serviceMembers.serviceId,serviceId),eq(serviceMembers.personId,targetId)));
     await writePermissions(tx,serviceId,targetId,[],[]);await invalidateInvitations(tx,serviceId,targetId,true);
     await history(tx,serviceId,personId,targetId,"ACCESS_REVOKED","Card access and related card invitations revoked. Merchant membership and permissions, historical records and obligations remain unchanged.");return targetId;
   });
   return returnedPerson(personId,serviceId,targetId);
+}
+
+/** Exact-card invitations use the existing invitation lifecycle and command receipts. */
+async function cardInvitationProjection(tx:ScopedTransaction,row:Invitation,viewerId:string,scope?:Scope):Promise<CardInvitationProjection>{
+ if(row.targetKind!=="CARD"||!row.cardId||!row.serviceId)throw new SecurityError("INVITATION_UNAVAILABLE",404);
+ const [card]=await tx.select().from(cards).where(and(eq(cards.id,row.cardId),eq(cards.serviceId,row.serviceId)));
+ const [inviter]=await tx.select().from(people).where(eq(people.id,row.inviterId));
+ const [recipient]=row.recipientId?await tx.select().from(people).where(eq(people.id,row.recipientId)):[];
+ if(!card||!inviter)throw new SecurityError("INVITATION_UNAVAILABLE",404);
+ const timestamp=await now(tx),status=row.status==="PENDING"&&row.expiresAt<=timestamp?"EXPIRED":row.status;
+ let ownerCurrent=false,hasServiceAccess=false;
+ try{const current=await loadServiceScope(tx,row.inviterId,row.serviceId);assertCardholderAccess(current);ownerCurrent=true;}catch(error){if(!(error instanceof SecurityError))throw error;}
+ if(row.recipientId===viewerId&&card.holderId===viewerId&&card.assignmentState==="ACCEPTED")try{await loadServiceScope(tx,viewerId,row.serviceId);hasServiceAccess=ownerCurrent;}catch(error){if(!(error instanceof SecurityError))throw error;}
+ const spending=await readCardSpending(tx,row.serviceId,card.id);
+ return {targetKind:"CARD",id:row.id,serviceId:row.serviceId,serviceName:card.nickname,serviceKind:"CARDHOLDER",cardId:card.id,cardName:card.nickname,inviterName:inviter.displayName,recipientId:row.recipientId,recipientEmail:row.recipientEmail,recipientName:recipient?.displayName??row.recipientEmail??"Cardholder",role:"CARDHOLDER",permissions:[...CARDHOLDER_ACCESS_PERMISSIONS],delegablePermissions:[],status,version:row.version,createdAt:row.createdAt.toISOString(),expiresAt:row.expiresAt.toISOString(),canRespond:ownerCurrent&&status==="PENDING"&&card.assignmentState==="UNASSIGNED"&&await isInvitationRecipient(tx,row,viewerId),canRevoke:!!scope&&status==="PENDING"&&canRevokeOffer(scope,row),hasServiceAccess,allowance:{amount:spending.allowance.toString(),currency:"USD"},href:`/cardholder-services?card=${card.id}`};
+}
+export async function getInvitationForPerson(personId:string,invitationId:string):Promise<AnyInvitationProjection>{
+ return getDb().transaction(async tx=>{
+  await requireServiceReader(tx,personId);
+  const [row]=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.id,invitationId));
+  if(!row||!await isInvitationRecipient(tx,row,personId))throw new SecurityError("INVITATION_UNAVAILABLE",404);
+  if(row.targetKind==="CARD")return cardInvitationProjection(tx,row,personId);
+  if(row.targetKind==="MERCHANT_TERMINAL")return merchantInvitationProjection(tx,row,personId);
+  return invitationProjection(tx,row,personId);
+ });
+}
+export async function getCardInvitations(personId:string,cardId:string){return getDb().transaction(async tx=>{
+ await requireServiceReader(tx,personId);
+ const [card]=await tx.select().from(cards).where(eq(cards.id,cardId));if(!card)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+ const scope=await loadServiceScope(tx,personId,card.serviceId);assertCardholderAccess(scope);
+ const rows=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.cardId,cardId),eq(serviceInvitations.targetKind,"CARD"))).orderBy(desc(serviceInvitations.createdAt)).limit(30);
+ const invitations:CardInvitationProjection[]=[];for(const row of rows)invitations.push(await cardInvitationProjection(tx,row,personId,scope));
+ return {cardId,serviceId:card.serviceId,cardName:card.nickname,canInvite:card.assignmentState==="UNASSIGNED",invitations};
+});}
+export async function createCardInvitation(personId:string,serviceId:string,cardId:string,raw:CreateCardInvitationInput):Promise<CardInvitationProjection>{
+ const input=parse(createCardInvitationSchema,raw),recipientEmail=normalizeVerifiedEmail(input.recipientEmail);if(!recipientEmail)throw new SecurityError("INVALID_REQUEST",422);
+ const id=await serviceCommand(personId,serviceId,"card.invitation.create","people.invite",input,cardId,async(tx,scope)=>{
+  assertCardholderAccess(scope);
+  if((await getVerifiedEmails(tx,personId)).includes(recipientEmail))throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
+  const [card]=await tx.select().from(cards).where(and(eq(cards.serviceId,serviceId),eq(cards.id,cardId))).for("update");
+  if(!card)throw new SecurityError("RESOURCE_UNAVAILABLE",404);if(card.assignmentState!=="UNASSIGNED")throw new SecurityError("CARD_ALREADY_ASSIGNED",409);
+  const timestamp=await now(tx);
+  await tx.update(serviceInvitations).set({status:"EXPIRED",version:sql`${serviceInvitations.version}+1`,decidedAt:timestamp}).where(and(eq(serviceInvitations.cardId,cardId),eq(serviceInvitations.status,"PENDING"),lte(serviceInvitations.expiresAt,timestamp)));
+  const [pending]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.cardId,cardId),eq(serviceInvitations.status,"PENDING")));
+  if(pending)throw new SecurityError("PENDING_INVITATION_EXISTS",409);
+  const invitationId=randomUUID();await tx.insert(serviceInvitations).values({id:invitationId,targetKind:"CARD",serviceId,cardId,inviterId:personId,recipientEmail,role:"CARDHOLDER",createdAt:timestamp,expiresAt:new Date(timestamp.getTime()+input.expiresInDays*86400000)});
+  for(const action of CARDHOLDER_ACCESS_PERMISSIONS)await tx.insert(invitationPermissions).values({invitationId,action,delegable:false});
+  await history(tx,serviceId,personId,null,"INVITED","Invitation created for this card.",invitationId);return invitationId;
+ });
+ return getDb().transaction(async tx=>{const scope=await loadServiceScope(tx,personId,serviceId);assertCardholderAccess(scope);const [row]=await tx.select().from(serviceInvitations).where(and(eq(serviceInvitations.id,id),eq(serviceInvitations.cardId,cardId),eq(serviceInvitations.serviceId,serviceId)));if(!row)throw new SecurityError("INVITATION_UNAVAILABLE",404);return cardInvitationProjection(tx,row,personId,scope);});
+}
+async function decideCardInvitation(tx:ScopedTransaction,personId:string,initial:Invitation,input:InvitationDecisionInput,decision:"accept"|"decline"){
+ if(!initial.serviceId||!initial.cardId)throw new SecurityError("INVITATION_UNAVAILABLE",404);
+ const serviceId=initial.serviceId;
+ await lockMoneyAccountsForServices(tx,[serviceId]);await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"workspace:"+serviceId},0))`);
+ const [row]=await tx.select().from(serviceInvitations).where(eq(serviceInvitations.id,initial.id)).for("update");
+ if(!row||!row.cardId||!await isInvitationRecipient(tx,row,personId))throw new SecurityError("INVITATION_UNAVAILABLE",404);
+ if(personId===row.inviterId)throw new SecurityError("RECIPIENT_UNAVAILABLE",422);
+ if(decision==="accept")try{assertCardholderAccess(await loadServiceScope(tx,row.inviterId,serviceId,true));}catch(error){if(error instanceof SecurityError)throw new SecurityError("INVITER_ACCESS_CHANGED",409);throw error;}
+ await receipt(tx,personId,serviceId,`card.invitation.${decision}`,input,row.id,async()=>{
+  requireVersion(row.version,input.expectedVersion);const timestamp=await now(tx);
+  if(row.status!=="PENDING")throw new SecurityError("INVITATION_ALREADY_USED",422);if(row.expiresAt<=timestamp)throw new SecurityError("INVITATION_EXPIRED",422);
+  if(decision==="accept"){
+   const [member]=await tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,serviceId),eq(serviceMembers.personId,personId))).for("update");
+   if(!member)await tx.insert(serviceMembers).values({serviceId,personId,state:"ACCEPTED"});
+   else if(member.state!=="ACCEPTED")await tx.update(serviceMembers).set({state:"ACCEPTED",version:member.version+1}).where(and(eq(serviceMembers.serviceId,serviceId),eq(serviceMembers.personId,personId)));
+   await writePermissions(tx,serviceId,personId,CARDHOLDER_ACCESS_PERMISSIONS,[]);
+   await bindCreatedCardRecipient(tx,row.inviterId,serviceId,row.cardId!,personId);
+  }
+  await tx.update(serviceInvitations).set({recipientId:personId,status:decision==="accept"?"ACCEPTED":"DECLINED",version:row.version+1,decidedAt:timestamp}).where(eq(serviceInvitations.id,row.id));
+  await history(tx,serviceId,personId,personId,decision==="accept"?"INVITATION_ACCEPTED":"INVITATION_DECLINED",decision==="accept"?"Cardholder accepted this card.":"Card invitation declined.",row.id);return row.id;
+ });
 }

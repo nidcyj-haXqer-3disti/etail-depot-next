@@ -8,7 +8,9 @@ it("derives a stable local card identity per request without payment credentials
   expect(issueSandboxCard(randomUUID()).id).not.toBe(card.id);
   expect(card.id).toMatch(/^[0-9a-f-]{36}$/);
   expect(card.lastFour).toMatch(/^[0-9]{4}$/);
-  expect(Object.keys(card).sort()).toEqual(["id", "issuerReference", "lastFour"]);
+  expect(Object.keys(card).sort()).toEqual(["id", "issuerReference", "lastFour", "network"]);
+  expect(card.network).toBe("VISA");
+  expect(card.issuerReference).toMatch(/^sandbox-card:/);
   expect(card).not.toHaveProperty("balance");
   expect(card).not.toHaveProperty("limit");
 });

@@ -39,7 +39,7 @@ import {
   submitCardRequest,
   updateCardRequest,
 } from "../../src/modules/workspace/service";
-import { cardPerson, cardPrimary, enrollCardholder } from "../helpers/cardholder";
+import { assignPracticeCard, cardPerson, cardPrimary, enrollCardholder } from "../helpers/cardholder";
 import { merchantAccessFixture } from "../helpers/merchant-access";
 import { paymentInput } from "../helpers/acquiring";
 
@@ -63,7 +63,7 @@ async function bareCard(
   const saved = await updateCardRequest(primaryId, serviceId, draft.id, {allowanceMinor:"0",
     commandId: randomUUID(),
     expectedVersion: draft.version,
-    holderId,
+    holderId:holderId===primaryId?holderId:null,
     nickname,
     format: "VIRTUAL",
   });
@@ -74,6 +74,7 @@ async function bareCard(
   if (issued.status !== "ISSUED" || !issued.issuedCardId) {
     throw new Error("Canonical card issuance did not complete");
   }
+  if(holderId!==primaryId)await assignPracticeCard(primaryId,serviceId,issued.issuedCardId,holderId);
   const card = (await getWorkspace(holderId, serviceId)).cards.find(
     row => row.id === issued.issuedCardId,
   );

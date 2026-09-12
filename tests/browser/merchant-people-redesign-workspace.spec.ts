@@ -1,3 +1,4 @@
+import {signInVerified} from "./helpers/card-invitation";
 import {randomUUID} from "node:crypto";
 import {and,eq} from "drizzle-orm";
 import AxeBuilder from "@axe-core/playwright";
@@ -28,16 +29,16 @@ async function accessible(page:Page){
 
 test("owner invitations recover one request, grant one terminal on acceptance and remove access",async({page,browser})=>{
  test.setTimeout(120000);const f=await merchantAccessFixture(),name=`Terminal colleague ${randomUUID().slice(0,6)}`;
- const member=await startSandbox(f.helper.personId,{commandId:randomUUID(),displayName:name,acknowledged:true});
- const context=await browser.newContext({viewport:page.viewportSize()??{width:1440,height:900}}),recipient=await context.newPage();await signIn(page.context(),f.merchant.personId);await signIn(context,f.helper.personId);
+ const email=`terminal-${randomUUID()}@example.test`;await startSandbox(f.helper.personId,{commandId:randomUUID(),displayName:name,acknowledged:true});
+ const context=await browser.newContext({viewport:page.viewportSize()??{width:1440,height:900}}),recipient=await context.newPage();await signIn(page.context(),f.merchant.personId);await signInVerified(recipient,f.helper.personId,email);
  try{
   await page.goto(`/merchants/${f.unit.id}?tab=people`);await page.getByRole("button",{name:"Invite a person",exact:true}).click();
-  const invite=page.getByRole("dialog",{name:"Invite a person",exact:true});await invite.getByRole("textbox",{name:"Member code",exact:true}).fill(member.memberCode!);await invite.getByRole("button",{name:"Find person",exact:true}).click();await expect(invite).toContainText(`Selected: ${name}`);
+  const invite=page.getByRole("dialog",{name:"Invite a person",exact:true});await invite.getByRole("textbox",{name:"Recipient email",exact:true}).fill(email);
   await invite.getByRole("button",{name:"Review invitation",exact:true}).click();const review=page.getByRole("dialog",{name:"Review payment access",exact:true});await expect(review).toContainText("You keep control of money, refunds, settings and invitations. They cannot change them.");await expect(review.getByRole("checkbox")).toHaveCount(0);
   const bodies:string[]=[];await page.route(`**/api/v1/merchants/${f.unit.id}/invitations`,async route=>{if(route.request().method()!=="POST"){await route.continue();return;}bodies.push(route.request().postData()!);if(bodies.length===1){expect((await route.fetch()).status()).toBe(200);await route.abort("failed");}else await route.continue();});
   await review.getByRole("button",{name:"Save invitation",exact:true}).click();await review.getByRole("button",{name:"Check access request again",exact:true}).click();await expect(review).toBeHidden();expect(bodies[0]).toBe(bodies[1]);
-  const access=await getMerchantAccessOverview(f.merchant.personId,f.unit.id),offer=access.invitations.find(row=>row.recipientId===f.helper.personId)!;expect(access.pendingInvitationCount).toBe(1);expect(offer.permissions).toContain("disputes.respond");expect(offer).not.toHaveProperty("delegablePermissions");
-  expect((await recipient.request.get(`/api/v1/merchants/${f.unit.id}`)).status()).toBe(404);await recipient.goto("/shared-access");await recipient.locator(".ws-person-row").filter({hasText:offer.id.slice(0,8).toUpperCase()}).getByRole("button",{name:"Review invitation"}).click();await recipient.getByRole("dialog",{name:"Review terminal invitation",exact:true}).getByRole("button",{name:"Accept invitation",exact:true}).click();await recipient.getByRole("link",{name:"Open your terminal",exact:true}).click();await expect(recipient).toHaveURL(new RegExp(`/merchants/${f.unit.id}`));expect((await recipient.request.get(`/api/v1/merchants/${f.master.id}`)).status()).toBe(404);
+  const access=await getMerchantAccessOverview(f.merchant.personId,f.unit.id),offer=access.invitations.find(row=>row.recipientEmail===email)!;expect(access.pendingInvitationCount).toBe(1);expect(offer.permissions).toContain("disputes.respond");expect(offer).not.toHaveProperty("delegablePermissions");
+  expect((await recipient.request.get(`/api/v1/merchants/${f.unit.id}`)).status()).toBe(404);await recipient.goto(`/invitations/${offer.id}`);await recipient.getByRole("button",{name:"Accept invitation",exact:true}).click();await recipient.getByRole("link",{name:"Open your payment terminal",exact:true}).click();await expect(recipient).toHaveURL(new RegExp(`/merchants/${f.unit.id}`));expect((await recipient.request.get(`/api/v1/merchants/${f.master.id}`)).status()).toBe(404);
   await page.reload();const person=page.locator(".mp-person").filter({hasText:name});await expect(person).toContainText("Can collect payments");await accessible(page);await person.getByRole("button",{name:"Remove access",exact:true}).click();await page.getByRole("dialog",{name:"Remove payment access?",exact:true}).getByRole("button",{name:"Confirm removal",exact:true}).click();await expect(page.getByRole("dialog")).toBeHidden();expect((await recipient.request.get(`/api/v1/merchants/${f.unit.id}`)).status()).toBe(404);
  }finally{await context.close();}
 });

@@ -80,7 +80,7 @@ export async function postJournal(tx: LedgerTransaction, input: PostJournalInput
   for (const line of lines) await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"ledger-position:" + positionKey(line)},0))`);
   for (const line of lines) {
     await requireResources(tx, line);
-    if ((["GROUP_AVAILABLE","CARD_AVAILABLE","MERCHANT_AVAILABLE","MERCHANT_SETTLED","MERCHANT_PAYOUT_PENDING","PAYOUT_CLEARING","MONEY_AVAILABLE","MONEY_WITHDRAWAL_PENDING","MONEY_WITHDRAWN"].includes(line.bucket)) && await getBalance(tx, line) + line.deltaMinor < 0n) throw new SecurityError("INSUFFICIENT_LEDGER_FUNDS", 409);
+    if ((["GROUP_AVAILABLE","CARD_AVAILABLE","MERCHANT_AVAILABLE","MERCHANT_SETTLED","MERCHANT_CAPTURE_PENDING", "MERCHANT_REFUND_PENDING", "MERCHANT_PAYOUT_PENDING","PAYOUT_CLEARING","MONEY_AVAILABLE","MONEY_WITHDRAWAL_PENDING","MONEY_WITHDRAWN"].includes(line.bucket)) && await getBalance(tx, line) + line.deltaMinor < 0n) throw new SecurityError("INSUFFICIENT_LEDGER_FUNDS", 409);
   }
   const [journal] = await tx.insert(ledgerJournals).values({ businessKey: input.businessKey, kind: input.kind, referenceId, digest, createdAt:input.occurredAt??sql`clock_timestamp()` }).returning();
   await tx.insert(ledgerEntries).values(lines.map((line, index) => ({ ...line, journalId: journal!.id, lineNumber: index + 1 })));

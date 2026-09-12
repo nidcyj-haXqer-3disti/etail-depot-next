@@ -79,7 +79,7 @@ describe("password verification to canonical session", () => {
     expect(await signInWithPassword("member@example.test", "existing password", "old-cookie", deps)).toBe("opaque-app-cookie");
     expect(deps.order).toEqual(["limit", "availability", "verify", "bind", "revoke previous", "issue"]);
     expect(deps.bind).toHaveBeenCalledExactlyOnceWith(verified.issuer, verified.subject);
-    expect(deps.sessions.issue).toHaveBeenCalledExactlyOnceWith({ identityId: "new-identity", personId: "new-person" });
+    expect(deps.sessions.issue).toHaveBeenCalledExactlyOnceWith({ identityId: "new-identity", personId: "new-person" }, { issuer: verified.issuer, subject: verified.subject });
     expect(deps.sessions.logout).toHaveBeenCalledExactlyOnceWith("old-cookie");
   });
   it("does not send any credential or bind an identity after exhausting the durable budget", async () => {

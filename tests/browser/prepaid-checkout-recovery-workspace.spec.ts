@@ -11,17 +11,12 @@ import {freshPrepaidCard,freshPublishedPayment,openSavedCardReview,signInPerson}
 
 test.afterAll(closeDatabase);
 
-for(const phase of ["review","payment"] as const)test(`lost checkout ${phase} survives later access denial and restores the exact saved request`,async({page})=>{
+for(const failure of ["malformed response","lost transport"] as const)test(`saved checkout ${failure} survives later access denial and restores the exact saved request`,async({page})=>{
  test.setTimeout(90_000);
  const {primary,card}=await freshPrepaidCard("900");
  const merchant=await freshPublishedPayment("325",`Recovery order ${randomUUID().slice(0,8)}`);
  await signInPerson(page,primary.personId);
- let path=`/api/v1/checkout/${merchant.publication.id}/card`;
- if(phase==="payment")path=(await openSavedCardReview(page,merchant.publication.id,card.id)).confirmPath;
- else{
-  await page.goto(`/checkout/${merchant.publication.id}/card`);
-  await page.getByRole("combobox",{name:"Your card",exact:true}).selectOption(card.id);
- }
+ const path=(await openSavedCardReview(page,merchant.publication.id,card.id)).confirmPath;
  const attempts:Array<{path:string;body:unknown}>=[],statuses:number[]=[];
  await page.route(`**${path}`,async route=>{
   if(route.request().method()!=="POST"){await route.continue();return;}
@@ -29,21 +24,21 @@ for(const phase of ["review","payment"] as const)test(`lost checkout ${phase} su
   const response=await route.fetch();statuses.push(response.status());
   if(attempts.length===1){
    expect(response.status()).toBe(200);
-   // Save the real operation, then lose a valid response: malformed review JSON
-   // and a dropped payment transport both require exact retry identity.
-   if(phase==="review")await route.fulfill({status:200,contentType:"application/json",body:""});
+   // Save the real payment, then return malformed JSON or drop the transport.
+   // Both cases must retain the same saved review and payment instruction.
+   if(failure==="malformed response")await route.fulfill({status:200,contentType:"application/json",body:""});
    else await route.abort("connectionfailed");
   }else await route.fulfill({response});
  });
- await page.getByRole("button",{name:phase==="review"?"Review payment":"Pay $3.25",exact:true}).click();
- await expect(page.getByRole("button",{name:phase==="review"?"Check review again":"Check payment again",exact:true})).toBeEnabled();
+ await page.getByRole("button",{name:"Pay $3.25",exact:true}).click();
+ await expect(page.getByRole("button",{name:"Check payment again",exact:true})).toBeEnabled();
  const recoveryMessage=page.locator("main").getByRole("alert");
  await expect(recoveryMessage).toHaveText("We couldn’t confirm this result. Check the request again.");
  await expect(recoveryMessage).not.toContainText(/JSON|Response|SyntaxError|TypeError|ZodError/);
  await expect(page.getByRole("link",{name:"Reload cards and choose again",exact:true})).toHaveCount(0);
- if(phase==="review")await expect(page.getByRole("combobox",{name:"Your card",exact:true})).toBeDisabled();
+ await expect(page.getByRole("combobox",{name:"Your card",exact:true})).toHaveCount(0);
  await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),eq(permissionGrants.action,"cards.read")));
- await page.getByRole("button",{name:phase==="review"?"Check review again":"Check payment again",exact:true}).click();
+ await page.getByRole("button",{name:"Check payment again",exact:true}).click();
  await expect.poll(()=>statuses.length).toBe(2);expect(statuses[1]).toBe(403);
  await expect(page.getByRole("heading",{name:"Card access unavailable",exact:true})).toBeVisible();
  await expect(page.locator("main")).not.toContainText(card.nickname);
@@ -57,10 +52,6 @@ for(const phase of ["review","payment"] as const)test(`lost checkout ${phase} su
  if(viewport)await page.setViewportSize(viewport);
  await getDb().update(permissionGrants).set({state:"ACCEPTED"}).where(and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),eq(permissionGrants.action,"cards.read")));
  await retry.click();
- if(phase==="review"){
-  await expect(page.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();
-  await page.getByRole("button",{name:"Pay $3.25",exact:true}).click();
- }
  await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();
  expect(statuses).toEqual([200,403,200]);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[2]).toEqual(attempts[0]);
  const savedUrl=page.url(),reviewId=new URL(savedUrl).searchParams.get("review");expect(reviewId).not.toBeNull();

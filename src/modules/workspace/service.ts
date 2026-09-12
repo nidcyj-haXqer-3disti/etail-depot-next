@@ -6,7 +6,7 @@ import { serviceMembers, people, permissionGrants, cards, cardRequests, serviceA
 import { SecurityError } from "../../platform/security/origin";
 import { ACTIONS, evaluate, type PolicyScope } from "../policy/evaluate";
 import { cardholderRole, canReadCardholderData, isCardholderPermission } from "../policy/cardholder-scope";
-import { loadServiceScope } from "../access/scope";
+import { loadServiceScope, type ScopedTransaction } from "../access/scope";
 import { CARDHOLDER_ACCESS_PERMISSIONS } from "../access/contracts";
 import { requireServiceReader } from "../services/service-reader";
 import { requireSandboxAdult, requireSandboxParticipant, sandboxPersona } from "../sandbox/service";
@@ -48,9 +48,9 @@ export async function getCardholderFunds(personId:string,serviceId:string,page=0
  const account=await requireFundingAccount(personId,serviceId,"cardholder.funds.read"),history=await getMoneyTopups(personId,account.id,page);
  return getDb().transaction(async tx=>{
   const scope=await loadScope(tx,personId,serviceId);requireFundingPrimary(scope,"cardholder.funds.read");
-  const ownedCards=permits(scope,"cards.read")?await tx.select({card:cards,holderName:people.displayName}).from(cards).innerJoin(people,eq(people.id,cards.holderId)).where(eq(cards.serviceId,serviceId)).orderBy(cards.nickname,cards.id):[];
+  const ownedCards=permits(scope,"cards.read")?await tx.select({card:cards,holderName:people.displayName}).from(cards).leftJoin(people,eq(people.id,cards.holderId)).where(eq(cards.serviceId,serviceId)).orderBy(cards.nickname,cards.id):[];
   const result:CardholderFunds={serviceId,moneyAccountId:account.id,serviceName:account.displayName,available:formatMoney(await readServiceMoneyAvailable(tx,serviceId)),source:"SANDBOX_BANK",sourceLabel:"Funding balance",topups:history.topups.map(row=>topupProjection(row,serviceId)),page:history.page,hasMore:history.hasMore,cards:[]};
-  for(const {card,holderName} of ownedCards)result.cards.push({id:card.id,name:card.nickname,holderName,spending:spendingProjection(await readCardSpending(tx,serviceId,card.id))});
+  for(const {card,holderName} of ownedCards)result.cards.push({id:card.id,name:card.nickname,holderName:holderName??"Not assigned",spending:spendingProjection(await readCardSpending(tx,serviceId,card.id))});
   return result;
  },{isolationLevel:"repeatable read"});
 }
@@ -79,7 +79,7 @@ export async function getCardSpending(personId:string,serviceId:string,cardId:st
  return getDb().transaction(async tx=>{
   const scope=await loadScope(tx,personId,serviceId);requireAction(scope,"cards.read");
   const [card]=await tx.select().from(cards).where(and(eq(cards.serviceId,serviceId),eq(cards.id,cardId)));
-  if(!card||!canReadCardholderData(scope.policy,card.holderId))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+  if(!card||!canReadCardholderData(scope.policy,card.holderId,card.assignmentState))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
   return spendingProjection(await readCardSpending(tx,serviceId,cardId));
  });
 }
@@ -126,11 +126,11 @@ function validate<T>(schema: z.ZodType<T>, input: unknown): T {
   return parsed.data;
 }
 
-function canManageHolder(scope: Scope, holderId: string) {
-  return canReadCardholderData(scope.policy, holderId) && (holderId === scope.actor.id || permits(scope, "cards.manageMembers"));
+function canManageHolder(scope: Scope, holderId: string | null, assignmentState: typeof cards.$inferSelect["assignmentState"] = "ACCEPTED") {
+  return canReadCardholderData(scope.policy, holderId, assignmentState) && (holderId === scope.actor.id || permits(scope, "cards.manageMembers"));
 }
-function requireManageHolder(scope: Scope, holderId: string) {
-  if (!canManageHolder(scope, holderId)) throw new SecurityError("ACTION_DENIED", 403);
+function requireManageHolder(scope: Scope, holderId: string | null, assignmentState: typeof cards.$inferSelect["assignmentState"] = "ACCEPTED") {
+  if (!canManageHolder(scope, holderId, assignmentState)) throw new SecurityError("ACTION_DENIED", 403);
 }
 async function holderReadiness(tx: Transaction, serviceId: string, holderId: string, lock = false) {
   const membershipQuery = tx.select().from(serviceMembers).where(and(eq(serviceMembers.serviceId, serviceId), eq(serviceMembers.personId, holderId)));
@@ -153,6 +153,8 @@ async function requestPrerequisites(tx: Transaction, scope: Scope, row: typeof c
   const result: CardRequestProjection["prerequisites"] = [];
   if (!permits(scope, "cards.create")) result.push({ code: "CARD_CREATE_PERMISSION_REQUIRED", title: "Card creation permission is required", detail: "You can save this request, but you need permission to create the card." });
   if (await sandboxPersona(tx, scope.actor.id) !== "FICTIONAL_ADULT") result.push({ code: "ADULT_APPLICANT_REQUIRED", title: "Cardholder setup is required", detail: "Complete the required card account setup before creating a card." });
+  if (row.holderId === null) return result;
+  if(row.holderId!==scope.actor.id)result.push({code:"CARD_RECIPIENT_INVITATION_REQUIRED",title:"Invite the cardholder after creation",detail:"Edit this request and choose Someone else. You can invite them from the created card."});
   const holder = await holderReadiness(tx, row.serviceId, row.holderId);
   if (!holder.allowed) result.push({ code: "CARDHOLDER_UNAVAILABLE", title: "Cardholder access needs attention", detail: "The person named on this card needs active cardholder access and permission to use a card." });
   if (!canManageHolder(scope, row.holderId)) result.push({ code: "MEMBER_MANAGEMENT_REQUIRED", title: "Permission to manage other people’s cards is required", detail: "The account owner needs permission to manage other people’s cards." });
@@ -164,19 +166,23 @@ async function peopleInService(tx: Transaction, serviceId: string) {
   return tx.select({ person: people, membership: serviceMembers }).from(serviceMembers).innerJoin(people, eq(people.id, serviceMembers.personId)).where(eq(serviceMembers.serviceId, serviceId)).orderBy(people.displayName, people.id);
 }
 export async function getCardProjection(tx: Transaction, scope: Scope, row: typeof cards.$inferSelect): Promise<WorkspaceCard> {
-  const [holder] = await tx.select().from(people).where(eq(people.id, row.holderId));
+  const [holder] = row.holderId ? await tx.select().from(people).where(eq(people.id, row.holderId)) : [];
   const spending=spendingProjection(await readCardSpending(tx,row.serviceId,row.id));
   const available=BigInt(spending.available.minor);
-  const readiness = await holderReadiness(tx, row.serviceId, row.holderId);
-  const manageable = canManageHolder(scope, row.holderId);
+  const readiness = row.holderId ? await holderReadiness(tx, row.serviceId, row.holderId) : {allowed:false,persona:null};
+  const manageable = canManageHolder(scope, row.holderId, row.assignmentState);
   const primary=scope.actor.id===scope.policy.primaryPersonId;
   const primaryRestriction=row.primaryFrozen||row.freezeReviewRequired;
   const reasons=[row.primaryFrozen?"Paused by the account owner.":"",row.holderFrozen?"Paused by the person named on the card.":"",row.freezeReviewRequired?"An earlier freeze needs review by the account owner.":""].filter(Boolean);
   const canUnfreeze=manageable && (primary?row.status === "FROZEN":row.holderFrozen) && permits(scope, "cards.unfreeze");
   // Explain the same current gates that permit a purchase. Management authority
   // never substitutes for being the person named on the card.
-  const purchaseAvailability:WorkspaceCard["purchaseAvailability"]=row.holderId!==scope.actor.id
-    ?{code:"OTHER_CARDHOLDER",title:`${holder!.displayName}’s card`,description:`${holder!.displayName} makes purchases when signed in to their own login. You can view its purchases and manage its settings.`}
+  const purchaseAvailability:WorkspaceCard["purchaseAvailability"]=row.assignmentState==="UNASSIGNED"
+    ?{code:"UNASSIGNED",title:"Invite a cardholder",description:"This card is created. Invite the person who will use it; they can access it after accepting your invitation."}
+    :row.assignmentState==="REVOKED"
+      ?{code:"REVOKED",title:"Card access removed",description:"This card can no longer be used. Its past activity stays in your records. Create a new card if you want to invite someone again."}
+      :row.holderId!==scope.actor.id
+    ?{code:"OTHER_CARDHOLDER",title:`${holder!.displayName}’s card`,description:`Only ${holder!.displayName} can use this card. You can view its purchases and manage its settings.`}
     :!readiness.allowed||!permits(scope,"cards.purchase")
       ?{code:"ACCESS_RESTRICTED",title:"You can’t make purchases with this card yet",description:primary?"Review your card access or contact support before making a purchase.":"Ask your account owner to review your card access before making a purchase."}
       :readiness.persona!=="FICTIONAL_ADULT"
@@ -186,8 +192,9 @@ export async function getCardProjection(tx: Transaction, scope: Scope, row: type
           :available<=0n
             ?{code:"NO_FUNDS",title:"No spending available",description:"Ask the account owner to add money to the card balance or review this card’s total spending limit."}
             :{code:"READY",title:"Ready to use",description:"Use this card at checkout within your total spending limit and the available card balance."};
-  return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder!.displayName, nickname: row.nickname,
-    relationship: row.holderId === scope.policy.primaryPersonId ? "OWNER" : "CARDHOLDER",
+  return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder?.displayName ?? "Not assigned", nickname: row.nickname,
+    assignmentState:row.assignmentState,network:row.network,canInvite:primary&&row.assignmentState==="UNASSIGNED"&&permits(scope,"people.invite"),canRevokeAssignment:primary&&row.assignmentState==="ACCEPTED"&&row.holderId!==scope.actor.id&&permits(scope,"people.revoke"),
+    relationship: row.holderId === null ? "UNASSIGNED" : row.holderId === scope.policy.primaryPersonId ? "OWNER" : "CARDHOLDER",
     lastFour: row.lastFour, format: row.format, status: row.status, version: row.version, spending, available: formatMoney(available),
     freeze:{primary:row.primaryFrozen,holder:row.holderFrozen,reviewRequired:row.freezeReviewRequired,description:reasons.join(" ")||"No freezes are active.",freezeLabel:row.status==="ACTIVE"?"Freeze card":primary?"Keep card frozen":"Add your freeze",unfreezeLabel:!primary&&primaryRestriction?"Remove your freeze":"Unfreeze card",unfreezeDescription:primary?"This removes all current freezes on this card. New purchases will be available to the named cardholder, within their spending limit and the available card balance.":primaryRestriction?"Your own freeze will be removed. The card will stay frozen until the account owner removes the remaining restriction.":"Your freeze will be removed. New purchases will be available within your spending limit and the available card balance."},
     canFreeze: manageable && !(primary?row.primaryFrozen:row.holderFrozen) && permits(scope, "cards.freeze"), canUnfreeze,
@@ -199,14 +206,14 @@ export function activityProjection(row: typeof serviceActivity.$inferSelect): Wo
     status: row.status, direction: row.direction, amount: formatMoney(row.amountMinor), description: row.description, fictional: true };
 }
 /** Card activity requires an attributed card in the exact Cardholder service. */
-export function canReadCardholderActivity(scope: PolicyScope, row: { cardId: string | null; holderId: string | null }): boolean {
-  return scope.serviceKind === "CARDHOLDER" && row.cardId !== null && canReadCardholderData(scope, row.holderId);
+export function canReadCardholderActivity(scope: PolicyScope, row: { cardId: string | null; holderId: string | null; assignmentState: typeof cards.$inferSelect["assignmentState"] | null }): boolean {
+  return scope.serviceKind === "CARDHOLDER" && row.cardId !== null && canReadCardholderData(scope, row.holderId, row.assignmentState);
 }
 export async function requestProjection(tx: Transaction, scope: Scope, row: typeof cardRequests.$inferSelect): Promise<CardRequestProjection> {
-  const [holder] = await tx.select().from(people).where(eq(people.id, row.holderId));
+  const [holder] = row.holderId ? await tx.select().from(people).where(eq(people.id, row.holderId)) : [];
   const [issued] = await tx.select({ id: cards.id }).from(cards).where(and(eq(cards.requestId, row.id), eq(cards.serviceId, row.serviceId)));
   const prerequisites = row.status === "CANCELED" || row.status === "ISSUED" ? [] : await requestPrerequisites(tx, scope, row);
-  return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder!.displayName, nickname: row.nickname, format: row.format,
+  return { id: row.id, serviceId: row.serviceId, holderId: row.holderId, holderName: holder?.displayName ?? "Not assigned", nickname: row.nickname, format: row.format,
     currency: "USD", allowance:formatMoney(row.requestedLimitMinor), status: row.status, version: row.version, issuedCardId: issued?.id ?? null,
     canSubmit: (row.status === "DRAFT" || row.status === "BLOCKED") && prerequisites.length === 0,
     updatedAt: row.updatedAt.toISOString(), prerequisites };
@@ -240,12 +247,12 @@ export async function getWorkspaceInTransaction(tx: Transaction, personId: strin
       capabilities: ACTIONS.map(action => { const {allowed,reasonCode,reason}=evaluate(scope.policy,action);return {action,allowed,reasonCode,reason}; }), cards: [], cardRequests: [], cardholderOptions: [], activity: [], people: [], preferences: preferenceProjection(),
     };
     if (permits(scope, "cards.read")) {
-      const rows = await tx.select().from(cards).where(and(eq(cards.serviceId, serviceId), relationship === "OWNER" ? undefined : eq(cards.holderId, personId))).orderBy(cards.nickname, cards.id);
-      for (const row of rows) if (canReadCardholderData(scope.policy, row.holderId)) result.cards.push(await getCardProjection(tx, scope, row));
+      const rows = await tx.select().from(cards).where(and(eq(cards.serviceId, serviceId), relationship === "OWNER" ? undefined : and(eq(cards.holderId, personId),eq(cards.assignmentState,"ACCEPTED")))).orderBy(cards.nickname, cards.id);
+      for (const row of rows) if (canReadCardholderData(scope.policy, row.holderId, row.assignmentState)) result.cards.push(await getCardProjection(tx, scope, row));
     }
     if (permits(scope, "activity.read")) {
-      const rows = await tx.select({ activity: serviceActivity, holderId: cards.holderId }).from(serviceActivity).leftJoin(cards, and(eq(cards.id, serviceActivity.cardId), eq(cards.serviceId, serviceActivity.serviceId))).where(and(eq(serviceActivity.serviceId, serviceId), relationship === "OWNER" ? undefined : eq(cards.holderId, personId))).orderBy(desc(serviceActivity.occurredAt), serviceActivity.id);
-      result.activity = rows.filter(row => canReadCardholderActivity(scope.policy, { cardId: row.activity.cardId, holderId: row.holderId })).map(row => activityProjection(row.activity));
+      const rows = await tx.select({ activity: serviceActivity, holderId: cards.holderId, assignmentState:cards.assignmentState }).from(serviceActivity).leftJoin(cards, and(eq(cards.id, serviceActivity.cardId), eq(cards.serviceId, serviceActivity.serviceId))).where(and(eq(serviceActivity.serviceId, serviceId), relationship === "OWNER" ? undefined : and(eq(cards.holderId, personId),eq(cards.assignmentState,"ACCEPTED")))).orderBy(desc(serviceActivity.occurredAt), serviceActivity.id);
+      result.activity = rows.filter(row => canReadCardholderActivity(scope.policy, { cardId: row.activity.cardId, holderId: row.holderId, assignmentState:row.assignmentState })).map(row => activityProjection(row.activity));
     }
     if (permits(scope, "people.read") || permits(scope, "cards.request")) {
       const members = await peopleInService(tx, serviceId);
@@ -257,7 +264,7 @@ export async function getWorkspaceInTransaction(tx: Transaction, personId: strin
           permissions: ACTIONS.filter(action=>isCardholderPermission(action)&&evaluate(memberPolicy,action).allowed), isCurrentPerson: person.id === personId };
       });
       if (permits(scope, "cards.request")) {
-        result.cardholderOptions = members.filter(({person, membership:member}) => member.state === "ACCEPTED" && (person.id !== scope.policy.primaryPersonId || grants.some(grant => grant.personId === person.id && grant.action === "cards.hold")) && canManageHolder(scope, person.id))
+        result.cardholderOptions = members.filter(({person, membership:member}) => person.id===personId && member.state === "ACCEPTED" && (person.id !== scope.policy.primaryPersonId || grants.some(grant => grant.personId === person.id && grant.action === "cards.hold")) && canManageHolder(scope, person.id))
           .map(({person}) => ({id:person.id,displayName:person.displayName,description:"Current cardholding access. Eligibility is checked before creation."}));
         const requests = await tx.select().from(cardRequests).where(eq(cardRequests.serviceId, serviceId)).orderBy(desc(cardRequests.updatedAt), cardRequests.id);
         for (const request of requests) result.cardRequests.push(await requestProjection(tx, scope, request));
@@ -291,6 +298,40 @@ async function commandInTransaction<T extends {commandId:string}>(tx:Transaction
     return resourceId;
 }
 
+/** Called only after the access command has locked the account/service and verified the exact invitation. */
+export async function bindCreatedCardRecipient(tx:ScopedTransaction,ownerId:string,serviceId:string,cardId:string,recipientId:string):Promise<WorkspaceCard>{
+  const scope=await loadScope(tx,ownerId,serviceId,true);
+  if(cardholderRole(scope.policy)!=="OWNER")throw new SecurityError("ACTION_DENIED",403);
+  requireAction(scope,"people.invite");requireAction(scope,"cards.read");
+  const [card]=await tx.select().from(cards).where(and(eq(cards.id,cardId),eq(cards.serviceId,serviceId))).for("update");
+  if(!card)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+  if(card.assignmentState!=="UNASSIGNED"||card.holderId!==null)throw new SecurityError("CARD_ALREADY_ASSIGNED",409);
+  await requireHolder(tx,serviceId,recipientId);
+  if((await holderReadiness(tx,serviceId,recipientId,true)).persona!=="FICTIONAL_ADULT")throw new SecurityError("CARD_APPLICANT_REQUIRED",403);
+  const [assigned]=await tx.update(cards).set({holderId:recipientId,assignmentState:"ACCEPTED",assignedAt:await databaseNow(tx),version:card.version+1}).where(eq(cards.id,cardId)).returning();
+  return getCardProjection(tx,scope,assigned!);
+}
+/** Revocation retains the original holder and all financial history. It cannot be undone by a new invitation. */
+export async function revokeCreatedCardRecipient(tx:ScopedTransaction,ownerId:string,serviceId:string,cardId:string,expectedVersion?:number):Promise<WorkspaceCard>{
+  const scope=await loadScope(tx,ownerId,serviceId,true);
+  if(cardholderRole(scope.policy)!=="OWNER")throw new SecurityError("ACTION_DENIED",403);
+  requireAction(scope,"people.revoke");requireAction(scope,"cards.read");
+  const [card]=await tx.select().from(cards).where(and(eq(cards.id,cardId),eq(cards.serviceId,serviceId))).for("update");
+  if(!card)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+  if(expectedVersion!==undefined)requireVersion(card.version,expectedVersion);
+  if(card.assignmentState!=="ACCEPTED"||card.holderId===ownerId)throw new SecurityError("INVALID_STATE",422);
+  const [revoked]=await tx.update(cards).set({assignmentState:"REVOKED",assignmentRevokedAt:await databaseNow(tx),version:card.version+1}).where(eq(cards.id,cardId)).returning();
+  return getCardProjection(tx,scope,revoked!);
+}
+export async function revokeCardRecipient(personId:string,serviceId:string,cardId:string,raw:VersionedCommand):Promise<WorkspaceCard>{
+  const input=validate(versionedCommandSchema,raw);
+  await command(personId,serviceId,"card-recipient.revoke","people.revoke",cardId,input,async tx=>{
+    await revokeCreatedCardRecipient(tx,personId,serviceId,cardId,input.expectedVersion);return cardId;
+  });
+  const scopeResult=await getWorkspace(personId,serviceId),card=scopeResult.cards.find(item=>item.id===cardId);
+  if(!card)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return card;
+}
+
 export async function controlCard(personId: string, serviceId: string, cardId: string, raw: CardControlCommand): Promise<WorkspaceCard> {
   const input = validate(cardControlCommandSchema, raw);
   await command(personId, serviceId, `card.${input.action}`, `cards.${input.action}`, cardId, input, async (tx,scope) => {
@@ -315,7 +356,7 @@ export async function controlCard(personId: string, serviceId: string, cardId: s
   }, async (tx, scope) => {
     const [card] = await tx.select().from(cards).where(and(eq(cards.id, cardId), eq(cards.serviceId, serviceId))).for("update");
     if (!card) throw new SecurityError("RESOURCE_UNAVAILABLE", 404);
-    requireManageHolder(scope, card.holderId);
+    requireManageHolder(scope, card.holderId, card.assignmentState);
   });
   const result = (await getWorkspace(personId, serviceId)).cards.find(card => card.id === cardId);
   if (!result) throw new SecurityError("RESOURCE_UNAVAILABLE", 404);
@@ -338,15 +379,9 @@ async function updatedRequest(personId: string, serviceId: string, requestId: st
 }
 export async function startCardRequest(personId: string, serviceId: string, raw: StartCardRequestCommand): Promise<CardRequestProjection> {
   const input = validate(startCardRequestSchema, raw);
-  const requestId = await command(personId, serviceId, "card-request.start", "cards.request", null, input, async (tx, scope) => {
-    const members = await peopleInService(tx, serviceId);
-    const grants = await tx.select().from(permissionGrants).where(and(eq(permissionGrants.serviceId,serviceId),eq(permissionGrants.action,"cards.hold"),eq(permissionGrants.state,"ACCEPTED")));
-    const eligible = members.filter(({person,membership})=>membership.state === "ACCEPTED" && (person.id !== scope.policy.primaryPersonId || grants.some(grant=>grant.personId === person.id)) && canManageHolder(scope, person.id));
-    const holderId = eligible.find(({person})=>person.id === personId)?.person.id ?? eligible[0]?.person.id;
-    if (!holderId) throw new SecurityError("CARDHOLDER_UNAVAILABLE",422);
-    await requireHolder(tx, serviceId, holderId);
-    // This explicit draft choice is displayed in the form/review; requesting never grants holder access.
-    const [request] = await tx.insert(cardRequests).values({ id: randomUUID(), serviceId, creatorId: personId, holderId }).returning();
+  const requestId = await command(personId, serviceId, "card-request.start", "cards.request", null, input, async (tx) => {
+    // Card creation is independent of who will later accept it.
+    const [request] = await tx.insert(cardRequests).values({ id: randomUUID(), serviceId, creatorId: personId, holderId:null }).returning();
     return request!.id;
   });
   return updatedRequest(personId, serviceId, requestId);
@@ -357,8 +392,11 @@ export async function updateCardRequest(personId: string, serviceId: string, req
     const request = await managedRequest(tx, serviceId, requestId);
     requireVersion(request.version, input.expectedVersion);
     if (request.status === "CANCELED" || request.status === "ISSUED") throw new SecurityError("INVALID_STATE", 422);
-    await requireHolder(tx, serviceId, input.holderId);
-    requireManageHolder(scope, input.holderId);
+    if(input.holderId!==null){
+      if(input.holderId!==personId)throw new SecurityError("CARD_RECIPIENT_INVITATION_REQUIRED",422);
+      await requireHolder(tx, serviceId, input.holderId);
+      requireManageHolder(scope, input.holderId);
+    }
     await tx.update(cardRequests).set({ holderId: input.holderId, nickname: input.nickname, format: input.format, requestedLimitMinor:BigInt(input.allowanceMinor), status: "DRAFT", version: request.version + 1, updatedAt: await databaseNow(tx) }).where(eq(cardRequests.id, requestId));
     return requestId;
   });
@@ -376,7 +414,7 @@ export async function submitCardRequest(personId: string, serviceId: string, req
       return requestId;
     }
     const issued = issueSandboxCard(requestId);
-    await tx.insert(cards).values({ ...issued, requestId, serviceId, holderId: request.holderId, nickname: request.nickname, format: request.format, status: "ACTIVE", limitMinor: 0n });
+    await tx.insert(cards).values({ ...issued, requestId, serviceId, holderId: request.holderId, assignmentState:request.holderId?"ACCEPTED":"UNASSIGNED",assignedAt:request.holderId?await databaseNow(tx):null, nickname: request.nickname, format: request.format, status: "ACTIVE", limitMinor: 0n });
     await writeCardLimit(tx,personId,serviceId,issued.id,request.requestedLimitMinor,await databaseNow(tx),0);
     await tx.update(cardRequests).set({ status: "ISSUED", version: request.version + 1, updatedAt: await databaseNow(tx) }).where(eq(cardRequests.id, requestId));
     return requestId;
@@ -384,10 +422,12 @@ export async function submitCardRequest(personId: string, serviceId: string, req
     requireAction(scope, "cards.request");
     await requireAdultCreator(tx, scope);
     const request = await managedRequest(tx, serviceId, requestId);
-    await requireHolder(tx, serviceId, request.holderId);
-    requireManageHolder(scope, request.holderId);
-    // Issuance never creates funds. Guardian-less supervised holders remain blocked.
-    await holderReadiness(tx, serviceId, request.holderId, true);
+    if(request.holderId!==null){
+      await requireHolder(tx, serviceId, request.holderId);
+      requireManageHolder(scope, request.holderId);
+      await holderReadiness(tx, serviceId, request.holderId, true);
+    }
+    // Issuance never creates funds or assigns an unnamed recipient.
   });
   return updatedRequest(personId, serviceId, requestId);
 }
@@ -418,7 +458,7 @@ export async function purchaseCardInTransaction(tx:Transaction,personId: string,
   }, async (tx, scope) => {
     const [card] = await tx.select().from(cards).where(and(eq(cards.id, cardId), eq(cards.serviceId, serviceId))).for("update");
     if (!card) throw new SecurityError("RESOURCE_UNAVAILABLE", 404);
-    if (card.holderId !== personId) throw new SecurityError("ACTION_DENIED", 403);
+    if (card.assignmentState!=="ACCEPTED" || card.holderId !== personId) throw new SecurityError("ACTION_DENIED", 403);
     await requireHolder(tx, serviceId, card.holderId);
     await requireAdultCreator(tx, scope);
   });

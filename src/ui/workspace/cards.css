@@ -34,3 +34,8 @@
  .consumer-card-form>.consumer-form-footer>div>.consumer-button{width:100%;min-width:0;white-space:normal}
  .consumer-card-form>.consumer-form-footer>div>.consumer-button:only-child{grid-column:2}
 }
+
+/* The recipient choice is one accessible group, without the browser fieldset frame. */
+fieldset.consumer-holder-options{min-width:0;padding:0;border:0}
+fieldset.consumer-holder-options legend{font-weight:600;padding:0;margin-bottom:10px}
+.consumer-card-recipient{margin:16px 0}

@@ -1,3 +1,4 @@
+import {createCardUI,inviteCardUI,acceptCardUI,signInVerified} from "./helpers/card-invitation";
 import {fundCardGroup} from "../helpers/cardholder";
 import { randomUUID } from "node:crypto";
 import { and,eq } from "drizzle-orm";
@@ -93,13 +94,15 @@ test("multiple drafts retain their own details and created/canceled requests rem
 test("an owner sees a person's cards and history while holders cannot open management",async({page,browser})=>{
  test.setTimeout(120_000);
  const primary=await cardPrimary(`People UI ${randomUUID().slice(0,8)}`),secondary=await cardPerson("Jordan Sample");
- await enrollCardholder(primary.personId,primary.serviceId,secondary);await signIn(page,primary.personId);
- for(const name of ["Jordan groceries","Jordan travel"]){
-  await page.goto(`${origin}/cardholder-services?view=cardholders&person=${secondary}`);
-  await page.getByRole("link",{name:"Add card for Jordan Sample",exact:true}).click();
-  const dialog=await fillCard(page,name);await expect(dialog.getByRole("radio",{name:/Jordan Sample/})).toBeChecked();
-  await dialog.getByRole("button",{name:"Review card",exact:true}).click();await dialog.getByRole("button",{name:"Create card",exact:true}).click();await expect(page.getByRole("dialog")).toHaveCount(0);
- }
+ await signIn(page,primary.personId);
+ const email=`jordan-${randomUUID()}@example.test`,recipientContext=await browser.newContext({viewport:page.viewportSize()??undefined}),recipientPage=await recipientContext.newPage();
+ try{
+  await signInVerified(recipientPage,secondary,email);
+  for(const name of ["Jordan groceries","Jordan travel"]){
+   const card=await createCardUI(page,name,"25.00");expect(card.assignmentState).toBe("UNASSIGNED");
+   const invitation=await inviteCardUI(page,card.id,email);await acceptCardUI(recipientPage,invitation);
+  }
+ }finally{await recipientContext.close();}
  await page.goto(`${origin}/cardholder-services?view=cardholders&person=${secondary}`);
  const profile=page.locator(".access-cardholder");await expect(profile.locator(".access-person-card-list li")).toHaveCount(2);await expect(profile).toContainText("Jordan groceries");await expect(profile).toContainText("Jordan travel");
  await expect(page.getByRole("button",{name:"Change access",exact:true})).toHaveCount(0);await accessible(page);
@@ -110,7 +113,7 @@ test("an owner sees a person's cards and history while holders cannot open manag
  await expect(page.getByRole("searchbox",{name:"Search people",exact:true})).toHaveValue("Jordan");await expect(profile).toHaveCount(1);
  await profile.getByRole("link",{name:"Jordan Sample",exact:true}).click();await expect(profile.locator(".access-person-card-list li")).toHaveCount(2);
  await profile.locator("li").filter({hasText:"Jordan travel"}).getByRole("link",{name:"Card settings",exact:true}).click();
- await expect(page.getByRole("dialog")).toContainText("Jordan Sample makes purchases when signed in to their own login");await expect(page.getByRole("dialog").getByRole("article",{name:"Card spending limit"})).toContainText("$25.00");await page.keyboard.press("Escape");
+ await expect(page.getByRole("dialog")).toContainText("Only Jordan Sample can use this card");await expect(page.getByRole("dialog").getByRole("article",{name:"Card spending limit"})).toContainText("$25.00");await page.keyboard.press("Escape");
  await page.getByRole("link",{name:"All people",exact:true}).click();await page.getByRole("button",{name:"History",exact:true}).click();await expect(page.locator(".access-history")).toContainText("Invitation accepted");
  const context=await browser.newContext({viewport:page.viewportSize()??undefined});
  try{const holderPage=await context.newPage();await signIn(holderPage,secondary);await holderPage.goto(`${origin}/cardholder-services?view=cardholders&person=${primary.personId}`);await expect(holderPage.getByRole("heading",{name:"People are managed by the account owner",exact:true})).toBeVisible();await expect(holderPage.getByRole("button",{name:"Remove access",exact:true})).toHaveCount(0);await holderPage.goto(`${origin}/cardholder-services?view=requests`);await expect(holderPage.locator(".ch-request-record")).toHaveCount(0);}finally{await context.close();}

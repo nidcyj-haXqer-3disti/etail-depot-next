@@ -1,5 +1,11 @@
 # Decision register
 
+## D76 — card and terminal invitations, public network checkout
+
+The user corrects Etail from an internal-only payment loop to Visa card program intent and acquiring-supported external networks. Follow [the D76 contract](NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md): create a non-spendable pending card before recipient invitation, bind one verified intended recipient once, preserve immutable holder history and card-specific revocation, use exact terminal invitations, and remove Etail login as a prerequisite to public customer payment. Keep separate funds and total allowances. Provider events and original payment source govern money; sandbox adapters do not establish Visa/Stripe enrollment or external message delivery. Record implementation and remaining provider dependencies separately.
+
+D76 verification is recorded in [delivery evidence](NETWORK_CARDS_AND_RESOURCE_INVITATIONS_EVIDENCE.md). Retain historical saved-card receipt/recovery and financial provenance while retiring new internal-card checkout preparation. The final visual pass uses the existing44px invitation select treatment and distinguishes pending payments from a genuinely empty payment history. No real financial or messaging connection is implied by sandbox completion.
+
 ## D75 — Practical service entry and preserved dashboard context (2026-09-12)
 
 The user rejected clutter and speculative experience. [The source-to-task review](PRACTICAL_DASHBOARD_REVIEW.md) grounds a bounded correction in Amex public account-switching, card-control and merchant-reconciliation screens. `/services` is a compact service selector; profile/security and authorized customer care stay reachable through shared account navigation. Cards expose exact spending limits and useful authorized choices; payment records retain search, dates, status, terminal scope and detail returns. The selected-card reader supplies the existing evaluated limit capability; it never infers authority from ownership alone.

@@ -1,5 +1,5 @@
 import {getServiceMoneyAccount,readServiceMoneyAvailable} from "../money/service";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray,isNull } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
 import { merchantNow } from "../access/merchant-scope";
 import { requireServiceReader } from "../services/service-reader";
@@ -7,6 +7,7 @@ import { evaluate } from "../policy/evaluate";
 import { getBalance } from "../ledger/service";
 import { formatMoney } from "../workspace/service";
 import { listMerchantScopes } from "./service";
+import {networkPaymentOperations} from "./network-schema";
 import { paymentChannels } from "./schema";
 import {merchantDeposits,merchantDepositEvents} from "./settlement-schema";
 import { channelActivations, merchantTestPayments, merchantTestRefunds, testGateways, testMerchantEnrollments } from "./operations-schema";
@@ -25,6 +26,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
   const channelIds=scopes.filter(scope=>evaluate(scope.policy,"channels.read").allowed).map(scope=>scope.terminal.id);
   const primaryServiceIds=[...new Set(scopes.map(scope=>scope.merchantService.id))],unitIds=scopes.map(scope=>scope.terminal.id);
   const payments=paymentIds.length?await tx.select().from(merchantTestPayments).where(inArray(merchantTestPayments.merchantUnitId,paymentIds)).orderBy(desc(merchantTestPayments.createdAt),merchantTestPayments.id):[];
+  const pending=paymentIds.length?await tx.select({operation:networkPaymentOperations}).from(networkPaymentOperations).leftJoin(merchantTestPayments,eq(merchantTestPayments.networkOperationId,networkPaymentOperations.id)).where(and(inArray(networkPaymentOperations.terminalId,paymentIds),isNull(merchantTestPayments.id))):[];
   const refunds=paymentIds.length?await tx.select().from(merchantTestRefunds).where(inArray(merchantTestRefunds.merchantUnitId,paymentIds)):[];
   const ownedPaymentIds=scopes.filter(scope=>scope.ownerAccess&&evaluate(scope.policy,"payments.read").allowed).map(scope=>scope.terminal.id);
   const deposits=ownedPaymentIds.length?await tx.select({deposit:merchantDeposits,event:merchantDepositEvents}).from(merchantDeposits).leftJoin(merchantDepositEvents,eq(merchantDepositEvents.depositId,merchantDeposits.id)).where(inArray(merchantDeposits.merchantUnitId,ownedPaymentIds)).orderBy(desc(merchantDeposits.createdAt),merchantDeposits.id):[];
@@ -35,7 +37,8 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
   const enrollments=unitIds.length?await tx.select().from(testMerchantEnrollments).where(inArray(testMerchantEnrollments.merchantUnitId,unitIds)):[];
   // Used one-time channels must not appear ready even to a channel reader without payment-record access.
   const approvedUses=channelIds.length?await tx.select({channelId:merchantTestPayments.channelId}).from(merchantTestPayments).where(and(inArray(merchantTestPayments.merchantUnitId,channelIds),eq(merchantTestPayments.outcome,"APPROVED"))):[];
-  const used=new Set(approvedUses.map(row=>row.channelId));
+  const reserved=channelIds.length?await tx.select({channelId:networkPaymentOperations.channelId}).from(networkPaymentOperations).where(and(inArray(networkPaymentOperations.terminalId,channelIds),eq(networkPaymentOperations.channelUsage,"ONE_TIME"))):[];
+  const used=new Set([...approvedUses,...reserved].map(row=>row.channelId));
   const units:MerchantDashboardUnit[]=[];
   for(const scope of scopes) {
    const unit=scope.terminal,canReadPayments=paymentIds.includes(unit.id),canReadChannels=channelIds.includes(unit.id);
@@ -104,6 +107,6 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
    ...refunds.map(row=>({id:row.id,kind:"refund" as const,merchantId:row.merchantUnitId,merchantName:units.find(unit=>unit.id===row.merchantUnitId)!.name,description:payments.find(payment=>payment.id===row.paymentId)!.description,amount:formatMoney(row.amountMinor),status:"COMPLETED" as const,reference:row.testReference,at:row.createdAt.toISOString(),paymentId:row.paymentId,paymentReference:payments.find(payment=>payment.id===row.paymentId)!.testReference})),
    ...transferRows.map(row=>({...row,kind:"transfer" as const,description:"Deposit",status:row.status,paymentId:null,paymentReference:null})),
   ];
-  return {mode:"TEST",canCreateMerchant:canCreatePrimary,merchants,moneyAccounts,units,views,activity:projectMerchantActivity(query,views.find(view=>view.id===query.view),activityRecords,now,options.exportRows)};
+  return {processingPayments:pending.map(({operation})=>({id:operation.id,terminalId:operation.terminalId,terminalName:units.find(unit=>unit.id===operation.terminalId)!.name,description:operation.description,amount:formatMoney(operation.amountMinor)})),mode:"TEST",canCreateMerchant:canCreatePrimary,merchants,moneyAccounts,units,views,activity:projectMerchantActivity(query,views.find(view=>view.id===query.view),activityRecords,now,options.exportRows)};
  },{isolationLevel:"repeatable read"});
 }

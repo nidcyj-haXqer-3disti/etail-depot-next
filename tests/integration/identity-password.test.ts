@@ -19,7 +19,8 @@ afterAll(closeDatabase);
 const globalKey = createHash("sha256").update("password-login:global").digest("hex");
 describe("persistent password login boundaries", () => {
   it("serializes delayed password verification and reset, rejects overlapping work promptly, and releases on failure", async () => {
-    const identity = await bindIdentity("https://new-provider.example.test/.netlify/identity", randomUUID());
+    const subject = randomUUID();
+    const identity = await bindIdentity("https://new-provider.example.test/.netlify/identity", subject);
     const sessions = new SessionService(sessionRepository, { appEnv: "test", publicOrigin: "http://127.0.0.1:3100" });
     let entered!: () => void, continueVerification!: () => void;
     const started = new Promise<void>(resolve => { entered = resolve; });
@@ -27,7 +28,7 @@ describe("persistent password login boundaries", () => {
     let activePassword = "old password";
     const login = withPasswordAuthentication(() => signInWithPassword("person@example.test", "old password", null, {
       limiter: { consume: async () => undefined },
-      provider: { passwordLoginAvailability: async () => ({ available: true, reason: "AVAILABLE" }), verifyPassword: async () => { entered(); await continueAfter; if (activePassword !== "old password") throw new SecurityError("INVALID_CREDENTIALS", 401); return { issuer: "https://new-provider.example.test/.netlify/identity", subject: "same-provider-person", providerConfirmed: true }; } },
+      provider: { passwordLoginAvailability: async () => ({ available: true, reason: "AVAILABLE" }), verifyPassword: async () => { entered(); await continueAfter; if (activePassword !== "old password") throw new SecurityError("INVALID_CREDENTIALS", 401); return { issuer: "https://new-provider.example.test/.netlify/identity", subject, providerConfirmed: true }; } },
       bind: async () => identity, sessions,
     }));
     await started;

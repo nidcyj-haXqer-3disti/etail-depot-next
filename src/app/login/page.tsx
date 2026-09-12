@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { resolveAuthNextPath } from "@/modules/identity/continuation";
 import { getRuntimeConfig } from "@/platform/config";
 import { getPasswordLoginAvailability } from "@/modules/identity/password-login";
 import { LoginForm } from "@/ui/login-form";
@@ -11,7 +13,7 @@ export const fetchCache = "force-no-store";
 export const metadata: Metadata = { title: "Sign in", referrer: "no-referrer" };
 
 export default async function LoginPage({searchParams}:{searchParams:Promise<{next?:string|string[];mode?:string|string[]}>}) {
-  const query=await searchParams;const requested=query.next;const nextPath=typeof requested==="string"&&/^\/checkout\/[0-9a-f-]{36}\/card(?:\?review=[0-9a-f-]{36})?$/i.test(requested)?requested:"/services";
+  const query=await searchParams;const nextPath=await resolveAuthNextPath(query.next,(await headers()).get("cookie"));
   const initialMode=query.mode==="register"?"register":"login";
   let localEmailLinkBridge = false;
   let validConfiguration = false;

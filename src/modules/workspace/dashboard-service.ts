@@ -39,7 +39,7 @@ export async function getCardholderDashboardFocus(personId:string,cardId:string)
   const [row]=await tx.select().from(cards).where(eq(cards.id,id));
   if(!row)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
   const scope=await loadCardholderWorkspaceScope(tx,personId,row.serviceId),role=cardholderRole(scope.policy);
-  if(role==="NONE"||!evaluate(scope.policy,"cards.read").allowed||(role==="CARDHOLDER"&&row.holderId!==personId))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+  if(role==="NONE"||!evaluate(scope.policy,"cards.read").allowed||(role==="CARDHOLDER"&&(row.assignmentState!=="ACCEPTED"||row.holderId!==personId)))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
   const [profile]=await tx.select({id:services.id,primaryName:people.displayName}).from(services).innerJoin(people,eq(people.id,services.primaryPersonId)).where(eq(services.id,scope.service.id));
   if(!profile)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
   const capabilities=["cards.read","people.read","activity.read","cardholder.limits.manage"].map(action=>evaluate(scope.policy,action));
@@ -72,13 +72,13 @@ export async function getCardholderDashboard(personId:string,page=0,filters:Card
    const permitted=linked.filter(context=>evaluate(context.policy,action).allowed);
    const primary=permitted.filter(context=>cardholderRole(context.policy)==="OWNER").map(context=>context.serviceId);
    const secondary=permitted.filter(context=>cardholderRole(context.policy)==="CARDHOLDER").map(context=>context.serviceId);
-   return or(primary.length?inArray(cards.serviceId,primary):undefined,secondary.length?and(inArray(cards.serviceId,secondary),eq(cards.holderId,personId)):undefined)??sql`false`;
+   return or(primary.length?inArray(cards.serviceId,primary):undefined,secondary.length?and(inArray(cards.serviceId,secondary),eq(cards.holderId,personId),eq(cards.assignmentState,"ACCEPTED")):undefined)??sql`false`;
   }
   const readable=cardPermissionScope("cards.read");
   const [count]=await tx.select({value:sql<number>`count(*)::integer`,own:sql<number>`count(*) filter (where ${cards.holderId}=${personId})::integer`}).from(cards).where(readable);
   // Search is a literal substring across the full permitted set, before paging.
   // Scope counts never include records hidden by the current service policy.
-  const cardWhere=and(readable,cardScope==="OWN"?eq(cards.holderId,personId):cardScope==="MANAGED"?ne(cards.holderId,personId):undefined,cardSearch?sql`position(lower(${cardSearch}) in lower(${cards.nickname} || ' ' || ${cards.lastFour} || ' ' || (select ${people.displayName} from ${people} where ${people.id}=${cards.holderId}))) > 0`:undefined);
+  const cardWhere=and(readable,cardScope==="OWN"?eq(cards.holderId,personId):cardScope==="MANAGED"?sql`${cards.holderId} is distinct from ${personId}`:undefined,cardSearch?sql`position(lower(${cardSearch}) in lower(${cards.nickname} || ' ' || ${cards.lastFour} || ' ' || coalesce((select ${people.displayName} from ${people} where ${people.id}=${cards.holderId}),'Not assigned'))) > 0`:undefined);
   const [matches]=await tx.select({value:sql<number>`count(*)::integer`}).from(cards).where(cardWhere);
   const rows=await tx.select().from(cards).where(cardWhere).orderBy(cards.nickname,cards.id).limit(pageSize+1).offset(page*pageSize);
   const scopes=new Map<string,Awaited<ReturnType<typeof loadCardholderWorkspaceScope>>>();
@@ -86,17 +86,17 @@ export async function getCardholderDashboard(personId:string,page=0,filters:Card
   const visible:CardholderDashboardProjection["cards"]=[];
   for(const row of rows.slice(0,pageSize)){
    const current=await scope(row.serviceId),role=cardholderRole(current.policy);
-   if(role==="NONE"||!evaluate(current.policy,"cards.read").allowed||(role==="CARDHOLDER"&&row.holderId!==personId))continue;
+   if(role==="NONE"||!evaluate(current.policy,"cards.read").allowed||(role==="CARDHOLDER"&&(row.assignmentState!=="ACCEPTED"||row.holderId!==personId)))continue;
    const profile=profileByPrimary.get(current.policy.primaryPersonId!);if(!profile)continue;
    visible.push({...await getCardProjection(tx,current,row),serviceId:profile.id,primaryName:profile.primaryName,accessRole:role,canManageAccess:role==="OWNER"&&evaluate(current.policy,"people.read").allowed});
   }
   const activityRows=await tx.select({activity:serviceActivity,card:cards,holder:people.displayName}).from(serviceActivity).innerJoin(cards,and(eq(cards.id,serviceActivity.cardId),eq(cards.serviceId,serviceActivity.serviceId))).innerJoin(people,eq(people.id,cards.holderId)).where(cardPermissionScope("activity.read")).orderBy(desc(serviceActivity.occurredAt),serviceActivity.id).limit(25);
   const activity:CardholderDashboardProjection["activity"]=[];
-  for(const row of activityRows){const current=await scope(row.card.serviceId),role=cardholderRole(current.policy);if(role==="NONE"||!evaluate(current.policy,"activity.read").allowed||(role==="CARDHOLDER"&&row.card.holderId!==personId))continue;activity.push({...activityProjection(row.activity),cardNickname:row.card.nickname,lastFour:row.card.lastFour,holderName:row.holder});}
+  for(const row of activityRows){const current=await scope(row.card.serviceId),role=cardholderRole(current.policy);if(role==="NONE"||!evaluate(current.policy,"activity.read").allowed||(role==="CARDHOLDER"&&(row.card.assignmentState!=="ACCEPTED"||row.card.holderId!==personId)))continue;activity.push({...activityProjection(row.activity),cardNickname:row.card.nickname,lastFour:row.card.lastFour,holderName:row.holder});}
   const requestScopes=linked.filter(context=>cardholderRole(context.policy)==="OWNER"&&evaluate(context.policy,"cards.request").allowed).map(context=>context.serviceId);
   const requestScope=requestScopes.length?inArray(cardRequests.serviceId,requestScopes):sql`false`;
   // Literal substring search includes the named holder across the entire authorized collection.
-  const requestWhere=and(requestScope,requestStatus==="ALL"?undefined:eq(cardRequests.status,requestStatus),requestSearch?sql`position(lower(${requestSearch}) in lower(${cardRequests.nickname} || ' ' || (select ${people.displayName} from ${people} where ${people.id}=${cardRequests.holderId}))) > 0`:undefined);
+  const requestWhere=and(requestScope,requestStatus==="ALL"?undefined:eq(cardRequests.status,requestStatus),requestSearch?sql`position(lower(${requestSearch}) in lower(${cardRequests.nickname} || ' ' || coalesce((select ${people.displayName} from ${people} where ${people.id}=${cardRequests.holderId}),'Not assigned'))) > 0`:undefined);
   const [requestTotal]=await tx.select({value:sql<number>`count(*)::integer`}).from(cardRequests).where(requestWhere);
   const [unfinishedTotal]=await tx.select({value:sql<number>`count(*)::integer`}).from(cardRequests).where(and(requestScope,inArray(cardRequests.status,["DRAFT","BLOCKED"])));
   const requestRows=await tx.select().from(cardRequests).where(requestWhere).orderBy(desc(cardRequests.updatedAt),cardRequests.id).limit(21).offset(requestPage*20);

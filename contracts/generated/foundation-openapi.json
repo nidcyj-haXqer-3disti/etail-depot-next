@@ -4165,6 +4165,7 @@
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
                           "holderId": {
+                            "nullable": true,
                             "type": "string",
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -4172,11 +4173,32 @@
                           "holderName": {
                             "type": "string"
                           },
+                          "assignmentState": {
+                            "type": "string",
+                            "enum": [
+                              "UNASSIGNED",
+                              "ACCEPTED",
+                              "REVOKED"
+                            ]
+                          },
+                          "network": {
+                            "type": "string",
+                            "enum": [
+                              "VISA"
+                            ]
+                          },
+                          "canInvite": {
+                            "type": "boolean"
+                          },
+                          "canRevokeAssignment": {
+                            "type": "boolean"
+                          },
                           "relationship": {
                             "type": "string",
                             "enum": [
                               "OWNER",
-                              "CARDHOLDER"
+                              "CARDHOLDER",
+                              "UNASSIGNED"
                             ]
                           },
                           "nickname": {
@@ -4368,6 +4390,8 @@
                                 "type": "string",
                                 "enum": [
                                   "READY",
+                                  "UNASSIGNED",
+                                  "REVOKED",
                                   "OTHER_CARDHOLDER",
                                   "ACCESS_RESTRICTED",
                                   "SETUP_REQUIRED",
@@ -4456,6 +4480,10 @@
                           "serviceId",
                           "holderId",
                           "holderName",
+                          "assignmentState",
+                          "network",
+                          "canInvite",
+                          "canRevokeAssignment",
                           "relationship",
                           "nickname",
                           "lastFour",
@@ -4682,6 +4710,7 @@
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
                           "holderId": {
+                            "nullable": true,
                             "type": "string",
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -5516,6 +5545,9 @@
                     "type": "string",
                     "minLength": 12,
                     "maxLength": 1024
+                  },
+                  "nextPath": {
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -5689,6 +5721,9 @@
                     "maxLength": 254,
                     "format": "email",
                     "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "nextPath": {
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -7435,212 +7470,6 @@
         }
       }
     },
-    "/api/v1/checkout/{publicationId}/card": {
-      "post": {
-        "operationId": "post_api_v1_checkout__publicationId__card",
-        "description": "Scoped prepaid Cardholder services: saved funding review, confirmation, per-card total allowances and connected merchant checkout use the common immutable ledger. Cardholders receive only their own data. Issuance creates no money; no real-money execution.",
-        "security": [
-          {
-            "appSession": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "publicationId",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "commandId": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "cardServiceId": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "cardId": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "expectedCardVersion": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "exclusiveMinimum": true,
-                    "maximum": 9007199254740991
-                  }
-                },
-                "required": [
-                  "commandId",
-                  "cardServiceId",
-                  "cardId",
-                  "expectedCardVersion"
-                ],
-                "additionalProperties": false
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "publicationId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "merchantName": {
-                      "type": "string"
-                    },
-                    "description": {
-                      "type": "string"
-                    },
-                    "amount": {
-                      "type": "object",
-                      "properties": {
-                        "minor": {
-                          "type": "string",
-                          "pattern": "^[1-9][0-9]{0,11}$"
-                        },
-                        "currency": {
-                          "type": "string",
-                          "enum": [
-                            "USD"
-                          ]
-                        },
-                        "formatted": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "minor",
-                        "currency",
-                        "formatted"
-                      ],
-                      "additionalProperties": false
-                    },
-                    "cardName": {
-                      "type": "string"
-                    },
-                    "lastFour": {
-                      "type": "string",
-                      "pattern": "^[0-9]{4}$"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "receipt": {
-                      "nullable": true,
-                      "type": "object",
-                      "properties": {
-                        "paymentId": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        },
-                        "reference": {
-                          "type": "string"
-                        },
-                        "paidAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        },
-                        "refundedAt": {
-                          "nullable": true,
-                          "type": "string",
-                          "format": "date-time",
-                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                        }
-                      },
-                      "required": [
-                        "paymentId",
-                        "reference",
-                        "paidAt",
-                        "refundedAt"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "publicationId",
-                    "merchantName",
-                    "description",
-                    "amount",
-                    "cardName",
-                    "lastFour",
-                    "createdAt",
-                    "receipt"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Request rejected",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string"
-                        },
-                        "requestId": {
-                          "type": "string",
-                          "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                        }
-                      },
-                      "required": [
-                        "code",
-                        "requestId"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/checkout/{publicationId}/card/{attemptId}": {
       "get": {
         "operationId": "get_api_v1_checkout__publicationId__card__attemptId_",
@@ -8264,6 +8093,7 @@
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
                           "holderId": {
+                            "nullable": true,
                             "type": "string",
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -8271,11 +8101,32 @@
                           "holderName": {
                             "type": "string"
                           },
+                          "assignmentState": {
+                            "type": "string",
+                            "enum": [
+                              "UNASSIGNED",
+                              "ACCEPTED",
+                              "REVOKED"
+                            ]
+                          },
+                          "network": {
+                            "type": "string",
+                            "enum": [
+                              "VISA"
+                            ]
+                          },
+                          "canInvite": {
+                            "type": "boolean"
+                          },
+                          "canRevokeAssignment": {
+                            "type": "boolean"
+                          },
                           "relationship": {
                             "type": "string",
                             "enum": [
                               "OWNER",
-                              "CARDHOLDER"
+                              "CARDHOLDER",
+                              "UNASSIGNED"
                             ]
                           },
                           "nickname": {
@@ -8467,6 +8318,8 @@
                                 "type": "string",
                                 "enum": [
                                   "READY",
+                                  "UNASSIGNED",
+                                  "REVOKED",
                                   "OTHER_CARDHOLDER",
                                   "ACCESS_RESTRICTED",
                                   "SETUP_REQUIRED",
@@ -8542,6 +8395,10 @@
                           "serviceId",
                           "holderId",
                           "holderName",
+                          "assignmentState",
+                          "network",
+                          "canInvite",
+                          "canRevokeAssignment",
                           "relationship",
                           "nickname",
                           "lastFour",
@@ -8576,6 +8433,7 @@
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
                           "holderId": {
+                            "nullable": true,
                             "type": "string",
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -8953,9 +8811,9 @@
         }
       }
     },
-    "/api/v1/cardholder-services/{serviceId}/cards/{cardId}/control": {
+    "/api/v1/cardholder-services/{serviceId}/cards/{cardId}/recipient/revoke": {
       "post": {
-        "operationId": "post_api_v1_cardholder_services__serviceId__cards__cardId__control",
+        "operationId": "post_api_v1_cardholder_services__serviceId__cards__cardId__recipient_revoke",
         "description": "Scoped prepaid Cardholder services: saved funding review, confirmation, per-card total allowances and connected merchant checkout use the common immutable ledger. Cardholders receive only their own data. Issuance creates no money; no real-money execution.",
         "security": [
           {
@@ -8999,19 +8857,11 @@
                     "minimum": 0,
                     "exclusiveMinimum": true,
                     "maximum": 9007199254740991
-                  },
-                  "action": {
-                    "type": "string",
-                    "enum": [
-                      "freeze",
-                      "unfreeze"
-                    ]
                   }
                 },
                 "required": [
                   "commandId",
-                  "expectedVersion",
-                  "action"
+                  "expectedVersion"
                 ],
                 "additionalProperties": false
               }
@@ -9037,6 +8887,7 @@
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "holderId": {
+                      "nullable": true,
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -9044,11 +8895,32 @@
                     "holderName": {
                       "type": "string"
                     },
+                    "assignmentState": {
+                      "type": "string",
+                      "enum": [
+                        "UNASSIGNED",
+                        "ACCEPTED",
+                        "REVOKED"
+                      ]
+                    },
+                    "network": {
+                      "type": "string",
+                      "enum": [
+                        "VISA"
+                      ]
+                    },
+                    "canInvite": {
+                      "type": "boolean"
+                    },
+                    "canRevokeAssignment": {
+                      "type": "boolean"
+                    },
                     "relationship": {
                       "type": "string",
                       "enum": [
                         "OWNER",
-                        "CARDHOLDER"
+                        "CARDHOLDER",
+                        "UNASSIGNED"
                       ]
                     },
                     "nickname": {
@@ -9240,6 +9112,8 @@
                           "type": "string",
                           "enum": [
                             "READY",
+                            "UNASSIGNED",
+                            "REVOKED",
                             "OTHER_CARDHOLDER",
                             "ACCESS_RESTRICTED",
                             "SETUP_REQUIRED",
@@ -9315,6 +9189,457 @@
                     "serviceId",
                     "holderId",
                     "holderName",
+                    "assignmentState",
+                    "network",
+                    "canInvite",
+                    "canRevokeAssignment",
+                    "relationship",
+                    "nickname",
+                    "lastFour",
+                    "format",
+                    "status",
+                    "version",
+                    "spending",
+                    "available",
+                    "canPurchase",
+                    "purchaseAvailability",
+                    "canFreeze",
+                    "canUnfreeze",
+                    "freeze",
+                    "fictional"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cardholder-services/{serviceId}/cards/{cardId}/control": {
+      "post": {
+        "operationId": "post_api_v1_cardholder_services__serviceId__cards__cardId__control",
+        "description": "Scoped prepaid Cardholder services: saved funding review, confirmation, per-card total allowances and connected merchant checkout use the common immutable ledger. Cardholders receive only their own data. Issuance creates no money; no real-money execution.",
+        "security": [
+          {
+            "appSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "serviceId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "cardId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commandId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true,
+                    "maximum": 9007199254740991
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "freeze",
+                      "unfreeze"
+                    ]
+                  }
+                },
+                "required": [
+                  "commandId",
+                  "expectedVersion",
+                  "action"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "serviceId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "holderId": {
+                      "nullable": true,
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "holderName": {
+                      "type": "string"
+                    },
+                    "assignmentState": {
+                      "type": "string",
+                      "enum": [
+                        "UNASSIGNED",
+                        "ACCEPTED",
+                        "REVOKED"
+                      ]
+                    },
+                    "network": {
+                      "type": "string",
+                      "enum": [
+                        "VISA"
+                      ]
+                    },
+                    "canInvite": {
+                      "type": "boolean"
+                    },
+                    "canRevokeAssignment": {
+                      "type": "boolean"
+                    },
+                    "relationship": {
+                      "type": "string",
+                      "enum": [
+                        "OWNER",
+                        "CARDHOLDER",
+                        "UNASSIGNED"
+                      ]
+                    },
+                    "nickname": {
+                      "type": "string"
+                    },
+                    "lastFour": {
+                      "type": "string",
+                      "pattern": "^[0-9]{4}$"
+                    },
+                    "format": {
+                      "type": "string",
+                      "enum": [
+                        "VIRTUAL",
+                        "PHYSICAL"
+                      ]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ACTIVE",
+                        "FROZEN"
+                      ]
+                    },
+                    "version": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true,
+                      "maximum": 9007199254740991
+                    },
+                    "spending": {
+                      "type": "object",
+                      "properties": {
+                        "cardId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "reviewRequired": {
+                          "type": "boolean"
+                        },
+                        "allowance": {
+                          "type": "object",
+                          "properties": {
+                            "minor": {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]*)$"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "USD"
+                              ]
+                            },
+                            "formatted": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "minor",
+                            "currency",
+                            "formatted"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "used": {
+                          "type": "object",
+                          "properties": {
+                            "minor": {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]*)$"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "USD"
+                              ]
+                            },
+                            "formatted": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "minor",
+                            "currency",
+                            "formatted"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "remaining": {
+                          "type": "object",
+                          "properties": {
+                            "minor": {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]*)$"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "USD"
+                              ]
+                            },
+                            "formatted": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "minor",
+                            "currency",
+                            "formatted"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "available": {
+                          "type": "object",
+                          "properties": {
+                            "minor": {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]*)$"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "USD"
+                              ]
+                            },
+                            "formatted": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "minor",
+                            "currency",
+                            "formatted"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "cardId",
+                        "reviewRequired",
+                        "allowance",
+                        "used",
+                        "remaining",
+                        "available",
+                        "version"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "available": {
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string",
+                          "pattern": "^-?(0|[1-9][0-9]*)$"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "canPurchase": {
+                      "type": "boolean"
+                    },
+                    "purchaseAvailability": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "READY",
+                            "UNASSIGNED",
+                            "REVOKED",
+                            "OTHER_CARDHOLDER",
+                            "ACCESS_RESTRICTED",
+                            "SETUP_REQUIRED",
+                            "FROZEN",
+                            "NO_FUNDS"
+                          ]
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "title",
+                        "description"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "canFreeze": {
+                      "type": "boolean"
+                    },
+                    "canUnfreeze": {
+                      "type": "boolean"
+                    },
+                    "freeze": {
+                      "type": "object",
+                      "properties": {
+                        "primary": {
+                          "type": "boolean"
+                        },
+                        "holder": {
+                          "type": "boolean"
+                        },
+                        "reviewRequired": {
+                          "type": "boolean"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "freezeLabel": {
+                          "type": "string"
+                        },
+                        "unfreezeLabel": {
+                          "type": "string"
+                        },
+                        "unfreezeDescription": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "primary",
+                        "holder",
+                        "reviewRequired",
+                        "description",
+                        "freezeLabel",
+                        "unfreezeLabel",
+                        "unfreezeDescription"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "fictional": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "serviceId",
+                    "holderId",
+                    "holderName",
+                    "assignmentState",
+                    "network",
+                    "canInvite",
+                    "canRevokeAssignment",
                     "relationship",
                     "nickname",
                     "lastFour",
@@ -9432,6 +9757,7 @@
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "holderId": {
+                      "nullable": true,
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -9638,6 +9964,7 @@
                     "maximum": 9007199254740991
                   },
                   "holderId": {
+                    "nullable": true,
                     "type": "string",
                     "format": "uuid",
                     "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -9691,6 +10018,7 @@
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "holderId": {
+                      "nullable": true,
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -9925,6 +10253,7 @@
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "holderId": {
+                      "nullable": true,
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -10159,6 +10488,7 @@
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "holderId": {
+                      "nullable": true,
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -16753,6 +17083,7 @@
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
                           "personId": {
+                            "nullable": true,
                             "type": "string",
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
@@ -16847,9 +17178,9 @@
         }
       }
     },
-    "/api/v1/cardholder-services/{serviceId}/invitations": {
+    "/api/v1/cardholder-services/{serviceId}/cards/{cardId}/invitations": {
       "post": {
-        "operationId": "post_api_v1_cardholder_services__serviceId__invitations",
+        "operationId": "post_api_v1_cardholder_services__serviceId__cards__cardId__invitations",
         "description": "Intended-person access and invitations with fixed owner-issued card or terminal access. Local invitations require existing fictional identities and do not send notifications or confer financial authority.",
         "security": [
           {
@@ -16860,6 +17191,15 @@
           {
             "in": "path",
             "name": "serviceId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "cardId",
             "required": true,
             "schema": {
               "type": "string",
@@ -16879,10 +17219,11 @@
                     "format": "uuid",
                     "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
-                  "recipientId": {
+                  "recipientEmail": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "maxLength": 254,
+                    "format": "email",
+                    "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                   },
                   "expiresInDays": {
                     "anyOf": [
@@ -16909,7 +17250,7 @@
                 },
                 "required": [
                   "commandId",
-                  "recipientId",
+                  "recipientEmail",
                   "expiresInDays"
                 ],
                 "additionalProperties": false
@@ -16925,12 +17266,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "targetKind": {
-                      "type": "string",
-                      "enum": [
-                        "SERVICE"
-                      ]
-                    },
                     "id": {
                       "type": "string",
                       "format": "uuid",
@@ -16952,11 +17287,6 @@
                     },
                     "inviterName": {
                       "type": "string"
-                    },
-                    "recipientId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "recipientName": {
                       "type": "string"
@@ -17045,16 +17375,57 @@
                     },
                     "hasServiceAccess": {
                       "type": "boolean"
+                    },
+                    "targetKind": {
+                      "type": "string",
+                      "enum": [
+                        "CARD"
+                      ]
+                    },
+                    "cardId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "cardName": {
+                      "type": "string"
+                    },
+                    "recipientId": {
+                      "nullable": true,
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "recipientEmail": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "allowance": {
+                      "type": "object",
+                      "properties": {
+                        "amount": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount",
+                        "currency"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "href": {
+                      "type": "string"
                     }
                   },
                   "required": [
-                    "targetKind",
                     "id",
                     "serviceId",
                     "serviceName",
                     "serviceKind",
                     "inviterName",
-                    "recipientId",
                     "recipientName",
                     "role",
                     "permissions",
@@ -17065,9 +17436,236 @@
                     "expiresAt",
                     "canRespond",
                     "canRevoke",
-                    "hasServiceAccess"
+                    "hasServiceAccess",
+                    "targetKind",
+                    "cardId",
+                    "cardName",
+                    "recipientId",
+                    "recipientEmail",
+                    "allowance",
+                    "href"
                   ],
                   "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invitations/{invitationId}": {
+      "get": {
+        "operationId": "get_api_v1_invitations__invitationId_",
+        "description": "Intended-person access and invitations with fixed owner-issued card or terminal access. Local invitations require existing fictional identities and do not send notifications or confer financial authority.",
+        "security": [
+          {
+            "appSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invitationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "targetName": {
+                          "type": "string"
+                        },
+                        "inviterName": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "REVOKED",
+                            "EXPIRED"
+                          ]
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "maximum": 9007199254740991
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "canRespond": {
+                          "type": "boolean"
+                        },
+                        "hasAccess": {
+                          "type": "boolean"
+                        },
+                        "href": {
+                          "type": "string"
+                        },
+                        "targetKind": {
+                          "type": "string",
+                          "enum": [
+                            "CARD"
+                          ]
+                        },
+                        "allowance": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "pattern": "^[0-9]+$"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "USD"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "targetName",
+                        "inviterName",
+                        "status",
+                        "version",
+                        "expiresAt",
+                        "canRespond",
+                        "hasAccess",
+                        "href",
+                        "targetKind",
+                        "allowance"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "targetName": {
+                          "type": "string"
+                        },
+                        "inviterName": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "REVOKED",
+                            "EXPIRED"
+                          ]
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "maximum": 9007199254740991
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "canRespond": {
+                          "type": "boolean"
+                        },
+                        "hasAccess": {
+                          "type": "boolean"
+                        },
+                        "href": {
+                          "type": "string"
+                        },
+                        "targetKind": {
+                          "type": "string",
+                          "enum": [
+                            "MERCHANT_TERMINAL"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "targetName",
+                        "inviterName",
+                        "status",
+                        "version",
+                        "expiresAt",
+                        "canRespond",
+                        "hasAccess",
+                        "href",
+                        "targetKind"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
                 }
               }
             }
@@ -17277,6 +17875,190 @@
                       {
                         "type": "object",
                         "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "serviceId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "serviceName": {
+                            "type": "string"
+                          },
+                          "serviceKind": {
+                            "type": "string",
+                            "enum": [
+                              "CARDHOLDER"
+                            ]
+                          },
+                          "inviterName": {
+                            "type": "string"
+                          },
+                          "recipientName": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string",
+                            "enum": [
+                              "CARDHOLDER"
+                            ]
+                          },
+                          "permissions": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "cards.read",
+                                "cards.hold",
+                                "cards.request",
+                                "cards.create",
+                                "cards.purchase",
+                                "cards.freeze",
+                                "cards.unfreeze",
+                                "cards.manageMembers",
+                                "activity.read",
+                                "people.read",
+                                "people.invite",
+                                "people.changeRole",
+                                "people.revoke",
+                                "notifications.manage"
+                              ]
+                            }
+                          },
+                          "delegablePermissions": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "cards.read",
+                                "cards.hold",
+                                "cards.request",
+                                "cards.create",
+                                "cards.purchase",
+                                "cards.freeze",
+                                "cards.unfreeze",
+                                "cards.manageMembers",
+                                "activity.read",
+                                "people.read",
+                                "people.invite",
+                                "people.changeRole",
+                                "people.revoke",
+                                "notifications.manage"
+                              ]
+                            }
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "ACCEPTED",
+                              "DECLINED",
+                              "REVOKED",
+                              "EXPIRED"
+                            ]
+                          },
+                          "version": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "exclusiveMinimum": true,
+                            "maximum": 9007199254740991
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "expiresAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "canRespond": {
+                            "type": "boolean"
+                          },
+                          "canRevoke": {
+                            "type": "boolean"
+                          },
+                          "hasServiceAccess": {
+                            "type": "boolean"
+                          },
+                          "targetKind": {
+                            "type": "string",
+                            "enum": [
+                              "CARD"
+                            ]
+                          },
+                          "cardId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "cardName": {
+                            "type": "string"
+                          },
+                          "recipientId": {
+                            "nullable": true,
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "recipientEmail": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "allowance": {
+                            "type": "object",
+                            "properties": {
+                              "amount": {
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "amount",
+                              "currency"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "href": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "serviceId",
+                          "serviceName",
+                          "serviceKind",
+                          "inviterName",
+                          "recipientName",
+                          "role",
+                          "permissions",
+                          "delegablePermissions",
+                          "status",
+                          "version",
+                          "createdAt",
+                          "expiresAt",
+                          "canRespond",
+                          "canRevoke",
+                          "hasServiceAccess",
+                          "targetKind",
+                          "cardId",
+                          "cardName",
+                          "recipientId",
+                          "recipientEmail",
+                          "allowance",
+                          "href"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
                           "targetKind": {
                             "type": "string",
                             "enum": [
@@ -17308,9 +18090,14 @@
                             "type": "string"
                           },
                           "recipientId": {
+                            "nullable": true,
                             "type": "string",
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "recipientEmail": {
+                            "nullable": true,
+                            "type": "string"
                           },
                           "recipientName": {
                             "type": "string"
@@ -17386,6 +18173,7 @@
                           "merchantName",
                           "inviterName",
                           "recipientId",
+                          "recipientEmail",
                           "recipientName",
                           "permissions",
                           "status",
@@ -17648,6 +18436,190 @@
                     {
                       "type": "object",
                       "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceName": {
+                          "type": "string"
+                        },
+                        "serviceKind": {
+                          "type": "string",
+                          "enum": [
+                            "CARDHOLDER"
+                          ]
+                        },
+                        "inviterName": {
+                          "type": "string"
+                        },
+                        "recipientName": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "CARDHOLDER"
+                          ]
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "cards.read",
+                              "cards.hold",
+                              "cards.request",
+                              "cards.create",
+                              "cards.purchase",
+                              "cards.freeze",
+                              "cards.unfreeze",
+                              "cards.manageMembers",
+                              "activity.read",
+                              "people.read",
+                              "people.invite",
+                              "people.changeRole",
+                              "people.revoke",
+                              "notifications.manage"
+                            ]
+                          }
+                        },
+                        "delegablePermissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "cards.read",
+                              "cards.hold",
+                              "cards.request",
+                              "cards.create",
+                              "cards.purchase",
+                              "cards.freeze",
+                              "cards.unfreeze",
+                              "cards.manageMembers",
+                              "activity.read",
+                              "people.read",
+                              "people.invite",
+                              "people.changeRole",
+                              "people.revoke",
+                              "notifications.manage"
+                            ]
+                          }
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "REVOKED",
+                            "EXPIRED"
+                          ]
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "maximum": 9007199254740991
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "canRespond": {
+                          "type": "boolean"
+                        },
+                        "canRevoke": {
+                          "type": "boolean"
+                        },
+                        "hasServiceAccess": {
+                          "type": "boolean"
+                        },
+                        "targetKind": {
+                          "type": "string",
+                          "enum": [
+                            "CARD"
+                          ]
+                        },
+                        "cardId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "cardName": {
+                          "type": "string"
+                        },
+                        "recipientId": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "recipientEmail": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "allowance": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "href": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "serviceId",
+                        "serviceName",
+                        "serviceKind",
+                        "inviterName",
+                        "recipientName",
+                        "role",
+                        "permissions",
+                        "delegablePermissions",
+                        "status",
+                        "version",
+                        "createdAt",
+                        "expiresAt",
+                        "canRespond",
+                        "canRevoke",
+                        "hasServiceAccess",
+                        "targetKind",
+                        "cardId",
+                        "cardName",
+                        "recipientId",
+                        "recipientEmail",
+                        "allowance",
+                        "href"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
                         "targetKind": {
                           "type": "string",
                           "enum": [
@@ -17679,9 +18651,14 @@
                           "type": "string"
                         },
                         "recipientId": {
+                          "nullable": true,
                           "type": "string",
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "recipientEmail": {
+                          "nullable": true,
+                          "type": "string"
                         },
                         "recipientName": {
                           "type": "string"
@@ -17757,6 +18734,7 @@
                         "merchantName",
                         "inviterName",
                         "recipientId",
+                        "recipientEmail",
                         "recipientName",
                         "permissions",
                         "status",
@@ -18018,6 +18996,190 @@
                     {
                       "type": "object",
                       "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceName": {
+                          "type": "string"
+                        },
+                        "serviceKind": {
+                          "type": "string",
+                          "enum": [
+                            "CARDHOLDER"
+                          ]
+                        },
+                        "inviterName": {
+                          "type": "string"
+                        },
+                        "recipientName": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "CARDHOLDER"
+                          ]
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "cards.read",
+                              "cards.hold",
+                              "cards.request",
+                              "cards.create",
+                              "cards.purchase",
+                              "cards.freeze",
+                              "cards.unfreeze",
+                              "cards.manageMembers",
+                              "activity.read",
+                              "people.read",
+                              "people.invite",
+                              "people.changeRole",
+                              "people.revoke",
+                              "notifications.manage"
+                            ]
+                          }
+                        },
+                        "delegablePermissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "cards.read",
+                              "cards.hold",
+                              "cards.request",
+                              "cards.create",
+                              "cards.purchase",
+                              "cards.freeze",
+                              "cards.unfreeze",
+                              "cards.manageMembers",
+                              "activity.read",
+                              "people.read",
+                              "people.invite",
+                              "people.changeRole",
+                              "people.revoke",
+                              "notifications.manage"
+                            ]
+                          }
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "REVOKED",
+                            "EXPIRED"
+                          ]
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "maximum": 9007199254740991
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "canRespond": {
+                          "type": "boolean"
+                        },
+                        "canRevoke": {
+                          "type": "boolean"
+                        },
+                        "hasServiceAccess": {
+                          "type": "boolean"
+                        },
+                        "targetKind": {
+                          "type": "string",
+                          "enum": [
+                            "CARD"
+                          ]
+                        },
+                        "cardId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "cardName": {
+                          "type": "string"
+                        },
+                        "recipientId": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "recipientEmail": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "allowance": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "href": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "serviceId",
+                        "serviceName",
+                        "serviceKind",
+                        "inviterName",
+                        "recipientName",
+                        "role",
+                        "permissions",
+                        "delegablePermissions",
+                        "status",
+                        "version",
+                        "createdAt",
+                        "expiresAt",
+                        "canRespond",
+                        "canRevoke",
+                        "hasServiceAccess",
+                        "targetKind",
+                        "cardId",
+                        "cardName",
+                        "recipientId",
+                        "recipientEmail",
+                        "allowance",
+                        "href"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
                         "targetKind": {
                           "type": "string",
                           "enum": [
@@ -18049,9 +19211,14 @@
                           "type": "string"
                         },
                         "recipientId": {
+                          "nullable": true,
                           "type": "string",
                           "format": "uuid",
                           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "recipientEmail": {
+                          "nullable": true,
+                          "type": "string"
                         },
                         "recipientName": {
                           "type": "string"
@@ -18127,6 +19294,7 @@
                         "merchantName",
                         "inviterName",
                         "recipientId",
+                        "recipientEmail",
                         "recipientName",
                         "permissions",
                         "status",
@@ -18246,151 +19414,339 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "targetKind": {
-                      "type": "string",
-                      "enum": [
-                        "SERVICE"
-                      ]
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "targetKind": {
+                          "type": "string",
+                          "enum": [
+                            "SERVICE"
+                          ]
+                        },
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceName": {
+                          "type": "string"
+                        },
+                        "serviceKind": {
+                          "type": "string",
+                          "enum": [
+                            "CARDHOLDER"
+                          ]
+                        },
+                        "inviterName": {
+                          "type": "string"
+                        },
+                        "recipientId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "recipientName": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "CARDHOLDER"
+                          ]
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "cards.read",
+                              "cards.hold",
+                              "cards.request",
+                              "cards.create",
+                              "cards.purchase",
+                              "cards.freeze",
+                              "cards.unfreeze",
+                              "cards.manageMembers",
+                              "activity.read",
+                              "people.read",
+                              "people.invite",
+                              "people.changeRole",
+                              "people.revoke",
+                              "notifications.manage"
+                            ]
+                          }
+                        },
+                        "delegablePermissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "cards.read",
+                              "cards.hold",
+                              "cards.request",
+                              "cards.create",
+                              "cards.purchase",
+                              "cards.freeze",
+                              "cards.unfreeze",
+                              "cards.manageMembers",
+                              "activity.read",
+                              "people.read",
+                              "people.invite",
+                              "people.changeRole",
+                              "people.revoke",
+                              "notifications.manage"
+                            ]
+                          }
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "REVOKED",
+                            "EXPIRED"
+                          ]
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "maximum": 9007199254740991
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "canRespond": {
+                          "type": "boolean"
+                        },
+                        "canRevoke": {
+                          "type": "boolean"
+                        },
+                        "hasServiceAccess": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "targetKind",
+                        "id",
+                        "serviceId",
+                        "serviceName",
+                        "serviceKind",
+                        "inviterName",
+                        "recipientId",
+                        "recipientName",
+                        "role",
+                        "permissions",
+                        "delegablePermissions",
+                        "status",
+                        "version",
+                        "createdAt",
+                        "expiresAt",
+                        "canRespond",
+                        "canRevoke",
+                        "hasServiceAccess"
+                      ],
+                      "additionalProperties": false
                     },
-                    "id": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "serviceId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "serviceName": {
-                      "type": "string"
-                    },
-                    "serviceKind": {
-                      "type": "string",
-                      "enum": [
-                        "CARDHOLDER"
-                      ]
-                    },
-                    "inviterName": {
-                      "type": "string"
-                    },
-                    "recipientId": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                    },
-                    "recipientName": {
-                      "type": "string"
-                    },
-                    "role": {
-                      "type": "string",
-                      "enum": [
-                        "CARDHOLDER"
-                      ]
-                    },
-                    "permissions": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "cards.read",
-                          "cards.hold",
-                          "cards.request",
-                          "cards.create",
-                          "cards.purchase",
-                          "cards.freeze",
-                          "cards.unfreeze",
-                          "cards.manageMembers",
-                          "activity.read",
-                          "people.read",
-                          "people.invite",
-                          "people.changeRole",
-                          "people.revoke",
-                          "notifications.manage"
-                        ]
-                      }
-                    },
-                    "delegablePermissions": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "enum": [
-                          "cards.read",
-                          "cards.hold",
-                          "cards.request",
-                          "cards.create",
-                          "cards.purchase",
-                          "cards.freeze",
-                          "cards.unfreeze",
-                          "cards.manageMembers",
-                          "activity.read",
-                          "people.read",
-                          "people.invite",
-                          "people.changeRole",
-                          "people.revoke",
-                          "notifications.manage"
-                        ]
-                      }
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "PENDING",
-                        "ACCEPTED",
-                        "DECLINED",
-                        "REVOKED",
-                        "EXPIRED"
-                      ]
-                    },
-                    "version": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "exclusiveMinimum": true,
-                      "maximum": 9007199254740991
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "expiresAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-                    },
-                    "canRespond": {
-                      "type": "boolean"
-                    },
-                    "canRevoke": {
-                      "type": "boolean"
-                    },
-                    "hasServiceAccess": {
-                      "type": "boolean"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceName": {
+                          "type": "string"
+                        },
+                        "serviceKind": {
+                          "type": "string",
+                          "enum": [
+                            "CARDHOLDER"
+                          ]
+                        },
+                        "inviterName": {
+                          "type": "string"
+                        },
+                        "recipientName": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "CARDHOLDER"
+                          ]
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "cards.read",
+                              "cards.hold",
+                              "cards.request",
+                              "cards.create",
+                              "cards.purchase",
+                              "cards.freeze",
+                              "cards.unfreeze",
+                              "cards.manageMembers",
+                              "activity.read",
+                              "people.read",
+                              "people.invite",
+                              "people.changeRole",
+                              "people.revoke",
+                              "notifications.manage"
+                            ]
+                          }
+                        },
+                        "delegablePermissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "cards.read",
+                              "cards.hold",
+                              "cards.request",
+                              "cards.create",
+                              "cards.purchase",
+                              "cards.freeze",
+                              "cards.unfreeze",
+                              "cards.manageMembers",
+                              "activity.read",
+                              "people.read",
+                              "people.invite",
+                              "people.changeRole",
+                              "people.revoke",
+                              "notifications.manage"
+                            ]
+                          }
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "REVOKED",
+                            "EXPIRED"
+                          ]
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "maximum": 9007199254740991
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "canRespond": {
+                          "type": "boolean"
+                        },
+                        "canRevoke": {
+                          "type": "boolean"
+                        },
+                        "hasServiceAccess": {
+                          "type": "boolean"
+                        },
+                        "targetKind": {
+                          "type": "string",
+                          "enum": [
+                            "CARD"
+                          ]
+                        },
+                        "cardId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "cardName": {
+                          "type": "string"
+                        },
+                        "recipientId": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "recipientEmail": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "allowance": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "href": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "serviceId",
+                        "serviceName",
+                        "serviceKind",
+                        "inviterName",
+                        "recipientName",
+                        "role",
+                        "permissions",
+                        "delegablePermissions",
+                        "status",
+                        "version",
+                        "createdAt",
+                        "expiresAt",
+                        "canRespond",
+                        "canRevoke",
+                        "hasServiceAccess",
+                        "targetKind",
+                        "cardId",
+                        "cardName",
+                        "recipientId",
+                        "recipientEmail",
+                        "allowance",
+                        "href"
+                      ],
+                      "additionalProperties": false
                     }
-                  },
-                  "required": [
-                    "targetKind",
-                    "id",
-                    "serviceId",
-                    "serviceName",
-                    "serviceKind",
-                    "inviterName",
-                    "recipientId",
-                    "recipientName",
-                    "role",
-                    "permissions",
-                    "delegablePermissions",
-                    "status",
-                    "version",
-                    "createdAt",
-                    "expiresAt",
-                    "canRespond",
-                    "canRevoke",
-                    "hasServiceAccess"
-                  ],
-                  "additionalProperties": false
+                  ]
                 }
               }
             }
@@ -18797,9 +20153,14 @@
                             "type": "string"
                           },
                           "recipientId": {
+                            "nullable": true,
                             "type": "string",
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "recipientEmail": {
+                            "nullable": true,
+                            "type": "string"
                           },
                           "recipientName": {
                             "type": "string"
@@ -18875,6 +20236,7 @@
                           "merchantName",
                           "inviterName",
                           "recipientId",
+                          "recipientEmail",
                           "recipientName",
                           "permissions",
                           "status",
@@ -18986,6 +20348,12 @@
                     "format": "uuid",
                     "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
+                  "recipientEmail": {
+                    "type": "string",
+                    "maxLength": 254,
+                    "format": "email",
+                    "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
                   "expiresInDays": {
                     "anyOf": [
                       {
@@ -19011,7 +20379,6 @@
                 },
                 "required": [
                   "commandId",
-                  "recipientId",
                   "expiresInDays"
                 ],
                 "additionalProperties": false
@@ -19058,9 +20425,14 @@
                       "type": "string"
                     },
                     "recipientId": {
+                      "nullable": true,
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "recipientEmail": {
+                      "nullable": true,
+                      "type": "string"
                     },
                     "recipientName": {
                       "type": "string"
@@ -19136,6 +20508,7 @@
                     "merchantName",
                     "inviterName",
                     "recipientId",
+                    "recipientEmail",
                     "recipientName",
                     "permissions",
                     "status",
@@ -19286,9 +20659,14 @@
                       "type": "string"
                     },
                     "recipientId": {
+                      "nullable": true,
                       "type": "string",
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "recipientEmail": {
+                      "nullable": true,
+                      "type": "string"
                     },
                     "recipientName": {
                       "type": "string"
@@ -19364,6 +20742,7 @@
                     "merchantName",
                     "inviterName",
                     "recipientId",
+                    "recipientEmail",
                     "recipientName",
                     "permissions",
                     "status",
@@ -19744,6 +21123,61 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "processingPayments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "terminalId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "terminalName": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "object",
+                            "properties": {
+                              "minor": {
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "enum": [
+                                  "USD"
+                                ]
+                              },
+                              "formatted": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "minor",
+                              "currency",
+                              "formatted"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "terminalId",
+                          "terminalName",
+                          "description",
+                          "amount"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
                     "activity": {
                       "type": "object",
                       "properties": {
@@ -24295,6 +25729,987 @@
         }
       }
     },
+    "/api/v1/merchants/{merchantId}/processing-payments/{operationId}/process": {
+      "post": {
+        "operationId": "post_api_v1_merchants__merchantId__processing_payments__operationId__process",
+        "description": "Scoped gateway setup, channel activation, payment records, full refunds and exact reviewed deposits use the common immutable ledger. Deposit results require separate operator assignment. Real money and external processing are disabled.",
+        "security": [
+          {
+            "appSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "merchantId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "operationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commandId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": [
+                  "commandId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "merchantUnitId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "serviceId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "TEST"
+                      ]
+                    },
+                    "liveEnabled": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "feeStatus": {
+                      "type": "string",
+                      "enum": [
+                        "NOT_APPLIED"
+                      ]
+                    },
+                    "gateway": {
+                      "type": "object",
+                      "properties": {
+                        "serviceId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "mode": {
+                          "type": "string",
+                          "enum": [
+                            "NOT_CONFIGURED",
+                            "TEST_READY",
+                            "DISABLED"
+                          ]
+                        },
+                        "processor": {
+                          "type": "string",
+                          "enum": [
+                            "ETAIL_TEST"
+                          ]
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "liveEnabled": {
+                          "type": "boolean",
+                          "enum": [
+                            false
+                          ]
+                        },
+                        "updatedAt": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        }
+                      },
+                      "required": [
+                        "serviceId",
+                        "mode",
+                        "processor",
+                        "version",
+                        "liveEnabled",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "enrollment": {
+                      "type": "object",
+                      "properties": {
+                        "merchantUnitId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "serviceId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "NOT_ENROLLED",
+                            "ENROLLED",
+                            "DISABLED"
+                          ]
+                        },
+                        "version": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "updatedAt": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        }
+                      },
+                      "required": [
+                        "merchantUnitId",
+                        "serviceId",
+                        "status",
+                        "version",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "channels": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "channelId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "merchantUnitId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "version": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "state": {
+                            "type": "string",
+                            "enum": [
+                              "ACTIVE",
+                              "DISABLED",
+                              "EXPIRED",
+                              "USED",
+                              "NOT_READY"
+                            ]
+                          },
+                          "canActivate": {
+                            "type": "boolean"
+                          },
+                          "canDisable": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "channelId",
+                          "merchantUnitId",
+                          "version",
+                          "state",
+                          "canActivate",
+                          "canDisable"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "payments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "merchantUnitId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "channelId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "type": "string",
+                            "enum": [
+                              "NETWORK",
+                              "ETAIL_CARD",
+                              "HISTORICAL"
+                            ]
+                          },
+                          "paymentMethod": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "object",
+                            "properties": {
+                              "minor": {
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "enum": [
+                                  "USD"
+                                ]
+                              },
+                              "formatted": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "minor",
+                              "currency",
+                              "formatted"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "APPROVED",
+                              "DECLINED",
+                              "REFUNDED"
+                            ]
+                          },
+                          "version": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "exclusiveMinimum": true,
+                            "maximum": 9007199254740991
+                          },
+                          "testReference": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "feeStatus": {
+                            "type": "string",
+                            "enum": [
+                              "NOT_APPLIED"
+                            ]
+                          },
+                          "canRefund": {
+                            "type": "boolean"
+                          },
+                          "refundSource": {
+                            "nullable": true,
+                            "type": "string",
+                            "enum": [
+                              "COLLECTION_BALANCE",
+                              "GROUP_MONEY"
+                            ]
+                          },
+                          "refundUnavailableReason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "refund": {
+                            "nullable": true,
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "amount": {
+                                "type": "object",
+                                "properties": {
+                                  "minor": {
+                                    "type": "string"
+                                  },
+                                  "currency": {
+                                    "type": "string",
+                                    "enum": [
+                                      "USD"
+                                    ]
+                                  },
+                                  "formatted": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "minor",
+                                  "currency",
+                                  "formatted"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "reason": {
+                                "type": "string"
+                              },
+                              "testReference": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount",
+                              "reason",
+                              "testReference",
+                              "createdAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "merchantUnitId",
+                          "channelId",
+                          "description",
+                          "amount",
+                          "status",
+                          "version",
+                          "testReference",
+                          "createdAt",
+                          "feeStatus",
+                          "canRefund",
+                          "refundSource",
+                          "refundUnavailableReason",
+                          "refund"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "payouts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "merchantUnitId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "amount": {
+                            "type": "object",
+                            "properties": {
+                              "minor": {
+                                "type": "string",
+                                "pattern": "^(0|[1-9][0-9]*)$"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "enum": [
+                                  "USD"
+                                ]
+                              },
+                              "formatted": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "required": [
+                              "minor",
+                              "currency",
+                              "formatted"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "PENDING",
+                              "COMPLETED",
+                              "FAILED"
+                            ]
+                          },
+                          "testReference": {
+                            "type": "string"
+                          },
+                          "destination": {
+                            "type": "string",
+                            "enum": [
+                              "TEST_DESTINATION"
+                            ]
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "settlementId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "processedAt": {
+                            "nullable": true,
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          },
+                          "retryReview": {
+                            "nullable": true,
+                            "type": "object",
+                            "properties": {
+                              "amount": {
+                                "type": "object",
+                                "properties": {
+                                  "minor": {
+                                    "type": "string",
+                                    "pattern": "^(0|[1-9][0-9]*)$"
+                                  },
+                                  "currency": {
+                                    "type": "string",
+                                    "enum": [
+                                      "USD"
+                                    ]
+                                  },
+                                  "formatted": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                },
+                                "required": [
+                                  "minor",
+                                  "currency",
+                                  "formatted"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "token": {
+                                "type": "string"
+                              },
+                              "paymentCount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": [
+                              "amount",
+                              "token",
+                              "paymentCount"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "payments": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "reference": {
+                                  "type": "string"
+                                },
+                                "amount": {
+                                  "type": "object",
+                                  "properties": {
+                                    "minor": {
+                                      "type": "string",
+                                      "pattern": "^(0|[1-9][0-9]*)$"
+                                    },
+                                    "currency": {
+                                      "type": "string",
+                                      "enum": [
+                                        "USD"
+                                      ]
+                                    },
+                                    "formatted": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "minor",
+                                    "currency",
+                                    "formatted"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "refundedAmount": {
+                                  "type": "object",
+                                  "properties": {
+                                    "minor": {
+                                      "type": "string",
+                                      "pattern": "^(0|[1-9][0-9]*)$"
+                                    },
+                                    "currency": {
+                                      "type": "string",
+                                      "enum": [
+                                        "USD"
+                                      ]
+                                    },
+                                    "formatted": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  },
+                                  "required": [
+                                    "minor",
+                                    "currency",
+                                    "formatted"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "description",
+                                "reference",
+                                "amount",
+                                "refundedAmount"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "merchantUnitId",
+                          "amount",
+                          "status",
+                          "testReference",
+                          "destination",
+                          "createdAt",
+                          "settlementId",
+                          "processedAt",
+                          "retryReview",
+                          "payments"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "settlements": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "terminalId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "settlementId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "moneyAccountId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "amount": {
+                            "type": "object",
+                            "properties": {
+                              "minor": {
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "enum": [
+                                  "USD"
+                                ]
+                              },
+                              "formatted": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "minor",
+                              "currency",
+                              "formatted"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "reference": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "terminalId",
+                          "settlementId",
+                          "moneyAccountId",
+                          "amount",
+                          "reference",
+                          "createdAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "depositReview": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "amount": {
+                          "type": "object",
+                          "properties": {
+                            "minor": {
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "USD"
+                              ]
+                            },
+                            "formatted": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "minor",
+                            "currency",
+                            "formatted"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "token": {
+                          "type": "string"
+                        },
+                        "paymentCount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "amount",
+                        "token",
+                        "paymentCount"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "settledFunds": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "pendingDeposits": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "pendingCardPayments": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "processingPayments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "channelId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "object",
+                            "properties": {
+                              "minor": {
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "enum": [
+                                  "USD"
+                                ]
+                              },
+                              "formatted": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "minor",
+                              "currency",
+                              "formatted"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "paymentMethod": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "channelId",
+                          "description",
+                          "amount",
+                          "paymentMethod",
+                          "createdAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "bankFunds": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "availableFunds": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "canConfigureGateway": {
+                      "type": "boolean"
+                    },
+                    "canEnroll": {
+                      "type": "boolean"
+                    },
+                    "canReadPayments": {
+                      "type": "boolean"
+                    },
+                    "canPayout": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "merchantUnitId",
+                    "serviceId",
+                    "mode",
+                    "liveEnabled",
+                    "feeStatus",
+                    "gateway",
+                    "enrollment",
+                    "channels",
+                    "payments",
+                    "payouts",
+                    "settlements",
+                    "depositReview",
+                    "settledFunds",
+                    "pendingDeposits",
+                    "bankFunds",
+                    "availableFunds",
+                    "canConfigureGateway",
+                    "canEnroll",
+                    "canReadPayments",
+                    "canPayout"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/operations/deposits/{depositId}": {
       "post": {
         "operationId": "post_api_v1_operations_deposits__depositId_",
@@ -24817,6 +27232,17 @@
                           "description": {
                             "type": "string"
                           },
+                          "source": {
+                            "type": "string",
+                            "enum": [
+                              "NETWORK",
+                              "ETAIL_CARD",
+                              "HISTORICAL"
+                            ]
+                          },
+                          "paymentMethod": {
+                            "type": "string"
+                          },
                           "amount": {
                             "type": "object",
                             "properties": {
@@ -25327,6 +27753,91 @@
                         "formatted"
                       ],
                       "additionalProperties": false
+                    },
+                    "pendingCardPayments": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "processingPayments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "channelId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "object",
+                            "properties": {
+                              "minor": {
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "enum": [
+                                  "USD"
+                                ]
+                              },
+                              "formatted": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "minor",
+                              "currency",
+                              "formatted"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "paymentMethod": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "channelId",
+                          "description",
+                          "amount",
+                          "paymentMethod",
+                          "createdAt"
+                        ],
+                        "additionalProperties": false
+                      }
                     },
                     "bankFunds": {
                       "nullable": true,
@@ -25981,6 +28492,17 @@
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "description": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string",
+                      "enum": [
+                        "NETWORK",
+                        "ETAIL_CARD",
+                        "HISTORICAL"
+                      ]
+                    },
+                    "paymentMethod": {
                       "type": "string"
                     },
                     "amount": {
@@ -26995,6 +29517,795 @@
                     "paymentUnavailable",
                     "canRespond",
                     "messages"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guest/session": {
+      "post": {
+        "operationId": "post_api_v1_guest_session",
+        "description": "Explicit merchant publication, read-only public payment offers and retained private guest receipts. New customer payments use authenticated connected Cardholder checkout. Public locators contain no credential; historical receipt access rechecks its existing private guest authority. No real money or external delivery.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ready": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ready"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guest/publications/{publicationId}/payments": {
+      "post": {
+        "operationId": "post_api_v1_guest_publications__publicationId__payments",
+        "description": "Explicit merchant publication, read-only public payment offers and retained private guest receipts. New customer payments use authenticated connected Cardholder checkout. Public locators contain no credential; historical receipt access rechecks its existing private guest authority. No real money or external delivery.",
+        "security": [
+          {
+            "guestSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publicationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commandId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "instrumentId": {
+                    "type": "string",
+                    "enum": [
+                      "visa",
+                      "mastercard",
+                      "amex",
+                      "discover"
+                    ]
+                  }
+                },
+                "required": [
+                  "commandId",
+                  "instrumentId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "publicationId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "PROCESSING",
+                        "PAID",
+                        "REFUNDED"
+                      ]
+                    },
+                    "merchantName": {
+                      "type": "string"
+                    },
+                    "businessName": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string",
+                          "pattern": "^[0-9]+$"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "fee": {
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string",
+                          "pattern": "^[0-9]+$"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "instrumentId": {
+                      "type": "string",
+                      "enum": [
+                        "visa",
+                        "mastercard",
+                        "amex",
+                        "discover"
+                      ]
+                    },
+                    "network": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "receipt": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "paymentId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "reference": {
+                          "type": "string"
+                        },
+                        "paidAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "refundedAt": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "refundReference": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "paymentId",
+                        "reference",
+                        "paidAt",
+                        "refundedAt",
+                        "refundReference"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "publicationId",
+                    "state",
+                    "merchantName",
+                    "businessName",
+                    "description",
+                    "amount",
+                    "fee",
+                    "instrumentId",
+                    "network",
+                    "createdAt",
+                    "receipt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guest/publications/{publicationId}/payments/{operationId}": {
+      "get": {
+        "operationId": "get_api_v1_guest_publications__publicationId__payments__operationId_",
+        "description": "Explicit merchant publication, read-only public payment offers and retained private guest receipts. New customer payments use authenticated connected Cardholder checkout. Public locators contain no credential; historical receipt access rechecks its existing private guest authority. No real money or external delivery.",
+        "security": [
+          {
+            "guestSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publicationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "operationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "publicationId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "PROCESSING",
+                        "PAID",
+                        "REFUNDED"
+                      ]
+                    },
+                    "merchantName": {
+                      "type": "string"
+                    },
+                    "businessName": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string",
+                          "pattern": "^[0-9]+$"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "fee": {
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string",
+                          "pattern": "^[0-9]+$"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "instrumentId": {
+                      "type": "string",
+                      "enum": [
+                        "visa",
+                        "mastercard",
+                        "amex",
+                        "discover"
+                      ]
+                    },
+                    "network": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "receipt": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "paymentId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "reference": {
+                          "type": "string"
+                        },
+                        "paidAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "refundedAt": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "refundReference": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "paymentId",
+                        "reference",
+                        "paidAt",
+                        "refundedAt",
+                        "refundReference"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "publicationId",
+                    "state",
+                    "merchantName",
+                    "businessName",
+                    "description",
+                    "amount",
+                    "fee",
+                    "instrumentId",
+                    "network",
+                    "createdAt",
+                    "receipt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "requestId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "requestId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/guest/publications/{publicationId}/payments/{operationId}/process": {
+      "post": {
+        "operationId": "post_api_v1_guest_publications__publicationId__payments__operationId__process",
+        "description": "Explicit merchant publication, read-only public payment offers and retained private guest receipts. New customer payments use authenticated connected Cardholder checkout. Public locators contain no credential; historical receipt access rechecks its existing private guest authority. No real money or external delivery.",
+        "security": [
+          {
+            "guestSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "publicationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "operationId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "commandId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": [
+                  "commandId"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "publicationId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "PROCESSING",
+                        "PAID",
+                        "REFUNDED"
+                      ]
+                    },
+                    "merchantName": {
+                      "type": "string"
+                    },
+                    "businessName": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string",
+                          "pattern": "^[0-9]+$"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "fee": {
+                      "type": "object",
+                      "properties": {
+                        "minor": {
+                          "type": "string",
+                          "pattern": "^[0-9]+$"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "enum": [
+                            "USD"
+                          ]
+                        },
+                        "formatted": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "minor",
+                        "currency",
+                        "formatted"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "instrumentId": {
+                      "type": "string",
+                      "enum": [
+                        "visa",
+                        "mastercard",
+                        "amex",
+                        "discover"
+                      ]
+                    },
+                    "network": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "receipt": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "paymentId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "reference": {
+                          "type": "string"
+                        },
+                        "paidAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "refundedAt": {
+                          "nullable": true,
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "refundReference": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "paymentId",
+                        "reference",
+                        "paidAt",
+                        "refundedAt",
+                        "refundReference"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "publicationId",
+                    "state",
+                    "merchantName",
+                    "businessName",
+                    "description",
+                    "amount",
+                    "fee",
+                    "instrumentId",
+                    "network",
+                    "createdAt",
+                    "receipt"
                   ],
                   "additionalProperties": false
                 }

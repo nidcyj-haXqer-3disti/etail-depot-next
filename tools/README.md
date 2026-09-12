@@ -2,6 +2,10 @@
 
 These are optional implementation-assistance tools for Codex. The owner does not need to run them manually to use the prompt. Require Python 3.10 or newer and the standard library. Only the explicitly requested planning import needs an installed/authenticated GitHub CLI. The verification and target guard use no network.
 
+## D76 additive invitation and network-checkout preparation
+
+The active extension is `docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md`. D76 adds card recipient assignment, provider-verified invitation contacts, exact card/terminal invitations and network payment events without resetting either marked database. Five additive migrations preserve accepted memberships, cards and posted history while retiring pending broad service invitations. The current owner/card/terminal model and separate balances remain. Only explicit preview preparation applies pending migrations; completed seed preparation stays a no-op. Public checkout uses sandbox network instruments without an Etail login; saved historical internal-card reviews remain recoverable.
+
 ## Current D73 preview model
 
 The active product contract is `docs/OWNER_CARDS_TERMINALS_DESIGN.md`. Keep the same marked D69 preview/test database generations and completed preparation receipts. Four additive D73 migrations create separate Card money and Merchant money, replace active merchant hierarchy with flat terminals, and replace monthly person limits with total card allowances. Posted history and historical pending deposit processing are retained. Applied migrations are immutable.

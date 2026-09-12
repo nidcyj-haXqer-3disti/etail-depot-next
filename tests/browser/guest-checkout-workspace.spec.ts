@@ -1,34 +1,44 @@
 import {expect,test} from "@playwright/test";
-import {closeDatabase} from "../../src/platform/database/client";
-import {cardCheckoutReviewSchema} from "../../src/shared/card-checkout-response";
-import {merchantOperationsProjectionSchema} from "../../src/modules/acquiring/operations-api-contracts";
-import {publishedGuestChannel} from "./helpers/guest";
-import {freshPrepaidCard,openSavedCardReview,signInPerson} from "./helpers/prepaid";
+import {eq} from "drizzle-orm";
+import {randomUUID} from "node:crypto";
+import {closeDatabase,getDb} from "../../src/platform/database/client";
+import {networkCheckoutProjectionSchema} from "../../src/shared/network-checkout-response";
+import {networkPaymentOperations,networkEvents} from "../../src/modules/acquiring/network-schema";
+import {getMerchantOperations} from "../../src/modules/acquiring/operations-service";
+import {revokeGuestPublication} from "../../src/modules/acquiring/guest-service";
+import {networkCheckoutFixture} from "../helpers/network-checkout";
 test.afterAll(closeDatabase);
 
-test("published customer link requires sign-in, preserves a private card receipt and stops new payments after revocation",async({page,browser})=>{
+test("customers can pay with each supported sandbox network without an Etail login",async({page})=>{
  test.setTimeout(90_000);
- const {merchant,channel,publication}=await publishedGuestChannel(page.request,"REUSABLE");
- const qr=await page.request.get(`/api/v1/guest/publications/${publication.id}/qr`);expect(qr.status()).toBe(200);expect(qr.headers()["content-type"]).toBe("image/png");expect(qr.headers()["cache-control"]).toContain("no-store");expect((await qr.body()).subarray(0,8).toString("hex")).toBe("89504e470d0a1a0a");
- const payer=await freshPrepaidCard("3680");
- const context=await browser.newContext({baseURL:"http://127.0.0.1:3100",viewport:page.viewportSize()??undefined}),customer=await context.newPage();
- try{
-  await customer.goto(publication.publicHref);await expect(customer.getByRole("heading",{name:channel.description,exact:true})).toBeVisible();
-  await customer.getByRole("link",{name:"Choose a card",exact:true}).click();await expect(customer).toHaveURL(/\/login\?next=/);
-  expect(new URL(customer.url()).searchParams.get("next")).toBe(`/checkout/${publication.id}/card`);
-  await signInPerson(customer,payer.primary.personId);
-  const saved=await openSavedCardReview(customer,publication.id,payer.card.id);
-  await customer.reload();await expect(customer.getByRole("heading",{name:"Review your payment",exact:true})).toBeVisible();
-  await customer.getByRole("button",{name:"Pay $18.40",exact:true}).click();await expect(customer.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();
-  const response=await customer.request.get(saved.confirmPath);expect(response.status()).toBe(200);const receipt=cardCheckoutReviewSchema.parse(await response.json()).receipt!;
-  await customer.reload();await expect(customer.locator("main")).toContainText(receipt.reference);
-  expect(await customer.evaluate(()=>({local:localStorage.length,session:sessionStorage.length,cookie:document.cookie}))).toEqual({local:0,session:0,cookie:""});
-  const outsider=await browser.newContext({baseURL:"http://127.0.0.1:3100"});try{expect((await outsider.request.get(saved.confirmPath)).status()).toBe(401);const outside=await outsider.newPage();await outside.goto(saved.url);await expect(outside).toHaveURL(/\/login\?next=/);await expect(outside.locator("main")).not.toContainText(receipt.reference);}finally{await outsider.close();}
-  const activity=await page.request.get(`/api/v1/merchants/${merchant.id}/operations`);expect(activity.status()).toBe(200);const payments=merchantOperationsProjectionSchema.parse(await activity.json()).payments.filter(row=>row.channelId===channel.id);expect(payments).toHaveLength(1);expect(payments[0]!.id).toBe(receipt.paymentId);
-  await page.goto(`/merchants/${merchant.id}?tab=channels&channel=${channel.id}`);const links=page.getByRole("region",{name:"Customer payment link",exact:true});
-  await links.getByRole("button",{name:"Turn off payment link",exact:true}).click();await links.getByRole("button",{name:"Turn off link",exact:true}).click();await expect(links.getByText("Link turned off",{exact:true})).toBeVisible();
-  expect((await page.request.get(`/api/v1/guest/publications/${publication.id}/qr`)).status()).toBe(404);
-  await customer.reload();await expect(customer.locator("main")).toContainText(receipt.reference);
-  await customer.goto(publication.publicHref);await expect(customer.getByRole("link",{name:"Choose a card",exact:true})).toHaveCount(0);
- }finally{await context.close();}
+ for(const network of ["Visa","Mastercard","American Express","Discover"]){const f=await networkCheckoutFixture();await page.goto(f.publication.publicHref);await expect(page.getByRole("heading",{name:f.channel.description,exact:true})).toBeVisible();await expect(page.getByText("No Etail Depot login is needed.",{exact:true})).toBeVisible();await page.getByRole("radio",{name:network,exact:true}).check();await page.getByRole("button",{name:"Pay $12.50",exact:true}).click();await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();await expect(page.locator(".gc-receipt")).toContainText(network);expect(page.url()).not.toContain("/login");expect((await getMerchantOperations(f.personId,f.merchantId)).payments).toHaveLength(1);}
+ expect(await page.evaluate(()=>({local:localStorage.length,session:sessionStorage.length,cookie:document.cookie}))).toEqual({local:0,session:0,cookie:""});
 });
+
+test("lost payment response recovers the same instruction after reload without a second charge",async({page})=>{
+ const f=await networkCheckoutFixture(),path=`**/api/v1/guest/publications/${f.publication.id}/payments`;let lost=false;
+ await page.route(path,async route=>{const response=await route.fetch();lost=true;await route.fulfill({response,body:'{"incomplete":true}'});});await page.goto(f.publication.publicHref);await page.getByRole("button",{name:"Pay $12.50",exact:true}).click();await expect(page.locator("main").getByRole("alert")).toContainText("couldn’t confirm");expect(lost).toBe(true);const operationId=new URL(page.url()).searchParams.get("payment")!;expect(operationId).toBeTruthy();expect((await getDb().select().from(networkPaymentOperations).where(eq(networkPaymentOperations.channelId,f.channel.id)))).toHaveLength(1);
+ await page.unroute(path);await page.reload();await expect(page.getByRole("button",{name:"Check payment status",exact:true})).toBeVisible();expect((await getDb().select().from(networkEvents).where(eq(networkEvents.operationId,operationId)))).toHaveLength(1);await page.getByRole("button",{name:"Check payment status",exact:true}).click();await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();expect(new URL(page.url()).searchParams.get("payment")).toBe(operationId);expect((await getMerchantOperations(f.personId,f.merchantId)).payments).toHaveLength(1);
+});
+
+test("double activation during guest session creation submits one payment instruction",async({page})=>{
+ const f=await networkCheckoutFixture();let sessionRequests=0,startRequests=0;let release!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve;});
+ await page.route("**/api/v1/guest/session",async route=>{sessionRequests++;await gate;await route.continue();});page.on("request",request=>{if(request.method()==="POST"&&new URL(request.url()).pathname===`/api/v1/guest/publications/${f.publication.id}/payments`)startRequests++;});await page.goto(f.publication.publicHref);await page.getByRole("button",{name:"Pay $12.50",exact:true}).evaluate(button=>{(button as HTMLButtonElement).click();(button as HTMLButtonElement).click();});await expect.poll(()=>sessionRequests).toBe(1);release();await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();expect(startRequests).toBe(1);expect((await getMerchantOperations(f.personId,f.merchantId)).payments).toHaveLength(1);
+});
+
+test("receipt stays private and readable after link revocation while fresh payments stop",async({page,browser})=>{
+ const f=await networkCheckoutFixture();const qr=await page.request.get(`/api/v1/guest/publications/${f.publication.id}/qr`);expect(qr.status()).toBe(200);expect((await qr.body()).subarray(0,8).toString("hex")).toBe("89504e470d0a1a0a");await page.goto(f.publication.publicHref);await page.getByRole("button",{name:"Pay $12.50",exact:true}).click();await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();const savedUrl=page.url(),id=new URL(savedUrl).searchParams.get("payment")!,path=`/api/v1/guest/publications/${f.publication.id}/payments/${id}`;const receipt=networkCheckoutProjectionSchema.parse(await (await page.request.get(path)).json()).receipt!;
+ const outsider=await browser.newContext({baseURL:"http://127.0.0.1:3100"});try{expect((await outsider.request.get(path)).status()).toBe(401);const outside=await outsider.newPage();await outside.goto(savedUrl);await expect(outside.locator("main")).not.toContainText(receipt.reference);}finally{await outsider.close();}
+ await revokeGuestPublication(f.personId,f.merchantId,f.channel.id,f.publication.id,{commandId:randomUUID(),expectedVersion:f.publication.version});await page.reload();await expect(page.locator(".gc-receipt")).toContainText(receipt.reference);expect((await page.request.get(`/api/v1/guest/publications/${f.publication.id}/qr`)).status()).toBe(404);await page.goto(f.publication.publicHref);await expect(page.getByRole("button",{name:"Pay $12.50",exact:true})).toHaveCount(0);
+});
+
+test("a mismatched checkout response does not display another payment as complete",async({page})=>{
+ const f=await networkCheckoutFixture(),path=`**/api/v1/guest/publications/${f.publication.id}/payments/*/process`;
+ await page.route(path,async route=>{const response=await route.fetch(),payload=await response.json();await route.fulfill({response,json:{...payload,publicationId:randomUUID(),amount:{minor:"1",currency:"USD",formatted:"$0.01"}}});});await page.goto(f.publication.publicHref);await page.getByRole("button",{name:"Pay $12.50",exact:true}).click();await expect(page.locator("main").getByRole("alert")).toContainText("couldn’t confirm");await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toHaveCount(0);await page.unroute(path);await page.getByRole("button",{name:"Check payment status",exact:true}).click();await expect(page.getByRole("heading",{name:"Payment complete",exact:true})).toBeVisible();expect((await getMerchantOperations(f.personId,f.merchantId)).payments).toHaveLength(1);
+});
+
+test("terminal operator recovers an abandoned checkout and retries a lost confirmation without money authority",async({page})=>{
+ const {acquiringPerson}=await import("../helpers/acquiring"),{createMerchantInvitation}=await import("../../src/modules/access/merchant-service"),{acceptInvitation}=await import("../../src/modules/access/service"),{startNetworkCheckout}=await import("../../src/modules/acquiring/network-service"),{signInPerson}=await import("./helpers/prepaid");const f=await networkCheckoutFixture(),user=await acquiringPerson(),invitation=await createMerchantInvitation(f.personId,f.merchantId,{commandId:randomUUID(),recipientId:user.personId,expiresInDays:3});await acceptInvitation(user.personId,invitation.id,{commandId:randomUUID(),expectedVersion:invitation.version});const pending=await startNetworkCheckout(f.cookie,f.publication.id,{commandId:randomUUID(),instrumentId:"visa"});await signInPerson(page,user.personId);const path=`**/api/v1/merchants/${f.merchantId}/processing-payments/${pending.id}/process`,commands:string[]=[];let lost=false;await page.route(path,async route=>{commands.push(route.request().postData()!);const response=await route.fetch();if(!lost){lost=true;await route.fulfill({response,body:'{"unconfirmed":true}'});}else await route.fulfill({response});});await page.goto(`/merchants/${f.merchantId}?tab=payments`);await expect(page.getByRole("button",{name:"Move to balance",exact:true})).toHaveCount(0);await expect(page.getByRole("heading",{name:"No completed payments yet",exact:true})).toBeVisible();await expect(page.getByRole("link",{name:"Create payment request",exact:true})).toHaveCount(0);await page.getByRole("searchbox",{name:"Search payments",exact:true}).fill("No matching confirmed receipt");await expect(page.getByRole("heading",{name:"No matching records",exact:true})).toBeVisible();await expect(page.getByRole("heading",{name:"No completed payments yet",exact:true})).toHaveCount(0);await page.getByRole("button",{name:"Clear filters",exact:true}).click();await expect(page.getByRole("heading",{name:"No completed payments yet",exact:true})).toBeVisible();await page.getByRole("button",{name:"Check payment status",exact:true}).click();await expect(page.locator("main").getByRole("alert")).toContainText("couldn’t confirm");await page.getByRole("button",{name:"Check request again",exact:true}).click();await expect(page.getByText("Payment confirmed. Its receipt is now in Payments.",{exact:true})).toBeVisible();expect(commands).toHaveLength(2);expect(commands[0]).toBe(commands[1]);await expect(page.getByRole("button",{name:"Check payment status",exact:true})).toHaveCount(0);expect((await getMerchantOperations(user.personId,f.merchantId))).toMatchObject({canPayout:false,bankFunds:null,payments:[{id:pending.id,canRefund:false}]});
+});
+
+test("old card-selection bookmarks redirect to public checkout and cannot start a second payment path",async({page})=>{const f=await networkCheckoutFixture();await page.goto(`/checkout/${f.publication.id}/card`);await expect(page).toHaveURL(new RegExp(`/checkout/${f.publication.id}$`));await expect(page.getByRole("radio",{name:"Visa",exact:true})).toBeVisible();await expect(page.getByRole("combobox",{name:"Your card",exact:true})).toHaveCount(0);expect((await page.request.post(`/api/v1/checkout/${f.publication.id}/card`,{headers:{Origin:"http://127.0.0.1:3100","Content-Type":"application/json"},data:{}})).status()).toBe(404);expect((await getDb().select().from(networkPaymentOperations).where(eq(networkPaymentOperations.channelId,f.channel.id)))).toHaveLength(0);});

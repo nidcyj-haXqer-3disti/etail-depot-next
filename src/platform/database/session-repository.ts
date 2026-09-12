@@ -7,6 +7,7 @@ import { getDb } from "./client";
 import { identityBindings, sessions } from "./schema";
 import { identityPasswordResets } from "../../modules/identity/schema";
 import { randomUUID } from "node:crypto";
+import { refreshVerifiedEmail } from "../../modules/identity/contact-service";
 
 type DatabaseTransaction = Parameters<Parameters<ReturnType<typeof getDb>["transaction"]>[0]>[0];
 
@@ -24,10 +25,11 @@ async function assertNoPendingReset(tx: DatabaseTransaction, identityId: string)
 }
 
 export const sessionRepository: SessionRepository = {
-  async insert(record) {
+  async insert(record, contact) {
     await getDb().transaction(async (tx) => {
       await lockIdentity(tx, record.identityId);
       await assertNoPendingReset(tx, record.identityId);
+      if (contact) await refreshVerifiedEmail(tx, record.identityId, contact);
       await tx.insert(sessions).values(record);
     });
   },

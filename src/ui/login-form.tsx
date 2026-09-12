@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { EmailAuthenticationAvailability } from "@/modules/identity/adapters/netlify";
 import { Icon } from "./icon";
 import { parseEmailLink, takeEmailLink, type EmailLink } from "./identity-email-link";
+import { invitationIdFromNextPath } from "@/shared/auth-continuation";
 
 type Mode = "login" | "register" | "confirm" | "recover" | "reset";
 type Operation = Mode;
@@ -169,8 +170,9 @@ export function LoginForm({ nextPath="/services",initialMode="login",localEmailL
     for (const name of ["password", "confirmPassword"]) { const field = form.elements.namedItem(name); if (field instanceof HTMLInputElement) field.value = ""; }
     if (link) { emailLink.current = link; setLinkReady(true); }
     if (mode === "login") void submit("/api/v1/auth/login", { email, password }, mode);
-    if (mode === "register") void submit("/api/v1/auth/register", { email, password }, mode);
-    if (mode === "recover") void submit("/api/v1/auth/recover", { email }, mode);
+    const continuation: Record<string, string> = invitationIdFromNextPath(nextPath) ? { nextPath } : {};
+    if (mode === "register") void submit("/api/v1/auth/register", { email, password, ...continuation }, mode);
+    if (mode === "recover") void submit("/api/v1/auth/recover", { email, ...continuation }, mode);
     if (mode === "confirm") void submit("/api/v1/auth/confirm", { token: link!.token }, mode);
     if (mode === "reset") void submit("/api/v1/auth/reset-password", { token: link!.token, password }, mode);
   }

@@ -41,7 +41,7 @@ async function detail(tx:ScopedTransaction,scope:Scope,row:CaseRow):Promise<Supp
   const messages=await tx.select().from(supportCaseMessages).where(and(eq(supportCaseMessages.caseId,row.id),eq(supportCaseMessages.creatorId,row.creatorId),eq(supportCaseMessages.serviceId,row.serviceId))).orderBy(asc(supportCaseMessages.sequence));
   let transaction:SupportCaseDetail["transaction"]=null;
   if(row.transactionId&&scope.cardholder&&evaluate(scope.cardholder.policy,"activity.read").allowed) {
-    const [activity]=await tx.select({id:serviceActivity.id,title:serviceActivity.title,cardId:serviceActivity.cardId,holderId:cards.holderId}).from(serviceActivity).leftJoin(cards,and(eq(cards.id,serviceActivity.cardId),eq(cards.serviceId,serviceActivity.serviceId))).where(and(eq(serviceActivity.id,row.transactionId),eq(serviceActivity.serviceId,row.serviceId)));
+    const [activity]=await tx.select({id:serviceActivity.id,title:serviceActivity.title,cardId:serviceActivity.cardId,holderId:cards.holderId,assignmentState:cards.assignmentState}).from(serviceActivity).leftJoin(cards,and(eq(cards.id,serviceActivity.cardId),eq(cards.serviceId,serviceActivity.serviceId))).where(and(eq(serviceActivity.id,row.transactionId),eq(serviceActivity.serviceId,row.serviceId)));
     if(activity&&canReadCardholderActivity(scope.cardholder.policy,activity))transaction={id:activity.id,title:activity.title};
   }
   const payment=row.paymentId&&row.merchantUnitId&&scope.merchant&&evaluate(scope.merchant.policy,"payments.read").allowed?await readSupportPayment(tx,row.paymentId,row.merchantUnitId,row.serviceId):null;
@@ -84,7 +84,7 @@ async function createCase(personId:string,target:Target,input:CreateSupportCaseC
     const transactionId="transactionId" in input?input.transactionId:null,paymentId="paymentId" in input?input.paymentId:null;
     if(transactionId) {
       if(!scope.cardholder||!evaluate(scope.cardholder.policy,"activity.read").allowed)throw new SecurityError("ACTION_DENIED",403);
-      const [transaction]=await tx.select({id:serviceActivity.id,cardId:serviceActivity.cardId,holderId:cards.holderId}).from(serviceActivity).leftJoin(cards,and(eq(cards.id,serviceActivity.cardId),eq(cards.serviceId,serviceActivity.serviceId))).where(and(eq(serviceActivity.id,transactionId),eq(serviceActivity.serviceId,scope.serviceId))).for("share",{of:serviceActivity});
+      const [transaction]=await tx.select({id:serviceActivity.id,cardId:serviceActivity.cardId,holderId:cards.holderId,assignmentState:cards.assignmentState}).from(serviceActivity).leftJoin(cards,and(eq(cards.id,serviceActivity.cardId),eq(cards.serviceId,serviceActivity.serviceId))).where(and(eq(serviceActivity.id,transactionId),eq(serviceActivity.serviceId,scope.serviceId))).for("share",{of:serviceActivity});
       if(!transaction||!canReadCardholderActivity(scope.cardholder.policy,transaction))throw new SecurityError("RESOURCE_UNAVAILABLE",404);
     }
     if(paymentId) {

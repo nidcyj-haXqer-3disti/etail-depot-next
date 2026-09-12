@@ -9,6 +9,7 @@ import type {ScopedTransaction} from "../access/scope";
 import {requireMerchantApplicant} from "../services/merchant-eligibility";
 import {evaluate} from "../policy/evaluate";
 import {formatMoney} from "../workspace/service";
+import {networkPaymentOperations} from "./network-schema";
 import {paymentChannels} from "./schema";
 import {channelActivations,testGateways,testMerchantEnrollments,merchantTestPayments,merchantTestRefunds,merchantOperationCommands} from "./operations-schema";
 import {guestPublications,guestPublicationCommands,guestSessions,guestOrders,guestAttempts,guestRequestBudgets} from "./guest-schema";
@@ -29,13 +30,13 @@ function cookieToken(header:string|null){
  const values=(header??"").split(";").map(value=>value.trim()).filter(value=>value.startsWith(`${guestCookieName()}=`)).map(value=>value.slice(value.indexOf("=")+1));
  return values.length===1&&/^[A-Za-z0-9_-]{43}$/.test(values[0])?values[0]:null;
 }
-async function session(tx:ScopedTransaction,cookieHeader:string|null):Promise<GuestSession>{
+export async function requireGuestSession(tx:ScopedTransaction,cookieHeader:string|null):Promise<GuestSession>{
  const token=cookieToken(cookieHeader);if(!token)throw new SecurityError("GUEST_SESSION_REQUIRED",401);
  const [row]=await tx.select().from(guestSessions).where(eq(guestSessions.tokenHash,hash(token))).for("share");
  if(!row||row.expiresAt<=await merchantNow(tx))throw new SecurityError("GUEST_SESSION_REQUIRED",401);return row;
 }
 /** Durable public-write budgets are independent of identity/email limits; only hashes are retained. */
-async function consumeBudget(keys:string[]){
+export async function consumeGuestBudget(keys:string[]){
  await getDb().transaction(async tx=>{
   const now=await merchantNow(tx),budgets=[{key:hash("guest-global"),limit:600},...keys.map(key=>({key:hash(`guest:${key}`),limit:60}))].sort((a,b)=>a.key.localeCompare(b.key));
   for(const budget of budgets)await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"guest-budget:"+budget.key},0))`);
@@ -50,8 +51,8 @@ async function consumeBudget(keys:string[]){
 /** Return the cookie only to a trusted HTTP Set-Cookie caller; never include it in a projection. */
 export async function ensureGuestSession(cookieHeader:string|null):Promise<{setCookie:string|null}>{
  getRuntimeConfig();
- try{await getDb().transaction(tx=>session(tx,cookieHeader));return {setCookie:null};}catch(error){if(!(error instanceof SecurityError&&error.code==="GUEST_SESSION_REQUIRED"))throw error;}
- await consumeBudget(["session-create"]);
+ try{await getDb().transaction(tx=>requireGuestSession(tx,cookieHeader));return {setCookie:null};}catch(error){if(!(error instanceof SecurityError&&error.code==="GUEST_SESSION_REQUIRED"))throw error;}
+ await consumeGuestBudget(["session-create"]);
  const token=randomBytes(32).toString("base64url");
  await getDb().transaction(async tx=>{const now=await merchantNow(tx);await tx.insert(guestSessions).values({id:randomUUID(),tokenHash:hash(token),createdAt:now,expiresAt:new Date(now.getTime()+86400000)});});
  return {setCookie:`${guestCookieName()}=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=86400${getRuntimeConfig().publicOrigin.startsWith("https:")?"; Secure":""}`};
@@ -69,9 +70,10 @@ async function merchantContext(tx:ScopedTransaction,personId:string,merchantId:s
  const [enrollment]=await tx.select().from(testMerchantEnrollments).where(eq(testMerchantEnrollments.merchantUnitId,merchantId));
  const [activation]=await tx.select().from(channelActivations).where(eq(channelActivations.channelId,channelId));
  const [used]=channel.usage==="ONE_TIME"?await tx.select({id:merchantTestPayments.id}).from(merchantTestPayments).where(and(eq(merchantTestPayments.channelId,channelId),eq(merchantTestPayments.outcome,"APPROVED"))).limit(1):[];
+ const [reserved]=channel.usage==="ONE_TIME"?await tx.select({id:networkPaymentOperations.id}).from(networkPaymentOperations).where(eq(networkPaymentOperations.channelId,channelId)).limit(1):[];
  let adult=true;try{await requireMerchantApplicant(tx,personId);}catch(error){if(error instanceof SecurityError&&[403,404].includes(error.status))adult=false;else throw error;}
  const now=await merchantNow(tx),canShare=adult&&evaluate(scope.policy,"channels.share").allowed;
- const ready=canShare&&channel.status==="DRAFT"&&channel.expiresAt>now&&!Boolean(used)&&gateway?.mode==="TEST_READY"&&enrollment?.status==="ENROLLED"&&activation?.status==="ACTIVE";
+ const ready=canShare&&channel.status==="DRAFT"&&channel.expiresAt>now&&!Boolean(used)&&!Boolean(reserved)&&gateway?.mode==="TEST_READY"&&enrollment?.status==="ENROLLED"&&activation?.status==="ACTIVE";
  return {scope,channel,gateway,enrollment,activation,ready,canShare,now};
 }
 export async function publicationContext(tx:ScopedTransaction,row:Publication,forWrite=false){
@@ -137,4 +139,4 @@ async function orderProjection(tx:ScopedTransaction,guest:GuestSession,order:Ord
  const status=payment?(refund?"REFUNDED":payment.outcome):!ready?"UNAVAILABLE":attempt?"REVIEW":"READY";
  return {id:order.id,version:attempts.length+1,publicationId:order.publicationId,merchantName:order.merchantName,primaryMerchantName:order.primaryMerchantName,description:order.description,amount:formatMoney(order.amountMinor),expiresAt:order.expiresAt.toISOString(),receiptAccessExpiresAt:guest.expiresAt.toISOString(),createdAt:order.createdAt.toISOString(),status,canPrepare:false,canConfirm:false,freshRequestHref:`/checkout/${order.publicationId}`,mode:"SANDBOX",feeStatus:"NOT_APPLIED",attempt:attempt?{id:attempt.id,outcome:attempt.outcome,createdAt:attempt.createdAt.toISOString()}:null,receipt:payment?{paymentId:payment.id,reference:payment.testReference,status:refund?"REFUNDED":payment.outcome,amount:formatMoney(payment.amountMinor),createdAt:payment.createdAt.toISOString(),refund:refund?{amount:formatMoney(refund.amountMinor),reference:refund.testReference,createdAt:refund.createdAt.toISOString()}:null}:null};
 }
-export async function getGuestOrder(cookieHeader:string|null,orderId:string){orderId=id(orderId);return getDb().transaction(async tx=>{const guest=await session(tx,cookieHeader);return orderProjection(tx,guest,await ownedOrder(tx,guest,orderId));},{isolationLevel:"repeatable read"});}
+export async function getGuestOrder(cookieHeader:string|null,orderId:string){orderId=id(orderId);return getDb().transaction(async tx=>{const guest=await requireGuestSession(tx,cookieHeader);return orderProjection(tx,guest,await ownedOrder(tx,guest,orderId));},{isolationLevel:"repeatable read"});}
