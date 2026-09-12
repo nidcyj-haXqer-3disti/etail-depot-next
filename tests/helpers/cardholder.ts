@@ -26,12 +26,16 @@ export async function enrollCardholder(primaryId: string, serviceId: string, per
   if(testGrants){await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,serviceId),eq(permissionGrants.personId,personId),inArray(permissionGrants.action,secondaryPermissions)));for(const action of testGrants)await getDb().insert(permissionGrants).values({serviceId,personId,action,state:"ACCEPTED"}).onConflictDoUpdate({target:[permissionGrants.serviceId,permissionGrants.personId,permissionGrants.action],set:{state:"ACCEPTED"}});}
   return accepted;
 }
-export async function issuePracticeCard(primaryId: string, serviceId: string, holderId: string, nickname: string, spend?: string, allowanceMinor="0") {
+export async function issuePracticeCardRequest(primaryId: string, serviceId: string, holderId: string, nickname: string, allowanceMinor="0") {
   const draft = await startCardRequest(primaryId, serviceId, { commandId: randomUUID() });
   const saved = await updateCardRequest(primaryId, serviceId, draft.id, { commandId: randomUUID(), expectedVersion: draft.version, holderId, nickname, format: "VIRTUAL", allowanceMinor });
   const submit = { commandId: randomUUID(), expectedVersion: saved.version };
   const request = await submitCardRequest(primaryId, serviceId, saved.id, submit);
   if (request.status !== "ISSUED" || !request.issuedCardId) throw new Error("Fixture card was not issued by the canonical command");
+  return { request, submit };
+}
+export async function issuePracticeCard(primaryId: string, serviceId: string, holderId: string, nickname: string, spend?: string, allowanceMinor="0") {
+  const {request,submit}=await issuePracticeCardRequest(primaryId,serviceId,holderId,nickname,allowanceMinor);
   const card = (await getWorkspace(holderId, serviceId)).cards.find(row => row.id === request.issuedCardId);
   if (!card) throw new Error("Issued fixture card unavailable to its holder");
   const purchase = spend ? await purchaseCard(holderId, serviceId, card.id, { commandId: randomUUID(), expectedVersion: card.version, amountMinor: spend, description: `${nickname} purchase` }) : null;

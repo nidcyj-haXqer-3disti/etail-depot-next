@@ -8,6 +8,8 @@ Four additive migrations are verified on the marked test and preserved preview d
 
 Branch `codex/group-money-cards-terminals` is based on local D72 `4fe3d06d671f7a34f6158b418608dda5d88d6d71`, whose tree matches remote D72 main `f287fa8db69606e003a74db9f1b36d7d4b54108f`. GitHub publication, exact-revision CI, reviewed merge and canonical Netlify deployment are tracked in the release pull request; local verification alone is not hosted acceptance. Release receipt: `artifacts/d73-publication.json`. Existing visitor access stays unchanged and real money stays disabled.
 
+The first PR16 CI run passed402 unit and219 integration cases, but its32-card pagination setup exceeded the15-second budget. A test-only correction removes repeated unused full-workspace reads while retaining canonical issuance, all pagination/privacy assertions and the original timeout. The final exact-head workflow outcome is recorded in the release receipt and PR.
+
 # D72 — verified customer interface cleanup (12 September 2026)
 
 The user accepted D71 and authorized cleanup, comprehensive checks and deployment. [D72 scope and evidence](../docs/PRODUCTION_UI_CLEANUP.md) records normal customer copy, one shared Sandbox badge, consistent headers/footers, member-code access and removal of proven unused code. Financial commands, permissions, schema and saved data remain unchanged.

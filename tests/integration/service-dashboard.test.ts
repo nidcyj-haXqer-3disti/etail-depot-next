@@ -8,7 +8,7 @@ import { ledgerEntries } from "../../src/modules/ledger/schema";
 import { getCardholderDashboard, getCardholderDashboardDetail, getCardholderDashboardFocus } from "../../src/modules/workspace/dashboard-service";
 import { getWorkspace, purchaseCard, startCardRequest, controlCard } from "../../src/modules/workspace/service";
 import { getAccessOverview, revokeMemberAccess } from "../../src/modules/access/service";
-import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard } from "../helpers/cardholder";
+import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard, issuePracticeCardRequest } from "../helpers/cardholder";
 
 afterAll(closeDatabase);
 async function fixture() {
@@ -141,7 +141,9 @@ describe("service-first Cardholder dashboard", () => {
   it("paginates the authorized card set without duplicates or hidden-holder counts", async () => {
     const primary = await cardPrimary(), secondary = await cardPerson("Paginated secondary");
     await enrollCardholder(primary.personId, primary.serviceId, secondary);
-    for (let n = 0; n < 31; n++) await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,`Primary card ${String(n).padStart(2, "0")}${n===30?" %_":""}`);
+    // Create through the same canonical request lifecycle, without re-reading
+    // every prior card after each addition. The complete set is asserted below.
+    for (let n = 0; n < 31; n++) await issuePracticeCardRequest(primary.personId,primary.serviceId,primary.personId,`Primary card ${String(n).padStart(2, "0")}${n===30?" %_":""}`);
     const own = await (async()=>{await fundCardGroup(primary.personId,primary.serviceId,"1");return issuePracticeCard(primary.personId, primary.serviceId, secondary, "Secondary card", undefined, "1");})();
     const first = await getCardholderDashboard(primary.personId), second = await getCardholderDashboard(primary.personId, 1);
     expect(first).toMatchObject({ cardCount: 32, cardsPage: 0, cardsHasMore: true });
