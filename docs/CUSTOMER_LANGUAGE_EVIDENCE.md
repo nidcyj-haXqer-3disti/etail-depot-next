@@ -24,6 +24,18 @@ Environment: macOS, Node24.19.0, pnpm11.19.0, Next16.3.4, TypeScript6.0.3, nativ
 
 The first unprivileged Netlify packaging attempt failed opening the CLI's preferences temporary file (`EPERM`); the authorized run outside that filesystem restriction passed. This was an environment failure, not an application build failure. Initial full browser results and corrected reruns are preserved separately; earlier D73 success is not substituted for D74 evidence.
 
+## Final narrow-screen correction
+
+The preserved-preview capture exercised81 authenticated states. Its initial result was80/81: at320×844px, the owner’s first card control ended at851.77px because the new View card balance link wrapped. All axe, overflow, runtime and before/after projection checks passed. The link is shortened to View balance within its labelled Card balance section; the URL and behavior are unchanged. The corrected built screen passes at320×844px, with moneyBottom723.58 and controlBottom843.77, zero axe violations/errors/overflow and an unchanged scoped card projection. See `artifacts/d74-owner-mobile-verified/receipt.json`. Final production Next/Netlify packaging and scoped lint pass (`artifacts/d74-netlify-build-mobile-final.log`, `artifacts/d74-mobile-final-lint.log`). The original capture and final full capture remain separate receipts under `artifacts/`.
+
+The prior215-case journey results and39 public visual states apply before this one-link wording refinement; exact final-head GitHub CI and the final preview capture provide its additional verification. No test timeout, viewport threshold, CSS geometry or behavior was changed to make this check pass.
+
+## Final merchant balance presentation
+
+Manual review identified a balance explanation using monetary-value typography, making it too large on phones. The three explanation rows now use the existing `md-balance-description` helper style, the overview explanation is shorter, and a single balance tile fills its grid. Amounts, actions, routes and data are unchanged. Production Next/offline Netlify packaging and scoped lint pass (`artifacts/d74-netlify-build-final-candidate.log`, `artifacts/d74-final-presentation-lint.log`).
+
+The corrected mobile card version passed all81 maintained authenticated capture states with unchanged holder/owner/operator projections. The final merchant refinement passes12 additional owner/terminal-user overview and balance views at1440/390/320px: normal-weight11–12px helper text, no axe violations, overflow or browser errors, full-width single balance tile, and no owner money actions exposed to terminal users. `artifacts/d74-merchant-display-final/results.json` and the review receipt retain exact evidence. The broader raw API comparison initially differed only at the generated `activity.asOf` report timestamp, consistent with `activity-service.ts`; before/after snapshots and exact differences are retained. Card data, financial fields, permissions and all other projection fields are identical after separating that timestamp. No write or reset was used to pass these checks.
+
 ## Release boundary
 
 Local base `72f180552f77076637f77520c834b64cb888d33c`, tree `ef72c34c2cc549e2a22af0257e7479148842ddd8`, matches deployed D73 main `75eee004a1ded48fb6adbf2bb0ff67c3f5ea7bc8`. The D74 feature PR and `artifacts/d74-publication.json` identify the exact final local/remote tree, CI, reviewed merge and canonical deployment. Release remains pending until those receipts exist.
