@@ -12,8 +12,8 @@ import {signInPerson} from "./helpers/prepaid";
 import {additionalPublishedPayment,freshConnectedPayment,merchantOperations,payPublishedMerchant} from "./helpers/merchant-payments";
 
 test.afterAll(closeDatabase);
-async function reviewSettlement(page:Page,amount:string,count:number){
- const terminalId=new URL(page.url()).pathname.split("/")[2]!,terminalName=(await page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{level:1}).innerText()).trim();
+async function reviewSettlement(page:Page,terminalId:string,amount:string,count:number){
+ const terminalName=(await page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{level:1}).innerText()).trim();
  await page.goto(`/merchant-services?section=funds&view=unit:${terminalId}`);
  await page.locator(".money-incoming > summary").click();
  await page.getByRole("region",{name:`Settlement for ${terminalName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();
@@ -75,7 +75,7 @@ test("exact settlement survives a lost result and credits merchant money once wh
  const before=await merchantOperations(page,m.unit.id);
  expect(before.depositReview).toMatchObject({amount:{minor:"2000"},paymentCount:2});
  await page.goto(`/merchants/${m.unit.id}?tab=payments`);
- const review=await reviewSettlement(page,"$20.00",2),bodies:unknown[]=[];
+ const review=await reviewSettlement(page,m.unit.id,"$20.00",2),bodies:unknown[]=[];
  await page.route(`**/api/v1/merchants/${m.unit.id}/settlements`,async route=>{
   bodies.push(route.request().postDataJSON());const response=await route.fetch();expect(response.status()).toBe(200);
   if(bodies.length===1)await route.abort("failed");else await route.fulfill({response});
@@ -103,7 +103,7 @@ test("exact settlement survives a lost result and credits merchant money once wh
 test("a settlement result for a different terminal remains unconfirmed and exact retry recovers the saved receipt",async({page})=>{
  test.setTimeout(90_000);const f=await freshConnectedPayment(page),m=f.merchant;
  await page.goto(`/merchants/${m.unit.id}?tab=payments`);
- const review=await reviewSettlement(page,"$12.50",1),bodies:unknown[]=[];
+ const review=await reviewSettlement(page,m.unit.id,"$12.50",1),bodies:unknown[]=[];
  await page.route(`**/api/v1/merchants/${m.unit.id}/settlements`,async route=>{
   bodies.push(route.request().postDataJSON());const response=await route.fetch();expect(response.status()).toBe(200);
   if(bodies.length===1)await route.fulfill({status:200,json:{...await response.json(),terminalId:randomUUID()}});else await route.fulfill({response});
@@ -117,7 +117,7 @@ test("a settlement result for a different terminal remains unconfirmed and exact
 
 test("new collections invalidate an open settlement review and require the updated exact batch",async({page,browser})=>{
  test.setTimeout(120_000);const f=await freshConnectedPayment(page),m=f.merchant,before=await merchantOperations(page,m.unit.id);
- await page.goto(`/merchants/${m.unit.id}?tab=payments`);const review=await reviewSettlement(page,"$12.50",1);
+ await page.goto(`/merchants/${m.unit.id}?tab=payments`);const review=await reviewSettlement(page,m.unit.id,"$12.50",1);
  const other=await browser.newContext({baseURL:"http://127.0.0.1:3100"});
  try{await payPublishedMerchant(await other.newPage(),await additionalPublishedPayment(m,"500"),f.payer);}finally{await other.close();}
  const requests:{commandId:string;reviewToken:string}[]=[],statuses:number[]=[];

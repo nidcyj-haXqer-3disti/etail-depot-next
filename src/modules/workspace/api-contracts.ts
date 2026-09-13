@@ -1,4 +1,6 @@
 import {cardSpendingSchema,topupReceiptSchema,fundingIntentSchema} from "../../shared/funding-response";
+import {notificationPreferencesSchema,notificationOverviewSchema,notificationSaveResponseSchema} from "../../shared/notification-response";
+export {notificationPreferencesSchema} from "../../shared/notification-response";
 export {cardSpendingSchema} from "../../shared/funding-response";
 import {topupCommandSchema,spendingLimitCommandSchema} from "./funding-contracts";
 import {cardCheckoutReviewSchema} from "../acquiring/card-checkout-contracts";
@@ -13,7 +15,6 @@ export const workspaceCardSchema=z.object({id,serviceId:id,holderId:id.nullable(
 export const workspaceActivitySchema=z.object({id,serviceId:id,cardId:id.nullable(),title:z.string(),category:z.string(),occurredAt:z.iso.datetime(),status:z.enum(["POSTED","PENDING","DECLINED"]),direction:z.enum(["DEBIT","CREDIT"]),amount:money,description:z.string(),fictional:z.literal(true)}).strict();
 export const cardPurchaseResultSchema=z.object({card:workspaceCardSchema,activity:workspaceActivitySchema,journalId:id,fictional:z.literal(true)}).strict();
 export const cardRequestProjectionSchema=z.object({id,serviceId:id,holderId:id.nullable(),holderName:z.string(),nickname:z.string(),format:z.enum(["VIRTUAL","PHYSICAL"]),currency:z.literal("USD"),allowance:money,status:z.enum(["DRAFT","BLOCKED","CANCELED","ISSUED"]),issuedCardId:id.nullable(),canSubmit:z.boolean(),version,updatedAt:z.iso.datetime(),prerequisites:z.array(z.object({code:z.string(),title:z.string(),detail:z.string()}).strict())}).strict();
-export const notificationPreferencesSchema=z.object({serviceActivity:z.boolean(),cardControls:z.boolean(),caseUpdates:z.boolean(),version,delivery:z.literal("SAVED_ONLY")}).strict();
 export const workspaceProjectionSchema=z.object({
   customerService:z.object({id,displayName:z.string(),primaryName:z.string()}).strict().optional(),
   cardholderRole:z.enum(["OWNER","CARDHOLDER","NONE"]),service,member:z.object({id,displayName:z.string()}).strict(),services:z.array(service),fictional:z.literal(true),notice:z.string(),
@@ -49,7 +50,8 @@ export const workspaceOperations=[
   {path:`${prefix}/card-requests/{requestId}`,method:"patch",request:cardDraftCommandSchema,response:cardRequestProjectionSchema,status:200,authenticated:true},
   {path:`${prefix}/card-requests/{requestId}/submit`,method:"post",request:versionedCommandSchema,response:cardRequestProjectionSchema,status:200,authenticated:true},
   {path:`${prefix}/card-requests/{requestId}/cancel`,method:"post",request:versionedCommandSchema,response:cardRequestProjectionSchema,status:200,authenticated:true},
-  {path:`${prefix}/preferences/notifications`,method:"put",request:notificationCommandSchema,response:notificationPreferencesSchema,status:200,authenticated:true},
+  {path:`${prefix}/preferences/notifications`,method:"get",response:notificationOverviewSchema,status:200,authenticated:true},
+  {path:`${prefix}/preferences/notifications`,method:"put",request:notificationCommandSchema,response:notificationSaveResponseSchema,status:200,authenticated:true},
   {path:`${prefix}/activity`,method:"get",response:z.array(workspaceActivitySchema),status:200,authenticated:true},
   {path:`${prefix}/activity/{activityId}`,method:"get",response:workspaceActivitySchema,status:200,authenticated:true},
 ] as const;

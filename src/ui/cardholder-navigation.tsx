@@ -14,5 +14,5 @@ export function CardholderNavigation({ active, primary, hrefFor, settingsHref }:
     {key:"activity",label:"Activity",href:hrefFor("activity"),icon:"activity"},
     {key:"settings",label:primary?"Account settings":"Preferences",href:accountHref,icon:"settings"},
   ] as const;
-  return <aside className="ch-sidebar"><p className="consumer-eyebrow">CARDS & SPENDING</p><nav aria-label="Cards and spending navigation">{destinations.map(item=><Link key={item.key} href={item.href} aria-current={selected===item.key?"page":undefined}><WorkspaceIcon name={item.icon}/>{item.label}</Link>)}</nav></aside>;
+  return <aside className="ch-sidebar"><p className="consumer-eyebrow">Cards & spending</p><nav aria-label="Cards and spending navigation">{destinations.map(item=><Link key={item.key} href={item.href} aria-current={selected===item.key?"page":undefined}><WorkspaceIcon name={item.icon}/>{item.label}</Link>)}</nav></aside>;
 }

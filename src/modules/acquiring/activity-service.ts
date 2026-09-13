@@ -1,3 +1,4 @@
+import {merchantRecordHref} from "../../shared/merchant-activity";
 import { SecurityError } from "../../platform/security/origin";
 import { formatMoney } from "../workspace/service";
 import type { MerchantDashboardView } from "./dashboard-contracts";
@@ -17,7 +18,7 @@ export function projectMerchantActivity(query:MerchantActivityQuery, view:Mercha
   // Keep a requested out-of-range page visible and empty; never silently show a different page.
   const page=exporting?matching:matching.slice((query.page-1)*ACTIVITY_PAGE_SIZE,query.page*ACTIVITY_PAGE_SIZE);
   const returnTo=merchantActivityHref(query);
-  return {query,range,asOf:now.toISOString(),available:!!view,completeScope,rows:page.map(row=>({...row,href:`/merchants/${row.merchantId}?${new URLSearchParams({tab:"payments",...(row.kind==="transfer"?{activity:"transfers",transfer:row.id}:{payment:row.paymentId!}),returnTo})}`})),totalCount:matching.length,pageCount,pageSize:ACTIVITY_PAGE_SIZE,periodTotals:{collected:total("payment"),refunded:total("refund"),transferred:total("transfer")}};
+  return {query,range,asOf:now.toISOString(),available:!!view,completeScope,rows:page.map(row=>({...row,href:merchantRecordHref(row.merchantId,{tab:"payments",...(row.kind==="transfer"?{activity:"transfers",transfer:row.id}:{payment:row.paymentId!})},returnTo)})),totalCount:matching.length,pageCount,pageSize:ACTIVITY_PAGE_SIZE,periodTotals:{collected:total("payment"),refunded:total("refund"),transferred:total("transfer")}};
 }
 
 function csvCell(value:string){return `"${(/^[\s]*[=+@\-]/.test(value)?"'":"")+value.replaceAll('"','""')}"`;}

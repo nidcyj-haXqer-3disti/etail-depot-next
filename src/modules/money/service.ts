@@ -1,3 +1,4 @@
+import {customerHref} from "../../shared/customer-routes";
 import {createHash,randomUUID} from "node:crypto";
 import {and,desc,eq,inArray,isNull,or,sql} from "drizzle-orm";
 import {z} from "zod";
@@ -100,12 +101,12 @@ async function historyReceiptHrefs(tx:Tx,accountId:string,journals:(typeof ledge
    union all select i.id,t."journalId" from cardholder_funding_intents i join money_account_services m on m."serviceId"=i."serviceId" join money_topups t on t."commandId"=i."confirmCommandId" and t."moneyAccountId"=m."moneyAccountId" and t."actorId"=i."actorId" and t."amountMinor"=i."amountMinor" join ledger_journals j on j.id=t."journalId" and j."referenceId"=t.id and j.kind='MONEY_FUNDING' where t."journalId" in (${journalIds}) and t."moneyAccountId"=${accountId}::uuid
   ) c where (select count(*) from money_funding_intents where id=c.id)+(select count(*) from cardholder_funding_intents where id=c.id)=1`);
   const byJournal=new Map<string,string[]>();for(const row of candidates.rows){const key=String(row.journalId);byJournal.set(key,[...(byJournal.get(key)??[]),String(row.id)]);}
-  for(const [journalId,intents] of byJournal)if(intents.length===1)result.set(journalId,`${base}?task=add&review=${intents[0]}`);
+  for(const [journalId,intents] of byJournal)if(intents.length===1)result.set(journalId,customerHref(base,{task:"add",review:intents[0]!}));
  }
  const withdrawals=journals.filter(journal=>["MONEY_WITHDRAWAL_RESERVE","MONEY_WITHDRAWAL_RELEASE"].includes(journal.kind));
  if(withdrawals.length){
   const ids=withdrawals.map(journal=>journal.id),rows=await tx.select({withdrawal:moneyWithdrawals,intent:moneyWithdrawalIntents,event:moneyWithdrawalEvents}).from(moneyWithdrawals).innerJoin(moneyWithdrawalIntents,and(eq(moneyWithdrawalIntents.id,moneyWithdrawals.intentId),eq(moneyWithdrawalIntents.moneyAccountId,moneyWithdrawals.moneyAccountId),eq(moneyWithdrawalIntents.actorId,moneyWithdrawals.actorId),eq(moneyWithdrawalIntents.amountMinor,moneyWithdrawals.amountMinor),eq(moneyWithdrawalIntents.confirmCommandId,moneyWithdrawals.commandId))).leftJoin(moneyWithdrawalEvents,eq(moneyWithdrawalEvents.withdrawalId,moneyWithdrawals.id)).where(and(eq(moneyWithdrawals.moneyAccountId,accountId),or(inArray(moneyWithdrawals.journalId,ids),inArray(moneyWithdrawalEvents.journalId,ids))));
-  for(const row of rows)for(const journal of withdrawals){const matches=journal.referenceId===row.withdrawal.id&&(journal.kind==="MONEY_WITHDRAWAL_RESERVE"?row.withdrawal.journalId===journal.id:row.event?.outcome==="FAILED"&&row.event.journalId===journal.id);if(matches)result.set(journal.id,`${base}?task=withdraw&review=${row.intent.id}`);}
+  for(const row of rows)for(const journal of withdrawals){const matches=journal.referenceId===row.withdrawal.id&&(journal.kind==="MONEY_WITHDRAWAL_RESERVE"?row.withdrawal.journalId===journal.id:row.event?.outcome==="FAILED"&&row.event.journalId===journal.id);if(matches)result.set(journal.id,customerHref(base,{task:"withdraw",review:row.intent.id}));}
  }
  return result;
 }

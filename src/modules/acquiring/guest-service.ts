@@ -116,10 +116,10 @@ export async function revokeGuestPublication(personId:string,merchantId:string,c
   await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${"guest-publication-command:"+input.commandId},0))`);
   const [row]=await tx.select().from(guestPublications).where(and(eq(guestPublications.id,publicationId),eq(guestPublications.channelId,channelId))).for("update");if(!row)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
   const [receipt]=await tx.select().from(guestPublicationCommands).where(eq(guestPublicationCommands.commandId,input.commandId));
-  if(receipt){if(receipt.actorId!==personId||receipt.kind!=="REVOKE"||receipt.digest!==requestDigest)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return managementProjection(tx,personId,merchantId,channelId);}
+  if(receipt){if(receipt.actorId!==personId||receipt.kind!=="REVOKE"||receipt.digest!==requestDigest||receipt.publicationId!==publicationId)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return {...await managementProjection(tx,personId,merchantId,channelId),revocation:{commandId:receipt.commandId,publicationId:receipt.publicationId,status:"REVOKED" as const,confirmedAt:receipt.createdAt.toISOString()}};}
   if(row.version!==input.expectedVersion)throw new SecurityError("STALE_VERSION",409);if(row.revokedAt)throw denied();
   await tx.update(guestPublications).set({revokedAt:current.now,version:row.version+1}).where(eq(guestPublications.id,row.id));
-  await tx.insert(guestPublicationCommands).values({commandId:input.commandId,publicationId,actorId:personId,kind:"REVOKE",digest:requestDigest,createdAt:current.now});return managementProjection(tx,personId,merchantId,channelId);
+  await tx.insert(guestPublicationCommands).values({commandId:input.commandId,publicationId,actorId:personId,kind:"REVOKE",digest:requestDigest,createdAt:current.now});return {...await managementProjection(tx,personId,merchantId,channelId),revocation:{commandId:input.commandId,publicationId,status:"REVOKED" as const,confirmedAt:current.now.toISOString()}};
  });
 }
 export async function getPublicGuestRequest(publicationId:string):Promise<PublicGuestRequest>{

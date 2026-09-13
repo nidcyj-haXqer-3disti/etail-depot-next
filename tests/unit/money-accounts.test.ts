@@ -22,10 +22,10 @@ describe("purpose-bound owner money",()=>{
  });
  it("requires account identity and complete success shape for saved reviews",()=>{const review={id:command,moneyAccountId:account,receiptId:command,amount:formatMoney(100n),sourceLabel:"Funding balance",createdAt:"2026-09-12T00:00:00.000Z",receipt:null};expect(moneyFundingIntentSchema.safeParse(review).success).toBe(true);expect(moneyFundingIntentSchema.safeParse({...review,moneyAccountId:undefined}).success).toBe(false);expect(moneyWithdrawalReceiptSchema.safeParse({id:command,status:"COMPLETED"}).success).toBe(false);});
  it("rejects unsafe or differently scoped money history receipt links",()=>{
-  const row={id:command,kind:"MONEY_FUNDING",label:"Money added",amount:formatMoney(100n),createdAt:"2026-09-12T00:00:00.000Z",referenceId:command,href:`/money-accounts/${account}?task=add&review=${command}`};
+  const row={id:command,kind:"MONEY_FUNDING",label:"Money added",amount:formatMoney(100n),createdAt:"2026-09-12T00:00:00.000Z",referenceId:command,href:`/money-accounts/${account}/add-money?review=${command}`};
   const overview={id:account,displayName:"Card money",serviceKind:"CARDHOLDER",currency:"USD",status:"ACTIVE",version:1,services:[],available:formatMoney(100n),pendingWithdrawals:formatMoney(0n),history:[row],withdrawals:[],withdrawalsHasMore:false,page:0,hasMore:false,canAddMoney:true,canWithdraw:true};
   expect(moneyOverviewSchema.safeParse(overview).success).toBe(true);
-  for(const href of [`/money-accounts/${command}?task=add&review=${command}`,`/money-accounts/${account}?task=withdraw&review=${command}`,`https://example.test/money-accounts/${account}?task=add&review=${command}`,`/money-accounts/${account}?task=add&review=${command}&owner=other`])expect(moneyOverviewSchema.safeParse({...overview,history:[{...row,href}]}).success).toBe(false);
+  for(const href of [`/money-accounts/${command}/add-money?review=${command}`,`/money-accounts/${account}/withdraw?review=${command}`,`https://example.test/money-accounts/${account}/add-money?review=${command}`,`/money-accounts/${account}/add-money?review=${command}&owner=other`])expect(moneyOverviewSchema.safeParse({...overview,history:[{...row,href}]}).success).toBe(false);
   expect(moneyOverviewSchema.safeParse({...overview,history:[{...row,href:null}]}).success).toBe(true);
  });
  it("requires exact account payout records and refuses merchant top-up capability",()=>{

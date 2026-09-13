@@ -1,5 +1,7 @@
 # Etail Depot — product and technical design
 
+> **D81 active override — 14 September 2026 (Tokyo):** [Cohesive service experience](COHESIVE_SERVICE_EXPERIENCE.md) governs channel marketing and sharing, modern dashboards, actual service settings, clean customer paths and versioned personal profile editing. D73 authority/money, D76 exact invitations and D80 unified card/terminal workspaces remain. Implementation and local verification are complete; see D81 delivery evidence. Review/publication remains separate, and no D81 deployment is claimed.
+
 > **D80 active override — 13 September 2026:** [Unified resource workspaces](UNIFIED_RESOURCE_WORKSPACES.md) makes cards and terminals follow the same create-for-self/others, detail, controls and sharing pattern. Card details contain their own controls and invitations; Merchant Overview is one credit/debit statement, with Terminals owning channels and assigned people. Personal profile/login and service account settings remain separate. D73 money/authority and D76 contact-bound invitations remain.
 
 > **D79 active override — 13 September 2026:** [Consolidated service workflows](CONSOLIDATED_SERVICE_WORKFLOWS.md) puts card Add money on Account home and Return unused money in owner settings; card filters describe use rather than names. Merchant has one Overview / Payments / Team & terminals / Channels / Settings menu, with balance and payouts on Overview and terminal context inside the same workspace. Existing financial, permission and recovery rules remain.

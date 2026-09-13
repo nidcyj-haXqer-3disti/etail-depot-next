@@ -39,3 +39,19 @@ it("terminal assignment scopes publication management and paused terminals prese
  const [before]=await getDb().select().from(guestPublications).where(eq(guestPublications.id,f.publication.id));await pauseMerchant(f.merchant.personId,f.unit.id,{commandId:randomUUID(),expectedVersion:1,reason:"Pause terminal"});expect((await getPublicGuestRequest(f.publication.id)).canStart).toBe(false);expect((await getDb().select().from(guestPublications).where(eq(guestPublications.id,f.publication.id)))[0]).toEqual(before);
  await expect(getDb().update(guestPublications).set({amountMinor:1n}).where(eq(guestPublications.id,f.publication.id))).rejects.toThrow();
 });
+
+
+it("a revoked link receipt remains exact after a new link is published and cannot be replayed by another actor",async()=>{
+ const {networkCheckoutFixture}=await import("../helpers/network-checkout"),{acquiringPerson}=await import("../helpers/acquiring"),{guestPublicationCommands}=await import("../../src/modules/acquiring/guest-schema");
+ const f=await networkCheckoutFixture(),other=await acquiringPerson(),input={commandId:randomUUID(),expectedVersion:f.publication.version};
+ const revoked=await revokeGuestPublication(f.personId,f.merchantId,f.channel.id,f.publication.id,input);
+ expect(revoked.revocation).toMatchObject({commandId:input.commandId,publicationId:f.publication.id,status:"REVOKED"});
+ const next=await publishGuestChannel(f.personId,f.merchantId,f.channel.id,{commandId:randomUUID(),expectedChannelVersion:f.channel.version});
+ expect(next.publication!.id).not.toBe(f.publication.id);
+ const replayed=await revokeGuestPublication(f.personId,f.merchantId,f.channel.id,f.publication.id,input);
+ expect(replayed.revocation).toEqual(revoked.revocation);expect(replayed.publication).toEqual(next.publication);expect(replayed.publication!.state).toBe("AVAILABLE");
+ expect(await getDb().select().from(guestPublicationCommands).where(eq(guestPublicationCommands.commandId,input.commandId))).toHaveLength(1);
+ expect(await getGuestPublicationManagement(f.personId,f.merchantId,f.channel.id)).not.toHaveProperty("revocation");
+ await expect(revokeGuestPublication(other.personId,f.merchantId,f.channel.id,f.publication.id,input)).rejects.toMatchObject({status:404});
+ expect((await getPublicGuestRequest(f.publication.id)).canStart).toBe(false);expect((await getPublicGuestRequest(next.publication!.id)).canStart).toBe(true);
+});

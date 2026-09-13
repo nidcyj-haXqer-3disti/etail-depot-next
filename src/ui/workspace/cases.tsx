@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {useCustomerSearchParams} from "../use-customer-search-params";
+import {customerHref} from "@/shared/customer-routes";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cardholderTaskHref } from "../cardholder-routing";
 import type { WorkspaceProjection } from "@/modules/workspace/contracts";
@@ -37,7 +39,7 @@ function errorMessage(error:unknown) {
 }
 
 function SupportCaseWorkspace({context}:{context:SupportContext}) {
-  const params=useSearchParams(),router=useRouter();
+  const params=useCustomerSearchParams(),router=useRouter();
   const [, ,contextChanged,isCurrent]=useServerProjection(context);
   const merchant=context.kind==="MERCHANT"?context:null;
   const workspace=context.kind==="CARDHOLDER"?context.workspace:null;
@@ -53,7 +55,7 @@ function SupportCaseWorkspace({context}:{context:SupportContext}) {
     for(const key of ["payment","from","to","q","status","activity"]){const values=params.getAll(key);if(values.length===1)query.set(key,values[0]);}
     const back=params.getAll("returnTo").length===1?merchantActivityReturn(params.get("returnTo")):null;if(back)query.set("returnTo",back);
     for(const [key,value]of Object.entries(extra)){if(value===null)query.delete(key);else query.set(key,value);}
-    return `/merchants/${merchant.merchantId}?${query}`;
+    return customerHref(`/merchants/${merchant.merchantId}`,query);
   };
   const linked=workspace?.activity.find(item=>item.id===requestedTransaction);
   const topics=merchant?{SERVICE:"Merchant question",ACCESS:topicLabels.ACCESS,PAYMENT:topicLabels.PAYMENT}:{SERVICE:"Cardholder question",ACCESS:topicLabels.ACCESS,CARD:topicLabels.CARD,TRANSACTION:topicLabels.TRANSACTION};
@@ -77,7 +79,7 @@ function SupportCaseWorkspace({context}:{context:SupportContext}) {
   const linkedPayment=relatedContextAvailable?merchant?.linkedPayment:null;
   const shownPayment=includePayment?linkedPayment:null;
   const currentPayment=creating?shownPayment:detail?.payment;
-  const paymentHref=merchant&&currentPayment?caseHref({payment:currentPayment.id}).replace("tab=help","tab=payments"):null;
+  const paymentHref=merchant&&currentPayment?caseHref({tab:"payments",case:null,new:null,payment:currentPayment.id}):null;
   const locked=busy||Boolean(attempt)||needsRefresh||opening;
   const draft=detail?updates[detail.id]??"":"";
   function denyAccess(){setAccessUnavailable(true);setRelatedContextAvailable(false);setList(null);setDetail(null);setWithdrawOpen(false);setCreating(false);setReview(false);setSubject("");setMessage("");setUpdates({});setReason("");setTransaction("");setIncludePayment(false);}

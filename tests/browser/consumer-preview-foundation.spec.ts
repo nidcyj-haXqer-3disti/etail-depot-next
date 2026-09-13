@@ -33,7 +33,7 @@ test("a visitor can explore clear card and payment dashboards without account re
  expect(privateReads).toEqual([]);
  await expect(example.getByRole("listitem")).toHaveCount(3);
  await example.getByRole("link",{name:"Open your payments",exact:true}).click();
- await expect(page).toHaveURL(/\/login$/);
+ await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.searchParams.get("next")==="/merchant-services");
  expect(changes).toEqual([]);expect(errors).toEqual([]);
 });
 

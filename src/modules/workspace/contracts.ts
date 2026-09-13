@@ -64,7 +64,7 @@ export const cardDraftCommandSchema = z.object({
 }).strict();
 export const versionedCommandSchema = z.object({ commandId: z.uuid(), expectedVersion: versionSchema }).strict();
 export const notificationCommandSchema = z.object({
-  commandId: z.uuid(), expectedVersion: versionSchema,
+  commandId: z.uuid(), expectedPersonId: z.uuid(), expectedVersion: versionSchema,
   serviceActivity: z.boolean(), cardControls: z.boolean(), caseUpdates: z.boolean(),
 }).strict();
 export type CardControlCommand = z.infer<typeof cardControlCommandSchema>;

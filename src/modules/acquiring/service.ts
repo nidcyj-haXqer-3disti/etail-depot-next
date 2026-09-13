@@ -1,3 +1,4 @@
+import {customerHref} from "../../shared/customer-routes";
 import {channelActivations,merchantTestPayments} from "./operations-schema";
 
 import { createHash, randomUUID } from "node:crypto";
@@ -159,7 +160,7 @@ async function readMerchantScope(tx:ScopedTransaction,personId:string,unitId:str
 }
 function merchantSummary(scope:MerchantScope,eligible=true):MerchantUnitSummary {
   const terminal=scope.terminal;
-  return {id:terminal.id,displayName:terminal.displayName,intendedUse:terminal.intendedUse,merchant:{serviceId:scope.merchantService.id,displayName:scope.merchantService.displayName},status:terminal.status,version:terminal.version,createdAt:terminal.createdAt.toISOString(),updatedAt:terminal.updatedAt.toISOString(),canPause:eligible&&terminal.status==="ACTIVE"&&evaluate(scope.policy,"merchant.terminals.pause").allowed,canResume:eligible&&terminal.status==="PAUSED"&&!["SUSPENDED","CLOSED"].includes(scope.merchantService.status)&&scope.ownerAccess,canOpen:evaluate(scope.policy,"merchant.read").allowed,href:`/merchants/${terminal.id}`};
+  return {id:terminal.id,displayName:terminal.displayName,intendedUse:terminal.intendedUse,merchant:{serviceId:scope.merchantService.id,displayName:scope.merchantService.displayName},status:terminal.status,version:terminal.version,createdAt:terminal.createdAt.toISOString(),updatedAt:terminal.updatedAt.toISOString(),canPause:eligible&&terminal.status==="ACTIVE"&&evaluate(scope.policy,"merchant.terminals.pause").allowed,canResume:eligible&&terminal.status==="PAUSED"&&!["SUSPENDED","CLOSED"].includes(scope.merchantService.status)&&scope.ownerAccess,canOpen:evaluate(scope.policy,"merchant.read").allowed,href:customerHref(`/merchants/${terminal.id}`)};
 }
 /** Enumerate owned Merchant services and exact accepted assignments, never Cardholder participation. */
 export async function listMerchantScopes(tx:ScopedTransaction,personId:string):Promise<MerchantScope[]> {
@@ -197,7 +198,7 @@ export async function getMerchantWorkspace(personId:string,merchantUnitId:string
     const rows=canRead?await tx.select().from(paymentChannels).where(and(eq(paymentChannels.merchantUnitId,merchantUnitId),undefined)).orderBy(desc(paymentChannels.updatedAt),paymentChannels.id):[];
     const events=await tx.select().from(merchantUnitEvents).where(eq(merchantUnitEvents.merchantUnitId,merchantUnitId)).orderBy(merchantUnitEvents.createdAt,merchantUnitEvents.id);
     let setupHref:string|null=null;
-    try {const service=await loadServiceScope(tx,personId,scope.merchantService.id);if(evaluate(service.policy,"acquiring.setup").allowed)setupHref=`/merchants/${scope.terminal.id}/business-details`;}
+    try {const service=await loadServiceScope(tx,personId,scope.merchantService.id);if(evaluate(service.policy,"acquiring.setup").allowed)setupHref=customerHref(`/merchants/${scope.terminal.id}/business-details`);}
     catch(error){if(!(error instanceof SecurityError&&(error.status===403||error.status===404)))throw error;}
     const now=await databaseNow(tx),readiness=await merchantReadiness(tx,scope);
     const channels:PaymentChannel[]=[];

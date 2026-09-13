@@ -27,7 +27,7 @@ export async function getPrimaryCardholderService(personId:string):Promise<Cardh
     canInvite=evaluate(scope.policy,"people.invite").allowed;
    }
   }catch(error){if(!(error instanceof SecurityError&&[403,404].includes(error.status)))throw error;}
-  return {id:profile.id,primaryPersonId:personId,primaryName:person.displayName,displayName:"Your cardholder service",relationship:"OWNER",canAddCard,canInvite};
+  return {id:profile.id,primaryPersonId:personId,primaryName:person.displayName,displayName:profile.displayName,relationship:"OWNER",canAddCard,canInvite};
  },{isolationLevel:"repeatable read"});
 }
 
@@ -45,7 +45,7 @@ export async function getCardholderDashboardFocus(personId:string,cardId:string)
   const capabilities=["cards.read","people.read","activity.read","cardholder.limits.manage"].map(action=>evaluate(scope.policy,action));
   const card={...await getCardProjection(tx,scope,row),serviceId:profile.id,primaryName:profile.primaryName,accessRole:role,canManageAccess:role==="OWNER"&&evaluate(scope.policy,"people.read").allowed};
   const activity=evaluate(scope.policy,"activity.read").allowed?(await tx.select().from(serviceActivity).where(and(eq(serviceActivity.serviceId,row.serviceId),eq(serviceActivity.cardId,id))).orderBy(desc(serviceActivity.occurredAt),serviceActivity.id).limit(25)).map(activityProjection):[];
-  return {card,workspace:{service:{id:scope.service.id,kind:scope.service.kind,primaryPersonId:scope.service.primaryPersonId,displayName:scope.service.displayName,status:scope.service.status,version:scope.service.version,role:scope.membership.role,cardholderRole:role},customerService:{...profile,displayName:role==="OWNER"?"Your cardholder service":`Cards with ${profile.primaryName}`},cardholderRole:role,capabilities,cards:[card],activity}};
+  return {card,workspace:{service:{id:scope.service.id,kind:scope.service.kind,primaryPersonId:scope.service.primaryPersonId,displayName:scope.service.displayName,status:scope.service.status,version:scope.service.version,role:scope.membership.role,cardholderRole:role},customerService:{...profile,displayName:role==="OWNER"?scope.service.displayName:`Cards with ${profile.primaryName}`},cardholderRole:role,capabilities,cards:[card],activity}};
  },{isolationLevel:"repeatable read"});
 }
 
@@ -64,7 +64,7 @@ export async function getCardholderDashboard(personId:string,page=0,filters:Card
   const profiles:CardholderServiceProfile[]=stored.map(({profile,name})=>{
    const own=profile.primaryPersonId===personId;
    const bound=contexts.find(context=>context.serviceId===profile.id&&context.primaryPersonId===personId);
-   return {id:profile.id,primaryPersonId:profile.primaryPersonId,primaryName:name,displayName:own?"Your cardholder service":`Cards with ${name}`,relationship:own?"OWNER":"CARDHOLDER",canAddCard:own&&!!bound&&evaluate(bound.policy,"cards.request").allowed,canInvite:own&&!!bound&&evaluate(bound.policy,"people.invite").allowed};
+   return {id:profile.id,primaryPersonId:profile.primaryPersonId,primaryName:name,displayName:own?profile.displayName:`Cards with ${name}`,relationship:own?"OWNER":"CARDHOLDER",canAddCard:own&&!!bound&&evaluate(bound.policy,"cards.request").allowed,canInvite:own&&!!bound&&evaluate(bound.policy,"people.invite").allowed};
   });
   const profileByPrimary=new Map(profiles.map(profile=>[profile.primaryPersonId,profile]));
   const linked=contexts.filter(context=>context.primaryPersonId&&profileByPrimary.has(context.primaryPersonId));
@@ -106,8 +106,8 @@ export async function getCardholderDashboard(personId:string,page=0,filters:Card
   if(!primaryService){
    // Existing enrollment remains known to its named primary, even when current access is suspended.
    // This metadata never supplies records or grants, and prevents offering duplicate enrollment.
-   const [own]=await tx.select({id:services.id}).from(services).where(and(eq(services.kind,"CARDHOLDER"),eq(services.primaryPersonId,personId)));
-   if(own)primaryService={id:own.id,primaryPersonId:personId,primaryName:person.displayName,displayName:"Your cardholder service",relationship:"OWNER",canAddCard:false,canInvite:false};
+   const [own]=await tx.select({id:services.id,displayName:services.displayName}).from(services).where(and(eq(services.kind,"CARDHOLDER"),eq(services.primaryPersonId,personId)));
+   if(own)primaryService={id:own.id,primaryPersonId:personId,primaryName:person.displayName,displayName:own.displayName,relationship:"OWNER",canAddCard:false,canInvite:false};
   }
   // Accepted people remain visible before their first card exists. This directory
   // has its own bounded page and never derives membership from a page of cards.

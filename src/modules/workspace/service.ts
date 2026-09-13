@@ -485,8 +485,18 @@ export async function cancelCardRequest(personId: string, serviceId: string, req
   return updatedRequest(personId, serviceId, requestId);
 }
 
+/** Preferences are personal to one accepted service membership; no card or activity read is needed. */
+export async function getNotificationPreferences(personId:string,serviceId:string) {
+  return getDb().transaction(async tx=>{
+    const scope=await loadScope(tx,personId,serviceId);
+    if(scope.service.kind!=="CARDHOLDER"||cardholderRole(scope.policy)==="NONE")throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+    const [row]=await tx.select().from(notificationPreferences).where(and(eq(notificationPreferences.serviceId,serviceId),eq(notificationPreferences.personId,personId)));
+    return {serviceId,personId,canManage:permits(scope,"notifications.manage"),preferences:preferenceProjection(row)};
+  });
+}
 export async function saveNotificationPreferences(personId: string, serviceId: string, raw: NotificationCommand): Promise<NotificationPreferences> {
   const input = validate(notificationCommandSchema, raw);
+  if(input.expectedPersonId!==personId)throw new SecurityError("PREFERENCES_PERSON_CHANGED",403);
   await command(personId, serviceId, "notifications.save", "notifications.manage", personId, input, async tx => {
     await tx.insert(notificationPreferences).values({ serviceId, personId }).onConflictDoNothing();
     const [current] = await tx.select().from(notificationPreferences).where(and(eq(notificationPreferences.serviceId, serviceId), eq(notificationPreferences.personId, personId))).for("update");
@@ -494,7 +504,7 @@ export async function saveNotificationPreferences(personId: string, serviceId: s
     await tx.update(notificationPreferences).set({ serviceActivity: input.serviceActivity, cardControls: input.cardControls, caseUpdates: input.caseUpdates, version: current!.version + 1 }).where(and(eq(notificationPreferences.serviceId, serviceId), eq(notificationPreferences.personId, personId)));
     return personId;
   });
-  return (await getWorkspace(personId, serviceId)).preferences;
+  return (await getNotificationPreferences(personId, serviceId)).preferences;
 }
 
 /** Query helpers share the authorized workspace projection, including masked card/service scope. */

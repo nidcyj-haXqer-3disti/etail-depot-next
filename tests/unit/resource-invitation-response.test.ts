@@ -4,7 +4,7 @@ import { PUBLIC_APP_URL } from "../../src/shared/public-origin";
 import targets from "../../project-targets.json";
 const id="bdf5ef78-32b0-47f1-a045-1229481b7c14";
 const base={id,targetName:"Personal card",inviterName:"Owner",status:"PENDING",version:1,expiresAt:"2026-09-15T12:00:00.000Z",canRespond:true,hasAccess:false};
-const card={...base,targetKind:"CARD",allowance:{amount:"10000",currency:"USD"},href:`/cardholder-services?view=cards&card=${id}`};
+const card={...base,targetKind:"CARD",allowance:{amount:"10000",currency:"USD"},href:`/cardholder-services/cards/${id}`};
 describe("recipient invitation response boundary",()=>{
  it("shares only the reviewed new project's public destination",()=>{
   expect(PUBLIC_APP_URL).toBe(targets.netlify.canonical_origin);

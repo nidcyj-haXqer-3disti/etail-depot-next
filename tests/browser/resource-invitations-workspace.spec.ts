@@ -151,7 +151,7 @@ test("email-bound card sharing returns a new recipient to the exact invitation a
     expect((await getWorkspace(recipient.personId, owner.serviceId)).cards.map(row => row.id)).toEqual([cardId]);
     expect((await getCardholderFunds(owner.personId, owner.serviceId)).available.minor).toBe("0");
     await recipientPage.getByRole("link", { name: "Open your card", exact: true }).click();
-    await expect(recipientPage).toHaveURL(`${origin}/cardholder-services?view=cards&card=${cardId}`);
+    await expect(recipientPage).toHaveURL(`${origin}/cardholder-services/cards/${cardId}`);
     await expect(recipientPage.locator("main")).not.toContainText("Owner private card");
     const ownWorkspace = await recipientContext.request.get(`${origin}/api/v1/cardholder-services/${owner.serviceId}/workspace`);
     expect(ownWorkspace.status()).toBe(200);
@@ -182,7 +182,7 @@ test("a terminal email invitation shares one terminal and revocation removes its
     await expect(recipientPage.locator("main")).toContainText("The account owner manages the payment balance, refunds and access.");
     await recipientPage.getByRole("button", { name: "Accept invitation", exact: true }).click();
     await recipientPage.getByRole("link", { name: "Open your payment terminal", exact: true }).click();
-    await expect(recipientPage).toHaveURL(`${origin}/merchants/${terminal.id}?tab=payments`);
+    await expect(recipientPage).toHaveURL(`${origin}/merchant-services/terminals/${terminal.id}/payments`);
     const dashboard = await getMerchantDashboard(recipient);
     expect(dashboard.units.map(row => row.id)).toEqual([terminal.id]); expect(dashboard.moneyAccounts).toEqual([]);
     expect(await getDb().select().from(terminalAssignments).where(and(eq(terminalAssignments.terminalId, terminal.id), eq(terminalAssignments.personId, recipient)))).toHaveLength(1);

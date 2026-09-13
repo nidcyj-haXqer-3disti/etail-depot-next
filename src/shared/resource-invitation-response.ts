@@ -4,6 +4,8 @@ function safeDestination(value: string): boolean {
   if (!value.startsWith("/") || value.startsWith("//") || value.includes("\\") || value.includes("%") || /[\u0000-\u0020\u007f]/.test(value)) return false;
   const url = new URL(value, "https://invitation.invalid");
   if (url.origin !== "https://invitation.invalid" || url.hash) return false;
+  if (/^\/cardholder-services\/cards\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(url.pathname)) return !url.search;
+  if (/^\/merchant-services\/terminals\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?:\/payments)?$/i.test(url.pathname)) return !url.search;
   if (url.pathname === "/cardholder-services") return new Set(url.searchParams.keys()).size === [...url.searchParams].length && [...url.searchParams].every(([key, item]) => (key === "card" && z.uuid().safeParse(item).success) || (key === "view" && item === "cards"));
   return /^\/merchants\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(url.pathname) && (!url.search || url.search === "?tab=payments");
 }

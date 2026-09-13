@@ -4,8 +4,9 @@ import { pgTable, pgEnum, uuid, text, timestamp, integer, bigint, boolean, prima
 export const serviceKind = pgEnum("service_kind", ["CARDHOLDER", "MERCHANT"]);
 export const people = pgTable("people", {
   id: uuid().primaryKey().defaultRandom(), displayName: text().notNull(),
+  version: integer().notNull().default(1),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-});
+}, t => [check("person_version_positive", sql`${t.version}>0`)]);
 export const identityBindings = pgTable("identity_bindings", {
   id: uuid().primaryKey().defaultRandom(), personId: uuid().notNull().references(() => people.id),
   issuer: text().notNull(), subject: text().notNull(),

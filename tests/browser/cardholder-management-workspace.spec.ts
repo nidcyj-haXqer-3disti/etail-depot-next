@@ -40,6 +40,7 @@ test("multiple drafts retain their own details and created/canceled requests rem
   const dialog=await fillCard(page,name);
   await dialog.getByRole("button",{name:"Save for later",exact:true}).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/card-requests"&&!url.searchParams.has("request")&&!url.searchParams.has("focus"));
   await expect(page.locator(".ch-request-record").filter({hasText:name})).toBeVisible();
  }
  await page.reload();
@@ -65,7 +66,7 @@ test("multiple drafts retain their own details and created/canceled requests rem
  expect(result.cards).toHaveLength(1);
  await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Cards",exact:true}).click();
  await page.getByRole("navigation",{name:"Card management",exact:true}).getByRole("link",{name:"Card history",exact:true}).click();
- await expect(page).toHaveURL(/view=requests/);
+ await expect(page).toHaveURL(/\/cardholder-services\/card-requests(?:\?|$)/);
  await expect(page.getByRole("heading",{name:"Card history",level:3,exact:true})).toBeVisible();
  await page.reload();
  const canceled=page.locator(".ch-request-record").filter({hasText:"Travel request"});
@@ -79,7 +80,7 @@ test("multiple drafts retain their own details and created/canceled requests rem
  await expect(dialog).toContainText("Card details saved");
  await expect(dialog).toContainText("Card creation checked");
  await dialog.getByRole("button",{name:"View your card",exact:true}).click();
- await expect(page).toHaveURL(new RegExp(`focus=${issued.id}`));
+ await expect(page).toHaveURL(url=>url.pathname===`/cardholder-services/cards/${issued.id}`&&!url.searchParams.has("focus"));
  await page.goto(`${origin}/cardholder-services?view=requests`);
  await page.getByRole("searchbox",{name:"Search card history",exact:true}).fill("Travel");
  await page.getByRole("combobox",{name:"Status",exact:true}).selectOption("CANCELED");
@@ -108,7 +109,7 @@ test("an owner sees a person's cards and history while holders cannot open manag
  await expect(page.getByRole("button",{name:"Change access",exact:true})).toHaveCount(0);await accessible(page);
  await page.getByRole("link",{name:"All people",exact:true}).click();
  await page.getByRole("searchbox",{name:"Search people",exact:true}).fill("Jordan");await page.getByRole("button",{name:"Search",exact:true}).click();
- await page.waitForURL(url=>url.pathname==="/cardholder-services"&&url.searchParams.get("view")==="cardholders"&&url.searchParams.get("peopleSearch")==="Jordan",{waitUntil:"domcontentloaded"});
+ await page.waitForURL(url=>url.pathname==="/cardholder-services/cardholders"&&!url.searchParams.has("view")&&url.searchParams.get("peopleSearch")==="Jordan",{waitUntil:"domcontentloaded"});
  await expect(profile).toHaveCount(1);await page.reload();
  await expect(page.getByRole("searchbox",{name:"Search people",exact:true})).toHaveValue("Jordan");await expect(profile).toHaveCount(1);
  await profile.getByRole("link",{name:"Jordan Sample",exact:true}).click();await expect(profile.locator(".access-person-card-list li")).toHaveCount(2);

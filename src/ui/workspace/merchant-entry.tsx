@@ -3,6 +3,7 @@
 import {useServerProjection} from "./use-server-projection";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import {merchantRecordHref} from "@/shared/merchant-activity";
 import type { MerchantBusinessDetailsProjection, MerchantSetupProjection, MerchantStatus, UpdateMerchantSetupInput } from "@/modules/acquiring/contracts";
 import { Button, Feedback, StatusBadge, WorkspaceCommandError, WorkspaceDialog, formatDate, merchantCommand } from "./primitives";
 import { WorkspaceIcon } from "./navigation";
@@ -10,11 +11,11 @@ import { useMerchantNavigationLock } from "./merchant-navigation-state";
 import { requestFailure } from "../api-feedback";
 import "./merchant-entry.css";
 
-export interface MerchantBusinessDetailsProps { initial: MerchantBusinessDetailsProjection; returnHref?:string;accountContext?:boolean }
+export interface MerchantBusinessDetailsProps { initial: MerchantBusinessDetailsProjection; returnHref?:string;accountContext?:boolean;embedded?:boolean }
 const merchantLabels: Record<MerchantStatus, string> = { NOT_STARTED: "Not started", DRAFT: "Draft", PENDING_LOCAL_REVIEW: "Saved for review", APPROVED: "Approved", RESTRICTED: "Restricted", DECLINED: "Declined", CLOSED: "Closed" };
 const legalLabels = { INDIVIDUAL: "Individual", SOLE_PROPRIETOR: "Sole proprietor", BUSINESS: "Business" };
 
-export function MerchantBusinessDetails({ initial,returnHref,accountContext=false }: MerchantBusinessDetailsProps) {
+export function MerchantBusinessDetails({ initial,returnHref,accountContext=false,embedded=false }: MerchantBusinessDetailsProps) {
   const router = useRouter();
   const [entry, setEntry, entryChanged, isEntryCurrent] = useServerProjection(initial);
   const [showSetup, setShowSetup] = useState(false);
@@ -29,7 +30,7 @@ export function MerchantBusinessDetails({ initial,returnHref,accountContext=fals
   const merchant = entry;
   const merchantId = entry.merchantId;
   const returnDestination=accountContext?"account settings":"payment setup";
-  const paymentSettingsHref=returnHref??`/merchants/${merchantId}?tab=verification`;
+  const paymentSettingsHref=returnHref??merchantRecordHref(merchantId,{tab:"verification"},null);
 
   async function command<T>(path: string, method: "POST" | "PATCH", input: Record<string, unknown> = {}) {
     const key = JSON.stringify([path, method, input]);
@@ -49,7 +50,7 @@ export function MerchantBusinessDetails({ initial,returnHref,accountContext=fals
   }
   function returnToPayments() {
     setShowSetup(false); setError("");
-    router.push(paymentSettingsHref);
+    if(!embedded)router.push(paymentSettingsHref);
   }
   function closeSetup() { if(!setupBusy)returnToPayments(); }
   async function startSetup() {
@@ -69,12 +70,12 @@ export function MerchantBusinessDetails({ initial,returnHref,accountContext=fals
   }
   if(startUnavailable)return <section className="merchant-entry-workspace"><h1>Business details unavailable</h1><Feedback kind="error" message={error}/><p>Your current access no longer allows these business details. The unconfirmed request is retained here. Leaving does not cancel it or confirm whether it was saved.</p><div className="merchant-entry-form-actions"><Button disabled={!!busy} busy={busy==="start"} onClick={()=>void startSetup()}>Check setup request again</Button><Button variant="secondary" disabled={!!busy} busy={busy==="reload"} onClick={()=>void reloadStart()}>Reload business details</Button><Button variant="quiet" disabled={!!busy} onClick={()=>{setLeavingStart(true);router.push("/merchant-services");}}>Leave for now</Button></div></section>;
 
-  return <section className="consumer-workspace merchant-entry-workspace" aria-labelledby="merchant-entry-title">
-    <header className="merchant-entry-hero"><div><p className="consumer-eyebrow">BUSINESS DETAILS</p><h1 id="merchant-entry-title">{setupUnavailable?"Accept payments":merchant.name}</h1><p>{accountContext?"Manage the business details for this account.":"Add your business details, then continue to payment setup."}</p></div></header>
+  return <section className="consumer-workspace merchant-entry-workspace" aria-labelledby={embedded?undefined:"merchant-entry-title"}>
+    {!embedded&&<header className="merchant-entry-hero"><div><p className="consumer-eyebrow">BUSINESS DETAILS</p><h1 id="merchant-entry-title">{setupUnavailable?"Accept payments":merchant.name}</h1><p>{accountContext?"Manage the business details for this account.":"Add your business details, then continue to payment setup."}</p></div></header>}
     {!showSetup&&<Feedback kind="error" message={error}/>}
     {startPending&&<Button variant="secondary" disabled={!!busy} busy={busy==="reload"} onClick={()=>void reloadStart()}>Reload business details</Button>}
     {setupUnavailable ? <p>Business details are not available with your current access.</p> : <>
-      <section className="merchant-setup-status" aria-label="Business details"><div className="merchant-setup-status-main"><div className="merchant-setup-status-top"><h3>Business details</h3><StatusBadge status={merchant.merchantStatus} label={merchantLabels[merchant.merchantStatus]} /></div><p>{merchant.setup ? merchant.setup.status === "PENDING_LOCAL_REVIEW" ? `Your details are saved for review. Return to ${returnDestination} for the next step.` : "Your details are saved. Continue where you left off." : "Start with your business name and a short description of what you sell."}</p>{merchant.setup && <p>Account owner: <strong>{merchant.setup.responsiblePersonName}</strong></p>}<div className="merchant-setup-status-actions">{startPending?<Button busy={busy==="start"} disabled={!!busy} onClick={()=>void startSetup()}>Check setup request again</Button>:merchant.setup ? <Button variant={merchant.setup.canEdit?"primary":"secondary"} onClick={() => { setError(""); setShowSetup(true); }}>{merchant.setup.canEdit ? "Continue business details" : "View business details"}</Button> : (merchant.canStartSetup||startPending) ? <Button busy={busy === "start"} disabled={!!busy} onClick={() => void startSetup()}>{startPending?"Check setup request again":"Add business details"}</Button> : null}</div>{!merchant.canManageSetup && merchant.setup?.status === "DRAFT" && <p>Your current access lets you view this draft. Your account owner can update it.</p>}</div><div className="merchant-setup-next"><p>Payment settings show what needs to be ready before customers can pay.</p><a className="consumer-button consumer-button-secondary" href={paymentSettingsHref}>{accountContext?"Return to account settings":"Return to terminal settings"}</a></div></section>
+      <section className="merchant-setup-status" aria-label="Business details"><div className="merchant-setup-status-main"><div className="merchant-setup-status-top"><h3>Business details</h3><StatusBadge status={merchant.merchantStatus} label={merchantLabels[merchant.merchantStatus]} /></div><p>{merchant.setup ? merchant.setup.status === "PENDING_LOCAL_REVIEW" ? `Your details are saved for review. Return to ${returnDestination} for the next step.` : "Your details are saved. Continue where you left off." : "Start with your business name and a short description of what you sell."}</p>{merchant.setup && <p>Account owner: <strong>{merchant.setup.responsiblePersonName}</strong></p>}<div className="merchant-setup-status-actions">{startPending?<Button busy={busy==="start"} disabled={!!busy} onClick={()=>void startSetup()}>Check setup request again</Button>:merchant.setup ? <Button variant={merchant.setup.canEdit?"primary":"secondary"} onClick={() => { setError(""); setShowSetup(true); }}>{merchant.setup.canEdit ? "Continue business details" : "View business details"}</Button> : (merchant.canStartSetup||startPending) ? <Button busy={busy === "start"} disabled={!!busy} onClick={() => void startSetup()}>{startPending?"Check setup request again":"Add business details"}</Button> : null}</div>{!merchant.canManageSetup && merchant.setup?.status === "DRAFT" && <p>Your current access lets you view this draft. Your account owner can update it.</p>}</div>{!embedded&&<div className="merchant-setup-next"><p>Payment settings show what needs to be ready before customers can pay.</p><a className="consumer-button consumer-button-secondary" href={paymentSettingsHref}>{accountContext?"Return to account settings":"Return to terminal settings"}</a></div>}</section>
     </>}
 
     {merchant?.setup && <WorkspaceDialog open={showSetup} onClose={closeSetup} title="Business details" serviceName={setupUnavailable?"Accept payments":merchant.name} wide><MerchantSetupForm key={merchant.setup.id} initial={merchant.setup} serviceName={merchant.name} returnDestination={returnDestination} command={command} onUpdate={updatedSetup} onClose={returnToPayments} onLeave={()=>router.push("/merchant-services")} onUnavailableChange={setSetupUnavailable} onBusyChange={setSetupBusy} refresh={async () => (await refreshEntry()).setup ?? null} /></WorkspaceDialog>}

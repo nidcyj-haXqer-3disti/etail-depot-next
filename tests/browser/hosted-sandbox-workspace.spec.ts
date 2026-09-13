@@ -42,6 +42,16 @@ async function join(page: Page, name: string) {
   await expect(page.getByRole("heading", {name: merchant ? "Overview" : "Account home", level: 1, exact: true})).toBeVisible();
 }
 
+async function businessPayments(page:Page,serviceId:string,enabled:boolean){
+  await page.goto(`/merchant-services/${serviceId}/settings`);
+  await page.getByRole("region",{name:"Business payment acceptance",exact:true}).getByRole("button",{name:enabled?"Turn on business payments":"Turn off business payments",exact:true}).click();
+  const dialog=page.getByRole("dialog",{name:enabled?"Turn on business payments?":"Turn off business payments?",exact:true});
+  await expect(dialog).toContainText(enabled?"Each terminal and payment link must also be enabled":"every terminal and payment link");
+  await dialog.getByRole("button",{name:"Confirm payment setting",exact:true}).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByRole("region",{name:"Business payment acceptance",exact:true})).toContainText(enabled?"On":"Off");
+}
+
 async function capture(page: Page, name: string) {
   if (process.env.ETAIL_JOURNEY_SCREENSHOTS !== "1") return;
   const directory = "artifacts/journey-refinement/after";
@@ -112,15 +122,15 @@ test("email member creates cards, reviews support and reports, and shares an exa
     expect((await downloading).suggestedFilename()).toMatch(/^etail-card-activity-/);
     await page.goto(`/cardholder-services?focus=${card.id}`);
     await page.getByRole("region",{name:"Card management details",exact:true}).getByRole("link",{name:"Notification preferences",exact:true}).click();
-    await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/settings"&&url.searchParams.get("focus")===card.id);
+    await expect(page).toHaveURL(url=>url.pathname===`/cardholder-services/cards/${card.id}/settings`&&!url.searchParams.has("focus"));
     await page.getByRole("checkbox").first().uncheck();
     await page.getByRole("button", { name: "Save preferences", exact: true }).click();
-    await expect(page.locator("main")).toContainText("Notification preferences saved");
+    await expect(page.locator("main")).toContainText("Your notification preferences are saved.");
     await page.reload();
     await expect(page.getByRole("checkbox").first()).not.toBeChecked();
     await page.goto(`/cardholder-services?focus=${card.id}`);
     await page.getByRole("region",{name:"Card management details",exact:true}).getByRole("link",{name:"Help with this card",exact:true}).click();
-    await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/help"&&url.searchParams.get("focus")===card.id);
+    await expect(page).toHaveURL(url=>url.pathname===`/cardholder-services/cards/${card.id}/help`&&!url.searchParams.has("focus"));
     await page.getByRole("button", { name: "Start a case", exact: true }).click();
     await page.getByRole("textbox", { name: "Subject", exact: true }).fill("My hosted card question");
     await page.getByRole("textbox", { name: "Your explanation", exact: true }).fill("Please explain my sandbox purchase controls.");
@@ -176,7 +186,8 @@ test("email merchant enrolls, publishes checkout, refunds, settles and shares on
     await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading", { name, level: 1, exact: true })).toBeVisible();
     const master = (await merchantDashboard(page.request)).units.find(unit => unit.ownerAccess && unit.name === name)!;
     expect((await cardDashboard(page.request)).profiles).toEqual([]);
-    await page.goto(`/merchants/${master.id}?tab=verification`);
+    await businessPayments(page,master.merchantServiceId,true);
+    await page.goto(`/merchant-services/terminals/${master.id}/controls`);
     await page.getByRole("button", { name: "Enable payments", exact: true }).click();
     await page.getByRole("dialog", { name: "Enable payments?", exact: true }).getByRole("button", { name: "Enable payments", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -207,7 +218,7 @@ test("email merchant enrolls, publishes checkout, refunds, settles and shares on
     const channelDetails=page.getByRole("dialog",{name:"Payment request details",exact:true});
     await channelDetails.getByRole("button",{name:"Allow payments",exact:true}).click();
     await page.getByRole("dialog",{name:"Allow payments for this request?",exact:true}).getByRole("button",{name:"Confirm setting",exact:true}).click();
-    await expect(channelDetails.getByRole("heading",{name:"Your request can accept payments",exact:true})).toBeVisible();
+    await expect(channelDetails.getByRole("heading",{name:"Payment collection",exact:true})).toBeVisible();
     await expect(channelDetails.getByRole("link",{name:"Try a practice payment",exact:true})).toHaveCount(0);
     const publication=await publishCustomerLink(page,master.id,channel.id);
     await capture(page,"merchant-published-channel");
@@ -237,7 +248,7 @@ test("email merchant enrolls, publishes checkout, refunds, settles and shares on
     expect((await payerPage.request.get("/api/v1/merchants/dashboard")).status()).toBe(401);
 
     await page.goto(`/merchant-services?section=merchants`);
-    await page.getByRole("button", { name: "Create terminal", exact: true }).click();
+    await page.getByRole("link", { name: "Create terminal", exact: true }).click();
     await page.getByRole("dialog",{name:"Create terminal",exact:true}).getByRole("radio",{name:/^For your use/}).check();
     await page.getByRole("textbox", { name: "Payment terminal name", exact: true }).fill("Hosted delegated shop");
     await page.getByRole("dialog").getByRole("button", { name: "Create terminal", exact: true }).click();
@@ -255,7 +266,7 @@ test("email merchant enrolls, publishes checkout, refunds, settles and shares on
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await page.getByRole("button",{name:"Share invitation",exact:true}).click();
     const invitationLink=page.getByRole("dialog",{name:"Share invitation",exact:true}).getByRole("textbox",{name:"Invitation link",exact:true});await expect(invitationLink).toBeVisible();const invitationId=new URL(await invitationLink.inputValue()).pathname.split("/").at(-1)!;
-    await colleaguePage.goto(`/invitations/${invitationId}`);await colleaguePage.getByRole("button",{name:"Accept invitation",exact:true}).click();await colleaguePage.getByRole("link",{name:"Open your payment terminal",exact:true}).click();await expect(colleaguePage).toHaveURL(new RegExp(`/merchants/${sub.id}`));
+    await colleaguePage.goto(`/invitations/${invitationId}`);await colleaguePage.getByRole("button",{name:"Accept invitation",exact:true}).click();await colleaguePage.getByRole("link",{name:"Open your payment terminal",exact:true}).click();await expect(colleaguePage).toHaveURL(new RegExp(`/merchant-services/terminals/${sub.id}`));
     expect((await merchantDashboard(colleaguePage.request)).units.map(unit => unit.id)).toEqual([sub.id]);
     expect((await cardDashboard(colleaguePage.request)).profiles).toEqual([]);
     await colleaguePage.goto(`/merchants/${sub.id}?tab=payments`);
@@ -282,7 +293,7 @@ test("merchant setup recovers lost connection responses without repeating proces
     await page.getByRole("dialog").getByRole("button", { name: "Add your business", exact: true }).click();
     await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading", { name, exact: true, level: 1 })).toBeVisible();
     const primary = (await merchantDashboard(page.request)).units.find(unit => unit.ownerAccess && unit.name === name)!;
-    await page.route("**/api/v1/merchants/*/gateway", async route => {
+    await page.route("**/api/v1/merchant-services/*/payment-settings", async route => {
       if (route.request().method() === "PUT") processingWrites += 1;
       await route.continue();
     });
@@ -304,7 +315,7 @@ test("merchant setup recovers lost connection responses without repeating proces
       const controls=page.getByRole("region",{name:"Terminal controls",exact:true}).locator(":scope > details");
       if(await controls.getAttribute("open")===null)await controls.locator(":scope > summary").click();
       await expect(page.getByRole("navigation",{name:"Payment terminal navigation"})).toHaveCount(0);
-      await expect(page).toHaveURL(url=>url.pathname===`/merchants/${merchantId}`&&url.hash==="#terminal-verification");
+      await expect(page).toHaveURL(url=>url.pathname===`/merchant-services/terminals/${merchantId}`&&url.hash==="#terminal-verification");
       await page.getByRole("button", { name: "Enable payments", exact: true }).click();
       const dialog = page.getByRole("dialog", { name: "Enable payments?", exact: true });
       await dialog.getByRole("button", { name: "Enable payments", exact: true }).click();
@@ -320,20 +331,18 @@ test("merchant setup recovers lost connection responses without repeating proces
       expect(operations.gateway).toMatchObject({ mode: "TEST_READY", version: 1 });
       expect(operations.enrollment).toMatchObject({ status: "ENROLLED", version: 1 });
     }
+    await businessPayments(page,primary.merchantServiceId,true);
+    await page.goto(`/merchant-services/terminals/${primary.id}`);
     await enableAndRecover(primary.id); expect(processingWrites).toBe(1);
     await page.goto(`/merchant-services?section=merchants`);
-    await page.getByRole("button", { name: "Create terminal", exact: true }).click();
+    await page.getByRole("link", { name: "Create terminal", exact: true }).click();
     await page.getByRole("dialog",{name:"Create terminal",exact:true}).getByRole("radio",{name:/^For your use/}).check();
     await page.getByRole("textbox", { name: "Payment terminal name", exact: true }).fill(`${name} branch`);
     await page.getByRole("dialog").getByRole("button", { name: "Create terminal", exact: true }).click();
     await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading", { name: `${name} branch`, exact: true, level: 1 })).toBeVisible();
     const sub = (await merchantDashboard(page.request)).units.find(unit => unit.name === `${name} branch`)!;
     await enableAndRecover(sub.id); expect(processingWrites).toBe(1);
-    await page.goto(`/merchants/${primary.id}?tab=verification`);
-    await page.getByText("Advanced payment settings", { exact: true }).click();
-    await page.getByRole("button", { name: "Turn off payments", exact: true }).click();
-    await page.getByRole("dialog", { name: "Turn off payments?", exact: true }).getByRole("button", { name: "Confirm setting", exact: true }).click();
-    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await businessPayments(page,primary.merchantServiceId,false);
     await page.goto(`/merchants/${sub.id}?tab=channels`);
     await expect(page.getByRole("heading", { name: "Payments need your attention", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Enable payments", exact: true })).toHaveCount(0);

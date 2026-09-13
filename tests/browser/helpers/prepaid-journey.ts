@@ -81,10 +81,10 @@ export async function addMoney(page:Page,serviceId:string,amount="50.00"){
   await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Account home",exact:true}).click();
   const homeBalance=page.getByRole("region",{name:"Card account balance",exact:true});
   await expect(homeBalance).toContainText(account.available.formatted);
-  await expect(homeBalance.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`${base}?task=add`);
+  await expect(homeBalance.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`${base}/add-money`);
   await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(1);
   await homeBalance.getByRole("link",{name:"Add money",exact:true}).click();
-  await expect(page).toHaveURL(url=>url.pathname===base&&url.searchParams.get("task")==="add"&&!url.searchParams.has("review"));
+  await expect(page).toHaveURL(url=>url.pathname===`${base}/add-money`&&!url.searchParams.has("task")&&!url.searchParams.has("review"));
   await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
   const panel=page.locator('section[aria-labelledby="money-task-title"]');
   await expect(panel.getByRole("heading",{name:"How much would you like to add?",exact:true})).toBeVisible();
@@ -95,7 +95,7 @@ export async function addMoney(page:Page,serviceId:string,amount="50.00"){
   const intent=moneyFundingIntentSchema.parse(await prepared.json());expect(intent.moneyAccountId).toBe(moneyAccountId);
   await expect(panel.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
   // Reload only after the exact saved review URL finishes navigating.
-  await expect(page).toHaveURL(url=>url.pathname===base&&url.searchParams.get("task")==="add"&&url.searchParams.get("review")===intent.id);
+  await expect(page).toHaveURL(url=>url.pathname===`${base}/add-money`&&!url.searchParams.has("task")&&url.searchParams.get("review")===intent.id);
   await page.reload();
   await expect(panel.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
   const confirming=responseFor(page,`/api/v1${base}/funding/intents/${intent.id}`);

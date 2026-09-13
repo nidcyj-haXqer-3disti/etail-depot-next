@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 import {pendingCardLimits,confirmCardLimitSignOut} from "./pending-card-limit";
+import {pendingNotificationPreferences,confirmNotificationPreferencesSignOut} from "./pending-notification-preferences";
+import {pendingProfiles} from "./pending-profile";
 import {Button,WorkspaceDialog} from "./workspace/primitives";
 
 const requestTimeoutMs = 30_000;
@@ -13,8 +15,9 @@ export function LogoutButton() {
   const inFlight = useRef(false);
   async function logout(leaveUnconfirmed=false) {
     if (inFlight.current) return;
-    if(pendingCardLimits.hasPending()&&!leaveUnconfirmed){setConfirmLeave(true);return;}
+    if((pendingCardLimits.hasPending()||pendingNotificationPreferences.hasPending()||pendingProfiles.hasPending())&&!leaveUnconfirmed){setConfirmLeave(true);return;}
     confirmCardLimitSignOut(leaveUnconfirmed);
+    confirmNotificationPreferencesSignOut(leaveUnconfirmed);
     inFlight.current = true;
     setPending(true);
     setError("");
@@ -30,14 +33,15 @@ export function LogoutButton() {
       if (!result || typeof result !== "object" || !("signedOut" in result) || result.signedOut !== true) { setError(unconfirmedSignOut); return; }
       // Start a new document only after the server confirms revocation and cookie clearing.
       pendingCardLimits.clearAfterSignOut();
+      pendingNotificationPreferences.clearAfterSignOut();pendingProfiles.clearAfterSignOut();
       window.location.replace("/login");
       navigating = true;
     } catch {
       setError(controller.signal.aborted ? "Sign-out is taking longer than expected. We could not confirm it. Please try Sign out again." : "We could not confirm sign-out. Check your connection and try again.");
     } finally {
       window.clearTimeout(timeout);
-      if (!navigating) { confirmCardLimitSignOut(false);inFlight.current = false; setPending(false); }
+      if (!navigating) { confirmCardLimitSignOut(false);confirmNotificationPreferencesSignOut(false);inFlight.current = false; setPending(false); }
     }
   }
-  return <div className="logout-control" onKeyDownCapture={event=>{if(confirmLeave&&event.key==="Escape"){event.preventDefault();event.stopPropagation();if(!pending)setConfirmLeave(false);}}}><button className="text-button" type="button" onClick={()=>void logout()} disabled={pending}>{pending ? "Signing out…" : "Sign out"}</button>{error && !confirmLeave&&<p className="header-error" role="alert">{error}</p>}{confirmLeave&&<WorkspaceDialog open onClose={()=>{if(!pending)setConfirmLeave(false);}} title="Sign out with an unconfirmed card change?" serviceName="Cards & spending"><p>A card limit change has not been confirmed. It may already have been saved.</p><p>Stay signed in to check it. Signing out ends this tab’s saved retry; it does not cancel or undo the change.</p>{error&&<p className="header-error" role="alert">{error}</p>}<div className="consumer-action-row"><Button variant="secondary" disabled={pending} onClick={()=>setConfirmLeave(false)}>Stay signed in</Button><Button busy={pending} onClick={()=>void logout(true)}>Sign out anyway</Button></div></WorkspaceDialog>}</div>;
+  return <div className="logout-control" onKeyDownCapture={event=>{if(confirmLeave&&event.key==="Escape"){event.preventDefault();event.stopPropagation();if(!pending)setConfirmLeave(false);}}}><button className="text-button" type="button" onClick={()=>void logout()} disabled={pending}>{pending ? "Signing out…" : "Sign out"}</button>{error && !confirmLeave&&<p className="header-error" role="alert">{error}</p>}{confirmLeave&&<WorkspaceDialog open onClose={()=>{if(!pending)setConfirmLeave(false);}} title={pendingCardLimits.hasPending()?"Sign out with an unconfirmed card change?":"Sign out with unconfirmed changes?"} serviceName="Your login"><p>{pendingCardLimits.hasPending()?"A card limit change has not been confirmed. It may already have been saved.":"A profile or notification change has not been confirmed. It may already have been saved."}</p><p>Stay signed in to check it. Signing out ends this tab’s saved retry; it does not cancel or undo the change.</p>{error&&<p className="header-error" role="alert">{error}</p>}<div className="consumer-action-row"><Button variant="secondary" disabled={pending} onClick={()=>setConfirmLeave(false)}>Stay signed in</Button><Button busy={pending} onClick={()=>void logout(true)}>Sign out anyway</Button></div></WorkspaceDialog>}</div>;
 }

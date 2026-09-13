@@ -1,3 +1,4 @@
+import {customerHref} from "../../shared/customer-routes";
 import {isInvitationRecipient} from "./recipient";
 import {getVerifiedEmails,normalizeVerifiedEmail} from "../identity/contact-service";
 import { createHash,randomUUID } from "node:crypto";
@@ -44,7 +45,7 @@ export async function merchantInvitationProjection(tx:ScopedTransaction,row:Invi
  let canRespond=false,hasMerchantAccess=false;
  if(await isInvitationRecipient(tx,row,viewerId)&&status==="PENDING")try{const inviter=await loadTerminalScope(tx,row.inviterId,terminal.id);action(inviter,"merchant.people.invite");canRespond=sameOwner(inviter,terms);}catch(error){if(!(error instanceof SecurityError))throw error;}
  if(row.recipientId&&(viewerId===row.recipientId||scope))try{await loadTerminalScope(tx,row.recipientId,terminal.id);hasMerchantAccess=true;}catch(error){if(!(error instanceof SecurityError))throw error;}
- return {targetKind:"MERCHANT_TERMINAL",id:row.id,terminalId:terminal.id,terminalName:terminal.displayName,merchantServiceId:terminal.merchantServiceId,merchantName:merchant!.displayName,inviterName:persons.find(p=>p.id===row.inviterId)!.displayName,recipientId:row.recipientId,recipientEmail:row.recipientEmail,recipientName:persons.find(p=>p.id===row.recipientId)?.displayName??row.recipientEmail??"Terminal user",permissions:[...TERMINAL_PERMISSIONS],status,version:row.version,createdAt:row.createdAt.toISOString(),expiresAt:row.expiresAt.toISOString(),accessExpiresAt:terms.accessExpiresAt?.toISOString()??null,canRespond,canRevoke:status==="PENDING"&&!!scope&&evaluate(scope.policy,"merchant.people.revoke").allowed,hasMerchantAccess,href:`/merchants/${terminal.id}`};
+ return {targetKind:"MERCHANT_TERMINAL",id:row.id,terminalId:terminal.id,terminalName:terminal.displayName,merchantServiceId:terminal.merchantServiceId,merchantName:merchant!.displayName,inviterName:persons.find(p=>p.id===row.inviterId)!.displayName,recipientId:row.recipientId,recipientEmail:row.recipientEmail,recipientName:persons.find(p=>p.id===row.recipientId)?.displayName??row.recipientEmail??"Terminal user",permissions:[...TERMINAL_PERMISSIONS],status,version:row.version,createdAt:row.createdAt.toISOString(),expiresAt:row.expiresAt.toISOString(),accessExpiresAt:terms.accessExpiresAt?.toISOString()??null,canRespond,canRevoke:status==="PENDING"&&!!scope&&evaluate(scope.policy,"merchant.people.revoke").allowed,hasMerchantAccess,href:customerHref(`/merchants/${terminal.id}`)};
 }
 export async function getMerchantAccessOverview(personId:string,terminalId:string):Promise<MerchantAccessOverview>{return getDb().transaction(async tx=>{
  const scope=await loadTerminalScope(tx,personId,terminalId,false,{read:true});action(scope,"merchant.people.read");

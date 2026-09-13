@@ -18,6 +18,35 @@ describe("invitation navigation is a locator only", () => {
     for (const nextPath of ["https://foreign.example", "/services", `/invitations/${id}?recipient=other`]) expect(registrationSchema.safeParse({ ...base, nextPath }).success).toBe(false);
     expect(registrationSchema.safeParse({ ...base, nextPath: `/invitations/${id}`, verifiedEmail: base.email }).success).toBe(false);
   });
+  it("retains an exact Cardholder support case or supported new-question topic after sign-in", () => {
+    const cardId = "713af722-e340-471f-b832-937b260a36cc";
+    const exact = `/cardholder-services/cards/${cardId}/help?case=${id}`;
+    expect(authNextPath(exact)).toBe(exact);
+    expect(authNextPath(`/cardholder-services/help?focus=${cardId}&case=${id}`)).toBe(exact);
+    for (const topic of ["SERVICE", "ACCESS", "CARD", "TRANSACTION"]) {
+      const next = `/cardholder-services/cards/${cardId}/help?new=1&topic=${topic}`;
+      expect(authNextPath(next)).toBe(next);
+    }
+    const accountQuestion = `/cardholder-services/help?context=${id}&topic=SERVICE`;
+    expect(authNextPath(accountQuestion)).toBe(accountQuestion);
+    for (const nextPath of [exact, accountQuestion]) {
+      expect(registrationSchema.safeParse({email:"person@example.test",password:"long synthetic password",nextPath}).success).toBe(false);
+      expect(recoveryRequestSchema.safeParse({email:"person@example.test",nextPath}).success).toBe(false);
+    }
+  });
+  it.each([
+    `/cardholder-services/help?case=not-a-case`,
+    `/cardholder-services/help?case=${id}&case=${id}`,
+    "/cardholder-services/help?topic=PAYMENT",
+    "/cardholder-services/help?topic=ADMIN",
+    "/cardholder-services/help?topic=SERVICE&topic=CARD",
+    `/cardholder-services/cards/${id}/activity?case=${id}`,
+    `/cardholder-services/cards/${id}?topic=CARD`,
+    `/cardholder-services/help?case=${id}&role=OWNER`,
+    `/cardholder-services/help?case=${id}&returnTo=https%3A%2F%2Fforeign.example`,
+  ])("rejects malformed or widened Cardholder support continuation %#", nextPath => {
+    expect(authNextPath(nextPath)).toBeNull();
+  });
 });
 describe("verified email matching normalization", () => {
   it("normalizes case and boundary whitespace but retains exact local-part aliases", () => {

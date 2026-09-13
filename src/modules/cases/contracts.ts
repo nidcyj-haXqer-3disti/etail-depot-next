@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { supportTopicSchema } from "../../shared/support-topics";
+export { supportTopicSchema } from "../../shared/support-topics";
 
-export const supportTopicSchema = z.enum(["SERVICE","ACCESS","CARD","TRANSACTION"]);
 export const merchantSupportTopicSchema = z.enum(["SERVICE","ACCESS","PAYMENT"]);
 export const supportStatusSchema = z.enum(["OPEN","WITHDRAWN","RESOLVED"]);
 const commandId = z.uuid();

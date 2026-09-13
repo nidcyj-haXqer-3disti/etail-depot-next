@@ -1,3 +1,4 @@
+import {customerHref} from "../../shared/customer-routes";
 import { requireSandboxParticipant } from "../sandbox/service";
 import {getVerifiedEmails,normalizeVerifiedEmail} from "../identity/contact-service";
 import {bindCreatedCardRecipient,revokeCreatedCardRecipient} from "../workspace/service";
@@ -240,7 +241,7 @@ async function cardInvitationProjection(tx:ScopedTransaction,row:Invitation,view
  try{const current=await loadServiceScope(tx,row.inviterId,row.serviceId);assertCardholderAccess(current);ownerCurrent=true;}catch(error){if(!(error instanceof SecurityError))throw error;}
  if(row.recipientId===viewerId&&card.holderId===viewerId&&card.assignmentState==="ACCEPTED")try{await loadServiceScope(tx,viewerId,row.serviceId);hasServiceAccess=ownerCurrent;}catch(error){if(!(error instanceof SecurityError))throw error;}
  const spending=await readCardSpending(tx,row.serviceId,card.id);
- return {targetKind:"CARD",id:row.id,serviceId:row.serviceId,serviceName:card.nickname,serviceKind:"CARDHOLDER",cardId:card.id,cardName:card.nickname,inviterName:inviter.displayName,recipientId:row.recipientId,recipientEmail:row.recipientEmail,recipientName:recipient?.displayName??row.recipientEmail??"Cardholder",role:"CARDHOLDER",permissions:[...CARDHOLDER_ACCESS_PERMISSIONS],delegablePermissions:[],status,version:row.version,createdAt:row.createdAt.toISOString(),expiresAt:row.expiresAt.toISOString(),canRespond:ownerCurrent&&status==="PENDING"&&card.assignmentState==="UNASSIGNED"&&await isInvitationRecipient(tx,row,viewerId),canRevoke:!!scope&&status==="PENDING"&&canRevokeOffer(scope,row),hasServiceAccess,allowance:{amount:spending.allowance.toString(),currency:"USD"},href:`/cardholder-services?card=${card.id}`};
+ return {targetKind:"CARD",id:row.id,serviceId:row.serviceId,serviceName:card.nickname,serviceKind:"CARDHOLDER",cardId:card.id,cardName:card.nickname,inviterName:inviter.displayName,recipientId:row.recipientId,recipientEmail:row.recipientEmail,recipientName:recipient?.displayName??row.recipientEmail??"Cardholder",role:"CARDHOLDER",permissions:[...CARDHOLDER_ACCESS_PERMISSIONS],delegablePermissions:[],status,version:row.version,createdAt:row.createdAt.toISOString(),expiresAt:row.expiresAt.toISOString(),canRespond:ownerCurrent&&status==="PENDING"&&card.assignmentState==="UNASSIGNED"&&await isInvitationRecipient(tx,row,viewerId),canRevoke:!!scope&&status==="PENDING"&&canRevokeOffer(scope,row),hasServiceAccess,allowance:{amount:spending.allowance.toString(),currency:"USD"},href:customerHref("/cardholder-services",{card:card.id})};
 }
 export async function getInvitationForPerson(personId:string,invitationId:string):Promise<AnyInvitationProjection>{
  return getDb().transaction(async tx=>{

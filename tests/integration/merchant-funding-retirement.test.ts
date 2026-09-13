@@ -66,7 +66,7 @@ describe("Merchant funding retirement and payout records",()=>{
    expect(await addMoneyFunds(f.personId,f.accountId,input("100",old.confirmCommandId))).toEqual(receipt);
   };
   await replay();
-  expect((await getMoneyAccountOverview(f.personId,f.accountId)).history[0].href).toBe(`/money-accounts/${f.accountId}?task=add&review=${old.commandId}`);
+  expect((await getMoneyAccountOverview(f.personId,f.accountId)).history[0].href).toBe(`/money-accounts/${f.accountId}/add-money?review=${old.commandId}`);
   await expect(addMoneyFunds(f.personId,f.accountId,input("101",old.confirmCommandId))).rejects.toMatchObject({code:"IDEMPOTENCY_CONFLICT"});
   await getDb().update(services).set({status:"SUSPENDED"}).where(eq(services.id,f.serviceId));await replay();
   expect(await getMoneyAccountOverview(f.personId,f.accountId)).toMatchObject({canAddMoney:false,canWithdraw:false,available:{minor:"100"}});

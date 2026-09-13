@@ -1,3 +1,4 @@
+import {customerHref} from "../../shared/customer-routes";
 import {getServiceMoneyAccount,readServiceMoneyAvailable} from "../money/service";
 import { and, desc, eq, inArray,isNull } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
@@ -50,9 +51,9 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
    const liveChannels=visibleChannels.filter(row=>row.status==="DRAFT"&&row.expiresAt>now);
    const activeChannelCount=liveChannels.filter(row=>setupState==="READY"&&activations.some(active=>active.channelId===row.id&&active.status==="ACTIVE")&&(row.usage==="REUSABLE"||!used.has(row.id))).length;
    const canCreateChannel=eligible&&evaluate(scope.policy,"channels.create").allowed;
-   const helpAction={label:"Open help",href:`/merchants/${unit.id}?tab=help`};
-   const setupAction={label:"Review payment setup",href:`/merchants/${unit.id}?tab=verification`};
-   const channelAction={label:"View payment requests",href:`/merchants/${unit.id}?tab=channels`};
+   const helpAction={label:"Open help",href:customerHref(`/merchants/${unit.id}`,{tab:"help"})};
+   const setupAction={label:"Review payment setup",href:customerHref(`/merchants/${unit.id}`,{tab:"verification"})};
+   const channelAction={label:"View payment requests",href:customerHref(`/merchants/${unit.id}`,{tab:"channels"})};
    // This suggests an existing scoped page, never supplies command authority.
    // Payment setup alone is not a ready channel, or a published customer checkout.
    const collectionAvailability:MerchantCollectionAvailability=!scope.policy.operating
@@ -67,7 +68,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
           ?{code:"ACCESS_RESTRICTED",title:"Payment requests are not shared with you",description:scope.ownerAccess?"Your current access does not include payment requests. Open Help to review your access.":`Ask ${scope.merchantService.displayName} to review your payment request access. You can still use the records shared with you.`,action:helpAction}
           :!visibleChannels.length
             ?canCreateChannel
-              ?{code:"CHANNEL_REQUIRED",title:"Create a payment request",description:"Payments are ready. Choose an amount and create a payment request.",action:{label:"Create payment request",href:`/merchants/${unit.id}?tab=channels&new=1`}}
+              ?{code:"CHANNEL_REQUIRED",title:"Create a payment request",description:"Payments are ready. Choose an amount and create a payment request.",action:{label:"Create payment request",href:customerHref(`/merchants/${unit.id}`,{tab:"channels",new:"1"})}}
               :{code:"ACCESS_RESTRICTED",title:"No payment requests are available to you",description:scope.ownerAccess?"Open Help to review your available payment tools.":`Ask ${scope.merchantService.displayName} to create or share a payment request with you.`,action:helpAction}
             :!activeChannelCount
               ?{code:"CHANNEL_REVIEW_REQUIRED",title:"Your payment requests need attention",description:"Your saved payment requests cannot accept payments right now. Open a request to see what needs attention.",action:channelAction}

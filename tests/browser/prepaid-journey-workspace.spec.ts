@@ -169,7 +169,7 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
     const balance=page.getByRole("region",{name:"Card account balance",exact:true});
     await expect(balance).toContainText("$0.00");
     await balance.getByRole("link",{name:"Add money",exact:true}).click();
-    await expect(page).toHaveURL(url=>url.pathname===`/money-accounts/${account.id}`&&url.searchParams.get("task")==="add");
+    await expect(page).toHaveURL(url=>url.pathname===`/money-accounts/${account.id}/add-money`&&!url.searchParams.has("task"));
     await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
     await page.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill("100.00");
     await page.getByRole("button",{name:"Continue",exact:true}).click();

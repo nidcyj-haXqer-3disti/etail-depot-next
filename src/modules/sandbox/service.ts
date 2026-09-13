@@ -68,7 +68,7 @@ export async function startSandbox(personId:string,raw:z.input<typeof startSandb
   const [existing]=await tx.select().from(sandboxParticipants).where(eq(sandboxParticipants.personId,personId));
   if(!existing){
    await tx.insert(sandboxParticipants).values({personId,commandId:input.commandId,digest,memberCode:`ED-${randomBytes(10).toString("hex").toUpperCase()}`,acknowledged:true});
-   await tx.update(people).set({displayName:input.displayName}).where(eq(people.id,personId));
+   await tx.update(people).set({displayName:input.displayName,version:sql`${people.version}+1`}).where(eq(people.id,personId));
    await tx.insert(eventOutbox).values({businessKey:`sandbox-started:${personId}`,kind:"sandbox.started",aggregateId:personId});
   }
   return sandboxOverviewInTransaction(tx,personId);

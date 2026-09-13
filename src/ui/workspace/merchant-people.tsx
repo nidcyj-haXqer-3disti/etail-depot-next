@@ -1,6 +1,7 @@
 "use client";
+import {useCustomerSearchParams} from "../use-customer-search-params";
 import {useState} from "react";
-import {useRouter,useSearchParams} from "next/navigation";
+import {useRouter} from "next/navigation";
 import type {MerchantAccessOverview,MerchantAccessPerson,MerchantInvitationProjection} from "@/modules/access/merchant-contracts";
 import {merchantAccessOverviewSchema,merchantAccessPersonSchema,merchantInvitationProjectionSchema} from "@/shared/merchant-access-response";
 import {Button,EmptyState,Feedback,StatusBadge,WorkspaceDialog,WorkspaceCommandError,formatDate} from "./primitives";
@@ -11,7 +12,7 @@ import {useMerchantNavigationLock} from "./merchant-navigation-state";
 import "./merchant-people.css";
 type Attempt={path:string;body:{commandId:string;recipientEmail?:string;expiresInDays?:1|3|7;expectedVersion?:number};kind:"INVITE"|"REVOKE_INVITE"|"REMOVE"};
 export function MerchantPeople({initial}:{initial:MerchantAccessOverview}){
- const params=useSearchParams(),router=useRouter(),[access,setAccess,,isCurrent]=useServerProjection(initial),[open,setOpen]=useState(initial.canInvite&&params.get("tab")==="people"&&params.get("invite")==="1"),[recipient,setRecipient]=useState(""),[days,setDays]=useState<1|3|7>(7),[review,setReview]=useState(false),[remove,setRemove]=useState<MerchantAccessPerson|MerchantInvitationProjection|null>(null),[busy,setBusy]=useState(false),[attempt,setAttempt]=useState<Attempt|null>(null),[message,setMessage]=useState(""),[error,setError]=useState(""),[unavailable,setUnavailable]=useState(false),[leaving,setLeaving]=useState(false);
+ const params=useCustomerSearchParams(),router=useRouter(),[access,setAccess,,isCurrent]=useServerProjection(initial),[open,setOpen]=useState(initial.canInvite&&params.get("tab")==="people"&&params.get("invite")==="1"),[recipient,setRecipient]=useState(""),[days,setDays]=useState<1|3|7>(7),[review,setReview]=useState(false),[remove,setRemove]=useState<MerchantAccessPerson|MerchantInvitationProjection|null>(null),[busy,setBusy]=useState(false),[attempt,setAttempt]=useState<Attempt|null>(null),[message,setMessage]=useState(""),[error,setError]=useState(""),[unavailable,setUnavailable]=useState(false),[leaving,setLeaving]=useState(false);
  const locked=busy||!!attempt;useMerchantNavigationLock(locked&&!leaving);
  async function reload(){const response=await fetch(`/api/v1/merchants/${access.terminalId}/access`,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new WorkspaceCommandError("You cannot view access for this payment terminal. Sign in again or ask the account owner.",response.status);const result=merchantAccessOverviewSchema.safeParse(await response.json());if(!result.success||result.data.terminalId!==access.terminalId)throw new WorkspaceCommandError("We couldn’t confirm the latest terminal access.",null);if(isCurrent()){setAccess(result.data);setUnavailable(false);}}
  async function send(command:Attempt){const retrying=!!attempt;setBusy(true);setLeaving(false);setAttempt(command);setError("");setMessage("");try{

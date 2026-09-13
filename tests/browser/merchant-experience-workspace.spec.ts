@@ -1,3 +1,4 @@
+import {customerHref,customerRouteQuery} from "../../src/shared/customer-routes";
 import {randomUUID} from "node:crypto";
 import AxeBuilder from "@axe-core/playwright";
 import {expect,test,type Page} from "@playwright/test";
@@ -24,13 +25,13 @@ test("channel identity, collection filters and exact receipts survive close and 
  await expect(detail.locator(".mch-channel-hero")).toContainText(channel.description);
  await expect(detail.locator(".mch-channel-hero")).toContainText("Ready to collect");
  await detail.getByRole("button",{name:"Close details",exact:true}).click();
- expect(new URL(page.url()).searchParams.has("channel")).toBe(false);
+ expect(customerRouteQuery(new URL(page.url()).pathname,new URL(page.url()).searchParams).has("channel")).toBe(false);
  await page.reload();await expect(detail).toBeHidden();
  await page.getByRole("searchbox",{name:"Find a payment request",exact:true}).fill(second.channel.description);
  await page.getByRole("combobox",{name:"Request status",exact:true}).selectOption("ACTIVE");
  await expect(page.locator(".mch-channel-list>li")).toHaveCount(1);
  await page.getByRole("button",{name:`View payment request ${second.channel.description}`,exact:true}).click();
- expect(new URL(page.url()).searchParams.get("channel")).toBe(second.channel.id);
+ expect(customerRouteQuery(new URL(page.url()).pathname,new URL(page.url()).searchParams).get("channel")).toBe(second.channel.id);
  await page.reload();await expect(detail.locator(".mch-channel-hero")).toContainText(second.channel.description);
  await detail.getByRole("button",{name:"Close details",exact:true}).click();
  await expect(page.getByRole("searchbox",{name:"Find a payment request",exact:true})).toHaveValue(second.channel.description);
@@ -128,7 +129,7 @@ test("an inaccessible saved channel request keeps its exact retry and offers an 
  const records=await page.request.get(`/api/v1/merchants/${merchant.id}`).then(response=>response.json());
  expect(records.channels.filter((channel:{description:string})=>channel.description===description)).toHaveLength(1);
  await page.getByRole("button",{name:"Leave for now",exact:true}).click();
- await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===expectedExit);
+ await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===customerHref(new URL(expectedExit,"http://127.0.0.1:3100").pathname,new URL(expectedExit,"http://127.0.0.1:3100").searchParams));
 });
 
 test("an inaccessible activation preserves the unknown command without trapping the merchant workspace",async({page})=>{
@@ -156,7 +157,7 @@ test("an inaccessible activation preserves the unknown command without trapping 
  expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
  expect((await operations(page,merchant.id)).channels.find(row=>row.channelId===channel.id)?.state).toBe("DISABLED");
  await detail.getByRole("button",{name:"Leave for now",exact:true}).click();
- await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===expectedExit);
+ await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===customerHref(new URL(expectedExit,"http://127.0.0.1:3100").pathname,new URL(expectedExit,"http://127.0.0.1:3100").searchParams));
 });
 
 
@@ -188,5 +189,5 @@ test("a hidden publication recovers through the same link controls without expos
  await expect(page.getByRole("button",{name:"Leave for now",exact:true})).toBeEnabled();
  expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
  await page.getByRole("button",{name:"Leave for now",exact:true}).click();
- await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===expectedExit);
+ await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===customerHref(new URL(expectedExit,"http://127.0.0.1:3100").pathname,new URL(expectedExit,"http://127.0.0.1:3100").searchParams));
 });

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { customerHref, customerRouteQuery } from "./customer-routes";
 
 export const ACTIVITY_PAGE_SIZE = 25;
 export const ACTIVITY_EXPORT_LIMIT = 10000;
@@ -45,12 +46,12 @@ export function merchantActivityHref(query: MerchantActivityQuery, updates: Part
   const next = {...query, ...updates};
   const params = new URLSearchParams();
   for (const [key,value] of Object.entries(next)) if (value !== "" && !(key === "view" && value === "all") && !(key === "terminalUse" && value === "all") && !(key === "section" && value === "activity") && !(key === "status" && value === "ALL") && !(key === "page" && value === 1)) params.set(key,String(value));
-  return `/merchant-services${params.size ? `?${params}` : ""}`;
+  return customerHref("/merchant-services", params);
 }
 /** Only our relative dashboard route and recognized filter values can be a return destination. */
 export function merchantActivityReturn(value: string | null): string | null {
-  if (!value || value.length > 2000 || !/^\/merchant-services(?:\?|$)/.test(value)) return null;
-  try {const url = new URL(value,"https://etail.invalid"); if (url.hash || [...url.searchParams.keys()].some(key => !(Object.hasOwn(merchantActivityQuerySchema.shape,key)))) return null; return merchantActivityHref(parseMerchantActivityFilters(url.searchParams));} catch {return null;}
+  if (!value || value.length > 2000 || !/^\/merchant-services(?:\/terminals|\/settings)?(?:\?|$)/.test(value)) return null;
+  try {const url = new URL(value,"https://etail.invalid"); if (url.hash || [...url.searchParams.keys()].some(key => !(Object.hasOwn(merchantActivityQuerySchema.shape,key)))) return null; return merchantActivityHref(parseMerchantActivityFilters(customerRouteQuery(url.pathname,url.searchParams)));} catch {return null;}
 }
 
 /** Carry a validated activity return through an exact merchant record. */
@@ -59,5 +60,5 @@ export function merchantRecordHref(merchantId: string, selection: Record<string,
   query.delete("returnTo");
   const back = merchantActivityReturn(returnTo);
   if (back) query.set("returnTo", back);
-  return `/merchants/${encodeURIComponent(merchantId)}?${query}`;
+  return customerHref(`/merchants/${encodeURIComponent(merchantId)}`,query);
 }

@@ -16,7 +16,7 @@ export const moneyOverviewSchema=ownedMoneyAccountSchema.extend({history:z.array
  for(const [index,row] of account.history.entries()){
   if(row.href===null)continue;
   const task=row.kind==="MONEY_FUNDING"?"add":["MONEY_WITHDRAWAL_RESERVE","MONEY_WITHDRAWAL_RELEASE"].includes(row.kind)?"withdraw":null;
-  const prefix=`/money-accounts/${account.id}?task=${task}&review=`;
+  const prefix=`/money-accounts/${account.id}/${task==="add"?"add-money":"withdraw"}?review=`;
   if(!task||!row.href.startsWith(prefix)||!z.uuid().safeParse(row.href.slice(prefix.length)).success)ctx.addIssue({code:"custom",path:["history",index,"href"],message:"Receipt link must refer to this account and saved review"});
  }
 });

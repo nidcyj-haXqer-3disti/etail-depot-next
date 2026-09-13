@@ -44,7 +44,7 @@ test("a lost card allowance result hides card details after denial and retries w
  await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  await expect(row.getByRole("button",{name:"Cancel",exact:true})).toHaveCount(0);
  await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Cards",exact:true}).click();
- await expect(page).toHaveURL(url=>url.searchParams.get("card")===card.id);
+ await expect(page).toHaveURL(url=>url.pathname===`/cardholder-services/cards/${card.id}`&&!url.searchParams.has("card"));
  await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  const grant=and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),eq(permissionGrants.action,"cardholder.limits.manage"));
  expect(await getDb().update(permissionGrants).set({state:"REVOKED"}).where(grant).returning({action:permissionGrants.action})).toEqual([{action:"cardholder.limits.manage"}]);
@@ -83,6 +83,7 @@ test("unconfirmed card limits survive browser navigation in the same tab and sig
  const path=`/api/v1/cardholder-services/${primary.serviceId}/cards/${card.id}/spending-limit`;
  const attempts:unknown[]=[];let logoutPosts=0;
  await page.route(`**${path}`,async route=>{
+  if(route.request().method()!=="PUT"){await route.continue();return;}
   attempts.push(route.request().postDataJSON());const result=await route.fetch();expect(result.status()).toBe(200);
   if(attempts.length===1||attempts.length===3)await route.fulfill({status:200,json:{}});else await route.fulfill({response:result});
  });
@@ -100,7 +101,7 @@ test("unconfirmed card limits survive browser navigation in the same tab and sig
  };
  await changeLimit("17.23");
  // Native same-document history is allowed: the exact request outlives its React owner.
- await page.goBack();await expect(page).toHaveURL(url=>url.searchParams.get("view")==="cards"&&!url.searchParams.has("focus"));
+ await page.goBack();await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/cards"&&!url.searchParams.has("view")&&!url.searchParams.has("focus"));
  await page.getByRole("link",{name:new RegExp(`^Open ${other.card.nickname},`)}).click();
  await expect(page.getByRole("button",{name:"Retry saved spending limit",exact:true})).toHaveCount(0);
  await expect(page.getByRole("article",{name:"Card spending limit",exact:true}).getByRole("button",{name:`Change spending limit for ${other.card.nickname}`,exact:true})).toBeVisible();
@@ -108,7 +109,7 @@ test("unconfirmed card limits survive browser navigation in the same tab and sig
  await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  await expect(row).toContainText("$17.23");expect(attempts).toHaveLength(1);
  await row.getByRole("link",{name:"Leave unconfirmed request",exact:true}).click();
- await expect(page).toHaveURL(url=>url.searchParams.get("view")==="cards"&&!url.searchParams.has("focus"));
+ await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/cards"&&!url.searchParams.has("view")&&!url.searchParams.has("focus"));
  await openCard();await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  const signOut=async()=>{await page.getByLabel("Profile and help",{exact:true}).click();await page.getByRole("button",{name:"Sign out",exact:true}).click();};
  await signOut();
@@ -125,6 +126,9 @@ test("unconfirmed card limits survive browser navigation in the same tab and sig
  await leave.getByRole("button",{name:"Sign out anyway",exact:true}).click();
  await expect(leave).toContainText("We could not confirm sign-out");expect(logoutPosts).toBe(1);
  await leave.getByRole("button",{name:"Stay signed in",exact:true}).click();
+ await expect(leave).toHaveCount(0);
+ await expect(page.getByRole("navigation",{name:"Your account",exact:true})).toBeVisible();
+ await expect(page.getByRole("button",{name:"Sign out",exact:true})).toBeFocused();
  await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  // Deliberately leaving an unconfirmed change must still allow secure sign-out.
  await page.getByRole("button",{name:"Sign out",exact:true}).click();await leave.getByRole("button",{name:"Sign out anyway",exact:true}).click();

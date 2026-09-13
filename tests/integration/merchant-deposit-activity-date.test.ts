@@ -15,7 +15,7 @@ it.each(["COMPLETED","FAILED"] as const)("dates a %s withdrawal outcome at its r
  const account=await getDb().transaction(tx=>getServiceMoneyAccount(tx,owner.serviceId));
  await addMoneyFunds(owner.personId,account.id,{commandId:randomUUID(),amountMinor:"3000"});
  const intent=await prepareMoneyWithdrawal(owner.personId,account.id,{commandId:randomUUID(),amountMinor:"1250"});
- const pending=await confirmMoneyWithdrawal(owner.personId,account.id,intent.id),href=`/money-accounts/${account.id}?task=withdraw&review=${intent.id}`;
+ const pending=await confirmMoneyWithdrawal(owner.personId,account.id,intent.id),href=`/money-accounts/${account.id}/withdraw?review=${intent.id}`;
  const requests=await getDb().select().from(moneyWithdrawals).where(eq(moneyWithdrawals.id,pending.id));
  const originalJournal=await getDb().select().from(ledgerJournals).where(eq(ledgerJournals.id,requests[0]!.journalId));
  expect(pending).toMatchObject({status:"PENDING",completedAt:null,createdAt:requests[0]!.createdAt.toISOString()});
@@ -48,7 +48,7 @@ it("links funding only to its exact saved review and keeps direct funding withou
  const review=await prepareMoneyFunding(owner.personId,account.id,{commandId:randomUUID(),amountMinor:"750"}),receipt=await confirmMoneyFunding(owner.personId,account.id,review.id);
  const history=moneyOverviewSchema.parse(await getMoneyAccountOverview(owner.personId,account.id)).history;
  expect(history.find(row=>row.referenceId===direct.id)?.href).toBeNull();
- const link=history.find(row=>row.referenceId===receipt.id)!.href!;expect(link).toBe(`/money-accounts/${account.id}?task=add&review=${review.id}`);
+ const link=history.find(row=>row.referenceId===receipt.id)!.href!;expect(link).toBe(`/money-accounts/${account.id}/add-money?review=${review.id}`);
  const exact=new URL(link,"https://etail.invalid");expect((await getMoneyFundingIntent(owner.personId,account.id,exact.searchParams.get("review")!)).receipt).toEqual(receipt);
  await expect(getMoneyFundingIntent(other.personId,account.id,review.id)).rejects.toMatchObject({status:404,code:"MONEY_ACCOUNT_UNAVAILABLE"});
 });

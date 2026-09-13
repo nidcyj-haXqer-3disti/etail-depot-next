@@ -19,11 +19,13 @@ export function AccountMenu() {
     previousPath.current = pathname;
   }, [pathname]);
   useEffect(() => {
-    function dismiss(event: PointerEvent) {
-      if (event.target instanceof Node && !menu.current?.contains(event.target) && menu.current) menu.current.open = false;
+    function dismiss(event: MouseEvent) {
+      // A dialog action can remove its target before this listener; retain its original menu ancestry.
+      if (menu.current && !event.composedPath().includes(menu.current)) menu.current.open = false;
     }
-    document.addEventListener("pointerdown", dismiss);
-    return () => document.removeEventListener("pointerdown", dismiss);
+    // Let the outside target activate before the mobile menu collapses the header.
+    document.addEventListener("click", dismiss);
+    return () => document.removeEventListener("click", dismiss);
   }, []);
 
   return <details className="account-menu" ref={menu} onKeyDown={event => {
@@ -33,7 +35,7 @@ export function AccountMenu() {
   }}>
     <summary ref={trigger} aria-label="Profile and help"><Icon name="person"/><span>Profile and help</span><span className="account-menu-chevron" aria-hidden="true">⌄</span></summary>
     <div className="account-menu-panel">
-      <nav aria-label="Your account">
+      <nav aria-label="Your account" onClick={event=>{if(event.target instanceof Element&&event.target.closest("a")&&menu.current)menu.current.open=false;}}>
         <Link href="/profile" aria-current={pathname === "/profile" ? "page" : undefined}><Icon name="person"/>Your profile</Link>
         <Link href="/security" aria-current={pathname === "/security" ? "page" : undefined}><Icon name="lock"/>Sign-in &amp; security</Link>
         <Link href="/help" aria-current={pathname === "/help" ? "page" : undefined}><Icon name="info"/>Help center</Link>

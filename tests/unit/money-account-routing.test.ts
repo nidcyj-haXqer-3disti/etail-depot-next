@@ -1,10 +1,25 @@
 import {describe,expect,it} from "vitest";
-import {moneyAccountHref,moneyAccountReturn,moneyAccountHistory} from "../../src/ui/money-account-routing";
+import {moneyAccountHref,moneyAccountReturn,moneyAccountHistory,moneyHistoryReceiptHref} from "../../src/ui/money-account-routing";
 
 const accountId="10000000-0000-4000-8000-000000000001",reviewId="10000000-0000-4000-8000-000000000002";
 const terminalId="10000000-0000-4000-8000-000000000003";
 
 describe("money account return navigation",()=>{
+ it("carries the exact history receipt through each merchant investigation without losing either page",()=>{
+  const receipt=`/money-accounts/${accountId}/withdraw?review=${reviewId}`;
+  for(const investigation of [`/merchant-services?view=unit%3A${terminalId}&activity=refunds&period=all&page=3`,`/merchant-services/terminals?view=unit%3A${terminalId}&activity=payments&period=all`]){
+   const href=moneyHistoryReceiptHref(accountId,receipt,investigation,"balance",2)!;
+   const target=new URL(href,"https://etail.invalid");
+   expect(target.pathname).toBe(`/money-accounts/${accountId}/withdraw`);
+   expect(target.searchParams.get("review")).toBe(reviewId);expect(target.searchParams.get("page")).toBe("2");
+   expect(target.searchParams.get("history")).toBe("balance");expect(target.searchParams.get("returnTo")).toBe(investigation);
+  }
+  expect(moneyHistoryReceiptHref(accountId,`/money-accounts/${accountId}/add-money?review=${reviewId}`)).toBe(`/money-accounts/${accountId}/add-money?review=${reviewId}`);
+ });
+ it("never decorates another account, external destination or duplicated receipt identifier",()=>{
+  for(const href of [`/money-accounts/${terminalId}/withdraw?review=${reviewId}`,`https://example.test/money-accounts/${accountId}/withdraw?review=${reviewId}`,`/money-accounts/${accountId}/withdraw?review=${reviewId}&review=${reviewId}`,`/money-accounts/${accountId}/withdraw?review=${reviewId}&owner=other`])expect(moneyHistoryReceiptHref(accountId,href)).toBeNull();
+  expect(moneyHistoryReceiptHref(accountId,`/money-accounts/${accountId}/withdraw?review=${reviewId}`,"/cardholder-services","balance",2)).toBeNull();
+ });
  it("allows no return destination for either independent service",()=>{
   for(const kind of ["CARDHOLDER","MERCHANT"] as const){
    expect(moneyAccountReturn(undefined,kind)).toBeNull();expect(moneyAccountReturn(null,kind)).toBeNull();
@@ -15,8 +30,8 @@ describe("money account return navigation",()=>{
   expect(moneyAccountReturn(investigation,"MERCHANT")).toBe(investigation);
   const href=moneyAccountHref(accountId,moneyAccountReturn(investigation,"MERCHANT"),{task:"add",review:reviewId,page:"1"});
   const result=new URL(href,"https://etail.invalid");
-  expect(result.pathname).toBe(`/money-accounts/${accountId}`);
-  expect(result.searchParams.get("task")).toBe("add");expect(result.searchParams.get("review")).toBe(reviewId);expect(result.searchParams.get("page")).toBe("1");
+  expect(result.pathname).toBe(`/money-accounts/${accountId}/add-money`);
+  expect(result.searchParams.has("task")).toBe(false);expect(result.searchParams.get("review")).toBe(reviewId);expect(result.searchParams.get("page")).toBe("1");
   expect(result.searchParams.get("returnTo")).toBe(investigation);
   expect(new URL(result.searchParams.get("returnTo")!,"https://etail.invalid").searchParams.get("page")).toBe("2");
   expect(result.searchParams.getAll("returnTo")).toHaveLength(1);
@@ -39,7 +54,7 @@ describe("money account return navigation",()=>{
  });
  it("leaves card money routes free of merchant context",()=>{
   expect(moneyAccountHref(accountId)).toBe(`/money-accounts/${accountId}`);
-  expect(moneyAccountHref(accountId,null,{task:"withdraw"})).toBe(`/money-accounts/${accountId}?task=withdraw`);
+  expect(moneyAccountHref(accountId,null,{task:"withdraw"})).toBe(`/money-accounts/${accountId}/withdraw`);
  });
 });
 
