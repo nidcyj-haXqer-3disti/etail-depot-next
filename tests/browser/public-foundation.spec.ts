@@ -82,7 +82,7 @@ test("public pages have unique canonical metadata and no private data", async ({
     expect(editorialText).not.toMatch(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice|fixture/i);
     await expect(page.locator(".sandbox-badge")).toHaveCount(1);
     await expect(page.locator(".sandbox-badge")).toHaveText("Sandbox");
-    await expect(page.getByRole("navigation", {name:"Footer support"}).getByRole("link", {name:"Help center"})).toBeVisible();
+    await expect(page.getByRole("contentinfo").getByRole("link", {name:"Help center"})).toBeVisible();
   }
   expect(titles.size).toBe(4);
   const sitemap=await request.get("/sitemap.xml");expect(sitemap.ok()).toBe(true);
@@ -97,65 +97,117 @@ test("public pages have unique canonical metadata and no private data", async ({
 });
 
 
-test("all seven payment examples work by keyboard without sending changes", async ({page}) => {
+test("all seven payment channels show a clear checkout journey and work by keyboard without private reads or changes", async ({page}) => {
   const mutations: string[] = [];
+  const privateReads: string[] = [];
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.route("**/*", async route => {
     const request = route.request();
-    if (["GET", "HEAD", "OPTIONS"].includes(request.method())) {
-      await route.continue();
-    } else {
+    if (!["GET", "HEAD", "OPTIONS"].includes(request.method())) {
       mutations.push(`${request.method()} ${request.url()}`);
       await route.abort("blockedbyclient");
+    } else if (new URL(request.url()).pathname.startsWith("/api/")) {
+      privateReads.push(request.url());
+      await route.abort("blockedbyclient");
+    } else {
+      await route.continue();
     }
   });
   await page.goto("/");
-  const tablist = page.getByRole("tablist", {name:"Ways to share a payment request"});
-  const examples = [
-    {name:"Text", context:/^Text message$/},
-    {name:"Email", context:/^Email ·/},
-    {name:"Invoice", context:/^Invoice ·/},
-    {name:"Bill", context:/^Bill ·/},
-    {name:"Social", context:/^Social post ·/},
-    {name:"QR code", context:/^QR code ·/},
-    {name:"Web link", context:/^Web link ·/},
+  const showcase = page.locator(".channel-showcase");
+  const tablist = showcase.getByRole("tablist", {name:"Ways to share a payment request"});
+  const channels = [
+    {name:"Text", content:"I’d love the market bouquet, please."},
+    {name:"Email", content:"Your flowers are ready"},
+    {name:"Invoice", content:"Due on receipt"},
+    {name:"Bill", content:"Your bill · 1042"},
+    {name:"Social", content:"FRESH FROM THE MARKET"},
+    {name:"QR code", content:"On your phone. In a few simple steps."},
+    {name:"Website", content:"FRESH FLOWERS"},
   ];
-  await expect(tablist.getByRole("tab")).toHaveCount(examples.length);
+  await expect(tablist.getByRole("tab")).toHaveCount(channels.length);
   await tablist.getByRole("tab", {name:"Text", exact:true}).focus();
-  async function expectExample(index: number) {
-    const example = examples[index]!;
-    const tab = tablist.getByRole("tab", {name:example.name, exact:true});
+  async function expectChannel(index: number) {
+    const channel = channels[index]!;
+    const tab = tablist.getByRole("tab", {name:channel.name, exact:true});
     await expect(tab).toBeFocused();
     await expect(tab).toHaveAttribute("aria-selected", "true");
     await expect(tab).toHaveAttribute("tabindex", "0");
     await expect(tablist.getByRole("tab", {selected:true})).toHaveCount(1);
-    const panel = page.getByRole("tabpanel", {name:example.name, exact:true});
+    const bounds = (await tab.boundingBox())!;
+    expect(bounds.height).toBeGreaterThanOrEqual(44);
+    expect(bounds.width).toBeGreaterThanOrEqual(44);
+    const panel = showcase.getByRole("tabpanel", {name:channel.name, exact:true});
     await expect(panel).toBeVisible();
     await expect(panel).toHaveAttribute("aria-labelledby", (await tab.getAttribute("id"))!);
-    await expect(panel.getByText(example.context)).toBeVisible();
+    await expect(panel.getByText(channel.content, {exact:true})).toBeVisible();
     await expect(panel.getByRole("heading", {level:3})).toBeVisible();
-    for (const other of examples.filter((_, otherIndex) => otherIndex !== index)) {
+    await expect(panel.getByText("One simple card checkout", {exact:true})).toBeVisible();
+    await expect(panel.getByText("Your customer reviews the amount and pays.", {exact:true})).toBeVisible();
+    for (const network of ["Visa", "Mastercard", "American Express", "Discover"]) {
+      await expect(panel.getByText(network, {exact:true})).toBeVisible();
+    }
+    await expect(panel.locator("input, textarea, select, form, button, a, [contenteditable=true]")).toHaveCount(0);
+    expect(await showcase.textContent()).not.toMatch(/example|sample|sandbox|demo|fixture|no messages|no money|no .*collected/i);
+    for (const other of channels.filter((_, otherIndex) => otherIndex !== index)) {
       await expect(tablist.getByRole("tab", {name:other.name, exact:true})).toHaveAttribute("tabindex", "-1");
     }
   }
-  await expectExample(0);
-  for (let index=1; index<examples.length; index+=1) {
+  await expectChannel(0);
+  for (let index=1; index<channels.length; index+=1) {
     await page.keyboard.press("ArrowRight");
-    await expectExample(index);
+    await expectChannel(index);
   }
   await page.keyboard.press("ArrowRight");
-  await expectExample(0);
-  await page.keyboard.press("End");
-  await expectExample(examples.length-1);
+  await expectChannel(0);
+  await page.keyboard.press("ArrowLeft");
+  await expectChannel(channels.length-1);
   await page.keyboard.press("Home");
-  await expectExample(0);
+  await expectChannel(0);
+  await page.keyboard.press("End");
+  await expectChannel(channels.length-1);
+  await page.keyboard.press("Home");
+  await expectChannel(0);
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("tabpanel", {name:"Text", exact:true})).toBeFocused();
-  await expect(page.getByText("Examples only. No messages are sent or money collected.", {exact:true})).toBeVisible();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(showcase.getByRole("tabpanel", {name:"Text", exact:true})).toBeFocused();
+  await page.keyboard.press("Tab");
+  const openTools = showcase.getByRole("link", {name:"Open your payment tools", exact:true});
+  await expect(openTools).toBeFocused();
+  await expect(openTools).toHaveAttribute("href", "/merchant-services");
+  expect(privateReads).toEqual([]);
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/login$/);
   expect(mutations).toEqual([]);
+  expect(privateReads).toEqual([]);
   expect(errors).toEqual([]);
+});
+
+test("payment channels keep their content and touch targets inside a 320px screen", async ({page}) => {
+  await page.setViewportSize({width:320,height:900});
+  const mutations = await preventMutationRequests(page);
+  await page.goto("/");
+  const showcase = page.locator(".channel-showcase");
+  const tabs = showcase.getByRole("tab");
+  for (const name of ["Text", "Email", "Invoice", "Bill", "Social", "QR code", "Website"]) {
+    await tabs.filter({hasText:new RegExp(`^${name}$`)}).click();
+    const panel = showcase.getByRole("tabpanel", {name,exact:true});
+    await expect(panel).toBeVisible();
+    const overflow = await showcase.evaluate(node => ({
+      document: document.documentElement.scrollWidth > window.innerWidth,
+      panel: node.scrollWidth > node.clientWidth,
+      content: [...node.querySelectorAll(".channel-medium, .channel-checkout")].some(element => element.scrollWidth > element.clientWidth),
+    }));
+    expect(overflow).toEqual({document:false,panel:false,content:false});
+    for (const tab of await tabs.all()) {
+      const bounds = (await tab.boundingBox())!;
+      expect(bounds.height).toBeGreaterThanOrEqual(44);
+      expect(bounds.width).toBeGreaterThanOrEqual(44);
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x+bounds.width).toBeLessThanOrEqual(320);
+    }
+  }
+  expect(mutations).toEqual([]);
 });
 
 test("a first-time visitor uses emailed callbacks instead of manual link entry without sending email", async ({page}) => {

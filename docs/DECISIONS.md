@@ -1,5 +1,21 @@
 # Decision register
 
+## D77 release authorization
+
+13 September2026. After the menu and landing-page review corrections, the user explicitly requests deployment. Proceed with the final revision of PR20, required checks, reviewed merge and publication to Netlify site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`; retain existing visitor access and disabled real money. Record final commit/tree, CI, published deploy and read-only hosted acceptance in PR20 and `artifacts/d77-publication.json`. No reprovisioning, database reset, provider connection or unrelated resource change is included.
+
+## D77 landing illustration title bar
+
+13 September2026. At the user's explicit request, remove the redundant “etail depot.” / “A look inside” bar from the landing dashboard illustration, including its now-unused desktop and responsive styles. Preserve the named account/shop headings, illustration controls, surrounding container and normal site/card branding. This supersedes the prior display-label choice below; it does not change financial behavior or service access.
+
+## D77 landing-page language and payment channels
+
+13 September2026. Keep a clear global Sandbox badge while removing internal and repeated example/preview language from the landing dashboard and payment-channel illustrations. Named account/shop illustrations and “A look inside” distinguish marketing figures from private account data. Present text, email, invoice, bill, social, QR code and website in familiar, distinct formats with a consistent card-checkout summary. Illustration controls only change local presentation; no sending, copying, editable payment details, provider request or private account read is introduced. Preserve separate balances, real authenticated service links, the truthful network disclosure and the single public footer. TypeScript, full lint, architecture,18 metadata unit cases,34 public browser/accessibility cases and30 responsive component captures pass. A small decorative payment-page heading style is corrected after removal of its extra label; the final production build and all5 affected public-page cases also pass (`artifacts/d77-marketing-build-final.log`, `artifacts/d77-marketing-payment-page-final.log`). Hosted publication remains separate from the local review corrections.
+
+## D77 footer review correction
+
+13 September2026. The user requests removal of the landing page's double footer. Consolidate the shared public footer into one section, retain its copyright and navigation, and remove the duplicate Help center/support row and obsolete public-row styles. Preserve the authenticated footer and its dashboard/profile links. Production build, focused lint and16 existing public-page desktop/mobile/accessibility cases pass; local preview and hosted publication remain distinct.
+
 ## D77 — one task hierarchy per service
 
 13 September2026. Adopt [Service menu hierarchy](SERVICE_MENU_HIERARCHY.md) for the user's requested practical account navigation. Keep account-level balance/settings distinct from individual cards and terminals. Main navigation has stable destinations, while add/assign/top-up actions belong inside the corresponding section. Retain one funding/issuance owner, historical saved-review recovery, exact return context, separate funds and existing permissions. No new financial product or schema is introduced by reorganizing the menu. Record local checks and review/release separately.
