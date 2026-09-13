@@ -11,6 +11,7 @@ import {createChannel,updateMerchantSetup,submitMerchantSetup} from "../../../sr
 import {configureTestGateway,enrollTestMerchant,setChannelActivation} from "../../../src/modules/acquiring/operations-service";
 import {publishGuestChannel} from "../../../src/modules/acquiring/guest-service";
 import {guestPublicationManagementSchema,type GuestPublication} from "../../../src/modules/acquiring/guest-contracts";
+import {moneyFundingIntentSchema,moneyTopupReceiptSchema,moneyOverviewSchema} from "../../../src/shared/money-response";
 import {cardCheckoutReviewSchema} from "../../../src/modules/acquiring/card-checkout-contracts";
 import {merchantOperationsProjectionSchema,merchantTestPaymentProjectionSchema,merchantSettlementReceiptSchema} from "../../../src/modules/acquiring/operations-api-contracts";
 import {cardPrimary} from "../../helpers/cardholder";
@@ -71,20 +72,33 @@ export async function publishedMerchantFixture(amountMinor="1250",description="F
 }
 export async function addMoney(page:Page,serviceId:string,amount="50.00"){
   await page.goto(`/cardholder-services/funds?service=${serviceId}`);
-  await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
-  await page.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill(amount);
-  await page.getByRole("button",{name:"Continue",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
-  // Review state renders before router.replace finishes; reload only the saved review URL.
-  await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/funds"&&url.searchParams.get("service")===serviceId&&/^[0-9a-f-]{36}$/.test(url.searchParams.get("review")??""));
-  const intentId=new URL(page.url()).searchParams.get("review");
-  expect(intentId).toBeTruthy();
+  await expect(page).toHaveURL(url=>/^\/money-accounts\/[0-9a-f-]{36}$/.test(url.pathname)&&!url.search);
+  const base=new URL(page.url()).pathname,moneyAccountId=base.split("/").at(-1)!;
+  const accountResponse=await page.request.get(`/api/v1${base}`);expect(accountResponse.status()).toBe(200);
+  const account=moneyOverviewSchema.parse(await accountResponse.json());
+  expect(account).toMatchObject({id:moneyAccountId,serviceKind:"CARDHOLDER",services:[{id:serviceId,kind:"CARDHOLDER"}],canAddMoney:true});
+  await expect(page.getByRole("heading",{name:"Card balance",level:1,exact:true})).toBeVisible();
+  await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(1);
+  await page.getByRole("link",{name:"Add money",exact:true}).click();
+  const panel=page.locator('section[aria-labelledby="money-task-title"]');
+  await expect(panel.getByRole("heading",{name:"Add money",exact:true})).toBeVisible();
+  await panel.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill(amount);
+  const preparing=responseFor(page,`/api/v1${base}/funding/intents`);
+  await panel.getByRole("button",{name:"Continue",exact:true}).click();
+  const prepared=await preparing;expect(prepared.status()).toBe(200);
+  const intent=moneyFundingIntentSchema.parse(await prepared.json());expect(intent.moneyAccountId).toBe(moneyAccountId);
+  await expect(panel.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
+  // Reload only after the exact saved review URL finishes navigating.
+  await expect(page).toHaveURL(url=>url.pathname===base&&url.searchParams.get("task")==="add"&&url.searchParams.get("review")===intent.id);
   await page.reload();
-  await expect(page.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
-  const confirming=responseFor(page,`/api/v1/cardholder-services/${serviceId}/funds/intents/${intentId}`);
-  await page.getByRole("button",{name:"Confirm and add money",exact:true}).click();
-  expect((await confirming).status()).toBe(200);
-  await expect(page.locator('section[aria-labelledby="funding-title"]')).toContainText("Money added");
+  await expect(panel.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
+  const confirming=responseFor(page,`/api/v1${base}/funding/intents/${intent.id}`);
+  await panel.getByRole("button",{name:"Confirm and add money",exact:true}).click();
+  const confirmed=await confirming;expect(confirmed.status()).toBe(200);
+  const receipt=moneyTopupReceiptSchema.parse(await confirmed.json());
+  expect(receipt).toMatchObject({id:intent.receiptId,moneyAccountId,amount:intent.amount,status:"COMPLETED"});
+  await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
+  await expect(panel).toContainText(receipt.reference);
 }
 export async function setCardAllowance(page:Page,serviceId:string,cardId:string,name:string,amount="25.00"){
   await page.goto(`/cardholder-services?card=${cardId}`);
@@ -100,7 +114,8 @@ export async function setCardAllowance(page:Page,serviceId:string,cardId:string,
 }
 export async function addUnfundedCard(page:Page,name:string,allowance="0.00"){
   if(!(await page.getByRole("dialog").count())){
-    await page.getByRole("link",{name:/^(Add card|Create your first card)$/}).click();
+    await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Cards",exact:true}).click();
+    await page.getByRole("link",{name:"Add card",exact:true}).click();
   }
   const dialog=page.getByRole("dialog");
   await expect(dialog.getByRole("radio",{name:/Someone else/})).toBeChecked();

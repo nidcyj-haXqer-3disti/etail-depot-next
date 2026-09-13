@@ -31,7 +31,7 @@ export function CardholderEnrollment() {
       }
       const saved=await response.json();
       if(saved?.kind!=="CARDHOLDER"||typeof saved.serviceId!=="string"||! /^[0-9a-f-]{36}$/.test(saved.serviceId))throw new Error("We couldn’t verify your card account setup. Retry the saved request.");
-      if (mounted.current) { setAttempt(null); router.push("/cardholder-services"); router.refresh(); }
+      if (mounted.current) { setAttempt(null); router.push("/cardholder-services?view=cards"); router.refresh(); }
     } catch (caught) { if (mounted.current) setError(caught instanceof Error ? caught.message : "Please try again."); }
     finally { inFlight.current = false; if (mounted.current) setBusy(false); }
   }

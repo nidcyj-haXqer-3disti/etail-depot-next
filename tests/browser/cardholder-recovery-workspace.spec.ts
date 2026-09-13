@@ -48,7 +48,7 @@ test("lost freeze result survives denied retry, hides unavailable card details, 
   if(attempts.length===1){expect(result.status()).toBe(200);await route.abort("connectionfailed");}else await route.fulfill({response:result});
  });
  await page.goto(`/cardholder-services?focus=${own.card.id}`);
- await page.getByRole("region",{name:"Selected card overview",exact:true}).getByRole("link",{name:"Card settings",exact:true}).click();
+ await page.getByRole("region",{name:"Selected card overview",exact:true}).getByRole("link",{name:"Manage card",exact:true}).click();
  const dialog=page.getByRole("dialog");
  await dialog.getByRole("button",{name:"Freeze",exact:true}).click();
  await dialog.getByRole("button",{name:"Freeze card",exact:true}).click();

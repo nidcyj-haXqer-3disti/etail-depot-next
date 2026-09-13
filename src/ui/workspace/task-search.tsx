@@ -13,20 +13,19 @@ export function TaskSearch({workspace:w,primaryService,selectedCardId}:{workspac
   const [open,setOpen]=useState(false);const [query,setQuery]=useState("");
   useEffect(()=>{function shortcut(e:KeyboardEvent){if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"&&!document.querySelector("dialog[open]")){e.preventDefault();setQuery("");setOpen(true);}}document.addEventListener("keydown",shortcut);return()=>document.removeEventListener("keydown",shortcut);},[]);
   const can=(action:string)=>w?.capabilities.some(item=>item.action===action&&item.allowed)===true;
-  const selection={cardId:selectedCardId,contextId:w?.service.id};
+  const selection={cardId:selectedCardId,contextId:w?.service.id??primaryService?.id};
+  const accountSelection=primaryService?{contextId:primaryService.id}:selection;
   const manage=primaryService?.canInvite?primaryService.id:w?.cardholderRole==="OWNER"&&can("people.read")?w.service.id:null;
   const tasks:{label:string;detail:string;path:string;icon:WorkspaceIconName;allowed:boolean;keywords:string}[]=[
-    {label:"Manage cards",detail:"View cards, change a spending limit or freeze a card",path:"/cardholder-services?view=cards",icon:"cards",allowed:true,keywords:"freeze unfreeze pause resume"},
-    {label:"Add a card",detail:"Create a card or continue a saved request",path:"/cardholder-services?new=1",icon:"plus",allowed:primaryService?.canAddCard===true,keywords:"apply application new holder"},
+    {label:"Cards",detail:primaryService?.canAddCard?"Add a card, assign its cardholder or manage its spending limit":"View your cards, purchases and card controls",path:"/cardholder-services?view=cards",icon:"cards",allowed:true,keywords:"freeze unfreeze pause resume"},
     {label:"Find a transaction",detail:"Search your activity and view purchase details",path:cardholderTaskHref("activity",selection),icon:"activity",allowed:true,keywords:"search purchases payments pending posted"},
     {label:"Statements & reports",detail:"Review card activity and download a report",path:cardholderTaskHref("reports",selection),icon:"reports",allowed:!!w&&can("activity.read"),keywords:"download csv accounting reconciliation"},
-    {label:"People",detail:"Manage people who use your cards and review invitations",path:primaryService?"/cardholder-services?view=cardholders":`/cardholder-services?manage=${manage??""}`,icon:"people",allowed:!!manage,keywords:"invite remove revoke roles manager viewer permissions"},
+    {label:"Cardholders",detail:"Manage people who use your cards and review invitations",path:primaryService?"/cardholder-services?view=cardholders":`/cardholder-services?manage=${manage??""}`,icon:"people",allowed:!!manage,keywords:"invite remove revoke roles manager viewer permissions"},
     {label:"Sign-in & security",detail:"Review active sessions and sign out other browsers",path:"/security",icon:"shield",allowed:true,keywords:"sessions devices login logout"},
-    {label:"Compare memberships",detail:"Explore Select, Premier and an annual cost estimate",path:cardholderTaskHref("membership",selection),icon:"overview",allowed:!!w,keywords:"plans pricing fees cashback bonus benefits rewards calculator"},
-    {label:"Notification settings",detail:"Choose which card updates you want",path:cardholderTaskHref("settings",selection),icon:"bell",allowed:!!w,keywords:"alerts email preferences"},
+    {label:primaryService?"Account settings":"Preferences",detail:"Account information and notification preferences",path:cardholderTaskHref("settings",accountSelection),icon:"settings",allowed:!!w||!!primaryService,keywords:"alerts email preferences"},
     {label:"Get help",detail:"Ask a question and read support replies",path:cardholderTaskHref("help",selection),icon:"help",allowed:!!w,keywords:"question support fraud problem cases contact"},
-    {label:"Invitations",detail:"Review invitations from other account owners",path:"/shared-access",icon:"bell",allowed:true,keywords:"accept decline invitation"},
-    {label:"Accept payments",detail:"View payments and the terminals you use",path:"/merchant-services",icon:"merchant",allowed:true,keywords:"collections payments channels gateway"},
+    {label:"Account balance",detail:"View money activity, add money or withdraw",path:`/cardholder-services/funds?service=${primaryService?.id??""}`,icon:"reports",allowed:!!primaryService,keywords:"top up topup funding bank"},
+    {label:"Card history",detail:"Continue saved card setup and review created cards",path:"/cardholder-services?view=requests",icon:"cards",allowed:primaryService?.canAddCard===true,keywords:"draft request application canceled"},
   ];
   const results=tasks.filter(task=>task.allowed&&`${task.label} ${task.detail} ${task.keywords}`.toLowerCase().includes(query.trim().toLowerCase()));
   function taskPath(path:string){

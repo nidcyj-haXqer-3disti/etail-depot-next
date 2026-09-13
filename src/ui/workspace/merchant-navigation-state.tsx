@@ -31,10 +31,11 @@ export function MerchantNavigation({label,activeKey,children}:{label:string;acti
  const navigation=useRef<HTMLElement>(null);
  const reveal=useCallback((link:HTMLElement|null)=>{
   const nav=navigation.current;if(!nav||!link||nav.scrollWidth<=nav.clientWidth)return;
-  const container=nav.getBoundingClientRect(),item=link.getBoundingClientRect();
-  const left=container.left+nav.clientLeft,right=left+nav.clientWidth;
+  const container=nav.getBoundingClientRect(),item=link.getBoundingClientRect(),style=getComputedStyle(nav);
+  const edge=container.left+nav.clientLeft;
+  const left=edge+(Number.parseFloat(style.scrollPaddingLeft)||0),right=edge+nav.clientWidth-(Number.parseFloat(style.scrollPaddingRight)||0);
   const movement=item.left<left?item.left-left:item.right>right?item.right-right:0;
-  if(movement)nav.scrollLeft+=movement;
+  if(movement)nav.scrollLeft+=movement>0?Math.ceil(movement):Math.floor(movement);
  },[]);
  useLayoutEffect(()=>{
   const nav=navigation.current;if(!nav)return;

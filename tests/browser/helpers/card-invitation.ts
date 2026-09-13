@@ -16,7 +16,8 @@ export async function signInVerified(page:Page,personId:string,email?:string){
  await page.context().addCookies([{name:pair.slice(0,pair.indexOf("=")),value:pair.slice(pair.indexOf("=")+1),domain:"127.0.0.1",path:"/",httpOnly:true,sameSite:"Strict",expires:Math.floor(session.record.expiresAt.getTime()/1000)}]);
 }
 export async function createCardUI(page:Page,name:string,allowance="25.00",forMe=false):Promise<WorkspaceCard>{
- await page.goto("/cardholder-services?new=1");const dialog=page.getByRole("dialog");
+ await page.goto("/cardholder-services?view=cards");
+ await page.getByRole("link",{name:"Add card",exact:true}).click();const dialog=page.getByRole("dialog");
  await expect(dialog.getByRole("radio",{name:/Someone else/})).toBeChecked();
  if(forMe)await dialog.getByRole("radio",{name:/^Me /}).check();
  await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);

@@ -4,6 +4,8 @@ These are optional implementation-assistance tools for Codex. The owner does not
 
 ## D76 additive invitation and network-checkout preparation
 
+D77 reorganizes menus without a database migration or preparation change. After the final production build and existing preview startup, run `node tools/run-with-database.mjs --preview tsx tools/capture-menu-preview.mjs d77-menu-preview` for36 owner/holder menu states at1440,390 and320px. Use a new `d77-menu-preview-*` name for a later capture to preserve prior evidence. The tool verifies the marked preview and exact fictional personas, permits only the two fixture sign-ins, blocks all other writes/external requests, and compares authorized projections before/after. It does not reset or seed the preview, confirm a top-up, send an invitation or move money.
+
 The active extension is `docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md`. D76 adds card recipient assignment, provider-verified invitation contacts, exact card/terminal invitations and network payment events without resetting either marked database. Five additive migrations preserve accepted memberships, cards and posted history while retiring pending broad service invitations. The current owner/card/terminal model and separate balances remain. Only explicit preview preparation applies pending migrations; completed seed preparation stays a no-op. Public checkout uses sandbox network instruments without an Etail login; saved historical internal-card reviews remain recoverable.
 
 ## Current D73 preview model

@@ -132,7 +132,6 @@ const retiredMutationRoutes = new Set([
   "src/app/api/v1/guest/orders/[orderId]/attempts/[attemptId]/confirm/route.ts",
 ]);
 const fundingUiStages = new Map([
-  ["/funds/intents", ["CardholderFundsWorkspace/prepare", "POST", fundingUiOwner]],
   ["/funds/intents/:id", ["CardholderFundsWorkspace/confirm", "POST", fundingUiOwner]],
   ["/cards/:id/spending-limit", ["CardLimitControl/save", "PUT", cardLimitUiOwner]],
 ]);
@@ -880,7 +879,8 @@ function selfTest() {
   assert.ok(probe("src/modules/other/service.ts", 'import {merchantDeposits} from "@/modules/acquiring/settlement-schema"; function bypass(){tx.insert(merchantDeposits).values({});}').includes("SETTLEMENT_WRITER_OWNERSHIP"));
   assert.ok(probe("src/modules/other/service.ts", 'import {purchaseCardInTransaction} from "@/modules/workspace/service"; function pay(){purchaseCardInTransaction();}').includes("CONNECTED_CARD_DEBIT_BOUNDARY"));
   assert.deepEqual(probe(checkoutUiOwner, '"use client"; function CardCheckout(){async function submit(){fetch(`/api/v1/checkout/${review.publicationId}/card/${review.id}`,{method:"POST"});}}'), []);
-  assert.deepEqual(probe(fundingUiOwner, '"use client"; import {workspaceCommand} from "./workspace/primitives"; function CardholderFundsWorkspace(){function prepare(){workspaceCommand(id,"/funds/intents","POST",{});} function confirm(){workspaceCommand(id,`/funds/intents/${intent.id}`,"POST",{});}}'), []);
+  assert.ok(probe(fundingUiOwner, '"use client"; import {workspaceCommand} from "./workspace/primitives"; function CardholderFundsWorkspace(){function prepare(){workspaceCommand(id,"/funds/intents","POST",{});}}').includes("PARALLEL_FUNDING_UI"));
+  assert.deepEqual(probe(fundingUiOwner, '"use client"; import {workspaceCommand} from "./workspace/primitives"; function CardholderFundsWorkspace(){function confirm(){workspaceCommand(id,`/funds/intents/${intent.id}`,"POST",{});}}'), []);
   assert.ok(probe("src/modules/acquiring/operations-service.ts", 'function legacy(){return {previewHref:`/pay/${row.id}`};}').includes("RETIRED_CHANNEL_CHECKOUT_LINK"));
   assert.ok(probe("src/modules/acquiring/operations-service.ts", 'export function getMerchantCheckout(){}').includes("RETIRED_CHANNEL_CHECKOUT_OWNER"));
   console.log("Architecture detector self-tests passed (dependency boundaries, finite template routes, aliased imports, duplicate Add card flow/writer mutations, raw SQL, fixture and API ownership).");
