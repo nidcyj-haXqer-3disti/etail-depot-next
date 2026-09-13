@@ -109,9 +109,6 @@ async function merchantProjection(page:Page,merchantId:string){
   expect(response.status()).toBe(200);
   return merchantOperationsProjectionSchema.parse(await response.json());
 }
-function moneyCard(page:Page,label:string){
-  return page.locator(".mop-money-card").filter({has:page.getByText(label,{exact:true})});
-}
 async function capture(page:Page,info:TestInfo,name:string){
   await mkdir(info.outputDir,{recursive:true});
   const filename=info.outputPath(name+".png");
@@ -338,20 +335,21 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
 
   const settlement=await test.step("settle only the unrefunded payment into separate merchant money",async()=>{
     await signIn(page,merchant.personId);
-    await page.goto("/merchants/"+merchant.merchantId+"?tab=payments");
-    await expect(moneyCard(page,"Ready to move")).toContainText("$12.50");
+    await page.goto("/merchant-services?section=funds&view=unit:"+merchant.merchantId);
+    const terminalSettlement=page.getByRole("region",{name:`Settlement for ${merchant.name}`,exact:true});
+    await expect(terminalSettlement).toContainText("$12.50");
     const operations=await merchantProjection(page,merchant.merchantId);
     expect(operations.depositReview).toMatchObject({amount:{minor:"1250"},paymentCount:1});
-    await page.getByRole("button",{name:"Move to balance",exact:true}).click();
-    const request=page.getByRole("dialog",{name:"Move received payments",exact:true});
+    await terminalSettlement.getByRole("button",{name:"Review settlement",exact:true}).click();
+    const request=page.getByRole("dialog",{name:"Settle received payments",exact:true});
     await expect(request).toContainText("$12.50");
-    await request.getByRole("button",{name:"Review received payments",exact:true}).click();
-    const review=page.getByRole("dialog",{name:"Review received payments",exact:true});
-    await expect(review).toContainText("Payment balance");
-    await expect(review).toContainText("It does not send money to a bank or add money to your card balance.");
+    await request.getByRole("button",{name:"Review settlement",exact:true}).click();
+    const review=page.getByRole("dialog",{name:"Review settlement",exact:true});
+    await expect(review).toContainText("Merchant available balance");
+    await expect(review).toContainText("Settlement and payout are separate steps.");
     await capture(page,info,"05-owner-reviews-exact-settlement");
     const response=responseFor(page,"/api/v1/merchants/"+merchant.merchantId+"/settlements");
-    await review.getByRole("button",{name:"Move to balance",exact:true}).click();
+    await review.getByRole("button",{name:"Confirm settlement",exact:true}).click();
     const saved=await successful(await response,value=>merchantSettlementReceiptSchema.parse(value));
     expect(saved).toMatchObject({terminalId:merchant.merchantId,amount:{minor:"1250"}});
     await expect(review).toBeHidden();
@@ -360,7 +358,7 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
     expect(after.settlements).toHaveLength(1);
     expect(after.settlements[0]).toMatchObject({id:saved.id,reference:saved.reference});
     await page.reload();
-    await expect(moneyCard(page,"Payment balance")).toContainText("$12.50");
+    await expect(page.getByRole("region",{name:"Balance & payouts",exact:true})).toContainText("$12.50");
     await capture(page,info,"06-merchant-money-settled");
     await accessible(page,info,"merchant-money-settled");
     return saved;

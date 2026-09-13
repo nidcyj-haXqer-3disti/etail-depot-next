@@ -3,7 +3,7 @@ import { z } from "zod";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { getRequestSession } from "@/platform/http/context";
 import { SecurityError } from "@/platform/security/origin";
-import { getCardholderDashboardFocus, getPrimaryCardholderService } from "@/modules/workspace/dashboard-service";
+import { getCardholderDashboard, getCardholderDashboardFocus, getPrimaryCardholderService } from "@/modules/workspace/dashboard-service";
 import { getWorkspace } from "@/modules/workspace/service";
 import { getHistoricalReport } from "@/modules/reports/service";
 import { estimateMembership, sampleMembershipInput } from "@/modules/membership/estimate";
@@ -28,10 +28,20 @@ export async function renderCardholderTask(task: CardholderTask, searchParams: P
   if (session === undefined) return <PageNotice title="We couldn’t load your session"><p>Please try signing in again.</p></PageNotice>;
   if (!session) redirect("/login");
   const query = await searchParams;
-  if (query.focus === undefined && query.context === undefined) return <PageNotice title="Choose a card to continue" authenticated><p>Open a card, then choose what you want to do.</p><Link href="/cardholder-services?view=cards">Choose a card</Link></PageNotice>;
   try {
+    const primaryService = await getPrimaryCardholderService(session.personId);
     const focusId = query.focus !== undefined ? exactId(query.focus) : undefined;
-    const contextId = query.context !== undefined ? exactId(query.context) : undefined;
+    let contextId = query.context !== undefined ? exactId(query.context) : undefined;
+    if (!focusId && !contextId) {
+      // A direct task link may use the person's own account or their sole
+      // invited account. Never choose the first of several unrelated accounts.
+      if (primaryService) contextId = primaryService.id;
+      else {
+        const dashboard = await getCardholderDashboard(session.personId);
+        if (dashboard.profiles.length === 1) contextId = dashboard.profiles[0]!.id;
+      }
+      if (!contextId) return <PageNotice title="Choose a card to continue" authenticated><p>Open the card you want to view, then choose its activity or preferences.</p><Link href="/cardholder-services?view=cards">Choose a card</Link></PageNotice>;
+    }
     const focused = focusId ? await getCardholderDashboardFocus(session.personId, focusId) : null;
     if (contextId && focused && contextId !== focused.card.serviceId) throw new SecurityError("NOT_FOUND", 404);
     const serviceId = focused?.card.serviceId ?? contextId!;
@@ -49,7 +59,6 @@ export async function renderCardholderTask(task: CardholderTask, searchParams: P
     else if (task === "settings") content = <SettingsWorkspace key={scopeKey} workspace={workspace}/>;
     else if (task === "membership") content = <MembershipWorkspace initial={estimateMembership(sampleMembershipInput)}/>;
     else content = <HelpWorkspace key={scopeKey} workspace={workspace} selectedCardId={focusId}/>;
-    const primaryService = await getPrimaryCardholderService(session.personId);
     return <WorkspaceShell workspace={workspace} section={task} selectedCardId={focusId} primaryService={primaryService}>{content}</WorkspaceShell>;
   } catch (error) {
     unstable_rethrow(error);

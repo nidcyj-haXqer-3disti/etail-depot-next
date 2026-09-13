@@ -6,9 +6,8 @@ import {merchantDashboard,openCardholder,signIn} from "./helpers/fresh";
 
 async function accessible(page:Page,label:string) {
  await test.step(label,async()=>{
-  await expect(page.locator("footer.site-footer")).toHaveCount(1);
-  await expect(page.locator('footer a[href="/help"]')).toHaveCount(1);
-  await expect(page.locator('footer a[href="/services"]')).toHaveCount(1);
+  await expect(page.locator("footer")).toHaveCount(0);
+  await expect(page.locator("header .account-menu > summary")).toHaveCount(1);
   const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
   expect(result.violations.map(({id,impact,nodes})=>({id,impact,nodes:nodes.map(node=>({target:node.target,summary:node.failureSummary}))})),label).toEqual([]);
   expect(await page.evaluate(()=>Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)-window.innerWidth),`${label}: no horizontal page overflow`).toBeLessThanOrEqual(1);
@@ -34,7 +33,7 @@ for(const width of [1440,320]) {
    const dialog=page.getByRole("dialog",{name:card.nickname,exact:true});
    await dialogKeyboard(page,dialog);await accessible(page,"Exact card controls dialog");
    await page.keyboard.press("Escape");await expect(dialog).toBeHidden();
-   await page.goto(`/cardholder-services?focus=${card.id}&view=cards`);
+   await page.goto("/cardholder-services?view=cards");
    await expect(page.getByRole("searchbox",{name:"Search your cards"})).toBeVisible();
    await accessible(page,"Visible cards list");
    await page.goto(`/cardholder-services/activity?focus=${card.id}`);
@@ -47,7 +46,7 @@ for(const width of [1440,320]) {
    const unit=dashboard.units.find(row=>persona==="owner"?row.ownerAccess&&row.name==="Online store":!row.ownerAccess);
    expect(unit).toBeTruthy();expect(unit!.ownerAccess).toBe(persona==="owner");
    await page.goto(`/merchant-services?view=unit:${unit!.id}`);
-   await expect(page.getByRole("heading",{name:persona==="owner"?"Payments for your business":"Payments you collect",exact:true})).toBeVisible();
+   await expect(page.getByRole("heading",{name:"Overview",exact:true})).toBeVisible();
    await accessible(page,"Authorized Merchant overview");
    const response=await page.request.get(`/api/v1/merchants/${unit!.id}/operations`);expect(response.status()).toBe(200);
    const operations=merchantOperationsProjectionSchema.parse(await response.json());
@@ -76,7 +75,7 @@ for(const width of [1440,320]) {
    } else {
     await expect(page.getByRole("navigation",{name:"Payment activity views"}).getByRole("button",{name:"Deposits",exact:true})).toHaveCount(0);
     await expect(page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Terminal settings",exact:true})).toHaveCount(0);
-    await expect(page.getByRole("button",{name:"Move to balance",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("button",{name:"Review settlement",exact:true})).toHaveCount(0);
     await expect(page.getByRole("region",{name:"Current available balance",exact:true})).toHaveCount(0);
    }
   });

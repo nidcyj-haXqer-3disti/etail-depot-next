@@ -13,14 +13,16 @@ import {additionalPublishedPayment,freshConnectedPayment,merchantOperations,payP
 
 test.afterAll(closeDatabase);
 async function reviewSettlement(page:Page,amount:string,count:number){
- await page.getByRole("button",{name:"Move to balance",exact:true}).click();
- const details=page.getByRole("dialog",{name:"Move received payments",exact:true});
+ const terminalId=new URL(page.url()).pathname.split("/")[2]!,terminalName=(await page.getByRole("heading",{level:1}).innerText()).trim();
+ await page.goto(`/merchant-services?section=funds&view=unit:${terminalId}`);
+ await page.getByRole("region",{name:`Settlement for ${terminalName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();
+ const details=page.getByRole("dialog",{name:"Settle received payments",exact:true});
  await expect(details).toContainText(amount);
  await expect(details.locator("dl>div").filter({has:page.getByText("Payments included",{exact:true})})).toContainText(String(count));
  await expect(details.getByRole("textbox")).toHaveCount(0);
- await details.getByRole("button",{name:"Review received payments",exact:true}).click();
- const review=page.getByRole("dialog",{name:"Review received payments",exact:true});
- await expect(review).toContainText("It does not send money to a bank or add money to your card balance.");
+ await details.getByRole("button",{name:"Review settlement",exact:true}).click();
+ const review=page.getByRole("dialog",{name:"Review settlement",exact:true});
+ await expect(review).toContainText("Settlement and payout are separate steps.");
  return review;
 }
 
@@ -77,7 +79,7 @@ test("exact settlement survives a lost result and credits merchant money once wh
   bodies.push(route.request().postDataJSON());const response=await route.fetch();expect(response.status()).toBe(200);
   if(bodies.length===1)await route.abort("failed");else await route.fulfill({response});
  });
- await review.getByRole("button",{name:"Move to balance",exact:true}).click();
+ await review.getByRole("button",{name:"Confirm settlement",exact:true}).click();
  await expect(review.getByRole("button",{name:"Check request again",exact:true})).toBeEnabled();
  await page.keyboard.press("Escape");await expect(review).toBeVisible();
  const pendingUrl=page.url();await page.locator("header a[href]").first().dispatchEvent("click");expect(page.url()).toBe(pendingUrl);
@@ -91,7 +93,7 @@ test("exact settlement survives a lost result and credits merchant money once wh
  const items=await getDb().select().from(merchantSettlementItems).where(eq(merchantSettlementItems.settlementId,after.settlements[0]!.settlementId));
  expect(new Set(items.map(item=>item.paymentId))).toEqual(new Set([f.payment.id,second.payment.id]));
  expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.payer.primary.serviceId))).toBe(8000n);
- await page.reload();await expect(page.getByRole("button",{name:"Move to balance",exact:true})).toBeDisabled();
+ await page.reload();await expect(page.getByRole("region",{name:`Settlement for ${m.unit.displayName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true})).toBeDisabled();
  await page.setViewportSize({width:320,height:900});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
  expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
@@ -105,7 +107,7 @@ test("a settlement result for a different terminal remains unconfirmed and exact
   bodies.push(route.request().postDataJSON());const response=await route.fetch();expect(response.status()).toBe(200);
   if(bodies.length===1)await route.fulfill({status:200,json:{...await response.json(),terminalId:randomUUID()}});else await route.fulfill({response});
  });
- await review.getByRole("button",{name:"Move to balance",exact:true}).click();
+ await review.getByRole("button",{name:"Confirm settlement",exact:true}).click();
  await expect(review.getByRole("button",{name:"Check request again",exact:true})).toBeEnabled();
  await expect(review).toContainText("couldn’t confirm this payment result");
  await review.getByRole("button",{name:"Check request again",exact:true}).click();await expect(review).toBeHidden();
@@ -119,13 +121,13 @@ test("new collections invalidate an open settlement review and require the updat
  try{await payPublishedMerchant(await other.newPage(),await additionalPublishedPayment(m,"500"),f.payer);}finally{await other.close();}
  const requests:{commandId:string;reviewToken:string}[]=[],statuses:number[]=[];
  await page.route(`**/api/v1/merchants/${m.unit.id}/settlements`,async route=>{requests.push(route.request().postDataJSON());const response=await route.fetch();statuses.push(response.status());await route.fulfill({response});});
- await review.getByRole("button",{name:"Move to balance",exact:true}).click();
+ await review.getByRole("button",{name:"Confirm settlement",exact:true}).click();
  await expect(review).toContainText("New payments or refunds changed the amount ready to move.");
- await expect(review.getByRole("button",{name:"Move to balance",exact:true})).toBeDisabled();
+ await expect(review.getByRole("button",{name:"Confirm settlement",exact:true})).toBeDisabled();
  expect(statuses).toEqual([409]);expect(requests[0]!.reviewToken).toBe(before.depositReview!.token);
  expect(await getDb().select().from(merchantSettlements).where(eq(merchantSettlements.merchantUnitId,m.unit.id))).toEqual([]);
  await review.getByRole("button",{name:"Reload payment status",exact:true}).click();await expect(review).toContainText("$17.50");
- await review.getByRole("button",{name:"Move to balance",exact:true}).click();await expect(review).toBeHidden();
+ await review.getByRole("button",{name:"Confirm settlement",exact:true}).click();await expect(review).toBeHidden();
  expect(statuses).toEqual([409,200]);expect(requests[1]!.commandId).not.toBe(requests[0]!.commandId);expect(requests[1]!.reviewToken).not.toBe(requests[0]!.reviewToken);
  const after=await merchantOperations(page,m.unit.id);expect(after.settlements).toHaveLength(1);expect(after.bankFunds?.minor).toBe("1750");
 });

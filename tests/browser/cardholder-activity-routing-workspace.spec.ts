@@ -35,8 +35,18 @@ test("an older selected-card activity link opens the canonical activity view and
   await expect(page.getByRole("combobox",{name:"Card",exact:true})).toHaveValue(own.card.id);
   // An explicit Cards selection still takes precedence over the older activity key.
   await page.goto(`/cardholder-services?view=cards&activityCard=${own.card.id}`);
-  await expect(page.getByRole("navigation",{name:"Card ownership",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Card details",level:1,exact:true})).toBeVisible();
+  await expect(page.getByRole("region",{name:"Selected card overview",exact:true})).toContainText(own.card.nickname);
+  await expect(page.getByRole("navigation",{name:"Card ownership",exact:true})).toHaveCount(0);
+  await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
   expect(new URL(page.url()).pathname).toBe("/cardholder-services");
+  await page.getByRole("link",{name:"Back to card list",exact:true}).click();
+  await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&url.searchParams.get("view")==="cards"&&!url.searchParams.has("focus")&&!url.searchParams.has("activityCard"));
+  await expect(page.getByRole("navigation",{name:"Card ownership",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("navigation",{name:"Card management",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("searchbox",{name:"Search your cards",exact:true})).toBeVisible();
+  await expect(page.getByRole("link",{name:new RegExp(`^Open ${own.card.nickname},`)})).toBeVisible();
+  await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
 });
 
 test("older activity links preserve unavailable and duplicate selection handling without falling back to another card",async({page})=>{

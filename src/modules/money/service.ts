@@ -65,7 +65,10 @@ export async function attachServiceMoneyAccount(tx:Tx,serviceId:string,ownerPers
  await tx.insert(moneyAccountServices).values({moneyAccountId:account.id,serviceId,serviceKind:kind});
  return account;
 }
-async function ownerAccount(tx:Tx,personId:string,accountId:string,action:"money.read"|"money.add"|"money.withdraw",write=false):Promise<MoneyAccount>{
+type MoneyAction="money.read"|"money.add"|"money.withdraw";
+function moneyDecision(personId:string,account:MoneyAccount,action:MoneyAction){return evaluate({targetKind:"MONEY_ACCOUNT",actorPersonId:personId,ownerPersonId:account.ownerPersonId,moneyAccountId:account.id,resourceMoneyAccountId:account.id,serviceKind:account.serviceKind,status:account.status},action);}
+function requireMoneyAction(personId:string,account:MoneyAccount,action:MoneyAction){if(!moneyDecision(personId,account,action).allowed)throw new SecurityError("MONEY_ACCOUNT_UNAVAILABLE",404);}
+async function ownerAccount(tx:Tx,personId:string,accountId:string,action:MoneyAction,write=false):Promise<MoneyAccount>{
  if(write)await requireSandboxParticipant(tx,personId);else await requireServiceReader(tx,personId);
  if(write)await lockMoneyAccount(tx,accountId);
  const accountQuery=tx.select().from(moneyAccounts).where(eq(moneyAccounts.id,id(accountId)));
@@ -75,7 +78,7 @@ async function ownerAccount(tx:Tx,personId:string,accountId:string,action:"money
  const [linked]=write?await linkedQuery.for("share"):await linkedQuery;
  if(!linked||linked.service.primaryPersonId!==account.ownerPersonId||linked.service.kind!==account.serviceKind)throw new SecurityError("MONEY_ACCOUNT_UNAVAILABLE",404);
  const status=account.status==="CLOSED"||linked.service.status==="CLOSED"?"CLOSED":account.status==="SUSPENDED"||linked.service.status==="SUSPENDED"?"SUSPENDED":account.status;
- if(!evaluate({targetKind:"MONEY_ACCOUNT",actorPersonId:personId,ownerPersonId:account.ownerPersonId,moneyAccountId:account.id,resourceMoneyAccountId:account.id,status},action).allowed)throw new SecurityError("MONEY_ACCOUNT_UNAVAILABLE",404);
+ requireMoneyAction(personId,{...account,status},action);
  return {...account,status};
 }
 async function accountProjection(tx:Tx,account:MoneyAccount):Promise<OwnedMoneyAccount>{
@@ -112,7 +115,12 @@ export async function getMoneyAccountOverview(personId:string,accountId:string,p
   const entries=await tx.select({entry:ledgerEntries,journal:ledgerJournals}).from(ledgerEntries).innerJoin(ledgerJournals,eq(ledgerJournals.id,ledgerEntries.journalId)).where(and(eq(ledgerEntries.moneyAccountId,account.id),eq(ledgerEntries.bucket,"MONEY_AVAILABLE"))).orderBy(desc(ledgerJournals.createdAt),ledgerJournals.id).limit(51).offset(page*50);
   const pageEntries=entries.slice(0,50),hrefs=await historyReceiptHrefs(tx,account.id,pageEntries.map(row=>row.journal));
   const history:MoneyAccountOverview["history"]=pageEntries.map(({entry,journal})=>({id:journal.id,kind:journal.kind,label:labels[journal.kind]??"Money movement",amount:formatMoney(entry.deltaMinor),createdAt:journal.createdAt.toISOString(),referenceId:journal.referenceId,href:hrefs.get(journal.id)??null}));
-  return {...await accountProjection(tx,account),history,page,hasMore:entries.length>50,canAddMoney:account.status==="ACTIVE",canWithdraw:account.status==="ACTIVE"};
+  const rows=await tx.select({withdrawal:moneyWithdrawals,event:moneyWithdrawalEvents}).from(moneyWithdrawals)
+   .innerJoin(moneyWithdrawalIntents,and(eq(moneyWithdrawalIntents.id,moneyWithdrawals.intentId),eq(moneyWithdrawalIntents.moneyAccountId,moneyWithdrawals.moneyAccountId),eq(moneyWithdrawalIntents.actorId,moneyWithdrawals.actorId),eq(moneyWithdrawalIntents.amountMinor,moneyWithdrawals.amountMinor),eq(moneyWithdrawalIntents.confirmCommandId,moneyWithdrawals.commandId)))
+   .innerJoin(ledgerJournals,and(eq(ledgerJournals.id,moneyWithdrawals.journalId),eq(ledgerJournals.kind,"MONEY_WITHDRAWAL_RESERVE"),eq(ledgerJournals.referenceId,moneyWithdrawals.id),eq(ledgerJournals.createdAt,moneyWithdrawals.createdAt)))
+   .leftJoin(moneyWithdrawalEvents,eq(moneyWithdrawalEvents.withdrawalId,moneyWithdrawals.id))
+   .where(and(eq(moneyWithdrawals.moneyAccountId,account.id),eq(moneyWithdrawals.actorId,personId))).orderBy(desc(moneyWithdrawals.createdAt),moneyWithdrawals.id).limit(51).offset(page*50);
+  return {...await accountProjection(tx,account),history,withdrawals:rows.slice(0,50).map(row=>withdrawalReceipt(row.withdrawal,row.event)),withdrawalsHasMore:rows.length>50,page,hasMore:entries.length>50,canAddMoney:moneyDecision(personId,account,"money.add").allowed,canWithdraw:moneyDecision(personId,account,"money.withdraw").allowed};
  },{isolationLevel:"repeatable read"});
 }
 function topupProjection(row:typeof moneyTopups.$inferSelect):MoneyTopupReceipt{return {id:row.id,moneyAccountId:row.moneyAccountId,amount:formatMoney(row.amountMinor),source:"SANDBOX_BANK",sourceLabel:"Funding balance",status:"COMPLETED",createdAt:row.createdAt.toISOString(),reference:`ADD-${row.id.slice(0,8).toUpperCase()}`};}
@@ -125,8 +133,18 @@ async function readTopups(tx:Tx,accountId:string,topupId:string|null,page=0):Pro
 }
 export async function getMoneyTopup(personId:string,accountId:string,topupId:string):Promise<MoneyTopupReceipt>{return getDb().transaction(async tx=>{await ownerAccount(tx,personId,accountId,"money.read");const [row]=await readTopups(tx,id(accountId),id(topupId));if(!row)throw new SecurityError("RESOURCE_UNAVAILABLE",404);return row;});}
 export async function getMoneyTopups(personId:string,accountId:string,page=0){if(!Number.isSafeInteger(page)||page<0||page>100000)throw new SecurityError("INVALID_REQUEST",422);return getDb().transaction(async tx=>{await ownerAccount(tx,personId,accountId,"money.read");const rows=await readTopups(tx,id(accountId),null,page);return {topups:rows.slice(0,100),page,hasMore:rows.length>100};});}
+/** An old Merchant credit can be read again, but it cannot authorize another credit. */
+async function postedFunding(tx:Tx,personId:string,accountId:string,commandId:string,amountMinor:bigint):Promise<MoneyTopupReceipt|null>{
+ const [stored]=await tx.select({topup:moneyTopups,journal:ledgerJournals}).from(moneyTopups).innerJoin(ledgerJournals,eq(ledgerJournals.id,moneyTopups.journalId)).where(eq(moneyTopups.commandId,commandId));
+ if(!stored)return null;
+ const {topup,journal}=stored;
+ if(topup.actorId!==personId||topup.moneyAccountId!==accountId||topup.amountMinor!==amountMinor||topup.id!==id(commandId)||journal.kind!=="MONEY_FUNDING"||journal.referenceId!==topup.id||journal.currency!==topup.currency||journal.createdAt.getTime()!==topup.createdAt.getTime())throw new SecurityError("IDEMPOTENCY_CONFLICT",409);
+ return topupProjection(topup);
+}
 async function addFunds(tx:Tx,personId:string,accountId:string,input:MoneyCommand):Promise<MoneyTopupReceipt>{
- await ownerAccount(tx,personId,accountId,"money.add",true);
+ const account=await ownerAccount(tx,personId,accountId,"money.read",true);
+ if(account.serviceKind==="MERCHANT"){const posted=await postedFunding(tx,personId,accountId,input.commandId,BigInt(input.amountMinor));if(posted)return posted;}
+ requireMoneyAction(personId,account,"money.add");
  const [legacy]=await tx.select().from(workspaceCommands).where(eq(workspaceCommands.commandId,input.commandId));
  if(legacy){const linked=await getServiceMoneyAccount(tx,legacy.serviceId);const [receipt]=await readTopups(tx,accountId,legacy.resourceId);if(legacy.kind!=="funds.add"||legacy.actorId!==personId||linked.id!==accountId||!receipt||receipt.amount.minor!==input.amountMinor)throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return receipt;}
  await claimCommand(tx,personId,accountId,input.commandId,"FUND",{amountMinor:input.amountMinor});
@@ -145,23 +163,26 @@ async function readFundingIntent(tx:Tx,intentId:string){
 }
 async function fundingReview(tx:Tx,personId:string,accountId:string,intentId:string):Promise<MoneyFundingIntent>{
  await ownerAccount(tx,personId,accountId,"money.read");const intent=await readFundingIntent(tx,id(intentId));
- if(!intent||intent.moneyAccountId!==accountId||intent.actorId!==personId)throw new SecurityError("RESOURCE_UNAVAILABLE",404);const [topup]=await tx.select().from(moneyTopups).where(eq(moneyTopups.commandId,intent.confirmCommandId));
+ if(!intent||intent.moneyAccountId!==accountId||intent.actorId!==personId)throw new SecurityError("RESOURCE_UNAVAILABLE",404);const topup=await postedFunding(tx,personId,accountId,intent.confirmCommandId,intent.amountMinor);
  const [legacyTopup]=topup?[]:await readTopups(tx,accountId,intent.confirmCommandId);
- return {id:intent.id,moneyAccountId:intent.moneyAccountId,receiptId:intent.confirmCommandId,amount:formatMoney(intent.amountMinor),sourceLabel:"Funding balance",createdAt:intent.createdAt.toISOString(),receipt:topup?topupProjection(topup):legacyTopup??null};
+ if(legacyTopup&&legacyTopup.amount.minor!==intent.amountMinor.toString())throw new SecurityError("IDEMPOTENCY_CONFLICT",409);
+ return {id:intent.id,moneyAccountId:intent.moneyAccountId,receiptId:intent.confirmCommandId,amount:formatMoney(intent.amountMinor),sourceLabel:"Funding balance",createdAt:intent.createdAt.toISOString(),receipt:topup??legacyTopup??null};
 }
 export async function prepareMoneyFunding(personId:string,accountId:string,raw:MoneyCommand):Promise<MoneyFundingIntent>{const input=parse(moneyCommandSchema,raw);accountId=id(accountId);return getDb().transaction(async tx=>{
- await ownerAccount(tx,personId,accountId,"money.add",true);const old=await readFundingIntent(tx,input.commandId);
- if(old){if(old.actorId!==personId||old.moneyAccountId!==accountId||old.amountMinor!==BigInt(input.amountMinor))throw new SecurityError("IDEMPOTENCY_CONFLICT",409);return fundingReview(tx,personId,accountId,input.commandId);}
+ const account=await ownerAccount(tx,personId,accountId,"money.read",true);if(account.serviceKind==="CARDHOLDER")requireMoneyAction(personId,account,"money.add");const old=await readFundingIntent(tx,input.commandId);
+ if(old){if(old.actorId!==personId||old.moneyAccountId!==accountId||old.amountMinor!==BigInt(input.amountMinor))throw new SecurityError("IDEMPOTENCY_CONFLICT",409);const review=await fundingReview(tx,personId,accountId,input.commandId);if(review.receipt)return review;requireMoneyAction(personId,account,"money.add");return review;}
+ requireMoneyAction(personId,account,"money.add");
  await claimCommand(tx,personId,accountId,input.commandId,"PREPARE_FUNDING",{amountMinor:input.amountMinor});
  await tx.insert(moneyFundingIntents).values({id:input.commandId,moneyAccountId:accountId,actorId:personId,amountMinor:BigInt(input.amountMinor),confirmCommandId:randomUUID(),createdAt:await now(tx)});
  return fundingReview(tx,personId,accountId,input.commandId);
  });}
 export async function getMoneyFundingIntent(personId:string,accountId:string,intentId:string){return getDb().transaction(tx=>fundingReview(tx,personId,id(accountId),id(intentId)));}
 export async function confirmMoneyFunding(personId:string,accountId:string,intentId:string):Promise<MoneyTopupReceipt>{accountId=id(accountId);intentId=id(intentId);return getDb().transaction(async tx=>{
- await ownerAccount(tx,personId,accountId,"money.add",true);const intent=await readFundingIntent(tx,intentId);if(!intent||intent.moneyAccountId!==accountId||intent.actorId!==personId)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
+ const account=await ownerAccount(tx,personId,accountId,"money.read",true);if(account.serviceKind==="CARDHOLDER")requireMoneyAction(personId,account,"money.add");const intent=await readFundingIntent(tx,intentId);if(!intent||intent.moneyAccountId!==accountId||intent.actorId!==personId)throw new SecurityError("RESOURCE_UNAVAILABLE",404);
  return addFunds(tx,personId,accountId,{commandId:intent.confirmCommandId,amountMinor:intent.amountMinor.toString()});
  });}
-async function withdrawalProjection(tx:Tx,row:typeof moneyWithdrawals.$inferSelect):Promise<MoneyWithdrawalReceipt>{const [event]=await tx.select().from(moneyWithdrawalEvents).where(eq(moneyWithdrawalEvents.withdrawalId,row.id));return {id:row.id,intentId:row.intentId,moneyAccountId:row.moneyAccountId,amount:formatMoney(row.amountMinor),destinationLabel:"Withdrawal balance",status:event?.outcome??"PENDING",createdAt:row.createdAt.toISOString(),completedAt:event?.createdAt.toISOString()??null,reference:`OUT-${row.id.slice(0,8).toUpperCase()}`};}
+function withdrawalReceipt(row:typeof moneyWithdrawals.$inferSelect,event:typeof moneyWithdrawalEvents.$inferSelect|null|undefined):MoneyWithdrawalReceipt{return {id:row.id,intentId:row.intentId,moneyAccountId:row.moneyAccountId,amount:formatMoney(row.amountMinor),destinationLabel:"Withdrawal balance",status:event?.outcome??"PENDING",createdAt:row.createdAt.toISOString(),completedAt:event?.createdAt.toISOString()??null,reference:`OUT-${row.id.slice(0,8).toUpperCase()}`};}
+async function withdrawalProjection(tx:Tx,row:typeof moneyWithdrawals.$inferSelect):Promise<MoneyWithdrawalReceipt>{const [event]=await tx.select().from(moneyWithdrawalEvents).where(eq(moneyWithdrawalEvents.withdrawalId,row.id));return withdrawalReceipt(row,event);}
 async function withdrawalReview(tx:Tx,personId:string,accountId:string,intentId:string):Promise<MoneyWithdrawalIntent>{await ownerAccount(tx,personId,accountId,"money.read");const [intent]=await tx.select().from(moneyWithdrawalIntents).where(and(eq(moneyWithdrawalIntents.id,id(intentId)),eq(moneyWithdrawalIntents.moneyAccountId,id(accountId)),eq(moneyWithdrawalIntents.actorId,personId)));if(!intent)throw new SecurityError("RESOURCE_UNAVAILABLE",404);const [withdrawal]=await tx.select().from(moneyWithdrawals).where(eq(moneyWithdrawals.intentId,intent.id));return {id:intent.id,moneyAccountId:intent.moneyAccountId,amount:formatMoney(intent.amountMinor),destinationLabel:"Withdrawal balance",createdAt:intent.createdAt.toISOString(),receipt:withdrawal?await withdrawalProjection(tx,withdrawal):null};}
 export async function prepareMoneyWithdrawal(personId:string,accountId:string,raw:MoneyCommand):Promise<MoneyWithdrawalIntent>{const input=parse(moneyCommandSchema,raw);accountId=id(accountId);return getDb().transaction(async tx=>{
  await ownerAccount(tx,personId,accountId,"money.withdraw",true);await claimCommand(tx,personId,accountId,input.commandId,"PREPARE_WITHDRAWAL",{amountMinor:input.amountMinor});

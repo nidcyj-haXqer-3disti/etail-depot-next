@@ -455,6 +455,7 @@ test("sign-out revokes the actual email session, protects both services and perm
   const oldSession = (await page.context().cookies()).find(cookie => cookie.name === "etail_session")!;
   const previous = await playwright.request.newContext({ baseURL: applicationOrigin, extraHTTPHeaders: { Cookie: `${oldSession.name}=${oldSession.value}` } });
   try {
+    await page.getByLabel("Profile and help", {exact:true}).click();
     const response = await submit(page, "logout", page.getByRole("button", { name: "Sign out", exact: true }));
     expect(response.status()).toBe(200);
     await expect(page).toHaveURL(`${applicationOrigin}/login`);
@@ -535,6 +536,7 @@ test("a stalled sign-out acknowledgement times out without duplicate requests an
   };
   await page.route(logoutRoute, intercept);
   try {
+    await page.getByLabel("Profile and help", {exact:true}).click();
     await page.getByRole("button", { name: "Sign out", exact: true }).evaluate(button => {
       button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
       button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
@@ -582,6 +584,7 @@ test("malformed or rejected sign-out responses keep the current page until an ac
   };
   await page.route(logoutRoute, intercept);
   try {
+    await page.getByLabel("Profile and help", {exact:true}).click();
     for (let index = 0; index < responses.length; index++) {
       await page.getByRole("button", { name: "Sign out", exact: true }).click();
       await expect.poll(() => requests).toBe(index + 1);

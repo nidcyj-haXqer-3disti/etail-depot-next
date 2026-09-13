@@ -1,7 +1,7 @@
 # Etail Depot Next — project instructions
 
 ## Read first
-`project-targets.json` → `docs/SOURCE_PRECEDENCE.md` → `02_MASTER_BUILD_PROMPT.md` → `docs/PRODUCT_TECHNICAL_DESIGN.md` → `planning/DELIVERY_PLAN.md` → `planning/STATUS.md`. D77 governs customer navigation in `docs/SERVICE_MENU_HIERARCHY.md`; D76 governs Visa product intent, network checkout and resource invitations in `docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md`, on D73’s separate money and owner/card/terminal model. Follow those overrides and the consolidated active design; retain D64–D68 walkthroughs/results as dated history, not alternate customer flows. The repository contains a working local sandbox plus broader requirements; status and delivery evidence distinguish implemented behavior from remaining work. Codex reads AGENTS.md at task start; keep this file concise and project-local. [C2]
+`project-targets.json` → `docs/SOURCE_PRECEDENCE.md` → `02_MASTER_BUILD_PROMPT.md` → `docs/PRODUCT_TECHNICAL_DESIGN.md` → `planning/DELIVERY_PLAN.md` → `planning/STATUS.md`. D78 governs account/card separation, Merchant settlement/payout navigation and retired Merchant top-ups in `docs/SERVICE_DASHBOARD_CLARITY.md`; D76 governs Visa product intent, network checkout and resource invitations in `docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md`, on D73’s separate money and owner/card/terminal model. Follow those overrides and the consolidated active design; retain D64–D68 walkthroughs/results as dated history, not alternate customer flows. The repository contains a working local sandbox plus broader requirements; status and delivery evidence distinguish implemented behavior from remaining work. Codex reads AGENTS.md at task start; keep this file concise and project-local. [C2]
 
 ## Non-negotiable boundaries
 - Greenfield only. Never modify `etail-depot-member-commerce`, `etail-depot-webapp`, `etaildepot.com`, or Netlify site `7e49e5cf-5938-4e90-8c0e-026432311e0b`.
@@ -21,7 +21,7 @@
 - Membership economic rules in `contracts/commercial-rules.json` and the original master §3 are required. Do not reset the shared Premier cap by opening accounts/cards.
 
 ## Delivery
-- American Express is the primary workflow/experience reference. Read `docs/research/amex/README.md` and the relevant comparison tasks before financial/management slices; track the user's updated 100% target with evidence, never inferred private architecture or paper completion.
+- American Express is the Cardholder workflow/experience reference; Stripe is the Merchant reference. Read `docs/SERVICE_DASHBOARD_CLARITY.md`, `docs/research/amex/README.md` and the relevant comparison tasks before financial/management slices; track the user's updated 100% target with evidence, never inferred private architecture or paper completion.
 - Use a modular monolith; current compatible Next.js/TypeScript, PostgreSQL via Netlify Database, one actual lockfile. Pin versions after resolving them, not guessed placeholders.
 - Contracts in `contracts/` are normative behavior/API inventories, not compiled migrations or an implemented OpenAPI file. Implement and generate the final executable contracts; do not declare completeness from these files.
 - Follow the active sequence in `planning/DELIVERY_PLAN.md`; `planning/backlog.json` retains original requirements and ticket IDs, not the retired account model or current execution order. Implement complete vertical slices and keep later scope visible. Update `planning/STATUS.md` and a decision log after each task.

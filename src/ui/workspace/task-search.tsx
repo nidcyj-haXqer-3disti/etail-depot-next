@@ -28,17 +28,11 @@ export function TaskSearch({workspace:w,primaryService,selectedCardId}:{workspac
     {label:"Card history",detail:"Continue saved card setup and review created cards",path:"/cardholder-services?view=requests",icon:"cards",allowed:primaryService?.canAddCard===true,keywords:"draft request application canceled"},
   ];
   const results=tasks.filter(task=>task.allowed&&`${task.label} ${task.detail} ${task.keywords}`.toLowerCase().includes(query.trim().toLowerCase()));
-  function taskPath(path:string){
-    if(!selectedCardId||!path.startsWith("/cardholder-services?"))return path;
-    const [pathname,search]=path.split("?");
-    const query=new URLSearchParams(search);query.set("focus",selectedCardId);
-    return `${pathname}?${query}`;
-  }
   return <><button type="button" className="ws-task-trigger" aria-label="Find a task" aria-keyshortcuts="Control+k Meta+k" onClick={()=>{setQuery("");setOpen(true);}}><WorkspaceIcon name="search"/><span>Find a task</span><kbd>⌘ K</kbd></button>
     <WorkspaceDialog open={open} onClose={()=>setOpen(false)} title="What would you like to do?" serviceName="Cards & spending"><label className="task-search-field"><WorkspaceIcon name="search"/><span className="consumer-sr-only">Search tasks</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={event=>{
         // Search inputs consume Escape to clear text before a native dialog can cancel.
         if(event.key==="Escape"&&!event.nativeEvent.isComposing){event.preventDefault();setOpen(false);}
       }} placeholder="Try cards, purchases or invitations" maxLength={100}/></label><p className="task-search-count" role="status">{results.length} available {results.length===1?"task":"tasks"}</p>
-      <div className="task-search-results">{results.map(task=><Link key={task.label} href={taskPath(task.path)} onClick={()=>setOpen(false)}><span className="task-search-icon"><WorkspaceIcon name={task.icon}/></span><span><strong>{task.label}</strong><small>{task.detail}</small></span><WorkspaceIcon name="arrow"/></Link>)}</div>{!results.length&&<EmptyState title="No matching tasks" description="Try a shorter search, or clear it to browse the actions available to you."/>}
+      <div className="task-search-results">{results.map(task=><Link key={task.label} href={task.path} onClick={()=>setOpen(false)}><span className="task-search-icon"><WorkspaceIcon name={task.icon}/></span><span><strong>{task.label}</strong><small>{task.detail}</small></span><WorkspaceIcon name="arrow"/></Link>)}</div>{!results.length&&<EmptyState title="No matching tasks" description="Try a shorter search, or clear it to browse the actions available to you."/>}
     </WorkspaceDialog></>;
 }

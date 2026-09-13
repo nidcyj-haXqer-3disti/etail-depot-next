@@ -14,3 +14,12 @@ export function moneyAccountHref(id: string, returnTo: string | null = null, val
   if (returnTo) query.set("returnTo", returnTo);
   return `/money-accounts/${encodeURIComponent(id)}${query.size ? `?${query}` : ""}`;
 }
+
+export type MoneyAccountHistory="payouts"|"balance";
+
+/** A Merchant history tab selects one paginated list. Cardholder history keeps its existing route. */
+export function moneyAccountHistory(value:unknown,serviceKind:"CARDHOLDER"|"MERCHANT"):MoneyAccountHistory{
+ if(value===undefined||value===null)return serviceKind==="MERCHANT"?"payouts":"balance";
+ if(serviceKind!=="MERCHANT"||(value!=="payouts"&&value!=="balance"))throw new Error("INVALID_MONEY_HISTORY");
+ return value;
+}

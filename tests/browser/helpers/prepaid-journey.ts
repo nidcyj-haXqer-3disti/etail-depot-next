@@ -197,14 +197,14 @@ export async function refundPayment(page:Page,merchantId:string,paymentId:string
   await expect(page.getByRole("dialog")).toHaveCount(0);return payment;
 }
 export async function settleExactPayment(page:Page,merchantId:string,paymentId:string){
-  await page.goto(`/merchants/${merchantId}?tab=payments`);
-  await page.getByRole("button",{name:"Move to balance",exact:true}).click();
-  await page.getByRole("dialog",{name:"Move received payments",exact:true}).getByRole("button",{name:"Review received payments",exact:true}).click();
-  const review=page.getByRole("dialog",{name:"Review received payments",exact:true});
-  await expect(review).toContainText("Payment balance");
-  await expect(review).toContainText("It does not send money to a bank or add money to your card balance.");
+  await page.goto(`/merchant-services?section=funds&view=unit:${merchantId}`);
+  await page.getByRole("region",{name:/^Settlement for /}).getByRole("button",{name:"Review settlement",exact:true}).click();
+  await page.getByRole("dialog",{name:"Settle received payments",exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();
+  const review=page.getByRole("dialog",{name:"Review settlement",exact:true});
+  await expect(review).toContainText("Merchant available balance");
+  await expect(review).toContainText("Settlement and payout are separate steps.");
   const requesting=responseFor(page,`/api/v1/merchants/${merchantId}/settlements`);
-  await review.getByRole("button",{name:"Move to balance",exact:true}).click();
+  await review.getByRole("button",{name:"Confirm settlement",exact:true}).click();
   const result=await requesting;expect(result.status()).toBe(200);
   const receipt=merchantSettlementReceiptSchema.parse(await result.json());
   expect(receipt.terminalId).toBe(merchantId);
