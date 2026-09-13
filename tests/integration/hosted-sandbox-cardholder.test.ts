@@ -90,7 +90,7 @@ describe("hosted sandbox Cardholder commands", () => {
     expect(report.activity.map(row => row.id)).toEqual([bought.activity.id]);
     expect(report.definitions.map(row => row.id)).toContain(definition.id);
     expect((await exportHistoricalReport(personId, serviceId, filters)).csv).toContain("Synthetic practice groceries");
-    expect(await saveNotificationPreferences(personId, serviceId, { commandId: randomUUID(), expectedVersion: 1, serviceActivity: false, cardControls: true, caseUpdates: true })).toMatchObject({ serviceActivity: false, cardControls: true, caseUpdates: true, version: 2, delivery: "SAVED_ONLY" });
+    expect(await saveNotificationPreferences(personId, serviceId, { commandId: randomUUID(), expectedPersonId: personId, expectedVersion: 1, serviceActivity: false, cardControls: true, caseUpdates: true })).toMatchObject({ serviceActivity: false, cardControls: true, caseUpdates: true, version: 2, delivery: "SAVED_ONLY" });
 
     const support = await createSupportCase(personId, serviceId, { commandId: randomUUID(), topic: "TRANSACTION", transactionId: bought.activity.id, subject: "Practice purchase question", message: "Please review this synthetic purchase." });
     expect(support).toMatchObject({ status: "OPEN", transaction: { id: bought.activity.id }, delivery: "SANDBOX_SUPPORT" });

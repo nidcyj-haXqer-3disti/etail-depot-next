@@ -11,7 +11,7 @@ for(const kind of ["merchant","terminal"] as const){
   const person=primary??await acquiringPerson();await signInPerson(page,person.personId);
   const name=`Private ${kind} request ${randomUUID().slice(0,8)}`;
   await page.goto(`/merchant-services?section=merchants${primary?`&view=merchant:${primary.serviceId}`:""}`);
-  await page.getByRole("button",{name:primary?"Create terminal":"Add your business",exact:true}).click();
+  await page.getByRole(primary?"link":"button",{name:primary?"Create terminal":"Add your business",exact:true}).click();
   const edit=page.getByRole("dialog",{name:primary?"Create terminal":"Name your business",exact:true});
   if(primary)await edit.getByRole("radio",{name:/^For someone else/}).check();
   await edit.getByRole("textbox",{name:primary?"Payment terminal name":"Business name",exact:true}).fill(name);
@@ -55,7 +55,9 @@ test("a terminal created for someone else stays in For others before an invitati
  const merchant=await acquiringFixture();await signInPerson(page,merchant.personId);
  const before=(await merchantDashboard(page.request)).moneyAccounts;
  await page.goto(`/merchant-services?section=merchants&view=merchant:${merchant.serviceId}`);
- await page.getByRole("button",{name:"Create terminal",exact:true}).click();
+ await page.getByRole("link",{name:"Create terminal",exact:true}).click();
+ await expect(page).toHaveURL(url=>url.pathname===`/merchant-services/${merchant.serviceId}/terminals/new`);
+ await page.reload();
  const create=page.getByRole("dialog",{name:"Create terminal",exact:true});
  await expect(create.getByRole("radio",{name:/^For someone else/})).toBeChecked();
  const name=`Shared terminal ${randomUUID().slice(0,8)}`;
@@ -64,7 +66,7 @@ test("a terminal created for someone else stays in For others before an invitati
  const invite=page.getByRole("dialog",{name:"Invite a person",exact:true});
  await expect(invite).toBeVisible();await expect(invite.getByRole("textbox",{name:"Recipient email",exact:true})).toHaveValue("");
  const terminal=(await merchantDashboard(page.request)).units.find(row=>row.name===name)!;
- expect(new URL(page.url()).pathname).toBe(`/merchants/${terminal.id}`);
+ expect(new URL(page.url()).pathname).toBe(`/merchant-services/terminals/${terminal.id}/people`);
  await page.keyboard.press("Escape");await expect(invite).toBeHidden();
  await page.getByRole("navigation",{name:"Merchant account navigation",exact:true}).getByRole("link",{name:"Terminals",exact:true}).click();
  await page.getByRole("navigation",{name:"Terminal use",exact:true}).getByRole("link",{name:"For others",exact:true}).click();
@@ -81,7 +83,7 @@ test("a mismatched created terminal name or use cannot redirect or discard the o
  const merchant=await acquiringFixture();await signInPerson(page,merchant.personId);
  const name=`Exact terminal ${randomUUID().slice(0,8)}`,requests:unknown[]=[];
  await page.goto(`/merchant-services?section=merchants&view=merchant:${merchant.serviceId}`);
- await page.getByRole("button",{name:"Create terminal",exact:true}).click();
+ await page.getByRole("link",{name:"Create terminal",exact:true}).click();
  const dialog=page.getByRole("dialog",{name:"Create terminal",exact:true});
  await dialog.getByRole("textbox",{name:"Payment terminal name",exact:true}).fill(name);
  await page.route(`**/api/v1/merchants/${merchant.serviceId}/terminals`,async route=>{
@@ -93,16 +95,30 @@ test("a mismatched created terminal name or use cannot redirect or discard the o
  });
  await dialog.getByRole("button",{name:"Create terminal",exact:true}).click();
  await expect(dialog.getByRole("button",{name:"Check request again",exact:true})).toBeVisible();
- await expect(page).toHaveURL(url=>url.pathname==="/merchant-services");
+ await expect(page).toHaveURL(url=>url.pathname===`/merchant-services/${merchant.serviceId}/terminals/new`);
  await expect(dialog.getByRole("textbox",{name:"Payment terminal name",exact:true})).toHaveValue(name);
  await expect(dialog.getByRole("radio",{name:/^For someone else/})).toBeChecked();
  await dialog.getByRole("button",{name:"Check request again",exact:true}).click();
  await expect(dialog.getByRole("button",{name:"Check request again",exact:true})).toBeVisible();
- await expect(page).toHaveURL(url=>url.pathname==="/merchant-services");
+ await expect(page).toHaveURL(url=>url.pathname===`/merchant-services/${merchant.serviceId}/terminals/new`);
  await dialog.getByRole("button",{name:"Check request again",exact:true}).click();
  await expect(page.getByRole("dialog",{name:"Invite a person",exact:true})).toBeVisible();
  expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
  const saved=(await merchantDashboard(page.request)).units.filter(row=>row.name===name);
  expect(saved).toHaveLength(1);expect(saved[0]).toMatchObject({intendedUse:"OTHER",forOthers:true});
- expect(new URL(page.url()).pathname).toBe(`/merchants/${saved[0].id}`);
+ expect(new URL(page.url()).pathname).toBe(`/merchant-services/terminals/${saved[0].id}/people`);
+});
+
+
+test("the exact business terminal creation route reloads, cancels and follows browser Back without creating records",async({page})=>{
+ const merchant=await acquiringFixture();await signInPerson(page,merchant.personId);
+ const before=(await merchantDashboard(page.request)).units.map(unit=>unit.id);
+ const directory=`/merchant-services/terminals?view=merchant%3A${merchant.serviceId}`;
+ await page.goto(directory);await page.getByRole("link",{name:"Create terminal",exact:true}).click();
+ const dialog=page.getByRole("dialog",{name:"Create terminal",exact:true});
+ await expect(dialog).toBeVisible();await expect(page).toHaveURL(url=>url.pathname===`/merchant-services/${merchant.serviceId}/terminals/new`);
+ await page.reload();await expect(dialog).toBeVisible();await dialog.getByRole("button",{name:"Cancel",exact:true}).click();
+ await expect(dialog).toBeHidden();await expect(page).toHaveURL(url=>url.pathname==="/merchant-services/terminals"&&url.searchParams.get("view")===`merchant:${merchant.serviceId}`);
+ await page.getByRole("link",{name:"Create terminal",exact:true}).click();await expect(dialog).toBeVisible();await page.goBack();await expect(dialog).toBeHidden();
+ expect((await merchantDashboard(page.request)).units.map(unit=>unit.id)).toEqual(before);
 });

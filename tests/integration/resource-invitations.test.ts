@@ -48,7 +48,7 @@ describe("verified recipient invitations to one resource",()=>{
   expect(await getDb().select().from(serviceMembers).where(and(eq(serviceMembers.serviceId,owner.serviceId),eq(serviceMembers.personId,recipient)))).toEqual([]);
   await verified(recipient,address.toUpperCase());
   const review=resourceInvitationProjectionSchema.parse(await getResourceInvitation(recipient,invite.id));
-  expect(review).toMatchObject({id:invite.id,targetKind:"CARD",targetName:"Private invitation card",canRespond:true,hasAccess:false,allowance:{amount:"7250",currency:"USD"},href:`/cardholder-services?view=cards&card=${cardId}`});
+  expect(review).toMatchObject({id:invite.id,targetKind:"CARD",targetName:"Private invitation card",canRespond:true,hasAccess:false,allowance:{amount:"7250",currency:"USD"},href:`/cardholder-services/cards/${cardId}`});
   expect(JSON.stringify(review)).not.toMatch(/issuerReference|recipientEmail|serviceId|MONEY_/);
   // GET only reads; ownership and money still have not changed.
   expect((await getCardholderFunds(owner.personId,owner.serviceId)).available.minor).toBe("0");
@@ -130,7 +130,7 @@ describe("verified recipient invitations to one resource",()=>{
   const terminal=await createTerminal(merchant.personId,merchant.serviceId,{commandId:randomUUID(),displayName:"Exact shared terminal"});
   const invite=await createMerchantInvitation(merchant.personId,terminal.id,offer(address.toUpperCase()));
   await expect(getResourceInvitation(stranger,invite.id)).rejects.toMatchObject({status:404});
-  const review=resourceInvitationProjectionSchema.parse(await getResourceInvitation(recipient,invite.id));expect(review).toMatchObject({targetKind:"MERCHANT_TERMINAL",targetName:"Exact shared terminal",canRespond:true,hasAccess:false,href:`/merchants/${terminal.id}?tab=payments`});
+  const review=resourceInvitationProjectionSchema.parse(await getResourceInvitation(recipient,invite.id));expect(review).toMatchObject({targetKind:"MERCHANT_TERMINAL",targetName:"Exact shared terminal",canRespond:true,hasAccess:false,href:`/merchant-services/terminals/${terminal.id}/payments`});
   await acceptInvitation(recipient,invite.id,decision(invite.version));
   const dashboard=await getMerchantDashboard(recipient);expect(dashboard.units.map(row=>row.id)).toEqual([terminal.id]);expect(dashboard.moneyAccounts).toEqual([]);
   await expect(getMerchantWorkspace(recipient,merchant.merchantId)).rejects.toMatchObject({status:404});

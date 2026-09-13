@@ -1,3 +1,4 @@
+import {customerHref} from "../../shared/customer-routes";
 import { createHash, randomUUID } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import { getDb } from "../../platform/database/client";
@@ -51,7 +52,7 @@ export async function createPrimaryMerchant(personId:string,input:CreateMerchant
     }
     const [unit]=await tx.select({id:merchantTerminals.id}).from(merchantTerminals).where(eq(merchantTerminals.merchantServiceId,serviceId)).orderBy(merchantTerminals.createdAt,merchantTerminals.id).limit(1);
     if(!unit)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-    return {serviceId,merchantId:unit.id,status:"DRAFT" as const,nextHref:`/merchants/${unit.id}?tab=payments`};
+    return {serviceId,merchantId:unit.id,status:"DRAFT" as const,nextHref:customerHref(`/merchants/${unit.id}`,{tab:"payments"})};
    });}catch(error){if(!(error instanceof MerchantLockSetChanged))throw error;}
   }
   throw new SecurityError("REQUEST_RETRY_REQUIRED",409);

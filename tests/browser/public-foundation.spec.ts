@@ -33,7 +33,7 @@ test("a new visitor can compare services before signing in", async ({ page }) =>
   await expect(page.getByRole("heading",{name:"Account owner",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"People you invite",exact:true})).toBeVisible();
   await page.getByRole("link",{name:"Open your payments",exact:true}).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.searchParams.get("next")==="/merchant-services");
   expect(errors).toEqual([]);
 });
 
@@ -118,13 +118,13 @@ test("all seven payment channels show a clear checkout journey and work by keybo
   const showcase = page.locator(".channel-showcase");
   const tablist = showcase.getByRole("tablist", {name:"Ways to share a payment request"});
   const channels = [
-    {name:"Text", content:"I’d love the market bouquet, please."},
-    {name:"Email", content:"Your flowers are ready"},
-    {name:"Invoice", content:"Due on receipt"},
-    {name:"Bill", content:"Your bill · 1042"},
-    {name:"Social", content:"FRESH FROM THE MARKET"},
+    {name:"Text", content:"I’d like to place an order, please."},
+    {name:"Email", content:"Your order · Market bouquet"},
+    {name:"Invoice", content:"Include this payment request with your invoice."},
+    {name:"Bill", content:"Keep your bill and payment details together."},
+    {name:"Social", content:"READY WHEN YOU ARE"},
     {name:"QR code", content:"On your phone. In a few simple steps."},
-    {name:"Website", content:"FRESH FLOWERS"},
+    {name:"Website", content:"YOUR ORDER"},
   ];
   await expect(tablist.getByRole("tab")).toHaveCount(channels.length);
   await tablist.getByRole("tab", {name:"Text", exact:true}).focus();
@@ -177,7 +177,7 @@ test("all seven payment channels show a clear checkout journey and work by keybo
   await expect(openTools).toHaveAttribute("href", "/merchant-services");
   expect(privateReads).toEqual([]);
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.searchParams.get("next")==="/merchant-services");
   expect(mutations).toEqual([]);
   expect(privateReads).toEqual([]);
   expect(errors).toEqual([]);

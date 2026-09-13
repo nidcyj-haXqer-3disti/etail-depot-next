@@ -3,6 +3,7 @@ import {describe,expect,it} from "vitest";
 import {activityRange,merchantActivityHref,merchantActivityReturn,parseMerchantActivityApiQuery,parseMerchantActivityQuery,type MerchantActivityRow} from "../../src/modules/acquiring/activity-contracts";
 import {projectMerchantActivity,merchantActivityCsv} from "../../src/modules/acquiring/activity-service";
 import type {MerchantDashboardView} from "../../src/modules/acquiring/dashboard-contracts";
+import {customerRouteQuery} from "../../src/shared/customer-routes";
 
 const money=(minor:string)=>({minor,currency:"USD" as const,formatted:`$${(Number(minor)/100).toFixed(2)}`});
 const unit=randomUUID(),foreign=randomUUID(),now=new Date("2026-09-11T12:00:00Z");
@@ -14,7 +15,8 @@ describe("merchant activity filters and projections",()=>{
   const original=parseMerchantActivityQuery({view:view.id,section:"merchants",terminalUse:"others",period:"last30",q:"reference"});
   const href=merchantActivityHref(original);
   expect(merchantActivityReturn(href)).toBe(href);
-  expect(parseMerchantActivityQuery(new URL(href,"https://etail.invalid").searchParams)).toEqual(original);
+  const location=new URL(href,"https://etail.invalid");
+  expect(parseMerchantActivityQuery(customerRouteQuery(location.pathname,location.searchParams))).toEqual(original);
   expect(merchantActivityReturn("/merchant-services?terminalUse=others&terminalUse=self")).toBeNull();
   expect(merchantActivityReturn("/merchant-services?terminalUse=unknown")).toBeNull();
   const records=[row({status:"APPROVED"})],self=projectMerchantActivity({...original,q:"",period:"all",terminalUse:"self",activity:"payments"},view,records,now),others=projectMerchantActivity({...original,q:"",period:"all",terminalUse:"others",activity:"payments"},view,records,now);
@@ -29,7 +31,8 @@ describe("merchant activity filters and projections",()=>{
   const original=parseMerchantActivityQuery({view:view.id,activity:"refunds",q:"saved reference",period:"last30",page:"2"});
   for(const section of ["overview","channels","merchants","funds","settings","activity"] as const){
    const href=merchantActivityHref(original,{section});
-   expect(parseMerchantActivityQuery(new URL(href,"https://etail.invalid").searchParams)).toEqual({...original,section});
+   const location=new URL(href,"https://etail.invalid");
+   expect(parseMerchantActivityQuery(customerRouteQuery(location.pathname,location.searchParams))).toEqual({...original,section:section==="channels"?"merchants":section==="funds"?"overview":section});
    expect(merchantActivityReturn(href)).toBe(href);
   }
  });
@@ -40,7 +43,7 @@ describe("merchant activity filters and projections",()=>{
   expect(result.periodTotals).toMatchObject({collected:{minor:"5000"},refunded:{minor:"0"}});
   expect(result.rows).toHaveLength(1);expect(result.totalCount).toBe(1);
   const detail=new URL(result.rows[0].href,"https://etail.invalid");
-  expect(detail.pathname).toBe(`/merchants/${unit}`);expect(detail.searchParams.get("payment")).toBe(payment.id);
+  expect(detail.pathname).toBe(`/merchant-services/terminals/${unit}/payments`);expect(detail.searchParams.get("payment")).toBe(payment.id);
   expect(detail.searchParams.get("returnTo")).toBe(merchantActivityHref(query));
   expect(view.totals.available?.minor).toBe("0");
   expect(projectMerchantActivity({...query,activity:"refunds",from:"2026-09-08",to:"2026-09-08"},view,[payment,refund],now).rows[0].id).toBe(refund.id);

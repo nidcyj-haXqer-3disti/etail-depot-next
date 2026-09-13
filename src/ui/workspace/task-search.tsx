@@ -17,15 +17,15 @@ export function TaskSearch({workspace:w,primaryService,selectedCardId,addMoneyHr
   const accountSelection=primaryService?{contextId:primaryService.id}:selection;
   const manage=primaryService?.canInvite?primaryService.id:w?.cardholderRole==="OWNER"&&can("people.read")?w.service.id:null;
   const tasks:{label:string;detail:string;path:string;icon:WorkspaceIconName;allowed:boolean;keywords:string}[]=[
-    {label:"Cards",detail:primaryService?.canAddCard?"Add a card, assign its cardholder or manage its spending limit":"View your cards, purchases and card controls",path:"/cardholder-services?view=cards",icon:"cards",allowed:true,keywords:"freeze unfreeze pause resume"},
+    {label:"Cards",detail:primaryService?.canAddCard?"Add a card, assign its cardholder or manage its spending limit":"View your cards, purchases and card controls",path:"/cardholder-services/cards",icon:"cards",allowed:true,keywords:"freeze unfreeze pause resume"},
     {label:"Find a transaction",detail:"Search your activity and view purchase details",path:cardholderTaskHref("activity",selection),icon:"activity",allowed:true,keywords:"search purchases payments pending posted"},
     {label:"Statements & reports",detail:"Review card activity and download a report",path:cardholderTaskHref("reports",selection),icon:"reports",allowed:!!w&&can("activity.read"),keywords:"download csv accounting reconciliation"},
-    {label:"Cardholders",detail:"Manage people who use your cards and review invitations",path:primaryService?"/cardholder-services?view=cardholders":`/cardholder-services?manage=${manage??""}`,icon:"people",allowed:!!manage,keywords:"invite remove revoke roles manager viewer permissions"},
+    {label:"Cardholders",detail:"Manage people who use your cards and review invitations",path:"/cardholder-services/cardholders",icon:"people",allowed:!!manage,keywords:"invite remove revoke roles manager viewer permissions"},
     {label:"Sign-in & security",detail:"Review active sessions and sign out other browsers",path:"/security",icon:"shield",allowed:true,keywords:"sessions devices login logout"},
     {label:primaryService?"Account settings":"Preferences",detail:"Account information and notification preferences",path:cardholderTaskHref("settings",accountSelection),icon:"settings",allowed:!!w||!!primaryService,keywords:"alerts email preferences"},
     {label:"Get help",detail:"Ask a question and read support replies",path:cardholderTaskHref("help",selection),icon:"help",allowed:!!w,keywords:"question support fraud problem cases contact"},
     {label:"Add money",detail:"Add money to your card account",path:addMoneyHref??"/cardholder-services",icon:"reports",allowed:!!addMoneyHref,keywords:"top up topup funding bank balance"},
-    {label:"Card history",detail:"Continue saved card setup and review created cards",path:"/cardholder-services?view=requests",icon:"cards",allowed:primaryService?.canAddCard===true,keywords:"draft request application canceled"},
+    {label:"Card history",detail:"Continue saved card setup and review created cards",path:"/cardholder-services/card-requests",icon:"cards",allowed:primaryService?.canAddCard===true,keywords:"draft request application canceled"},
   ];
   const results=tasks.filter(task=>task.allowed&&`${task.label} ${task.detail} ${task.keywords}`.toLowerCase().includes(query.trim().toLowerCase()));
   return <><button type="button" className="ws-task-trigger" aria-label="Find a task" aria-keyshortcuts="Control+k Meta+k" onClick={()=>{setQuery("");setOpen(true);}}><WorkspaceIcon name="search"/><span>Find a task</span><kbd>⌘ K</kbd></button>

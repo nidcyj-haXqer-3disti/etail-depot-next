@@ -16,7 +16,7 @@ describe("local workspace contracts and exact display money", () => {
     for (const delta of [{role:"OWNER"},{format:"REAL"},{requestedLimitMinor:"10000"},{monthlyLimitMinor:"10000"},{amountMinor:"10000"},{balanceMinor:"10000"},{nickname:""},{nickname:"x".repeat(61)}]) expect(cardDraftCommandSchema.safeParse({...base,...delta}).success).toBe(false);
     for(const allowanceMinor of ["-1","1.23","1000000000000"])expect(cardDraftCommandSchema.safeParse({...base,allowanceMinor}).success).toBe(false);
     expect(cardControlCommandSchema.safeParse({commandId:randomUUID(),expectedVersion:1,action:"issue"}).success).toBe(false);
-    expect(notificationCommandSchema.safeParse({commandId:randomUUID(),expectedVersion:1,serviceActivity:true,cardControls:true,caseUpdates:true,personId:randomUUID()}).success).toBe(false);
+    expect(notificationCommandSchema.safeParse({commandId:randomUUID(),expectedPersonId:randomUUID(),expectedVersion:1,serviceActivity:true,cardControls:true,caseUpdates:true,personId:randomUUID()}).success).toBe(false);
   });
 });
 const scope:PolicyScope={actorPersonId:"a",serviceId:"x",resourceServiceId:"x",membershipPersonId:"a",membershipServiceId:"x",membershipState:"ACCEPTED",primaryPersonId:"a",primaryMembershipState:"ACCEPTED",role:"OWNER",serviceKind:"CARDHOLDER",status:"ACTIVE"};

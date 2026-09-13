@@ -32,14 +32,15 @@ async function merchantMenu(page:Page,filters:URLSearchParams){
  await expect(navigation.getByRole("link",{name:"Overview",exact:true})).toHaveAttribute("aria-current","page");
  for(const label of ["Overview","Terminals","Account settings"]){
   const target=new URL((await navigation.getByRole("link",{name:label,exact:true}).getAttribute("href"))!,"http://127.0.0.1:3100");
-  expect(target.pathname).toBe("/merchant-services");
-  for(const [key,value] of filters)expect(target.searchParams.get(key)).toBe(value);
+  expect(target.pathname).toBe(label==="Overview"?"/merchant-services":label==="Terminals"?"/merchant-services/terminals":"/merchant-services/settings");
+  for(const [key,value] of filters)expect(target.searchParams.get(key)??(key==="activity"?"payments":null)).toBe(value);
  }
  return navigation;
 }
 
 function moneyUrl(accountId:string,returnTo:string,values:Record<string,string>={}){
- return `/money-accounts/${accountId}?${new URLSearchParams({history:"payouts",...values,returnTo})}`;
+ const {task,...selection}=values;
+ return `/money-accounts/${accountId}${task?task==="add"?"/add-money":"/withdraw":""}?${new URLSearchParams({history:"payouts",...selection,returnTo})}`;
 }
 
 test("card account menu stays with the top-up review and receipt without duplicate Add money actions",async({page})=>{
@@ -55,7 +56,7 @@ test("card account menu stays with the top-up review and receipt without duplica
  await expect(page.getByRole("link",{name:"Cancel and return",exact:true})).toHaveAttribute("href","/cardholder-services");
  await page.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill("9999999999.99");
  await page.getByRole("button",{name:"Continue",exact:true}).click();
- await expect(page).toHaveURL(url=>url.pathname===path&&url.searchParams.get("task")==="add"&&!!url.searchParams.get("review"));
+ await expect(page).toHaveURL(url=>url.pathname===`${path}/add-money`&&!url.searchParams.has("task")&&!!url.searchParams.get("review"));
  const reviewUrl=page.url();
  await expect(page.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();await cardMenu(page);
  await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
@@ -79,11 +80,11 @@ test("card account menu stays with the top-up review and receipt without duplica
  await expect(page).toHaveURL(url=>url.pathname===path&&!url.search);
  await cardMenu(page);await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
  await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Account home",exact:true}).click();
- await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`${path}?task=add`);
+ await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`${path}/add-money`);
  await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Account settings",exact:true}).click();
  await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
  await page.getByRole("link",{name:"Return unused money",exact:true}).click();
- await expect(page).toHaveURL(url=>url.pathname===path&&url.searchParams.get("task")==="withdraw");
+ await expect(page).toHaveURL(url=>url.pathname===`${path}/withdraw`&&!url.searchParams.has("task"));
  await expect(page.getByRole("heading",{name:"Return unused money",exact:true})).toBeVisible();
  await cardMenu(page);
 });
@@ -117,14 +118,14 @@ test.describe("merchant money retains the payment investigation",()=>{
   await merchantMenu(page,filters);
   await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
   await page.getByRole("link",{name:"Request payout",exact:true}).click();
-  await expect(page).toHaveURL(url=>url.searchParams.get("returnTo")===returnTo&&url.searchParams.get("task")===task);
+  await expect(page).toHaveURL(url=>url.pathname===`/money-accounts/${accountId}/withdraw`&&url.searchParams.get("returnTo")===returnTo&&!url.searchParams.has("task"));
   await merchantMenu(page,filters);
   await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
   await expect(page.getByRole("link",{name:"Request payout",exact:true})).toHaveCount(0);
   await expect(page.getByRole("link",{name:"Cancel and return",exact:true})).toHaveAttribute("href",returnTo);
   await page.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill("2.50");
   await page.getByRole("button",{name:"Continue",exact:true}).click();
-  await expect(page).toHaveURL(url=>url.searchParams.get("returnTo")===returnTo&&url.searchParams.get("task")===task&&!!url.searchParams.get("review"));
+  await expect(page).toHaveURL(url=>url.pathname===`/money-accounts/${accountId}/withdraw`&&url.searchParams.get("returnTo")===returnTo&&!url.searchParams.has("task")&&!!url.searchParams.get("review"));
   const reviewId=new URL(page.url()).searchParams.get("review")!;
   await merchantMenu(page,filters);
   await expect(page.getByRole("link",{name:"Change amount",exact:true})).toHaveAttribute("href",moneyUrl(accountId,returnTo,{task}));
@@ -139,14 +140,14 @@ test.describe("merchant money retains the payment investigation",()=>{
   await expect(page).toHaveURL(url=>url.pathname===`/money-accounts/${accountId}`&&url.searchParams.get("returnTo")===returnTo&&!url.searchParams.has("task")&&!url.searchParams.has("review"));
   const historyReceipt=page.locator(`.money-payout-history a[href*="review=${reviewId}"]`);
   const receiptTarget=new URL((await historyReceipt.getAttribute("href"))!,"http://127.0.0.1:3100");
-  expect(receiptTarget.pathname).toBe(`/money-accounts/${accountId}`);expect(receiptTarget.searchParams.get("returnTo")).toBe(returnTo);expect(receiptTarget.searchParams.get("review")).toBe(reviewId);
+  expect(receiptTarget.pathname).toBe(`/money-accounts/${accountId}/withdraw`);expect(receiptTarget.searchParams.get("returnTo")).toBe(returnTo);expect(receiptTarget.searchParams.get("review")).toBe(reviewId);
   await historyReceipt.click();await expect(page.getByRole("heading",{name:"Payout requested",exact:true})).toBeVisible();await merchantMenu(page,filters);
   const after=await getMoneyAccountOverview(ownerId,accountId);
   expect(BigInt(after.available.minor)-BigInt(before.available.minor)).toBe(-250n);
   expect((await getDb().select().from(moneyWithdrawals).where(eq(moneyWithdrawals.moneyAccountId,accountId))).length).toBe(beforeCount+1);
   expect((await getMoneyAccountOverview(ownerId,cardAccountId)).available.minor).toBe("0");
   const back=page.getByRole("link",{name:"← Your payments",exact:true});await expect(back).toHaveAttribute("href",returnTo);
-  await back.click();await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&[...filters].every(([key,value])=>url.searchParams.get(key)===value));
+  await back.click();await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&[...filters].every(([key,value])=>(url.searchParams.get(key)??(key==="activity"?"payments":null))===value));
  });
 
  test("history tabs show one list, reset their page and retain the original terminal, dates and search",async({page})=>{
@@ -192,7 +193,7 @@ test("invalid, external and cross-service money return destinations fail closed"
  ];
  for(const path of cases){
   await page.goto(path);
-  await expect(page.getByRole("heading",{name:"This money account is unavailable",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:new URL(path,"http://127.0.0.1:3100").searchParams.getAll("returnTo").length>1?"This money view is unavailable":"This money account is unavailable",exact:true})).toBeVisible();
   expect(new URL(page.url()).origin).toBe("http://127.0.0.1:3100");
   await expect(page.getByRole("textbox",{name:"Amount (USD)",exact:true})).toHaveCount(0);
   await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);

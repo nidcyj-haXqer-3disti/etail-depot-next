@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { EmailAuthenticationAvailability } from "@/modules/identity/adapters/netlify";
 import { Icon } from "./icon";
 import { parseEmailLink, takeEmailLink, type EmailLink } from "./identity-email-link";
-import { invitationIdFromNextPath } from "@/shared/auth-continuation";
+import { invitationIdFromNextPath, loginLocation } from "@/shared/auth-continuation";
 
 type Mode = "login" | "register" | "confirm" | "recover" | "reset";
 type Operation = Mode;
@@ -54,20 +54,24 @@ export function LoginForm({ nextPath="/services",initialMode="login",localEmailL
         // Capture before deferring: Strict Mode can replay this effect after the
         // single-use handoff and fragment have already been consumed.
         incomingLink.current = { link };
-        const cleanUrl = `${window.location.pathname}${window.location.search}`;
+        const cleanUrl = loginLocation(window.location.search);
         // Scrub immediately. Reusing Next's internal history state would bypass
         // its URL synchronization and let a refresh restore the fragment.
         window.history.replaceState(null, "", cleanUrl);
       }
+      // Preserve the callback handoff above before removing unrelated workspace
+      // parameters. This is a history replacement, never an authentication action.
+      const cleanLocation = loginLocation(window.location.search);
+      if (!window.location.hash && `${window.location.pathname}${window.location.search}` !== cleanLocation) window.history.replaceState(null, "", cleanLocation);
       const incoming = incomingLink.current;
-      if (!incoming) return;
+      if (!incoming) { queueMicrotask(() => { if (active && !window.location.hash) window.history.replaceState(null, "", loginLocation(window.location.search)); }); return; }
       queueMicrotask(() => {
         if (!active || incomingLink.current !== incoming) return;
         incomingLink.current = null;
         // On first hydration the parent router installs its history integration
         // after this effect. Synchronize once it is installed, without a route
         // navigation that can reuse the initial fragment from the route cache.
-        window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+        window.history.replaceState(null, "", loginLocation(window.location.search));
         if (inFlight.current) { setError("Wait for your current request to finish, then open the email link again."); return; }
         const { link } = incoming;
         emailLink.current = link; setLinkReady(Boolean(link)); setNotice("");

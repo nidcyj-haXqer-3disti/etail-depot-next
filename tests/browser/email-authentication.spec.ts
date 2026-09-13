@@ -466,11 +466,14 @@ test("sign-out revokes the actual email session, protects both services and perm
       expect((await previous.get(route)).status()).toBe(401);
     }
     for (const route of ["/services", "/cardholder-services", "/merchant-services"]) {
-      await page.goto(route); await expect(page).toHaveURL(`${applicationOrigin}/login`);
+      await page.goto(route);
+      await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.hash===""&&(route==="/services"?url.search==="":url.search===`?${new URLSearchParams({next:route})}`));
       await expect(page.getByRole("form", { name: "Sign in with email", exact: true })).toBeVisible();
     }
     const { rows } = await pool.query('SELECT "revokedAt" FROM app_sessions WHERE "tokenHash"=$1', [oldHash]);
     expect(rows).toHaveLength(1); expect(rows[0].revokedAt instanceof Date).toBe(true);
+    // Start an ordinary sign-in after proving each protected service retained its own destination.
+    await page.goto("/login");
     expect((await login(page, email, password)).status()).toBe(200);
     const newHash = await authenticated(page); expect(newHash).not.toBe(oldHash);
     expect((await previous.get("/api/v1/services")).status()).toBe(401);
@@ -500,9 +503,12 @@ test("an expired application session protects both services and password sign-in
       expect((await previous.get(route)).status()).toBe(401);
     }
     for (const route of ["/services", "/cardholder-services", "/merchant-services"]) {
-      await page.goto(route); await expect(page).toHaveURL(`${applicationOrigin}/login`);
+      await page.goto(route);
+      await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.hash===""&&(route==="/services"?url.search==="":url.search===`?${new URLSearchParams({next:route})}`));
       await expect(page.getByRole("form", { name: "Sign in with email", exact: true })).toBeVisible();
     }
+    // The next destination is intentional; this assertion separately exercises ordinary sign-in.
+    await page.goto("/login");
     expect((await login(page, email, password)).status()).toBe(200);
     const newHash = await authenticated(page); expect(newHash).not.toBe(oldHash);
     for (const route of ["/api/v1/cardholder-services", "/api/v1/merchants/dashboard"]) {

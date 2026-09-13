@@ -87,6 +87,8 @@ const terminalAccessOwner = "src/modules/access/merchant-service.ts";
 const peopleUiOwner = "src/ui/workspace/people.tsx";
 const terminalPeopleUiOwner = "src/ui/workspace/merchant-people.tsx";
 const connectedRoutes = [
+  ["src/modules/identity/profile-service.ts", "src/app/api/v1/profile/route.ts", "GET", "getPersonalProfile"],
+  ["src/modules/identity/profile-service.ts", "src/app/api/v1/profile/route.ts", "PUT", "updatePersonalProfile"],
   ["src/modules/access/service.ts", "src/app/api/v1/cardholder-services/[serviceId]/cards/[cardId]/invitations/route.ts", "POST", "createCardInvitation"],
   [networkOwner,"src/app/api/v1/merchants/[merchantId]/processing-payments/[operationId]/process/route.ts","POST","processMerchantNetworkCheckout"],
   [networkOwner,"src/app/api/v1/guest/publications/[publicationId]/payments/route.ts","POST","startNetworkCheckout"],
@@ -153,6 +155,7 @@ const cardRoutes = new Map([
 const operationRoutes = new Map([
   ["src/app/api/v1/operations/deposits/[depositId]/route.ts", ["POST", "processMerchantDeposit"]],
   ["src/app/api/v1/merchants/[merchantId]/gateway/route.ts", ["PUT", "configureTestGateway"]],
+  ["src/app/api/v1/merchant-services/[serviceId]/payment-settings/route.ts", ["PUT", "configureMerchantAccountGateway"]],
   ["src/app/api/v1/merchants/[merchantId]/test-enrollment/route.ts", ["PUT", "enrollTestMerchant"]],
   ["src/app/api/v1/merchants/[merchantId]/channels/[channelId]/activation/route.ts", ["PUT", "setChannelActivation"]],
   ["src/app/api/v1/merchants/[merchantId]/payments/[paymentId]/refund/route.ts", ["POST", "refundMerchantPayment"]],
@@ -160,7 +163,7 @@ const operationRoutes = new Map([
   ["src/app/api/v1/merchants/[merchantId]/operations/route.ts", ["GET", "getMerchantOperations"]],
 ]);
 const operationWriters = {
-  testGateways: { insert: ["configureTestGateway"], update: ["configureTestGateway"] },
+  testGateways: { insert: ["configureGateway"], update: ["configureGateway"] },
   testMerchantEnrollments: { insert: ["enrollTestMerchant"], update: ["enrollTestMerchant"] },
   channelActivations: { insert: ["setChannelActivation"], update: ["setChannelActivation"] },
   merchantTestPayments: { insert: ["recordMerchantSandboxPayment","recordMerchantNetworkPayment"] },
@@ -517,6 +520,8 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
           const access=name === "src/modules/access/service.ts" && ((callee === "insert" && ["decideInvitation","decideCardInvitation"].includes(chain[0])) || (callee === "update" && ["decideInvitation","decideCardInvitation","updateMemberAccess","revokeMemberAccess"].includes(chain[0])));
           if(!creation&&!access)emit(file,call,"SERVICE_MEMBERSHIP_OWNER","Membership comes from canonical primary enrollment or accepted service access lifecycle; merchant helpers use their assignments.");
         }
+        if(tableModule === "src/modules/identity/profile-schema" && !(name === "src/modules/identity/profile-service.ts" && table.imported === "profileCommands" && callee === "insert" && chain[0] === "updatePersonalProfile"))emit(file,call,"PROFILE_COMMAND_OWNER","Personal profile edit receipts are append-only and owned by the one current-person command.");
+        if(tableModule === "src/platform/database/schema" && table.imported === "people" && callee === "update" && !((name === "src/modules/identity/profile-service.ts" && chain[0] === "updatePersonalProfile") || (name === "src/modules/sandbox/service.ts" && chain[0] === "startSandbox")))emit(file,call,"PERSONAL_NAME_OWNER","The initial setup and versioned personal profile command alone edit display names.");
         if(tableModule === "src/modules/sandbox/schema" && !(name === "src/modules/sandbox/service.ts" && table.imported === "sandboxParticipants" && callee === "insert" && chain[0] === "startSandbox"))emit(file,call,"SANDBOX_ENROLLMENT_OWNER","Explicit sandbox participation is written only by startSandbox; login, reads and fixtures do not enroll provider members.");
         if(tableModule === "src/modules/cases/schema") {
           const customer=name === "src/modules/cases/service.ts" && ({supportCases:{insert:["createCase"],update:["updateCase"]},supportCaseMessages:{insert:["createCase","updateCase"]},supportCaseCommands:{insert:["execute"]}})[table.imported]?.[callee]?.includes(chain[0]);
@@ -598,6 +603,7 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         if (name !== expected[0] || chain[0] !== expected[1][0]) emit(file, call, "PARALLEL_OPERATION_ROUTE", "Each Merchant operation has one exact route and HTTP method.");
         else { counts.operationRouteCalls++; operationStages.set(bound.imported, (operationStages.get(bound.imported) ?? 0) + 1); }
       }
+      if(callee==="configureGateway"&&!(name===operationsOwner&&["configureTestGateway","configureMerchantAccountGateway"].includes(chain[0])))emit(file,call,"GATEWAY_WRITER_BOUNDARY","Only exact terminal and business-account wrappers call the single gateway writer.");
       if(bound&&["recordMerchantNetworkPayment","recordMerchantNetworkRefund"].includes(bound.imported)&&sourceModule(file,bound.specifier)===operationsOwner.slice(0,-3)&&!(name===networkOwner&&chain[0]==="reconcileNetworkEvent"))emit(file,call,"NETWORK_EFFECT_BOUNDARY","Only verified provider event reconciliation calls the canonical network economic writer.");
       if (bound?.imported === "postJournal" && ["src/modules/ledger", "src/modules/ledger/index", "src/modules/ledger/service"].includes(sourceModule(file, bound.specifier))) {
         const allowed = (name === workspaceOwner && chain[0] === "purchaseCardInTransaction") || (name === operationsOwner && ["recordMerchantSandboxPayment", "refundMerchantPayment", "createMerchantSettlement", "processMerchantDeposit","recordMerchantNetworkPayment","prepareMerchantNetworkRefund","recordMerchantNetworkRefund"].includes(chain[0])) || (name===networkOwner&&chain[0]==="reconcileNetworkEvent") || (name===moneyOwner&&["addFunds","confirmMoneyWithdrawal","processMoneyWithdrawal"].includes(chain[0]));
@@ -821,6 +827,8 @@ function selfTest() {
   assert.ok(probe(cardUiOwner, canonicalUi.replace('async function execute(attempt)', 'async function secondRequestEngine(attempt)')).includes("PARALLEL_CARD_REQUEST_UI"), "All request stages belong to the one explicit attempt executor.");
   assert.deepEqual(probe("src/ui/workspace/member-code-picker.tsx", '"use client"; function find(code) { fetch(`/api/v1/sandbox/recipient?code=${encodeURIComponent(code)}`,{cache:"no-store"}); }'), []);
   assert.ok(probe("src/ui/workspace/member-code-picker.tsx", '"use client"; function find(code) { fetch(`/api/v1/sandbox/recipient?code=${encodeURIComponent(code)}`,{method:"POST"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
+  assert.ok(probe("src/modules/other/service.ts", 'import {profileCommands} from "@/modules/identity/profile-schema"; function overwrite(){tx.update(profileCommands).set({});}').includes("PROFILE_COMMAND_OWNER"));
+  assert.ok(probe("src/modules/other/service.ts", 'import {people} from "@/platform/database/schema"; function rename(){tx.update(people).set({displayName:"Other"});}').includes("PERSONAL_NAME_OWNER"));
   assert.ok(probe("src/modules/other/service.ts", 'import {sandboxParticipants} from "@/modules/sandbox/schema"; function grant(){tx.insert(sandboxParticipants).values({});}').includes("SANDBOX_ENROLLMENT_OWNER"));
   assert.ok(probe("src/ui/second.tsx", '"use client"; function x(url:string) { fetch(url,{method:"POST"}); }').includes("UNINSPECTABLE_UI_COMMAND_PATH"));
   assert.deepEqual(probe("src/ui/workspace/reports.tsx", '"use client"; function report(id,query) { fetch(`/api/v1/cardholder-services/${encodeURIComponent(id)}/reports?${query}`,{cache:"no-store"}); }'), []);
@@ -832,6 +840,15 @@ function selfTest() {
   assert.ok(probe(workspaceTransport, '"use client"; function workspaceCommand(serviceId,path,method) { return fetch(`/api/v1/cardholder-services/${encodeURIComponent(serviceId)}/legacy-create`,{method}); }').includes("WORKSPACE_TRANSPORT_REWRITE"));
   assert.ok(probe(cardUiOwner, '"use client"; import {workspaceCommand} from "./primitives"; function CardsWorkspace() { function command(path,method) { return workspaceCommand(id,"/legacy-create",method,{}); } }').includes("CARD_COMMAND_FORWARDING"));
   assert.deepEqual(probe("src/ui/comment.tsx", '"use client"; // tx.update(workspaceBalances);\nconst description="/card-requests";'), []);
+  const gatewayRoute='import {configureMerchantAccountGateway} from "@/modules/acquiring/operations-service";export function PUT(){return configureMerchantAccountGateway();}';
+  assert.deepEqual(probe("src/app/api/v1/merchant-services/[serviceId]/payment-settings/route.ts",gatewayRoute),[]);
+  assert.ok(probe("src/app/api/v1/other/route.ts",gatewayRoute).includes("PARALLEL_OPERATION_ROUTE"));
+  assert.deepEqual(probe(operationsOwner,'function configureMerchantAccountGateway(){return configureGateway();}'),[]);
+  assert.ok(probe(operationsOwner,'function bypass(){return configureGateway();}').includes("GATEWAY_WRITER_BOUNDARY"));
+  const gatewayWriter='import {testGateways} from "./operations-schema"; function configureGateway(){tx.insert(testGateways).values({});tx.update(testGateways).set({});}';
+  assert.deepEqual(probe(operationsOwner,gatewayWriter),[]);
+  assert.ok(probe(operationsOwner,gatewayWriter.replace("function configureGateway","function configureTestGateway")).includes("OPERATION_WRITER_OWNERSHIP"));
+  assert.ok(probe("src/modules/other/service.ts",gatewayWriter.replace('./operations-schema','@/modules/acquiring/operations-schema')).includes("OPERATION_WRITER_OWNERSHIP"));
   const writerImport = 'import {cardRequests as drafts} from "@/platform/database/schema";';
   assert.ok(probe("src/modules/other/service.ts", 'import {services} from "@/platform/database/schema"; function bypass(){tx.update(services).set({primaryPersonId:"other"});}').includes("SERVICE_RESPONSIBILITY_OWNER"));
   const validWriter = writerImport + 'export async function startCardRequest() { await tx.insert(drafts).values({}); }';

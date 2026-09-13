@@ -47,7 +47,7 @@ export function CardInvitationManager({initial,embedded=false,initiallyOpen=fals
    {data.invitations.some(row=>row.status!=="PENDING")&&<details className="consumer-request-history"><summary>Invitation history</summary>{data.invitations.filter(row=>row.status!=="PENDING").map(row=><p key={row.id}>{row.recipientName} · {formatDate(row.createdAt)} <StatusBadge status={row.status}/></p>)}</details>}
   </>}
  </>;
- if(!embedded)return <section className="ws-panel"><Link href={`/cardholder-services?view=cards&focus=${data.cardId}`}>← Back to {data.cardName}</Link><h1>{unavailable?"Card access is unavailable":"Invite cardholder"}</h1>{content}</section>;
+ if(!embedded)return <section className="ws-panel"><Link href={`/cardholder-services/cards/${data.cardId}`}>← Back to {data.cardName}</Link><h1>{unavailable?"Card access is unavailable":"Invite cardholder"}</h1>{content}</section>;
  return <div className="consumer-card-invitation">
   {pending&&<p className="consumer-card-invitation-status"><strong>{pending.recipientEmail}</strong><StatusBadge status={pending.status}/><span>Accept by {formatDate(pending.expiresAt)}</span></p>}
   {(data.canInvite||pending)&&<Button variant="secondary" disabled={disabled} onClick={()=>setOpen(true)}>{pending?"View invitation":"Invite cardholder"}</Button>}

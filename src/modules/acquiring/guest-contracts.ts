@@ -5,7 +5,7 @@ export const emptyGuestSchema=z.object({}).strict();
 export const publishGuestChannelSchema=z.object({commandId:z.uuid(),expectedChannelVersion:z.int().positive()}).strict();
 export const revokeGuestPublicationSchema=z.object({commandId:z.uuid(),expectedVersion:z.int().positive()}).strict();
 import {guestPublicationSchema,guestPublicationManagementSchema,publicGuestRequestSchema} from "../../shared/merchant-publication-response";
-export {guestPublicationSchema,guestPublicationManagementSchema,publicGuestRequestSchema} from "../../shared/merchant-publication-response";
+export {guestPublicationSchema,guestPublicationManagementSchema,publicGuestRequestSchema,guestRevocationResultSchema} from "../../shared/merchant-publication-response";
 export const guestOrderProjectionSchema=z.object({
  id:z.uuid(),version:z.int().positive(),publicationId:z.uuid(),merchantName:z.string(),primaryMerchantName:z.string(),description:z.string(),amount:money,expiresAt:z.iso.datetime(),receiptAccessExpiresAt:z.iso.datetime(),createdAt:z.iso.datetime(),
  status:z.enum(["READY","REVIEW","APPROVED","DECLINED","REFUNDED","UNAVAILABLE"]),canPrepare:z.boolean(),canConfirm:z.boolean(),freshRequestHref:z.string(),mode:z.literal("SANDBOX"),feeStatus:z.literal("NOT_APPLIED"),

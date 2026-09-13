@@ -83,7 +83,7 @@ test("one card form starts only on review and safely retries lost start, save an
   const created = (await cardDashboard(page.request)).cards.filter(card => card.nickname === name);
   expect(created).toHaveLength(1);
   expect(created[0]!.available.minor).toBe("1600");
-  expect(new URL(page.url()).searchParams.get("focus")).toBe(created[0]!.id);
+  await expect(page).toHaveURL(url=>url.pathname===`/cardholder-services/cards/${created[0]!.id}`&&!url.searchParams.has("focus"));
   const after = await workspace();
   expect(after.cardRequests).toHaveLength(before.cardRequests.length + 1);
   expect(after.cardRequests.filter((request: { nickname: string }) => request.nickname === name)).toHaveLength(1);

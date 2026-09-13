@@ -39,7 +39,7 @@ describe("authoritative merchant statement",()=>{
   expect(statement.rows.find(row=>row.reference===payout.reference)?.href).toContain(`review=${first.id}`);
   const byReceipt=await getMerchantStatement(f.personId,{view:`merchant:${f.serviceId}`,section:"overview",q:savedPayment.testReference});
   expect(byReceipt.rows.filter(row=>row.credit)).toHaveLength(1);expect(byReceipt.rows.every(row=>row.reference===savedPayment.testReference)).toBe(true);
-  const paymentLink=new URL(byReceipt.rows.find(row=>row.credit)!.href!,"https://etail.invalid");expect(paymentLink.pathname).toBe(`/merchants/${f.merchantId}`);expect(paymentLink.searchParams.get("payment")).toBe(paymentId);
+  const paymentLink=new URL(byReceipt.rows.find(row=>row.credit)!.href!,"https://etail.invalid");expect(paymentLink.pathname).toBe(`/merchant-services/terminals/${f.merchantId}/payments`);expect(paymentLink.searchParams.get("payment")).toBe(paymentId);
   const byPayoutReceipt=await getMerchantStatement(f.personId,{view:`merchant:${f.serviceId}`,section:"overview",q:payout.reference});expect(byPayoutReceipt.rows).toHaveLength(2);expect(byPayoutReceipt.totals[0]).toMatchObject({credit:{minor:"0"},debit:{minor:"500"}});expect(byPayoutReceipt.rows.every(row=>new URL(row.href!,"https://etail.invalid").searchParams.get("review")===first.id)).toBe(true);
   expect((await getMerchantStatement(f.personId,{view:`merchant:${f.serviceId}`})).rows).toEqual(statement.rows);
   expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.moneyAccountId,account.id))).toEqual(before);
@@ -54,7 +54,7 @@ describe("authoritative merchant statement",()=>{
   expect(owner.rows.filter(row=>row.kind==="refund"&&row.debit)).toHaveLength(1);
   const byRefundReceipt=await getMerchantStatement(f.personId,{view:`merchant:${f.serviceId}`,section:"overview",q:savedRefund.refund!.testReference});
   expect(byRefundReceipt.rows).toHaveLength(1);expect(byRefundReceipt.rows[0]).toMatchObject({reference:savedRefund.refund!.testReference,kind:"refund",debit:{minor:"1250"}});
-  const refundLink=new URL(byRefundReceipt.rows[0]!.href!,"https://etail.invalid");expect(refundLink.pathname).toBe(`/merchants/${f.merchantId}`);expect(refundLink.searchParams.get("payment")).toBe(paymentId);
+  const refundLink=new URL(byRefundReceipt.rows[0]!.href!,"https://etail.invalid");expect(refundLink.pathname).toBe(`/merchant-services/terminals/${f.merchantId}/payments`);expect(refundLink.searchParams.get("payment")).toBe(paymentId);
   const sibling=await createTerminal(f.personId,f.serviceId,{commandId:randomUUID(),displayName:"No sibling refund visibility"});
   expect((await getMerchantStatement(f.personId,{view:`unit:${sibling.id}`})).rows).toEqual([]);
   const refunded=await getMerchantStatement(f.personId,{view:`merchant:${f.serviceId}`,section:"activity",activity:"payments",status:"REFUNDED"});expect(refunded.rows.filter(row=>row.credit)).toHaveLength(1);

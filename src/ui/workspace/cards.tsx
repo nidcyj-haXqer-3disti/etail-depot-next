@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState, useTransition, type ReactNode } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import {useCustomerSearchParams} from "../use-customer-search-params";
+import {customerHref} from "@/shared/customer-routes";
 import type { CardRequestProjection, WorkspaceCard, WorkspaceProjection } from "@/modules/workspace/contracts";
 import type { CardRequestHistory, CardControlHistory } from "@/modules/workspace/dashboard-contracts";
 import { Button, Feedback, StatusBadge, WorkspaceCommandError, WorkspaceDialog, capability, formatDate, formatMoney, workspaceCommand } from "./primitives";
@@ -31,7 +33,7 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
   const serviceName = workspace.customerService?.displayName ?? "Cards & spending";
   const cardRoute = routeBase ?? "/cardholder-services";
   const router = useRouter();
-  const params = useSearchParams();
+  const params = useCustomerSearchParams();
   const [, startNavigation] = useTransition();
   const [cardUpdates, setCardUpdates] = useState<Record<string, WorkspaceCard>>({});
   const [requestUpdates, setRequestUpdates] = useState<Record<string, CardRequestProjection>>({});
@@ -84,10 +86,9 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
   function navigateDialog(kind: "card" | "request" | "new" | null, value = "", push = false) {
     const query = new URLSearchParams(params.toString());
     // A route has one active card surface. Other page query state survives opening and closing it.
-    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review", "cardTask"]) query.delete(key);
-    if (kind) query.set(kind, kind === "new" ? "1" : value);
-    const suffix = query.toString();
-    const url = `${cardRoute}${suffix ? `?${suffix}` : ""}`;
+    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review", "cardTask", "invite"]) query.delete(key);
+    if (kind) { query.delete("focus"); query.delete("activityCard"); query.set("view",kind === "request" ? "requests" : "cards"); query.set(kind, kind === "new" ? "1" : value); }
+    const url = customerHref(cardRoute,query);
     startNavigation(() => { if (push) router.push(url, { scroll: false }); else router.replace(url, { scroll: false }); });
   }
   function closeCard() {
@@ -164,7 +165,7 @@ export function CardsWorkspace({ workspace, requestHistory, cardHistory, routeBa
         <section className="consumer-card-holder-panel" aria-label="Cardholder"><h3>Cardholder</h3>
           <p>{selected.assignmentState==="UNASSIGNED"?"This card is ready for someone to accept.":selected.assignmentState==="REVOKED"?"Cardholder access has been removed.":ownCard?"This card is for your use.":selected.holderName}</p>
           {invitations&&<CardInvitationManager key={selected.id} initial={invitations} embedded initiallyOpen={inviteOpen} disabled={cardNavigationBlocked} onBusy={value=>setBusy(value?"invite":"")}/>}
-          {!invitations&&selected.canInvite&&<Link className="consumer-button consumer-button-primary" href={`/cards/${selected.id}/invite`}>Invite cardholder</Link>}
+          {!invitations&&selected.canInvite&&<Link className="consumer-button consumer-button-primary" href={customerHref("/cardholder-services",{focus:selected.id,invite:"1"})}>Invite cardholder</Link>}
           {selected.canRevokeAssignment&&<CardRecipientRemoval command={command} disabled={cardNavigationBlocked} card={selected} onSaved={card=>{setCardUpdates(current=>({...current,[card.id]:card}));router.refresh();}} onBusy={value=>setBusy(value?"recipient":"")} onAccessDenied={recovery=>{setRecipientRecovery(recovery);setCardUnavailable(true);setBusy("");}}/>}
         </section>
         <div className="consumer-action-row" aria-label="Related Cards & spending">{capability(workspace,"activity.read")?.allowed && relatedService("reports","Statements & reports")}{relatedService("settings","Notification preferences")}{relatedService("help","Help with this card")}</div>
@@ -218,7 +219,7 @@ type CardFormAttempt =
 
 function CardRequestForm({ request: initialRequest, history, workspace:initialWorkspace, canEdit:initialCanEdit, command, onUpdate, onBusy, onClose, onUnavailable, onLeave, routeBase }: CardRequestFormProps) {
   const allowanceFieldId=useId();
-  const params = useSearchParams(), router = useRouter();
+  const params = useCustomerSearchParams(), router = useRouter();
   const [workspace,setWorkspace]=useServerProjection(initialWorkspace);
   const canEdit=initialCanEdit&&capability(workspace,"cards.request")?.allowed===true;
   const [unavailable,setUnavailable]=useState(false);
@@ -241,15 +242,21 @@ function CardRequestForm({ request: initialRequest, history, workspace:initialWo
   function update(next: CardRequestProjection) { setRequest(next); onUpdate(next); }
   function navigate(next: CardRequestProjection, closeAfter = false) {
     const query = new URLSearchParams(params.toString());
-    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review", "cardTask"]) query.delete(key);
+    for (const key of ["card", "request", "new", "manage", "transaction", "holder", "review", "cardTask", "invite"]) query.delete(key);
     if (next.status === "ISSUED" && next.issuedCardId) {
       for (const key of ["view", "page", "activityCard"]) query.delete(key);
       query.set("focus", next.issuedCardId);
-    } else if (!closeAfter) { query.set("request", next.id); query.set("review", "1"); }
+    } else {
+      query.set("view", "requests");
+      if(closeAfter){
+        // A saved draft belongs in history, even when Add card began from the card list.
+        for(const key of ["focus","activityCard","requestPage","requestSearch","requestStatus"])query.delete(key);
+      }else{query.set("request", next.id);query.set("review", "1");}
+    }
     // The saved request URL can replace this form. Hold all actions until the
     // transition settles so a rapid Create click cannot lose its retry state.
     startNavigation(() => {
-      router.replace(`${routeBase}${query.size ? `?${query}` : ""}`, {scroll: false});
+      router.replace(customerHref(routeBase,query), {scroll: false});
       router.refresh();
     });
   }

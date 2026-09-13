@@ -92,7 +92,7 @@ it("migrates posted and pending deposit history without rewriting journals, doub
   // Search narrows receipt rows; totals still include every completed deposit on that day.
   const completedOnDay=(await getMerchantOperations(owner,terminal)).payouts.filter(deposit=>deposit.status==="COMPLETED"&&deposit.processedAt?.slice(0,10)===eventDay);
   expect(activity.activity.periodTotals.transferred?.minor).toBe((BigInt(completedOnDay.length)*1000n).toString());
-  const link=new URL(activity.activity.rows[0]!.href,"https://etail.invalid");expect(link.pathname).toBe(`/merchants/${terminal}`);expect(link.searchParams.get("transfer")).toBe(processed.id);
+  const link=new URL(activity.activity.rows[0]!.href,"https://etail.invalid");expect(link.pathname).toBe(`/merchant-services/terminals/${terminal}/payments`);expect(link.searchParams.get("transfer")).toBe(processed.id);
   const csv=merchantActivityCsv(activity.activity);expect(csv).toContain(`"${processed.processedAt}"`);expect(csv).not.toContain(`"${processed.createdAt}"`);
  }
  const after=await pool.connect();try{expect(await snapshot(after,historicalJournalIds)).toBe(beforeHash);}finally{after.release();}

@@ -1,6 +1,7 @@
 import type {DisputeProjection} from "@/modules/disputes/contracts";
 import {MerchantDisputes} from "./merchant-disputes";
 import Link from "next/link";
+import {merchantActivityHref,merchantRecordHref,parseMerchantActivityFilters} from "@/shared/merchant-activity";
 import type {MerchantWorkspaceProjection} from "@/modules/acquiring/contracts";
 import type {MerchantOperationsProjection} from "@/modules/acquiring/operations-contracts";
 import type {MerchantAccessOverview} from "@/modules/access/merchant-contracts";
@@ -16,8 +17,8 @@ import "./merchant-network.css";
 
 export function MerchantWorkspace({workspace,tab,access,operations,support,disputes,overviewHref}:{workspace:MerchantWorkspaceProjection;tab:MerchantTab;access?:MerchantAccessOverview;operations?:MerchantOperationsProjection;support?:MerchantSupportContext;disputes?:DisputeProjection[];overviewHref?:string}) {
  const {merchant}=workspace;
- const directoryHref=overviewHref??`/merchant-services?section=merchants&view=${workspace.ownerAccess?`merchant:${merchant.merchant.serviceId}`:`unit:${merchant.id}`}`;
- const sectionHref=(section:MerchantTab)=>`/merchants/${merchant.id}?${new URLSearchParams({tab:section,returnTo:directoryHref})}#terminal-${section}`;
+ const directoryHref=overviewHref??merchantActivityHref(parseMerchantActivityFilters({section:"merchants",view:workspace.ownerAccess?`merchant:${merchant.merchant.serviceId}`:`unit:${merchant.id}`}));
+ const sectionHref=(section:MerchantTab)=>`${merchantRecordHref(merchant.id,{tab:section},directoryHref)}#terminal-${section}`;
  const ready=operations?.gateway.mode==="TEST_READY"&&operations.enrollment.status==="ENROLLED";
  const retry=(section:MerchantTab,title:string)=><EmptyState title={title} description="Reload to check your current access. Your saved records have not changed."><a href={sectionHref(section)}>Reload this section</a></EmptyState>;
  return <MerchantShell merchantId={merchant.id} showSettings={workspace.ownerAccess} overviewHref={directoryHref} activeSection="merchants">

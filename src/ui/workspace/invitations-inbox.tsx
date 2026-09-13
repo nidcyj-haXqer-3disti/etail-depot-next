@@ -1,4 +1,5 @@
 "use client";
+import {customerHref} from "@/shared/customer-routes";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -13,9 +14,9 @@ function invitationName(invitation:AnyInvitationProjection) {return invitation.t
 function invitationReference(invitation:AnyInvitationProjection) {return invitation.id.slice(0,8).toUpperCase();}
 function invitationLabel(invitation:AnyInvitationProjection) {return invitation.targetKind==="MERCHANT_TERMINAL"?"Accept payments":"Cards & spending";}
 function invitationHref(invitation:AnyInvitationProjection) {
- if(invitation.targetKind==="CARD")return `/cardholder-services?view=cards&card=${invitation.cardId}`;
+ if(invitation.targetKind==="CARD")return customerHref("/cardholder-services",{card:invitation.cardId});
  if(invitation.targetKind!=="MERCHANT_TERMINAL")return "/cardholder-services";
- return `/merchants/${invitation.terminalId}?tab=payments`;
+ return customerHref(`/merchants/${invitation.terminalId}`,{tab:"payments"});
 }
 function resourceId(invitation:AnyInvitationProjection){return invitation.targetKind==="MERCHANT_TERMINAL"?invitation.terminalId:invitation.targetKind==="CARD"?invitation.cardId:invitation.serviceId;}
 function invitedPermission(action:string) {return merchantPermissionLabels[action as keyof typeof merchantPermissionLabels]??permissionLabel(action);}

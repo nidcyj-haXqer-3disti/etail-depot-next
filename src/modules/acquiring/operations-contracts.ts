@@ -23,3 +23,5 @@ export interface MerchantOperationsProjection {
 export const merchantSettlementSchema=z.object({commandId:z.uuid(),settlementId:z.uuid().optional(),reviewToken:z.string().regex(/^[0-9a-f]{64}$/)}).strict();
 export type MerchantSettlementInput=z.infer<typeof merchantSettlementSchema>;
 export interface MerchantSettlementReceipt {id:string;terminalId:string;settlementId:string;moneyAccountId:string;amount:Money;reference:string;createdAt:string}
+
+export interface MerchantPaymentSettings {serviceId:string;name:string;gateway:TestGateway;canConfigureGateway:boolean;networks:{id:"visa"|"mastercard"|"amex"|"discover";network:string}[]}

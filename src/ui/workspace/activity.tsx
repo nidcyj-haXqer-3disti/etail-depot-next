@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import {useCustomerSearchParams} from "../use-customer-search-params";
+import {customerHref} from "@/shared/customer-routes";
 import { cardholderTaskHref } from "../cardholder-routing";
 import type { WorkspaceActivity, WorkspaceProjection } from "@/modules/workspace/contracts";
 import { Button, EmptyState, StatusBadge, WorkspaceDialog, formatDate, formatMoney } from "./primitives";
@@ -10,7 +12,7 @@ import { Button, EmptyState, StatusBadge, WorkspaceDialog, formatDate, formatMon
 export interface ActivityWorkspaceProps { workspace: WorkspaceProjection; selectedCardId?: string }
 
 export function ActivityWorkspace({ workspace, selectedCardId }: ActivityWorkspaceProps) {
-  const params = useSearchParams(), pathname = usePathname(), router = useRouter();
+  const params = useCustomerSearchParams(), pathname = usePathname(), router = useRouter();
   const search = params.get("q") ?? "";
   const status = params.get("status") ?? "ALL";
   const cardId = selectedCardId ?? "ALL";
@@ -20,7 +22,7 @@ export function ActivityWorkspace({ workspace, selectedCardId }: ActivityWorkspa
   function setQuery(changes: Record<string, string | null>, push = false) {
     const next = new URLSearchParams(params.toString());
     for (const [key, value] of Object.entries(changes)) { if (value) next.set(key, value); else next.delete(key); }
-    const url = `${pathname}${next.size ? `?${next}` : ""}`;
+    const url = customerHref(pathname,next);
     // Filters and the selected dialog are URL state; the already-authorized rows stay local.
     if (push) window.history.pushState(null, "", url); else window.history.replaceState(null, "", url);
   }
@@ -28,7 +30,7 @@ export function ActivityWorkspace({ workspace, selectedCardId }: ActivityWorkspa
     const next = new URLSearchParams(params.toString());
     next.delete("transaction"); next.delete("focus"); next.delete("context");
     if (id === "ALL") next.set("context", workspace.service.id); else next.set("focus", id);
-    router.push(`${pathname}?${next}`, { scroll: false });
+    router.push(customerHref("/cardholder-services/activity",next), { scroll: false });
   }
   function setSelectedId(id: string | null) { setQuery({ transaction: id }, Boolean(id)); }
   const selected = workspace.activity.find((item) => item.id === selectedId && (!selectedCardId || item.cardId === selectedCardId));

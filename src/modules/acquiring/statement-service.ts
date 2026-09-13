@@ -1,3 +1,4 @@
+import {customerHref} from "../../shared/customer-routes";
 import {and,eq,inArray,or} from "drizzle-orm";
 import {getDb} from "../../platform/database/client";
 import {evaluate} from "../policy/evaluate";
@@ -80,11 +81,11 @@ export async function getMerchantStatement(personId:string,input:MerchantActivit
    const withdrawal=withdrawals.find(row=>row.withdrawal.id===journal.referenceId&&(row.withdrawal.journalId===journal.id||row.event?.journalId===journal.id));
    if(withdrawal&&accountId===withdrawal.withdrawal.moneyAccountId){
     context.reference=`OUT-${withdrawal.withdrawal.id.slice(0,8).toUpperCase()}`;
-    context.href=`/money-accounts/${accountId}?${new URLSearchParams({task:"withdraw",review:withdrawal.intent.id,returnTo})}`;
+    context.href=customerHref(`/money-accounts/${accountId}`,{task:"withdraw",review:withdrawal.intent.id,returnTo});
     context.status=withdrawal.event?.outcome??"PENDING";
    }
    const topup=topups.find(row=>row.topup.id===journal.referenceId&&row.topup.journalId===journal.id);
-   if(topup&&accountId===topup.topup.moneyAccountId){context.reference=`ADD-${topup.topup.id.slice(0,8).toUpperCase()}`;context.href=`/money-accounts/${accountId}?${new URLSearchParams({task:"add",review:topup.intent.id,returnTo})}`;}
+   if(topup&&accountId===topup.topup.moneyAccountId){context.reference=`ADD-${topup.topup.id.slice(0,8).toUpperCase()}`;context.href=customerHref(`/money-accounts/${accountId}`,{task:"add",review:topup.intent.id,returnTo});}
    records.push(statementJournalRow(journal,context));
   }
   // A request without a posted journal remains visible with no money effect.

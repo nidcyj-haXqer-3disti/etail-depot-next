@@ -1,3 +1,4 @@
+import {customerRouteQuery} from "../../src/shared/customer-routes";
 import {closeDatabase} from "../../src/platform/database/client";
 import {signInPerson} from "./helpers/prepaid";
 import {expect,test} from "@playwright/test";
@@ -9,6 +10,7 @@ import {completeSetup} from "../helpers/acquiring";
 import {getMerchantBusinessDetails,updateMerchantSetup,submitMerchantSetup} from "../../src/modules/acquiring/service";
 import {parseMerchantActivityFilters} from "../../src/shared/merchant-activity";
 
+function matchesQuery(url:URL,expected:URLSearchParams){const actual=parseMerchantActivityFilters(customerRouteQuery(url.pathname,url.searchParams));return [...expected].every(([key,value])=>String(actual[key as keyof typeof actual])===value);}
 test.afterAll(closeDatabase);
 test("one Merchant menu opens a complete exact terminal and business-only account settings",async({page})=>{
  const {merchant,master,unit,operator}=await merchantAccessFixture();
@@ -21,12 +23,12 @@ test("one Merchant menu opens a complete exact terminal and business-only accoun
  expect(await navigation.evaluate(node=>node.scrollWidth<=node.clientWidth+1)).toBe(true);
  if(viewport)await page.setViewportSize(viewport);
  await expect(page.getByRole("heading",{name:"Account statement",exact:true})).toBeVisible();
- await expect(page.getByRole("button",{name:"Create terminal",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toHaveCount(0);
  await navigation.getByRole("link",{name:"Terminals",exact:true}).click();
  await page.getByRole("navigation",{name:"Terminal use",exact:true}).getByRole("link",{name:"For others",exact:true}).click();
  await expect(page.getByRole("navigation",{name:"Terminal use",exact:true}).getByRole("link",{name:"For others",exact:true})).toHaveAttribute("aria-current","page");
  await page.getByRole("link",{name:unit.displayName,exact:true}).click();
- await expect(page).toHaveURL(url=>url.pathname===`/merchants/${unit.id}`&&url.searchParams.has("returnTo"));
+ await expect(page).toHaveURL(url=>url.pathname===`/merchant-services/terminals/${unit.id}`&&url.searchParams.has("returnTo"));
  const returnTo=new URL(page.url()).searchParams.get("returnTo");expect(returnTo).toContain("terminalUse=others");
  await expect(navigation.getByRole("link")).toHaveText(["Overview","Terminals","Account settings"]);
  await expect(navigation.getByRole("link",{name:"Terminals",exact:true})).toHaveAttribute("aria-current","page");
@@ -81,7 +83,7 @@ test("owner can manage every flat terminal while a terminal user sees only assig
  await expect(page.getByRole("heading",{name:"Terminals",exact:true})).toBeVisible();
  await expect(page.getByRole("heading",{name:unit.displayName,exact:true})).toBeVisible();
  await expect(page.getByRole("article").getByRole("heading",{name:master.displayName,exact:true})).toBeVisible();
- await expect(page.getByRole("button",{name:"Create terminal",exact:true})).toBeVisible();
+ await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toBeVisible();
  await page.getByRole("link",{name:unit.displayName,exact:true}).click();
  await page.getByRole("group",{name:"Terminal sections",exact:true}).getByRole("link",{name:"Activity",exact:true}).click();
  await expect(page.getByRole("heading",{name:unit.displayName,exact:true})).toBeVisible();
@@ -92,7 +94,7 @@ test("owner can manage every flat terminal while a terminal user sees only assig
  await expect(page.getByRole("heading",{name:"Terminals",level:1,exact:true})).toBeVisible();
  await expect(page.getByRole("heading",{name:unit.displayName,exact:true})).toBeVisible();
  await expect(page.getByRole("article").getByRole("heading",{name:master.displayName,exact:true})).toHaveCount(0);
- await expect(page.getByRole("button",{name:"Create terminal",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toHaveCount(0);
  await expect(page.getByRole("link",{name:"Balance & payouts",exact:true})).toHaveCount(0);
  await expect(page.getByRole("link",{name:"Team access",exact:true})).toHaveCount(0);
  const dashboard=await page.request.get("/api/v1/merchants/dashboard");expect(dashboard.status()).toBe(200);
@@ -112,9 +114,9 @@ test("merchant activity keeps exact terminal scope, dates, pages and receipts wh
  await expect(page.getByRole("searchbox",{name:"Find a record",exact:true})).toHaveValue(f.channel.description);
  // Submitting either form must keep the other investigation filters.
  await page.getByRole("button",{name:"Show",exact:true}).click();
- await expect(page).toHaveURL(url=>[...query].every(([key,value])=>url.searchParams.get(key)===value));
+ await expect(page).toHaveURL(url=>matchesQuery(url,query));
  await page.getByRole("button",{name:"Search statement",exact:true}).click();
- await expect(page).toHaveURL(url=>[...query].every(([key,value])=>url.searchParams.get(key)===value));
+ await expect(page).toHaveURL(url=>matchesQuery(url,query));
  expect(new URL(page.url()).searchParams.get("status")).toBe("COLLECTED");
  const table=page.getByRole("table");await expect(table.locator("tbody tr")).toHaveCount(25);
  await page.getByRole("link",{name:"Older records",exact:true}).click();await expect(table.locator("tbody tr")).toHaveCount(1);
@@ -133,13 +135,13 @@ test("merchant activity keeps exact terminal scope, dates, pages and receipts wh
  await expect(channelDetails.getByRole("link",{name:"Preview payment page",exact:true})).toHaveAttribute("href",f.publication.publicHref);
  await channelDetails.getByRole("button",{name:"Close details",exact:true}).click();
  await page.getByRole("link",{name:"← Back to terminals",exact:true}).click();
- await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&[...query].every(([key,value])=>url.searchParams.get(key)===value)&&url.searchParams.get("page")==="2");
+ await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&matchesQuery(url,query)&&url.searchParams.get("page")==="2");
  const csv=await page.request.get(`/api/v1/merchants/dashboard?${query}&format=csv`);
  expect(csv.status()).toBe(200);expect(csv.headers()["cache-control"]).toContain("no-store");expect((await csv.text()).split("\r\n")).toHaveLength(28);
  await page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Overview",exact:true}).click();
  // The old page has the same money and filter controls while this client
  // navigation is pending. Wait for the new query's keyed form before editing.
- await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&url.searchParams.get("section")==="overview"&&url.searchParams.get("page")==="2"&&[...query].every(([key,value])=>url.searchParams.get(key)===value));
+ await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&url.searchParams.get("section")==="overview"&&url.searchParams.get("page")==="2"&&matchesQuery(url,query));
  await expect(page.getByRole("form",{name:"Filter account statement",exact:true}).locator('input[name="section"]')).toHaveValue("overview");
  await expect(table.locator("tbody tr")).toHaveCount(1);
  await page.locator(".money-incoming > summary").click();
@@ -169,12 +171,12 @@ test("merchant activity keeps exact terminal scope, dates, pages and receipts wh
  const investigation=new URL(page.url());
  await page.getByRole("navigation",{name:"Merchant account navigation",exact:true}).getByRole("link",{name:"Terminals",exact:true}).click();
  await page.getByRole("link",{name:f.unit.displayName,exact:true}).click();
- await expect(page).toHaveURL(url=>url.pathname===`/merchants/${f.unit.id}`&&url.searchParams.has("returnTo"));
+ await expect(page).toHaveURL(url=>url.pathname===`/merchant-services/terminals/${f.unit.id}`&&url.searchParams.has("returnTo"));
  await page.getByRole("link",{name:"← Back to terminals",exact:true}).click();
  // Canonical links omit default values such as terminalUse=all and page=1.
  // Compare the complete interpreted filters so a dropped nondefault still fails.
  const expectedReturn={...parseMerchantActivityFilters(investigation.searchParams),section:"merchants"};
- await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&Object.entries(expectedReturn).every(([key,value])=>parseMerchantActivityFilters(url.searchParams)[key as keyof typeof expectedReturn]===value));
+ await expect(page).toHaveURL(url=>url.pathname==="/merchant-services/terminals"&&Object.entries(expectedReturn).every(([key,value])=>parseMerchantActivityFilters(customerRouteQuery(url.pathname,url.searchParams))[key as keyof typeof expectedReturn]===value));
 });
 
 
@@ -186,7 +188,7 @@ test("saved Channels links open the unified explicit terminal list before creati
  await expect(chooser.getByRole("link",{name:unit.displayName,exact:true})).toBeVisible();
  await expect(page.getByRole("button",{name:"New payment request",exact:true})).toHaveCount(0);
  await chooser.getByRole("link",{name:unit.displayName,exact:true}).click();
- await expect(page).toHaveURL(url=>url.pathname===`/merchants/${unit.id}`&&url.searchParams.get("tab")==="channels");
+ await expect(page).toHaveURL(url=>url.pathname===`/merchant-services/terminals/${unit.id}`&&customerRouteQuery(url.pathname,url.searchParams).get("tab")==="channels");
  await expect(page.getByRole("navigation",{name:"Merchant account navigation",exact:true}).getByRole("link",{name:"Terminals",exact:true})).toHaveAttribute("aria-current","page");
  await expect(page.getByRole("navigation",{name:"Payment terminal navigation",exact:true})).toHaveCount(0);
  await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true})).toContainText(unit.displayName);
@@ -195,6 +197,6 @@ test("saved Channels links open the unified explicit terminal list before creati
  await expect(page.getByText("Optional: add your own business",{exact:true})).toHaveCount(0);
  await expect(chooser.getByRole("link",{name:unit.displayName,exact:true})).toBeVisible();
  await expect(chooser.getByRole("link",{name:master.displayName,exact:true})).toHaveCount(0);
- await expect(page.getByRole("button",{name:"Create terminal",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toHaveCount(0);
  expect((await page.request.get(`/api/v1/merchants/${master.id}`)).status()).toBe(404);
 });

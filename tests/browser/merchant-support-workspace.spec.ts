@@ -48,6 +48,7 @@ test("a payment question carries exact refund dates through assigned support and
   expect(ticket.payment?.id).toBe(payment.id);expect(ticket.nextActor).toBe("SUPPORT");
   await expect(page).toHaveURL(url=>url.searchParams.get("case")===ticket.id);
   await page.reload();await expect(page.getByRole("heading",{name:subject,exact:true})).toBeVisible();
+  await expect(page.getByRole("link",{name:"Return to payment",exact:true})).toHaveAttribute("href",new RegExp(`/merchant-services/terminals/${unit.id}/payments\\?`));
   await page.getByRole("link",{name:"Return to payment",exact:true}).click();
   await expect(receipt).toContainText(payment.testReference);
   expect(new URL(page.url()).searchParams.get("activity")).toBe("refunds");expect(new URL(page.url()).searchParams.get("q")).toBe(payment.testReference);

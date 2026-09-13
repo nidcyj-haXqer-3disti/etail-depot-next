@@ -18,7 +18,7 @@ test("owner adds card money, reviews a withdrawal and keeps merchant money separ
  expect(card.id).not.toBe(business.id);expect(business.services[0]!.id).toBe(merchant.serviceId);
  await signInPerson(page,owner.personId);await page.goto(`/money-accounts/${card.id}?task=add`);
  await page.getByRole("textbox",{name:"Amount (USD)"}).fill("125.50");await page.getByRole("button",{name:"Continue",exact:true}).click();
- await expect(page.getByRole("button",{name:"Confirm and add money",exact:true})).toBeVisible();await expect(page).toHaveURL(url=>!!url.searchParams.get("review"));const reviewUrl=page.url();await page.reload();
+ await expect(page.getByRole("button",{name:"Confirm and add money",exact:true})).toBeVisible();await expect(page).toHaveURL(url=>url.pathname.endsWith("/add-money")&&!url.searchParams.has("task")&&!!url.searchParams.get("review"));const reviewUrl=page.url();await page.reload();
  await page.getByRole("button",{name:"Confirm and add money",exact:true}).click();await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
  await page.goto(reviewUrl);await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
  expect((await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
@@ -47,7 +47,7 @@ test("a holder can open their profile but cannot view the owner's money or saved
 test("a mismatched funding receipt stays unconfirmed and retry uses the same saved review",async({page})=>{
  const owner=await cardPrimary("Receipt owner"),[account]=await listOwnedMoneyAccounts(owner.personId);await signInPerson(page,owner.personId);
  await page.goto(`/money-accounts/${account!.id}?task=add`);await page.getByRole("textbox",{name:"Amount (USD)"}).fill("10");await page.getByRole("button",{name:"Continue",exact:true}).click();await expect(page.getByRole("button",{name:"Confirm and add money",exact:true})).toBeVisible();
- await expect(page).toHaveURL(url=>!!url.searchParams.get("review"));
+ await expect(page).toHaveURL(url=>url.pathname.endsWith("/add-money")&&!url.searchParams.has("task")&&!!url.searchParams.get("review"));
  const review=new URL(page.url()).searchParams.get("review")!,path=`**/api/v1/money-accounts/${account!.id}/funding/intents/${review}`;let altered=false;
  await page.route(path,async route=>{if(route.request().method()!=="POST"||altered)return route.continue();altered=true;const response=await route.fetch(),body=await response.json();await route.fulfill({response,json:{...body,id:randomUUID()}});});
  await page.getByRole("button",{name:"Confirm and add money",exact:true}).click();await expect(page.getByText("We couldn’t verify this receipt. Retry this same request.")).toBeVisible();
@@ -62,7 +62,7 @@ for(const task of ["add","withdraw"] as const)test(`${task} waits for the saved 
  await signInPerson(page,owner.personId);await page.goto(`${path}?task=${task}`);
  let release!:()=>void,held=false,reviewId="",confirmations=0;
  const gate=new Promise<void>(resolve=>{release=resolve;});
- await page.route(url=>url.pathname===path&&url.searchParams.has("review"),async route=>{
+ await page.route(url=>url.pathname===`${path}/${task==="add"?"add-money":"withdraw"}`&&url.searchParams.has("review"),async route=>{
   if(route.request().headers().rsc!=="1"||held)return route.continue();
   reviewId=new URL(route.request().url()).searchParams.get("review")!;
   const response=await route.fetch();expect(response.status()).toBe(200);held=true;await gate;await route.fulfill({response});

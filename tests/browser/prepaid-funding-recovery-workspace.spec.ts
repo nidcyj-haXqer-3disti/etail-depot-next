@@ -23,7 +23,7 @@ for(const phase of ["review","confirmation"] as const)test(`malformed funding ${
  await page.goto(`/cardholder-services/funds?service=${primary.serviceId}`);
  await expect(page).toHaveURL(url=>url.pathname===`/money-accounts/${account.id}`&&!url.search);
  await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Account home",exact:true}).click();
- await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`/money-accounts/${account.id}?task=add`);
+ await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`/money-accounts/${account.id}/add-money`);
  await page.getByRole("link",{name:"Add money",exact:true}).click();
  await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
  const panel=page.locator('section[aria-labelledby="money-task-title"]');

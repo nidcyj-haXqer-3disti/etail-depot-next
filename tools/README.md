@@ -2,6 +2,12 @@
 
 These are optional implementation-assistance tools for Codex. The owner does not need to run them manually to use the prompt. Require Python 3.10 or newer and the standard library. Only the explicitly requested planning import needs an installed/authenticated GitHub CLI. The verification and target guard use no network.
 
+## D81 cohesive service experience review
+
+After the final production build and preserved preview startup, run `node tools/run-with-database.mjs --preview tsx tools/capture-dashboard-preview.mjs d81-dashboard-preview` for 120 owner/recipient states at 1440, 390 and 320px. Use a new `d81-dashboard-preview-*` output directory for each run; D80 and earlier output remains historical evidence. The current helper uses the shared canonical customer URL builder for cards, terminals, account settings and money tasks.
+
+The read-only review retains the exact marked preview/persona guards, blocks business writes and external requests, and compares source hashes. It preserves all 19 existing authorized projection comparisons, plus the two personas’ exact profile and notification-preference GETs, for 23 comparisons. Card settings show the stored account name and the selected person’s saved choices; personal profiles show the saved display name and the current read-only sign-in email state. Creation, freeze and terminal-invitation dialogs are opened without submitting commands. Each persona also opens the payment-request form and the exact prepared terminal’s authorized published request, checking its saved sharing tabs by keyboard without sending, copying, printing or paying. Unavailable or revoked links retain their actual state and expose no sharing controls. No preference, profile, invitation, channel or money changes are saved. Start the capture only after final checks return the preserved preview server; the helper does not start, prepare or reset it.
+
 ## D80 unified resource workspace review
 
 D80 adds the terminal’s saved intended use without resetting either marked database. Only `node tools/run-with-database.mjs --prepare-preview` applies the additive migration; completed seed preparation remains a read-only no-op. Preserve every previous migration and preview record. The D80 private before/after evidence compares every pre-existing public field, excluding only the added terminal `intendedUse` column and its expected migration receipt.

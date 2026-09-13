@@ -21,8 +21,8 @@ test("personal profile setup stays separate from service enrollment",async({page
   await page.goto("/profile");
   await expect(page.getByRole("heading",{name:"Your profile",exact:true,level:1})).toBeVisible();
   await expect(page.getByRole("radio")).toHaveCount(0);
-  await page.getByRole("textbox",{name:"Your name",exact:true}).fill("Preferred display name");
-  await page.getByRole("button",{name:"Save your details",exact:true}).click();
+  await page.getByRole("textbox",{name:"Display name",exact:true}).fill("Preferred display name");
+  await page.getByRole("button",{name:"Save changes",exact:true}).click();
   await expect(page.getByRole("region",{name:"Your details",exact:true})).toContainText("Preferred display name");
   await expect(page).toHaveURL(/\/profile$/);
   await page.reload();

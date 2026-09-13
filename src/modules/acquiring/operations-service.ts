@@ -19,9 +19,10 @@ import { merchantProfiles, merchantTerminals, paymentChannels } from "./schema";
 import { channelActivations, merchantOperationCommands, merchantTestPayments, merchantTestRefunds, testGateways, testMerchantEnrollments } from "./operations-schema";
 import {networkPaymentOperations,networkRefundOperations,networkEvents,networkEventEffects} from "./network-schema";
 import { testPayment, testRefund } from "./adapters/sandbox";
+import {sandboxNetworkAdapter} from "./adapters/network-sandbox";
 import { channelActivationSchema, configureTestGatewaySchema, enrollTestMerchantSchema, refundMerchantPaymentSchema,
   merchantSettlementSchema,type MerchantSettlementInput,type MerchantSettlementReceipt,
-  type ChannelActivation, type ChannelActivationInput, type ConfigureTestGatewayInput, type EnrollTestMerchantInput, type MerchantOperationsProjection, type MerchantTestPayment, type MerchantTestPayout, type RefundMerchantPaymentInput, type TestGateway, type TestMerchantEnrollment } from "./operations-contracts";
+  type MerchantPaymentSettings,type ChannelActivation, type ChannelActivationInput, type ConfigureTestGatewayInput, type EnrollTestMerchantInput, type MerchantOperationsProjection, type MerchantTestPayment, type MerchantTestPayout, type RefundMerchantPaymentInput, type TestGateway, type TestMerchantEnrollment } from "./operations-contracts";
 
 type UnitScope=Awaited<ReturnType<typeof loadTerminalScope>>;
 type ServiceScope=Awaited<ReturnType<typeof loadServiceScope>>;
@@ -128,20 +129,31 @@ export async function getMerchantOperations(personId:string,merchantUnitId:strin
     return {merchantUnitId,serviceId:scope.merchantService.id,processingPayments,pendingCardPayments,mode:"TEST",liveEnabled:false,feeStatus:"NOT_APPLIED",gateway:gatewayProjection(scope.merchantService.id,config.gateway),enrollment:enrollmentProjection(scope,config.enrollment),channels:projectedChannels,payments:projectedPayments,payouts:projectedPayouts,settlements:scope.ownerAccess?await listSettlementReceipts(tx,merchantUnitId):[],bankFunds:scope.ownerAccess?formatMoney(await readServiceMoneyAvailable(tx,scope.merchantService.id)):null,settledFunds:scope.ownerAccess&&canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.merchantService.id,merchantUnitId,bucket:"MERCHANT_SETTLED"})):null,pendingDeposits:scope.ownerAccess&&canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.merchantService.id,merchantUnitId,bucket:"MERCHANT_PAYOUT_PENDING"})):null,availableFunds:scope.ownerAccess&&canReadPayments?formatMoney(await getBalance(tx,{serviceId:scope.merchantService.id,merchantUnitId,bucket:"MERCHANT_AVAILABLE"})):null,canConfigureGateway,canEnroll:canConfigureGateway,canReadPayments,canPayout,depositReview:depositReview&&depositReview.amountMinor>0n?{amount:formatMoney(depositReview.amountMinor),token:depositReview.token,paymentCount:depositReview.payments.length}:null};
   },{isolationLevel:"repeatable read"});
 }
-export async function configureTestGateway(personId:string,merchantUnitId:string,raw:ConfigureTestGatewayInput):Promise<TestGateway> {
-  merchantUnitId=uuid(merchantUnitId);const input=parse(configureTestGatewaySchema,raw);
-  return getDb().transaction(async tx=>{
-    const unit=await loadTerminalScope(tx,personId,merchantUnitId,true);
-    const serviceId=unit.merchantService.id,scopeKey=`service:${serviceId}`;
-    await management(tx,personId,serviceId,true);
-    const [profile]=await tx.select().from(merchantProfiles).where(eq(merchantProfiles.serviceId,serviceId));
-    if(!profile||["RESTRICTED","DECLINED","CLOSED"].includes(profile.status))throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-    const receipt=await begin(tx,personId,scopeKey,"GATEWAY",input),[current]=await tx.select().from(testGateways).where(eq(testGateways.serviceId,serviceId));
-    if(receipt.old)return gatewayProjection(serviceId,current);
-    checkVersion(current?.version??0,input.expectedVersion);const now=await merchantNow(tx),mode=input.enabled?"TEST_READY":"DISABLED";
-    const [saved]=current?await tx.update(testGateways).set({mode,version:current.version+1,updatedBy:personId,updatedAt:now}).where(eq(testGateways.serviceId,serviceId)).returning():await tx.insert(testGateways).values({serviceId,mode,updatedBy:personId,createdAt:now,updatedAt:now}).returning();
-    await finish(tx,personId,scopeKey,"GATEWAY",input,receipt.digest,serviceId);return gatewayProjection(serviceId,saved);
-  });
+async function configureGateway(tx:ScopedTransaction,personId:string,serviceId:string,input:ConfigureTestGatewayInput):Promise<TestGateway>{
+ const scopeKey=`service:${serviceId}`;
+ await management(tx,personId,serviceId,true);
+ const [profile]=await tx.select().from(merchantProfiles).where(eq(merchantProfiles.serviceId,serviceId));
+ if(!profile||["RESTRICTED","DECLINED","CLOSED"].includes(profile.status))throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ const receipt=await begin(tx,personId,scopeKey,"GATEWAY",input),[current]=await tx.select().from(testGateways).where(eq(testGateways.serviceId,serviceId));
+ if(receipt.old)return gatewayProjection(serviceId,current);
+ checkVersion(current?.version??0,input.expectedVersion);const now=await merchantNow(tx),mode=input.enabled?"TEST_READY":"DISABLED";
+ const [saved]=current?await tx.update(testGateways).set({mode,version:current.version+1,updatedBy:personId,updatedAt:now}).where(eq(testGateways.serviceId,serviceId)).returning():await tx.insert(testGateways).values({serviceId,mode,updatedBy:personId,createdAt:now,updatedAt:now}).returning();
+ await finish(tx,personId,scopeKey,"GATEWAY",input,receipt.digest,serviceId);return gatewayProjection(serviceId,saved);
+}
+export async function configureTestGateway(personId:string,merchantUnitId:string,raw:ConfigureTestGatewayInput):Promise<TestGateway>{
+ merchantUnitId=uuid(merchantUnitId);const input=parse(configureTestGatewaySchema,raw);
+ return getDb().transaction(async tx=>{const unit=await loadTerminalScope(tx,personId,merchantUnitId,true);return configureGateway(tx,personId,unit.merchantService.id,input);});
+}
+export async function configureMerchantAccountGateway(personId:string,serviceId:string,raw:ConfigureTestGatewayInput):Promise<TestGateway>{
+ serviceId=uuid(serviceId);const input=parse(configureTestGatewaySchema,raw);
+ return getDb().transaction(tx=>configureGateway(tx,personId,serviceId,input));
+}
+export async function getMerchantPaymentSettings(personId:string,serviceId:string):Promise<MerchantPaymentSettings>{
+ serviceId=uuid(serviceId);
+ return getDb().transaction(async tx=>{const scope=await responsible(tx,personId,serviceId);requireAction(scope,"acquiring.read");
+  const [gateway]=await tx.select().from(testGateways).where(eq(testGateways.serviceId,serviceId)),[profile]=await tx.select().from(merchantProfiles).where(eq(merchantProfiles.serviceId,serviceId));
+  return {serviceId,name:scope.service.displayName,gateway:gatewayProjection(serviceId,gateway),canConfigureGateway:!!profile&&!["RESTRICTED","DECLINED","CLOSED"].includes(profile.status)&&await canManage(tx,personId,serviceId),networks:sandboxNetworkAdapter.capabilities().instruments};
+ },{isolationLevel:"repeatable read"});
 }
 export async function enrollTestMerchant(personId:string,merchantUnitId:string,raw:EnrollTestMerchantInput):Promise<TestMerchantEnrollment> {
   merchantUnitId=uuid(merchantUnitId);const input=parse(enrollTestMerchantSchema,raw),scopeKey=`unit:${merchantUnitId}`;
