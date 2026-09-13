@@ -2,6 +2,10 @@
 
 These are optional implementation-assistance tools for Codex. The owner does not need to run them manually to use the prompt. Require Python 3.10 or newer and the standard library. Only the explicitly requested planning import needs an installed/authenticated GitHub CLI. The verification and target guard use no network.
 
+## D79 consolidated workflow review
+
+D79 changes menus and read composition without a migration or preview preparation. After the production build and existing preview startup, run `node tools/run-with-database.mjs --preview tsx tools/capture-dashboard-preview.mjs d79-dashboard-preview` for81 owner/recipient states at1440,390 and320px. Use a new `d79-dashboard-preview-*` output directory for each run. The tool retains exact preview/persona guards, blocks business writes and external requests, and compares19 authorized projections plus source hashes. It navigates through funding, return and payout amount screens without submitting them; no preview data is reset or restored.
+
 ## D76 additive invitation and network-checkout preparation
 
 D77 reorganizes menus without a database migration or preparation change. After the final production build and existing preview startup, run `node tools/run-with-database.mjs --preview tsx tools/capture-menu-preview.mjs d77-menu-preview` for36 owner/holder menu states at1440,390 and320px. Use a new `d77-menu-preview-*` name for a later capture to preserve prior evidence. The tool verifies the marked preview and exact fictional personas, permits only the two fixture sign-ins, blocks all other writes/external requests, and compares authorized projections before/after. It does not reset or seed the preview, confirm a top-up, send an invitation or move money.

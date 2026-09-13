@@ -5,11 +5,14 @@ import {getMerchantWorkspace} from "./service";
 import {getMerchantOperations} from "./operations-service";
 
 /** Exact owner-scoped terminals that settle into this business account. Reads never create a terminal. */
-export async function getMerchantMoneyWorkspace(personId:string,account:MoneyAccountOverview){
+export async function getMerchantMoneyWorkspace(personId:string,account:MoneyAccountOverview,discovered?:{
+ // Reuse this request's server-owned discovery, never browser-supplied scope.
+ units:readonly {id:string;merchantServiceId:string;ownerAccess:boolean}[];
+}){
  if(account.serviceKind!=="MERCHANT")return {account,settlements:[],settlementsUnavailable:false};
  let settlements:{workspace:Awaited<ReturnType<typeof getMerchantWorkspace>>;operations:Awaited<ReturnType<typeof getMerchantOperations>>}[];
  try{
-  const dashboard=await getMerchantDashboard(personId,{section:"funds"});
+  const dashboard=discovered??await getMerchantDashboard(personId,{section:"funds"});
   const serviceIds=new Set(account.services.filter(service=>service.kind==="MERCHANT").map(service=>service.id));
   const terminals=dashboard.units.filter(terminal=>terminal.ownerAccess&&serviceIds.has(terminal.merchantServiceId));
   settlements=await Promise.all(terminals.map(async terminal=>({workspace:await getMerchantWorkspace(personId,terminal.id),operations:await getMerchantOperations(personId,terminal.id)})));

@@ -4,7 +4,8 @@ import { redirect, unstable_rethrow } from "next/navigation";
 import { getRequestSession } from "@/platform/http/context";
 import { SecurityError } from "@/platform/security/origin";
 import { getCardholderDashboard, getCardholderDashboardFocus, getPrimaryCardholderService } from "@/modules/workspace/dashboard-service";
-import { getWorkspace } from "@/modules/workspace/service";
+import { getWorkspace, getCardholderFunds } from "@/modules/workspace/service";
+import {getMoneyAccountOverview} from "@/modules/money/service";
 import { getHistoricalReport } from "@/modules/reports/service";
 import { estimateMembership, sampleMembershipInput } from "@/modules/membership/estimate";
 import { PageNotice } from "@/ui/shell";
@@ -52,14 +53,23 @@ export async function renderCardholderTask(task: CardholderTask, searchParams: P
       const transactionId = exactId(query.transaction);
       if (!workspace.activity.some(item => item.id === transactionId && (!focusId || item.cardId === focusId))) throw new SecurityError("NOT_FOUND", 404);
     }
+    // Funding always belongs to the signed-in account owner, even while an
+    // invited card is selected. Preferences for that invited account never
+    // acquire an owner's balance-return action.
+    const moneyAccount=primaryService?await (async()=>{
+      try{const funds=await getCardholderFunds(session.personId,primaryService.id);return await getMoneyAccountOverview(session.personId,funds.moneyAccountId);}
+      catch(error){if(error instanceof SecurityError&&[403,404].includes(error.status))return null;throw error;}
+    })():null;
+    const addMoneyHref=moneyAccount?.canAddMoney?`/money-accounts/${moneyAccount.id}?task=add`:undefined;
+    const returnMoneyHref=workspace.cardholderRole==="OWNER"&&moneyAccount?.canWithdraw&&moneyAccount.services.some(service=>service.kind==="CARDHOLDER"&&service.id===workspace.service.id)?`/money-accounts/${moneyAccount.id}?task=withdraw`:undefined;
     const scopeKey = JSON.stringify([serviceId, workspace.cardholderRole, workspace.capabilities, workspace.cards.map(card => card.id), focusId]);
     let content;
     if (task === "activity") content = <ActivityWorkspace key={scopeKey} workspace={workspace} selectedCardId={focusId}/>;
     else if (task === "reports") content = workspace.capabilities.some(item => item.action === "activity.read" && item.allowed) ? <><p className="consumer-muted">{workspace.cardholderRole === "OWNER" ? "Reports include the cards you manage in this account." : "Reports include only your own card activity."}</p><ReportsWorkspace key={scopeKey} workspace={workspace} report={await getHistoricalReport(session.personId, serviceId)}/></> : <EmptyState title="Report access is restricted" description="You can’t view these reports with your current account access."/>;
-    else if (task === "settings") content = <SettingsWorkspace key={scopeKey} workspace={workspace}/>;
+    else if (task === "settings") content = <SettingsWorkspace key={scopeKey} workspace={workspace} returnMoneyHref={returnMoneyHref}/>;
     else if (task === "membership") content = <MembershipWorkspace initial={estimateMembership(sampleMembershipInput)}/>;
     else content = <HelpWorkspace key={scopeKey} workspace={workspace} selectedCardId={focusId}/>;
-    return <WorkspaceShell workspace={workspace} section={task} selectedCardId={focusId} primaryService={primaryService}>{content}</WorkspaceShell>;
+    return <WorkspaceShell workspace={workspace} section={task} selectedCardId={focusId} primaryService={primaryService} addMoneyHref={addMoneyHref}>{content}</WorkspaceShell>;
   } catch (error) {
     unstable_rethrow(error);
     const unavailable = error instanceof SecurityError && [403, 404, 422].includes(error.status);

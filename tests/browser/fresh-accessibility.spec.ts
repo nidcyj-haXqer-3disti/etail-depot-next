@@ -53,7 +53,9 @@ for(const width of [1440,320]) {
    expect(operations.canReadPayments).toBe(true);expect(operations.payments.length).toBeGreaterThan(0);
    expect(operations.canConfigureGateway).toBe(persona==="owner");expect(operations.canPayout).toBe(persona==="owner");
    await page.goto(`/merchants/${unit!.id}?tab=payments`);
-   await expect(page.getByRole("heading",{name:unit!.name,level:1,exact:true})).toBeVisible();
+   await expect(page.getByRole("heading",{name:"Payments",level:1,exact:true})).toBeVisible();
+   await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{name:unit!.name,level:2,exact:true})).toBeVisible();
+   await expect(page.getByRole("navigation",{name:"Payment terminal navigation"})).toHaveCount(0);
    await expect(page.getByRole("searchbox",{name:"Search payments",exact:true})).toBeVisible();
    await accessible(page,"Merchant payments");
    const payment=operations.payments[0]!;
@@ -69,12 +71,16 @@ for(const width of [1440,320]) {
     await accessible(page,`Merchant ${view.toLowerCase()}`);
    }
    if(persona==="owner") {
-    await page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Terminal settings",exact:true}).click();
+    await page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Settings",exact:true}).click();
+    await page.getByRole("link",{name:`Terminal settings for ${unit!.name}`,exact:true}).click();
+    await expect(page).toHaveURL(url=>url.pathname===`/merchants/${unit!.id}`&&url.searchParams.get("tab")==="verification");
+    await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{name:unit!.name,level:2,exact:true})).toBeVisible();
     await expect(page.getByRole("heading",{name:"Your payments are ready",exact:true})).toBeVisible();
     await accessible(page,"Merchant payment setup");
    } else {
     await expect(page.getByRole("navigation",{name:"Payment activity views"}).getByRole("button",{name:"Deposits",exact:true})).toHaveCount(0);
-    await expect(page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Terminal settings",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Settings",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("link",{name:`Terminal settings for ${unit!.name}`,exact:true})).toHaveCount(0);
     await expect(page.getByRole("button",{name:"Review settlement",exact:true})).toHaveCount(0);
     await expect(page.getByRole("region",{name:"Current available balance",exact:true})).toHaveCount(0);
    }

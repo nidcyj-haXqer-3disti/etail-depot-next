@@ -13,8 +13,9 @@ import {additionalPublishedPayment,freshConnectedPayment,merchantOperations,payP
 
 test.afterAll(closeDatabase);
 async function reviewSettlement(page:Page,amount:string,count:number){
- const terminalId=new URL(page.url()).pathname.split("/")[2]!,terminalName=(await page.getByRole("heading",{level:1}).innerText()).trim();
+ const terminalId=new URL(page.url()).pathname.split("/")[2]!,terminalName=(await page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{level:2}).innerText()).trim();
  await page.goto(`/merchant-services?section=funds&view=unit:${terminalId}`);
+ await page.locator(".money-incoming > summary").click();
  await page.getByRole("region",{name:`Settlement for ${terminalName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();
  const details=page.getByRole("dialog",{name:"Settle received payments",exact:true});
  await expect(details).toContainText(amount);
@@ -93,7 +94,7 @@ test("exact settlement survives a lost result and credits merchant money once wh
  const items=await getDb().select().from(merchantSettlementItems).where(eq(merchantSettlementItems.settlementId,after.settlements[0]!.settlementId));
  expect(new Set(items.map(item=>item.paymentId))).toEqual(new Set([f.payment.id,second.payment.id]));
  expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.payer.primary.serviceId))).toBe(8000n);
- await page.reload();await expect(page.getByRole("region",{name:`Settlement for ${m.unit.displayName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true})).toBeDisabled();
+ await page.reload();await page.locator(".money-incoming > summary").click();await expect(page.getByRole("region",{name:`Settlement for ${m.unit.displayName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true})).toBeDisabled();
  await page.setViewportSize({width:320,height:900});
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
  expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);

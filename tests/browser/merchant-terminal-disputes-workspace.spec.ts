@@ -19,7 +19,7 @@ test("customer reports a payment, terminal user supplies evidence, and an assign
  expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.payer.serviceId))).toBe(18750n);expect((await getMerchantOperations(f.merchant.personId,f.unit.id)).payments[0]?.status).toBe("APPROVED");
 });
 test("owner settlement requires the exact reviewed request and terminal users cannot see funds",async({page})=>{
- const f=await terminalCheckoutFixture();await payTerminal(f);await signInPerson(page,f.merchant.personId);await page.goto(`/merchant-services?section=funds&view=unit:${f.unit.id}`);await page.getByRole("region",{name:`Settlement for ${f.unit.displayName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();const details=page.getByRole("dialog",{name:"Settle received payments",exact:true});await details.getByRole("button",{name:"Review settlement",exact:true}).click();const dialog=page.getByRole("dialog",{name:"Review settlement",exact:true});await expect(dialog).toContainText("$12.50");await dialog.getByRole("button",{name:"Confirm settlement",exact:true}).click();await expect(dialog).toBeHidden();expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.merchant.serviceId))).toBe(1250n);
+ const f=await terminalCheckoutFixture();await payTerminal(f);await signInPerson(page,f.merchant.personId);await page.goto(`/merchant-services?section=funds&view=unit:${f.unit.id}`);await expect(page.getByRole("heading",{name:"Overview",level:1,exact:true})).toBeVisible();await page.locator(".money-incoming > summary").click();await page.getByRole("region",{name:`Settlement for ${f.unit.displayName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();const details=page.getByRole("dialog",{name:"Settle received payments",exact:true});await details.getByRole("button",{name:"Review settlement",exact:true}).click();const dialog=page.getByRole("dialog",{name:"Review settlement",exact:true});await expect(dialog).toContainText("$12.50");await dialog.getByRole("button",{name:"Confirm settlement",exact:true}).click();await expect(dialog).toBeHidden();expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.merchant.serviceId))).toBe(1250n);
  await signInPerson(page,f.operator.personId);await page.goto(`/merchants/${f.unit.id}?tab=payments`);await expect(page.getByRole("button",{name:"Confirm settlement",exact:true})).toHaveCount(0);await expect(page.getByText("Payment balance",{exact:true})).toHaveCount(0);const response=await page.request.post(`/api/v1/merchants/${f.unit.id}/settlements`,{headers:{Origin:"http://127.0.0.1:3100"},data:{commandId:randomUUID(),reviewToken:"0".repeat(64)}});expect(response.status()).toBe(403);
 });
 
@@ -51,21 +51,30 @@ test("an unknown terminal response keeps its exact request, hides evidence after
  expect((await listTerminalDisputes(f.merchant.personId,f.unit.id))[0]?.messages.filter(item=>item.kind==="RESPONSE")).toHaveLength(1);
 });
 
-test("a direct dispute route reveals its active terminal tab at320px and keyboard movement stays in the horizontal navigation",async({page})=>{
+test("a direct dispute route uses one visible account menu and scoped task links at320px",async({page})=>{
  const f=await terminalCheckoutFixture();await signInPerson(page,f.merchant.personId);await page.setViewportSize({width:320,height:900});
  const route=`/merchants/${f.unit.id}?tab=disputes`;await page.goto(route);
- const nav=page.getByRole("navigation",{name:"Payment terminal navigation",exact:true}),current=nav.getByRole("link",{name:"Disputes",exact:true});
+ const nav=page.getByRole("navigation",{name:"Merchant account navigation",exact:true});
+ await expect(page.getByRole("navigation",{name:"Payment terminal navigation",exact:true})).toHaveCount(0);
+ await expect(nav.getByRole("link")).toHaveText(["Overview","Payments","Team & terminals","Channels","Settings"]);
+ const current=nav.getByRole("link",{name:"Payments",exact:true});
  const fullyVisible=async(link:typeof current)=>{
   await expect(link).toBeInViewport({ratio:0.99});
-  const clipped=await link.evaluate(node=>{const item=node.getBoundingClientRect(),container=node.closest("nav")!.getBoundingClientRect();return Math.max(container.left-item.left,item.right-container.right,0);});
-  expect(clipped).toBeLessThanOrEqual(1); // Browser scroll positions round to device pixels.
+  const clipped=await link.evaluate(node=>{const item=node.getBoundingClientRect(),container=node.parentElement!.getBoundingClientRect();return Math.max(container.left-item.left,item.right-container.right,0);});
+  expect(clipped).toBeLessThanOrEqual(1);
  };
- await expect(current).toHaveAttribute("aria-current","page");await fullyVisible(current);
- expect(await nav.evaluate(node=>node.scrollLeft)).toBeGreaterThan(0);expect(await page.evaluate(()=>window.scrollY)).toBe(0);const originalUrl=page.url();
- await current.focus();
- for(const [key,label] of [["Tab","Terminal settings"],["Tab","Contact support"],["Shift+Tab","Terminal settings"],["Shift+Tab","Disputes"],["Shift+Tab","Team access"],["Shift+Tab","Payments"],["Shift+Tab","Payment links"]] as const){
-  await page.keyboard.press(key);const focused=nav.getByRole("link",{name:label,exact:true});await expect(focused).toBeFocused();await fullyVisible(focused);expect(page.url()).toBe(originalUrl);expect(await page.evaluate(()=>window.scrollY)).toBe(0);
+ await expect(current).toHaveAttribute("aria-current","page");
+ for(const link of await nav.getByRole("link").all())await fullyVisible(link);
+ expect(await nav.evaluate(node=>node.scrollWidth<=node.clientWidth+1)).toBe(true);
+ const originalUrl=page.url();await nav.getByRole("link",{name:"Overview",exact:true}).focus();
+ for(const [key,label] of [["Tab","Payments"],["Tab","Team & terminals"],["Tab","Channels"],["Tab","Settings"],["Shift+Tab","Channels"],["Shift+Tab","Team & terminals"],["Shift+Tab","Payments"]] as const){
+  await page.keyboard.press(key);const focused=nav.getByRole("link",{name:label,exact:true});await expect(focused).toBeFocused();await fullyVisible(focused);expect(page.url()).toBe(originalUrl);
  }
- expect(await nav.evaluate(node=>node.scrollLeft)).toBe(0);
- await page.reload();await fullyVisible(current);expect(page.url()).toBe(originalUrl);expect(await page.evaluate(()=>window.scrollY)).toBe(0);
+ const related=page.getByRole("group",{name:"Related terminal tasks",exact:true});
+ await expect(related.getByRole("link")).toHaveText(["View payments","Contact support"]);
+ const payments=related.getByRole("link",{name:"View payments",exact:true}),support=related.getByRole("link",{name:"Contact support",exact:true});
+ await payments.focus();await fullyVisible(payments);await page.keyboard.press("Tab");await expect(support).toBeFocused();await fullyVisible(support);
+ const target=new URL((await support.getAttribute("href"))!,"http://127.0.0.1:3100");expect(target.pathname).toBe(`/merchants/${f.unit.id}`);expect(target.searchParams.get("tab")).toBe("help");
+ expect(page.url()).toBe(originalUrl);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
+ await page.reload();await fullyVisible(current);expect(page.url()).toBe(originalUrl);
 });

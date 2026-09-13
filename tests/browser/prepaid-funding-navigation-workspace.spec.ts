@@ -19,9 +19,11 @@ test("funding waits for its saved review navigation before confirming and recove
  const base=`/api/v1/money-accounts/${account.id}/funding/intents`;
  await page.goto(`/cardholder-services/funds?service=${primary.serviceId}`);
  await expect(page).toHaveURL(url=>url.pathname===`/money-accounts/${account.id}`&&!url.search);
+ await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Account home",exact:true}).click();
+ await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`/money-accounts/${account.id}?task=add`);
  await page.getByRole("link",{name:"Add money",exact:true}).click();
  const panel=page.locator('section[aria-labelledby="money-task-title"]');
- await expect(panel.getByRole("heading",{name:"Add money",exact:true})).toBeVisible();
+ await expect(panel.getByRole("heading",{name:"How much would you like to add?",exact:true})).toBeVisible();
  let releaseNavigation!:()=>void;
  const navigationGate=new Promise<void>(resolve=>{releaseNavigation=resolve;});
  let heldReviewId="",navigationHeld=false;

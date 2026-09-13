@@ -166,12 +166,11 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
 
   await test.step("save a top-up review and recover a committed but lost confirmation",async()=>{
     await page.goto("/cardholder-services");
-    await page.getByRole("navigation",{name:"Cards and spending navigation"})
-      .getByRole("link",{name:"Account balance",exact:true}).click();
-    await expect(page).toHaveURL(new RegExp(`/money-accounts/${account.id}$`));
-    await expect(page.locator(".money-balance")).toContainText("$0.00");
-    await page.getByRole("link",{name:"Add money",exact:true}).click();
-    await expect(page.getByRole("heading",{name:"Add money",level:2,exact:true})).toBeVisible();
+    const balance=page.getByRole("region",{name:"Card account balance",exact:true});
+    await expect(balance).toContainText("$0.00");
+    await balance.getByRole("link",{name:"Add money",exact:true}).click();
+    await expect(page).toHaveURL(url=>url.pathname===`/money-accounts/${account.id}`&&url.searchParams.get("task")==="add");
+    await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
     await page.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill("100.00");
     await page.getByRole("button",{name:"Continue",exact:true}).click();
     await expect(page.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
@@ -336,6 +335,7 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
   const settlement=await test.step("settle only the unrefunded payment into separate merchant money",async()=>{
     await signIn(page,merchant.personId);
     await page.goto("/merchant-services?section=funds&view=unit:"+merchant.merchantId);
+    await page.locator(".money-incoming > summary").click();
     const terminalSettlement=page.getByRole("region",{name:`Settlement for ${merchant.name}`,exact:true});
     await expect(terminalSettlement).toContainText("$12.50");
     const operations=await merchantProjection(page,merchant.merchantId);
@@ -358,7 +358,7 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
     expect(after.settlements).toHaveLength(1);
     expect(after.settlements[0]).toMatchObject({id:saved.id,reference:saved.reference});
     await page.reload();
-    await expect(page.getByRole("region",{name:"Balance & payouts",exact:true})).toContainText("$12.50");
+    await expect(page.locator(".money-home")).toContainText("$12.50");
     await capture(page,info,"06-merchant-money-settled");
     await accessible(page,info,"merchant-money-settled");
     return saved;

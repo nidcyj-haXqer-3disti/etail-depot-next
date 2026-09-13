@@ -9,7 +9,7 @@ import { WorkspaceDialog, EmptyState } from "./primitives";
 import { WorkspaceIcon, type WorkspaceIconName } from "./navigation";
 import "./task-search.css";
 
-export function TaskSearch({workspace:w,primaryService,selectedCardId}:{workspace?:Pick<WorkspaceProjection,"service"|"cardholderRole"|"capabilities">;primaryService?:CardholderServiceProfile|null;selectedCardId?:string}) {
+export function TaskSearch({workspace:w,primaryService,selectedCardId,addMoneyHref}:{workspace?:Pick<WorkspaceProjection,"service"|"cardholderRole"|"capabilities">;primaryService?:CardholderServiceProfile|null;selectedCardId?:string;addMoneyHref?:string}) {
   const [open,setOpen]=useState(false);const [query,setQuery]=useState("");
   useEffect(()=>{function shortcut(e:KeyboardEvent){if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"&&!document.querySelector("dialog[open]")){e.preventDefault();setQuery("");setOpen(true);}}document.addEventListener("keydown",shortcut);return()=>document.removeEventListener("keydown",shortcut);},[]);
   const can=(action:string)=>w?.capabilities.some(item=>item.action===action&&item.allowed)===true;
@@ -24,7 +24,7 @@ export function TaskSearch({workspace:w,primaryService,selectedCardId}:{workspac
     {label:"Sign-in & security",detail:"Review active sessions and sign out other browsers",path:"/security",icon:"shield",allowed:true,keywords:"sessions devices login logout"},
     {label:primaryService?"Account settings":"Preferences",detail:"Account information and notification preferences",path:cardholderTaskHref("settings",accountSelection),icon:"settings",allowed:!!w||!!primaryService,keywords:"alerts email preferences"},
     {label:"Get help",detail:"Ask a question and read support replies",path:cardholderTaskHref("help",selection),icon:"help",allowed:!!w,keywords:"question support fraud problem cases contact"},
-    {label:"Account balance",detail:"View money activity, add money or withdraw",path:`/cardholder-services/funds?service=${primaryService?.id??""}`,icon:"reports",allowed:!!primaryService,keywords:"top up topup funding bank"},
+    {label:"Add money",detail:"Add money to your card account",path:addMoneyHref??"/cardholder-services",icon:"reports",allowed:!!addMoneyHref,keywords:"top up topup funding bank balance"},
     {label:"Card history",detail:"Continue saved card setup and review created cards",path:"/cardholder-services?view=requests",icon:"cards",allowed:primaryService?.canAddCard===true,keywords:"draft request application canceled"},
   ];
   const results=tasks.filter(task=>task.allowed&&`${task.label} ${task.detail} ${task.keywords}`.toLowerCase().includes(query.trim().toLowerCase()));

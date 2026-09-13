@@ -13,7 +13,7 @@ test("merchant account menu stays stable and terminal tasks stay scoped to the c
  const {merchant,master,unit,operator}=await merchantAccessFixture();
  await signInPerson(page,merchant.personId);await page.goto("/merchant-services");
  const navigation=page.getByRole("navigation",{name:"Merchant account navigation",exact:true});
- await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Payment links","Team & terminals","Balance & payouts","Settings"]);
+ await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Team & terminals","Channels","Settings"]);
  await expect(navigation.getByRole("link",{name:"Overview",exact:true})).toHaveAttribute("aria-current","page");
  const viewport=page.viewportSize();await page.setViewportSize({width:320,height:900});
  for(const link of await navigation.getByRole("link").all())await expect(link).toBeInViewport({ratio:0.99});
@@ -24,21 +24,31 @@ test("merchant account menu stays stable and terminal tasks stay scoped to the c
  await expect(page.getByRole("button",{name:"Create terminal",exact:true})).toHaveCount(0);
  await navigation.getByRole("link",{name:"Team & terminals",exact:true}).click();
  await page.getByRole("link",{name:unit.displayName,exact:true}).click();
- await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Payment links","Team & terminals","Balance & payouts","Settings"]);
+ await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Team & terminals","Channels","Settings"]);
  await expect(navigation.getByRole("link",{name:"Team & terminals",exact:true})).toHaveAttribute("aria-current","page");
  const terminalNavigation=page.getByRole("navigation",{name:"Payment terminal navigation",exact:true});
- await expect(terminalNavigation.getByRole("link")).toHaveText(["Payment links","Payments","Team access","Disputes","Terminal settings","Contact support"]);
- const supportLink=new URL((await terminalNavigation.getByRole("link",{name:"Contact support",exact:true}).getAttribute("href"))!,"http://127.0.0.1:3100");
- expect(supportLink.pathname).toBe(`/merchants/${unit.id}`);expect(supportLink.searchParams.get("tab")).toBe("help");
- expect(supportLink.searchParams.get("returnTo")).toBe(new URL(page.url()).searchParams.get("returnTo"));
+ const related=page.getByRole("group",{name:"Related terminal tasks",exact:true});
+ await expect(terminalNavigation).toHaveCount(0);
+ await expect(page.getByRole("navigation",{name:"Merchant account navigation",exact:true})).toHaveCount(1);
+ await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true})).toContainText(unit.displayName);
+ await expect(related.getByRole("link")).toHaveText(["View channels","View payments"]);
  await expect(page.getByRole("button",{name:"New payment request",exact:true})).toHaveCount(0);
- await terminalNavigation.getByRole("link",{name:"Payment links",exact:true}).click();
- await expect(navigation.getByRole("link",{name:"Payment links",exact:true})).toHaveAttribute("aria-current","page");
+ await related.getByRole("link",{name:"View channels",exact:true}).click();
+ await expect(navigation.getByRole("link",{name:"Channels",exact:true})).toHaveAttribute("aria-current","page");
+ await expect(terminalNavigation).toHaveCount(0);
  await expect(page.getByRole("button",{name:"New payment request",exact:true})).toHaveCount(1);
  await expect(page.getByRole("link",{name:"Collect a payment",exact:true})).toHaveCount(0);
- await terminalNavigation.getByRole("link",{name:"Team access",exact:true}).click();
+ await related.getByRole("link",{name:"Manage team access",exact:true}).click();
  await expect(page.getByRole("button",{name:"Invite a person",exact:true})).toHaveCount(1);
  await expect(page).toHaveURL(url=>url.pathname===`/merchants/${unit.id}`&&url.searchParams.get("tab")==="people");
+ await related.getByRole("link",{name:"View payments",exact:true}).click();
+ await expect(page).toHaveURL(url=>url.pathname===`/merchants/${unit.id}`&&url.searchParams.get("tab")==="payments");
+ const supportLink=new URL((await related.getByRole("link",{name:"Contact support",exact:true}).getAttribute("href"))!,"http://127.0.0.1:3100");
+ expect(supportLink.pathname).toBe(`/merchants/${unit.id}`);expect(supportLink.searchParams.get("tab")).toBe("help");
+ expect(supportLink.searchParams.get("returnTo")).toBe(new URL(page.url()).searchParams.get("returnTo"));
+ await related.getByRole("link",{name:"Contact support",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Contact support",level:1,exact:true})).toBeVisible();
+ await expect(navigation.getByRole("link",{name:"Payments",exact:true})).toHaveAttribute("aria-current","page");
  await navigation.getByRole("link",{name:"Settings",exact:true}).click();
  await expect(page.getByRole("region",{name:"Merchant settings",exact:true})).toContainText(unit.displayName);
  await expect(page.getByRole("link",{name:`Terminal settings for ${master.displayName}`,exact:true})).toHaveAttribute("href",new RegExp(`/merchants/${master.id}\\?tab=verification`));
@@ -53,7 +63,7 @@ test("merchant account menu stays stable and terminal tasks stay scoped to the c
  await submitMerchantSetup(merchant.personId,unit.id,saved.id,{commandId:randomUUID(),expectedVersion:saved.version});
  expect(await getMerchantBusinessDetails(merchant.personId,unit.id)).toMatchObject({ownerAccess:true,canManageSetup:false,merchantStatus:"PENDING_LOCAL_REVIEW"});
  await page.reload();
- await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Payment links","Team & terminals","Balance & payouts","Settings"]);
+ await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Team & terminals","Channels","Settings"]);
  await page.getByRole("link",{name:"Back to terminal settings",exact:true}).click();
  await expect(page).toHaveURL(url=>url.pathname===`/merchants/${unit.id}`&&url.searchParams.get("tab")==="verification"&&url.searchParams.get("returnTo")===accountReturn);
  await page.getByRole("link",{name:"← Back to merchant services",exact:true}).click();
@@ -66,7 +76,7 @@ test("merchant account menu stays stable and terminal tasks stay scoped to the c
  await expect(page).toHaveURL(url=>url.searchParams.get("view")===`unit:${unit.id}`&&url.searchParams.get("activity")==="payments"&&url.searchParams.get("period")==="all"&&!url.searchParams.has("q")&&!url.searchParams.has("status")&&!url.searchParams.has("page"));
  await expect(page.getByRole("searchbox",{name:"Find a payment",exact:true})).toHaveValue("");
  await signInPerson(page,operator.personId);await page.goto("/merchant-services");
- await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Payment links","Your terminals"]);
+ await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Your terminals","Channels"]);
  const optionalBusiness=page.locator("details").filter({has:page.getByText("Optional: add your own business",{exact:true})});
  await expect(optionalBusiness).not.toHaveAttribute("open");
  await expect(page.getByRole("button",{name:"Add your business",exact:true})).toHaveCount(0);
@@ -80,7 +90,9 @@ test("merchant account menu stays stable and terminal tasks stay scoped to the c
  await expect(optionalBusiness).toHaveCount(0);
  await expect(page.getByRole("button",{name:"Add your business",exact:true})).toHaveCount(0);
  await page.getByRole("link",{name:unit.displayName,exact:true}).click();
- await expect(terminalNavigation.getByRole("link")).toHaveText(["Payment links","Payments","Disputes","Contact support"]);
+ await expect(terminalNavigation).toHaveCount(0);
+ await expect(related.getByRole("link")).toHaveText(["View payments"]);
+ await expect(page.getByRole("link",{name:"Request payout",exact:true})).toHaveCount(0);
  await expect(page.getByRole("button",{name:"Invite a person",exact:true})).toHaveCount(0);
  await page.goto("/merchant-services?section=settings");
  await expect(page.getByRole("heading",{name:"Account settings are managed by the owner",exact:true})).toBeVisible();
@@ -97,7 +109,7 @@ test("owner can manage every flat terminal while a terminal user sees only assig
  await expect(page.getByRole("article").getByRole("heading",{name:master.displayName,exact:true})).toBeVisible();
  await expect(page.getByRole("button",{name:"Create terminal",exact:true})).toBeVisible();
  await page.getByRole("link",{name:unit.displayName,exact:true}).click();
- await page.getByRole("navigation",{name:"Payment terminal navigation",exact:true}).getByRole("link",{name:"Payments",exact:true}).click();
+ await page.getByRole("group",{name:"Related terminal tasks",exact:true}).getByRole("link",{name:"View payments",exact:true}).click();
  await expect(page.getByRole("heading",{name:unit.displayName,exact:true})).toBeVisible();
  await page.getByRole("link",{name:"← Back to merchant services",exact:true}).click();
  await expect(page).toHaveURL(/\/merchant-services/);
@@ -150,7 +162,8 @@ test("merchant activity keeps exact terminal scope, dates, pages and receipts wh
  await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&[...query].every(([key,value])=>url.searchParams.get(key)===value)&&url.searchParams.get("page")==="2");
  const csv=await page.request.get((await page.getByRole("link",{name:"Download activity",exact:true}).getAttribute("href"))!);
  expect(csv.status()).toBe(200);expect(csv.headers()["cache-control"]).toContain("no-store");expect((await csv.text()).split("\r\n")).toHaveLength(28);
- await page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Balance & payouts",exact:true}).click();
+ await page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Overview",exact:true}).click();
+ await page.locator(".money-incoming > summary").click();
  await expect(page.getByRole("region",{name:`Settlement for ${f.unit.displayName}`,exact:true})).toContainText("$325.00");
  await page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Payments",exact:true}).click();
  await page.getByRole("searchbox",{name:"Find a payment",exact:true}).fill("No matching order");
@@ -178,7 +191,7 @@ test("merchant activity keeps exact terminal scope, dates, pages and receipts wh
 });
 
 
-test("Payment links requires an explicit authorized terminal before creating a request",async({page})=>{
+test("Channels requires an explicit authorized terminal before creating a request",async({page})=>{
  const {merchant,master,unit,operator}=await merchantAccessFixture();
  await signInPerson(page,merchant.personId);await page.goto("/merchant-services?section=channels");
  const chooser=page.getByRole("region",{name:"Choose a terminal for payment links",exact:true});
@@ -187,7 +200,9 @@ test("Payment links requires an explicit authorized terminal before creating a r
  await expect(page.getByRole("button",{name:"New payment request",exact:true})).toHaveCount(0);
  await chooser.getByRole("link",{name:unit.displayName,exact:true}).click();
  await expect(page).toHaveURL(url=>url.pathname===`/merchants/${unit.id}`&&url.searchParams.get("tab")==="channels");
- await expect(page.getByRole("navigation",{name:"Merchant account navigation",exact:true}).getByRole("link",{name:"Payment links",exact:true})).toHaveAttribute("aria-current","page");
+ await expect(page.getByRole("navigation",{name:"Merchant account navigation",exact:true}).getByRole("link",{name:"Channels",exact:true})).toHaveAttribute("aria-current","page");
+ await expect(page.getByRole("navigation",{name:"Payment terminal navigation",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true})).toContainText(unit.displayName);
  await signInPerson(page,operator.personId);await page.goto("/merchant-services?section=channels");
  await expect(page.getByRole("button",{name:"Add your business",exact:true})).toHaveCount(0);
  await expect(page.getByText("Optional: add your own business",{exact:true})).toHaveCount(0);

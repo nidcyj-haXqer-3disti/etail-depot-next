@@ -101,7 +101,8 @@ test("uncertain channel activation keeps its command and the outer channel open 
 test("an inaccessible saved channel request keeps its exact retry and offers an explained exit",async({page})=>{
  test.setTimeout(90_000);
  const {merchant}=await activeGuestChannel(page.request),description=`Recovery channel ${randomUUID().slice(0,8)}`;
- await page.goto(`/merchants/${merchant.id}?tab=channels&new=1`);
+ const expectedExit=`/merchant-services?${new URLSearchParams({view:`unit:${merchant.id}`,section:"channels",activity:"refunds",period:"last30",q:description})}`;
+ await page.goto(`/merchants/${merchant.id}?${new URLSearchParams({tab:"channels",new:"1",returnTo:expectedExit})}`);
  const edit=page.getByRole("dialog",{name:"New payment request",exact:true});
  await edit.getByRole("textbox",{name:"What is this payment for?",exact:true}).fill(description);
  await edit.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill("12.50");
@@ -127,12 +128,13 @@ test("an inaccessible saved channel request keeps its exact retry and offers an 
  const records=await page.request.get(`/api/v1/merchants/${merchant.id}`).then(response=>response.json());
  expect(records.channels.filter((channel:{description:string})=>channel.description===description)).toHaveLength(1);
  await page.getByRole("button",{name:"Leave for now",exact:true}).click();
- await expect(page).toHaveURL(/\/merchant-services$/);
+ await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===expectedExit);
 });
 
 test("an inaccessible activation preserves the unknown command without trapping the merchant workspace",async({page})=>{
  test.setTimeout(90_000);
  const {merchant,channel}=await activeGuestChannel(page.request,"REUSABLE");
+ const expectedExit=`/merchant-services?${new URLSearchParams({view:`merchant:${merchant.merchantServiceId}`,section:"merchants",activity:"payments",period:"all"})}`;
  await page.goto(`/merchants/${merchant.id}?tab=channels&channel=${channel.id}`);
  const detail=page.getByRole("dialog",{name:"Payment request details",exact:true}),requests:unknown[]=[];
  await page.route(`**/api/v1/merchants/${merchant.id}/channels/${channel.id}/activation`,async route=>{
@@ -154,7 +156,7 @@ test("an inaccessible activation preserves the unknown command without trapping 
  expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
  expect((await operations(page,merchant.id)).channels.find(row=>row.channelId===channel.id)?.state).toBe("DISABLED");
  await detail.getByRole("button",{name:"Leave for now",exact:true}).click();
- await expect(page).toHaveURL(/\/merchant-services$/);
+ await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===expectedExit);
 });
 
 
@@ -162,6 +164,7 @@ test("an inaccessible activation preserves the unknown command without trapping 
 test("a hidden publication recovers through the same link controls without exposing its details",async({page})=>{
  test.setTimeout(90_000);
  const {merchant,channel}=await activeGuestChannel(page.request,"REUSABLE"),requests:unknown[]=[];
+ const expectedExit=`/merchant-services?${new URLSearchParams({view:`merchant:${merchant.merchantServiceId}`,section:"merchants",activity:"payments",period:"all"})}`;
  await page.goto(`/merchants/${merchant.id}?tab=channels&channel=${channel.id}`);
  const detail=page.getByRole("dialog",{name:"Payment request details",exact:true});
  await detail.getByRole("button",{name:"Create payment link",exact:true}).click();
@@ -185,5 +188,5 @@ test("a hidden publication recovers through the same link controls without expos
  await expect(page.getByRole("button",{name:"Leave for now",exact:true})).toBeEnabled();
  expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
  await page.getByRole("button",{name:"Leave for now",exact:true}).click();
- await expect(page).toHaveURL(/\/merchant-services$/);
+ await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===expectedExit);
 });
