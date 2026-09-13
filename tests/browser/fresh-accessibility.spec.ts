@@ -29,8 +29,8 @@ for(const width of [1440,320]) {
    const {card}=await openCardholder(page,persona);
    await expect(page.getByRole("region",{name:"Selected card overview"})).toContainText(card.nickname);
    await accessible(page,"Cardholder overview");
-   await page.getByRole("link",{name:persona==="owner"?"Manage card":"Card settings",exact:true}).click();
-   const dialog=page.getByRole("dialog",{name:card.nickname,exact:true});
+   await page.getByRole("region",{name:"Card controls",exact:true}).getByRole("button",{name:"Freeze card",exact:true}).click();
+   const dialog=page.getByRole("dialog",{name:"Freeze card?",exact:true});
    await dialogKeyboard(page,dialog);await accessible(page,"Exact card controls dialog");
    await page.keyboard.press("Escape");await expect(dialog).toBeHidden();
    await page.goto("/cardholder-services?view=cards");
@@ -53,8 +53,7 @@ for(const width of [1440,320]) {
    expect(operations.canReadPayments).toBe(true);expect(operations.payments.length).toBeGreaterThan(0);
    expect(operations.canConfigureGateway).toBe(persona==="owner");expect(operations.canPayout).toBe(persona==="owner");
    await page.goto(`/merchants/${unit!.id}?tab=payments`);
-   await expect(page.getByRole("heading",{name:"Payments",level:1,exact:true})).toBeVisible();
-   await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{name:unit!.name,level:2,exact:true})).toBeVisible();
+   await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{name:unit!.name,level:1,exact:true})).toBeVisible();
    await expect(page.getByRole("navigation",{name:"Payment terminal navigation"})).toHaveCount(0);
    await expect(page.getByRole("searchbox",{name:"Search payments",exact:true})).toBeVisible();
    await accessible(page,"Merchant payments");
@@ -71,16 +70,16 @@ for(const width of [1440,320]) {
     await accessible(page,`Merchant ${view.toLowerCase()}`);
    }
    if(persona==="owner") {
-    await page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Settings",exact:true}).click();
-    await page.getByRole("link",{name:`Terminal settings for ${unit!.name}`,exact:true}).click();
-    await expect(page).toHaveURL(url=>url.pathname===`/merchants/${unit!.id}`&&url.searchParams.get("tab")==="verification");
-    await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{name:unit!.name,level:2,exact:true})).toBeVisible();
+    await page.getByRole("group",{name:"Terminal sections",exact:true}).getByRole("link",{name:"Terminal controls",exact:true}).click();
+    const controls=page.getByRole("region",{name:"Terminal controls",exact:true}).locator(":scope > details");
+    if(await controls.getAttribute("open")===null)await controls.locator(":scope > summary").click();
+    await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{name:unit!.name,level:1,exact:true})).toBeVisible();
     await expect(page.getByRole("heading",{name:"Your payments are ready",exact:true})).toBeVisible();
     await accessible(page,"Merchant payment setup");
    } else {
     await expect(page.getByRole("navigation",{name:"Payment activity views"}).getByRole("button",{name:"Deposits",exact:true})).toHaveCount(0);
-    await expect(page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Settings",exact:true})).toHaveCount(0);
-    await expect(page.getByRole("link",{name:`Terminal settings for ${unit!.name}`,exact:true})).toHaveCount(0);
+    await expect(page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Account settings",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("region",{name:"Terminal controls",exact:true})).toHaveCount(0);
     await expect(page.getByRole("button",{name:"Review settlement",exact:true})).toHaveCount(0);
     await expect(page.getByRole("region",{name:"Current available balance",exact:true})).toHaveCount(0);
    }

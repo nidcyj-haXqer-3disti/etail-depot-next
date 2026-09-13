@@ -13,6 +13,7 @@ for(const kind of ["merchant","terminal"] as const){
   await page.goto(`/merchant-services?section=merchants${primary?`&view=merchant:${primary.serviceId}`:""}`);
   await page.getByRole("button",{name:primary?"Create terminal":"Add your business",exact:true}).click();
   const edit=page.getByRole("dialog",{name:primary?"Create terminal":"Name your business",exact:true});
+  if(primary)await edit.getByRole("radio",{name:/^For someone else/}).check();
   await edit.getByRole("textbox",{name:primary?"Payment terminal name":"Business name",exact:true}).fill(name);
   await expect(edit.getByRole("button",{name:"Review merchant",exact:true})).toHaveCount(0);
   await expect(edit).toContainText(primary?"You control the payment balance":"You control the payment balance, refunds and who can collect payments");
@@ -41,7 +42,7 @@ for(const kind of ["merchant","terminal"] as const){
   expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
   const saved=(await merchantDashboard(page.request)).units.filter(unit=>unit.name===name);
   expect(saved).toHaveLength(1);expect(saved[0].ownerAccess).toBe(true);
-  if(primary)expect(saved[0].merchantServiceId).toBe(primary.serviceId);
+  if(primary){expect(saved[0].merchantServiceId).toBe(primary.serviceId);expect(saved[0]).toMatchObject({intendedUse:"OTHER",forOthers:true});}
   await recovery.getByRole("button",{name:"Leave for now",exact:true}).click();
   await expect(page).toHaveURL(url=>url.pathname==="/services");
   await expect(recovery).toBeHidden();
@@ -49,3 +50,59 @@ for(const kind of ["merchant","terminal"] as const){
   await expect(page.locator(".mn-navigation-boundary[data-pending]")).toHaveCount(0);
  });
 }
+
+test("a terminal created for someone else stays in For others before an invitation is sent",async({page})=>{
+ const merchant=await acquiringFixture();await signInPerson(page,merchant.personId);
+ const before=(await merchantDashboard(page.request)).moneyAccounts;
+ await page.goto(`/merchant-services?section=merchants&view=merchant:${merchant.serviceId}`);
+ await page.getByRole("button",{name:"Create terminal",exact:true}).click();
+ const create=page.getByRole("dialog",{name:"Create terminal",exact:true});
+ await expect(create.getByRole("radio",{name:/^For someone else/})).toBeChecked();
+ const name=`Shared terminal ${randomUUID().slice(0,8)}`;
+ await create.getByRole("textbox",{name:"Payment terminal name",exact:true}).fill(name);
+ await create.getByRole("button",{name:"Create terminal",exact:true}).click();
+ const invite=page.getByRole("dialog",{name:"Invite a person",exact:true});
+ await expect(invite).toBeVisible();await expect(invite.getByRole("textbox",{name:"Recipient email",exact:true})).toHaveValue("");
+ const terminal=(await merchantDashboard(page.request)).units.find(row=>row.name===name)!;
+ expect(new URL(page.url()).pathname).toBe(`/merchants/${terminal.id}`);
+ await page.keyboard.press("Escape");await expect(invite).toBeHidden();
+ await page.getByRole("navigation",{name:"Merchant account navigation",exact:true}).getByRole("link",{name:"Terminals",exact:true}).click();
+ await page.getByRole("navigation",{name:"Terminal use",exact:true}).getByRole("link",{name:"For others",exact:true}).click();
+ await page.reload();await expect(page.getByRole("link",{name,exact:true})).toBeVisible();
+ await page.getByRole("navigation",{name:"Terminal use",exact:true}).getByRole("link",{name:"For your use",exact:true}).click();
+ await expect(page.getByRole("link",{name,exact:true})).toHaveCount(0);
+ const after=await merchantDashboard(page.request);expect(after.moneyAccounts).toEqual(before);
+ expect(after.units.filter(row=>row.id===terminal.id)).toHaveLength(1);
+ const access=await page.request.get(`/api/v1/merchants/${terminal.id}/access`);expect(access.status()).toBe(200);
+ const saved=await access.json();expect(saved.people).toEqual([]);expect(saved.invitations).toEqual([]);
+});
+
+test("a mismatched created terminal name or use cannot redirect or discard the original request",async({page})=>{
+ const merchant=await acquiringFixture();await signInPerson(page,merchant.personId);
+ const name=`Exact terminal ${randomUUID().slice(0,8)}`,requests:unknown[]=[];
+ await page.goto(`/merchant-services?section=merchants&view=merchant:${merchant.serviceId}`);
+ await page.getByRole("button",{name:"Create terminal",exact:true}).click();
+ const dialog=page.getByRole("dialog",{name:"Create terminal",exact:true});
+ await dialog.getByRole("textbox",{name:"Payment terminal name",exact:true}).fill(name);
+ await page.route(`**/api/v1/merchants/${merchant.serviceId}/terminals`,async route=>{
+  if(route.request().method()!=="POST"){await route.continue();return;}
+  requests.push(route.request().postDataJSON());
+  const response=await route.fetch();expect(response.status()).toBe(200);
+  const result=await response.json();
+  await route.fulfill({status:200,json:requests.length===1?{...result,intendedUse:"SELF"}:requests.length===2?{...result,displayName:"A different terminal"}:result});
+ });
+ await dialog.getByRole("button",{name:"Create terminal",exact:true}).click();
+ await expect(dialog.getByRole("button",{name:"Check request again",exact:true})).toBeVisible();
+ await expect(page).toHaveURL(url=>url.pathname==="/merchant-services");
+ await expect(dialog.getByRole("textbox",{name:"Payment terminal name",exact:true})).toHaveValue(name);
+ await expect(dialog.getByRole("radio",{name:/^For someone else/})).toBeChecked();
+ await dialog.getByRole("button",{name:"Check request again",exact:true}).click();
+ await expect(dialog.getByRole("button",{name:"Check request again",exact:true})).toBeVisible();
+ await expect(page).toHaveURL(url=>url.pathname==="/merchant-services");
+ await dialog.getByRole("button",{name:"Check request again",exact:true}).click();
+ await expect(page.getByRole("dialog",{name:"Invite a person",exact:true})).toBeVisible();
+ expect(requests).toHaveLength(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
+ const saved=(await merchantDashboard(page.request)).units.filter(row=>row.name===name);
+ expect(saved).toHaveLength(1);expect(saved[0]).toMatchObject({intendedUse:"OTHER",forOthers:true});
+ expect(new URL(page.url()).pathname).toBe(`/merchants/${saved[0].id}`);
+});

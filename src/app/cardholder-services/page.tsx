@@ -7,7 +7,7 @@ import { SecurityError } from "@/platform/security/origin";
 import { getCardholderDashboard, getCardholderDashboardDetail, getCardholderDashboardFocus } from "@/modules/workspace/dashboard-service";
 import {getCardholderFunds} from "@/modules/workspace/service";
 import {getMoneyAccountOverview} from "@/modules/money/service";
-import { getAccessOverview } from "@/modules/access/service";
+import { getAccessOverview, getCardInvitations } from "@/modules/access/service";
 import { cardholderDashboardQuerySchema } from "@/modules/workspace/api-contracts";
 import { Shell, PageNotice } from "@/ui/shell";
 import { CardholderDashboard } from "@/ui/cardholder-dashboard";
@@ -41,20 +41,22 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     ]);
     // Home is the account overview. Card details require an explicit resource;
     // alphabetical order, directory filters and received cards never choose it.
-    const focusValue = query.focus ?? query.activityCard;
+    const focusValue = query.focus ?? query.activityCard ?? (detail?.kind==="CARD"?query.card:undefined);
     const focusRequested = focusValue !== undefined;
     const focusId = focusRequested && typeof focusValue === "string" ? focusValue.toLowerCase() : undefined;
     const focused = focusId ? await getCardholderDashboardFocus(session.personId, focusId).catch(error => {
       if (error instanceof SecurityError && [403, 404, 422].includes(error.status)) return null;
       throw error;
     }) : null;
+    const focusedDetail=focused?detail?.kind==="CARD"&&typeof query.card==="string"&&query.card.toLowerCase()===focused.card.id?detail:await getCardholderDashboardDetail(session.personId,{card:focused.card.id}).catch(error=>{if(error instanceof SecurityError&&[403,404,422].includes(error.status))return null;throw error;}):null;
+    const focusedInvitations=focused?.card.accessRole==="OWNER"&&focusedDetail?.workspace.capabilities.some(item=>item.action==="people.invite"&&item.allowed)?await getCardInvitations(session.personId,focused.card.id).catch(error=>{if(error instanceof SecurityError&&[403,404].includes(error.status))return null;throw error;}):null;
     const management=detail?.kind==="PEOPLE"?detail:query.view==="cardholders"&&dashboard.primaryService?await getCardholderDashboardDetail(session.personId,{manage:dashboard.primaryService.id}).catch(error=>{if(error instanceof SecurityError&&[403,404].includes(error.status))return null;throw error;}):null;
     const access = management ? await getAccessOverview(session.personId, management.workspace.service.id) : undefined;
     const selectedPerson=typeof query.person==="string"?query.person.toLowerCase():undefined;
     const personUnavailable=query.person!==undefined&&(!selectedPerson||!access?.people.some(person=>person.id===selectedPerson));
     const funds=dashboard.primaryService?await getCardholderFunds(session.personId,dashboard.primaryService.id).catch(error=>{if(error instanceof SecurityError&&[403,404].includes(error.status))return null;throw error;}):null;
     const moneyAccount=funds?await getMoneyAccountOverview(session.personId,funds.moneyAccountId).catch(error=>{if(error instanceof SecurityError&&[403,404].includes(error.status))return null;throw error;}):null;
-    return {dashboard,detail,access,moneyAccount,managementWorkspace:management?.workspace,selectedPerson,personUnavailable,focusedCard:focused?.card??null,focusedWorkspace:focused?.workspace??null,focusUnavailable:focusRequested && !focused};
+    return {dashboard,detail,access,moneyAccount,focusedDetail,focusedInvitations,managementWorkspace:management?.workspace,selectedPerson,personUnavailable,focusedCard:focused?.card??null,focusedWorkspace:focused?.workspace??null,focusUnavailable:focusRequested && !focused};
   } catch (error) {
     unstable_rethrow(error);
     return null;
@@ -70,5 +72,5 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
     if (query.transaction !== undefined) for (const value of Array.isArray(query.transaction) ? query.transaction : [query.transaction]) target.append("transaction", value);
     redirect(`/cardholder-services/activity${target.size ? `?${target}` : ""}`);
   }
-  return <Shell authenticated><CardholderDashboard moneyAccount={result.moneyAccount} dashboard={result.dashboard} detail={result.detail} access={result.access} managementWorkspace={result.managementWorkspace} selectedPersonId={result.selectedPerson} personUnavailable={result.personUnavailable} selectionUnavailable={selectionRequested && !result.detail} focusedCard={result.focusedCard} focusedWorkspace={result.focusedWorkspace} focusUnavailable={result.focusUnavailable}/></Shell>;
+  return <Shell authenticated><CardholderDashboard focusedDetail={result.focusedDetail} focusedInvitations={result.focusedInvitations} moneyAccount={result.moneyAccount} dashboard={result.dashboard} detail={result.detail} access={result.access} managementWorkspace={result.managementWorkspace} selectedPersonId={result.selectedPerson} personUnavailable={result.personUnavailable} selectionUnavailable={selectionRequested && !result.detail} focusedCard={result.focusedCard} focusedWorkspace={result.focusedWorkspace} focusUnavailable={result.focusUnavailable}/></Shell>;
 }

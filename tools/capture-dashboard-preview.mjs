@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** D79 read-only dashboard QA. Run through run-with-database.mjs --preview after starting the preserved preview. */
+/** D80 read-only dashboard QA. Run through run-with-database.mjs --preview after starting the preserved preview. */
 import {chromium,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import pg from 'pg';
@@ -14,11 +14,11 @@ import {previewDatabase,previewSeedKey,verifyPreviewRuntime,verifyPreviewDatabas
 const origin='http://127.0.0.1:3100';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const name=process.argv[2],connectionString=`postgres://etail_local@127.0.0.1:55439/${previewDatabase}`;
-if(process.argv.length!==3||!/^d79-dashboard-preview(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?$/.test(name??'')||name.length>90||
+if(process.argv.length!==3||!/^d80-dashboard-preview(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?$/.test(name??'')||name.length>90||
  process.env.APP_ENV!=='local'||process.env.ENABLE_LOCAL_FIXTURE_IDENTITY!=='true'||process.env.ENABLE_REAL_MONEY!=='false'||
  process.env.DATABASE_URL!==connectionString||process.env.ETAIL_PUBLIC_ORIGIN!==origin||
  process.env.CI&&process.env.CI!=='false'||process.env.NETLIFY||process.env.SITE_ID||process.env.CONTEXT)
- throw new Error('Use a new d79-dashboard-preview directory name with the exact prepared local preview environment.');
+ throw new Error('Use a new d80-dashboard-preview directory name with the exact prepared local preview environment.');
 
 const output=path.join(root,'artifacts',name),run=promisify(execFile);
 const hash=value=>createHash('sha256').update(value).digest('hex');
@@ -27,7 +27,7 @@ let current={role:'setup',screen:'verification',width:0},browser=null,outputRead
 let beforeSource=null,afterSource=null;
 process.umask(0o077);
 function assert(condition,code){if(!condition)throw new Error(code);}
-function failure(code,error){errors.push({...current,code,...(error?{diagnosticHash:hash(String(error.message??error))}:{})});}
+function failure(code,error){errors.push({...current,code,...(error?{diagnosticHash:hash(String(error.message??error)),sourceAt:String(error.stack??'').match(/capture-dashboard-preview\.mjs:\d+:\d+/)?.[0]??null}:{})});}
 async function ownedDirectory(directory,create=false){
  if(create)await fs.mkdir(directory,{mode:0o700});
  const stat=await fs.lstat(directory);
@@ -73,8 +73,8 @@ async function bounded(promise,milliseconds){
 }
 const ownerCardMenu=['Account home','Cards','Activity','Account settings'];
 const holderCardMenu=['Account home','Cards','Activity','Preferences'];
-const ownerMerchantMenu=['Overview','Payments','Team & terminals','Channels','Settings'];
-const holderMerchantMenu=['Overview','Payments','Your terminals','Channels'];
+const ownerMerchantMenu=['Overview','Terminals','Account settings'];
+const holderMerchantMenu=['Overview','Terminals'];
 function cardMenu(page){return page.getByRole('navigation',{name:'Cards and spending navigation',exact:true});}
 function merchantMenu(page){return page.getByRole('navigation',{name:'Merchant account navigation',exact:true});}
 async function capture(page,role,width,screen,url,ready){
@@ -195,6 +195,24 @@ try{
      await expect(page.getByRole('region',{name:'Selected card overview',exact:true})).toContainText(card.nickname);
      await expect(cardMenu(page).getByRole('link',{name:'Cards',exact:true})).toHaveAttribute('aria-current','page');
     });
+    await capture(page,role,width,'card-freeze-review',`/cardholder-services?view=cards&focus=${card.id}`,async page=>{
+     await page.getByRole('region',{name:'Card controls',exact:true}).getByRole('button',{name:'Freeze card',exact:true}).click();
+     await expect(page.getByRole('dialog',{name:'Freeze card?',exact:true})).toBeVisible();
+    });
+    if(own){
+     await capture(page,role,width,'card-for-others-detail',`/cardholder-services?view=cards&focus=${ids.secondaryCardId}`,async page=>{
+      const detail=page.getByRole('region',{name:'Card management details',exact:true});
+      await expect(detail.getByRole('article',{name:'Card spending limit',exact:true})).toBeVisible();
+      await expect(detail.getByRole('region',{name:'Cardholder',exact:true})).toBeVisible();
+      await expect(page.getByRole('link',{name:/^(Manage card|Managed cards|Card settings)$/})).toHaveCount(0);
+     });
+     await capture(page,role,width,'card-create','/cardholder-services?view=cards',async page=>{
+      await page.getByRole('link',{name:'Add card',exact:true}).click();
+      const dialog=page.getByRole('dialog',{name:'Add card',exact:true});
+      await expect(dialog.getByRole('radio',{name:/^For someone else/})).toBeChecked();
+      await expect(dialog.getByRole('radio',{name:/^For your use/})).toBeVisible();
+     });
+    }
     await capture(page,role,width,'card-settings',`/cardholder-services/settings?context=${ids.serviceId}`,async page=>{
      await expect(page.getByRole('heading',{name:own?'Account settings':'Preferences',level:1,exact:true})).toBeVisible();
      await expect(cardMenu(page).getByRole('link')).toHaveText(cardLinks);
@@ -213,45 +231,59 @@ try{
      else await expect(page.getByRole('heading',{name:'Money activity',level:2,exact:true})).toBeVisible();
     });
     const merchantReturn=`/merchant-services?${new URLSearchParams({view:own?'merchant:'+ids.merchantServiceId:'unit:'+terminal.id,section:'overview',activity:'payments',period:'all'})}`;
-    for(const [screen,section,label] of [['merchant-overview','overview','Overview'],['merchant-channels','channels','Channels'],['merchant-terminals','merchants',own?'Team & terminals':'Your terminals']])await capture(page,role,width,screen,`/merchant-services?section=${section}&view=${own?'merchant:'+ids.merchantServiceId:'unit:'+terminal.id}`,async page=>{
+    for(const [screen,section,label] of [['merchant-overview','overview','Overview'],['merchant-terminals','merchants','Terminals']])await capture(page,role,width,screen,`/merchant-services?section=${section}&view=${own?'merchant:'+ids.merchantServiceId:'unit:'+terminal.id}`,async page=>{
      await expect(merchantMenu(page).getByRole('link')).toHaveText(merchantLinks);
      await expect(merchantMenu(page).getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
      await expect(page.getByRole('navigation',{name:'Payment terminal navigation',exact:true})).toHaveCount(0);
      if(section==='overview'){
-      await expect(page.getByRole('heading',{name:'Recent payments',exact:true})).toBeVisible();
+      await expect(page.getByRole('heading',{name:'Account statement',exact:true})).toBeVisible();
+      await expect(page.getByRole('form',{name:'Filter account statement',exact:true})).toBeVisible();
       await expect(page.getByRole('link',{name:'Request payout',exact:true})).toHaveCount(own?1:0);
-      await expect(page.getByRole('link',{name:'Payout history',exact:true})).toHaveCount(own?1:0);
       if(own)await expect(page.locator('details.money-incoming')).not.toHaveAttribute('open');
-     }
-     else await expect(page.getByRole('link',{name:terminal.name,exact:true})).toBeVisible();
-     await expect(page.getByRole('button',{name:'New payment request',exact:true})).toHaveCount(0);
+     }else await expect(page.getByRole('link',{name:terminal.name,exact:true})).toBeVisible();
      await expect(page.getByRole('link',{name:'Add money',exact:true})).toHaveCount(0);
      if(!own){await expect(page.locator('.money-home,.money-settlements')).toHaveCount(0);await expect(page.locator('a[href^="/money-accounts/"]')).toHaveCount(0);}
     });
-    await capture(page,role,width,'merchant-terminal-channels',`/merchants/${terminal.id}?${new URLSearchParams({tab:'channels',returnTo:merchantReturn})}`,async page=>{
-     await expect(page.getByRole('heading',{name:'Channels',level:1,exact:true})).toBeVisible();
+    const terminalHref=`/merchants/${terminal.id}?${new URLSearchParams({tab:'channels',returnTo:merchantReturn})}`;
+    await capture(page,role,width,'merchant-terminal-detail',terminalHref,async page=>{
+     await expect(page.getByRole('heading',{name:terminal.name,level:1,exact:true})).toBeVisible();
      await expect(merchantMenu(page).getByRole('link')).toHaveText(merchantLinks);
-     await expect(merchantMenu(page).getByRole('link',{name:'Channels',exact:true})).toHaveAttribute('aria-current','page');
+     await expect(merchantMenu(page).getByRole('link',{name:'Terminals',exact:true})).toHaveAttribute('aria-current','page');
      await expect(page.getByRole('navigation',{name:'Payment terminal navigation',exact:true})).toHaveCount(0);
-     await expect(page.getByRole('region',{name:'Selected payment terminal',exact:true})).toContainText(terminal.name);
+     for(const name of ['Payment channels','Terminal activity','Customer support'])await expect(page.getByRole('region',{name,exact:true})).toBeVisible();
+     await expect(page.getByRole('region',{name:'People and sharing',exact:true})).toHaveCount(own?1:0);
+     await expect(page.getByRole('region',{name:'Terminal controls',exact:true})).toHaveCount(own?1:0);
      await expect(page.getByRole('button',{name:'New payment request',exact:true})).toHaveCount(1);
-     const related=page.getByRole('group',{name:'Related terminal tasks',exact:true});
-     await expect(related.getByRole('link')).toHaveText(own?['View payments','Manage team access']:['View payments']);
-     for(const link of await related.getByRole('link').all()){
-      const target=new URL(await link.getAttribute('href'),origin);
-      assert(target.origin===origin&&target.pathname===`/merchants/${terminal.id}`&&target.searchParams.get('returnTo')===merchantReturn,'TERMINAL_CONTEXT_CHANGED');
-     }
      if(!own){await expect(page.getByRole('button',{name:'Invite a person',exact:true})).toHaveCount(0);await expect(page.locator('a[href^="/money-accounts/"]')).toHaveCount(0);}
     });
-    if(own)await capture(page,role,width,'merchant-terminal-team',`/merchants/${terminal.id}?${new URLSearchParams({tab:'people',returnTo:merchantReturn})}`,async page=>{
-     await expect(page.getByRole('heading',{name:'Team & terminals',level:1,exact:true})).toBeVisible();
-     await expect(merchantMenu(page).getByRole('link')).toHaveText(ownerMerchantMenu);
-     await expect(merchantMenu(page).getByRole('link',{name:'Team & terminals',exact:true})).toHaveAttribute('aria-current','page');
-     await expect(page.getByRole('navigation',{name:'Payment terminal navigation',exact:true})).toHaveCount(0);
-     await expect(page.getByRole('region',{name:'Selected payment terminal',exact:true})).toContainText(terminal.name);
-     await expect(page.getByRole('button',{name:'Invite a person',exact:true})).toHaveCount(1);
-     await expect(page.getByRole('group',{name:'Related terminal tasks',exact:true}).getByRole('link')).toHaveText(['View channels','View payments']);
-    });
+    if(own){
+     await capture(page,role,width,'merchant-terminal-invite',terminalHref,async page=>{
+      await page.getByRole('button',{name:'Invite a person',exact:true}).click();
+      const dialog=page.getByRole('dialog',{name:'Invite a person',exact:true});
+      await expect(dialog.getByRole('textbox',{name:'Recipient email',exact:true})).toBeVisible();
+      await expect(dialog.getByRole('button',{name:'Review invitation',exact:true})).toBeDisabled();
+     });
+     for(const [use,label] of [['self','For your use'],['others','For others']])await capture(page,role,width,`merchant-terminals-${use}`,`/merchant-services?${new URLSearchParams({section:'merchants',view:'merchant:'+ids.merchantServiceId,terminalUse:use})}`,async page=>{
+      await expect(page.getByRole('navigation',{name:'Terminal use',exact:true}).getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
+     });
+     await capture(page,role,width,'merchant-create-terminal',`/merchant-services?section=merchants&view=merchant:${ids.merchantServiceId}`,async page=>{
+      await page.getByRole('button',{name:'Create terminal',exact:true}).click();
+      const dialog=page.getByRole('dialog',{name:'Create terminal',exact:true});
+      await expect(dialog.getByRole('radio',{name:/^For someone else/})).toBeChecked();
+      await dialog.getByRole('radio',{name:/^For your use/}).check();
+      await expect(dialog.getByRole('textbox',{name:'Payment terminal name',exact:true})).toBeVisible();
+     });
+     await capture(page,role,width,'merchant-settings',`/merchant-services?section=settings&view=merchant:${ids.merchantServiceId}`,async page=>{
+      await expect(page.getByRole('heading',{name:'Account settings',level:1,exact:true})).toBeVisible();
+      await expect(merchantMenu(page).getByRole('link',{name:'Account settings',exact:true})).toHaveAttribute('aria-current','page');
+      await expect(page.getByRole('region',{name:'Merchant account settings',exact:true})).not.toContainText('Sign-in');
+     });
+     await capture(page,role,width,'merchant-business-settings',`/merchant-services/${ids.merchantServiceId}/settings`,async page=>{
+      await expect(merchantMenu(page).getByRole('link',{name:'Account settings',exact:true})).toHaveAttribute('aria-current','page');
+      await expect(page.getByRole('heading',{level:1})).toHaveCount(1);
+      await expect(page.getByRole('region',{name:'Business details',exact:true})).toBeVisible();
+     });
+    }
     if(own)await capture(page,role,width,'merchant-incoming',merchantReturn,async page=>{
      await expect(page.getByRole('heading',{name:'Overview',level:1,exact:true})).toBeVisible();
      await expect(merchantMenu(page).getByRole('link')).toHaveText(ownerMerchantMenu);
@@ -275,6 +307,12 @@ try{
      if(task){await expect(page.getByLabel('Amount (USD)',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Continue',exact:true})).toBeVisible();}
      else await expect(page.getByRole('heading',{name:'Payout history',level:2,exact:true})).toBeVisible();
     });
+    await capture(page,role,width,'profile','/profile',async page=>{
+     await expect(page.getByRole('heading',{name:'Your profile',level:1,exact:true})).toBeVisible();
+     await expect(page.getByRole('region',{name:'Your details',exact:true})).toContainText('Display name');
+     await expect(page.getByRole('link',{name:'Manage sign-ins',exact:true})).toHaveAttribute('href','/security');
+     await expect(page.locator('a[href^="/money-accounts/"]')).toHaveCount(0);
+    });
     await capture(page,role,width,'profile-help-menu','/cardholder-services',async page=>{
      const trigger=page.getByLabel('Profile and help',{exact:true});
      await trigger.focus();await page.keyboard.press('Enter');
@@ -291,7 +329,7 @@ finally{
  clearTimeout(deadline);if(browser)try{await browser.close();}catch(error){failure('BROWSER_CLOSE_FAILED',error);}
  if(beforeSource)try{afterSource=await sourceHash();}catch(error){failure('SOURCE_HASH_FAILED',error);}
 }
-const summary={result:checks.length===81&&!checks.some(item=>item.failed)&&!errors.length&&preserved.length===2&&preserved.every(item=>item.unchanged)&&beforeSource?.hash===afterSource?.hash?'PASS':'FAIL',screens:checks.length,failed:checks.filter(item=>item.failed).length,runtimeOrGuardErrors:errors.length,fixtureSignIns:signIns,source:{before:beforeSource,after:afterSource,unchanged:!!beforeSource&&beforeSource.hash===afterSource?.hash},normalization:'Only projection asOf timestamps are omitted. No report endpoint is captured; all business fields and array order are compared.',preserved};
+const summary={result:checks.length===108&&!checks.some(item=>item.failed)&&!errors.length&&preserved.length===2&&preserved.every(item=>item.unchanged)&&beforeSource?.hash===afterSource?.hash?'PASS':'FAIL',screens:checks.length,failed:checks.filter(item=>item.failed).length,runtimeOrGuardErrors:errors.length,fixtureSignIns:signIns,source:{before:beforeSource,after:afterSource,unchanged:!!beforeSource&&beforeSource.hash===afterSource?.hash},normalization:'Only projection asOf timestamps are omitted. No report endpoint is captured; all business fields and array order are compared.',preserved};
 try{assert(outputReady,'ARTIFACT_DIRECTORY_NOT_CREATED');await writePrivate('checks.json',JSON.stringify({summary,checks,errors},null,2)+'\n');}catch{summary.result='FAIL';}
 console.log(JSON.stringify({result:summary.result,screens:summary.screens,failed:summary.failed,runtimeOrGuardErrors:summary.runtimeOrGuardErrors,sourceUnchanged:summary.source.unchanged,artifactDirectory:path.relative(root,output)}));
 if(summary.result!=='PASS')process.exitCode=1;

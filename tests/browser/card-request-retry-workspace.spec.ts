@@ -44,7 +44,7 @@ test("one card form starts only on review and safely retries lost start, save an
   expect((await workspace()).cardRequests).toEqual(before.cardRequests);
   expect(attempts.start).toEqual([]);
   const self = dialog.getByRole("radio", { name: new RegExp(data.person.displayName) });
-  await expect(dialog.getByRole("radio",{name:/Someone else/})).toBeChecked();
+  await expect(dialog.getByRole("radio",{name:/For someone else/})).toBeChecked();
   await expect(dialog).not.toContainText("That cardholder isn’t available");
   await expect(self).not.toBeChecked();
   // Choosing Me explicitly assigns the owner; the URL never chooses a recipient.

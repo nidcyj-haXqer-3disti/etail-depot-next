@@ -1,5 +1,7 @@
 # Etail Depot — current project prompt
 
+> **D80 active override — 13 September 2026:** [Unified resource workspaces](docs/UNIFIED_RESOURCE_WORKSPACES.md) makes cards and terminals follow the same create-for-self/others, detail, controls and sharing pattern. Card details contain their own controls and invitations; Merchant Overview is one credit/debit statement, with Terminals owning channels and assigned people. Personal profile/login and service account settings remain separate. D73 money/authority and D76 contact-bound invitations remain.
+
 > **D79 active override — 13 September 2026:** [Consolidated service workflows](docs/CONSOLIDATED_SERVICE_WORKFLOWS.md) puts card Add money on Account home and Return unused money in owner settings; card filters describe use rather than names. Merchant has one Overview / Payments / Team & terminals / Channels / Settings menu, with balance and payouts on Overview and terminal context inside the same workspace. Existing financial, permission and recovery rules remain.
 
 > **D78 active override — 13 September 2026:** [Clear service workspaces](docs/SERVICE_DASHBOARD_CLARITY.md) makes Amex the Cardholder reference and Stripe the Merchant reference. Separate account overview from named-card detail; use one personal account menu with no authenticated footer. Merchant collection, settlement and payouts have distinct views; routine merchant top-ups are retired server-side while posted receipts remain recoverable. D73 money/permissions and D76 invitations/checkout remain.

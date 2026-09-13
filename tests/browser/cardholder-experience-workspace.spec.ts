@@ -47,7 +47,7 @@ test("cardholder navigation separates account money from cards and keeps holder 
   const overview=page.getByRole("region",{name:"Selected card overview",exact:true});
   await expect(overview.locator(".ch-focus-balance")).toContainText("Available on this card");
   await expect(overview.locator(".ch-focus-balance")).toContainText("$40.00");
-  await expect(overview.getByRole("button",{name:/Freeze/})).toBeVisible();
+  await expect(page.getByRole("region",{name:"Card controls",exact:true}).getByRole("button",{name:"Freeze card",exact:true})).toBeVisible();
   const group=page.getByRole("region",{name:"Card account balance",exact:true});
   await expect(group).toHaveCount(0);
   await expect(navigation.getByRole("link",{name:"Cards",exact:true})).toHaveAttribute("aria-current","page");
@@ -57,9 +57,10 @@ test("cardholder navigation separates account money from cards and keeps holder 
   await expect(totalAllowance).toHaveCount(1);
   await expect(totalAllowance).toBeVisible();
   await expect(overview.locator(".ch-limit-summary>div").filter({hasText:"Total spending limit"}).locator("dd")).toHaveText("$40.00");
-  await overview.getByRole("link",{name:"Manage card",exact:true}).click();
-  await expect(page.getByRole("dialog").getByRole("article",{name:"Card spending limit",exact:true})).toContainText("$40.00");
-  await page.keyboard.press("Escape");
+  await expect(page.getByRole("link",{name:/^(Manage card|Managed cards|Card settings)$/})).toHaveCount(0);
+  await expect(page.getByRole("region",{name:"Card management details",exact:true}).getByRole("article",{name:"Card spending limit",exact:true})).toContainText("$40.00");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("region",{name:"Cardholder",exact:true})).toContainText("This card is for your use.");
   await expect(page.getByRole("heading",{name:"Recent activity",exact:true})).toBeVisible();
   await expect(navigation.getByText("More",{exact:true})).toHaveCount(0);
   await expect(navigation.getByRole("link",{name:"Account settings",exact:true})).toHaveAttribute("href",`/cardholder-services/settings?context=${primary.serviceId}`);
@@ -91,10 +92,14 @@ test("cardholder navigation separates account money from cards and keeps holder 
   await navigation.getByRole("link",{name:"Account settings",exact:true}).click();
   await expect(page).toHaveURL(new RegExp(`/cardholder-services/settings\\?context=${primary.serviceId}$`));
   await expect(page.getByRole("heading",{name:"Account settings",level:1,exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Card account settings",exact:true})).toBeVisible();
+  await expect(page.locator("main")).not.toContainText("Signed in as");
+  await expect(page.getByRole("textbox")).toHaveCount(0);
+  await expect(page.locator("main")).toContainText("Prepaid card balance");
   await expect(page.getByRole("link",{name:"Return unused money",exact:true})).toHaveAttribute("href",`/money-accounts/${funds.moneyAccountId}?task=withdraw`);
 
   await page.goto(`/cardholder-services?card=${shared.card.id}`);
-  const allowance=page.getByRole("dialog").getByRole("article",{name:"Card spending limit",exact:true});
+  const allowance=page.getByRole("region",{name:"Card management details",exact:true}).getByRole("article",{name:"Card spending limit",exact:true});
   await expect(allowance).toContainText("$25.00");
   const limitGrant=and(eq(permissionGrants.personId,primary.personId),eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.action,"cardholder.limits.manage"));
   expect(await getDb().update(permissionGrants).set({state:"REVOKED"}).where(limitGrant).returning({action:permissionGrants.action})).toHaveLength(1);
@@ -106,7 +111,8 @@ test("cardholder navigation separates account money from cards and keeps holder 
   await expect(overview.locator(".ch-focus-balance")).toContainText("$25.00");
   await expect(page.locator("main")).not.toContainText(own.card.nickname);
   await expect(group).toHaveCount(0);
-  await expect(overview.getByRole("link",{name:"Manage card",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("article",{name:"Card spending limit",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("button",{name:"Invite cardholder",exact:true})).toHaveCount(0);
   await expect(navigation.getByRole("link")).toHaveText(["Account home","Cards","Activity","Preferences"]);
   await expect(navigation.getByRole("link",{name:"Account balance",exact:true})).toHaveCount(0);
   await expect(navigation.getByRole("link",{name:"Account settings",exact:true})).toHaveCount(0);
@@ -270,24 +276,22 @@ test("an owned card pays at a published checkout while another holder's card off
   await page.goto(`/cardholder-services?focus=${owned.card.id}`);
   await expect(overview).toContainText("No spending available");
   // Reaching the card's allowance never strands them in a removed purchase task.
-  await overview.getByRole("link",{name:"Manage card",exact:true}).click();
+  const ownControls=page.getByRole("region",{name:"Card controls",exact:true});
   const ownDialog=page.getByRole("dialog");
-  await expect(ownDialog.getByRole("textbox",{name:"Purchase description",exact:true})).toHaveCount(0);
-  await ownDialog.getByRole("button", { name: "Freeze", exact: true }).click();
+  await expect(page.getByRole("textbox",{name:"Purchase description",exact:true})).toHaveCount(0);
+  await ownControls.getByRole("button", { name: "Freeze card", exact: true }).click();
   await ownDialog.getByRole("button", { name: "Freeze card", exact: true }).click();
-  await expect(ownDialog.getByRole("button", { name: "Unfreeze", exact: true })).toBeVisible();
-  await page.keyboard.press("Escape");
+  await expect(ownDialog).toHaveCount(0);
+  await expect(ownControls.getByRole("button", { name: "Unfreeze card", exact: true })).toBeVisible();
 
   await page.getByRole("link",{name:"Back to card list",exact:true}).click();
   await page.getByRole("link",{name:new RegExp(`^Open ${managed.card.nickname},`)}).click();
   await expect(overview).toContainText("Jamie Ownership");
   await expect(overview.getByRole("link", { name: "Try a purchase", exact: true })).toHaveCount(0);
-  await overview.getByRole("link", { name: "Manage card", exact: true }).click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toContainText("Jamie Ownership’s card");
-  await expect(dialog).toContainText("Only Jamie Ownership can use this card");
-  await expect(dialog.getByRole("textbox", { name: "Purchase description", exact: true })).toHaveCount(0);
-  await expect(dialog.getByRole("button", { name: "Freeze", exact: true })).toBeEnabled();
+  await expect(overview).toContainText("Jamie Ownership’s card");
+  await expect(overview).toContainText("Only Jamie Ownership can use this card");
+  await expect(page.getByRole("textbox", { name: "Purchase description", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("region",{name:"Card controls",exact:true}).getByRole("button", { name: "Freeze card", exact: true })).toBeEnabled();
   await expect(prepareCardCheckout(primary.personId,merchant.publication.id,{commandId:randomUUID(),cardServiceId:primary.serviceId,cardId:managed.card.id,expectedCardVersion:managed.card.version})).rejects.toMatchObject({status:404});
   const result = await dashboard(page);
   expect(result.cards.find(card => card.id === owned.card.id)).toMatchObject({ available: { minor: "0" }, status: "FROZEN", canPurchase: false });
@@ -312,9 +316,9 @@ test("owner-frozen holder cards stay their own with an accurate explanation and 
   await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
   await expect(page.getByRole("link", { name: "People", exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Try a purchase", exact: true })).toHaveCount(0);
-  await overview.getByRole("link", { name: "Card settings", exact: true }).click();
-  await expect(page.getByRole("dialog")).toContainText("Ask your account owner to review the freeze");
-  await expect(page.getByRole("dialog")).not.toContainText("Only the person named on this card");
+  await expect(overview).toContainText("Ask your account owner to review the freeze");
+  await expect(overview).not.toContainText("Only the person named on this card");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   expect((await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   const result = await dashboard(page, "OWN");

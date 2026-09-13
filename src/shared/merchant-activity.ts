@@ -5,6 +5,7 @@ export const ACTIVITY_EXPORT_LIMIT = 10000;
 export const merchantActivityQuerySchema = z.object({
   view: z.string().regex(/^(all|(?:unit|merchant):[0-9a-f-]{36})$/i).default("all"),
   section: z.enum(["overview", "activity", "channels", "funds", "merchants", "settings"]).default("overview"),
+  terminalUse: z.enum(["all", "self", "others"]).default("all"),
   activity: z.enum(["payments", "refunds", "transfers"]).default("payments"),
   period: z.enum(["all", "last7", "last30", "thisMonth", "lastMonth", "custom"]).default("all"),
   from: z.string().default(""), to: z.string().default(""),
@@ -17,7 +18,7 @@ export type MerchantActivityQueryInput = Record<string, string | string[] | unde
 export function parseMerchantActivityFilters(input: MerchantActivityQueryInput = {}): MerchantActivityQuery {
   const source = input instanceof URLSearchParams ? Object.fromEntries([...new Set(input.keys())].map(key => [key, input.getAll(key).length === 1 ? input.get(key)! : input.getAll(key)])) : input;
   const raw = Object.fromEntries(Object.keys(merchantActivityQuerySchema.shape).filter(key => source[key] !== undefined).map(key => [key, source[key]]));
-  // Saved payment investigations predate Account home. Their filters still open Payments.
+  // Saved payment investigations retain their filter context within Overview.
   if (raw.section === undefined && ["activity", "period", "from", "to", "q", "status", "page"].some(key => raw[key] !== undefined)) raw.section = "activity";
   const parsed = merchantActivityQuerySchema.safeParse(raw);
   if (!parsed.success) throw new Error("INVALID_ACTIVITY_FILTER");
@@ -43,7 +44,7 @@ export function activityRange(query: MerchantActivityQuery, now: Date) {
 export function merchantActivityHref(query: MerchantActivityQuery, updates: Partial<MerchantActivityQuery> = {}) {
   const next = {...query, ...updates};
   const params = new URLSearchParams();
-  for (const [key,value] of Object.entries(next)) if (value !== "" && !(key === "view" && value === "all") && !(key === "section" && value === "activity") && !(key === "status" && value === "ALL") && !(key === "page" && value === 1)) params.set(key,String(value));
+  for (const [key,value] of Object.entries(next)) if (value !== "" && !(key === "view" && value === "all") && !(key === "terminalUse" && value === "all") && !(key === "section" && value === "activity") && !(key === "status" && value === "ALL") && !(key === "page" && value === 1)) params.set(key,String(value));
   return `/merchant-services${params.size ? `?${params}` : ""}`;
 }
 /** Only our relative dashboard route and recognized filter values can be a return destination. */

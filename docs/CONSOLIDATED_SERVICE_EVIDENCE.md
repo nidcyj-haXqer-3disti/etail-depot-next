@@ -36,4 +36,6 @@ In the full corrected run, one post-setup action was fractionally outside the vi
 
 ## Release boundary
 
-D79 has not been merged or published. D78 remains the live version. Local fictional email/provider harnesses do not establish successful real mailbox/password or live network operation. No measured private Amex/Stripe parity or full-provider completion is claimed.
+The user explicitly approved deployment. PR22 merged as `d52ddd6207c0b9d4b60bb60959f0877eab315947` after GitHub run `34746241573` passed all checks, including all 222 browser and 30 accessibility cases in one run. Its checked merge tree, reviewed feature tree, final main tree and the 796-file uploaded archive all match `7caeaafe48e5db7db0cf739ba088b7c99180b5c5`. Netlify deploy `6aa679ca607b79d1f6633d8c` published at 10:25:16.854 UTC on 13 September 2026 and is confirmed current on the bound site. The provider applied no migrations and created an on-publish snapshot. Visitor access is unchanged. All 96 hosted read-only checks and 38 responsive public captures passed, with zero issues. Actual password/mailbox and authenticated hosted-dashboard verification are not claimed; private workflows retain the completed local end-to-end evidence. The durable release receipt is `artifacts/d79-publication.json`.
+
+Local fictional email/provider harnesses do not establish successful real mailbox/password or live network operation. No measured private Amex/Stripe parity or full-provider completion is claimed.

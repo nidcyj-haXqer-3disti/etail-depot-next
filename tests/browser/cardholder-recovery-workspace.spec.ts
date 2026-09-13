@@ -48,9 +48,8 @@ test("lost freeze result survives denied retry, hides unavailable card details, 
   if(attempts.length===1){expect(result.status()).toBe(200);await route.abort("connectionfailed");}else await route.fulfill({response:result});
  });
  await page.goto(`/cardholder-services?focus=${own.card.id}`);
- await page.getByRole("region",{name:"Selected card overview",exact:true}).getByRole("link",{name:"Manage card",exact:true}).click();
+ await page.getByRole("region",{name:"Card controls",exact:true}).getByRole("button",{name:"Freeze card",exact:true}).click();
  const dialog=page.getByRole("dialog");
- await dialog.getByRole("button",{name:"Freeze",exact:true}).click();
  await dialog.getByRole("button",{name:"Freeze card",exact:true}).click();
  const retry=dialog.getByRole("button",{name:"Retry same change",exact:true});
  await expect(retry).toBeEnabled();
@@ -111,7 +110,8 @@ test("lost exact-card invitation keeps its original email and command through a 
  const retry=page.getByRole("button",{name:"Check invitation request again",exact:true});await expect(retry).toBeEnabled();
  await expect(page.getByRole("textbox",{name:"Their email address",exact:true})).toBeDisabled();await expect(page.getByRole("combobox",{name:"Accept within",exact:true})).toBeDisabled();
  await setPermission(primary,"people.invite","REVOKED");await retry.click();await expect.poll(()=>statuses.length).toBe(2);expect(statuses[1]).toBe(403);
- await expect(page.getByRole("heading",{name:"Card access is unavailable",exact:true})).toBeVisible();await expect(page.locator("main")).not.toContainText(card.nickname);await expect(page.locator("main")).not.toContainText(email);
+ await expect(page.getByRole("heading",{name:"Card access is unavailable",exact:true})).toBeVisible();const unavailable=page.getByRole("dialog",{name:"Card access is unavailable",exact:true});await expect(unavailable).not.toContainText(card.nickname);await expect(unavailable).not.toContainText(email);
+ const stillAuthorized=await page.request.get(`/api/v1/cardholder-services/${primary.serviceId}/workspace`);expect(stillAuthorized.status()).toBe(200);expect((await stillAuthorized.json()).cards.some((row:{id:string})=>row.id===card.id)).toBe(true);
  await expect(retry).toBeEnabled();await setPermission(primary,"people.invite","ACCEPTED");await retry.click();
  await expect(page.getByRole("region",{name:"Share invitation",exact:true})).toContainText(email);await expect(retry).toHaveCount(0);
  expect(statuses).toEqual([200,403,200]);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[2]).toEqual(attempts[0]);
@@ -130,13 +130,13 @@ test("lost cardholder removal hides private details after denial and retries the
   if(attempts.length===1){expect(response.status()).toBe(200);await route.abort("connectionfailed");}else await route.fulfill({response});
  });
  await page.goto(`/cardholder-services?card=${own.card.id}`);const dialog=page.getByRole("dialog");
- await dialog.getByRole("button",{name:"Remove cardholder",exact:true}).click();await dialog.getByRole("button",{name:"Remove cardholder",exact:true}).click();
+ await page.getByRole("region",{name:"Cardholder",exact:true}).getByRole("button",{name:"Remove cardholder",exact:true}).click();await dialog.getByRole("button",{name:"Remove cardholder",exact:true}).click();
  const retry=dialog.getByRole("button",{name:"Retry same removal",exact:true});await expect(retry).toBeEnabled();await expect(dialog.getByRole("button",{name:"Keep cardholder",exact:true})).toBeDisabled();
  await page.keyboard.press("Escape");await expect(dialog).toBeVisible();
  await setPermission(primary,"people.revoke","REVOKED");await retry.click();await expect.poll(()=>statuses.length).toBe(2);expect(statuses[1]).toBe(403);
  await expect(dialog).toHaveAccessibleName("Card access unavailable");await expect(dialog).not.toContainText(own.card.nickname);await expect(dialog).not.toContainText(own.card.holderName);await expect(dialog).not.toContainText(own.card.lastFour);
  const recovery=dialog.getByRole("button",{name:"Retry saved card removal",exact:true});await expect(recovery).toBeEnabled();await accessibleRecovery(page);
- await setPermission(primary,"people.revoke","ACCEPTED");await recovery.click();await expect(dialog).toHaveAccessibleName(own.card.nickname);await expect(dialog).toContainText("Card access removed");await expect(recovery).toHaveCount(0);
+ await setPermission(primary,"people.revoke","ACCEPTED");await recovery.click();await expect(dialog).toHaveCount(0);await expect(page.getByRole("region",{name:"Selected card overview",exact:true})).toContainText("Card access removed");await expect(recovery).toHaveCount(0);
  expect(statuses).toEqual([200,403,200]);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[2]).toEqual(attempts[0]);
  const current=(await getWorkspace(primary.personId,primary.serviceId)).cards.find(row=>row.id===own.card.id)!;
  expect(current).toMatchObject({holderId:recipient,assignmentState:"REVOKED",version:own.card.version+1});expect((await getWorkspace(recipient,primary.serviceId)).cards).toEqual([]);

@@ -12,6 +12,26 @@ import {services} from "../../src/platform/database/schema";
 import {sandboxParticipants} from "../../src/modules/sandbox/schema";
 
 test.afterAll(closeDatabase);
+test("personal profile setup stays separate from service enrollment",async({page})=>{
+ const identity=await bindIdentity(`${targets.netlify.canonical_origin}/.netlify/identity`,randomUUID());
+ const sessions=new SessionService(sessionRepository,{appEnv:"test",publicOrigin:"http://127.0.0.1:3100"});
+ const session=await sessions.issue(identity),pair=session.cookie.split(";",1)[0]!;
+ await page.context().addCookies([{name:pair.slice(0,pair.indexOf("=")),value:pair.slice(pair.indexOf("=")+1),domain:"127.0.0.1",path:"/",httpOnly:true,sameSite:"Strict"}]);
+ try{
+  await page.goto("/profile");
+  await expect(page.getByRole("heading",{name:"Your profile",exact:true,level:1})).toBeVisible();
+  await expect(page.getByRole("radio")).toHaveCount(0);
+  await page.getByRole("textbox",{name:"Your name",exact:true}).fill("Preferred display name");
+  await page.getByRole("button",{name:"Save your details",exact:true}).click();
+  await expect(page.getByRole("region",{name:"Your details",exact:true})).toContainText("Preferred display name");
+  await expect(page).toHaveURL(/\/profile$/);
+  await page.reload();
+  await expect(page.getByRole("region",{name:"Your details",exact:true})).toContainText("Preferred display name");
+  expect(await getDb().select().from(services).where(eq(services.primaryPersonId,identity.personId))).toEqual([]);
+  await expect(page.locator("main a[href^='/money-accounts/']")).toHaveCount(0);
+  await expect(page.getByRole("link",{name:"Manage sign-ins",exact:true})).toHaveAttribute("href","/security");
+ }finally{await sessions.logout(pair);}
+});
 test("first service choice survives an unknown setup result without opening financial services",async({page})=>{
  const identity=await bindIdentity(`${targets.netlify.canonical_origin}/.netlify/identity`,randomUUID());
  const sessions=new SessionService(sessionRepository,{appEnv:"test",publicOrigin:"http://127.0.0.1:3100"});

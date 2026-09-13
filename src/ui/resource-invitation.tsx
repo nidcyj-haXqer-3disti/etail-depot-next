@@ -7,8 +7,9 @@ import { resourceInvitationProjectionSchema, type ResourceInvitationProjection }
 import { invitationIdFromNextPath } from "@/shared/auth-continuation";
 import { normalizeVerifiedEmail } from "@/shared/verified-email";
 import { PUBLIC_APP_URL } from "@/shared/public-origin";
-import { Button, Feedback, StatusBadge, formatMoney } from "./workspace/primitives";
+import { Button, Feedback, StatusBadge, WorkspaceDialog, formatMoney } from "./workspace/primitives";
 import { requestFailure } from "./api-feedback";
+import "./resource-invitation.css";
 
 type Attempt = { commandId: string; expectedVersion: number; decision: "accept" | "decline" };
 const retryMessage = "We couldn’t confirm your response. Check the same request again.";
@@ -72,32 +73,61 @@ export function ResourceInvitation({ initial }: { initial: ResourceInvitationPro
   </section>;
 }
 
-export interface ShareResourceInvitationProps { invitationId: string; recipientEmail: string; status: string }
+export interface ShareResourceInvitationProps {
+  invitationId: string; recipientEmail: string; status: string;
+  resourceName?: string; resourceKind?: "card" | "terminal";
+}
 /** Shares only a locator. Matching verified contact and explicit acceptance remain server requirements. */
-export function ShareResourceInvitation({ invitationId, recipientEmail, status }: ShareResourceInvitationProps) {
+export function ShareResourceInvitation({ invitationId, recipientEmail, status, resourceName, resourceKind }: ShareResourceInvitationProps) {
   const [notice, setNotice] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(false), [open, setOpen] = useState(false), [nativeShare, setNativeShare] = useState(false);
   const [origin, setOrigin] = useState<string>(PUBLIC_APP_URL);
   useEffect(() => {
     let active = true;
     const current = window.location;
-    if (["localhost", "127.0.0.1", "[::1]"].includes(current.hostname)) queueMicrotask(() => { if (active) setOrigin(current.origin); });
+    queueMicrotask(() => { if (active) {
+      setNativeShare(typeof navigator.share === "function");
+      if (["localhost", "127.0.0.1", "[::1]"].includes(current.hostname)) setOrigin(current.origin);
+    } });
     return () => { active = false; };
   }, []);
   if (!invitationIdFromNextPath(`/invitations/${invitationId}`) || !normalizeVerifiedEmail(recipientEmail)) return null;
   const href = new URL(`/invitations/${invitationId}`, origin).href;
-  const text = `You’re invited to Etail Depot. Sign in with ${recipientEmail} to review your invitation: ${href}`;
+  const title = resourceKind === "card" ? "Your Etail Depot card invitation" : resourceKind === "terminal" ? "Your Etail Depot payment terminal invitation" : "Your Etail Depot invitation";
+  const text = `You’re invited${resourceName ? ` to use ${resourceName}` : " to Etail Depot"}. Sign in with ${recipientEmail} to review your invitation: ${href}`;
   async function copy() {
     try { await navigator.clipboard.writeText(href); setNotice("Invitation link copied. No message has been sent."); }
     catch { setNotice("Select the invitation link below and copy it."); }
   }
   async function share() {
     if (busy) return;
-    if (!navigator.share) { await copy(); return; }
+    if (!navigator.share) { setNotice("More sharing options are unavailable here. Choose an app or copy the link."); return; }
     setBusy(true);
-    try { await navigator.share({ title: "Your Etail Depot invitation", text, url: href }); setNotice("Sharing closed. Check your chosen app to confirm whether you sent the invitation."); }
+    try { await navigator.share({ title, text, url: href }); setNotice("Sharing closed. Check your chosen app to confirm whether you sent the invitation."); }
     catch (failure) { setNotice(failure instanceof DOMException && failure.name === "AbortError" ? "Sharing canceled. You can still copy the link." : "Sharing is unavailable here. Copy the invitation link instead."); }
     finally { setBusy(false); }
   }
-  return <section className="ws-panel" aria-label="Share invitation"><h3>Share this invitation</h3><p>For {recipientEmail}. Only this person can accept after signing in with that email.</p><StatusBadge status={status}/>{status === "PENDING" ? <><div className="consumer-action-row"><a className="consumer-button consumer-button-secondary" href={`mailto:${encodeURIComponent(recipientEmail)}?subject=${encodeURIComponent("Your Etail Depot invitation")}&body=${encodeURIComponent(text)}`}>Email</a><a className="consumer-button consumer-button-secondary" href={`sms:?body=${encodeURIComponent(text)}`}>Text message</a><Button variant="secondary" busy={busy} onClick={()=>void share()}>Share</Button><Button variant="secondary" onClick={()=>void copy()}>Copy link</Button></div><p>Choose a recipient in your messaging app, then send. Etail Depot does not send a message for you.</p><label className="field">Invitation link<input type="url" readOnly value={href} onFocus={event=>event.currentTarget.select()}/></label></> : <p>This invitation is no longer waiting for a response.</p>}<Feedback kind="info" message={notice}/></section>;
+  return <section className="resource-invitation-ready" aria-label="Share invitation">
+    <div><h3>Invitation ready</h3><p>For <strong>{recipientEmail}</strong></p><StatusBadge status={status}/></div>
+    {status === "PENDING" ? <Button variant="secondary" onClick={()=>{setNativeShare(typeof navigator.share==="function");setOpen(true);}}><InvitationShareIcon kind="share"/>Share invitation</Button> : <p>This invitation is no longer waiting for a response.</p>}
+    {open&&status==="PENDING"&&<WorkspaceDialog open onClose={()=>{if(!busy)setOpen(false);}} title="Share invitation" serviceName={resourceName??"Etail Depot"}>
+      <div className="resource-share-sheet">
+        <p className="resource-share-recipient">Only <strong>{recipientEmail}</strong> can accept. They’ll need to sign in with this email address.</p>
+        <div className="resource-share-options" aria-label="Sharing options">
+          <a href={`mailto:${encodeURIComponent(recipientEmail)}?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text)}`}><span className="resource-share-icon is-email"><InvitationShareIcon kind="email"/></span>Email</a>
+          <a href={`sms:?body=${encodeURIComponent(text)}`}><span className="resource-share-icon is-message"><InvitationShareIcon kind="message"/></span>Text message</a>
+          <a href={`https://wa.me/?text=${encodeURIComponent(text)}`} target="_blank" rel="noopener noreferrer"><span className="resource-share-icon is-social"><InvitationShareIcon kind="message"/></span>WhatsApp<span className="resource-share-sr-only"> (opens a new window)</span></a>
+          <Button variant="quiet" onClick={()=>void copy()}><span className="resource-share-icon is-copy"><InvitationShareIcon kind="copy"/></span>Copy link</Button>
+          {nativeShare&&<Button variant="quiet" busy={busy} onClick={()=>void share()}><span className="resource-share-icon is-more"><InvitationShareIcon kind="share"/></span>More apps</Button>}
+        </div>
+        <p className="resource-share-note">Choose the person in your messaging app, review your message, then send.</p>
+        <label className="field">Invitation link<input type="url" readOnly value={href} onFocus={event=>event.currentTarget.select()}/></label>
+        <Feedback kind="info" message={notice}/>
+      </div>
+    </WorkspaceDialog>}
+  </section>;
+}
+
+function InvitationShareIcon({kind}:{kind:"email"|"message"|"copy"|"share"}){
+ return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{kind==="email"?<><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></>:kind==="message"?<path d="M20 11a8 8 0 0 1-8 8H5l-3 3V11a9 9 0 0 1 18 0Z"/>:kind==="copy"?<><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></>:<><path d="M12 15V2m-4 4 4-4 4 4M7 9H4v12h16V9h-3"/></>}</svg>;
 }

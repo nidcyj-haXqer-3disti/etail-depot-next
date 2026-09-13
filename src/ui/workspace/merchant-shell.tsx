@@ -13,17 +13,15 @@ export function MerchantShell({merchantId,showSettings=false,dashboardQuery,over
  const back=merchantActivityReturn(overviewHref??null);
  const query=dashboardQuery??parseMerchantActivityFilters(back?new URL(back,"https://etail.invalid").searchParams:{});
  const requestedSection=activeSection??(merchantId?"merchants":query.section);
- const section=requestedSection==="funds"?"overview":requestedSection;
+ const section=requestedSection==="funds"||requestedSection==="activity"?"overview":requestedSection==="channels"?"merchants":requestedSection;
  const href=(next:MerchantActivityQuery["section"])=>merchantActivityHref(query,{section:next});
  return <MerchantNavigationBoundary><div className="mn-app"><Header authenticated activeService="MERCHANT"/><div className="mn-frame"><aside className="mn-sidebar">
   <p className="consumer-eyebrow">ACCEPT PAYMENTS</p>
   <MerchantNavigation label="Merchant account navigation" activeKey={section}>
    {([
     {id:"overview",label:"Overview",icon:"overview"},
-    {id:"activity",label:"Payments",icon:"activity"},
-    {id:"merchants",label:showSettings?"Team & terminals":"Your terminals",icon:"people"},
-    {id:"channels",label:"Channels",icon:"merchant"},
-    {id:"settings",label:"Settings",icon:"settings"},
+    {id:"merchants",label:"Terminals",icon:"merchant"},
+    {id:"settings",label:"Account settings",icon:"settings"},
    ] as const).filter(item=>item.id!=="settings"||showSettings).map(item=><Link key={item.id} href={href(item.id)} aria-current={section===item.id?"page":undefined}><WorkspaceIcon name={item.icon}/>{item.label}</Link>)}
   </MerchantNavigation>
  </aside><main id="main-content" className="mn-main">{children}</main></div></div></MerchantNavigationBoundary>;

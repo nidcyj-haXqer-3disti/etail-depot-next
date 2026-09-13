@@ -13,7 +13,7 @@ import {additionalPublishedPayment,freshConnectedPayment,merchantOperations,payP
 
 test.afterAll(closeDatabase);
 async function reviewSettlement(page:Page,amount:string,count:number){
- const terminalId=new URL(page.url()).pathname.split("/")[2]!,terminalName=(await page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{level:2}).innerText()).trim();
+ const terminalId=new URL(page.url()).pathname.split("/")[2]!,terminalName=(await page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{level:1}).innerText()).trim();
  await page.goto(`/merchant-services?section=funds&view=unit:${terminalId}`);
  await page.locator(".money-incoming > summary").click();
  await page.getByRole("region",{name:`Settlement for ${terminalName}`,exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();

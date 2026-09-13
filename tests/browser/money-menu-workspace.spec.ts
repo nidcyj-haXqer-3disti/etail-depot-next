@@ -28,9 +28,9 @@ async function cardMenu(page:Page){
 async function merchantMenu(page:Page,filters:URLSearchParams){
  const navigation=page.getByRole("navigation",{name:"Merchant account navigation",exact:true});
  await expect(navigation).toBeVisible();
- await expect(navigation.getByRole("link")).toHaveText(["Overview","Payments","Team & terminals","Channels","Settings"]);
+ await expect(navigation.getByRole("link")).toHaveText(["Overview","Terminals","Account settings"]);
  await expect(navigation.getByRole("link",{name:"Overview",exact:true})).toHaveAttribute("aria-current","page");
- for(const label of ["Overview","Payments","Team & terminals","Channels","Settings"]){
+ for(const label of ["Overview","Terminals","Account settings"]){
   const target=new URL((await navigation.getByRole("link",{name:label,exact:true}).getAttribute("href"))!,"http://127.0.0.1:3100");
   expect(target.pathname).toBe("/merchant-services");
   for(const [key,value] of filters)expect(target.searchParams.get(key)).toBe(value);

@@ -5,13 +5,14 @@ import { services, serviceKind, serviceMembers, people } from "../../platform/da
 /** Flat operating terminals. Funds belong to the linked money account, never a terminal. */
 export const merchantTerminals=pgTable("merchant_terminals",{
   id:uuid().primaryKey().defaultRandom(),merchantServiceId:uuid("masterServiceId").notNull(),merchantServiceKind:serviceKind("masterServiceKind").notNull().default("MERCHANT"),
-  displayName:text().notNull(),status:text({enum:["ACTIVE","PAUSED","CLOSED"]}).notNull().default("ACTIVE"),
+  displayName:text().notNull(),intendedUse:text({enum:["SELF","OTHER"]}).notNull().default("SELF"),status:text({enum:["ACTIVE","PAUSED","CLOSED"]}).notNull().default("ACTIVE"),
   version:integer().notNull().default(1),createdAt:timestamp({withTimezone:true}).notNull().defaultNow(),updatedAt:timestamp({withTimezone:true}).notNull().defaultNow(),
 },t=>[
   unique("merchant_terminal_service_scope").on(t.id,t.merchantServiceId),
   foreignKey({columns:[t.merchantServiceId,t.merchantServiceKind],foreignColumns:[services.id,services.kind]}),
   check("merchant_terminal_service_kind",sql`${t.merchantServiceKind}='MERCHANT'`),
   check("merchant_terminal_status",sql`${t.status} in ('ACTIVE','PAUSED','CLOSED')`),
+  check("merchant_terminal_intended_use",sql`${t.intendedUse} in ('SELF','OTHER')`),
   check("merchant_terminal_fields",sql`char_length(${t.displayName}) between 1 and 80 and ${t.version}>0`),
   index("merchant_terminals_service").on(t.merchantServiceId,t.id),
 ]);

@@ -32,20 +32,20 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     catch (error) { if (!(error instanceof SecurityError && [403,404].includes(error.status))) return retryNotice; }
   }
   if (!workspace) return <MerchantShell><h1>Payment terminal unavailable</h1><div className="mn-panel"><EmptyState title="This payment terminal is not available to you" description="Your access or the terminal status may have changed. Choose a payment terminal you can use."><Link className="consumer-button consumer-button-secondary" href="/merchant-services">Choose a payment terminal</Link></EmptyState></div></MerchantShell>;
-  const access = tab === "people" && workspace.canReadPeople ? await getMerchantAccessOverview(session.personId, merchantId).catch(() => undefined) : undefined;
-  const support:MerchantSupportContext|undefined=tab==="help"?await(async()=>{
+  const accessRead = workspace.canReadPeople ? getMerchantAccessOverview(session.personId, merchantId).catch(() => undefined) : Promise.resolve(undefined);
+  const supportRead:Promise<MerchantSupportContext|undefined>=(async()=>{
     try {
       const initialCases=await listMerchantSupportCases(session.personId,merchantId,{q:""});
       let linkedPayment:MerchantSupportContext["linkedPayment"]=null;
-      let paymentUnavailable=Boolean(query.payment);
-      if(typeof query.payment==="string"&&z.uuid().safeParse(query.payment).success){
+      let paymentUnavailable=tab==="help"&&Boolean(query.payment);
+      if(tab==="help"&&typeof query.payment==="string"&&z.uuid().safeParse(query.payment).success){
         try {linkedPayment=await getMerchantSupportPaymentPreview(session.personId,merchantId,query.payment.toLowerCase());paymentUnavailable=false;}
         catch(error){if(!(error instanceof SecurityError&&[403,404].includes(error.status)))throw error;}
       }
       return {kind:"MERCHANT",merchantId,serviceId:workspace.merchant.merchant.serviceId,merchantName:workspace.merchant.displayName,primaryName:workspace.merchant.merchant.displayName,initialCases,linkedPayment,paymentUnavailable};
     }catch{return undefined;}
-  })():undefined;
+  })();
   const overviewHref=merchantActivityReturn(typeof query.returnTo==="string"?query.returnTo:null)??undefined;
-  const disputes=tab==="disputes"?await listTerminalDisputes(session.personId,merchantId).catch(()=>undefined):undefined;
-  return <MerchantWorkspace disputes={disputes} overviewHref={overviewHref} support={support} workspace={workspace} tab={tab} access={access} operations={tab!=="help"&&(workspace.ownerAccess || workspace.merchant.status === "ACTIVE") ? await getMerchantOperations(session.personId,merchantId).catch(()=>undefined) : undefined} />;
+  const [access,support,disputes,operations]=await Promise.all([accessRead,supportRead,listTerminalDisputes(session.personId,merchantId).catch(()=>undefined),(workspace.ownerAccess||workspace.merchant.status==="ACTIVE")?getMerchantOperations(session.personId,merchantId).catch(()=>undefined):Promise.resolve(undefined)]);
+  return <MerchantWorkspace disputes={disputes} overviewHref={overviewHref} support={support} workspace={workspace} tab={tab} access={access} operations={operations} />;
 }

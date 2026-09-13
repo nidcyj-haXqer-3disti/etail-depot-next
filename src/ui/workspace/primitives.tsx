@@ -87,7 +87,7 @@ export function WorkspaceDialog({ open, onClose, title, serviceName, children, f
     document.addEventListener("keydown", wrapTab, true);
     return () => { document.removeEventListener("keydown", wrapTab, true); dialog.close(); if (opener?.isConnected) opener.focus(); };
   }, [open]);
-  return <dialog ref={ref} className={`consumer-dialog ${wide ? "consumer-dialog-wide" : ""}`} aria-labelledby={titleId} aria-describedby={contextId} onCancel={(event) => { event.preventDefault(); onClose(); }}>
+  return <dialog ref={ref} className={`consumer-dialog ${wide ? "consumer-dialog-wide" : ""}`} aria-labelledby={titleId} aria-describedby={contextId} onCancel={(event) => { event.preventDefault(); event.stopPropagation(); onClose(); }}>
     <div className="consumer-dialog-header"><div><p id={contextId} className="consumer-eyebrow">{serviceName}</p><h2 ref={heading} tabIndex={-1} id={titleId}>{title}</h2></div><button type="button" className="consumer-close" aria-label={`Close ${title}`} onClick={onClose}>×</button></div>
     <div className="consumer-dialog-body">{children}</div>{footer && <div className="consumer-dialog-footer">{footer}</div>}
   </dialog>;
@@ -128,13 +128,13 @@ export async function workspaceCommand<T>(serviceId: string, path: string, metho
 }
 
 /** Merchant-resource commands never acquire financial-service authority. */
-export async function merchantCommand<T>(merchantId: string, path: string, method: "POST" | "PATCH" | "PUT", body: Record<string, unknown>): Promise<T> {
+export async function merchantCommand<T>(merchantId: string, path: string, method: "POST" | "PATCH" | "PUT", body: Record<string, unknown>, scope:"TERMINAL"|"SERVICE"="TERMINAL"): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
   try {
   let response: Response;
   try {
-    response = await fetch(`/api/v1/merchants/${encodeURIComponent(merchantId)}${path}`, { method, credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: controller.signal });
+    response = await fetch(`/api/v1/${scope==="SERVICE"?"merchant-services":"merchants"}/${encodeURIComponent(merchantId)}${path}`, { method, credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: controller.signal });
   } catch { throw new WorkspaceCommandError("We couldn’t confirm the result. Retry the same request to recover its saved outcome.", null); }
   if (!response.ok) {
     const body = await response.json().catch(() => {

@@ -2,9 +2,11 @@
 
 These are optional implementation-assistance tools for Codex. The owner does not need to run them manually to use the prompt. Require Python 3.10 or newer and the standard library. Only the explicitly requested planning import needs an installed/authenticated GitHub CLI. The verification and target guard use no network.
 
-## D79 consolidated workflow review
+## D80 unified resource workspace review
 
-D79 changes menus and read composition without a migration or preview preparation. After the production build and existing preview startup, run `node tools/run-with-database.mjs --preview tsx tools/capture-dashboard-preview.mjs d79-dashboard-preview` for81 owner/recipient states at1440,390 and320px. Use a new `d79-dashboard-preview-*` output directory for each run. The tool retains exact preview/persona guards, blocks business writes and external requests, and compares19 authorized projections plus source hashes. It navigates through funding, return and payout amount screens without submitting them; no preview data is reset or restored.
+D80 adds the terminal’s saved intended use without resetting either marked database. Only `node tools/run-with-database.mjs --prepare-preview` applies the additive migration; completed seed preparation remains a read-only no-op. Preserve every previous migration and preview record. The D80 private before/after evidence compares every pre-existing public field, excluding only the added terminal `intendedUse` column and its expected migration receipt.
+
+After the production build and preserved preview startup, run `node tools/run-with-database.mjs --preview tsx tools/capture-dashboard-preview.mjs d80-dashboard-preview` for108 owner/recipient states at1440,390 and320px. Use a new `d80-dashboard-preview-*` output directory for each run. The tool retains exact preview/persona guards, blocks business writes and external requests, and compares19 authorized projections plus source hashes. It checks card controls, creation forms, terminal invitations, account statements/settings and personal profiles without submitting business commands. Prior D79 captures remain review history.
 
 ## D76 additive invitation and network-checkout preparation
 

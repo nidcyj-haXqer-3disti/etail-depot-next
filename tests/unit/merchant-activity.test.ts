@@ -10,6 +10,18 @@ const view:MerchantDashboardView={id:`merchant:${randomUUID()}`,name:"Primary ne
 function row(patch:Partial<Omit<MerchantActivityRow,"href">>={}):Omit<MerchantActivityRow,"href"> {const id=randomUUID();return {id,kind:"payment",merchantId:unit,merchantName:"Market",description:"Order",amount:money("5000"),status:"REFUNDED",reference:"test-payment",at:"2026-09-06T23:59:59.000Z",paymentId:id,paymentReference:"test-payment",...patch};}
 
 describe("merchant activity filters and projections",()=>{
+ it("preserves terminal use in exact return links without changing financial scope",()=>{
+  const original=parseMerchantActivityQuery({view:view.id,section:"merchants",terminalUse:"others",period:"last30",q:"reference"});
+  const href=merchantActivityHref(original);
+  expect(merchantActivityReturn(href)).toBe(href);
+  expect(parseMerchantActivityQuery(new URL(href,"https://etail.invalid").searchParams)).toEqual(original);
+  expect(merchantActivityReturn("/merchant-services?terminalUse=others&terminalUse=self")).toBeNull();
+  expect(merchantActivityReturn("/merchant-services?terminalUse=unknown")).toBeNull();
+  const records=[row({status:"APPROVED"})],self=projectMerchantActivity({...original,q:"",period:"all",terminalUse:"self",activity:"payments"},view,records,now),others=projectMerchantActivity({...original,q:"",period:"all",terminalUse:"others",activity:"payments"},view,records,now);
+  expect(self.rows).toHaveLength(1);
+  expect(self.periodTotals).toEqual(others.periodTotals);
+  expect(self.rows.map(item=>item.id)).toEqual(others.rows.map(item=>item.id));
+ });
  it("separates account home from saved payment investigations and preserves filters across account destinations",()=>{
   expect(parseMerchantActivityQuery().section).toBe("overview");
   expect(parseMerchantActivityQuery({view:view.id}).section).toBe("overview");

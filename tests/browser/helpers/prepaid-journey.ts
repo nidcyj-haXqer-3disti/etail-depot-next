@@ -108,7 +108,7 @@ export async function addMoney(page:Page,serviceId:string,amount="50.00"){
 }
 export async function setCardAllowance(page:Page,serviceId:string,cardId:string,name:string,amount="25.00"){
   await page.goto(`/cardholder-services?card=${cardId}`);
-  const control=page.getByRole("dialog").getByRole("article",{name:"Card spending limit",exact:true});
+  const control=page.getByRole("region",{name:"Card management details",exact:true}).getByRole("article",{name:"Card spending limit",exact:true});
   await control.getByRole("button",{name:"Change spending limit for "+name,exact:true}).click();
   await control.getByRole("textbox",{name:"New total spending limit for "+name,exact:true}).fill(amount);
   await control.getByRole("button",{name:"Review spending limit",exact:true}).click();
@@ -124,8 +124,8 @@ export async function addUnfundedCard(page:Page,name:string,allowance="0.00"){
     await page.getByRole("link",{name:"Add card",exact:true}).click();
   }
   const dialog=page.getByRole("dialog");
-  await expect(dialog.getByRole("radio",{name:/Someone else/})).toBeChecked();
-  await dialog.getByRole("radio",{name:/^Me /}).check();
+  await expect(dialog.getByRole("radio",{name:/For someone else/})).toBeChecked();
+  await dialog.getByRole("radio",{name:/^For your use/}).check();
   await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);
   await dialog.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill(allowance);
   await expect(dialog.getByRole("textbox",{name:"Starting balance (USD)",exact:true})).toHaveCount(0);
