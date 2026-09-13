@@ -34,8 +34,8 @@ export function MerchantCreate(props:Props) {
   }catch(failure){if(retrying&&failure instanceof WorkspaceCommandError&&[401,403,404].includes(failure.status??0))setAccessDenied(true);if(failure instanceof WorkspaceCommandError&&!failure.uncertain&&!retrying)setAttempt(null);setError(failure instanceof Error?failure.message:"We couldn’t confirm this request. Retry to recover the saved result.");}
   finally{setBusy(false);}
  }
- return <><Button variant="secondary" onClick={()=>{if(!attempt&&!savedHref){setName("");setError("");setAccessDenied(false);setLeavingUnconfirmed(false);}setOpen(true);}}>{attempt?`Resume ${label} request`:isPrimary?"Add your business":"Add payment terminal"}</Button>
-  <WorkspaceDialog open={open} onClose={()=>{if(!busy)setOpen(false);}} title={unavailable?"We couldn’t confirm this request":isPrimary?"Name your business":"Name your payment terminal"} serviceName={isPrimary||unavailable?"Accept payments":props.merchantName}>
+ return <><Button variant="secondary" onClick={()=>{if(!attempt&&!savedHref){setName("");setError("");setAccessDenied(false);setLeavingUnconfirmed(false);}setOpen(true);}}>{attempt?`Resume ${label} request`:isPrimary?"Add your business":"Create terminal"}</Button>
+  <WorkspaceDialog open={open} onClose={()=>{if(!busy)setOpen(false);}} title={unavailable?"We couldn’t confirm this request":isPrimary?"Name your business":"Create terminal"} serviceName={isPrimary||unavailable?"Accept payments":props.merchantName}>
    {unavailable?<><Feedback kind="error" message={error}/><p>Your access has changed, so we cannot show whether this request was saved. Check the same request again when you have access.</p><p>Leaving this page does not cancel the request. Check your saved business details when your access is restored.</p><div className="mn-actions"><Button busy={busy} onClick={()=>void save()}>Check request again</Button><Button variant="quiet" disabled={busy} onClick={()=>{setOpen(false);setLeavingUnconfirmed(true);router.push("/services");}}>Leave for now</Button></div></>:<>
     <Feedback kind="error" message={error}/>
     {savedHref?<><Feedback kind="success" message={`Your ${label} is saved.`}/><a className="consumer-button consumer-button-primary" href={savedHref}>Open saved details</a></>:<>
@@ -44,8 +44,8 @@ export function MerchantCreate(props:Props) {
       <div className="merchant-create-context"><WorkspaceIcon name="merchant"/><div><h3>{isPrimary?"Start with your business name":"Create an online checkout for a person or location"}</h3><p>{isPrimary?"Receive payments for your business and let trusted people collect for you.":`This payment terminal belongs to ${props.merchantName}. People you invite can collect payments here and see only its records.`}</p></div></div>
       <label>{isPrimary?"Business name":"Payment terminal name"}<input value={attempt?.displayName??name} onChange={event=>setName(event.target.value)} maxLength={80} required autoComplete="off" disabled={locked} placeholder={isPrimary?"For example, Garden shop":"For example, Weekend market"}/></label>
       <p className="mn-notice">{isPrimary?"You control the payment balance, refunds and who can collect payments.":`All payments belong to ${props.merchantName}. You control the payment balance. Invite someone after creating this terminal.`} </p>
-      <p>Next: enable payments, then create a payment request or invite someone.</p>
-      <div className="mn-actions"><Button variant="quiet" disabled={busy} onClick={()=>setOpen(false)}>{attempt?"Close":"Cancel"}</Button>{attempt?<Button type="button" busy={busy} disabled={busy} onClick={()=>void save()}>Check request again</Button>:<Button type="submit" busy={busy} disabled={locked||!name.trim()}>{isPrimary?"Add your business":"Add payment terminal"}</Button>}</div>
+      <p>Next: enable payments, then create a payment link or invite someone.</p>
+      <div className="mn-actions"><Button variant="quiet" disabled={busy} onClick={()=>setOpen(false)}>{attempt?"Close":"Cancel"}</Button>{attempt?<Button type="button" busy={busy} disabled={busy} onClick={()=>void save()}>Check request again</Button>:<Button type="submit" busy={busy} disabled={locked||!name.trim()}>{isPrimary?"Add your business":"Create terminal"}</Button>}</div>
      </form>
     </>}
    </>}

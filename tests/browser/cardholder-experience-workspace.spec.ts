@@ -45,12 +45,12 @@ test("cardholder navigation separates account money from cards and keeps holder 
   const navigation=page.getByRole("navigation",{name:"Cards and spending navigation",exact:true});
   await expect(navigation.getByRole("link")).toHaveText(["Account home","Cards","Activity","Account balance","Account settings"]);
   const overview=page.getByRole("region",{name:"Selected card overview",exact:true});
-  await expect(overview.locator(".ch-focus-balance")).toContainText("Available to spend");
+  await expect(overview.locator(".ch-focus-balance")).toContainText("Available on this card");
   await expect(overview.locator(".ch-focus-balance")).toContainText("$40.00");
   await expect(overview.getByRole("button",{name:/Freeze/})).toBeVisible();
   const group=page.getByRole("region",{name:"Your card balance",exact:true});
-  await expect(group).toContainText("Card balance");await expect(group).toContainText("$85.00");
-  await expect(group.getByRole("link",{name:"View account balance",exact:true})).toHaveAttribute("href",`/money-accounts/${funds.moneyAccountId}`);
+  await expect(group).toHaveCount(0);
+  await expect(navigation.getByRole("link",{name:"Cards",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
   await expect(page.getByRole("link",{name:"Add card",exact:true})).toHaveCount(0);
   const totalAllowance=overview.getByText(/^Total spending limit/);
@@ -65,15 +65,20 @@ test("cardholder navigation separates account money from cards and keeps holder 
   await expect(navigation.getByRole("link",{name:"Account settings",exact:true})).toHaveAttribute("href",`/cardholder-services/settings?context=${primary.serviceId}`);
   await navigation.getByRole("link",{name:"Cards",exact:true}).click();
   const cardNavigation=page.getByRole("navigation",{name:"Card management",exact:true});
-  await expect(cardNavigation.getByRole("link")).toHaveText(["All cards","Cardholders","Card history"]);
+  await expect(cardNavigation.getByRole("link")).toHaveText(["Card list","Cardholders","Card history"]);
   await expect(page.getByRole("link",{name:"Add card",exact:true})).toHaveCount(1);
-  await expect(cardNavigation.getByRole("link",{name:"Card history",exact:true})).toHaveAttribute("href",new RegExp(`focus=${own.card.id}`));
+  await expect(cardNavigation.getByRole("link",{name:"Card history",exact:true})).toHaveAttribute("href","/cardholder-services?view=requests");
   await cardNavigation.getByRole("link",{name:"Card history",exact:true}).click();
-  await expect(page).toHaveURL(url=>url.searchParams.get("view")==="requests"&&url.searchParams.get("focus")===own.card.id);
+  await expect(page).toHaveURL(url=>url.searchParams.get("view")==="requests"&&!url.searchParams.has("focus"));
   await expect(navigation.getByRole("link",{name:"Cards",exact:true})).toHaveAttribute("aria-current","page");
   await expect(cardNavigation.getByRole("link",{name:"Card history",exact:true})).toHaveAttribute("aria-current","page");
   await navigation.getByRole("link",{name:"Account home",exact:true}).click();
-  await expect(overview).toContainText(own.card.nickname);
+  await expect(overview).toHaveCount(0);
+  await expect(group).toContainText("Card balance");await expect(group).toContainText("$85.00");
+  await expect(group.getByRole("link",{name:"View account balance",exact:true})).toHaveAttribute("href",`/money-accounts/${funds.moneyAccountId}`);
+  await expect(page.getByRole("combobox",{name:"Selected card",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("link",{name:"Add card",exact:true})).toHaveCount(0);
   await expect(cardNavigation).toHaveCount(0);
   await navigation.getByRole("link",{name:"Account balance",exact:true}).click();
   await expect(page).toHaveURL(new RegExp(`/money-accounts/${funds.moneyAccountId}$`));
@@ -103,8 +108,19 @@ test("cardholder navigation separates account money from cards and keeps holder 
   await expect(navigation.getByRole("link",{name:"Account settings",exact:true})).toHaveCount(0);
   await expect(navigation.getByRole("link",{name:"Preferences",exact:true})).toHaveAttribute("href",`/cardholder-services/settings?focus=${shared.card.id}`);
   await navigation.getByRole("link",{name:"Cards",exact:true}).click();
-  await expect(page.getByRole("navigation",{name:"Card management",exact:true}).getByRole("link")).toHaveText(["All cards"]);
+  await expect(page.getByRole("navigation",{name:"Card management",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("navigation",{name:"Card ownership",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("searchbox",{name:"Search your cards",exact:true})).toBeVisible();
   await expect(page.getByRole("link",{name:"Add card",exact:true})).toHaveCount(0);
+  await page.goto(`/cardholder-services?${new URLSearchParams({view:"cards",cardScope:"MANAGED",cardSearch:shared.card.nickname})}`);
+  await expect(page.locator(".ch-card")).toHaveCount(0);
+  await expect(page.locator("main")).not.toContainText(own.card.nickname);
+  await page.getByRole("link",{name:"View your cards",exact:true}).click();
+  await expect(page).toHaveURL(url=>url.searchParams.get("cardScope")==="ALL"&&url.searchParams.get("cardSearch")===shared.card.nickname);
+  await expect(page.getByRole("searchbox",{name:"Search your cards",exact:true})).toHaveValue(shared.card.nickname);
+  await expect(page.locator(".ch-card")).toHaveCount(1);
+  await expect(page.locator(".ch-card")).toContainText(shared.card.nickname);
+  await expect(page.locator("main")).not.toContainText(own.card.nickname);
   await navigation.getByRole("link",{name:"Preferences",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Preferences",level:1,exact:true})).toBeVisible();
   await expect(page.locator("main")).not.toContainText(own.card.nickname);
@@ -113,7 +129,7 @@ test("cardholder navigation separates account money from cards and keeps holder 
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
 });
 
-test("your cards and cards you manage remain distinct through server filters, search and reload", async ({ page }) => {
+test("account overview stays separate while named card categories survive filters, search and reload", async ({ page }) => {
   test.setTimeout(120_000);
   const primary = await cardPrimary(`Avery ${randomUUID().slice(0, 8)}`);
   const otherPrimary = await cardPrimary(`Casey ${randomUUID().slice(0, 8)}`);
@@ -127,39 +143,49 @@ test("your cards and cards you manage remain distinct through server filters, se
   await signIn(page, primary.personId);
 
   await page.goto("/cardholder-services");
-  const picker=page.getByRole("region",{name:"Choose a card",exact:true});
-  await expect(picker).toBeVisible();
-  await expect(page.getByRole("region",{name:"Selected card overview",exact:true})).toHaveCount(0);
-  for(const card of [own.card,received.card,managed.card])await expect(picker.getByRole("link",{name:new RegExp(`^Open ${card.nickname},`)})).toBeVisible();
-  await picker.getByRole("link",{name:new RegExp(`^Open ${own.card.nickname},`)}).click();
-  await expect(page).toHaveURL(url=>url.searchParams.get("focus")===own.card.id);
-
-  await page.goto(`/cardholder-services?focus=${own.card.id}`);
   const groupBalance=page.getByRole("region",{name:"Your card balance",exact:true});
+  const account=page.getByRole("region",{name:"Your card account",exact:true});
   await expect(groupBalance).toContainText("$42.00");
-  await expect(groupBalance.getByRole("link",{name:"View account balance",exact:true})).toHaveAttribute("href",`/money-accounts/${funds.moneyAccountId}`);
-  await page.getByLabel("Selected card",{exact:true}).selectOption(received.card.id);
+  await expect(account.locator(".ch-account-counts>div").filter({hasText:"Cards in this account"}).locator("dd")).toHaveText("2");
+  await expect(page.getByRole("combobox",{name:"Selected card",exact:true})).toHaveCount(0);
   const selected=page.getByRole("region",{name:"Selected card overview",exact:true});
+  await expect(selected).toHaveCount(0);
+  await account.getByRole("link",{name:"View cards",exact:true}).click();
+  for(const card of [own.card,received.card,managed.card])await expect(page.getByRole("link",{name:new RegExp(`^Open ${card.nickname},`)})).toBeVisible();
+  await page.getByRole("link",{name:new RegExp(`^Open ${received.card.nickname},`)}).click();
+  await expect(page).toHaveURL(url=>url.searchParams.get("view")==="cards"&&url.searchParams.get("focus")===received.card.id);
   await expect(selected).toContainText(received.card.nickname);
+  await expect(selected).toContainText(`Account owner: ${(await dashboard(page)).profiles.find(profile=>profile.id===otherPrimary.serviceId)!.primaryName}`);
   await expect(selected.locator(".ch-focus-balance")).toContainText("$31.00");
   await expect(groupBalance).toHaveCount(0);
   await expect(page.locator("main")).not.toContainText("$73.00");
-  await page.reload();await expect(groupBalance).toHaveCount(0);
-  await page.locator(".ch-group-details > summary").filter({hasText:"Your card account"}).click();
-  const ownGroup=page.getByRole("region",{name:"Your card account",exact:true});
-  await expect(ownGroup).toContainText("$42.00");
-  await expect(ownGroup.getByRole("link",{name:"View account balance",exact:true})).toHaveAttribute("href",`/money-accounts/${funds.moneyAccountId}`);
+  await page.reload();await expect(groupBalance).toHaveCount(0);await expect(selected).toContainText(received.card.nickname);
   const navigation=page.getByRole("navigation",{name:"Cards and spending navigation",exact:true});
   await expect(navigation.getByRole("link",{name:"Account balance",exact:true})).toHaveAttribute("href",`/money-accounts/${funds.moneyAccountId}`);
   await expect(navigation.getByRole("link",{name:"Account settings",exact:true})).toHaveAttribute("href",`/cardholder-services/settings?context=${primary.serviceId}`);
-  await expect(page.locator("main")).not.toContainText("$73.00");
-  await page.getByLabel("Selected card",{exact:true}).selectOption(managed.card.id);
-  await expect(selected).toContainText(managed.card.nickname);
+  await page.getByRole("button",{name:"Find a task",exact:true}).click();
+  const tasks=page.getByRole("dialog",{name:"What would you like to do?",exact:true});
+  const cardsTask=tasks.getByRole("link",{name:"Cards Add a card, assign its cardholder or manage its spending limit",exact:true});
+  await expect(cardsTask).toHaveAttribute("href","/cardholder-services?view=cards");
+  await expect(tasks.getByRole("link",{name:/^Cardholders Manage people/})).toHaveAttribute("href","/cardholder-services?view=cardholders");
+  await expect(tasks.getByRole("link",{name:/^Card history Continue saved/})).toHaveAttribute("href","/cardholder-services?view=requests");
+  await expect(tasks.getByRole("link",{name:/^Find a transaction Search/})).toHaveAttribute("href",`/cardholder-services/activity?focus=${received.card.id}`);
+  await expect(tasks.getByRole("link",{name:/^Account settings Account information/})).toHaveAttribute("href",`/cardholder-services/settings?context=${primary.serviceId}`);
+  await cardsTask.click();
+  await expect(page).toHaveURL(url=>url.searchParams.get("view")==="cards"&&!url.searchParams.has("focus"));
+  await expect(page.getByRole("heading",{name:"Cards",level:1,exact:true})).toBeVisible();
+  await expect(page.getByRole("link",{name:"Add card",exact:true})).toHaveCount(1);
+  await expect(selected).toHaveCount(0);
+  await navigation.getByRole("link",{name:"Account home",exact:true}).click();
+  await expect(page).toHaveURL(url=>!url.searchParams.has("focus"));
   await expect(groupBalance).toContainText("$42.00");
+  await expect(selected).toHaveCount(0);
+  await expect(navigation.getByRole("link",{name:"Activity",exact:true})).toHaveAttribute("href",`/cardholder-services/activity?context=${primary.serviceId}`);
+  await expect(page.locator("main")).not.toContainText("$73.00");
 
   const groups = [
-    { scope: "OWN", label: /^Your cards/, names: [own.card.nickname, received.card.nickname], ids: [own.card.id, received.card.id] },
-    { scope: "MANAGED", label: /^Cards you manage/, names: [managed.card.nickname], ids: [managed.card.id] },
+    { scope: "OWN", label: /^Cards in your name/, names: [own.card.nickname, received.card.nickname], ids: [own.card.id, received.card.id] },
+    { scope: "MANAGED", label: /^Cards for others/, names: [managed.card.nickname], ids: [managed.card.id] },
     { scope: "ALL", label: /^All cards/, names: [own.card.nickname, received.card.nickname, managed.card.nickname], ids: [own.card.id, received.card.id, managed.card.id] },
   ];
   await page.goto("/cardholder-services?view=cards");
@@ -208,9 +234,13 @@ test("an owned card pays at a published checkout while another holder's card off
   await signIn(page, primary.personId);
   await page.goto("/cardholder-services");
   const overview = page.getByRole("region", { name: "Selected card overview", exact: true });
-  // Alphabetical order must not make another person's card the default.
+  // Home must remain the account overview; neither alphabetical order nor an
+  // own card changes the screen into an implicitly selected card.
+  await expect(overview).toHaveCount(0);
+  await page.getByRole("region",{name:"Your card account",exact:true}).getByRole("link",{name:"View cards",exact:true}).click();
+  await page.getByRole("link",{name:new RegExp(`^Open ${owned.card.nickname},`)}).click();
   await expect(overview).toContainText(owned.card.nickname);
-  await expect(overview.getByText("YOUR CARD", { exact: true })).toBeVisible();
+  await expect(overview.getByText("CARD IN YOUR NAME", { exact: true })).toBeVisible();
   await expect(overview.getByRole("link", { name: "Try a purchase", exact: true })).toHaveCount(0);
   const merchant=await freshPublishedPayment("2300","Use the exact remaining card allowance");
   await openSavedCardReview(page,merchant.publication.id,owned.card.id);
@@ -227,7 +257,8 @@ test("an owned card pays at a published checkout while another holder's card off
   await expect(ownDialog.getByRole("button", { name: "Unfreeze", exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
 
-  await page.getByLabel("Selected card", { exact: true }).selectOption(managed.card.id);
+  await page.getByRole("link",{name:"Back to card list",exact:true}).click();
+  await page.getByRole("link",{name:new RegExp(`^Open ${managed.card.nickname},`)}).click();
   await expect(overview).toContainText("Jamie Ownership");
   await expect(overview.getByRole("link", { name: "Try a purchase", exact: true })).toHaveCount(0);
   await overview.getByRole("link", { name: "Manage card", exact: true }).click();
@@ -251,9 +282,11 @@ test("owner-frozen holder cards stay their own with an accurate explanation and 
   await controlCard(primary.personId,primary.serviceId,own.card.id,{commandId:randomUUID(),expectedVersion:own.card.version,action:"freeze"});
   await signIn(page, holder);
   await page.goto("/cardholder-services");
+  await expect(page.getByRole("region",{name:"Your card account",exact:true})).toHaveCount(0);
+  await page.getByRole("link",{name:new RegExp(`^Open ${own.card.nickname},`)}).click();
   const overview = page.getByRole("region", { name: "Selected card overview", exact: true });
   await expect(overview).toContainText(own.card.nickname);
-  await expect(overview.getByText("YOUR CARD", { exact: true })).toBeVisible();
+  await expect(overview.getByText("CARD IN YOUR NAME", { exact: true })).toBeVisible();
   await expect(overview).toContainText("This card is frozen");
   await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
   await expect(page.getByRole("link", { name: "People", exact: true })).toHaveCount(0);

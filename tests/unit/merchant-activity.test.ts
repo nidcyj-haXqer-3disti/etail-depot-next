@@ -15,7 +15,7 @@ describe("merchant activity filters and projections",()=>{
   expect(parseMerchantActivityQuery({view:view.id}).section).toBe("overview");
   for(const input of [{activity:"refunds"},{q:"saved reference"},{period:"last7"},{page:"2"}])expect(parseMerchantActivityQuery(input).section).toBe("activity");
   const original=parseMerchantActivityQuery({view:view.id,activity:"refunds",q:"saved reference",period:"last30",page:"2"});
-  for(const section of ["overview","merchants","funds","settings","activity"] as const){
+  for(const section of ["overview","channels","merchants","funds","settings","activity"] as const){
    const href=merchantActivityHref(original,{section});
    expect(parseMerchantActivityQuery(new URL(href,"https://etail.invalid").searchParams)).toEqual({...original,section});
    expect(merchantActivityReturn(href)).toBe(href);

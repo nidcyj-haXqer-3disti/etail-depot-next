@@ -1,0 +1,220 @@
+#!/usr/bin/env node
+/** D78 read-only dashboard QA. Run through run-with-database.mjs --preview after starting the preserved preview. */
+import {chromium,expect} from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import pg from 'pg';
+import {constants,promises as fs} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {previewDatabase,previewSeedKey,verifyPreviewRuntime,verifyPreviewDatabase} from './clean-preview-target.mjs';
+
+const origin='http://127.0.0.1:3100';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const name=process.argv[2],connectionString=`postgres://etail_local@127.0.0.1:55439/${previewDatabase}`;
+if(process.argv.length!==3||!/^d78-dashboard-preview(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?$/.test(name??'')||name.length>90||
+ process.env.APP_ENV!=='local'||process.env.ENABLE_LOCAL_FIXTURE_IDENTITY!=='true'||process.env.ENABLE_REAL_MONEY!=='false'||
+ process.env.DATABASE_URL!==connectionString||process.env.ETAIL_PUBLIC_ORIGIN!==origin||
+ process.env.CI&&process.env.CI!=='false'||process.env.NETLIFY||process.env.SITE_ID||process.env.CONTEXT)
+ throw new Error('Use a new d78-dashboard-preview directory name with the exact prepared local preview environment.');
+
+const output=path.join(root,'artifacts',name),run=promisify(execFile);
+const hash=value=>createHash('sha256').update(value).digest('hex');
+const checks=[],errors=[],preserved=[];
+let current={role:'setup',screen:'verification',width:0},browser=null,outputReady=false,deadline=null,signIns=0;
+let beforeSource=null,afterSource=null;
+process.umask(0o077);
+function assert(condition,code){if(!condition)throw new Error(code);}
+function failure(code,error){errors.push({...current,code,...(error?{diagnosticHash:hash(String(error.message??error))}:{})});}
+async function ownedDirectory(directory,create=false){
+ if(create)await fs.mkdir(directory,{mode:0o700});
+ const stat=await fs.lstat(directory);
+ assert(stat.isDirectory()&&!stat.isSymbolicLink()&&(!process.getuid||stat.uid===process.getuid()),'INVALID_ARTIFACT_DIRECTORY');
+}
+async function writePrivate(filename,data){
+ const handle=await fs.open(path.join(output,filename),constants.O_CREAT|constants.O_EXCL|constants.O_WRONLY|constants.O_NOFOLLOW,0o600);
+ try{await handle.writeFile(data);}finally{await handle.close();}
+}
+async function sourceHash(){
+ const {stdout}=await run('git',['ls-files','--cached','--others','--exclude-standard','-z'],{cwd:root,encoding:'buffer',maxBuffer:8*1024*1024,timeout:15_000,env:{...process.env,GIT_OPTIONAL_LOCKS:'0'}});
+ const files=[...new Set(stdout.toString('utf8').split('\0').filter(Boolean))].sort(),digest=createHash('sha256');
+ for(const file of files){
+  assert(!path.isAbsolute(file)&&!file.split('/').includes('..'),'INVALID_SOURCE_PATH');
+  const absolute=path.join(root,file);let stat;
+  try{stat=await fs.lstat(absolute);}catch(error){if(error.code==='ENOENT'){digest.update(`${file}\0MISSING\0`);continue;}throw error;}
+  assert(stat.isFile()||stat.isSymbolicLink(),'INVALID_SOURCE_TYPE');
+  const content=stat.isSymbolicLink()?await fs.readlink(absolute):await fs.readFile(absolute);
+  digest.update(`${file}\0${stat.mode}\0${hash(content)}\0`);
+ }
+ return {files:files.length,hash:digest.digest('hex')};
+}
+// Omit only the documented projection clock; every business field and array order remains significant.
+function normalize(value){
+ if(Array.isArray(value))return value.map(normalize);
+ if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).filter(([key])=>key!=='asOf').sort(([a],[b])=>a.localeCompare(b)).map(([key,child])=>[key,normalize(child)]));
+ return value;
+}
+async function read(page,endpoint){
+ assert(endpoint.startsWith('/api/v1/')&&!endpoint.includes('#'),'INVALID_READ_PATH');
+ const result=await page.evaluate(async endpoint=>{
+  const response=await fetch(endpoint,{credentials:'same-origin',cache:'no-store',redirect:'error',signal:AbortSignal.timeout(15_000)});
+  return {status:response.status,data:response.ok?await response.json():null};
+ },endpoint);
+ assert(result.status===200,`PROJECTION_READ_FAILED_${result.status}`);return result.data;
+}
+async function snapshot(page,endpoints){
+ const records=[];for(const endpoint of endpoints)records.push([endpoint,await read(page,endpoint)]);
+ return hash(JSON.stringify(normalize(records)));
+}
+async function bounded(promise,milliseconds){
+ let timer;try{return await Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('CHECK_TIMEOUT')),milliseconds);})]);}finally{clearTimeout(timer);}
+}
+const ownerCardMenu=['Account home','Cards','Activity','Account balance','Account settings'];
+const holderCardMenu=['Account home','Cards','Activity','Preferences'];
+const ownerMerchantMenu=['Overview','Payments','Payment links','Team & terminals','Balance & payouts','Settings'];
+const holderMerchantMenu=['Overview','Payments','Payment links','Your terminals'];
+function cardMenu(page){return page.getByRole('navigation',{name:'Cards and spending navigation',exact:true});}
+function merchantMenu(page){return page.getByRole('navigation',{name:'Merchant account navigation',exact:true});}
+async function capture(page,role,width,screen,url,ready){
+ current={role,width,screen};
+ const response=await page.goto(origin+url,{waitUntil:'domcontentloaded'});
+ assert(response?.ok(),'PAGE_OPEN_FAILED');assert(new URL(page.url()).origin===origin,'UNEXPECTED_PAGE_ORIGIN');
+ await ready(page);
+ await bounded(page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));}),15_000);
+ await expect(page.locator('footer')).toHaveCount(0);
+ await expect(page.locator('.sandbox-badge')).toHaveCount(1);
+ await expect(page.locator('.sandbox-badge')).toHaveText('Sandbox');
+ const geometry=await page.evaluate(()=>({width:innerWidth,height:innerHeight,scrollWidth:Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)}));
+ const axe=await bounded(new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze(),30_000);
+ const violations=axe.violations.map(item=>({id:item.id,targets:item.nodes.map(node=>node.target)}));
+ const file=`${role}-${screen}-${width}.png`;
+ await writePrivate(file,await page.screenshot({fullPage:true,animations:'disabled',timeout:15_000}));
+ const failed=geometry.scrollWidth>geometry.width+1||violations.length>0;
+ checks.push({...current,file,geometry,violations,failed});
+ console.log(JSON.stringify({...current,failed}));
+}
+
+try{
+ await verifyPreviewRuntime();
+ const client=new pg.Client({connectionString,connectionTimeoutMillis:5000,application_name:'etail-dashboard-visual-read',query_timeout:15_000,statement_timeout:10_000});
+ let ids;
+ try{
+  await client.connect();await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');await verifyPreviewDatabase(client);
+  const marker=await client.query('SELECT result FROM public._etail_preview_seed WHERE key=$1',[previewSeedKey]);ids=marker.rows[0]?.result;
+  const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+  assert(marker.rows.length===1&&ids?.realMoney===false&&['primaryId','secondaryId','serviceId','merchantServiceId','primaryCardId','secondaryCardId'].every(key=>uuid.test(ids[key])),'INVALID_PREVIEW_MARKER');
+  const bindings=await client.query('SELECT subject,"personId" FROM public.identity_bindings WHERE issuer=$1 AND subject=ANY($2::text[])',['urn:etail:isolated-fixture',['owner','viewer']]);
+  assert(bindings.rows.length===2&&bindings.rows.some(row=>row.subject==='owner'&&row.personId===ids.primaryId)&&bindings.rows.some(row=>row.subject==='viewer'&&row.personId===ids.secondaryId),'FICTIONAL_IDENTITIES_NOT_PREPARED');
+  await client.query('COMMIT');
+ }finally{await client.end();}
+ const artifacts=path.join(root,'artifacts');
+ try{await ownedDirectory(artifacts);}catch(error){if(error.code==='ENOENT')await ownedDirectory(artifacts,true);else throw error;}
+ await ownedDirectory(output,true);outputReady=true;beforeSource=await sourceHash();
+ browser=await chromium.launch();
+ deadline=setTimeout(()=>{failure('CAPTURE_DEADLINE');void browser.close().catch(()=>undefined);},12*60_000);
+ let assignedTerminalId=null;
+ // Resolve the recipient's sole assigned terminal first; the owner must independently authorize that exact terminal.
+ for(const [role,persona,personId] of [['holder','viewer',ids.secondaryId],['owner','owner',ids.primaryId]]){
+  current={role,screen:'sign-in',width:1440};
+  const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce',serviceWorkers:'block'});
+  let loginBudget=1;
+  try{
+   await context.route('**/*',async route=>{
+    const request=route.request(),url=new URL(request.url());
+    if(url.origin!==origin){failure('EXTERNAL_REQUEST_BLOCKED');await route.abort('blockedbyclient');return;}
+    const login=request.method()==='POST'&&url.pathname==='/api/v1/auth/local-fixture'&&!url.search&&request.postData()===JSON.stringify({persona})&&loginBudget===1;
+    if(login){loginBudget--;await route.continue();return;}
+    if(!['GET','HEAD','OPTIONS'].includes(request.method())){failure('BUSINESS_WRITE_BLOCKED');await route.abort('blockedbyclient');return;}
+    await route.continue();
+   });
+   await context.routeWebSocket('**/*',socket=>{failure('WEBSOCKET_BLOCKED');socket.close();});
+   const page=await context.newPage();page.setDefaultTimeout(15_000);page.setDefaultNavigationTimeout(30_000);
+   // Axe may create a temporary analysis page; context routing still blocks external and mutating requests.
+   page.on('response',response=>{if(response.status()>=400)failure(`HTTP_RESPONSE_${response.status()}`);});
+   page.on('pageerror',error=>failure('BROWSER_RUNTIME_ERROR',error));
+   page.on('console',message=>{if(message.type()==='error')failure('BROWSER_CONSOLE_ERROR',new Error(message.text()));});
+   const entry=await page.goto(origin+'/login',{waitUntil:'domcontentloaded'});assert(entry?.ok(),'LOGIN_PAGE_UNAVAILABLE');
+   const login=await page.evaluate(async persona=>{
+    const response=await fetch('/api/v1/auth/local-fixture',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({persona}),redirect:'error',signal:AbortSignal.timeout(15_000)});
+    return {status:response.status,authenticated:response.ok&&(await response.json()).authenticated};
+   },persona);
+   assert(login.status===200&&login.authenticated===true&&loginBudget===0,'FIXTURE_LOGIN_FAILED');signIns++;
+   const cards=await read(page,'/api/v1/cardholder-services'),merchants=await read(page,'/api/v1/merchants/dashboard'),accounts=await read(page,'/api/v1/money-accounts');
+   assert(cards.person.id===personId,'WRONG_PREVIEW_PERSON');
+   const selectedCardId=role==='owner'?ids.primaryCardId:ids.secondaryCardId;
+   const card=cards.cards.find(item=>item.id===selectedCardId&&item.holderId===personId&&item.assignmentState==='ACCEPTED');
+   assert(card&&card.serviceId===ids.serviceId,'PREPARED_CARD_NOT_AUTHORIZED');
+   if(role==='holder'){
+    assert(!cards.primaryService&&cards.cards.every(item=>item.holderId===personId)&&accounts.length===0,'UNEXPECTED_HOLDER_AUTHORITY');
+    assert(merchants.units.length===1&&!merchants.units[0].ownerAccess,'EXPECTED_ONE_ASSIGNED_TERMINAL');assignedTerminalId=merchants.units[0].id;
+   }
+   const terminal=merchants.units.find(item=>item.id===assignedTerminalId&&item.merchantServiceId===ids.merchantServiceId&&item.ownerAccess===(role==='owner'));
+   assert(terminal,'PREPARED_TERMINAL_NOT_AUTHORIZED');
+   const cardAccount=role==='owner'?accounts.find(item=>item.serviceKind==='CARDHOLDER'&&item.services.some(service=>service.id===ids.serviceId)):null;
+   const merchantAccount=role==='owner'?accounts.find(item=>item.serviceKind==='MERCHANT'&&item.services.some(service=>service.id===ids.merchantServiceId)):null;
+   if(role==='owner')assert(cards.primaryService?.id===ids.serviceId&&cardAccount&&merchantAccount&&cardAccount.id!==merchantAccount.id,'OWNER_ACCOUNTS_NOT_AUTHORIZED');
+   const endpoints=['/api/v1/services','/api/v1/cardholder-services','/api/v1/merchants/dashboard','/api/v1/money-accounts',`/api/v1/cardholder-services/${ids.serviceId}/workspace`,`/api/v1/merchants/${terminal.id}`,`/api/v1/merchants/${terminal.id}/operations`];
+   if(role==='owner')endpoints.push(`/api/v1/cardholder-services/${ids.serviceId}/funds`,`/api/v1/cardholder-services/${ids.serviceId}/access`,`/api/v1/merchants/${terminal.id}/access`,`/api/v1/money-accounts/${cardAccount.id}`,`/api/v1/money-accounts/${merchantAccount.id}`);
+   const before=await snapshot(page,endpoints);
+   const own=role==='owner',cardLinks=own?ownerCardMenu:holderCardMenu,merchantLinks=own?ownerMerchantMenu:holderMerchantMenu;
+   for(const width of [1440,390,320]){
+    await page.setViewportSize({width,height:width===1440?1000:900});
+    await capture(page,role,width,'card-home','/cardholder-services',async page=>{
+     await expect(page.getByRole('heading',{name:'Account home',level:1,exact:true})).toBeVisible();
+     await expect(cardMenu(page).getByRole('link')).toHaveText(cardLinks);
+     await expect(cardMenu(page).getByRole('link',{name:'Account home',exact:true})).toHaveAttribute('aria-current','page');
+     await expect(page.getByRole('region',{name:'Selected card overview',exact:true})).toHaveCount(0);
+    });
+    await capture(page,role,width,'card-list','/cardholder-services?view=cards',async page=>{
+     await expect(cardMenu(page).getByRole('link')).toHaveText(cardLinks);
+     await expect(cardMenu(page).getByRole('link',{name:'Cards',exact:true})).toHaveAttribute('aria-current','page');
+     if(own)await expect(page.getByRole('navigation',{name:'Card management',exact:true}).getByRole('link')).toHaveText(['Card list','Cardholders','Card history']);
+     else await expect(page.getByRole('navigation',{name:'Card management',exact:true})).toHaveCount(0);
+     await expect(page.getByRole('navigation',{name:'Card ownership',exact:true})).toHaveCount(own?1:0);
+     await expect(page.getByRole('link',{name:'Add card',exact:true})).toHaveCount(own?1:0);
+    });
+    await capture(page,role,width,'card-details',`/cardholder-services?focus=${card.id}`,async page=>{
+     await expect(page.getByRole('heading',{name:'Card details',level:1,exact:true})).toBeVisible();
+     await expect(page.getByRole('region',{name:'Selected card overview',exact:true})).toContainText(card.nickname);
+     await expect(cardMenu(page).getByRole('link',{name:'Cards',exact:true})).toHaveAttribute('aria-current','page');
+    });
+    for(const [screen,section,label] of [['merchant-overview','overview','Overview'],['merchant-payment-links','channels','Payment links'],['merchant-terminals','merchants',own?'Team & terminals':'Your terminals']])await capture(page,role,width,screen,`/merchant-services?section=${section}&view=${own?'merchant:'+ids.merchantServiceId:'unit:'+terminal.id}`,async page=>{
+     await expect(merchantMenu(page).getByRole('link')).toHaveText(merchantLinks);
+     await expect(merchantMenu(page).getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
+     if(section==='overview')await expect(page.getByRole('heading',{name:'Recent payments',exact:true})).toBeVisible();
+     else await expect(page.getByRole('link',{name:terminal.name,exact:true})).toBeVisible();
+     await expect(page.getByRole('button',{name:'New payment request',exact:true})).toHaveCount(0);
+     if(!own)await expect(page.getByRole('link',{name:'Balance & payouts',exact:true})).toHaveCount(0);
+    });
+    if(own)await capture(page,role,width,'merchant-payouts',`/merchant-services?section=funds&view=merchant:${ids.merchantServiceId}`,async page=>{
+     await expect(page.getByRole('heading',{name:'Balance & payouts',level:1,exact:true})).toBeVisible();
+     await expect(merchantMenu(page).getByRole('link')).toHaveText(ownerMerchantMenu);
+     await expect(merchantMenu(page).getByRole('link',{name:'Balance & payouts',exact:true})).toHaveAttribute('aria-current','page');
+     await expect(page.getByRole('heading',{name:'Payout history',exact:true})).toBeVisible();
+     await expect(page.getByRole('region',{name:`Settlement for ${terminal.name}`,exact:true})).toBeVisible();
+     await expect(page.getByRole('link',{name:'Add money',exact:true})).toHaveCount(0);
+     await expect(page.getByRole('link',{name:'Withdraw',exact:true})).toHaveCount(0);
+     await expect(page.getByRole('link',{name:'Request payout',exact:true})).toHaveCount(1);
+    });
+    await capture(page,role,width,'profile-help-menu','/cardholder-services',async page=>{
+     const trigger=page.getByLabel('Profile and help',{exact:true});
+     await trigger.focus();await page.keyboard.press('Enter');
+     await expect(page.locator('details.account-menu')).toHaveAttribute('open','');
+     await expect(page.getByRole('navigation',{name:'Your account',exact:true}).getByRole('link')).toHaveText(['Your profile','Sign-in & security','Help center']);
+     await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
+    });
+   }
+   const after=await snapshot(page,endpoints);preserved.push({role,reads:endpoints.length,before,after,unchanged:before===after});
+  }finally{await context.close();}
+ }
+}catch(error){failure(error instanceof Error&&/^[A-Z][A-Z0-9_]+$/.test(error.message)?error.message:'CAPTURE_FAILED',error);}
+finally{
+ clearTimeout(deadline);if(browser)try{await browser.close();}catch(error){failure('BROWSER_CLOSE_FAILED',error);}
+ if(beforeSource)try{afterSource=await sourceHash();}catch(error){failure('SOURCE_HASH_FAILED',error);}
+}
+const summary={result:checks.length===45&&!checks.some(item=>item.failed)&&!errors.length&&preserved.length===2&&preserved.every(item=>item.unchanged)&&beforeSource?.hash===afterSource?.hash?'PASS':'FAIL',screens:checks.length,failed:checks.filter(item=>item.failed).length,runtimeOrGuardErrors:errors.length,fixtureSignIns:signIns,source:{before:beforeSource,after:afterSource,unchanged:!!beforeSource&&beforeSource.hash===afterSource?.hash},normalization:'Only projection asOf timestamps are omitted. No report endpoint is captured; all business fields and array order are compared.',preserved};
+try{assert(outputReady,'ARTIFACT_DIRECTORY_NOT_CREATED');await writePrivate('checks.json',JSON.stringify({summary,checks,errors},null,2)+'\n');}catch{summary.result='FAIL';}
+console.log(JSON.stringify({result:summary.result,screens:summary.screens,failed:summary.failed,runtimeOrGuardErrors:summary.runtimeOrGuardErrors,sourceUnchanged:summary.source.unchanged,artifactDirectory:path.relative(root,output)}));
+if(summary.result!=='PASS')process.exitCode=1;

@@ -1,8 +1,12 @@
 import {getSandboxOverview} from "@/modules/sandbox/service";
 import {SandboxEntry} from "@/ui/sandbox-entry";
-import { redirect } from "next/navigation";
+import { redirect,unstable_rethrow } from "next/navigation";
 import { getRequestSession } from "@/platform/http/context";
 import { getMerchantDashboard } from "@/modules/acquiring/dashboard-service";
+import {getMoneyAccountOverview} from "@/modules/money/service";
+import {getMerchantMoneyWorkspace} from "@/modules/acquiring/money-workspace";
+import {MoneyAccountWorkspace} from "@/ui/money-account";
+import {merchantActivityHref} from "@/shared/merchant-activity";
 import { MerchantDashboard } from "@/ui/workspace/merchant-dashboard";
 import { MerchantShell } from "@/ui/workspace/merchant-shell";
 import { PageNotice } from "@/ui/shell";
@@ -25,5 +29,22 @@ export default async function Page({searchParams}:{searchParams:Promise<Record<s
   dashboard=null;
  }
  if(!dashboard)return <PageNotice title="We couldn’t load your payments" authenticated><p>Please reload this page. Your payments and saved records have not changed.</p></PageNotice>;
+ if(dashboard.activity.query.section==="funds"){
+  const view=dashboard.views.find(view=>view.id===dashboard.activity.query.view);
+  const units=dashboard.units.filter(unit=>view?.unitIds.includes(unit.id));
+  const accounts=dashboard.moneyAccounts.filter(account=>account.merchantServiceIds.some(serviceId=>units.some(unit=>unit.ownerAccess&&unit.merchantServiceId===serviceId)));
+  if(accounts.length===1){
+   let moneyWorkspace:Awaited<ReturnType<typeof getMerchantMoneyWorkspace>>;
+   try{
+    const overview=await getMoneyAccountOverview(session.personId,accounts[0]!.id);
+    moneyWorkspace=await getMerchantMoneyWorkspace(session.personId,overview);
+   }catch(error){
+    unstable_rethrow(error);
+    return <PageNotice title="This money account is unavailable" authenticated><p>Your current account access could not be confirmed. Return to merchant services to choose an available account.</p><Link href="/merchant-services">Back to merchant services</Link></PageNotice>;
+   }
+   const {account,settlements,settlementsUnavailable}=moneyWorkspace;
+   return <MerchantShell dashboardQuery={dashboard.activity.query} showMoney showSettings><MoneyAccountWorkspace showBackLink={false} account={account} task={null} review={null} returnTo={merchantActivityHref(dashboard.activity.query)} settlements={settlements} settlementsUnavailable={settlementsUnavailable}/></MerchantShell>;
+  }
+ }
  return <MerchantShell dashboardQuery={dashboard.activity.query} showMoney={dashboard.moneyAccounts.length>0} showSettings={dashboard.merchants.some(merchant=>merchant.ownerAccess)}><MerchantDashboard initial={dashboard}/></MerchantShell>;
 }

@@ -1,5 +1,7 @@
 # Etail Depot — product and technical design
 
+> **D78 active override — 13 September 2026:** [Clear service workspaces](SERVICE_DASHBOARD_CLARITY.md) makes Amex the Cardholder reference and Stripe the Merchant reference. Separate account overview from named-card detail; use one personal account menu with no authenticated footer. Merchant collection, settlement and payouts have distinct views; routine merchant top-ups are retired server-side while posted receipts remain recoverable. D73 money/permissions and D76 invitations/checkout remain.
+
 > **D77 navigation override — 13 September2026:** [Service menu hierarchy](SERVICE_MENU_HIERARCHY.md) separates account home, cards/payments, resource management, account balance and settings. New top-ups use one money-account workspace; historical funding reviews retain recovery. D76 invitations/network checkout and D73 money/permission rules are unchanged.
 
 > **D76 active override — 12 September 2026:** [Network cards and resource invitations](NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md) governs Visa product intent, create-card-first recipient assignment, exact terminal invitations and public external-card checkout. It supersedes the internal-Etail-only payment path and person-first/member-code invitation requirements. D73 separate balances, total card allowances and owner/holder/terminal isolation remain in force. Historical text below is dated context.

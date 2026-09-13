@@ -1,24 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LogoutButton } from "./logout-button";
+import { AccountMenu } from "./account-menu";
 import { Icon } from "./icon";
 import { ServiceNavigation } from "./service-navigation";
 import { PublicNavigation } from "./public-navigation";
 import "./services.css";
 
 export function Header({ authenticated = false, activeService }: { authenticated?: boolean; activeService?: "CARDHOLDER" | "MERCHANT" }) {
-  return <header className={`site-header${authenticated ? "" : " public-header"}`}><div className="header-inner"><Link href={authenticated ? "/services" : "/"} className="brand-link" aria-label="Etail Depot home"><Image src="/brand/logo.png" alt="Etail Depot" width={799} height={148} priority className="brand-logo" /></Link>{authenticated ? <ServiceNavigation activeService={activeService} /> : <PublicNavigation />}<div className="header-actions"><span className="sandbox-badge"><span aria-hidden="true" />Sandbox</span>{authenticated ? <LogoutButton /> : <Link className="header-sign-in" href="/login">Sign in <Icon name="arrow" /></Link>}</div></div></header>;
+  return <header className={`site-header ${authenticated ? "account-header" : "public-header"}`}><div className="header-inner"><Link href={authenticated ? "/services" : "/"} className="brand-link" aria-label="Etail Depot home"><Image src="/brand/logo.png" alt="Etail Depot" width={799} height={148} priority className="brand-logo" /></Link>{authenticated ? <ServiceNavigation activeService={activeService} /> : <PublicNavigation />}<div className="header-actions"><span className="sandbox-badge"><span aria-hidden="true" />Sandbox</span>{authenticated ? <AccountMenu /> : <Link className="header-sign-in" href="/login">Sign in <Icon name="arrow" /></Link>}</div></div></header>;
 }
 
-export function Footer({ authenticated = false }: { authenticated?: boolean }) {
-  return <footer className={`site-footer${authenticated ? "" : " public-footer"}`}>
-    {authenticated ? <div className="footer-inner"><span>© Etail Depot</span><nav className="footer-support-links" aria-label="Footer support"><Link href="/services">Your dashboard</Link><Link href="/profile">Your profile</Link><Link href="/help">Help center</Link></nav></div> :
-      <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Cards for your people. More ways to get paid.</p><p className="footer-copyright">© Etail Depot</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cards & spending</Link><Link href="/payment-services">Accept payments</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>}
+function Footer() {
+  return <footer className="site-footer public-footer">
+    <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Cards for your people. More ways to get paid.</p><p className="footer-copyright">© Etail Depot</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cards & spending</Link><Link href="/payment-services">Accept payments</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>
   </footer>;
 }
 
 export function Shell({ children, authenticated = false, activeService }: { children: React.ReactNode; authenticated?: boolean; activeService?: "CARDHOLDER" | "MERCHANT" }) {
-  return <><Header authenticated={authenticated} activeService={activeService} /><main id="main-content">{children}</main><Footer authenticated={authenticated} /></>;
+  return <><Header authenticated={authenticated} activeService={activeService} /><main id="main-content">{children}</main>{!authenticated && <Footer />}</>;
 }
 
 export function PageNotice({ title, children, authenticated = false }: { title: string; children: React.ReactNode; authenticated?: boolean }) {

@@ -31,7 +31,7 @@ export async function getPrimaryCardholderService(personId:string):Promise<Cardh
  },{isolationLevel:"repeatable read"});
 }
 
-/** Selected-card Home loads one authorized card and at most 25 of its transactions. */
+/** Card details load one authorized card and at most 25 of its transactions. */
 export async function getCardholderDashboardFocus(personId:string,cardId:string):Promise<CardholderDashboardFocus>{
  const id=uuid(cardId);
  return getDb().transaction(async tx=>{
@@ -114,6 +114,23 @@ export async function getCardholderDashboard(personId:string,page=0,filters:Card
   const cardholders:CardholderDashboardProjection["cardholders"]=[];
   let cardholdersHasMore=false;
   const ownContext=linked.find(context=>context.serviceId===primaryService?.id&&cardholderRole(context.policy)==="OWNER");
+  let accountOverview:CardholderDashboardProjection["accountOverview"]=null;
+  if(ownContext&&evaluate(ownContext.policy,"cards.read").allowed){
+   // Scope before counting and limiting: received-card purchases cannot
+   // displace this owner's account activity or inflate its card totals.
+   const [accountCount]=await tx.select({
+    value:sql<number>`count(*)::integer`,
+    own:sql<number>`count(*) filter (where ${cards.holderId}=${personId})::integer`,
+    unassigned:sql<number>`count(*) filter (where ${cards.assignmentState}='UNASSIGNED')::integer`,
+   }).from(cards).where(and(readable,eq(cards.serviceId,ownContext.serviceId)));
+   const recent=evaluate(ownContext.policy,"activity.read").allowed?await tx.select({activity:serviceActivity,card:cards,holder:people.displayName})
+    .from(serviceActivity).innerJoin(cards,and(eq(cards.id,serviceActivity.cardId),eq(cards.serviceId,serviceActivity.serviceId)))
+    .innerJoin(people,eq(people.id,cards.holderId))
+    .where(and(cardPermissionScope("activity.read"),eq(serviceActivity.serviceId,ownContext.serviceId)))
+    .orderBy(desc(serviceActivity.occurredAt),serviceActivity.id).limit(25):[];
+   accountOverview={serviceId:ownContext.serviceId,cardCount:accountCount!.value,ownCardCount:accountCount!.own,otherCardCount:accountCount!.value-accountCount!.own,unassignedCardCount:accountCount!.unassigned,
+    activity:recent.map(row=>({...activityProjection(row.activity),cardNickname:row.card.nickname,lastFour:row.card.lastFour,holderName:row.holder}))};
+  }
   if(ownContext&&evaluate(ownContext.policy,"people.read").allowed){
    const memberRows=await tx.select({id:people.id,displayName:people.displayName,
     canHold:sql<boolean>`true`,
@@ -122,7 +139,7 @@ export async function getCardholderDashboard(personId:string,page=0,filters:Card
    cardholdersHasMore=memberRows.length>pageSize;
    for(const member of memberRows.slice(0,pageSize))cardholders.push({id:member.id,displayName:member.displayName,serviceId:ownContext.serviceId,cardCount:evaluate(ownContext.policy,"cards.read").allowed?member.cardCount:null,canAddCard:member.canHold&&evaluate(ownContext.policy,"cards.request").allowed&&evaluate(ownContext.policy,"cards.manageMembers").allowed});
   }
-  return {person,canCreatePrimary,profiles,primaryService,cards:visible,cardCount:count!.value,ownCardCount:count!.own,managedCardCount:count!.value-count!.own,cardMatchCount:matches!.value,cardScope,cardSearch,cardsPage:page,cardsHasMore:rows.length>pageSize,cardholders,cardholdersHasMore,activity,requests,requestPage,requestsHasMore:requestRows.length>20,requestCount:requestTotal!.value,unfinishedRequestCount:unfinishedTotal!.value,requestStatus,requestSearch,fictional:true};
+  return {person,canCreatePrimary,profiles,primaryService,accountOverview,cards:visible,cardCount:count!.value,ownCardCount:count!.own,managedCardCount:count!.value-count!.own,cardMatchCount:matches!.value,cardScope,cardSearch,cardsPage:page,cardsHasMore:rows.length>pageSize,cardholders,cardholdersHasMore,activity,requests,requestPage,requestsHasMore:requestRows.length>20,requestCount:requestTotal!.value,unfinishedRequestCount:unfinishedTotal!.value,requestStatus,requestSearch,fictional:true};
  },{isolationLevel:"repeatable read"});
 }
 

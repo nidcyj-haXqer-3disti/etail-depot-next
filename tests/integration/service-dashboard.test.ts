@@ -6,7 +6,7 @@ import { closeDatabase, getDb } from "../../src/platform/database/client";
 import { cards, cardRequests, serviceActivity, permissionGrants } from "../../src/platform/database/schema";
 import { ledgerEntries } from "../../src/modules/ledger/schema";
 import { getCardholderDashboard, getCardholderDashboardDetail, getCardholderDashboardFocus } from "../../src/modules/workspace/dashboard-service";
-import { getWorkspace, purchaseCard, startCardRequest, controlCard } from "../../src/modules/workspace/service";
+import { getWorkspace, purchaseCard, startCardRequest, controlCard, updateCardRequest, submitCardRequest } from "../../src/modules/workspace/service";
 import { getAccessOverview, revokeMemberAccess } from "../../src/modules/access/service";
 import { cardPerson, cardPrimary, enrollCardholder, issuePracticeCard, issuePracticeCardRequest } from "../helpers/cardholder";
 
@@ -43,6 +43,8 @@ describe("service-first Cardholder dashboard", () => {
     expect(dashboard.profiles).toHaveLength(2);
     expect(dashboard).toMatchObject({cardCount:3,ownCardCount:2,managedCardCount:1,cardMatchCount:3,cardScope:"ALL",cardSearch:""});
     expect(dashboard.primaryService).toMatchObject({ id: f.actor.serviceId, primaryPersonId: f.actor.personId, relationship: "OWNER" });
+    expect(dashboard.accountOverview).toMatchObject({serviceId:f.actor.serviceId,cardCount:2,ownCardCount:1,otherCardCount:1,unassignedCardCount:0});
+    expect(dashboard.accountOverview!.activity.map(row=>row.id).sort()).toEqual([f.ownPrimary.activity!.id,f.managedAdditional.activity!.id].sort());
     expect(dashboard.cards.filter(card => card.accessRole === "OWNER").map(card => card.id).sort()).toEqual([f.ownPrimary.card.id, f.managedAdditional.card.id].sort());
     expect(dashboard.cards.filter(card => card.accessRole === "CARDHOLDER")).toMatchObject([{ id: f.ownSecondary.card.id, serviceId: f.otherPrimary.serviceId, holderId: f.actor.personId, canPurchase: false, canManageAccess: false, available: { minor: "9889" } }]);
     expect(dashboard.activity.map(row => row.id).sort()).toEqual([f.ownPrimary.activity!.id, f.managedAdditional.activity!.id, f.ownSecondary.activity!.id].sort());
@@ -50,6 +52,37 @@ describe("service-first Cardholder dashboard", () => {
     for (const hidden of [f.hiddenPrimary.card.id, f.hiddenAdditional.card.id, f.hiddenPrimary.activity!.id, f.hiddenAdditional.activity!.id, f.pendingOther.id, f.pendingForeign.id, f.foreignCard.card.id]) expect(JSON.stringify(dashboard)).not.toContain(hidden);
     await expect(purchaseCard(f.actor.personId, f.otherPrimary.serviceId, f.ownSecondary.card.id, { commandId: randomUUID(), expectedVersion: f.ownSecondary.card.version, amountMinor: "1", description: "An independent account cannot override the owner freeze" })).rejects.toMatchObject({ code: "CARD_FROZEN" });
     expect(await f.snapshot()).toEqual(before);
+  });
+
+  it("scopes account activity before the recent-record limit and keeps totals independent of directory filters", async () => {
+    const f=await fixture();
+    let received=await controlCard(f.otherPrimary.personId,f.otherPrimary.serviceId,f.ownSecondary.card.id,{commandId:randomUUID(),expectedVersion:f.ownSecondary.card.version,action:"unfreeze"});
+    for(let n=0;n<26;n++) received=(await purchaseCard(f.actor.personId,f.otherPrimary.serviceId,received.id,{commandId:randomUUID(),expectedVersion:received.version,amountMinor:"1",description:`Received-card purchase ${n}`})).card;
+    const before=await f.snapshot();
+    const overview=await getCardholderDashboard(f.actor.personId);
+    expect(overview.activity).toHaveLength(25);
+    expect(overview.activity.every(row=>row.serviceId===f.otherPrimary.serviceId)).toBe(true);
+    expect(overview.accountOverview!.activity.map(row=>row.id).sort()).toEqual([f.ownPrimary.activity!.id,f.managedAdditional.activity!.id].sort());
+    const filtered=await getCardholderDashboard(f.actor.personId,1,{cardScope:"OWN",cardSearch:"no matching card"});
+    expect(filtered.cards).toEqual([]);
+    expect(filtered.accountOverview).toEqual(overview.accountOverview);
+    expect((await getCardholderDashboard(f.additional)).accountOverview).toBeNull();
+    expect(await f.snapshot()).toEqual(before);
+  });
+
+  it("shows the account owner without an own card and counts ready-to-invite cards without funding them",async()=>{
+    const owner=await cardPrimary("Account owner without a card");
+    expect((await getCardholderDashboard(owner.personId)).accountOverview).toEqual({serviceId:owner.serviceId,cardCount:0,ownCardCount:0,otherCardCount:0,unassignedCardCount:0,activity:[]});
+    const draft=await startCardRequest(owner.personId,owner.serviceId,{commandId:randomUUID()});
+    const saved=await updateCardRequest(owner.personId,owner.serviceId,draft.id,{commandId:randomUUID(),expectedVersion:draft.version,holderId:null,nickname:"Ready for a recipient",format:"VIRTUAL",allowanceMinor:"2500"});
+    await submitCardRequest(owner.personId,owner.serviceId,saved.id,{commandId:randomUUID(),expectedVersion:saved.version});
+    const before=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,owner.serviceId));
+    const overview=await getCardholderDashboard(owner.personId);
+    expect(overview.accountOverview).toEqual({serviceId:owner.serviceId,cardCount:1,ownCardCount:0,otherCardCount:1,unassignedCardCount:1,activity:[]});
+    expect(overview.cards[0]).toMatchObject({holderId:null,assignmentState:"UNASSIGNED",available:{minor:"0"},canPurchase:false,canInvite:true});
+    expect(await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,owner.serviceId))).toEqual(before);
+    await getDb().update(permissionGrants).set({state:"REVOKED"}).where(and(eq(permissionGrants.serviceId,owner.serviceId),eq(permissionGrants.personId,owner.personId),eq(permissionGrants.action,"cards.read")));
+    expect((await getCardholderDashboard(owner.personId)).accountOverview).toBeNull();
   });
 
   it("separates cards named to the signed-in person from cards they manage without widening authority", async () => {

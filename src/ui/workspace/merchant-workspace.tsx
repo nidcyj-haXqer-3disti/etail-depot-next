@@ -22,8 +22,8 @@ export function MerchantWorkspace({workspace,tab,access,operations,support,dispu
  const delegatedView=!workspace.ownerAccess;
 
  const content=<>
-  <Link className="mn-account-back" href={directoryHref}>← Back to your account</Link>
-  <header className="mn-heading mn-workspace-heading"><div><p className="consumer-eyebrow">PAYMENT TERMINAL</p><h1>{merchant.displayName}</h1><p>{merchant.merchant.displayName} · {delegatedView?"Your payment requests, received payments and customer disputes.":"Manage this terminal’s payments, channels and team access."}</p><div className="mn-context"><StatusBadge status={merchant.status}/></div></div></header>
+  <Link className="mn-account-back" href={directoryHref}>← Back to merchant services</Link>
+  <header className="mn-heading mn-workspace-heading"><div><p className="consumer-eyebrow">PAYMENT TERMINAL</p><h1>{merchant.displayName}</h1><p>{merchant.merchant.displayName} · {delegatedView?"Your payment requests, received payments and customer disputes.":"Manage payment links and the people who collect here."}</p><div className="mn-context"><StatusBadge status={merchant.status}/></div></div></header>
   <MerchantTerminalNavigation merchantId={merchant.id} tab={tab} showPeople={workspace.canReadPeople} showSettings={workspace.ownerAccess} returnTo={directoryHref}/>
 
   {merchant.status!=="ACTIVE"&&<div className="mn-notice">New payments are stopped for this terminal. You can still review the history available to you.</div>}
@@ -32,5 +32,5 @@ export function MerchantWorkspace({workspace,tab,access,operations,support,dispu
   {tab==="verification"&&<MerchantStatusControl key={merchant.id} initial={workspace}/>}
   {tab==="verification"&&<details className="mn-panel"><summary>Payment terminal details & history</summary><p>{merchant.merchant.displayName} is responsible for sales, fees, refunds and chargebacks. </p><dl className="mn-review"><div><dt>Payment terminal status</dt><dd><StatusBadge status={merchant.status}/></dd></div></dl>{businessDetailsHref&&<Link href={businessDetailsHref}>Review business details</Link>}<ul className="mn-list">{workspace.timeline.map(item=><li key={item.id}><strong>{item.label}</strong><span> · {formatDate(item.at)}</span></li>)}</ul></details>}
  </>;
- return <MerchantShell merchantId={merchant.id} showMoney={workspace.ownerAccess} showSettings={workspace.ownerAccess} overviewHref={directoryHref}>{content}</MerchantShell>;
+ return <MerchantShell merchantId={merchant.id} showMoney={workspace.ownerAccess} showSettings={workspace.ownerAccess} overviewHref={directoryHref} activeSection={tab==="channels"?"channels":tab==="payments"||tab==="disputes"||tab==="help"?"activity":tab==="verification"?"settings":"merchants"}>{content}</MerchantShell>;
 }

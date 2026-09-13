@@ -36,7 +36,8 @@ test("a payment question carries exact refund dates through assigned support and
   await page.goto(original);
   const receipt=page.getByRole("dialog",{name:"Payment details",exact:true});await expect(receipt).toContainText(payment.testReference);
   await receipt.getByRole("link",{name:"Get help with this payment",exact:true}).click();
-  await expect(page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Help",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Contact support",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Payments",exact:true})).toHaveAttribute("aria-current","page");
   await explain(page,subject);
   const context=page.getByRole("region",{name:"Related payment",exact:true});
   await expect(context).toContainText(unit.name);await expect(context).toContainText(unit.merchantName);await expect(context).toContainText(payment.testReference);

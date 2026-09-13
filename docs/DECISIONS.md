@@ -1,5 +1,9 @@
 # Decision register
 
+## D78 — separate account context, card use and merchant proceeds (13 September 2026)
+
+The user selects American Express for Cardholder and Stripe for Merchant experience and rejects footer navigation and generic merchant funding actions. [D78](SERVICE_DASHBOARD_CLARITY.md) freezes separate account/card views, exact server-scoped overview projections, one personal account menu, named terminal selection, merchant settlement/payout presentation and server-enforced retirement of new merchant top-ups. Card money stays separate; total card allowances and current resource permissions stay intact. Historical posted top-up receipts remain recoverable; unconfirmed merchant top-ups may not create new money. No automatic settlement, actual bank connection or broader delegate authority is introduced. The local implementation and verification are complete; [D78 evidence](SERVICE_DASHBOARD_EVIDENCE.md) records the full suite, final recipient-list checks, responsive review and unchanged preview projections. Owner card filters remain, while invited holders receive a direct searchable card list. Implementation and verification are separate from reviewed publication.
+
 ## D77 release authorization
 
 13 September2026. After the menu and landing-page review corrections, the user explicitly requests deployment. Proceed with the final revision of PR20, required checks, reviewed merge and publication to Netlify site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`; retain existing visitor access and disabled real money. Record final commit/tree, CI, published deploy and read-only hosted acceptance in PR20 and `artifacts/d77-publication.json`. No reprovisioning, database reset, provider connection or unrelated resource change is included.

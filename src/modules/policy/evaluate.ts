@@ -25,13 +25,13 @@ export interface OperatorPolicyScope {
  targetKind:"OPERATOR_SERVICE";actorPersonId:string;assignmentPersonId:string;serviceId:string;resourceServiceId:string;state:"ACCEPTED"|"REVOKED";serviceStatus:string;grants:readonly string[];
 }
 export interface MoneyPolicyScope {
- targetKind:"MONEY_ACCOUNT";actorPersonId:string;ownerPersonId:string;moneyAccountId:string;resourceMoneyAccountId:string;status:string;
+ targetKind:"MONEY_ACCOUNT";actorPersonId:string;ownerPersonId:string;moneyAccountId:string;resourceMoneyAccountId:string;serviceKind:"CARDHOLDER"|"MERCHANT";status:string;
 }
 export function evaluate(scope:PolicyScope|MerchantPolicyScope|OperatorPolicyScope|MoneyPolicyScope, action:string) {
   if(scope.targetKind==="MONEY_ACCOUNT") {
-    const same=scope.actorPersonId===scope.ownerPersonId&&scope.moneyAccountId===scope.resourceMoneyAccountId;
-    const allowed=same&&(action==="money.read"?scope.status!=="CLOSED":["money.add","money.withdraw"].includes(action)&&scope.status==="ACTIVE");
-    return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available to the account owner.":"Only the account owner can manage this money.",remediation:null,scope:{moneyAccountId:scope.moneyAccountId},policyVersion:11};
+    const same=scope.actorPersonId===scope.ownerPersonId&&scope.moneyAccountId===scope.resourceMoneyAccountId&&["CARDHOLDER","MERCHANT"].includes(scope.serviceKind);
+    const allowed=same&&(action==="money.read"?scope.status!=="CLOSED":scope.status==="ACTIVE"&&(action==="money.withdraw"||action==="money.add"&&scope.serviceKind==="CARDHOLDER"));
+    return {action,allowed,reasonCode:allowed?"ALLOWED":"ACTION_DENIED",reason:allowed?"Available to the account owner.":"Only the account owner can use the available money controls.",remediation:null,scope:{moneyAccountId:scope.moneyAccountId},policyVersion:12};
   }
   if(scope.targetKind==="OPERATOR_SERVICE") {
     const allowed=scope.actorPersonId===scope.assignmentPersonId&&scope.serviceId===scope.resourceServiceId&&scope.state==="ACCEPTED"&&scope.serviceStatus!=="CLOSED"&&["support.operator.read","support.operator.respond","payments.operator.process","disputes.operator.read","disputes.operator.resolve"].includes(action)&&scope.grants.includes("support.operator.read")&&scope.grants.includes(action);

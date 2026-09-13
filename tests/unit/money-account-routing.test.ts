@@ -1,5 +1,5 @@
 import {describe,expect,it} from "vitest";
-import {moneyAccountHref,moneyAccountReturn} from "../../src/ui/money-account-routing";
+import {moneyAccountHref,moneyAccountReturn,moneyAccountHistory} from "../../src/ui/money-account-routing";
 
 const accountId="10000000-0000-4000-8000-000000000001",reviewId="10000000-0000-4000-8000-000000000002";
 const terminalId="10000000-0000-4000-8000-000000000003";
@@ -40,5 +40,24 @@ describe("money account return navigation",()=>{
  it("leaves card money routes free of merchant context",()=>{
   expect(moneyAccountHref(accountId)).toBe(`/money-accounts/${accountId}`);
   expect(moneyAccountHref(accountId,null,{task:"withdraw"})).toBe(`/money-accounts/${accountId}?task=withdraw`);
+ });
+});
+
+
+describe("Merchant history selection",()=>{
+ it("defaults Merchant to payouts and keeps Cardholder history independent",()=>{
+  expect(moneyAccountHistory(undefined,"MERCHANT")).toBe("payouts");
+  expect(moneyAccountHistory(undefined,"CARDHOLDER")).toBe("balance");
+  for(const history of ["payouts","balance"] as const)expect(moneyAccountHistory(history,"MERCHANT")).toBe(history);
+ });
+ it("rejects malformed, repeated and cross-service history selections",()=>{
+  for(const value of ["","unknown",["payouts","balance"],1,{}])expect(()=>moneyAccountHistory(value,"MERCHANT")).toThrow("INVALID_MONEY_HISTORY");
+  for(const value of ["payouts","balance"])expect(()=>moneyAccountHistory(value,"CARDHOLDER")).toThrow("INVALID_MONEY_HISTORY");
+ });
+ it("keeps the selected history and exact receipt independent from payment investigation pages",()=>{
+  const returnTo=`/merchant-services?view=unit:${terminalId}&activity=refunds&period=all&page=3`;
+  const receipt=new URL(moneyAccountHref(accountId,returnTo,{history:"balance",page:"1",task:"withdraw",review:reviewId}),"https://etail.invalid");
+  expect(receipt.searchParams.get("history")).toBe("balance");expect(receipt.searchParams.get("page")).toBe("1");
+  expect(receipt.searchParams.get("review")).toBe(reviewId);expect(receipt.searchParams.get("returnTo")).toBe(returnTo);
  });
 });

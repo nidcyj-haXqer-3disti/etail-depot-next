@@ -20,6 +20,15 @@ export interface DashboardActivity extends WorkspaceActivity {
  lastFour:string;
  holderName:string;
 }
+/** Owner account data is independent of received cards and directory filters. */
+export interface CardholderAccountOverview {
+ serviceId:string;
+ cardCount:number;
+ ownCardCount:number;
+ otherCardCount:number;
+ unassignedCardCount:number;
+ activity:DashboardActivity[];
+}
 export type RequestStatusFilter = "ALL" | "DRAFT" | "BLOCKED" | "ISSUED" | "CANCELED";
 export interface CardholderRequestFilters { requestPage?: number; requestStatus?: RequestStatusFilter; requestSearch?: string }
 export type CardScopeFilter = "ALL" | "OWN" | "MANAGED";
@@ -35,6 +44,7 @@ export interface CardholderDashboardProjection {
  canCreatePrimary:boolean;
  profiles:CardholderServiceProfile[];
  primaryService:CardholderServiceProfile|null;
+ accountOverview:CardholderAccountOverview|null;
  cards:DashboardCard[];
  cardCount:number;
  ownCardCount:number;

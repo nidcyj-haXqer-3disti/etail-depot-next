@@ -38,14 +38,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         throw error;
       }),
     ]);
-    // A selected card is an exact authorized resource, independent of an open dialog.
-    // Only an unambiguous, complete list may supply an implicit selection.
+    // Home is the account overview. Card details require an explicit resource;
+    // alphabetical order, directory filters and received cards never choose it.
     const focusValue = query.focus ?? query.activityCard;
     const focusRequested = focusValue !== undefined;
-    const ownCards = dashboard.cards.filter(card => card.holderId === session.personId);
-    const completeList = dashboard.cardsPage === 0 && !dashboard.cardsHasMore;
-    const defaultCard = completeList && dashboard.ownCardCount === 1 && ownCards.length === 1 ? ownCards[0] : undefined;
-    const focusId = focusRequested ? (typeof focusValue === "string" ? focusValue.toLowerCase() : undefined) : defaultCard?.id;
+    const focusId = focusRequested && typeof focusValue === "string" ? focusValue.toLowerCase() : undefined;
     const focused = focusId ? await getCardholderDashboardFocus(session.personId, focusId).catch(error => {
       if (error instanceof SecurityError && [403, 404, 422].includes(error.status)) return null;
       throw error;

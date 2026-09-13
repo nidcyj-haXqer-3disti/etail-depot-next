@@ -11,8 +11,8 @@ for(const kind of ["merchant","terminal"] as const){
   const person=primary??await acquiringPerson();await signInPerson(page,person.personId);
   const name=`Private ${kind} request ${randomUUID().slice(0,8)}`;
   await page.goto(`/merchant-services?section=merchants${primary?`&view=merchant:${primary.serviceId}`:""}`);
-  await page.getByRole("button",{name:primary?"Add payment terminal":"Add your business",exact:true}).click();
-  const edit=page.getByRole("dialog",{name:primary?"Name your payment terminal":"Name your business",exact:true});
+  await page.getByRole("button",{name:primary?"Create terminal":"Add your business",exact:true}).click();
+  const edit=page.getByRole("dialog",{name:primary?"Create terminal":"Name your business",exact:true});
   await edit.getByRole("textbox",{name:primary?"Payment terminal name":"Business name",exact:true}).fill(name);
   await expect(edit.getByRole("button",{name:"Review merchant",exact:true})).toHaveCount(0);
   await expect(edit).toContainText(primary?"You control the payment balance":"You control the payment balance, refunds and who can collect payments");
@@ -24,7 +24,7 @@ for(const kind of ["merchant","terminal"] as const){
    if(requests.length===1){const saved=await route.fetch();expect(saved.status()).toBe(200);await route.abort("failed");}
    else await route.fulfill({status:primary?404:403,json:{error:{code:"ACTION_DENIED"}}});
   });
-  await edit.getByRole("button",{name:primary?"Add payment terminal":"Add your business",exact:true}).click();
+  await edit.getByRole("button",{name:primary?"Create terminal":"Add your business",exact:true}).click();
   await expect(edit.getByRole("button",{name:"Check request again",exact:true})).toBeVisible();
   await expect(edit.getByRole("textbox",{name:primary?"Payment terminal name":"Business name",exact:true})).toBeDisabled();
   await expect(page.getByRole("button",{name:"Leave for now",exact:true})).toHaveCount(0);

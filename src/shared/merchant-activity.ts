@@ -4,7 +4,7 @@ export const ACTIVITY_PAGE_SIZE = 25;
 export const ACTIVITY_EXPORT_LIMIT = 10000;
 export const merchantActivityQuerySchema = z.object({
   view: z.string().regex(/^(all|(?:unit|merchant):[0-9a-f-]{36})$/i).default("all"),
-  section: z.enum(["overview", "activity", "funds", "merchants", "settings"]).default("overview"),
+  section: z.enum(["overview", "activity", "channels", "funds", "merchants", "settings"]).default("overview"),
   activity: z.enum(["payments", "refunds", "transfers"]).default("payments"),
   period: z.enum(["all", "last7", "last30", "thisMonth", "lastMonth", "custom"]).default("all"),
   from: z.string().default(""), to: z.string().default(""),
