@@ -43,7 +43,7 @@ test("owner invitations recover one request, grant one terminal on acceptance an
  }finally{await context.close();}
 });
 test("terminal users cannot access people management or invite anyone onward",async({page})=>{
- const f=await merchantAccessFixture();await signIn(page.context(),f.operator.personId);await page.goto(`/merchants/${f.unit.id}?tab=channels`);await expect(page.getByRole("button",{name:"Invite a person",exact:true})).toHaveCount(0);await expect(page.getByRole("link",{name:"People",exact:true})).toHaveCount(0);expect((await page.request.get(`/api/v1/merchants/${f.unit.id}/access`)).status()).toBe(403);await accessible(page);
+ const f=await merchantAccessFixture();await signIn(page.context(),f.operator.personId);await page.goto(`/merchants/${f.unit.id}?tab=channels`);await expect(page.getByRole("button",{name:"Invite a person",exact:true})).toHaveCount(0);await expect(page.getByRole("link",{name:"Team access",exact:true})).toHaveCount(0);expect((await page.request.get(`/api/v1/merchants/${f.unit.id}/access`)).status()).toBe(403);await accessible(page);
 });
 
 test("business details starts with saved progress, recovers its exact draft and returns to payment setup without implying approval",async({page})=>{

@@ -10,6 +10,17 @@ const view:MerchantDashboardView={id:`merchant:${randomUUID()}`,name:"Primary ne
 function row(patch:Partial<Omit<MerchantActivityRow,"href">>={}):Omit<MerchantActivityRow,"href"> {const id=randomUUID();return {id,kind:"payment",merchantId:unit,merchantName:"Market",description:"Order",amount:money("5000"),status:"REFUNDED",reference:"test-payment",at:"2026-09-06T23:59:59.000Z",paymentId:id,paymentReference:"test-payment",...patch};}
 
 describe("merchant activity filters and projections",()=>{
+ it("separates account home from saved payment investigations and preserves filters across account destinations",()=>{
+  expect(parseMerchantActivityQuery().section).toBe("overview");
+  expect(parseMerchantActivityQuery({view:view.id}).section).toBe("overview");
+  for(const input of [{activity:"refunds"},{q:"saved reference"},{period:"last7"},{page:"2"}])expect(parseMerchantActivityQuery(input).section).toBe("activity");
+  const original=parseMerchantActivityQuery({view:view.id,activity:"refunds",q:"saved reference",period:"last30",page:"2"});
+  for(const section of ["overview","merchants","funds","settings","activity"] as const){
+   const href=merchantActivityHref(original,{section});
+   expect(parseMerchantActivityQuery(new URL(href,"https://etail.invalid").searchParams)).toEqual({...original,section});
+   expect(merchantActivityReturn(href)).toBe(href);
+  }
+ });
  it("keeps payment and later refund dates separate and generates exact scoped return links",()=>{
   const payment=row(),refund=row({kind:"refund",status:"COMPLETED",at:"2026-09-08T00:00:00.000Z",paymentId:payment.id,reference:"test-refund"});
   const query=parseMerchantActivityQuery({view:view.id,period:"custom",from:"2026-08-31",to:"2026-09-06",q:"test-payment"});

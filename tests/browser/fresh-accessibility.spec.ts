@@ -30,7 +30,7 @@ for(const width of [1440,320]) {
    const {card}=await openCardholder(page,persona);
    await expect(page.getByRole("region",{name:"Selected card overview"})).toContainText(card.nickname);
    await accessible(page,"Cardholder overview");
-   await page.getByRole("link",{name:"Card settings",exact:true}).click();
+   await page.getByRole("link",{name:persona==="owner"?"Manage card":"Card settings",exact:true}).click();
    const dialog=page.getByRole("dialog",{name:card.nickname,exact:true});
    await dialogKeyboard(page,dialog);await accessible(page,"Exact card controls dialog");
    await page.keyboard.press("Escape");await expect(dialog).toBeHidden();
@@ -70,12 +70,12 @@ for(const width of [1440,320]) {
     await accessible(page,`Merchant ${view.toLowerCase()}`);
    }
    if(persona==="owner") {
-    await page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Settings",exact:true}).click();
+    await page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Terminal settings",exact:true}).click();
     await expect(page.getByRole("heading",{name:"Your payments are ready",exact:true})).toBeVisible();
     await accessible(page,"Merchant payment setup");
    } else {
     await expect(page.getByRole("navigation",{name:"Payment activity views"}).getByRole("button",{name:"Deposits",exact:true})).toHaveCount(0);
-    await expect(page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Settings",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Terminal settings",exact:true})).toHaveCount(0);
     await expect(page.getByRole("button",{name:"Move to balance",exact:true})).toHaveCount(0);
     await expect(page.getByRole("region",{name:"Current available balance",exact:true})).toHaveCount(0);
    }

@@ -76,7 +76,7 @@ test("email member creates cards, reviews support and reports, and shares an exa
     await join(page, name);
     await expect(page.getByRole("link", { name: "Open customer care", exact: true })).toHaveCount(0);
     await page.getByRole("button", { name: "Open a card account", exact: true }).click();
-    await expect(page.getByRole("link",{name:"Create your first card",exact:true})).toBeVisible();
+    await expect(page.getByRole("link",{name:"Add card",exact:true})).toBeVisible();
     await accessible(page);
     await capture(page, "cardholder-first-card-form");
     const card = await addCard(page, "My hosted practice card");
@@ -93,7 +93,7 @@ test("email member creates cards, reviews support and reports, and shares an exa
     });
     await page.goto(`/cardholder-services?focus=${card.id}`);
     await expect(page.getByRole("link",{name:"Try a purchase",exact:true})).toHaveCount(0);
-    await page.getByRole("link",{name:"Card settings",exact:true}).click();
+    await page.getByRole("link",{name:"Manage card",exact:true}).click();
     const dialog=page.getByRole("dialog");
     for (const action of ["Freeze", "Unfreeze"] as const) {
       await dialog.getByRole("button", { name: action, exact: true }).click();
@@ -104,7 +104,7 @@ test("email member creates cards, reviews support and reports, and shares an exa
     await page.goto(`/cardholder-services?focus=${card.id}`);
     await expect(page.getByRole("region", { name: "Selected card overview", exact: true })).toContainText("$19.75");
     await accessible(page);
-    await page.getByRole("link",{name:"Card settings",exact:true}).click();
+    await page.getByRole("link",{name:"Manage card",exact:true}).click();
     await page.getByRole("dialog").getByRole("link", { name: /Statements & reports/ }).click();
     await expect(page.locator("main")).toContainText(checkout.publication.merchantName);
     expect(payment.reference).toBeTruthy();
@@ -112,7 +112,7 @@ test("email member creates cards, reviews support and reports, and shares an exa
     await page.getByRole("button", { name: "Download CSV", exact: true }).click();
     expect((await downloading).suggestedFilename()).toMatch(/^etail-card-activity-/);
     await page.goto(`/cardholder-services?focus=${card.id}`);
-    await page.getByRole("link",{name:"Card settings",exact:true}).click();
+    await page.getByRole("link",{name:"Manage card",exact:true}).click();
     await page.getByRole("dialog").getByRole("link",{name:"Notification preferences",exact:true}).click();
     await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/settings"&&url.searchParams.get("focus")===card.id);
     await page.getByRole("checkbox").first().uncheck();
@@ -121,7 +121,7 @@ test("email member creates cards, reviews support and reports, and shares an exa
     await page.reload();
     await expect(page.getByRole("checkbox").first()).not.toBeChecked();
     await page.goto(`/cardholder-services?focus=${card.id}`);
-    await page.getByRole("link",{name:"Card settings",exact:true}).click();
+    await page.getByRole("link",{name:"Manage card",exact:true}).click();
     await page.getByRole("dialog").getByRole("link",{name:"Help with this card",exact:true}).click();
     await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/help"&&url.searchParams.get("focus")===card.id);
     await page.getByRole("button", { name: "Start a case", exact: true }).click();
@@ -154,7 +154,7 @@ test("email member creates cards, reviews support and reports, and shares an exa
     expect((await cardDashboard(secondaryPage.request)).cards.map(row => row.id)).toEqual([secondaryCard.id]);
     expect((await merchantDashboard(secondaryPage.request)).units).toEqual([]);
     expect((await secondaryPage.request.get(`/api/v1/cardholder-services/${serviceId}/funds`)).status()).toBe(403);
-    await expect(secondaryPage.getByRole("navigation",{name:"Cards and spending navigation"}).getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
+    await expect(secondaryPage.getByRole("navigation",{name:"Cards and spending navigation"}).getByRole("link",{name:"Account balance",exact:true})).toHaveCount(0);
     await secondaryPage.goto(`/cardholder-services?focus=${card.id}`);
     await expect(secondaryPage.getByRole("heading", { name: "This card is unavailable", exact: true })).toBeVisible();
     expect((await merchantDashboard(page.request)).units).toEqual([]);
@@ -299,7 +299,7 @@ test("merchant setup recovers lost connection responses without repeating proces
       } else await route.continue();
     });
     async function enableAndRecover(merchantId: string) {
-      const settings=page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Settings",exact:true});
+      const settings=page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Terminal settings",exact:true});
       await settings.click();
       await expect(settings).toHaveAttribute("aria-current","page");
       await expect(page).toHaveURL(new RegExp(`/merchants/${merchantId}\\?tab=verification`));

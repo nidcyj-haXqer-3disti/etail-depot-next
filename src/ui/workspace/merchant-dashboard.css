@@ -49,3 +49,10 @@
  .md-activity-filters>.md-filter-search{flex-basis:100%}
  .md-result-bar{gap:8px}
 }
+
+/* Account home introduces only balances, terminals and recent payments. */
+.md-home-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.md-home-summary article{border:1px solid var(--md-line);border-radius:12px;padding:26px;background:#fff;min-width:0}
+.md-home-summary h2{font-size:20px;line-height:1.4;margin:0 0 12px}.md-home-summary p,.md-home-summary span{font-size:13px;line-height:1.65;color:var(--md-muted);display:block}.md-home-summary strong{display:block;font-size:36px;line-height:1.3;font-weight:600;letter-spacing:-.03em;overflow-wrap:anywhere;margin:10px 0}.md-home-summary a{display:inline-flex;align-items:center;min-height:44px;margin-top:12px;font-size:14px;font-weight:600;color:#155a9d;text-underline-offset:3px}
+.md-home-list,.md-settings-list{list-style:none;margin:0;padding:0}.md-home-list li,.md-settings-list li{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 0;border-top:1px solid var(--md-line);font-size:14px}.md-home-list li>a,.md-settings-list li>div{min-width:0;overflow-wrap:anywhere}.md-home-list small{display:block;font-size:12px;color:var(--md-muted);line-height:1.6;margin-top:6px}.md-home-list li>div{display:grid;gap:8px;justify-items:end;flex-shrink:0}.md-home-list strong{font-weight:600;font-variant-numeric:tabular-nums}.md-settings-list p{font-size:13px;line-height:1.6;color:var(--md-muted);margin:6px 0 0}.md-settings-list a{min-height:44px;display:inline-flex;align-items:center;font-size:14px;font-weight:600;flex-shrink:0}.md-current-money{margin-top:24px}.md-current-money>.consumer-button{margin-top:16px}
+@media(max-width:600px){.md-home-summary{grid-template-columns:1fr;gap:16px}.md-home-summary article{padding:22px}.md-home-list li{gap:12px}.md-home-list li>div{max-width:45%}.md-settings-list li{display:block}.md-settings-list a{margin-top:8px}.md-panel-heading{display:block}.md-panel-heading p{margin-top:7px}}

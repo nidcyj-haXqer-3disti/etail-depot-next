@@ -36,7 +36,7 @@ test("multiple drafts retain their own details and created/canceled requests rem
  await signIn(page,primary.personId);
  await page.goto(`${origin}/cardholder-services?view=requests`);
  for(const name of ["Travel request","Everyday request"]){
-  await page.getByRole("link",{name:"Create your first card",exact:true}).click();
+  await page.getByRole("link",{name:"Add card",exact:true}).click();
   const dialog=await fillCard(page,name);
   await dialog.getByRole("button",{name:"Save for later",exact:true}).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -63,10 +63,10 @@ test("multiple drafts retain their own details and created/canceled requests rem
  const result=await getWorkspace(primary.personId,primary.serviceId),issued=result.cards[0]!;
  expect(result.cardRequests).toHaveLength(2);
  expect(result.cards).toHaveLength(1);
- await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByText("More",{exact:true}).click();
- await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Card requests",exact:true}).click();
+ await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Cards",exact:true}).click();
+ await page.getByRole("navigation",{name:"Card management",exact:true}).getByRole("link",{name:"Card history",exact:true}).click();
  await expect(page).toHaveURL(/view=requests/);
- await expect(page.getByRole("heading",{name:"Card requests",level:2,exact:true})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Card history",level:3,exact:true})).toBeVisible();
  await page.reload();
  const canceled=page.locator(".ch-request-record").filter({hasText:"Travel request"});
  const created=page.locator(".ch-request-record").filter({hasText:"Everyday request"});
@@ -81,12 +81,12 @@ test("multiple drafts retain their own details and created/canceled requests rem
  await dialog.getByRole("button",{name:"View your card",exact:true}).click();
  await expect(page).toHaveURL(new RegExp(`focus=${issued.id}`));
  await page.goto(`${origin}/cardholder-services?view=requests`);
- await page.getByRole("searchbox",{name:"Search requests",exact:true}).fill("Travel");
+ await page.getByRole("searchbox",{name:"Search card history",exact:true}).fill("Travel");
  await page.getByRole("combobox",{name:"Status",exact:true}).selectOption("CANCELED");
  await page.getByRole("button",{name:"Apply filters",exact:true}).click();
  await expect(page.locator(".ch-request-record")).toHaveCount(1);
  await page.reload();
- await expect(page.getByRole("searchbox",{name:"Search requests",exact:true})).toHaveValue("Travel");
+ await expect(page.getByRole("searchbox",{name:"Search card history",exact:true})).toHaveValue("Travel");
  await expect(page.getByRole("combobox",{name:"Status",exact:true})).toHaveValue("CANCELED");
  await accessible(page);
 });

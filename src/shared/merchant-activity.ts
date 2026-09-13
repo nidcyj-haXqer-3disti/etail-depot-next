@@ -4,7 +4,7 @@ export const ACTIVITY_PAGE_SIZE = 25;
 export const ACTIVITY_EXPORT_LIMIT = 10000;
 export const merchantActivityQuerySchema = z.object({
   view: z.string().regex(/^(all|(?:unit|merchant):[0-9a-f-]{36})$/i).default("all"),
-  section: z.enum(["activity", "funds", "merchants"]).default("activity"),
+  section: z.enum(["overview", "activity", "funds", "merchants", "settings"]).default("overview"),
   activity: z.enum(["payments", "refunds", "transfers"]).default("payments"),
   period: z.enum(["all", "last7", "last30", "thisMonth", "lastMonth", "custom"]).default("all"),
   from: z.string().default(""), to: z.string().default(""),
@@ -17,6 +17,8 @@ export type MerchantActivityQueryInput = Record<string, string | string[] | unde
 export function parseMerchantActivityFilters(input: MerchantActivityQueryInput = {}): MerchantActivityQuery {
   const source = input instanceof URLSearchParams ? Object.fromEntries([...new Set(input.keys())].map(key => [key, input.getAll(key).length === 1 ? input.get(key)! : input.getAll(key)])) : input;
   const raw = Object.fromEntries(Object.keys(merchantActivityQuerySchema.shape).filter(key => source[key] !== undefined).map(key => [key, source[key]]));
+  // Saved payment investigations predate Account home. Their filters still open Payments.
+  if (raw.section === undefined && ["activity", "period", "from", "to", "q", "status", "page"].some(key => raw[key] !== undefined)) raw.section = "activity";
   const parsed = merchantActivityQuerySchema.safeParse(raw);
   if (!parsed.success) throw new Error("INVALID_ACTIVITY_FILTER");
   const query = parsed.data;

@@ -1,5 +1,29 @@
 # Decision register
 
+## D77 release authorization
+
+13 September2026. After the menu and landing-page review corrections, the user explicitly requests deployment. Proceed with the final revision of PR20, required checks, reviewed merge and publication to Netlify site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`; retain existing visitor access and disabled real money. Record final commit/tree, CI, published deploy and read-only hosted acceptance in PR20 and `artifacts/d77-publication.json`. No reprovisioning, database reset, provider connection or unrelated resource change is included.
+
+## D77 landing illustration title bar
+
+13 September2026. At the user's explicit request, remove the redundant “etail depot.” / “A look inside” bar from the landing dashboard illustration, including its now-unused desktop and responsive styles. Preserve the named account/shop headings, illustration controls, surrounding container and normal site/card branding. This supersedes the prior display-label choice below; it does not change financial behavior or service access.
+
+## D77 landing-page language and payment channels
+
+13 September2026. Keep a clear global Sandbox badge while removing internal and repeated example/preview language from the landing dashboard and payment-channel illustrations. Named account/shop illustrations and “A look inside” distinguish marketing figures from private account data. Present text, email, invoice, bill, social, QR code and website in familiar, distinct formats with a consistent card-checkout summary. Illustration controls only change local presentation; no sending, copying, editable payment details, provider request or private account read is introduced. Preserve separate balances, real authenticated service links, the truthful network disclosure and the single public footer. TypeScript, full lint, architecture,18 metadata unit cases,34 public browser/accessibility cases and30 responsive component captures pass. A small decorative payment-page heading style is corrected after removal of its extra label; the final production build and all5 affected public-page cases also pass (`artifacts/d77-marketing-build-final.log`, `artifacts/d77-marketing-payment-page-final.log`). Hosted publication remains separate from the local review corrections.
+
+## D77 footer review correction
+
+13 September2026. The user requests removal of the landing page's double footer. Consolidate the shared public footer into one section, retain its copyright and navigation, and remove the duplicate Help center/support row and obsolete public-row styles. Preserve the authenticated footer and its dashboard/profile links. Production build, focused lint and16 existing public-page desktop/mobile/accessibility cases pass; local preview and hosted publication remain distinct.
+
+## D77 — one task hierarchy per service
+
+13 September2026. Adopt [Service menu hierarchy](SERVICE_MENU_HIERARCHY.md) for the user's requested practical account navigation. Keep account-level balance/settings distinct from individual cards and terminals. Main navigation has stable destinations, while add/assign/top-up actions belong inside the corresponding section. Retain one funding/issuance owner, historical saved-review recovery, exact return context, separate funds and existing permissions. No new financial product or schema is introduced by reorganizing the menu. Record local checks and review/release separately.
+
+D76 release is complete after explicit user approval: PR19, mergef4c82e75f297ec0ab7300878a0ec24f0b7352213, deploy6aa57086b29ebe819a131087, five applied migrations, exact-tree GitHub checks and39 hosted read-only checks. This completion supersedes earlier pending notes; it does not assert actual mailbox/password or external financial-provider execution.
+
+D77 final verification is recorded in [the menu evidence](SERVICE_MENU_EVIDENCE.md). Mobile account menus show every destination; terminal tabs preserve selected context and keyboard focus gutters. Historical funding receipts retain navigation. Denied merchant money operations offer an explicit exit while retaining uncertainty. No database or financial-policy change was made; feature publication remains subject to the existing review gate.
+
 ## D76 — card and terminal invitations, public network checkout
 
 The user corrects Etail from an internal-only payment loop to Visa card program intent and acquiring-supported external networks. Follow [the D76 contract](NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md): create a non-spendable pending card before recipient invitation, bind one verified intended recipient once, preserve immutable holder history and card-specific revocation, use exact terminal invitations, and remove Etail login as a prerequisite to public customer payment. Keep separate funds and total allowances. Provider events and original payment source govern money; sandbox adapters do not establish Visa/Stripe enrollment or external message delivery. Record implementation and remaining provider dependencies separately.

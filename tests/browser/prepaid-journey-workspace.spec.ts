@@ -12,7 +12,7 @@ import {operatorServiceAccess} from "../../src/modules/operations/schema";
 import {moneyTopups} from "../../src/modules/money/schema";
 import {getServiceMoneyAccount} from "../../src/modules/money/service";
 import {getCardholderFunds,getCardSpending} from "../../src/modules/workspace/service";
-import type {TopupReceipt} from "../../src/modules/workspace/funding-contracts";
+import {moneyTopupReceiptSchema} from "../../src/shared/money-response";
 import {cardholderDashboardSchema,cardRequestProjectionSchema} from "../../src/modules/workspace/api-contracts";
 import {createChannel,updateMerchantSetup,submitMerchantSetup,getMerchantWorkspace} from "../../src/modules/acquiring/service";
 import {configureTestGateway,enrollTestMerchant,setChannelActivation,getMerchantOperations} from "../../src/modules/acquiring/operations-service";
@@ -169,11 +169,12 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
 
   await test.step("save a top-up review and recover a committed but lost confirmation",async()=>{
     await page.goto("/cardholder-services");
-    await page.getByRole("navigation",{name:"Cards and spending navigation"}).getByText("More",{exact:true}).click();
     await page.getByRole("navigation",{name:"Cards and spending navigation"})
-      .getByRole("link",{name:"Add money",exact:true}).click();
-    await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
-    await expect(page.locator(".funds-balance")).toContainText("$0.00");
+      .getByRole("link",{name:"Account balance",exact:true}).click();
+    await expect(page).toHaveURL(new RegExp(`/money-accounts/${account.id}$`));
+    await expect(page.locator(".money-balance")).toContainText("$0.00");
+    await page.getByRole("link",{name:"Add money",exact:true}).click();
+    await expect(page.getByRole("heading",{name:"Add money",level:2,exact:true})).toBeVisible();
     await page.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill("100.00");
     await page.getByRole("button",{name:"Continue",exact:true}).click();
     await expect(page.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
@@ -185,14 +186,14 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
     await expect(page.getByRole("heading",{name:"Review your top-up",exact:true})).toBeVisible();
     expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("0");
 
-    const confirmPath=fundsPath+"/funds/intents/"+intentId;
+    const confirmPath=`/api/v1/money-accounts/${account.id}/funding/intents/${intentId}`;
     const attempts:Array<{path:string;body:unknown;receiptId:string}>=[];
     const intercept=async(route:Route)=>{
       if(route.request().method()!=="POST"){await route.continue();return;}
       const response=await route.fetch();
       expect(response.status()).toBe(200);
-      const receipt=await response.json() as TopupReceipt;
-      expect(receipt).toMatchObject({serviceId:primary.serviceId,amount:{minor:"10000"},status:"COMPLETED"});
+      const receipt=moneyTopupReceiptSchema.parse(await response.json());
+      expect(receipt).toMatchObject({moneyAccountId:account.id,amount:{minor:"10000"},status:"COMPLETED"});
       attempts.push({
         path:new URL(route.request().url()).pathname,
         body:route.request().postDataJSON(),
@@ -204,12 +205,12 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
     await page.route(origin+confirmPath,intercept);
     try{
       await page.getByRole("button",{name:"Confirm and add money",exact:true}).click();
-      await expect(page.getByRole("button",{name:"Retry this top-up",exact:true})).toBeVisible();
+      await expect(page.getByRole("button",{name:"Retry this same request",exact:true})).toBeVisible();
       expect(page.url()).toBe(reviewUrl);
       expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("10000");
       expect(await getDb().select().from(moneyTopups).where(eq(moneyTopups.moneyAccountId,account.id))).toHaveLength(1);
-      await page.getByRole("button",{name:"Retry this top-up",exact:true}).click();
-      const confirmation=page.locator('section[aria-labelledby="funding-title"]');
+      await page.getByRole("button",{name:"Retry this same request",exact:true}).click();
+      const confirmation=page.locator('section[aria-labelledby="money-task-title"]');
       await expect(confirmation.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
       await expect(confirmation).toContainText("$100.00");
       expect(attempts).toHaveLength(2);
@@ -218,8 +219,8 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
       expect(attempts[0]!.body).toEqual({});
     }finally{await page.unroute(origin+confirmPath,intercept);}
     await page.reload();
-    await expect(page.locator('section[aria-labelledby="funding-title"]')).toContainText("Money added");
-    await expect(page.locator(".funds-balance")).toContainText("$100.00");
+    await expect(page.locator('section[aria-labelledby="money-task-title"]')).toContainText("Money added");
+    await expect(page.locator(".money-balance")).toContainText("$100.00");
     const funds=await getCardholderFunds(primary.personId,primary.serviceId);
     expect(funds.available.minor).toBe("10000");
     expect(funds.topups).toHaveLength(1);
@@ -230,8 +231,8 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
   let cardId="";
   await test.step("create a card through the UI with no starting-balance field or funding effect",async()=>{
     const before=await getCardholderFunds(primary.personId,primary.serviceId);
-    await page.getByRole("link",{name:"Back to your cards →",exact:true}).click();
-    await page.getByRole("link",{name:"Create your first card",exact:true}).click();
+    await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Cards",exact:true}).click();
+    await page.getByRole("link",{name:"Add card",exact:true}).click();
     const form=page.getByRole("dialog",{name:"Add card",exact:true});
     await expect(form).toBeVisible();
     await expect(form.getByRole("textbox",{name:/starting balance/i})).toHaveCount(0);

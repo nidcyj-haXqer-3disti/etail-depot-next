@@ -10,11 +10,11 @@ import { useMerchantNavigationLock } from "./merchant-navigation-state";
 import { requestFailure } from "../api-feedback";
 import "./merchant-entry.css";
 
-export interface MerchantBusinessDetailsProps { initial: MerchantBusinessDetailsProjection }
+export interface MerchantBusinessDetailsProps { initial: MerchantBusinessDetailsProjection; returnHref?:string }
 const merchantLabels: Record<MerchantStatus, string> = { NOT_STARTED: "Not started", DRAFT: "Draft", PENDING_LOCAL_REVIEW: "Saved for review", APPROVED: "Approved", RESTRICTED: "Restricted", DECLINED: "Declined", CLOSED: "Closed" };
 const legalLabels = { INDIVIDUAL: "Individual", SOLE_PROPRIETOR: "Sole proprietor", BUSINESS: "Business" };
 
-export function MerchantBusinessDetails({ initial }: MerchantBusinessDetailsProps) {
+export function MerchantBusinessDetails({ initial,returnHref }: MerchantBusinessDetailsProps) {
   const router = useRouter();
   const [entry, setEntry, entryChanged, isEntryCurrent] = useServerProjection(initial);
   const [showSetup, setShowSetup] = useState(false);
@@ -28,6 +28,7 @@ export function MerchantBusinessDetails({ initial }: MerchantBusinessDetailsProp
   useMerchantNavigationLock(!!busy||(startPending&&!leavingStart));
   const merchant = entry;
   const merchantId = entry.merchantId;
+  const paymentSettingsHref=returnHref??`/merchants/${merchantId}?tab=verification`;
 
   async function command<T>(path: string, method: "POST" | "PATCH", input: Record<string, unknown> = {}) {
     const key = JSON.stringify([path, method, input]);
@@ -47,7 +48,7 @@ export function MerchantBusinessDetails({ initial }: MerchantBusinessDetailsProp
   }
   function returnToPayments() {
     setShowSetup(false); setError("");
-    router.push(`/merchants/${merchantId}?tab=verification`);
+    router.push(paymentSettingsHref);
   }
   function closeSetup() { if(!setupBusy)returnToPayments(); }
   async function startSetup() {
@@ -72,7 +73,7 @@ export function MerchantBusinessDetails({ initial }: MerchantBusinessDetailsProp
     {!showSetup&&<Feedback kind="error" message={error}/>}
     {startPending&&<Button variant="secondary" disabled={!!busy} busy={busy==="reload"} onClick={()=>void reloadStart()}>Reload business details</Button>}
     {setupUnavailable ? <p>Business details are not available with your current access.</p> : <>
-      <section className="merchant-setup-status" aria-label="Business details"><div className="merchant-setup-status-main"><div className="merchant-setup-status-top"><h3>Business details</h3><StatusBadge status={merchant.merchantStatus} label={merchantLabels[merchant.merchantStatus]} /></div><p>{merchant.setup ? merchant.setup.status === "PENDING_LOCAL_REVIEW" ? "Your details are saved for review. Return to payment setup for the next step." : "Your details are saved. Continue where you left off." : "Start with your business name and a short description of what you sell."}</p>{merchant.setup && <p>Account owner: <strong>{merchant.setup.responsiblePersonName}</strong></p>}<div className="merchant-setup-status-actions">{startPending?<Button busy={busy==="start"} disabled={!!busy} onClick={()=>void startSetup()}>Check setup request again</Button>:merchant.setup ? <Button variant={merchant.setup.canEdit?"primary":"secondary"} onClick={() => { setError(""); setShowSetup(true); }}>{merchant.setup.canEdit ? "Continue business details" : "View business details"}</Button> : (merchant.canStartSetup||startPending) ? <Button busy={busy === "start"} disabled={!!busy} onClick={() => void startSetup()}>{startPending?"Check setup request again":"Add business details"}</Button> : null}</div>{!merchant.canManageSetup && merchant.setup?.status === "DRAFT" && <p>Your current access lets you view this draft. Your account owner can update it.</p>}</div><div className="merchant-setup-next"><p>Payment settings show what needs to be ready before customers can pay.</p><a className="consumer-button consumer-button-secondary" href={`/merchants/${merchantId}?tab=verification`}>Return to payment setup</a></div></section>
+      <section className="merchant-setup-status" aria-label="Business details"><div className="merchant-setup-status-main"><div className="merchant-setup-status-top"><h3>Business details</h3><StatusBadge status={merchant.merchantStatus} label={merchantLabels[merchant.merchantStatus]} /></div><p>{merchant.setup ? merchant.setup.status === "PENDING_LOCAL_REVIEW" ? "Your details are saved for review. Return to payment setup for the next step." : "Your details are saved. Continue where you left off." : "Start with your business name and a short description of what you sell."}</p>{merchant.setup && <p>Account owner: <strong>{merchant.setup.responsiblePersonName}</strong></p>}<div className="merchant-setup-status-actions">{startPending?<Button busy={busy==="start"} disabled={!!busy} onClick={()=>void startSetup()}>Check setup request again</Button>:merchant.setup ? <Button variant={merchant.setup.canEdit?"primary":"secondary"} onClick={() => { setError(""); setShowSetup(true); }}>{merchant.setup.canEdit ? "Continue business details" : "View business details"}</Button> : (merchant.canStartSetup||startPending) ? <Button busy={busy === "start"} disabled={!!busy} onClick={() => void startSetup()}>{startPending?"Check setup request again":"Add business details"}</Button> : null}</div>{!merchant.canManageSetup && merchant.setup?.status === "DRAFT" && <p>Your current access lets you view this draft. Your account owner can update it.</p>}</div><div className="merchant-setup-next"><p>Payment settings show what needs to be ready before customers can pay.</p><a className="consumer-button consumer-button-secondary" href={paymentSettingsHref}>Return to terminal settings</a></div></section>
     </>}
 
     {merchant?.setup && <WorkspaceDialog open={showSetup} onClose={closeSetup} title="Business details" serviceName={setupUnavailable?"Accept payments":merchant.name} wide><MerchantSetupForm key={merchant.setup.id} initial={merchant.setup} serviceName={merchant.name} command={command} onUpdate={updatedSetup} onClose={returnToPayments} onLeave={()=>router.push("/merchant-services")} onUnavailableChange={setSetupUnavailable} onBusyChange={setSetupBusy} refresh={async () => (await refreshEntry()).setup ?? null} /></WorkspaceDialog>}

@@ -20999,12 +20999,14 @@
             "name": "section",
             "required": false,
             "schema": {
-              "default": "activity",
+              "default": "overview",
               "type": "string",
               "enum": [
+                "overview",
                 "activity",
                 "funds",
-                "merchants"
+                "merchants",
+                "settings"
               ]
             },
             "description": "Unknown or duplicate parameters are rejected."
@@ -21190,12 +21192,14 @@
                               "pattern": "^(all|(?:unit|merchant):[0-9a-f-]{36})$"
                             },
                             "section": {
-                              "default": "activity",
+                              "default": "overview",
                               "type": "string",
                               "enum": [
+                                "overview",
                                 "activity",
                                 "funds",
-                                "merchants"
+                                "merchants",
+                                "settings"
                               ]
                             },
                             "activity": {

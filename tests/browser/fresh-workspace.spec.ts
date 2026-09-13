@@ -23,7 +23,7 @@ test("selected card keeps balance, activity and reversible controls together",as
 test("primary issues a named card through one review without adding money or changing their shared limit",async({page})=>{
  const {primary}=await freshPrepaidCard();await signInPerson(page,primary.personId);const data=await cardDashboard(page.request);
  const before=await getDb().select().from(ledgerEntries).where(eq(ledgerEntries.serviceId,primary.serviceId)).orderBy(ledgerEntries.journalId,ledgerEntries.lineNumber);
- const name=`Travel ${randomUUID().slice(0,8)}`;await page.goto("/cardholder-services");await page.getByRole("navigation",{name:"Cards and spending navigation"}).getByText("More",{exact:true}).click();await page.getByRole("link",{name:"Add card",exact:true}).click();
+ const name=`Travel ${randomUUID().slice(0,8)}`;await page.goto("/cardholder-services");await page.getByRole("navigation",{name:"Cards and spending navigation"}).getByRole("link",{name:"Cards",exact:true}).click();await page.getByRole("link",{name:"Add card",exact:true}).click();
  const dialog=page.getByRole("dialog");await expect(dialog.getByRole("heading",{name:"Create a card"})).toBeVisible();const holderChoice=dialog.getByRole("radio",{name:new RegExp(data.person.displayName)});if(await holderChoice.count())await holderChoice.check();
  await expect(dialog.getByRole("textbox",{name:"Starting balance (USD)"})).toHaveCount(0);
  await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);await dialog.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill("25.00");await dialog.getByRole("button",{name:"Review card",exact:true}).click();
