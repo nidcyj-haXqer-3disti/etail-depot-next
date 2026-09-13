@@ -36,7 +36,8 @@ test("a payment question carries exact refund dates through assigned support and
   await page.goto(original);
   const receipt=page.getByRole("dialog",{name:"Payment details",exact:true});await expect(receipt).toContainText(payment.testReference);
   await receipt.getByRole("link",{name:"Get help with this payment",exact:true}).click();
-  await expect(page.getByRole("navigation",{name:"Payment terminal navigation"}).getByRole("link",{name:"Contact support",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.getByRole("heading",{name:"Contact support",level:1,exact:true})).toBeVisible();
+  await expect(page.getByRole("navigation",{name:"Payment terminal navigation"})).toHaveCount(0);
   await expect(page.getByRole("navigation",{name:"Merchant account navigation"}).getByRole("link",{name:"Payments",exact:true})).toHaveAttribute("aria-current","page");
   await explain(page,subject);
   const context=page.getByRole("region",{name:"Related payment",exact:true});
@@ -95,7 +96,7 @@ test("a collector recovers one saved case after a lost response, keeps it privat
 test("a payment from another merchant is never substituted into the case form",async({page})=>{
   const {payment}=await merchantPayment(page,"owner");const dashboard=await merchantDashboard(page.request),other=dashboard.units.find(unit=>unit.ownerAccess&&unit.name==="Pop-up shop")!;
   await page.goto(`/merchants/${other.id}?tab=help&new=1&payment=${payment.id}`);
-  await expect(page.getByRole("heading",{level:1,name:other.name,exact:true})).toBeVisible();
+  await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true}).getByRole("heading",{level:2,name:other.name,exact:true})).toBeVisible();
   await expect(page.getByText("That payment is unavailable with your current access. It will not be attached to this case.",{exact:true})).toBeVisible();
   await expect(page.getByRole("region",{name:"Related payment"})).toHaveCount(0);await expect(page.getByRole("main")).not.toContainText(payment.testReference);
   await expect(page.getByRole("checkbox",{name:"Include this payment with my question",exact:true})).toHaveCount(0);

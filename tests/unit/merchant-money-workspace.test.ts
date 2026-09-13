@@ -30,6 +30,24 @@ describe("merchant balance settlement-read containment",()=>{
   expect(reads.getMoneyAccountOverview).not.toHaveBeenCalled();
  });
 
+ it("reuses current discovery without repeating the full dashboard for each business",async()=>{
+  const discovery={units:[terminal,{...terminal,id:"foreign-terminal",merchantServiceId:"foreign-service"},{...terminal,id:"delegated-terminal",ownerAccess:false}]};
+  const result=await getMerchantMoneyWorkspace(owner,account,discovery);
+  expect(reads.getMerchantDashboard).not.toHaveBeenCalled();
+  expect(reads.getMerchantWorkspace.mock.calls).toEqual([[owner,terminal.id]]);
+  expect(reads.getMerchantOperations.mock.calls).toEqual([[owner,terminal.id]]);
+  expect(result.settlements).toHaveLength(1);
+ });
+
+ it("rechecks current ownership after reused discovery becomes stale",async()=>{
+  reads.getMerchantWorkspace.mockRejectedValue(new SecurityError("MERCHANT_UNAVAILABLE",404));
+  const denial=new SecurityError("MONEY_ACCOUNT_UNAVAILABLE",404);
+  reads.getMoneyAccountOverview.mockRejectedValue(denial);
+  await expect(getMerchantMoneyWorkspace(owner,account,{units:[terminal]})).rejects.toBe(denial);
+  expect(reads.getMerchantDashboard).not.toHaveBeenCalled();
+  expect(reads.getMoneyAccountOverview).toHaveBeenCalledExactlyOnceWith(owner,accountId,3);
+ });
+
  it.each(["getMerchantDashboard","getMerchantWorkspace","getMerchantOperations"] as const)("keeps a reauthorized current balance and explicit unavailable state after %s fails",async failingRead=>{
   const current={...account,available:money("1300"),pendingWithdrawals:money("0"),status:"SUSPENDED" as const,canWithdraw:false};
   reads[failingRead].mockRejectedValue(new Error("Transient read interruption"));reads.getMoneyAccountOverview.mockResolvedValue(current);

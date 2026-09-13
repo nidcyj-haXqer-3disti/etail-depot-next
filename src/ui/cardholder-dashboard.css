@@ -42,14 +42,10 @@
 @media(max-width:540px){.ch-card-sections{gap:4px 20px;margin-bottom:18px}.ch-card-sections>a{font-size:13px}}
 
 /* Account overview and card detail are separate, named destinations. */
-.ch-account-overview{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.8fr);gap:26px 40px;padding:30px;border:1px solid var(--ch-line);border-radius:10px;background:#fff}
+.ch-account-overview{display:grid;grid-template-columns:minmax(0,1fr);gap:26px 40px;padding:30px;border:1px solid var(--ch-line);border-radius:10px;background:#fff}
+.ch-account-overview>.money-home{margin:0;min-width:0}
 .ch-account-intro .consumer-eyebrow{font-size:11px;color:var(--ch-muted);margin:0 0 12px}
 .ch-account-intro h2{font-size:24px;line-height:1.3;font-weight:600;letter-spacing:-.025em;margin:0 0 10px;overflow-wrap:anywhere}
-.ch-account-intro>p:last-child{font-size:14px;line-height:1.7;color:var(--ch-muted);max-width:430px;margin:0}
-.ch-account-balance{display:grid;justify-items:start;gap:8px;border-left:1px solid var(--ch-line);padding-left:32px;min-width:0}
-.ch-account-balance>span{font-size:14px;color:var(--ch-muted)}
-.ch-account-balance>strong{font-size:44px;line-height:1.15;font-weight:600;letter-spacing:-.045em;overflow-wrap:anywhere}
-.ch-account-balance>.consumer-button{min-height:44px;font-size:13px;margin-top:6px}
 .ch-account-counts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-column:1/-1;gap:24px;margin:0;padding-top:24px;border-top:1px solid var(--ch-line)}
 .ch-account-counts dt{font-size:13px;line-height:1.5;color:var(--ch-muted)}
 .ch-account-counts dd{font-size:27px;font-weight:600;margin:6px 0 0}
@@ -79,5 +75,5 @@
 .ch-back-to-cards{margin:0 0 14px}
 .ch-back-to-cards>svg{transform:rotate(180deg)}
 .ch-section-heading h2{font-size:22px;font-weight:600;letter-spacing:-.025em;line-height:1.4;margin:0}
-@media(max-width:800px){.ch-card-row{gap:14px;padding:20px}.ch-account-overview{gap:24px;padding:25px}.ch-account-balance{padding-left:24px}.ch-list-card-money>strong{font-size:20px}.ch-list-card-icon{display:none}}
-@media(max-width:540px){.ch-account-overview{grid-template-columns:minmax(0,1fr);padding:22px 18px;gap:22px}.ch-account-intro h2{font-size:22px}.ch-account-balance{border-left:0;padding-left:0}.ch-account-balance>strong{font-size:40px}.ch-account-counts{gap:14px;padding-top:20px}.ch-account-counts dt{font-size:12px}.ch-account-counts dd{font-size:24px}.ch-account-links{gap:5px}.ch-card-toolbar{flex-wrap:wrap;gap:12px}.ch-card-toolbar>.consumer-button{order:-1;margin-left:auto}.ch-card-toolbar .ch-card-sections{flex-basis:100%}.ch-card-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:15px;padding:18px 15px}.ch-list-card-name{grid-column:1/-1}.ch-list-card-money{text-align:left;margin:0}.ch-list-card-money>small{font-size:11px}.ch-card-row>.consumer-status{max-width:105px}.ch-card-row>svg{display:none}.ch-section-heading h2{font-size:20px}}
+@media(max-width:800px){.ch-card-row{gap:14px;padding:20px}.ch-account-overview{gap:24px;padding:25px}.ch-list-card-money>strong{font-size:20px}.ch-list-card-icon{display:none}}
+@media(max-width:540px){.ch-account-overview{grid-template-columns:minmax(0,1fr);padding:22px 18px;gap:22px}.ch-account-intro h2{font-size:22px}.ch-account-counts{gap:14px;padding-top:20px}.ch-account-counts dt{font-size:12px}.ch-account-counts dd{font-size:24px}.ch-account-links{gap:5px}.ch-card-toolbar{flex-wrap:wrap;gap:12px}.ch-card-toolbar>.consumer-button{order:-1;margin-left:auto}.ch-card-toolbar .ch-card-sections{flex-basis:100%}.ch-card-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:15px;padding:18px 15px}.ch-list-card-name{grid-column:1/-1}.ch-list-card-money{text-align:left;margin:0}.ch-list-card-money>small{font-size:11px}.ch-card-row>.consumer-status{max-width:105px}.ch-card-row>svg{display:none}.ch-section-heading h2{font-size:20px}}

@@ -22,5 +22,5 @@ export default async function Page({params,searchParams}:{params:Promise<{mercha
  const query=await searchParams;
  const returnTo=merchantActivityReturn(typeof query.returnTo==="string"?query.returnTo:null);
  const returnHref=merchantRecordHref(merchantId,{tab:"verification"},returnTo);
- return <MerchantShell merchantId={merchantId} showMoney={data.ownerAccess} showSettings={data.ownerAccess} overviewHref={returnTo??undefined}><Link href={returnHref}>Back to terminal settings</Link><MerchantBusinessDetails initial={data} returnHref={returnHref}/></MerchantShell>;
+ return <MerchantShell merchantId={merchantId} activeSection="settings" showMoney={data.ownerAccess} showSettings={data.ownerAccess} overviewHref={returnTo??undefined}><Link href={returnHref}>Back to terminal settings</Link><MerchantBusinessDetails initial={data} returnHref={returnHref}/></MerchantShell>;
 }

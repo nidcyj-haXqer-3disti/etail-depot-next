@@ -26,7 +26,7 @@ test("owner adds card money, reviews a withdrawal and keeps merchant money separ
  expect(await getDb().select().from(moneyTopups).where(eq(moneyTopups.moneyAccountId,card.id))).toHaveLength(1);
  expect((await getMoneyAccountOverview(owner.personId,business.id)).available.minor).toBe("0");
  await page.goto(`/money-accounts/${card.id}?task=withdraw`);await page.getByRole("textbox",{name:"Amount (USD)"}).fill("25.50");await page.getByRole("button",{name:"Continue",exact:true}).click();
- await page.getByRole("button",{name:"Confirm withdrawal",exact:true}).click();await expect(page.getByRole("heading",{name:"Withdrawal requested",exact:true})).toBeVisible();
+ await page.getByRole("button",{name:"Confirm return",exact:true}).click();await expect(page.getByRole("heading",{name:"Return requested",exact:true})).toBeVisible();
  expect(await getMoneyAccountOverview(owner.personId,card.id)).toMatchObject({available:{minor:"10000"},pendingWithdrawals:{minor:"2550"}});
  expect((await getMoneyAccountOverview(owner.personId,business.id)).available.minor).toBe("0");
  const ownQueue=await page.request.post(`/api/v1/operations/money-withdrawals/${(await getDb().select().from(moneyWithdrawals).where(eq(moneyWithdrawals.moneyAccountId,card.id)))[0]!.id}`,{headers,data:{commandId:randomUUID(),outcome:"COMPLETED"}});expect(ownQueue.status()).toBe(403);
@@ -68,7 +68,7 @@ for(const task of ["add","withdraw"] as const)test(`${task} waits for the saved 
   const response=await route.fetch();expect(response.status()).toBe(200);held=true;await gate;await route.fulfill({response});
  });
  await page.route(`**/api/v1${path}/${task==="add"?"funding":"withdrawals"}/intents/*`,async route=>{if(route.request().method()==="POST")confirmations++;await route.continue();});
- const confirm=page.getByRole("button",{name:task==="add"?"Confirm and add money":"Confirm withdrawal",exact:true});
+ const confirm=page.getByRole("button",{name:task==="add"?"Confirm and add money":"Confirm return",exact:true});
  await page.getByRole("textbox",{name:"Amount (USD)"}).fill("10.00");
  try{
   await page.getByRole("button",{name:"Continue",exact:true}).click();await expect.poll(()=>held).toBe(true);
@@ -77,8 +77,8 @@ for(const task of ["add","withdraw"] as const)test(`${task} waits for the saved 
   expect((await getMoneyAccountOverview(owner.personId,account!.id)).available).toEqual(before.available);
  }finally{release();}
  await expect(page).toHaveURL(url=>url.searchParams.get("review")===reviewId);await expect(confirm).toBeEnabled();await confirm.click();
- await expect(page.getByRole("heading",{name:task==="add"?"Money added":"Withdrawal requested",exact:true})).toBeVisible();expect(confirmations).toBe(1);
- await page.reload();await expect(page.getByRole("heading",{name:task==="add"?"Money added":"Withdrawal requested",exact:true})).toBeVisible();expect(confirmations).toBe(1);
+ await expect(page.getByRole("heading",{name:task==="add"?"Money added":"Return requested",exact:true})).toBeVisible();expect(confirmations).toBe(1);
+ await page.reload();await expect(page.getByRole("heading",{name:task==="add"?"Money added":"Return requested",exact:true})).toBeVisible();expect(confirmations).toBe(1);
 });
 
 test("an oversized withdrawal can be corrected after a definitive rejection",async({page})=>{
@@ -90,6 +90,6 @@ test("an oversized withdrawal can be corrected after a definitive rejection",asy
  expect((await getMoneyAccountOverview(owner.personId,account!.id)).available.minor).toBe("1000");
  expect(await getDb().select().from(moneyWithdrawals).where(eq(moneyWithdrawals.moneyAccountId,account!.id))).toHaveLength(0);
  await amount.fill("5.00");await page.getByRole("button",{name:"Continue",exact:true}).click();await expect(page).toHaveURL(url=>!!url.searchParams.get("review"));
- await page.getByRole("button",{name:"Confirm withdrawal",exact:true}).click();await expect(page.getByRole("heading",{name:"Withdrawal requested",exact:true})).toBeVisible();
+ await page.getByRole("button",{name:"Confirm return",exact:true}).click();await expect(page.getByRole("heading",{name:"Return requested",exact:true})).toBeVisible();
  expect(await getMoneyAccountOverview(owner.personId,account!.id)).toMatchObject({available:{minor:"500"},pendingWithdrawals:{minor:"500"}});
 });

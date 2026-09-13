@@ -77,11 +77,17 @@ export async function addMoney(page:Page,serviceId:string,amount="50.00"){
   const accountResponse=await page.request.get(`/api/v1${base}`);expect(accountResponse.status()).toBe(200);
   const account=moneyOverviewSchema.parse(await accountResponse.json());
   expect(account).toMatchObject({id:moneyAccountId,serviceKind:"CARDHOLDER",services:[{id:serviceId,kind:"CARDHOLDER"}],canAddMoney:true});
-  await expect(page.getByRole("heading",{name:"Card balance",level:1,exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Account activity",level:1,exact:true})).toBeVisible();
+  await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Account home",exact:true}).click();
+  const homeBalance=page.getByRole("region",{name:"Card account balance",exact:true});
+  await expect(homeBalance).toContainText(account.available.formatted);
+  await expect(homeBalance.getByRole("link",{name:"Add money",exact:true})).toHaveAttribute("href",`${base}?task=add`);
   await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(1);
-  await page.getByRole("link",{name:"Add money",exact:true}).click();
+  await homeBalance.getByRole("link",{name:"Add money",exact:true}).click();
+  await expect(page).toHaveURL(url=>url.pathname===base&&url.searchParams.get("task")==="add"&&!url.searchParams.has("review"));
+  await expect(page.getByRole("heading",{name:"Add money",level:1,exact:true})).toBeVisible();
   const panel=page.locator('section[aria-labelledby="money-task-title"]');
-  await expect(panel.getByRole("heading",{name:"Add money",exact:true})).toBeVisible();
+  await expect(panel.getByRole("heading",{name:"How much would you like to add?",exact:true})).toBeVisible();
   await panel.getByRole("textbox",{name:"Amount (USD)",exact:true}).fill(amount);
   const preparing=responseFor(page,`/api/v1${base}/funding/intents`);
   await panel.getByRole("button",{name:"Continue",exact:true}).click();
@@ -198,6 +204,7 @@ export async function refundPayment(page:Page,merchantId:string,paymentId:string
 }
 export async function settleExactPayment(page:Page,merchantId:string,paymentId:string){
   await page.goto(`/merchant-services?section=funds&view=unit:${merchantId}`);
+  await page.locator(".money-incoming > summary").click();
   await page.getByRole("region",{name:/^Settlement for /}).getByRole("button",{name:"Review settlement",exact:true}).click();
   await page.getByRole("dialog",{name:"Settle received payments",exact:true}).getByRole("button",{name:"Review settlement",exact:true}).click();
   const review=page.getByRole("dialog",{name:"Review settlement",exact:true});

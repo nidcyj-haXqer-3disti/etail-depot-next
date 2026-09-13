@@ -11,12 +11,8 @@
 
 /* The same account destinations remain visible while terminal tasks stay contextual. */
 .mn-account-back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:10px;color:#155a9d;font-size:13px;text-underline-offset:3px}
-.mn-terminal-navigation{margin:-8px 0 24px;border-bottom:1px solid #cbd6e4;min-width:0}
-.mn-terminal-navigation nav{display:flex;gap:22px;overflow-x:auto;scrollbar-width:thin;padding:6px;scroll-padding-inline:6px}
-.mn-terminal-navigation a{display:inline-flex;align-items:center;flex-shrink:0;min-height:48px;padding:10px 2px;border-bottom:3px solid transparent;color:#52657d;text-decoration:none;font-size:14px;font-weight:550;white-space:nowrap}
-.mn-terminal-navigation a[aria-current=page]{color:#155a9d;border-bottom-color:#155a9d;font-weight:650}
-.mn-terminal-navigation a:hover{color:#104d88}
-@media(max-width:800px){.mn-sidebar nav{display:flex;overflow-x:auto;gap:0}.mn-sidebar nav a{min-height:48px;padding:12px 13px;font-size:13px}.mn-terminal-navigation nav{gap:20px}.mn-terminal-navigation a{font-size:13px;min-height:44px}.mn-workspace-heading{padding-bottom:14px}}
+ .mn-terminal-context{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:22px 24px;margin:0 0 24px;border:1px solid #d4dce7;border-radius:10px;background:#fff;min-width:0}.mn-terminal-context>div{min-width:0}.mn-terminal-context h2{font-size:22px;line-height:1.35;letter-spacing:-.025em;font-weight:600;margin:6px 0;overflow-wrap:anywhere}.mn-terminal-context p{font-size:13px;line-height:1.65;color:#4a5870;margin:0 0 10px;max-width:610px;overflow-wrap:anywhere}.mn-terminal-context .consumer-status{margin-top:4px}.mn-terminal-actions{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:flex-end;max-width:290px}.mn-terminal-actions a{display:inline-flex;align-items:center;min-height:44px;color:#155a9d;font-size:13px;font-weight:600;text-underline-offset:3px;overflow-wrap:anywhere}
+@media(max-width:800px){.mn-terminal-context{flex-direction:column;gap:12px;padding:18px}.mn-terminal-actions{max-width:none;justify-content:flex-start;gap:6px 20px}.mn-workspace-heading{padding-bottom:14px}}
 
-/* Keep every account destination discoverable on phones; terminal tabs retain horizontal context. */
+/* Keep every account destination discoverable on phones. */
 @media(max-width:800px){.mn-sidebar nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;gap:0}.mn-sidebar nav a{justify-content:center;white-space:normal;text-align:center;line-height:1.4;padding:12px 7px;font-size:12px;min-width:0}}
