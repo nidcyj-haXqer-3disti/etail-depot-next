@@ -2,6 +2,8 @@ node_modules/
 .pnpm-store/
 .next/
 .netlify/
+# Generated Netlify edge bootstrap lock; pnpm-lock.yaml owns application dependencies.
+/deno.lock
 dist/
 coverage/
 playwright-report/
