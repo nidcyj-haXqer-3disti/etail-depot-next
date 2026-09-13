@@ -5,6 +5,8 @@ import { getRequestSession } from "@/platform/http/context";
 import { getMerchantDashboard } from "@/modules/acquiring/dashboard-service";
 import {getMoneyAccountOverview} from "@/modules/money/service";
 import {getMerchantMoneyWorkspace} from "@/modules/acquiring/money-workspace";
+import {getMerchantStatement} from "@/modules/acquiring/statement-service";
+import {MerchantStatement} from "@/ui/workspace/merchant-statement";
 import { MerchantDashboard, type MerchantMoneyHome } from "@/ui/workspace/merchant-dashboard";
 import { MerchantShell } from "@/ui/workspace/merchant-shell";
 import { PageNotice } from "@/ui/shell";
@@ -28,7 +30,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Record<s
  }
  if(!dashboard)return <PageNotice title="We couldn’t load your payments" authenticated><p>Please reload this page. Your payments and saved records have not changed.</p></PageNotice>;
  const moneyHomes:MerchantMoneyHome[]=[];
- if(dashboard.activity.query.section==="overview"||dashboard.activity.query.section==="funds"){
+ if(["overview","funds","activity"].includes(dashboard.activity.query.section)){
   const view=dashboard.views.find(view=>view.id===dashboard.activity.query.view);
   const units=dashboard.units.filter(unit=>view?.unitIds.includes(unit.id));
   const accounts=dashboard.moneyAccounts.filter(account=>account.merchantServiceIds.some(serviceId=>units.some(unit=>unit.ownerAccess&&unit.merchantServiceId===serviceId)));
@@ -48,5 +50,6 @@ export default async function Page({searchParams}:{searchParams:Promise<Record<s
   }
  }
 
- return <MerchantShell dashboardQuery={dashboard.activity.query} showMoney={dashboard.moneyAccounts.length>0} showSettings={dashboard.merchants.some(merchant=>merchant.ownerAccess)}><MerchantDashboard initial={dashboard} moneyHomes={moneyHomes}/></MerchantShell>;
+ const statement=["overview","funds","activity"].includes(dashboard.activity.query.section)?await getMerchantStatement(session.personId,query).catch(error=>{unstable_rethrow(error);return null;}):null;
+ return <MerchantShell dashboardQuery={dashboard.activity.query} showMoney={dashboard.moneyAccounts.length>0} showSettings={dashboard.merchants.some(merchant=>merchant.ownerAccess)}><MerchantDashboard initial={dashboard} moneyHomes={moneyHomes} statement={statement?<MerchantStatement statement={statement}/>:undefined}/></MerchantShell>;
 }

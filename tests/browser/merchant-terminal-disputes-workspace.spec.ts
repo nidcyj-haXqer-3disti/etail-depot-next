@@ -13,7 +13,7 @@ test("customer reports a payment, terminal user supplies evidence, and an assign
  test.setTimeout(90000);const f=await terminalCheckoutFixture(),payment=await payTerminal(f);
  await signInPerson(page,f.payer.personId);await page.goto(`/payments/${payment.paymentId}/dispute`);await expect(page.getByRole("heading",{name:"Payment help",exact:true})).toBeVisible();await page.getByRole("combobox",{name:"What happened?",exact:true}).selectOption("NOT_RECEIVED");await page.getByRole("textbox",{name:"Tell us what happened",exact:true}).fill("My order has not arrived.");await page.getByRole("button",{name:"Send report",exact:true}).click();await expect(page.getByText("Waiting for a response",{exact:true})).toBeVisible();
  await signInPerson(page,f.operator.personId);await page.goto(`/merchants/${f.unit.id}?tab=disputes`);await expect(page.getByText("My order has not arrived.",{exact:true})).toBeVisible();await page.getByRole("textbox",{name:"Your response",exact:true}).fill("We checked the delivery.");await page.getByRole("textbox",{name:"Evidence",exact:true}).fill("Dispatch record 500 shows the parcel was returned to us.");await page.getByRole("button",{name:"Submit response",exact:true}).click();await expect(page.getByText("In review",{exact:true})).toBeVisible();
- await expect(page.getByRole("link",{name:"Team access",exact:true})).toHaveCount(0);await expect(page.getByRole("link",{name:"Terminal settings",exact:true})).toHaveCount(0);await expect(page.getByRole("button",{name:/Refund|Review settlement/})).toHaveCount(0);
+ await expect(page.getByRole("link",{name:"Team access",exact:true})).toHaveCount(0);await expect(page.getByRole("link",{name:"Terminal settings",exact:true})).toHaveCount(0);await expect(page.getByRole("button",{name:/^(Refund|Refund payment|Review settlement)$/})).toHaveCount(0);
  expect((await new AxeBuilder({page}).include("main").withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
  await getDb().insert(operatorServiceAccess).values({serviceId:f.merchant.serviceId,personId:f.helper.personId,state:"ACCEPTED",canResolveDisputes:true});await signInPerson(page,f.helper.personId);await page.goto("/operations/disputes");await page.getByRole("combobox",{name:"Review outcome",exact:true}).selectOption("REFUND_RECOMMENDED");await page.getByRole("textbox",{name:"Review notes",exact:true}).fill("The goods were returned. The owner should review a refund.");await page.getByRole("button",{name:"Save review",exact:true}).click();await expect(page.getByText("Review completed",{exact:true})).toBeVisible();await expect(page.getByText(/A refund is recommended/)).toBeVisible();
  expect(await getDb().transaction(tx=>readServiceMoneyAvailable(tx,f.payer.serviceId))).toBe(18750n);expect((await getMerchantOperations(f.merchant.personId,f.unit.id)).payments[0]?.status).toBe("APPROVED");
@@ -45,7 +45,7 @@ test("an unknown terminal response keeps its exact request, hides evidence after
  await page.route(`**/api/v1/merchants/${f.unit.id}/disputes/${claim.id}/respond`,async route=>{requests.push(route.request().postDataJSON());if(requests.length===1){const response=await route.fetch();expect(response.status()).toBe(200);await route.abort("failed");}else await route.fulfill({status:404,json:{error:{code:"NOT_FOUND"}}});});
  await page.getByRole("textbox",{name:"Your response",exact:true}).fill(message);await page.getByRole("textbox",{name:"Evidence",exact:true}).fill(evidence);await page.getByRole("button",{name:"Submit response",exact:true}).click();
  await page.getByRole("button",{name:"Retry same response",exact:true}).click();await expect(page.getByRole("heading",{name:"Dispute unavailable",exact:true})).toBeVisible();
- await expect(page.locator("main")).not.toContainText(message);await expect(page.locator("main")).not.toContainText(evidence);await expect(page.getByRole("textbox")).toHaveCount(0);
+ await expect(page.locator("main")).not.toContainText(message);await expect(page.locator("main")).not.toContainText(evidence);await expect(page.getByRole("region",{name:"Customer support",exact:true}).getByRole("textbox")).toHaveCount(0);
  await page.getByRole("button",{name:"Retry same response",exact:true}).click();await expect.poll(()=>requests.length).toBe(3);expect(requests[1]).toEqual(requests[0]);expect(requests[2]).toEqual(requests[0]);
  await expect(page.getByRole("button",{name:"Leave unconfirmed response",exact:true})).toBeEnabled();await page.getByRole("button",{name:"Leave unconfirmed response",exact:true}).click();await expect(page).toHaveURL(/\/services$/);
  expect((await listTerminalDisputes(f.merchant.personId,f.unit.id))[0]?.messages.filter(item=>item.kind==="RESPONSE")).toHaveLength(1);
@@ -56,8 +56,8 @@ test("a direct dispute route uses one visible account menu and scoped task links
  const route=`/merchants/${f.unit.id}?tab=disputes`;await page.goto(route);
  const nav=page.getByRole("navigation",{name:"Merchant account navigation",exact:true});
  await expect(page.getByRole("navigation",{name:"Payment terminal navigation",exact:true})).toHaveCount(0);
- await expect(nav.getByRole("link")).toHaveText(["Overview","Payments","Team & terminals","Channels","Settings"]);
- const current=nav.getByRole("link",{name:"Payments",exact:true});
+ await expect(nav.getByRole("link")).toHaveText(["Overview","Terminals","Account settings"]);
+ const current=nav.getByRole("link",{name:"Terminals",exact:true});
  const fullyVisible=async(link:typeof current)=>{
   await expect(link).toBeInViewport({ratio:0.99});
   const clipped=await link.evaluate(node=>{const item=node.getBoundingClientRect(),container=node.parentElement!.getBoundingClientRect();return Math.max(container.left-item.left,item.right-container.right,0);});
@@ -67,14 +67,13 @@ test("a direct dispute route uses one visible account menu and scoped task links
  for(const link of await nav.getByRole("link").all())await fullyVisible(link);
  expect(await nav.evaluate(node=>node.scrollWidth<=node.clientWidth+1)).toBe(true);
  const originalUrl=page.url();await nav.getByRole("link",{name:"Overview",exact:true}).focus();
- for(const [key,label] of [["Tab","Payments"],["Tab","Team & terminals"],["Tab","Channels"],["Tab","Settings"],["Shift+Tab","Channels"],["Shift+Tab","Team & terminals"],["Shift+Tab","Payments"]] as const){
+ for(const [key,label] of [["Tab","Terminals"],["Tab","Account settings"],["Shift+Tab","Terminals"],["Shift+Tab","Overview"]] as const){
   await page.keyboard.press(key);const focused=nav.getByRole("link",{name:label,exact:true});await expect(focused).toBeFocused();await fullyVisible(focused);expect(page.url()).toBe(originalUrl);
  }
- const related=page.getByRole("group",{name:"Related terminal tasks",exact:true});
- await expect(related.getByRole("link")).toHaveText(["View payments","Contact support"]);
- const payments=related.getByRole("link",{name:"View payments",exact:true}),support=related.getByRole("link",{name:"Contact support",exact:true});
- await payments.focus();await fullyVisible(payments);await page.keyboard.press("Tab");await expect(support).toBeFocused();await fullyVisible(support);
- const target=new URL((await support.getAttribute("href"))!,"http://127.0.0.1:3100");expect(target.pathname).toBe(`/merchants/${f.unit.id}`);expect(target.searchParams.get("tab")).toBe("help");
+ const related=page.getByRole("group",{name:"Terminal sections",exact:true});
+ const activity=related.getByRole("link",{name:"Activity",exact:true}),support=related.getByRole("link",{name:"Customer support",exact:true});
+ await activity.focus();await fullyVisible(activity);await page.keyboard.press("Tab");await expect(support).toBeFocused();await fullyVisible(support);
+ await expect(support).toHaveAttribute("href","#terminal-service");
  expect(page.url()).toBe(originalUrl);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
  await page.reload();await fullyVisible(current);expect(page.url()).toBe(originalUrl);
 });

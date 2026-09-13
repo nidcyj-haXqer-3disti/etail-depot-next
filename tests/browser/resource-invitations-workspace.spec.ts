@@ -28,20 +28,8 @@ async function unassignedCard(owner: {personId: string; serviceId: string}) {
   return issued.issuedCardId;
 }
 async function sharedLink(page: Page, email: string) {
-  const sharing = page.getByRole("region", { name: "Share invitation", exact: true });
-  await expect(sharing).toBeVisible();
-  const link = sharing.getByRole("textbox", { name: "Invitation link", exact: true });
-  await expect(link).toHaveValue(new RegExp(`^${origin}/invitations/[a-f0-9-]{36}$`));
-  const href = await link.inputValue();
-  expect(new URL(href).search).toBe("");
-  expect(new URL(href).hash).toBe("");
-  const emailHref = await sharing.getByRole("link", { name: "Email", exact: true }).getAttribute("href");
-  expect(emailHref).toMatch(/^mailto:/);
-  expect(decodeURIComponent(emailHref!)).toContain(email);
-  expect(decodeURIComponent(emailHref!)).toContain(href);
-  const sms = await sharing.getByRole("link", { name: "Text message", exact: true }).getAttribute("href");
-  expect(sms).toMatch(/^sms:/);
-  expect(decodeURIComponent(sms!)).toContain(href);
+  const ready = page.getByRole("region", { name: "Share invitation", exact: true });
+  await expect(ready).toBeVisible();
   // Substitute only OS share/clipboard transports; never open a mail app or read the user's clipboard.
   await page.evaluate(() => {
     const writes: string[] = [], shares: ShareData[] = [];
@@ -49,14 +37,34 @@ async function sharedLink(page: Page, email: string) {
     Object.defineProperty(navigator, "share", { configurable: true, value: async (value: ShareData) => { shares.push(value); throw new DOMException("Canceled synthetic share", "AbortError"); } });
     Object.defineProperty(window, "__invitationShareTransport", { configurable: true, value: { writes, shares } });
   });
+  const opener=ready.getByRole("button",{name:"Share invitation",exact:true});
+  await opener.click();
+  const sharing=page.getByRole("dialog",{name:"Share invitation",exact:true});
+  await expect(sharing).toBeVisible();
+  const link = sharing.getByRole("textbox", { name: "Invitation link", exact: true });
+  await expect(link).toHaveValue(new RegExp(`^${origin}/invitations/[a-f0-9-]{36}$`));
+  const href = await link.inputValue();
+  expect(new URL(href).search).toBe(""); expect(new URL(href).hash).toBe("");
+  const emailHref = await sharing.getByRole("link", { name: "Email", exact: true }).getAttribute("href");
+  expect(emailHref).toMatch(/^mailto:/); expect(decodeURIComponent(emailHref!)).toContain(email); expect(decodeURIComponent(emailHref!)).toContain(href);
+  const sms = await sharing.getByRole("link", { name: "Text message", exact: true }).getAttribute("href");
+  expect(sms).toMatch(/^sms:/); expect(decodeURIComponent(sms!)).toContain(href);
+  const social=sharing.getByRole("link",{name:"WhatsApp (opens a new window)",exact:true});
+  await expect(social).toHaveAttribute("href",new RegExp("^https://wa\\.me/"));
+  expect(decodeURIComponent((await social.getAttribute("href"))!)).toContain(href);
   await sharing.getByRole("button", { name: "Copy link", exact: true }).click();
   await expect(sharing).toContainText("Invitation link copied. No message has been sent.");
-  await sharing.getByRole("button", { name: "Share", exact: true }).click();
+  await sharing.getByRole("button", { name: "More apps", exact: true }).click();
   await expect(sharing).toContainText("Sharing canceled. You can still copy the link.");
   const transport = await page.evaluate(() => Reflect.get(window, "__invitationShareTransport") as { writes: string[]; shares: ShareData[] });
-  expect(transport.writes).toEqual([href]);
-  expect(transport.shares).toHaveLength(1); expect(transport.shares[0]).toMatchObject({ title: "Your Etail Depot invitation", url: href });
-  expect(transport.shares[0]!.text).toContain(email); expect(transport.shares[0]!.text).toContain(href);
+  expect(transport.writes).toEqual([href]); expect(transport.shares).toHaveLength(1);
+  expect(transport.shares[0]!.title).toMatch(/^Your Etail Depot(?: card| payment terminal)? invitation$/);
+  expect(transport.shares[0]!.url).toBe(href); expect(transport.shares[0]!.text).toContain(email); expect(transport.shares[0]!.text).toContain(href);
+  await accessible(page);
+  await page.screenshot({path:test.info().outputPath("invitation-share-sheet.png"),animations:"disabled"});
+  const viewport=page.viewportSize();
+  if(viewport&&viewport.width!==320){await page.setViewportSize({width:320,height:900});await accessible(page);await page.screenshot({path:test.info().outputPath("invitation-share-sheet-320.png"),animations:"disabled"});await page.setViewportSize(viewport);}
+  await page.keyboard.press("Escape"); await expect(sharing).toHaveCount(0); await expect(opener).toBeFocused();
   return href;
 }
 
@@ -67,7 +75,7 @@ test("email-bound card sharing returns a new recipient to the exact invitation a
   const email = `card-${randomUUID()}@example.test`;
   await signInVerified(page, owner.personId);
   await page.goto(`${origin}/cards/${cardId}/invite`);
-  await expect(page.getByRole("heading", { name: "Invite a cardholder", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Invite cardholder", exact: true })).toBeVisible();
   const createPath = `**/api/v1/cardholder-services/${owner.serviceId}/cards/${cardId}/invitations`, createBodies: string[] = [];
   await page.route(createPath, async route => {
     createBodies.push(route.request().postData()!);

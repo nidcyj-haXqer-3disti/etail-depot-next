@@ -7,6 +7,7 @@ const serviceId = "00000000-0000-4000-8000-000000000001";
 describe.each([
   { name: "cardholder", command: workspaceCommand, route: `/api/v1/cardholder-services/${serviceId}` },
   { name: "merchant", command: merchantCommand, route: `/api/v1/merchants/${serviceId}` },
+  { name: "merchant account", command: (...args:Parameters<typeof workspaceCommand>)=>merchantCommand(...args,"SERVICE"), route: `/api/v1/merchant-services/${serviceId}` },
 ])("$name command response certainty", ({ command, route }) => {
   it("treats a lost network response as uncertain so the original request can be retried", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Network response lost")));
@@ -75,4 +76,10 @@ describe.each([
     await vi.advanceTimersByTimeAsync(60_000);
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
+});
+
+it("encodes the exact selected service id in Merchant account commands",async()=>{
+ const fetcher=vi.fn().mockResolvedValue(Response.json({saved:true}));vi.stubGlobal("fetch",fetcher);
+ await merchantCommand("selected/id?scope=other","/business-details/application","POST",{commandId:"same-request"},"SERVICE");
+ expect(fetcher).toHaveBeenCalledWith("/api/v1/merchant-services/selected%2Fid%3Fscope%3Dother/business-details/application",expect.objectContaining({method:"POST",body:JSON.stringify({commandId:"same-request"})}));
 });

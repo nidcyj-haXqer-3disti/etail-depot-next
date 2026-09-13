@@ -26,6 +26,9 @@ for (const width of [1440, 320]) {
     await expect(page).toHaveURL(/\/profile$/);
     await expect(page.getByRole("region", { name: "Your details", exact: true })).toBeVisible();
     await expect(page.locator("main a[href^='/money-accounts/']")).toHaveCount(0);
+    await expect(page.getByRole("link", {name:"Manage sign-ins",exact:true})).toHaveAttribute("href","/security");
+    await expect(page.getByRole("heading", {name:"Customer care",exact:true})).toHaveCount(0);
+    await expect(page.locator("main")).toContainText("Display name");
     await expect(page.locator("footer")).toHaveCount(0);
     await expect(navigation).toBeHidden();
 

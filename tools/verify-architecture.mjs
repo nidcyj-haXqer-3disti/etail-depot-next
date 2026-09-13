@@ -642,13 +642,18 @@ function inspectWorkspaceOwnership(files, emit, requirePresence = true) {
         } else if (name === workspaceTransport) {
           const merchantTransport = chain.join("/") === "merchantCommand";
           const spans = target && ts.isTemplateExpression(target) ? target.templateSpans : [];
-          const service = spans[0]?.expression;
+          const selector=spans[0]?.expression;
+          const scopedMerchant=merchantTransport&&target&&ts.isTemplateExpression(target)&&target.head.text==="/api/v1/";
+          const validSelector=selector&&ts.isConditionalExpression(selector)&&ts.isBinaryExpression(selector.condition)&&selector.condition.operatorToken.kind===ts.SyntaxKind.EqualsEqualsEqualsToken&&identifierIs(selector.condition.left,"scope")&&ts.isStringLiteral(selector.condition.right)&&selector.condition.right.text==="SERVICE"&&ts.isStringLiteral(selector.whenTrue)&&selector.whenTrue.text==="merchant-services"&&ts.isStringLiteral(selector.whenFalse)&&selector.whenFalse.text==="merchants";
+          const offset=scopedMerchant?1:0;
+          const service = spans[offset]?.expression;
           const validService = service && ts.isCallExpression(service) && identifierIs(service.expression, "encodeURIComponent") && identifierIs(service.arguments[0], merchantTransport ? "merchantId" : "serviceId");
-          const validPath = spans[1] && ts.isIdentifier(spans[1].expression) && spans[1].expression.text === "path";
+          const validPath = spans[offset+1] && ts.isIdentifier(spans[offset+1].expression) && spans[offset+1].expression.text === "path";
           const options = call.arguments[1];
           const method = options && ts.isObjectLiteralExpression(options) ? options.properties.find(property => property.name?.getText(file.tree) === "method") : null;
           const forwardsMethod = method && ((ts.isShorthandPropertyAssignment(method) && method.name.text === "method") || (ts.isPropertyAssignment(method) && ts.isIdentifier(method.initializer) && method.initializer.text === "method"));
-          if (!target || !ts.isTemplateExpression(target) || target.head.text !== (merchantTransport ? "/api/v1/merchants/" : "/api/v1/cardholder-services/") || spans.length !== 2 || spans.some(span => span.literal.text !== "") || !validService || !validPath || !forwardsMethod) emit(file, call, "WORKSPACE_TRANSPORT_REWRITE", "The shared transport must forward the encoded selected service or merchant, requested path and method unchanged.");
+          const validPrefix=scopedMerchant?validSelector&&spans.length===3&&spans[0].literal.text==="/"&&spans.slice(1).every(span=>span.literal.text===""):target&&ts.isTemplateExpression(target)&&target.head.text===(merchantTransport?"/api/v1/merchants/":"/api/v1/cardholder-services/")&&spans.length===2&&spans.every(span=>span.literal.text==="");
+          if (!validPrefix || !validService || !validPath || !forwardsMethod) emit(file, call, "WORKSPACE_TRANSPORT_REWRITE", "The shared transport must forward the encoded selected service or merchant, requested path and method unchanged.");
         } else if (name === cardUiOwner && (!identifierIs(call.arguments[1], "path") || !identifierIs(call.arguments[2], "method"))) emit(file, call, "CARD_COMMAND_FORWARDING", "The canonical card UI wrapper must forward the requested path and method to the shared transport.");
         else if (name === operationUiOwner) {
           const forward = (argument, field) => argument && ts.isPropertyAccessExpression(argument) && identifierIs(argument.expression, "command") && argument.name.text === field;
@@ -857,6 +862,9 @@ function selfTest() {
   assert.ok(probe("src/app/api/quick-sell/route.ts",merchantRoute).includes("PARALLEL_MERCHANT_CREATION_ROUTE"));
   assert.deepEqual(probe(workspaceTransport, '"use client"; function merchantCommand(merchantId,path,method) { return fetch(`/api/v1/merchants/${encodeURIComponent(merchantId)}${path}`,{method}); }'),[]);
   assert.ok(probe(workspaceTransport, '"use client"; function merchantCommand(merchantId,path,method) { return fetch(`/api/v1/merchants/${encodeURIComponent(otherMerchant)}${path}`,{method}); }').includes("WORKSPACE_TRANSPORT_REWRITE"));
+  const scopedMerchantTransport='"use client"; function merchantCommand(merchantId,path,method,body,scope="TERMINAL") { return fetch(`/api/v1/${scope==="SERVICE"?"merchant-services":"merchants"}/${encodeURIComponent(merchantId)}${path}`,{method}); }';
+  assert.deepEqual(probe(workspaceTransport,scopedMerchantTransport),[]);
+  for(const [before,after] of [['"merchant-services"','"other-service"'],['"merchants"','"other-terminal"'],['scope===','arbitraryScope==='],['encodeURIComponent(merchantId)','encodeURIComponent(otherMerchant)'],['encodeURIComponent(merchantId)','merchantId'],['${path}','/bypass']])assert.ok(probe(workspaceTransport,scopedMerchantTransport.replace(before,after)).includes("WORKSPACE_TRANSPORT_REWRITE"));
   assert.ok(probe("src/ui/workspace/merchant-channels.tsx", '"use client"; import {merchantCommand} from "./primitives"; function MerchantChannels(){function send(command){return merchantCommand(id,"/bypass",command.method,command.body);}}').includes("MERCHANT_COMMAND_FORWARDING"));
   assert.ok(probe("src/ui/qr-channel.tsx", '"use client"; export function MerchantChannels(){return <form/>;}').includes("DUPLICATE_CHANNEL_FORM"));
   assert.ok(probe(channelOwner, 'import {paymentChannels} from "./schema"; function anotherCommand(){tx.update(paymentChannels).set({});}').includes("CHANNEL_WRITER_OWNERSHIP"));

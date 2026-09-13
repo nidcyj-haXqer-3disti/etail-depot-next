@@ -233,8 +233,8 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
     await expect(form).toBeVisible();
     await expect(form.getByRole("textbox",{name:/starting balance/i})).toHaveCount(0);
     await expect(form.getByLabel(/starting balance/i)).toHaveCount(0);
-    await expect(form.getByRole("radio",{name:/Someone else/})).toBeChecked();
-    await form.getByRole("radio",{name:/^Me /}).check();
+    await expect(form.getByRole("radio",{name:/For someone else/})).toBeChecked();
+    await form.getByRole("radio",{name:/^For your use/}).check();
     await form.getByRole("textbox",{name:"Card name",exact:true}).fill("Everyday browser card");
     await form.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill("50.00");
     await form.getByRole("button",{name:"Review card",exact:true}).click();

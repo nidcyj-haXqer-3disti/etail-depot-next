@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type {MoneyAccountOverview} from "@/modules/money/contracts";
 import type { WorkspaceProjection } from "@/modules/workspace/contracts";
@@ -9,6 +8,7 @@ import type { AccessOverview } from "@/modules/access/contracts";
 import type { CardholderDashboardDetail, CardholderDashboardFocus, CardholderDashboardProjection, DashboardCard } from "@/modules/workspace/dashboard-contracts";
 import { CardholderEnrollment } from "./cardholder-enrollment";
 import { CardsWorkspace } from "./workspace/cards";
+import type {CardInvitationOverview} from "./card-invitation-manager";
 import { ActivityDetails } from "./workspace/activity";
 import { PeopleWorkspace } from "./workspace/people";
 import { CardPreview } from "./workspace/card-art";
@@ -25,8 +25,8 @@ const base = "/cardholder-services";
 const views = ["overview", "cards", "activity", "cardholders", "requests"] as const;
 const detailKeys = ["card", "request", "new", "manage", "transaction", "holder", "review", "cardTask"];
 
-export function CardholderDashboard({ moneyAccount=null,dashboard, detail, access, managementWorkspace, selectedPersonId, personUnavailable = false, selectionUnavailable = false, focusedCard = null, focusedWorkspace = null, focusUnavailable = false }: {
-  moneyAccount?:MoneyAccountOverview|null;dashboard: CardholderDashboardProjection; detail: CardholderDashboardDetail | null; access?: AccessOverview;
+export function CardholderDashboard({ moneyAccount=null,dashboard, detail, access, managementWorkspace, selectedPersonId, personUnavailable = false, selectionUnavailable = false, focusedCard = null, focusedWorkspace = null, focusUnavailable = false, focusedDetail=null, focusedInvitations=null }: {
+  focusedDetail?:CardholderDashboardDetail|null;focusedInvitations?:CardInvitationOverview|null;moneyAccount?:MoneyAccountOverview|null;dashboard: CardholderDashboardProjection; detail: CardholderDashboardDetail | null; access?: AccessOverview;
   managementWorkspace?: WorkspaceProjection; selectedPersonId?: string; personUnavailable?: boolean;
   selectionUnavailable?: boolean; focusedCard?: DashboardCard | null;
   focusedWorkspace?: CardholderDashboardFocus["workspace"] | null; focusUnavailable?: boolean;
@@ -34,8 +34,7 @@ export function CardholderDashboard({ moneyAccount=null,dashboard, detail, acces
   const router = useRouter(), params = useSearchParams();
   const requestedView = params.get("view");
   const requestedCard = params.has("focus") || focusUnavailable || detail?.kind === "CARD" || detail?.kind === "NEW";
-  const view: CardholderView = detail?.kind === "PEOPLE" ? "cardholders" : requestedCard && (!requestedView || requestedView === "overview") ? "cards" : views.includes(requestedView as CardholderView) ? requestedView as CardholderView : params.has("activityCard") ? "activity" : params.has("page") ? "cards" : "overview";
-  const [controlIntent, setControlIntent] = useState<{ id: string; action: "freeze" | "unfreeze" } | null>(null);
+  const view: CardholderView = detail?.kind === "PEOPLE" ? "cardholders" : detail?.kind === "CARD" ? "cards" : requestedCard && (!requestedView || requestedView === "overview") ? "cards" : views.includes(requestedView as CardholderView) ? requestedView as CardholderView : params.has("activityCard") ? "activity" : params.has("page") ? "cards" : "overview";
   const primary = dashboard.primaryService;
   const hasPrimary = Boolean(primary || dashboard.profiles.some(profile => profile.relationship === "OWNER"));
   const secondaryProfiles = dashboard.profiles.filter(profile => profile.relationship === "CARDHOLDER");
@@ -66,12 +65,11 @@ export function CardholderDashboard({ moneyAccount=null,dashboard, detail, acces
     if (next !== "cards") preserveFocus(query);
     return `${next === "activity" ? `${base}/activity` : base}${query.size ? `?${query}` : ""}`;
   }
-  function href(key: string, value: string, task?: "controls") {
+  function href(key: string, value: string) {
     const query = new URLSearchParams(params.toString());
     for (const item of [...detailKeys, "focus"]) query.delete(item);
     if (view !== "overview") query.set("view", view);
     preserveFocus(query); query.set(key, value);
-    if (task) query.set("cardTask", task);
     return `${base}?${query}`;
   }
   function closeDetail() {
@@ -115,7 +113,6 @@ export function CardholderDashboard({ moneyAccount=null,dashboard, detail, acces
   }
   const scopeKey = detail ? JSON.stringify([dashboard.person.id, detail.kind, detail.workspace.service.id, detail.workspace.cardholderRole, detail.workspace.capabilities.filter(item => item.allowed).map(item => item.action), detail.workspace.cards.map(card => card.id)]) : "none";
   const descriptions = { overview: hasPrimary?"Your money, cards and activity in one place.":"Your cards, spending and recent activity.", cards: "Find a card by its name, cardholder or last four digits.", activity: "Follow purchases and find the details you need.", cardholders: "Manage cardholders, cards and card spending limits.", requests: "Pick up where you left off, or find a card you created." };
-  const canChangeFocusedLimit = focus?.accessRole === "OWNER" && focusedWorkspace?.cardholderRole === "OWNER" && focusedWorkspace.capabilities.some(item => item.action === "cardholder.limits.manage" && item.allowed);
   const unfinishedRequestLink = hasPrimary && dashboard.unfinishedRequestCount > 0 ? <Link className="ch-unfinished-request" href={viewHref("requests", 0)}>Continue card setup <span>{dashboard.unfinishedRequestCount} to finish</span><WorkspaceIcon name="arrow"/></Link> : null;
   const inCards = ["cards", "cardholders", "requests"].includes(view);
   const showingCard = view === "cards" && Boolean(focus || focusUnavailable);
@@ -153,10 +150,11 @@ export function CardholderDashboard({ moneyAccount=null,dashboard, detail, acces
                 <dl className="ch-limit-summary"><div><dt>Total spending limit</dt><dd>{focus.spending.allowance.formatted}</dd></div><div><dt>Spent toward limit</dt><dd>{focus.spending.used.formatted}</dd></div></dl>
               </div>
             </div>
-            <div className="ch-focus-actions">{focus.canInvite&&<Link className="consumer-button consumer-button-primary" href={`/cards/${focus.id}/invite`}>Invite cardholder</Link>}{(focus.canUnfreeze||focus.canFreeze)&&<Button variant="secondary" onClick={()=>{setControlIntent({id:focus.id,action:focus.canUnfreeze?"unfreeze":"freeze"});router.push(href("card",focus.id,"controls"),{scroll:false});}}>{focus.canUnfreeze?focus.freeze.unfreezeLabel:focus.freeze.freezeLabel}</Button>}<Link className="consumer-button consumer-button-secondary" href={href("card",focus.id,"controls")} onClick={()=>setControlIntent(null)} scroll={false}>{canChangeFocusedLimit ? "Manage card" : "Card settings"}<WorkspaceIcon name="settings"/></Link></div>
+
             {(!owns(focus)||!focus.canPurchase) && <div className="ch-availability" role="status"><WorkspaceIcon name={owns(focus)?"shield":"people"}/><div><strong>{focus.purchaseAvailability.title}</strong><p>{focus.purchaseAvailability.description}</p>{focus.status === "FROZEN" && <p>{focus.freeze.description}</p>}</div></div>}
             <div className="ch-card-support-actions"><details className="ch-spending-details"><summary>Spending details</summary><p>The total spending limit stays in place until the account owner changes it. Refunds don’t reduce spending counted toward the limit. Purchases also need enough money in the card balance.</p></details></div>
           </section>
+          {focusedDetail&&<CardsWorkspace key={`${dashboard.person.id}:${focusedDetail.workspace.service.id}:${focus.id}`} workspace={focusedDetail.workspace} cardHistory={focusedDetail.cardHistory} routeBase={base} embeddedCardId={focus.id} invitations={focusedInvitations} inviteOpen={params.get("invite")==="1"}/>}
           <section className="ch-focus-activity" aria-labelledby="ch-overview-activity-title"><div className="ch-section-heading"><div><h3 id="ch-overview-activity-title">Recent activity</h3><p>{focus.nickname} · Ending {focus.lastFour}</p></div><Link className="ch-section-link" href={viewHref("activity")}>View activity<WorkspaceIcon name="arrow"/></Link></div>{focusedActivity.length ? activityList(focusedActivity.slice(0,5)) : <div className="ch-empty">No purchases on this card yet.</div>}</section>
       </>}</div>}
       {view === "cards" && !showingCard && <div className="ch-cards">{hasPrimary&&<nav className="ch-card-scopes" aria-label="Card ownership"><Link aria-current={dashboard.cardScope==="ALL"?"page":undefined} href={cardScopeHref("ALL")}>All cards<span>{dashboard.cardCount}</span></Link><Link aria-current={dashboard.cardScope==="OWN"?"page":undefined} href={cardScopeHref("OWN")}>For your use<span>{dashboard.ownCardCount}</span></Link><Link aria-current={dashboard.cardScope==="MANAGED"?"page":undefined} href={cardScopeHref("MANAGED")}>For others<span>{dashboard.managedCardCount}</span></Link></nav>}<form className="ch-card-tools" action={base}><input type="hidden" name="view" value="cards"/><input type="hidden" name="cardScope" value={dashboard.cardScope}/><label>Search your cards<input type="search" name="cardSearch" key={dashboard.cardSearch} defaultValue={dashboard.cardSearch} maxLength={100} placeholder="Card name, person or last four digits"/></label><Button type="submit" variant="secondary">Search cards</Button>{dashboard.cardSearch&&<Link href={`${base}?view=cards&cardScope=${dashboard.cardScope}`}>Clear search</Link>}</form><p className="ch-request-count">{dashboard.cardMatchCount} matching {dashboard.cardMatchCount===1?"card":"cards"} · Page {dashboard.cardsPage+1}</p>{cardList(dashboard.cards)}{!dashboard.cards.length&&<EmptyState title={dashboard.cardSearch?"No matching cards":dashboard.cardScope==="MANAGED"?"No cards for others on this page":dashboard.cardScope==="OWN"?"No cards for your use on this page":"No cards on this page"} description={hasPrimary?"Change your filters, return to an earlier page or add a card when you’re ready.":"Change your filters or return to an earlier page."}>{!hasPrimary&&dashboard.cardScope==="MANAGED"&&<Link href={cardScopeHref("ALL")}>View your cards</Link>}</EmptyState>}{(dashboard.cardsPage>0||dashboard.cardsHasMore)&&<nav className="ch-pagination" aria-label="Card pages">{dashboard.cardsPage>0&&<Link className="consumer-button consumer-button-secondary" href={viewHref("cards",dashboard.cardsPage-1)}>Previous cards</Link>}<span>Page {dashboard.cardsPage+1}</span>{dashboard.cardsHasMore&&<Link className="consumer-button consumer-button-secondary" href={viewHref("cards",dashboard.cardsPage+1)}>Next cards</Link>}</nav>}</div>}
@@ -164,7 +162,7 @@ export function CardholderDashboard({ moneyAccount=null,dashboard, detail, acces
       {view==="requests"&&<section id="requests" className="ch-section" aria-labelledby="ch-requests-title"><div className="ch-request-intro"><span className="ch-feature-icon"><WorkspaceIcon name="reports"/></span><div><h3 id="ch-requests-title">Card history</h3><p>Continue a saved card setup, or review cards you’ve created and canceled setups.</p></div>{dashboard.unfinishedRequestCount>0&&<span className="ch-request-tally">{dashboard.unfinishedRequestCount} to finish</span>}</div><form className="ch-request-filters" action={base}><input type="hidden" name="view" value="requests"/>{focus&&<input type="hidden" name="focus" value={focus.id}/>}<label>Search card history<input key={dashboard.requestSearch} type="search" name="requestSearch" defaultValue={dashboard.requestSearch} maxLength={100} placeholder="Card name or cardholder"/></label><label>Status<select key={dashboard.requestStatus} name="requestStatus" defaultValue={dashboard.requestStatus}><option value="ALL">All card setups</option><option value="DRAFT">Drafts</option><option value="BLOCKED">Needs attention</option><option value="ISSUED">Cards created</option><option value="CANCELED">Canceled</option></select></label><Button type="submit" variant="secondary">Apply filters</Button>{(dashboard.requestSearch||dashboard.requestStatus!=="ALL")&&<Link href={`${base}?view=requests`}>Clear filters</Link>}</form><p className="ch-request-count">{dashboard.requestCount} matching {dashboard.requestCount===1?"record":"records"}</p>{dashboard.requests.length?requests():<EmptyState title={dashboard.requestSearch||dashboard.requestStatus!=="ALL"?"No matching card history":"No card history yet"} description={primary?.canAddCard?"Choose Add card to start. Saved and completed card setups stay here.":"Card creation is managed by the account owner."}/>}{(dashboard.requestPage>0||dashboard.requestsHasMore)&&<nav className="ch-pagination" aria-label="Request pages">{dashboard.requestPage>0&&<Link className="consumer-button consumer-button-secondary" href={requestPageHref(dashboard.requestPage-1)}>Previous records</Link>}<span>Page {dashboard.requestPage+1}</span>{dashboard.requestsHasMore&&<Link className="consumer-button consumer-button-secondary" href={requestPageHref(dashboard.requestPage+1)}>Next records</Link>}</nav>}</section>}
       {view === "overview"&&!primary&&dashboard.canCreatePrimary&&(waitingForFirstCard||dashboard.cardCount>0)&&<details className="ch-optional-enrollment"><summary>Optional: open your own card account</summary><p>Open a separate account if you want to add money and manage your own cards. You can keep using cards shared with you without opening one.</p><CardholderEnrollment/></details>}
     </div>
-    {detail&&["CARD","REQUEST","NEW"].includes(detail.kind)&&<CardsWorkspace key={scopeKey} workspace={detail.workspace} requestHistory={detail.requestHistory} cardHistory={detail.cardHistory} routeBase={base} initialControlAction={controlIntent?.id===params.get("card")?controlIntent.action:undefined} onClose={()=>setControlIntent(null)}/>}
+    {detail&&["REQUEST","NEW"].includes(detail.kind)&&<CardsWorkspace key={scopeKey} workspace={detail.workspace} requestHistory={detail.requestHistory} cardHistory={detail.cardHistory} routeBase={base}/>}
     {detail?.kind==="ACTIVITY"&&selectedActivity&&<WorkspaceDialog open title="Transaction details" serviceName={detail.workspace.customerService?.displayName??"Cards & spending"} onClose={closeDetail}><ActivityDetails item={selectedActivity} workspace={detail.workspace}/><div className="consumer-action-row"><Button variant="secondary" onClick={closeDetail}>Back to activity</Button></div></WorkspaceDialog>}
   </div>;
 }

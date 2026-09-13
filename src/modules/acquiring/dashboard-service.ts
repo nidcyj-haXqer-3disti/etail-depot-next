@@ -7,6 +7,7 @@ import { evaluate } from "../policy/evaluate";
 import { getBalance } from "../ledger/service";
 import { formatMoney } from "../workspace/service";
 import { listMerchantScopes } from "./service";
+import {serviceInvitations,terminalInvitationTerms} from "../access/schema";
 import {networkPaymentOperations} from "./network-schema";
 import { paymentChannels } from "./schema";
 import {merchantDeposits,merchantDepositEvents} from "./settlement-schema";
@@ -39,6 +40,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
   const approvedUses=channelIds.length?await tx.select({channelId:merchantTestPayments.channelId}).from(merchantTestPayments).where(and(inArray(merchantTestPayments.merchantUnitId,channelIds),eq(merchantTestPayments.outcome,"APPROVED"))):[];
   const reserved=channelIds.length?await tx.select({channelId:networkPaymentOperations.channelId}).from(networkPaymentOperations).where(and(inArray(networkPaymentOperations.terminalId,channelIds),eq(networkPaymentOperations.channelUsage,"ONE_TIME"))):[];
   const used=new Set([...approvedUses,...reserved].map(row=>row.channelId));
+  const pendingInvitations=unitIds.length?await tx.select({invitation:serviceInvitations,terms:terminalInvitationTerms}).from(serviceInvitations).innerJoin(terminalInvitationTerms,eq(terminalInvitationTerms.invitationId,serviceInvitations.id)).where(and(inArray(terminalInvitationTerms.terminalId,unitIds),eq(serviceInvitations.status,"PENDING"))):[];
   const units:MerchantDashboardUnit[]=[];
   for(const scope of scopes) {
    const unit=scope.terminal,canReadPayments=paymentIds.includes(unit.id),canReadChannels=channelIds.includes(unit.id);
@@ -71,7 +73,7 @@ export async function getMerchantDashboard(personId:string,input:MerchantActivit
               ?{code:"CHANNEL_REVIEW_REQUIRED",title:"Your payment requests need attention",description:"Your saved payment requests cannot accept payments right now. Open a request to see what needs attention.",action:channelAction}
               :{code:"READY",title:"A payment request is ready",description:"A payment request is ready. Open it to review and share its payment link.",action:channelAction};
    const total=(values:{amountMinor:bigint}[])=>formatMoney(values.reduce((sum,row)=>sum+row.amountMinor,0n));
-   units.push({id:unit.id,name:unit.displayName,merchantServiceId:scope.merchantService.id,merchantName:scope.merchantService.displayName,ownerAccess:scope.ownerAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddTerminal:evaluate(scope.policy,"merchant.terminals.create").allowed&&scope.policy.operating&&eligible,canCreateChannel,canReadPeople:evaluate(scope.policy,"merchant.people.read").allowed,setupState,collectionAvailability,totals:{
+   units.push({id:unit.id,name:unit.displayName,intendedUse:unit.intendedUse,forOthers:scope.ownerAccess&&(unit.intendedUse==="OTHER"||scope.liveAssignments.length>0||pendingInvitations.some(({invitation,terms})=>terms.terminalId===unit.id&&invitation.expiresAt>now&&terms.grantedByPersonId===scope.merchantService.primaryPersonId&&terms.ownerMembershipVersion===scope.ownerMember?.version&&(!terms.accessExpiresAt||terms.accessExpiresAt>now))),merchantServiceId:scope.merchantService.id,merchantName:scope.merchantService.displayName,ownerAccess:scope.ownerAccess,status:unit.status,canOpen:evaluate(scope.policy,"merchant.read").allowed,canAddTerminal:evaluate(scope.policy,"merchant.terminals.create").allowed&&scope.policy.operating&&eligible,canCreateChannel,canReadPeople:evaluate(scope.policy,"merchant.people.read").allowed,setupState,collectionAvailability,totals:{
     collected:canReadPayments?total(payments.filter(row=>row.merchantUnitId===unit.id&&row.outcome==="APPROVED")):null,
     refunded:canReadPayments?total(refunds.filter(row=>row.merchantUnitId===unit.id)):null,
     transferred:scope.ownerAccess&&canReadPayments?total(payouts.filter(row=>row.merchantUnitId===unit.id&&row.status==="COMPLETED")):null,

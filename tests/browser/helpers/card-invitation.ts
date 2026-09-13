@@ -18,8 +18,8 @@ export async function signInVerified(page:Page,personId:string,email?:string){
 export async function createCardUI(page:Page,name:string,allowance="25.00",forMe=false):Promise<WorkspaceCard>{
  await page.goto("/cardholder-services?view=cards");
  await page.getByRole("link",{name:"Add card",exact:true}).click();const dialog=page.getByRole("dialog");
- await expect(dialog.getByRole("radio",{name:/Someone else/})).toBeChecked();
- if(forMe)await dialog.getByRole("radio",{name:/^Me /}).check();
+ await expect(dialog.getByRole("radio",{name:/For someone else/})).toBeChecked();
+ if(forMe)await dialog.getByRole("radio",{name:/^For your use /}).check();
  await dialog.getByRole("textbox",{name:"Card name",exact:true}).fill(name);
  await dialog.getByRole("textbox",{name:"Total spending limit (USD)",exact:true}).fill(allowance);
  await dialog.getByRole("button",{name:"Review card",exact:true}).click();await dialog.getByRole("button",{name:"Create card",exact:true}).click();
@@ -30,7 +30,8 @@ export async function createCardUI(page:Page,name:string,allowance="25.00",forMe
 export async function inviteCardUI(page:Page,cardId:string,email:string):Promise<string>{
  await page.goto(`/cards/${cardId}/invite`);await page.getByRole("textbox",{name:"Their email address",exact:true}).fill(email);
  await page.getByRole("button",{name:"Create invitation",exact:true}).click();
- const link=page.getByRole("textbox",{name:"Invitation link",exact:true});await expect(link).toBeVisible();
+ await page.getByRole("region",{name:"Share invitation",exact:true}).getByRole("button",{name:"Share invitation",exact:true}).click();
+ const link=page.getByRole("dialog",{name:"Share invitation",exact:true}).getByRole("textbox",{name:"Invitation link",exact:true});await expect(link).toBeVisible();
  const id=new URL(await link.inputValue()).pathname.split("/").at(-1)!;
  expect(id).toMatch(/^[0-9a-f-]{36}$/);return id;
 }

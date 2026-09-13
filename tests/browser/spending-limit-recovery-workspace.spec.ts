@@ -1,3 +1,4 @@
+import {randomUUID} from "node:crypto";
 import {and,eq} from "drizzle-orm";
 import AxeBuilder from "@axe-core/playwright";
 import {expect,test} from "@playwright/test";
@@ -9,6 +10,7 @@ import {moneyFundingIntents,moneyTopups} from "../../src/modules/money/schema";
 import {getServiceMoneyAccount} from "../../src/modules/money/service";
 import {ledgerEntries} from "../../src/modules/ledger/schema";
 import {cardSpendingSchema} from "../../src/shared/funding-response";
+import {issuePracticeCard} from "../helpers/cardholder";
 import {freshPrepaidCard,signInPerson} from "./helpers/prepaid";
 
 test.afterAll(closeDatabase);
@@ -26,7 +28,7 @@ test("a lost card allowance result hides card details after denial and retries w
  page.on("request",request=>{const pathname=new URL(request.url()).pathname;if(!["GET","HEAD"].includes(request.method())&&(pathname.startsWith(`${prefix}/funds`)||pathname.includes("/money-accounts/")))fundingWrites.push(pathname);});
  await signInPerson(page,primary.personId);
  await page.goto(`/cardholder-services?card=${card.id}`);
- const dialog=page.getByRole("dialog"),row=dialog.getByRole("article",{name:"Card spending limit",exact:true});
+ const dialog=page.getByRole("dialog"),row=page.getByRole("region",{name:"Card management details",exact:true}).getByRole("article",{name:"Card spending limit",exact:true});
  await row.getByRole("button",{name:`Change spending limit for ${card.nickname}`,exact:true}).click();
  await row.getByRole("textbox",{name:`New total spending limit for ${card.nickname}`,exact:true}).fill("17.23");
  await row.getByRole("button",{name:"Review spending limit",exact:true}).click();
@@ -41,6 +43,9 @@ test("a lost card allowance result hides card details after denial and retries w
  await row.getByRole("button",{name:"Save spending limit",exact:true}).click();
  await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  await expect(row.getByRole("button",{name:"Cancel",exact:true})).toHaveCount(0);
+ await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Cards",exact:true}).click();
+ await expect(page).toHaveURL(url=>url.searchParams.get("card")===card.id);
+ await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  const grant=and(eq(permissionGrants.serviceId,primary.serviceId),eq(permissionGrants.personId,primary.personId),eq(permissionGrants.action,"cardholder.limits.manage"));
  expect(await getDb().update(permissionGrants).set({state:"REVOKED"}).where(grant).returning({action:permissionGrants.action})).toEqual([{action:"cardholder.limits.manage"}]);
  await row.getByRole("button",{name:"Retry saved spending limit",exact:true}).click();
@@ -63,4 +68,68 @@ test("a lost card allowance result hides card details after denial and retries w
  expect(await getDb().select().from(moneyFundingIntents).where(eq(moneyFundingIntents.moneyAccountId,account.id))).toEqual([]);
  expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("2500");
  await page.reload();await expect(row.locator(".funds-limit-value")).toHaveText("$17.23");
+});
+
+
+test("unconfirmed card limits survive browser navigation in the same tab and sign-out asks before revoking the session",async({page})=>{
+ test.setTimeout(120_000);
+ const {primary,card}=await freshPrepaidCard("2500","1000");
+ const other=await issuePracticeCard(primary.personId,primary.serviceId,primary.personId,`Other retained-scope card ${randomUUID().slice(0,8)}`,undefined,"500");
+ await signInPerson(page,primary.personId);
+ await page.goto("/cardholder-services?view=cards");
+ const openCard=()=>page.getByRole("link",{name:new RegExp(`^Open ${card.nickname},`)}).click();
+ await openCard();
+ const row=page.getByRole("region",{name:"Card management details",exact:true}).getByRole("article",{name:"Card spending limit",exact:true});
+ const path=`/api/v1/cardholder-services/${primary.serviceId}/cards/${card.id}/spending-limit`;
+ const attempts:unknown[]=[];let logoutPosts=0;
+ await page.route(`**${path}`,async route=>{
+  attempts.push(route.request().postDataJSON());const result=await route.fetch();expect(result.status()).toBe(200);
+  if(attempts.length===1||attempts.length===3)await route.fulfill({status:200,json:{}});else await route.fulfill({response:result});
+ });
+ await page.route("**/api/v1/auth/logout",async route=>{
+  logoutPosts++;
+  if(logoutPosts===1)await route.fulfill({status:503,json:{error:{code:"TEMPORARILY_UNAVAILABLE"}}});
+  else await route.continue();
+ });
+ const changeLimit=async(amount:string)=>{
+  await row.getByRole("button",{name:`Change spending limit for ${card.nickname}`,exact:true}).click();
+  await row.getByRole("textbox",{name:`New total spending limit for ${card.nickname}`,exact:true}).fill(amount);
+  await row.getByRole("button",{name:"Review spending limit",exact:true}).click();
+  await row.getByRole("button",{name:"Save spending limit",exact:true}).click();
+  await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
+ };
+ await changeLimit("17.23");
+ // Native same-document history is allowed: the exact request outlives its React owner.
+ await page.goBack();await expect(page).toHaveURL(url=>url.searchParams.get("view")==="cards"&&!url.searchParams.has("focus"));
+ await page.getByRole("link",{name:new RegExp(`^Open ${other.card.nickname},`)}).click();
+ await expect(page.getByRole("button",{name:"Retry saved spending limit",exact:true})).toHaveCount(0);
+ await expect(page.getByRole("article",{name:"Card spending limit",exact:true}).getByRole("button",{name:`Change spending limit for ${other.card.nickname}`,exact:true})).toBeVisible();
+ await page.getByRole("link",{name:"Back to card list",exact:true}).click();await openCard();
+ await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
+ await expect(row).toContainText("$17.23");expect(attempts).toHaveLength(1);
+ await row.getByRole("link",{name:"Leave unconfirmed request",exact:true}).click();
+ await expect(page).toHaveURL(url=>url.searchParams.get("view")==="cards"&&!url.searchParams.has("focus"));
+ await openCard();await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
+ const signOut=async()=>{await page.getByLabel("Profile and help",{exact:true}).click();await page.getByRole("button",{name:"Sign out",exact:true}).click();};
+ await signOut();
+ const leave=page.getByRole("dialog",{name:"Sign out with an unconfirmed card change?",exact:true});
+ await expect(leave).toBeVisible();expect(logoutPosts).toBe(0);
+ await expect(leave).not.toContainText(card.nickname);await expect(leave).not.toContainText("17.23");
+ await page.keyboard.press("Escape");await expect(leave).toHaveCount(0);expect(logoutPosts).toBe(0);
+ await row.getByRole("button",{name:"Retry saved spending limit",exact:true}).click();
+ await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toHaveCount(0);
+ expect(attempts).toHaveLength(2);expect(attempts[1]).toEqual(attempts[0]);
+ expect(attempts[0]).toMatchObject({expectedVersion:1,allowanceMinor:"1723"});
+ await expect(row.locator(".funds-limit-value")).toHaveText("$17.23");
+ await changeLimit("18.00");await signOut();await expect(leave).toBeVisible();expect(logoutPosts).toBe(0);
+ await leave.getByRole("button",{name:"Sign out anyway",exact:true}).click();
+ await expect(leave).toContainText("We could not confirm sign-out");expect(logoutPosts).toBe(1);
+ await leave.getByRole("button",{name:"Stay signed in",exact:true}).click();
+ await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
+ // Deliberately leaving an unconfirmed change must still allow secure sign-out.
+ await page.getByRole("button",{name:"Sign out",exact:true}).click();await leave.getByRole("button",{name:"Sign out anyway",exact:true}).click();
+ await expect(page).toHaveURL(/\/login$/);expect(logoutPosts).toBe(2);
+ expect((await page.request.get(`/api/v1/cardholder-services/${primary.serviceId}/workspace`)).status()).toBe(401);
+ expect(await getCardSpending(primary.personId,primary.serviceId,card.id)).toMatchObject({allowance:{minor:"1800"},version:3});
+ expect(attempts).toHaveLength(3);
 });

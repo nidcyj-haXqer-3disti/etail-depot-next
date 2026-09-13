@@ -34,7 +34,7 @@ export const channelFieldsSchema=paymentChannelFieldsSchema.extend({
 export const createChannelSchema=channelFieldsSchema.extend({commandId:z.uuid()});
 export const updateChannelSchema=channelFieldsSchema.extend({commandId:z.uuid(),expectedVersion:z.int().positive()});
 export const cancelChannelSchema=z.object({commandId:z.uuid(),expectedVersion:z.int().positive()}).strict();
-export const createTerminalSchema=z.object({commandId:z.uuid(),displayName:plain(80).min(1)}).strict();
+export const createTerminalSchema=z.object({commandId:z.uuid(),displayName:plain(80).min(1),intendedUse:z.enum(["SELF","OTHER"]).optional()}).strict();
 export type CreateTerminalInput=z.infer<typeof createTerminalSchema>;
 export const pauseMerchantSchema=z.object({commandId:z.uuid(),expectedVersion:z.int().positive(),reason:plain(300).min(1)}).strict();
 export type CreateChannelInput=z.infer<typeof createChannelSchema>;
@@ -49,7 +49,7 @@ export interface PaymentChannel {
   merchantUnitId:string;creatorId:string;presentations:ChannelPresentation[];visibility:z.infer<typeof channelVisibilitySchema>;canShare:boolean;
 }
 export interface MerchantUnitSummary {
-  id:string;displayName:string;
+  id:string;displayName:string;intendedUse:"SELF"|"OTHER";
   merchant:{serviceId:string;displayName:string};
   status:"ACTIVE"|"PAUSED"|"CLOSED";version:number;createdAt:string;updatedAt:string;
   canPause:boolean;canResume:boolean;canOpen:boolean;href:string;

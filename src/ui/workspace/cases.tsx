@@ -45,8 +45,8 @@ function SupportCaseWorkspace({context}:{context:SupportContext}) {
   const serviceId=merchant?.serviceId??workspace!.service.id;
   const contextName=merchant?.merchantName??workspace?.customerService?.displayName??"Cards & spending";
   const apiBase=merchant?`/api/v1/merchants/${encodeURIComponent(merchant.merchantId)}/cases`:`/api/v1/cardholder-services/${encodeURIComponent(serviceId)}/cases`;
-  const caseValues=params.getAll("case"),initialCase=caseValues.length===1?caseValues[0]:caseValues.length?"invalid-selection":null;
-  const requestedTransaction=params.get("transaction"),requestedPayment=params.get("payment");
+  const caseValues=merchant&&params.get("tab")!=="help"?[]:params.getAll("case"),initialCase=caseValues.length===1?caseValues[0]:caseValues.length?"invalid-selection":null;
+  const requestedTransaction=params.get("transaction"),requestedPayment=merchant&&params.get("tab")!=="help"?null:params.get("payment");
   const caseHref=(extra:Record<string,string|null>)=>{
     if(!merchant)return cardholderTaskHref("help",{cardId:selectedCardId,contextId:serviceId},Object.fromEntries(Object.entries(extra).filter((entry):entry is [string,string]=>entry[1]!==null)));
     const query=new URLSearchParams({tab:"help"});
@@ -60,7 +60,7 @@ function SupportCaseWorkspace({context}:{context:SupportContext}) {
   const requestedTopic=params.get("topic");
   const initialTopic:SupportTopic=requestedTopic&&Object.hasOwn(topics,requestedTopic)?requestedTopic as SupportTopic:merchant?.linkedPayment?"PAYMENT":linked?"TRANSACTION":"SERVICE";
   const [list,setList]=useState<SupportCaseList|null>(merchant?.initialCases??null),[detail,setDetail]=useState<SupportCaseDetail|null>(null);
-  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[creating,setCreating]=useState(params.get("new")==="1"||Boolean(merchant&&requestedPayment&&!initialCase)),[review,setReview]=useState(false);
+  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[creating,setCreating]=useState((!merchant||params.get("tab")==="help")&&params.get("new")==="1"||Boolean(merchant&&requestedPayment&&!initialCase)),[review,setReview]=useState(false);
   const [search,setSearch]=useState(""),[status,setStatus]=useState("ALL");
   const [topic,setTopic]=useState<SupportTopic>(initialTopic),[subject,setSubject]=useState(""),[message,setMessage]=useState(""),[transaction,setTransaction]=useState(linked?.id??"");
   const [includePayment,setIncludePayment]=useState(Boolean(merchant?.linkedPayment));

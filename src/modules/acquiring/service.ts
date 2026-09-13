@@ -70,27 +70,38 @@ export async function initializeMerchantSetup(tx:ScopedTransaction,personId:stri
   return created!;
 }
 
+type BusinessContext="TERMINAL"|"SERVICE";
+async function businessScope(tx:ScopedTransaction,personId:string,id:string,forWrite:boolean,context:BusinessContext){
+ if(context==="TERMINAL"){
+  const terminal=await loadTerminalScope(tx,personId,id,forWrite,{read:!forWrite});
+  if(!terminal.ownerAccess)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+  return {id:terminal.terminal.id,name:terminal.merchantService.displayName,service:terminal.merchantService};
+ }
+ const scope=await loadServiceScope(tx,personId,id,forWrite);
+ if(scope.service.kind!=="MERCHANT"||scope.service.primaryPersonId!==personId)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
+ requireAction(scope,"acquiring.read");
+ return {id:scope.service.id,name:scope.service.displayName,service:scope.service};
+}
+
 /** Business information belongs to the selected primary merchant, independently of Cardholder access. */
-export async function getMerchantBusinessDetails(personId:string,merchantId:string):Promise<MerchantBusinessDetailsProjection> {
+export async function getMerchantBusinessDetails(personId:string,merchantId:string,context:BusinessContext="TERMINAL"):Promise<MerchantBusinessDetailsProjection> {
   if(!z.uuid().safeParse(merchantId).success)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
   return getDb().transaction(async tx=>{
-    const merchant=await loadTerminalScope(tx,personId,merchantId.toLowerCase(),false,{read:true});
-    if(!merchant.ownerAccess)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-    const scope=await loadServiceScope(tx,personId,merchant.merchantService.id);requireAction(scope,"acquiring.read");
+    const merchant=await businessScope(tx,personId,merchantId.toLowerCase(),false,context);
+    const scope=await loadServiceScope(tx,personId,merchant.service.id);requireAction(scope,"acquiring.read");
     const [profile]=await tx.select().from(merchantProfiles).where(eq(merchantProfiles.serviceId,scope.service.id));
     const [application]=await tx.select().from(merchantApplications).where(eq(merchantApplications.serviceId,scope.service.id));
     const canManageSetup=await applicantAllowed(tx,personId)&&evaluate(scope.policy,"acquiring.setup").allowed&&(!profile||profile.status==="DRAFT");
-    return {merchantId:merchant.terminal.id,name:merchant.terminal.displayName,ownerAccess:merchant.ownerAccess,
+    return {merchantId:merchant.id,name:merchant.name,ownerAccess:true,
       merchantStatus:profile?.status??"NOT_STARTED",statusDetail:profile?.status==="PENDING_LOCAL_REVIEW"?"Business details are saved for review.":"Review your business details, then continue to payment setup.",
       canStartSetup:canManageSetup&&!application,canManageSetup,setup:application?await applicationProjection(tx,application,canManageSetup):null};
   },{isolationLevel:"repeatable read"});
 }
 
-async function applicationCommand(personId:string,merchantId:string,applicationId:string|null,kind:"START"|"SAVE"|"SUBMIT",input:StartMerchantSetupInput|UpdateMerchantSetupInput|SubmitMerchantSetupInput):Promise<MerchantSetupProjection> {
+async function applicationCommand(personId:string,merchantId:string,applicationId:string|null,kind:"START"|"SAVE"|"SUBMIT",input:StartMerchantSetupInput|UpdateMerchantSetupInput|SubmitMerchantSetupInput,context:BusinessContext="TERMINAL"):Promise<MerchantSetupProjection> {
   return getDb().transaction(async tx=>{
-    const merchant=await loadTerminalScope(tx,personId,merchantId,true);
-    if(!merchant.ownerAccess)throw new SecurityError("MERCHANT_UNAVAILABLE",404);
-    const serviceId=merchant.merchantService.id,scope=await loadServiceScope(tx,personId,serviceId,true);requireAction(scope,"acquiring.setup");await requireMerchantApplicant(tx,personId);
+    const merchant=await businessScope(tx,personId,merchantId,true,context);
+    const serviceId=merchant.service.id,scope=await loadServiceScope(tx,personId,serviceId,true);requireAction(scope,"acquiring.setup");await requireMerchantApplicant(tx,personId);
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${input.commandId},0))`);
     const digest=createHash("sha256").update(JSON.stringify({kind,applicationId,input})).digest("hex");
     const [receipt]=await tx.select().from(merchantApplicationCommands).where(eq(merchantApplicationCommands.commandId,input.commandId));
@@ -148,7 +159,7 @@ async function readMerchantScope(tx:ScopedTransaction,personId:string,unitId:str
 }
 function merchantSummary(scope:MerchantScope,eligible=true):MerchantUnitSummary {
   const terminal=scope.terminal;
-  return {id:terminal.id,displayName:terminal.displayName,merchant:{serviceId:scope.merchantService.id,displayName:scope.merchantService.displayName},status:terminal.status,version:terminal.version,createdAt:terminal.createdAt.toISOString(),updatedAt:terminal.updatedAt.toISOString(),canPause:eligible&&terminal.status==="ACTIVE"&&evaluate(scope.policy,"merchant.terminals.pause").allowed,canResume:eligible&&terminal.status==="PAUSED"&&!["SUSPENDED","CLOSED"].includes(scope.merchantService.status)&&scope.ownerAccess,canOpen:evaluate(scope.policy,"merchant.read").allowed,href:`/merchants/${terminal.id}`};
+  return {id:terminal.id,displayName:terminal.displayName,intendedUse:terminal.intendedUse,merchant:{serviceId:scope.merchantService.id,displayName:scope.merchantService.displayName},status:terminal.status,version:terminal.version,createdAt:terminal.createdAt.toISOString(),updatedAt:terminal.updatedAt.toISOString(),canPause:eligible&&terminal.status==="ACTIVE"&&evaluate(scope.policy,"merchant.terminals.pause").allowed,canResume:eligible&&terminal.status==="PAUSED"&&!["SUSPENDED","CLOSED"].includes(scope.merchantService.status)&&scope.ownerAccess,canOpen:evaluate(scope.policy,"merchant.read").allowed,href:`/merchants/${terminal.id}`};
 }
 /** Enumerate owned Merchant services and exact accepted assignments, never Cardholder participation. */
 export async function listMerchantScopes(tx:ScopedTransaction,personId:string):Promise<MerchantScope[]> {
@@ -206,7 +217,7 @@ export async function createTerminal(personId:string,merchantServiceId:string,ra
     const [receipt]=await tx.select().from(merchantUnitCommands).where(eq(merchantUnitCommands.commandId,input.commandId));
     if(receipt&&(receipt.actorId!==personId||receipt.kind!=="CREATE_TERMINAL"||receipt.digest!==digest))throw new SecurityError("IDEMPOTENCY_CONFLICT",409);
     if(receipt)return merchantSummary(await loadTerminalScope(tx,personId,receipt.merchantUnitId,false,{read:true}));
-    const [terminal]=await tx.insert(merchantTerminals).values({merchantServiceId,displayName:input.displayName,status:"ACTIVE"}).returning();
+    const [terminal]=await tx.insert(merchantTerminals).values({merchantServiceId,displayName:input.displayName,intendedUse:input.intendedUse??"SELF",status:"ACTIVE"}).returning();
     await tx.insert(merchantUnitEvents).values({merchantUnitId:terminal!.id,actorId:personId,kind:"CREATED",version:1});
     await tx.insert(merchantUnitCommands).values({commandId:input.commandId,merchantUnitId:terminal!.id,actorId:personId,kind:"CREATE_TERMINAL",digest});
     return merchantSummary(await loadTerminalScope(tx,personId,terminal!.id));
@@ -280,3 +291,7 @@ async function channelCommand(personId:string,merchantUnitId:string,channelId:st
 export async function createChannel(personId:string,merchantUnitId:string,raw:CreateChannelInput) {return channelCommand(personId,merchantUnitId,null,"CREATE",parse(createChannelSchema,raw));}
 export async function updateChannel(personId:string,merchantUnitId:string,channelId:string,raw:UpdateChannelInput) {return channelCommand(personId,merchantUnitId,channelId,"UPDATE",parse(updateChannelSchema,raw));}
 export async function cancelChannel(personId:string,merchantUnitId:string,channelId:string,raw:CancelChannelInput) {return channelCommand(personId,merchantUnitId,channelId,"CANCEL",parse(cancelChannelSchema,raw));}
+
+export async function startMerchantAccountSetup(personId:string,serviceId:string,raw:StartMerchantSetupInput){return applicationCommand(personId,serviceId,null,"START",parse(startMerchantSetupSchema,raw),"SERVICE");}
+export async function updateMerchantAccountSetup(personId:string,serviceId:string,applicationId:string,raw:UpdateMerchantSetupInput){return applicationCommand(personId,serviceId,applicationId,"SAVE",parse(updateMerchantSetupSchema,raw),"SERVICE");}
+export async function submitMerchantAccountSetup(personId:string,serviceId:string,applicationId:string,raw:SubmitMerchantSetupInput){return applicationCommand(personId,serviceId,applicationId,"SUBMIT",parse(submitMerchantSetupSchema,raw),"SERVICE");}
