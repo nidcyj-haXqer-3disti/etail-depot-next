@@ -9,6 +9,7 @@ import {normalizeVerifiedEmail} from "@/shared/verified-email";
 import {ShareResourceInvitation} from "./resource-invitation";
 import {Button,Feedback,StatusBadge,WorkspaceCommandError,WorkspaceDialog,formatDate} from "./workspace/primitives";
 import {useServerProjection} from "./workspace/use-server-projection";
+import "./card-invitation-manager.css";
 
 export type CardInvitationOverview={cardId:string;serviceId:string;cardName:string;canInvite:boolean;invitations:CardInvitationProjection[]};
 type Attempt={kind:"CREATE";commandId:string;recipientEmail:string;expiresInDays:1|3|7}|{kind:"CANCEL";commandId:string;id:string;expectedVersion:number};
@@ -32,7 +33,7 @@ export function CardInvitationManager({initial,embedded=false,initiallyOpen=fals
   }finally{inFlight.current=false;setBusy(false);}
  }
  const close=()=>{if(!locked)setOpen(false);};
- const content=<>
+ const content=<div className="consumer-card-invitation-content">
   <Feedback kind="error" message={error}/>
   {attempt&&<div className="consumer-card-retry"><p>Your invitation request may have been saved. Check the same request to confirm.</p><Button variant="secondary" busy={busy} onClick={()=>void save(attempt)}>Check invitation request again</Button></div>}
   {unavailable?<><p>Sign in again or return to your dashboard. Leaving does not cancel an invitation request that may have been saved.</p><Link href="/services">Your dashboard</Link></>:<>
@@ -46,7 +47,7 @@ export function CardInvitationManager({initial,embedded=false,initiallyOpen=fals
    {pending&&<><ShareResourceInvitation invitationId={pending.id} recipientEmail={pending.recipientEmail!} status={pending.status} resourceName={data.cardName} resourceKind="card"/><Button variant="quiet" disabled={locked} onClick={()=>void save({kind:"CANCEL",commandId:crypto.randomUUID(),id:pending.id,expectedVersion:pending.version})}>Cancel invitation</Button></>}
    {data.invitations.some(row=>row.status!=="PENDING")&&<details className="consumer-request-history"><summary>Invitation history</summary>{data.invitations.filter(row=>row.status!=="PENDING").map(row=><p key={row.id}>{row.recipientName} · {formatDate(row.createdAt)} <StatusBadge status={row.status}/></p>)}</details>}
   </>}
- </>;
+ </div>;
  if(!embedded)return <section className="ws-panel"><Link href={`/cardholder-services/cards/${data.cardId}`}>← Back to {data.cardName}</Link><h1>{unavailable?"Card access is unavailable":"Invite cardholder"}</h1>{content}</section>;
  return <div className="consumer-card-invitation">
   {pending&&<p className="consumer-card-invitation-status"><strong>{pending.recipientEmail}</strong><StatusBadge status={pending.status}/><span>Accept by {formatDate(pending.expiresAt)}</span></p>}

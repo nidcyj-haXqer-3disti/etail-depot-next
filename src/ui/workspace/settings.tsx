@@ -11,8 +11,8 @@ import {Button,Feedback,WorkspaceCommandError,workspaceCommand} from "./primitiv
 import "./settings.css";
 
 const preferenceOptions=[
-  {key:"serviceActivity",title:"Card activity",text:"Purchases and important changes to your card activity."},
-  {key:"cardControls",title:"Card controls",text:"Changes when a card is frozen or unfrozen."},
+  {key:"serviceActivity",title:"Card activity",text:"Purchases and activity changes."},
+  {key:"cardControls",title:"Card controls",text:"When a card is frozen or unfrozen."},
   {key:"caseUpdates",title:"Case updates",text:"Replies to your support questions."},
 ] as const;
 function errorMessage(error:unknown){return error instanceof Error&&error.name!=="ZodError"?error.message:"We couldn’t verify these preferences. Retry the same save.";}
@@ -81,21 +81,20 @@ export function SettingsWorkspace({workspace:w,returnMoneyHref}:{workspace:Works
   if(unavailable)return <section className="ch-settings-unavailable" aria-labelledby="preferences-unavailable-title"><WorkspaceIcon name="shield"/><h2 id="preferences-unavailable-title">Preferences unavailable</h2><p>Your current access does not show these account details. Check access again or retry an unconfirmed save.</p>{recovery}</section>;
 
   return <div className="ch-settings">
-    <div className="ch-settings-intro"><h2>{owner?"Card account settings":"Your card preferences"}</h2><p>{owner?"Account information and the updates you choose to receive.":"Choose updates for the cards you use in this account."}</p></div>
     <div className="ch-settings-layout">
-      <section className="ch-settings-panel" aria-labelledby="card-account-details-title"><div className="ch-settings-section-heading"><span><WorkspaceIcon name="shield"/></span><div><h3 id="card-account-details-title">{owner?"Account details":"Your card access"}</h3><p>{owner?"This account is separate from your personal profile.":"Your access is limited to cards assigned to you."}</p></div></div>
-        <dl className="ch-settings-details"><div><dt>Account name</dt><dd>{w.service.displayName}</dd></div><div><dt>Account owner</dt><dd>{w.customerService?.primaryName??"Account owner"}</dd></div>{owner?<><div><dt>Account status</dt><dd>{w.service.status.toLowerCase().replace(/^./,first=>first.toUpperCase())}</dd></div><div><dt>Funding</dt><dd>Prepaid card balance</dd></div><div><dt>Spending limits</dt><dd>A total allowance for each card</dd></div></>:<div><dt>Your access</dt><dd>Your assigned cards and their activity</dd></div>}</dl>
-        <p className="ch-settings-note">{owner?"Freeze a card, change its spending limit or invite its cardholder from the card’s detail page.":"Open a card to see its available spending and freeze controls."}</p>
+      <section className="ch-settings-panel" aria-labelledby="card-account-details-title"><div className="ch-settings-section-heading"><span><WorkspaceIcon name="shield"/></span><div><h2 id="card-account-details-title">{owner?"Account details":"Your card access"}</h2></div></div>
+        <dl className="ch-settings-details"><div><dt>Account name</dt><dd>{w.service.displayName}</dd></div><div><dt>Account owner</dt><dd>{w.customerService?.primaryName??"Account owner"}</dd></div>{owner?<><div><dt>Status</dt><dd>{w.service.status.toLowerCase().replace(/^./,first=>first.toUpperCase())}</dd></div><div><dt>Funding</dt><dd>Prepaid card balance</dd></div><div><dt>Spending limits</dt><dd>Total allowance per card</dd></div></>:<div><dt>Your access</dt><dd>Your assigned cards and their activity</dd></div>}</dl>
+        <p className="ch-settings-note">{owner?"Open a card to manage controls and invitations.":"Open a card for spending and freeze controls."}</p>
       </section>
-      <section className="ch-settings-panel ch-settings-preferences" aria-labelledby="card-notification-preferences-title"><div className="ch-settings-section-heading"><span><WorkspaceIcon name="bell"/></span><div><h3 id="card-notification-preferences-title">Notification preferences</h3><p>These choices apply to you in this account.</p></div></div>
-        <p className="ch-settings-delivery"><WorkspaceIcon name="help"/><span>You can save your choices. Notification delivery is not available yet.</span></p>
+      <section className="ch-settings-panel ch-settings-preferences" aria-labelledby="card-notification-preferences-title"><div className="ch-settings-section-heading"><span><WorkspaceIcon name="bell"/></span><div><h2 id="card-notification-preferences-title">Notification preferences</h2><p>For you in this account.</p></div></div>
+        <p className="ch-settings-delivery"><WorkspaceIcon name="help"/><span>Notification delivery is not available yet.</span></p>
         <form onSubmit={event=>{event.preventDefault();void save();}}>{feedback&&<Feedback kind={feedback.kind} message={feedback.message}/>}
           <div className="ch-settings-options">{preferenceOptions.map(option=><label key={option.key}><span><strong>{option.title}</strong><small>{option.text}</small></span><input type="checkbox" checked={attempt?.[option.key]??preferences[option.key]} disabled={locked} onChange={event=>{setPreferences({...preferences,[option.key]:event.target.checked});setFeedback(null);}}/></label>)}</div>
           {attempt?<><p className="ch-settings-note">This save has not been confirmed. Retry its original choices before making another change. You can return to this account to retry while this tab stays open. Reloading or signing out ends the saved retry; it does not cancel the change.</p><div className="ch-settings-actions"><Button type="submit" disabled={!!busy} busy={busy==="save"}>Retry saved preferences</Button><Button variant="secondary" disabled={!!busy} busy={busy==="reload"} onClick={()=>void reload()}>Check account access</Button></div></>:<div className="ch-settings-actions">{canManage&&<Button type="submit" disabled={!!busy||stale} busy={busy==="save"}>Save preferences</Button>}{(stale||feedback?.kind==="error"||!canManage)&&<Button variant="secondary" disabled={!!busy} busy={busy==="reload"} onClick={()=>void reload()}>Reload saved preferences</Button>}</div>}
           {!canManage&&<p className="ch-settings-note">Your current access lets you view saved preferences. Ask your account owner to review access before making changes.</p>}
         </form>
       </section>
-      {owner&&returnMoneyHref&&<section className="ch-settings-panel ch-settings-money" aria-labelledby="card-return-money-title"><div className="ch-settings-section-heading"><span><WorkspaceIcon name="reports"/></span><div><h3 id="card-return-money-title">Return unused money</h3><p>Review a return from the available balance. Money already spent on cards cannot be returned.</p></div></div><Link className="consumer-button consumer-button-secondary" href={returnMoneyHref}>Return unused money<WorkspaceIcon name="arrow"/></Link></section>}
+      {owner&&returnMoneyHref&&<section className="ch-settings-panel ch-settings-money" aria-labelledby="card-return-money-title"><div className="ch-settings-section-heading"><span><WorkspaceIcon name="reports"/></span><div><h2 id="card-return-money-title">Unused money</h2><p>Only unspent money in your available balance can be returned.</p></div></div><Link className="consumer-button consumer-button-secondary" href={returnMoneyHref}>Return unused money<WorkspaceIcon name="arrow"/></Link></section>}
     </div>
   </div>;
 }

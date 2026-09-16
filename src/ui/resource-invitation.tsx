@@ -58,7 +58,7 @@ export function ResourceInvitation({ initial }: { initial: ResourceInvitationPro
     finally { inFlight.current = false; setBusy(false); }
   }
   const locked = busy || !!attempt;
-  return <section className="ws-panel" aria-labelledby="resource-invitation-heading">
+  return <section className="ws-panel resource-invitation-details" aria-labelledby="resource-invitation-heading">
     <h1 id="resource-invitation-heading">{invitation ? invitation.targetKind === "CARD" ? "Your card invitation" : "Your payment terminal invitation" : "Invitation unavailable"}</h1>
     <Feedback kind="error" message={error}/>
     {invitation ? <><p><strong>{invitation.inviterName}</strong> invited you to use <strong>{invitation.targetName}</strong>.</p><StatusBadge status={invitation.status}/>

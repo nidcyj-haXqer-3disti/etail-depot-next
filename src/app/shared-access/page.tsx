@@ -10,5 +10,5 @@ export const metadata={title:"Invitations"};
 export default async function Page(){
  const session=await getRequestSession();if(!session)redirect("/login");
  const invitations=await listInvitationsForPerson(session.personId);
- return <Shell authenticated><section className="page-container services-page"><h1>Invitations</h1><p>Review invitations to use someone’s cards or collect payments for them.</p><InvitationsInbox invitations={invitations}/></section></Shell>;
+ return <Shell authenticated><section className="page-container services-page"><div className="page-heading"><h1>Invitations</h1><p>Review access to cards and payment terminals shared with you.</p></div><InvitationsInbox invitations={invitations}/></section></Shell>;
 }

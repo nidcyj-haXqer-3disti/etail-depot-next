@@ -19,7 +19,7 @@ export function MerchantStatement({statement:s}:{statement:MerchantStatementProj
  if(!s.available)return <section className="ms-statement"><h2>Statement unavailable</h2><p>Choose a business or payment terminal you can access.</p><Link href="/merchant-services">Return to Overview</Link></section>;
  return <section className="ms-statement" aria-labelledby="merchant-statement-title">
   <header><div><h2 id="merchant-statement-title">Account statement</h2><p>{s.name}</p></div><p>{s.range.from||s.range.to?`${s.range.from||"Start"} to ${s.range.to||"today"} (UTC)`:"All time"}</p></header>
-  <p>Credits show money coming in. Debits show money going out. Moves within your business are listed without counting them twice.{s.includesAccountMovements&&" Available money is shown separately."}</p>
+  <p>Internal transfers are listed without adding to money in or out.{s.includesAccountMovements&&" Available money is shown separately."}</p>
   {!s.includesAccountMovements&&<p className="ms-scope-note">Your view includes only these terminals. Business payouts are not included.</p>}
   <MerchantStatementFilters key={JSON.stringify(s.query)} query={s.query}/>
   {filtered&&<div role="group" aria-label="Applied statement filters"><p>Showing: {filters.join(" · ")}</p><Link className="consumer-button consumer-button-secondary" href={clearHref}>Clear statement filters</Link></div>}

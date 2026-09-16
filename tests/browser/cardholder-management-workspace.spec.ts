@@ -67,7 +67,7 @@ test("multiple drafts retain their own details and created/canceled requests rem
  await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Cards",exact:true}).click();
  await page.getByRole("navigation",{name:"Card management",exact:true}).getByRole("link",{name:"Card history",exact:true}).click();
  await expect(page).toHaveURL(/\/cardholder-services\/card-requests(?:\?|$)/);
- await expect(page.getByRole("heading",{name:"Card history",level:3,exact:true})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Card history",level:1,exact:true})).toBeVisible();
  await page.reload();
  const canceled=page.locator(".ch-request-record").filter({hasText:"Travel request"});
  const created=page.locator(".ch-request-record").filter({hasText:"Everyday request"});
@@ -158,9 +158,11 @@ test("a secondary can remove their own freeze while the primary's restriction st
   await primaryControls.getByRole("button",{name:"Unfreeze card",exact:true}).click();
   await expect(primaryDialog).toContainText("all current freezes");
   await primaryDialog.getByRole("button",{name:"Unfreeze card",exact:true}).click();
-  await expect(primaryControls.locator(".consumer-restriction-status")).toHaveText("Manage new purchases while keeping past activity and balances visible.");
+  await expect(primaryControls.locator(".consumer-restriction-status")).toHaveCount(0);
+  await expect(primaryControls.getByRole("button",{name:"Freeze card",exact:true})).toBeEnabled();
   await secondaryPage.reload();
-  await expect(controls.locator(".consumer-restriction-status")).toHaveText("Manage new purchases while keeping past activity and balances visible.");
+  await expect(controls.locator(".consumer-restriction-status")).toHaveCount(0);
+  await expect(controls.getByRole("button",{name:"Freeze card",exact:true})).toBeEnabled();
   expect((await getWorkspace(holder,primary.serviceId)).cards[0]).toMatchObject({status:"ACTIVE",canPurchase:true,available:{minor:"2400"}});
  }finally{await secondaryContext.close();}
 });

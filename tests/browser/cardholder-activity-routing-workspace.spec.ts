@@ -44,7 +44,7 @@ test("an older selected-card activity link opens the canonical activity view and
   const {own,foreign}=await fixture(page);
   await page.goto(`/cardholder-services?activityCard=${own.card.id.toUpperCase()}&transaction=${own.activity!.id}`);
   await expect(page).toHaveURL(`/cardholder-services/cards/${own.card.id}/activity?transaction=${own.activity!.id}`);
-  await expect(page.getByRole("heading",{name:"Card activity",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Activity",level:1,exact:true})).toBeVisible();
   await expect(page.getByRole("dialog",{name:"Transaction details",exact:true})).toContainText(own.activity!.title);
   await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
   await page.reload();
@@ -79,7 +79,7 @@ test("older activity links preserve unavailable and duplicate selection handling
     await page.goto(`/cardholder-services?${query}`);
     await expect(page.getByRole("heading",{name:title,exact:true})).toBeVisible();
     expect(new URL(page.url()).pathname).toBe(pathname);
-    await expect(page.getByRole("heading",{name:"Card activity",exact:true})).toHaveCount(0);
+    await expect(page.getByRole("region",{name:"Card activity",exact:true})).toHaveCount(0);
     await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
     await expect(page.locator("main")).not.toContainText(own.activity!.title);
   }

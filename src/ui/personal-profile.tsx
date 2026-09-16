@@ -74,16 +74,16 @@ export function PersonalProfileWorkspace({initial}:{initial:PersonalProfile}){
     }catch(error){setFeedback({kind:"error",message:error instanceof Error?error.message:"We couldn’t load your profile."});}finally{setLoading(false);}
   }
   return <div className="personal-profile-workspace">
-    <section className="personal-profile-identity" aria-label="Your details"><span className="personal-profile-avatar" aria-hidden="true">{profile.displayName.slice(0,1).toUpperCase()}</span><div><p className="personal-profile-kicker">YOUR PERSONAL PROFILE</p><h2>{profile.displayName}</h2><p>One profile for your cards and payments.</p></div></section>
-    <section className="personal-profile-panel" aria-labelledby="profile-details-heading"><div className="personal-profile-section-heading"><span className="personal-profile-icon"><Icon name="person"/></span><div><h2 id="profile-details-heading">Personal details</h2><p>Choose how your name appears to people you share with.</p></div></div>
+    <section className="personal-profile-identity" aria-label="Your details"><span className="personal-profile-avatar" aria-hidden="true">{profile.displayName.slice(0,1).toUpperCase()}</span><div><h2>{profile.displayName}</h2></div></section>
+    <section className="personal-profile-panel" aria-labelledby="profile-details-heading"><div className="personal-profile-section-heading"><span className="personal-profile-icon"><Icon name="person"/></span><div><h2 id="profile-details-heading">Personal details</h2></div></div>
       <form onSubmit={save}><label htmlFor="personal-display-name">Display name</label><input id="personal-display-name" name="displayName" autoComplete="nickname" value={shownName} maxLength={80} required disabled={busy||!!pending||stale||signInRequired} onChange={event=>setName(event.target.value)} aria-describedby="profile-name-description"/><p id="profile-name-description" className="personal-profile-hint">You can use a preferred name. This does not change a card label or your business name.</p>
         {feedback&&<Feedback {...feedback}/>}{pending&&!feedback&&<Feedback kind="info" message="An earlier edit needs confirmation. Retry to check the same saved request."/>}
         <div className="personal-profile-actions">{stale?<Button variant="secondary" busy={loading} onClick={()=>void reload()}>Load latest details</Button>:<Button type="submit" busy={!!pending?.inFlight} disabled={signInRequired||loading||!pending&&(!name.trim()||name.trim()===profile.displayName)}>{pending?"Retry save":"Save changes"}</Button>}{signInRequired&&<Link className="consumer-button consumer-button-secondary" href="/login">Sign in to continue</Link>}</div>
       </form>
     </section>
-    <section className="personal-profile-panel" aria-labelledby="profile-sign-in-heading"><div className="personal-profile-section-heading"><span className="personal-profile-icon"><Icon name="lock"/></span><div><h2 id="profile-sign-in-heading">Sign-in &amp; security</h2><p>Your login is shared across both services.</p></div></div>
+    <section className="personal-profile-panel" aria-labelledby="profile-sign-in-heading"><div className="personal-profile-section-heading"><span className="personal-profile-icon"><Icon name="lock"/></span><div><h2 id="profile-sign-in-heading">Sign-in &amp; security</h2></div></div>
       <dl className="personal-profile-contact"><dt>Sign-in email</dt><dd>{profile.signInEmail?<><span>{profile.signInEmail.address}</span><span className="personal-profile-verified">Verified</span></>:"No verified email is available for this sign-in."}</dd></dl>
-      <div className="personal-profile-security-action"><p>Review active sign-ins and manage your login access.</p><Link className="consumer-button consumer-button-secondary" href="/security">Manage sign-ins</Link></div>
+      <div className="personal-profile-security-action"><Link className="consumer-button consumer-button-secondary" href="/security">Manage sign-ins</Link></div>
     </section>
   </div>;
 }
