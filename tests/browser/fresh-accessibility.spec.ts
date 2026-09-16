@@ -37,7 +37,7 @@ for(const width of [1440,320]) {
    await expect(page.getByRole("searchbox",{name:"Search your cards"})).toBeVisible();
    await accessible(page,"Visible cards list");
    await page.goto(`/cardholder-services/activity?focus=${card.id}`);
-   await expect(page.getByRole("heading",{name:"Card activity",exact:true})).toBeVisible();
+   await expect(page.getByRole("heading",{name:"Activity",level:1,exact:true})).toBeVisible();
    await accessible(page,"Exact card activity");
   });
   test(`${persona === "owner" ? "merchant owner" : "assigned terminal"} overview, payment views and setup are accessible at ${width}px`,async({page})=>{

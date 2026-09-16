@@ -190,7 +190,7 @@ export function LoginForm({ nextPath="/services",initialMode="login",localEmailL
     {error && <div className="error-message" role="alert" tabIndex={-1} ref={errorRef}>{error}</div>}
     {notice && <p className="form-note" role="status">{notice}</p>}
     <form key={mode} aria-labelledby="email-mode-title" onSubmit={submitForm}>
-      <h3 id="email-mode-title" ref={titleRef} tabIndex={-1}>{waitingForLink ? "Check your email" : titles[mode]}</h3>
+      <h2 id="email-mode-title" ref={titleRef} tabIndex={-1}>{waitingForLink ? "Check your email" : titles[mode]}</h2>
       {(mode === "login" || mode === "register" || mode === "recover") && <div className="field"><label htmlFor="email">Email address</label><input type="email" name="email" id="email" autoComplete={mode === "login" ? "username" : "email"} inputMode="email" maxLength={254} required disabled={disabled} placeholder="you@example.com" /></div>}
       {waitingForLink && <p className="form-note">{mode === "confirm" ? "For a new login, open the confirmation email in your inbox or spam folder and follow its link." : "Check your inbox and spam folder. Open the link in your latest password reset email to choose a new password."}{localEmailLinkBridge && " Then return here to sign in."}</p>}
       {(mode === "login" || mode === "register" || (mode === "reset" && linkReady)) && <div className="field"><label htmlFor="password">{mode === "reset" ? "New password" : "Password"}</label><input type="password" name="password" id="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={mode === "login" ? undefined : 12} maxLength={1024} required disabled={disabled} />{mode !== "login" && <p className="form-note">Use at least 12 characters.</p>}</div>}

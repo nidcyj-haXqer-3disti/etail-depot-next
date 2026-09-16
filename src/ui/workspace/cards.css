@@ -39,3 +39,7 @@
 fieldset.consumer-holder-options{min-width:0;padding:0;border:0}
 fieldset.consumer-holder-options legend{font-weight:600;padding:0;margin-bottom:10px}
 .consumer-card-recipient{margin:16px 0}
+
+.consumer-card-confirm{display:grid;gap:16px}
+.consumer-card-confirm>p,.consumer-card-confirm>.consumer-action-row{margin:0}
+.consumer-card-confirm .consumer-review-highlight{margin:0}

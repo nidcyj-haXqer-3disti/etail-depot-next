@@ -24,7 +24,7 @@ test("account preferences keep an exact saved request through navigation, access
   const details=page.getByRole("region",{name:"Account details",exact:true}),preferences=page.getByRole("region",{name:"Notification preferences",exact:true});
   await expect(details.locator("dl>div").filter({has:page.getByText("Account name",{exact:true})}).locator("dd")).toHaveText(accountName);
   await expect(details.getByRole("textbox")).toHaveCount(0);
-  await expect(page.getByRole("heading",{name:"Card account settings",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Account details",level:2,exact:true})).toBeVisible();
   await expect(page.getByRole("link",{name:"Return unused money",exact:true})).toBeVisible();
   await expect(preferences).toContainText("Notification delivery is not available yet.");
   const activity=preferences.getByRole("checkbox",{name:/^Card activity/});
@@ -82,7 +82,7 @@ test("an invited cardholder changes only personal preferences in that card accou
   const owner=await cardPrimary("Owner account settings"),other=await cardPrimary("Other account settings"),holder=await cardPerson("Private card preferences");
   await enrollCardholder(owner.personId,owner.serviceId,holder);await enrollCardholder(other.personId,other.serviceId,holder);
   await signInPerson(page,holder);await page.goto(`/cardholder-services/settings?context=${owner.serviceId}`);
-  await expect(page.getByRole("heading",{name:"Your card preferences",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Your card access",level:2,exact:true})).toBeVisible();
   await expect(page.getByRole("region",{name:"Your card access",exact:true})).toContainText("Your assigned cards and their activity");
   await expect(page.getByRole("link",{name:"Return unused money",exact:true})).toHaveCount(0);
   await expect(page.getByRole("region",{name:"Card account balance",exact:true})).toHaveCount(0);

@@ -92,7 +92,7 @@ test("cardholder navigation separates account money from cards and keeps holder 
   await navigation.getByRole("link",{name:"Account settings",exact:true}).click();
   await expect(page).toHaveURL(new RegExp(`/cardholder-services/settings\\?context=${primary.serviceId}$`));
   await expect(page.getByRole("heading",{name:"Account settings",level:1,exact:true})).toBeVisible();
-  await expect(page.getByRole("heading",{name:"Card account settings",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Account details",level:2,exact:true})).toBeVisible();
   await expect(page.locator("main")).not.toContainText("Signed in as");
   await expect(page.getByRole("textbox")).toHaveCount(0);
   await expect(page.locator("main")).toContainText("Prepaid card balance");
@@ -384,12 +384,12 @@ test("a recipient with several cards in one account opens Activity without choos
  await expect(navigation.getByRole("link",{name:"Activity",exact:true})).toHaveAttribute("href",`/cardholder-services/activity?context=${primary.serviceId}`);
  await expect(navigation.getByRole("link",{name:"Preferences",exact:true})).toHaveAttribute("href",`/cardholder-services/settings?context=${primary.serviceId}`);
  await navigation.getByRole("link",{name:"Activity",exact:true}).click();
- await expect(page.getByRole("heading",{name:"Card activity",exact:true})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Activity",level:1,exact:true})).toBeVisible();
  const cardOptions=page.getByRole("combobox",{name:"Card",exact:true}).locator("option");
  await expect(cardOptions).toHaveText(["All available cards",`${first.card.nickname} · ${first.card.lastFour}`,`${second.card.nickname} · ${second.card.lastFour}`]);
  await expect(page.locator("main")).not.toContainText(privateCard.card.nickname);
  await expect(navigation.getByRole("link",{name:"Account balance",exact:true})).toHaveCount(0);
- await page.reload();await expect(page.getByRole("heading",{name:"Card activity",exact:true})).toBeVisible();
+ await page.reload();await expect(page.getByRole("heading",{name:"Activity",level:1,exact:true})).toBeVisible();
  const other=await cardPrimary(`Separate activity ${randomUUID().slice(0,8)}`);
  await enrollCardholder(other.personId,other.serviceId,holder);
  await issuePracticeCard(other.personId,other.serviceId,holder,"Separate account card",undefined,"1500");

@@ -6,8 +6,9 @@ import type {MoneyWithdrawalReceipt} from "@/modules/money/contracts";
 import {moneyWithdrawalReceiptSchema} from "@/shared/money-response";
 import {moneyRequest} from "./money-account";
 import {Button,Feedback,formatDate,WorkspaceCommandError} from "./workspace/primitives";
+import "./operations.css";
 export function MoneyWithdrawalProcessing({withdrawals}:{withdrawals:(MoneyWithdrawalReceipt&{accountName:string})[]}){
- return <section className="page-container"><p className="eyebrow">CUSTOMER CARE</p><h1>Withdrawal processing</h1><p>Review withdrawals for the accounts assigned to you.</p><Link href="/operations">Back to customer care</Link>{withdrawals.length?withdrawals.map(item=><WithdrawalRow key={item.id} withdrawal={item}/>):<p>No withdrawals are waiting for your review.</p>}</section>;
+ return <section className="page-container ops-processing-page"><header className="ops-processing-heading"><Link className="service-back" href="/operations">Back to customer care</Link><h1>Withdrawal processing</h1><p>Review withdrawals for the accounts assigned to you.</p></header>{withdrawals.length?withdrawals.map(item=><WithdrawalRow key={item.id} withdrawal={item}/>):<p>No withdrawals are waiting for your review.</p>}</section>;
 }
 function WithdrawalRow({withdrawal}:{withdrawal:MoneyWithdrawalReceipt&{accountName:string}}){
  const router=useRouter(),flight=useRef(false),[choice,setChoice]=useState<"COMPLETED"|"FAILED"|null>(null),[commandId,setCommandId]=useState<string|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(""),[hidden,setHidden]=useState(false),[saved,setSaved]=useState<MoneyWithdrawalReceipt|null>(null);

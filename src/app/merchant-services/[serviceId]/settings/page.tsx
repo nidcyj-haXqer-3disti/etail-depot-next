@@ -20,5 +20,5 @@ export default async function Page({params,searchParams}:{params:Promise<{servic
  if(!result)return <PageNotice title="Account settings are unavailable" authenticated><p>Your current access does not show these business details.</p><Link href="/merchant-services">Back to merchant services</Link></PageNotice>;
  const [data,paymentSettings]=result;
  const returnTo=merchantActivityReturn(typeof query.returnTo==="string"?query.returnTo:null)??merchantActivityHref(parseMerchantActivityFilters({view:`merchant:${serviceId}`,section:"settings"}));
- return <MerchantShell showSettings activeSection="settings" overviewHref={returnTo}><Link href={returnTo}>Back to account settings</Link><MerchantAccountSettings initial={paymentSettings} businessDetails={data} returnHref={returnTo}/></MerchantShell>;
+ return <MerchantShell showSettings activeSection="settings" overviewHref={returnTo}><div className="mas-route"><Link className="service-back" href={returnTo}>Back to account settings</Link><MerchantAccountSettings initial={paymentSettings} businessDetails={data} returnHref={returnTo}/></div></MerchantShell>;
 }

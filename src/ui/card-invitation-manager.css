@@ -1,0 +1,8 @@
+.consumer-card-invitation-content{display:grid;gap:18px;min-width:0}
+.consumer-card-invitation-content>p{margin:0;line-height:1.7}
+.consumer-card-invitation-content>form{display:grid;gap:16px;min-width:0}
+.consumer-card-invitation-content>form>.field,.consumer-card-invitation-content>form>p{margin:0}
+.consumer-card-invitation-content>form>p{font-size:14px;line-height:1.7}
+.consumer-card-invitation-content>form>.consumer-button{justify-self:start}
+.consumer-card-invitation-content>.resource-invitation-ready,.consumer-card-invitation-content>.consumer-request-history{margin:0}
+@media(max-width:540px){.consumer-card-invitation-content>form>.consumer-button{width:100%}}

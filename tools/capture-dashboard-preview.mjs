@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** D81 read-only dashboard QA. Run through run-with-database.mjs --preview after starting the preserved preview. */
+/** D81 dashboard QA; opt-in D83 all-page-family QA. Start only the preserved preview, then use --preview. */
 import {chromium,expect} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import pg from 'pg';
@@ -15,19 +15,22 @@ import {personalProfileSchema} from '../src/shared/personal-profile.ts';
 import {parseNotificationOverview} from '../src/shared/notification-response.ts';
 import {merchantWorkspaceProjectionSchema} from '../src/shared/merchant-response.ts';
 import {guestPublicationManagementSchema} from '../src/shared/merchant-publication-response.ts';
+import {discoverAllPages,prepareCustomerPages,captureCustomerPages,captureOperatorPages,capturePublicPages} from './capture-all-pages-preview.mjs';
 
 const origin='http://127.0.0.1:3100';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const name=process.argv[2],connectionString=`postgres://etail_local@127.0.0.1:55439/${previewDatabase}`;
-if(process.argv.length!==3||!/^d81-dashboard-preview(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?$/.test(name??'')||name.length>90||
+const name=process.argv[2],allPages=process.argv[3]==='--all-pages',connectionString=`postgres://etail_local@127.0.0.1:55439/${previewDatabase}`;
+const validName=allPages?/^d83-all-pages-preview(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?$/:/^d81-dashboard-preview(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?$/;
+if(process.argv.length!==(allPages?4:3)||!validName.test(name??'')||name.length>90||
  process.env.APP_ENV!=='local'||process.env.ENABLE_LOCAL_FIXTURE_IDENTITY!=='true'||process.env.ENABLE_REAL_MONEY!=='false'||
  process.env.DATABASE_URL!==connectionString||process.env.ETAIL_PUBLIC_ORIGIN!==origin||
  process.env.CI&&process.env.CI!=='false'||process.env.NETLIFY||process.env.SITE_ID||process.env.CONTEXT)
- throw new Error('Use a new d81-dashboard-preview directory name with the exact prepared local preview environment.');
+ throw new Error('Use a new d81-dashboard-preview name, or d83-all-pages-preview name with --all-pages, in the exact prepared local preview environment.');
 
 const output=path.join(root,'artifacts',name),run=promisify(execFile);
 const hash=value=>createHash('sha256').update(value).digest('hex');
-const checks=[],errors=[],preserved=[];
+const checks=[],errors=[],preserved=[],coverageGaps=[],extendedFamilies=new Set(),publications=[];
+let expandedExpected=0,expectedHttp=null;
 let current={role:'setup',screen:'verification',width:0},browser=null,outputReady=false,deadline=null,signIns=0;
 let beforeSource=null,afterSource=null;
 process.umask(0o077);
@@ -83,13 +86,16 @@ const holderMerchantMenu=['Overview','Terminals'];
 const sharingNames=[['SMS','Text'],['EMAIL','Email'],['INVOICE','Invoice'],['BILL','Bill'],['SOCIAL','Social'],['QR','QR code'],['WEB','Website']];
 function cardMenu(page){return page.getByRole('navigation',{name:'Cards and spending navigation',exact:true});}
 function merchantMenu(page){return page.getByRole('navigation',{name:'Merchant account navigation',exact:true});}
-async function capture(page,role,width,screen,url,ready){
+async function capture(page,role,width,screen,url,ready,options={}){
  current={role,width,screen};
+ assert(url.startsWith('/')&&!url.startsWith('//')&&new URL(url,origin).origin===origin,'INVALID_CAPTURE_PATH');
+ expectedHttp=options.status===404?{url:origin+url,status:404}:null;
  const response=await page.goto(origin+url,{waitUntil:'domcontentloaded'});
- assert(response?.ok(),'PAGE_OPEN_FAILED');assert(new URL(page.url()).origin===origin,'UNEXPECTED_PAGE_ORIGIN');
+ assert(options.status?response?.status()===options.status:response?.ok(),'PAGE_OPEN_FAILED');assert(new URL(page.url()).origin===origin,'UNEXPECTED_PAGE_ORIGIN');
  await ready(page);
  await bounded(page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));}),15_000);
- await expect(page.locator('footer')).toHaveCount(0);
+ // A statement may have a document footer; only the global site footer depends on sign-in state.
+ await expect(page.locator('footer.site-footer')).toHaveCount(options.public?1:0);
  await expect(page.locator('.sandbox-badge')).toHaveCount(1);
  await expect(page.locator('.sandbox-badge')).toHaveText('Sandbox');
  const geometry=await page.evaluate(()=>({width:innerWidth,height:innerHeight,scrollWidth:Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)}));
@@ -98,14 +104,54 @@ async function capture(page,role,width,screen,url,ready){
  const file=`${role}-${screen}-${width}.png`;
  await writePrivate(file,await page.screenshot({fullPage:true,animations:'disabled',timeout:15_000}));
  const failed=geometry.scrollWidth>geometry.width+1||violations.length>0;
- checks.push({...current,file,geometry,violations,failed});
+ checks.push({...current,file,geometry,violations,failed,...(options.family?{family:options.family,status:response.status(),state:options.state??'available',requestedPath:url,finalPath:new URL(page.url()).pathname+new URL(page.url()).search}:{})});
+ expectedHttp=null;
  console.log(JSON.stringify({...current,failed}));
+}
+function observe(page){
+ page.on('response',response=>{
+  if(response.status()<400)return;
+  const request=response.request();
+  if(expectedHttp&&response.status()===expectedHttp.status&&response.url()===expectedHttp.url&&request.isNavigationRequest()&&request.frame()===page.mainFrame())return;
+  failure(`HTTP_RESPONSE_${response.status()}`);
+ });
+ page.on('pageerror',error=>failure('BROWSER_RUNTIME_ERROR',error));
+ page.on('console',message=>{if(message.type()==='error'){
+  // Chromium emits a console error for the deliberately requested 404 document.
+  // Suppress only that exact document; API, asset and other console failures remain failures.
+  if(expectedHttp&&message.location().url===expectedHttp.url&&/^Failed to load resource: the server responded with a status of 404 \(Not Found\)$/.test(message.text()))return;
+  failure('BROWSER_CONSOLE_ERROR',new Error(message.text()));
+ }});
+}
+async function extraCapture(page,role,width,screen,url,ready,options){
+ assert(allPages&&options?.family,'INVALID_EXPANDED_CAPTURE');expandedExpected++;extendedFamilies.add(options.family);
+ return capture(page,role,width,screen,url,ready,options);
+}
+async function extraContext(persona){
+ const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce',serviceWorkers:'block'});
+ let loginBudget=persona?1:0;
+ await context.route('**/*',async route=>{
+  const request=route.request(),url=new URL(request.url());
+  if(url.origin!==origin){failure('EXTERNAL_REQUEST_BLOCKED');await route.abort('blockedbyclient');return;}
+  const login=persona&&request.method()==='POST'&&url.pathname==='/api/v1/auth/local-fixture'&&!url.search&&request.postData()===JSON.stringify({persona})&&loginBudget===1;
+  if(login){loginBudget--;await route.continue();return;}
+  if(!['GET','HEAD','OPTIONS'].includes(request.method())){failure('BUSINESS_WRITE_BLOCKED');await route.abort('blockedbyclient');return;}
+  await route.continue();
+ });
+ await context.routeWebSocket('**/*',socket=>{failure('WEBSOCKET_BLOCKED');socket.close();});
+ const page=await context.newPage();page.setDefaultTimeout(15_000);page.setDefaultNavigationTimeout(30_000);observe(page);
+ if(persona){
+  const entry=await page.goto(origin+'/login',{waitUntil:'domcontentloaded'});assert(entry?.ok(),'LOGIN_PAGE_UNAVAILABLE');
+  const result=await page.evaluate(async persona=>{const response=await fetch('/api/v1/auth/local-fixture',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({persona}),redirect:'error',signal:AbortSignal.timeout(15_000)});return {status:response.status,authenticated:response.ok&&(await response.json()).authenticated};},persona);
+  assert(result.status===200&&result.authenticated===true&&loginBudget===0,'FIXTURE_LOGIN_FAILED');signIns++;
+ }
+ return {context,page};
 }
 
 try{
  await verifyPreviewRuntime();
  const client=new pg.Client({connectionString,connectionTimeoutMillis:5000,application_name:'etail-dashboard-visual-read',query_timeout:15_000,statement_timeout:10_000});
- let ids;
+ let ids,expanded;
  try{
   await client.connect();await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');await verifyPreviewDatabase(client);
   const marker=await client.query('SELECT result FROM public._etail_preview_seed WHERE key=$1',[previewSeedKey]);ids=marker.rows[0]?.result;
@@ -113,13 +159,14 @@ try{
   assert(marker.rows.length===1&&ids?.realMoney===false&&['primaryId','secondaryId','serviceId','merchantServiceId','primaryCardId','secondaryCardId'].every(key=>uuid.test(ids[key])),'INVALID_PREVIEW_MARKER');
   const bindings=await client.query('SELECT subject,"personId" FROM public.identity_bindings WHERE issuer=$1 AND subject=ANY($2::text[])',['urn:etail:isolated-fixture',['owner','viewer']]);
   assert(bindings.rows.length===2&&bindings.rows.some(row=>row.subject==='owner'&&row.personId===ids.primaryId)&&bindings.rows.some(row=>row.subject==='viewer'&&row.personId===ids.secondaryId),'FICTIONAL_IDENTITIES_NOT_PREPARED');
+  if(allPages)expanded=await discoverAllPages(client,ids,assert);
   await client.query('COMMIT');
  }finally{await client.end();}
  const artifacts=path.join(root,'artifacts');
  try{await ownedDirectory(artifacts);}catch(error){if(error.code==='ENOENT')await ownedDirectory(artifacts,true);else throw error;}
  await ownedDirectory(output,true);outputReady=true;beforeSource=await sourceHash();
  browser=await chromium.launch();
- deadline=setTimeout(()=>{failure('CAPTURE_DEADLINE');void browser.close().catch(()=>undefined);},12*60_000);
+ deadline=setTimeout(()=>{failure('CAPTURE_DEADLINE');void browser.close().catch(()=>undefined);},(allPages?30:12)*60_000);
  let assignedTerminalId=null;
  // Resolve the recipient's sole assigned terminal first; the owner must independently authorize that exact terminal.
  for(const [role,persona,personId] of [['holder','viewer',ids.secondaryId],['owner','owner',ids.primaryId]]){
@@ -138,9 +185,7 @@ try{
    await context.routeWebSocket('**/*',socket=>{failure('WEBSOCKET_BLOCKED');socket.close();});
    const page=await context.newPage();page.setDefaultTimeout(15_000);page.setDefaultNavigationTimeout(30_000);
    // Axe may create a temporary analysis page; context routing still blocks external and mutating requests.
-   page.on('response',response=>{if(response.status()>=400)failure(`HTTP_RESPONSE_${response.status()}`);});
-   page.on('pageerror',error=>failure('BROWSER_RUNTIME_ERROR',error));
-   page.on('console',message=>{if(message.type()==='error')failure('BROWSER_CONSOLE_ERROR',new Error(message.text()));});
+   observe(page);
    const entry=await page.goto(origin+'/login',{waitUntil:'domcontentloaded'});assert(entry?.ok(),'LOGIN_PAGE_UNAVAILABLE');
    const login=await page.evaluate(async persona=>{
     const response=await fetch('/api/v1/auth/local-fixture',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({persona}),redirect:'error',signal:AbortSignal.timeout(15_000)});
@@ -168,6 +213,7 @@ try{
    assert(management.channelId===channel.id&&publication&&(publication.state!=='AVAILABLE'||publication.description===channel.description&&publication.amount.minor===channel.amount.minor&&publication.amount.currency===channel.amount.currency&&publication.usage===channel.usage&&publication.expiresAt===channel.expiresAt),'PREPARED_PUBLICATION_NOT_AUTHORIZED');
    const checkout=new URL(publication.publicHref);
    assert(checkout.origin===origin&&checkout.pathname===`/checkout/${publication.id}`&&!checkout.search&&!checkout.hash&&!checkout.username&&!checkout.password,'PREPARED_PUBLICATION_WRONG_ORIGIN');
+   if(allPages&&!publications.some(item=>item.id===publication.id))publications.push({id:publication.id,path:checkout.pathname,state:publication.state,description:publication.description});
    const cardAccount=role==='owner'?accounts.find(item=>item.serviceKind==='CARDHOLDER'&&item.services.some(service=>service.id===ids.serviceId)):null;
    const merchantAccount=role==='owner'?accounts.find(item=>item.serviceKind==='MERCHANT'&&item.services.some(service=>service.id===ids.merchantServiceId)):null;
    if(role==='owner')assert(cards.primaryService?.id===ids.serviceId&&cardAccount&&merchantAccount&&cardAccount.id!==merchantAccount.id,'OWNER_ACCOUNTS_NOT_AUTHORIZED');
@@ -178,6 +224,7 @@ try{
    // Keep the original 19 comparisons, plus each persona's profile and narrow account preferences.
    const endpoints=['/api/v1/services','/api/v1/cardholder-services','/api/v1/merchants/dashboard','/api/v1/money-accounts',`/api/v1/cardholder-services/${ids.serviceId}/workspace`,`/api/v1/merchants/${terminal.id}`,`/api/v1/merchants/${terminal.id}/operations`,'/api/v1/profile',preferencesEndpoint];
    if(role==='owner')endpoints.push(`/api/v1/cardholder-services/${ids.serviceId}/funds`,`/api/v1/cardholder-services/${ids.serviceId}/access`,`/api/v1/merchants/${terminal.id}/access`,`/api/v1/money-accounts/${cardAccount.id}`,`/api/v1/money-accounts/${merchantAccount.id}`);
+   const extra=allPages?await prepareCustomerPages({page,read,assert,ids,expanded,role,personId,cards,card,terminal,endpoints,coverageGaps}):null;
    const before=await snapshot(page,endpoints);
    const own=role==='owner',cardLinks=own?ownerCardMenu:holderCardMenu,merchantLinks=own?ownerMerchantMenu:holderMerchantMenu;
    for(const width of [1440,390,320]){
@@ -407,9 +454,16 @@ try{
      await expect(page.getByRole('navigation',{name:'Your account',exact:true}).getByRole('link')).toHaveText(['Your profile','Sign-in & security','Help center']);
      await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
     });
+    if(allPages)await captureCustomerPages({page,capture:extraCapture,role,width,ids,cards,card,terminal,extra,coverageGaps});
    }
    const after=await snapshot(page,endpoints);preserved.push({role,reads:endpoints.length,before,after,unchanged:before===after});
   }finally{await context.close();}
+ }
+ if(allPages){
+  const operator=await extraContext('operator');
+  try{await captureOperatorPages({...operator,ids,expanded,capture:extraCapture,read,snapshot,preserved,coverageGaps,assert});}finally{await operator.context.close();}
+  const publicContext=await extraContext(null);
+  try{await capturePublicPages({...publicContext,capture:extraCapture,publications,coverageGaps,assert});}finally{await publicContext.context.close();}
  }
 }catch(error){failure(error instanceof Error&&/^[A-Z][A-Z0-9_]+$/.test(error.message)?error.message:'CAPTURE_FAILED',error);}
 finally{
@@ -417,7 +471,8 @@ finally{
  if(beforeSource)try{afterSource=await sourceHash();}catch(error){failure('SOURCE_HASH_FAILED',error);}
 }
 const projectionComparisons=preserved.reduce((total,item)=>total+item.reads,0);
-const summary={result:checks.length===120&&!checks.some(item=>item.failed)&&!errors.length&&preserved.length===2&&projectionComparisons===23&&preserved.every(item=>item.unchanged)&&beforeSource?.hash===afterSource?.hash?'PASS':'FAIL',screens:checks.length,failed:checks.filter(item=>item.failed).length,runtimeOrGuardErrors:errors.length,fixtureSignIns:signIns,projectionComparisons,source:{before:beforeSource,after:afterSource,unchanged:!!beforeSource&&beforeSource.hash===afterSource?.hash},normalization:'Only projection asOf timestamps are omitted. No report endpoint is captured; all business fields and array order are compared.',preserved};
+const expandedComplete=!allPages||['public','auth','services','security','invitations','card-activity','card-reports','card-help','membership','card-history','terminal-activity','terminal-help','terminal-disputes','operator','checkout','receipt-denied','payer-dispute','not-found'].every(family=>extendedFamilies.has(family));
+const summary={result:checks.length===120+expandedExpected&&expandedComplete&&!checks.some(item=>item.failed)&&!errors.length&&preserved.length===(allPages?3:2)&&(allPages?projectionComparisons>23:projectionComparisons===23)&&preserved.every(item=>item.unchanged)&&beforeSource?.hash===afterSource?.hash?'PASS':'FAIL',mode:allPages?'all-pages':'dashboard',screens:checks.length,baseScreens:checks.filter(item=>!item.family).length,expandedExpected,failed:checks.filter(item=>item.failed).length,runtimeOrGuardErrors:errors.length,fixtureSignIns:signIns,projectionComparisons,source:{before:beforeSource,after:afterSource,unchanged:!!beforeSource&&beforeSource.hash===afterSource?.hash},normalization:allPages?'Only projection asOf timestamps are omitted. Reports are visually captured; their generated clock is not included in the before/after API digest. All captured projection business fields and array order are compared.':'Only projection asOf timestamps are omitted. No report endpoint is captured; all business fields and array order are compared.',preserved,...(allPages?{families:[...extendedFamilies].sort(),coverageGaps}: {})};
 try{assert(outputReady,'ARTIFACT_DIRECTORY_NOT_CREATED');await writePrivate('checks.json',JSON.stringify({summary,checks,errors},null,2)+'\n');}catch{summary.result='FAIL';}
 console.log(JSON.stringify({result:summary.result,screens:summary.screens,failed:summary.failed,runtimeOrGuardErrors:summary.runtimeOrGuardErrors,sourceUnchanged:summary.source.unchanged,artifactDirectory:path.relative(root,output)}));
 if(summary.result!=='PASS')process.exitCode=1;

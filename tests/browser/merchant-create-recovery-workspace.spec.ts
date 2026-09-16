@@ -16,7 +16,7 @@ for(const kind of ["merchant","terminal"] as const){
   if(primary)await edit.getByRole("radio",{name:/^For someone else/}).check();
   await edit.getByRole("textbox",{name:primary?"Payment terminal name":"Business name",exact:true}).fill(name);
   await expect(edit.getByRole("button",{name:"Review merchant",exact:true})).toHaveCount(0);
-  await expect(edit).toContainText(primary?"You control the payment balance":"You control the payment balance, refunds and who can collect payments");
+  await expect(edit).toContainText(primary?"You control the balance, refunds and access":"You control the payment balance, refunds and who can collect payments");
   expect((await merchantDashboard(page.request)).units.filter(unit=>unit.name===name)).toEqual([]);
   const path=primary?`/api/v1/merchants/${primary.serviceId}/terminals`:"/api/v1/merchants",requests:unknown[]=[];
   await page.route(`**${path}`,async route=>{
