@@ -51,5 +51,5 @@ export async function renderMerchantDashboard(searchParams:Promise<Record<string
  }
 
  const statement=["overview","funds","activity"].includes(dashboard.activity.query.section)?await getMerchantStatement(session.personId,query).catch(error=>{unstable_rethrow(error);return null;}):null;
- return <MerchantShell dashboardQuery={dashboard.activity.query} showMoney={dashboard.moneyAccounts.length>0} showSettings={dashboard.merchants.some(merchant=>merchant.ownerAccess)}><MerchantDashboard initial={dashboard} moneyHomes={moneyHomes} statement={statement?<MerchantStatement statement={statement}/>:undefined}/></MerchantShell>;
+ return <MerchantShell dashboardQuery={dashboard.activity.query} showMoney={dashboard.moneyAccounts.length>0} showSettings={dashboard.merchants.some(merchant=>merchant.ownerAccess)}><MerchantDashboard initial={dashboard} moneyHomes={moneyHomes} statement={statement?<MerchantStatement statement={statement} scopeChoices={dashboard.units.length>1?dashboard.views.map(view=>({value:view.id,label:view.name})):[]}/>:undefined}/></MerchantShell>;
 }

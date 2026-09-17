@@ -133,7 +133,6 @@ export function CardholderDashboard({ moneyAccount=null,dashboard, detail, acces
       {selectionUnavailable && <section className="ch-selection-notice" role="alert"><h2>This card view is unavailable</h2><p>You may no longer have access, or this item may have changed.</p><Button variant="secondary" onClick={closeDetail}>Return to your cards</Button></section>}
       {view === "overview" && !waitingForFirstCard && <div className="ch-home-layout">
         {hasPrimary && <section className="ch-account-overview" aria-label="Your card account">
-          <div className="ch-account-intro"><p className="consumer-eyebrow">YOUR CARD ACCOUNT</p><h2>{primary?.displayName ?? "Your card account"}</h2><p>Account owner: {dashboard.person.displayName}</p></div>
           {moneyAccount ? <MoneyAccountHome account={moneyAccount}/> : <p className="ch-account-unavailable">Your account balance is unavailable with your current access.</p>}
           {account && <dl className="ch-account-counts"><div><dt>Cards in this account</dt><dd>{account.cardCount}</dd></div><div><dt>For your use</dt><dd>{account.ownCardCount}</dd></div><div><dt>For others</dt><dd>{account.otherCardCount}</dd></div></dl>}
           <div className="ch-account-links"><Link href={viewHref("cards")}>{account?.cardCount === 0 ? "Set up your first card" : "View cards"}<WorkspaceIcon name="arrow"/></Link>{account && account.unassignedCardCount > 0 && <span>{account.unassignedCardCount} {account.unassignedCardCount === 1 ? "card is" : "cards are"} ready to invite a cardholder.</span>}</div>

@@ -239,7 +239,9 @@ try{
      await expect(page.getByRole('link',{name:'Return unused money',exact:true})).toHaveCount(0);
      if(own){
       await expect(page.getByRole('link',{name:'Add money',exact:true})).toHaveAttribute('href',customerHref(`/money-accounts/${cardAccount.id}`,{task:'add'}));
-      await expect(page.getByRole('region',{name:'Your card account',exact:true}).getByRole('heading',{level:2,exact:true})).toHaveText(cards.primaryService.displayName);
+      const account=page.getByRole('region',{name:'Your card account',exact:true});
+      await expect(account.getByRole('region',{name:'Card account balance',exact:true})).toContainText(cardAccount.available.formatted);
+      await expect(account.getByRole('link',{name:'Money activity',exact:true})).toHaveAttribute('href',customerHref(`/money-accounts/${cardAccount.id}`));
      }
      else await expect(page.locator('.money-home,.ch-account-counts')).toHaveCount(0);
     });
@@ -332,10 +334,24 @@ try{
      await expect(merchantMenu(page).getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
      await expect(page.getByRole('navigation',{name:'Payment terminal navigation',exact:true})).toHaveCount(0);
      if(section==='overview'){
-      await expect(page.getByRole('heading',{name:'Account statement',exact:true})).toBeVisible();
-      await expect(page.getByRole('form',{name:'Filter account statement',exact:true})).toBeVisible();
+      const statement=page.getByRole('region',{name:'Account statement',exact:true});
+      await expect(statement.getByRole('heading',{name:'Account statement',exact:true})).toBeVisible();
+      await expect(statement.locator('details.ms-filter-options')).not.toHaveAttribute('open');
+      await expect(statement.getByRole('form',{name:'Filter account statement',exact:true})).not.toBeVisible();
+      await expect(statement.locator('.ms-totals,.ms-count,.ms-about')).toHaveCount(0);
+      const payout=page.getByRole('region',{name:'Payout',exact:true});
+      await expect(payout).toHaveCount(own?1:0);
       await expect(page.getByRole('link',{name:'Request payout',exact:true})).toHaveCount(own?1:0);
-      if(own)await expect(page.locator('details.money-incoming')).not.toHaveAttribute('open');
+      if(own){
+       const balance=payout.getByRole('region',{name:`${merchantAccount.displayName} balance`,exact:true});
+       await expect(payout.locator('.money-payout-account')).toHaveCount(1);
+       await expect(balance.getByRole('heading',{name:merchantAccount.displayName,exact:true})).toBeVisible();
+       await expect(balance.locator('.money-payout-summary dl > div').first().locator('dd')).toHaveText(merchantAccount.available.formatted);
+       await expect(balance.locator('.money-payout-summary dl > div').nth(1).locator('dd')).toHaveText(merchantAccount.pendingWithdrawals.formatted);
+       await expect(balance.getByRole('link',{name:'Request payout',exact:true})).toHaveAttribute('href',customerHref(`/money-accounts/${merchantAccount.id}`,{task:'withdraw',returnTo:merchantReturn}));
+       await expect(balance.getByRole('link',{name:'Payout history',exact:true})).toHaveAttribute('href',customerHref(`/money-accounts/${merchantAccount.id}`,{history:'payouts',returnTo:merchantReturn}));
+       await expect(balance.locator('details.money-incoming')).not.toHaveAttribute('open');
+      }
      }else await expect(page.getByRole('link',{name:terminal.name,exact:true})).toBeVisible();
      await expect(page.getByRole('link',{name:'Add money',exact:true})).toHaveCount(0);
      if(!own){await expect(page.locator('.money-home,.money-settlements')).toHaveCount(0);await expect(page.locator('a[href^="/money-accounts/"]')).toHaveCount(0);}
