@@ -206,14 +206,14 @@ test("a prepaid group funds a connected checkout, refund and separate Merchant s
       expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe("10000");
       expect(await getDb().select().from(moneyTopups).where(eq(moneyTopups.moneyAccountId,account.id))).toHaveLength(1);
       await page.getByRole("button",{name:"Retry this same request",exact:true}).click();
-      const confirmation=page.locator('section[aria-labelledby="money-task-title"]');
-      await expect(confirmation.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
-      await expect(confirmation).toContainText("$100.00");
+      await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);
+      await expect(page.getByRole("region",{name:"Card account balance",exact:true})).toContainText("$100.00");
       expect(attempts).toHaveLength(2);
       expect(attempts[1]).toEqual(attempts[0]);
       expect(attempts[0]!.path).toBe(confirmPath);
       expect(attempts[0]!.body).toEqual({});
     }finally{await page.unroute(origin+confirmPath,intercept);}
+    await page.goto(reviewUrl);await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
     await page.reload();
     await expect(page.locator('section[aria-labelledby="money-task-title"]')).toContainText("Money added");
     await expect(page.locator(".money-balance")).toContainText("$100.00");

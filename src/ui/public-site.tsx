@@ -13,8 +13,8 @@ export function ProductPreview({ variant = "cards" }: { variant?: "cards" | "pay
 }
 
 const commonQuestions = [
- {question:"What can I do with Etail Depot?",answer:"Add money, create Visa cards and invite your people to use them with spending limits you choose. You can also create payment requests for products or services and invite people to help collect payments. You control the money in each account."},
- {question:"Who can see my cards and payments?",answer:"As the account owner, you see all your cards or payment terminals. Each cardholder sees only their own cards and purchases. People you invite to collect payments see only their assigned terminals and cannot move money."},
+ {question:"What can I do with Etail Depot?",answer:"Add money, create Visa cards for family members or team members, and choose their spending limits. You can also create payment requests for products or services and give your team access to collect payments. You control the money in each account."},
+ {question:"Who can see my cards and payments?",answer:"As the account owner, you see all your cards or payment terminals. Each cardholder sees only their own cards and purchases. Team members collecting payments see only their assigned terminals and cannot move money."},
  {question:"Do spending limits reset each month?",answer:"No. Each card has a total spending limit that stays in place until you change it. For example, spending $200 of a $1,000 limit leaves $800, as long as there is enough money in the shared card balance. Refunds restore the balance but do not restore the used limit."},
  {question:"Where can these cards be used?",answer:"The product is a Visa prepaid card, designed for purchases wherever Visa is accepted, subject to the card’s controls and available balance. The cards shown in this sandbox are not live Visa credentials."},
  {question:"Do payments I receive add money to my cards?",answer:"No. Money you add funds your cards. Customer payments stay separate, and only you can manage refunds and payouts from your payment account."},

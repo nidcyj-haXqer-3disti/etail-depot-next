@@ -12,11 +12,11 @@ test("a visitor can explore clear card and payment dashboards without account re
  const showcase=page.locator(".service-showcase");
  await expect(showcase).not.toContainText(/preview|example|sample|illustrative|sandbox|no monthly reset|all terminals/i);
  await expect(page.getByText("Each cardholder sees only their own cards.",{exact:true})).toBeVisible();
- await expect(cardholder.getByText("Card balance",{exact:true})).toBeVisible();
- const liam=cardholder.getByRole("button",{name:"Liam’s card",exact:true});
- await liam.focus();await page.keyboard.press("Enter");
- await expect(liam).toHaveAttribute("aria-pressed","true");
- await expect(cardholder.getByText("Card you manage",{exact:true})).toBeVisible();
+ await expect(cardholder.getByText("Available to spend",{exact:true})).toBeVisible();
+ const teamCard=cardholder.getByRole("button",{name:"Team supplies For your team",exact:true});
+ await teamCard.focus();await page.keyboard.press("Enter");
+ await expect(teamCard).toHaveAttribute("aria-pressed","true");
+ await expect(cardholder.getByText("For your team",{exact:true})).toBeVisible();
  await expect(cardholder.getByText("$280.00",{exact:true})).toBeVisible();
  const merchant=services.getByRole("button",{name:"Payments",exact:true});
  await merchant.focus();await page.keyboard.press("Space");
@@ -25,8 +25,8 @@ test("a visitor can explore clear card and payment dashboards without account re
  const example=page.getByRole("region",{name:"Payments dashboard",exact:true});
  await expect(example).toBeVisible();
  await expect(example.getByText("Ready to move",{exact:true})).toHaveCount(0);
- await expect(example.getByText("Payment balance",{exact:true})).toHaveCount(1);
- await expect(example.getByText("Payment terminals",{exact:true})).toBeVisible();
+ await expect(example.getByText("Available for payout",{exact:true})).toHaveCount(1);
+ await expect(example.getByText("Flower shop · 2 terminals",{exact:true})).toBeVisible();
  await expect(example.getByText("Payments received",{exact:true})).toBeVisible();
  await expect(showcase).toContainText("Your card balance and payment balance stay separate.");
  await expect(showcase).not.toContainText(/preview|example|sample|illustrative|sandbox|no monthly reset|all terminals/i);

@@ -19,7 +19,7 @@ test("owner adds card money, reviews a withdrawal and keeps merchant money separ
  await signInPerson(page,owner.personId);await page.goto(`/money-accounts/${card.id}?task=add`);
  await page.getByRole("textbox",{name:"Amount (USD)"}).fill("125.50");await page.getByRole("button",{name:"Continue",exact:true}).click();
  await expect(page.getByRole("button",{name:"Confirm and add money",exact:true})).toBeVisible();await expect(page).toHaveURL(url=>url.pathname.endsWith("/add-money")&&!url.searchParams.has("task")&&!!url.searchParams.get("review"));const reviewUrl=page.url();await page.reload();
- await page.getByRole("button",{name:"Confirm and add money",exact:true}).click();await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
+ await page.getByRole("button",{name:"Confirm and add money",exact:true}).click();await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);await expect(page.getByRole("region",{name:"Card account balance",exact:true})).toContainText("$125.50");
  await page.goto(reviewUrl);await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
  expect((await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
@@ -51,7 +51,7 @@ test("a mismatched funding receipt stays unconfirmed and retry uses the same sav
  const review=new URL(page.url()).searchParams.get("review")!,path=`**/api/v1/money-accounts/${account!.id}/funding/intents/${review}`;let altered=false;
  await page.route(path,async route=>{if(route.request().method()!=="POST"||altered)return route.continue();altered=true;const response=await route.fetch(),body=await response.json();await route.fulfill({response,json:{...body,id:randomUUID()}});});
  await page.getByRole("button",{name:"Confirm and add money",exact:true}).click();await expect(page.getByText("We couldn’t verify this receipt. Retry this same request.")).toBeVisible();
- await expect(page.getByRole("heading",{name:"Money added",exact:true})).toHaveCount(0);await page.getByRole("button",{name:"Retry this same request",exact:true}).click();await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Money added",exact:true})).toHaveCount(0);await expect(page).toHaveURL(url=>url.pathname.endsWith("/add-money")&&url.searchParams.get("review")===review);await page.getByRole("button",{name:"Retry this same request",exact:true}).click();await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);await expect(page.getByRole("region",{name:"Card account balance",exact:true})).toContainText("$10.00");
  expect(await getDb().select().from(moneyTopups).where(eq(moneyTopups.moneyAccountId,account!.id))).toHaveLength(1);
 });
 
@@ -77,8 +77,8 @@ for(const task of ["add","withdraw"] as const)test(`${task} waits for the saved 
   expect((await getMoneyAccountOverview(owner.personId,account!.id)).available).toEqual(before.available);
  }finally{release();}
  await expect(page).toHaveURL(url=>url.searchParams.get("review")===reviewId);await expect(confirm).toBeEnabled();await confirm.click();
- await expect(page.getByRole("heading",{name:task==="add"?"Money added":"Return requested",exact:true})).toBeVisible();expect(confirmations).toBe(1);
- await page.reload();await expect(page.getByRole("heading",{name:task==="add"?"Money added":"Return requested",exact:true})).toBeVisible();expect(confirmations).toBe(1);
+ await expect(page.getByRole("heading",{name:task==="add"?"Account home":"Return requested",exact:true})).toBeVisible();if(task==="add")await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);expect(confirmations).toBe(1);
+ await page.reload();await expect(page.getByRole("heading",{name:task==="add"?"Account home":"Return requested",exact:true})).toBeVisible();if(task==="add")await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);expect(confirmations).toBe(1);
 });
 
 test("an oversized withdrawal can be corrected after a definitive rejection",async({page})=>{

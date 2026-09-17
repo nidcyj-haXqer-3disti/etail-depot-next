@@ -12,7 +12,7 @@ export function Header({ authenticated = false, activeService }: { authenticated
 
 function Footer() {
   return <footer className="site-footer public-footer">
-    <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Cards for your people. More ways to get paid.</p><p className="footer-copyright">© Etail Depot</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cards & spending</Link><Link href="/payment-services">Accept payments</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>
+    <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Cards for family and business. More ways to get paid.</p><p className="footer-copyright">© Etail Depot</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cards & spending</Link><Link href="/payment-services">Accept payments</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>
   </footer>;
 }
 

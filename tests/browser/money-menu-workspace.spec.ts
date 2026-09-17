@@ -65,9 +65,12 @@ test("card account menu stays with the top-up review and receipt without duplica
  let confirmations=0;
  page.on("request",request=>{if(request.method()==="POST"&&new URL(request.url()).pathname.startsWith(`/api/v1${path}/funding/intents/`))confirmations++;});
  await page.getByRole("button",{name:"Confirm and add money",exact:true}).click();
- await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();await cardMenu(page);
- await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(0);
- await page.reload();await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();await cardMenu(page);
+ await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);
+ await expect(page.getByRole("heading",{name:"Account home",exact:true})).toBeVisible();await cardMenu(page);
+ await expect(page.getByRole("link",{name:"Add money",exact:true})).toHaveCount(1);
+ await expect(page.getByRole("region",{name:"Card account balance",exact:true})).toContainText("$9,999,999,999.99");
+ await page.reload();await expect(page.getByRole("heading",{name:"Account home",exact:true})).toBeVisible();await cardMenu(page);
+ await page.goto(reviewUrl);await expect(page.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
  await page.setViewportSize({width:320,height:900});
  await expect(page.locator(".money-receipt-amount")).toHaveText("$9,999,999,999.99");
  for(const area of [page.locator(".money-balance"),page.locator(".money-receipt-amount")])expect(await area.evaluate(node=>node.scrollWidth<=node.clientWidth+1)).toBe(true);

@@ -34,7 +34,7 @@ for(const width of [1440,320]) {
    await dialogKeyboard(page,dialog);await accessible(page,"Exact card controls dialog");
    await page.keyboard.press("Escape");await expect(dialog).toBeHidden();
    await page.goto("/cardholder-services?view=cards");
-   await expect(page.getByRole("searchbox",{name:"Search your cards"})).toBeVisible();
+   await expect(page.getByRole("searchbox",{name:"Search cards"})).toBeVisible();
    await accessible(page,"Visible cards list");
    await page.goto(`/cardholder-services/activity?focus=${card.id}`);
    await expect(page.getByRole("heading",{name:"Activity",level:1,exact:true})).toBeVisible();
