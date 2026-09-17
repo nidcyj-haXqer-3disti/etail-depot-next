@@ -432,3 +432,5 @@ A successful Cardholder funding confirmation returns to Account home only after 
 D85 publication approval (17 September2026): user requested “deploy” after local UI review and final checks. This authorizes reviewed feature merge/publication to the existing bound sandbox. No access-setting, provider, financial-model or data reset change is included.
 
 D85 release-check correction: preserve the immediate verified return to Account home. Verify the exact saved funding receipt with the authenticated request context after navigation, retaining the confirmed POST status and exact intent, receipt ID, account, amount and completed-status assertions. Do not delay customer navigation, weaken money validation or bypass CI to accommodate the test.
+
+D85 second release-check correction: establish the stale notification snapshot explicitly after recovery completes. A prior save’s automatic refresh may otherwise read the competing version, making the test’s next save valid. Reload version2 before staging version3, and assert outgoing version2 plus server409 and no write; retain the production conflict policy unchanged.
