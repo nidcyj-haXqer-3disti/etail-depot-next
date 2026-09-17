@@ -30,3 +30,9 @@ Local implementation is verified. Final build (`build-focus-final.log`), lint, a
 ## Publication authorization
 
 17 September2026: the user explicitly requested deployment of the completed local version. Publish the D84 marketing/style and D85 dashboard cleanup through the existing bound repository/site after exact-source CI and packaging checks. Preserve account data and site access. The secured charge-card research/design is documentation only; no financial cutover is included. Hosted deployment and verification results will be recorded separately.
+
+## Release-check correction
+
+GitHub run `35178966719` on the first PR27 candidate passed lint, types, unit, PostgreSQL integration/concurrency, contracts, architecture, production build and API checks. Desktop/mobile finished258 passing and2 failing cases: the email-member journey read the funding response body after the new successful return to Account home had already navigated away. Both failures are the same Playwright response-lifetime race in the shared test helper. Publication remains gated on a corrected exact-source run; no application or financial guard is relaxed. The original failed run and release receipt are retained.
+
+The reviewed helper correction checks the confirmed POST200, then loads the exact saved intent via authenticated APIRequestContext after Account home navigation. Strict intent/account/receipt/amount/status checks are retained. All14 affected desktop/mobile journeys pass in `artifacts/d85-checks/browser-funding-response-recovery.log`, including the previously failing email-member journey, Merchant onboarding and funding/recovery/settlement flows. No production application code changed for this correction. Full corrected CI remains required before publication.

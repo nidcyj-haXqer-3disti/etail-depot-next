@@ -101,10 +101,16 @@ export async function addMoney(page:Page,serviceId:string,amount="50.00"){
   const confirming=responseFor(page,`/api/v1${base}/funding/intents/${intent.id}`);
   await panel.getByRole("button",{name:"Confirm and add money",exact:true}).click();
   const confirmed=await confirming;expect(confirmed.status()).toBe(200);
-  const receipt=moneyTopupReceiptSchema.parse(await confirmed.json());
-  expect(receipt).toMatchObject({id:intent.receiptId,moneyAccountId,amount:intent.amount,status:"COMPLETED"});
   await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);
   await expect(page.getByRole("heading",{name:"Account home",exact:true})).toBeVisible();
+  // The confirmed top-up returns with a full document navigation. Read the exact
+  // saved review through APIRequestContext; its body outlives the old document.
+  const savedResponse=await page.request.get(`/api/v1${base}/funding/intents/${intent.id}`);
+  expect(savedResponse.status()).toBe(200);
+  const saved=moneyFundingIntentSchema.parse(await savedResponse.json());
+  expect(saved).toMatchObject({id:intent.id,moneyAccountId,receiptId:intent.receiptId,amount:intent.amount});
+  const receipt=moneyTopupReceiptSchema.parse(saved.receipt);
+  expect(receipt).toMatchObject({id:intent.receiptId,moneyAccountId,amount:intent.amount,status:"COMPLETED"});
   const fundedResponse=await page.request.get(`/api/v1${base}`);expect(fundedResponse.status()).toBe(200);
   const funded=moneyOverviewSchema.parse(await fundedResponse.json());
   expect(funded).toMatchObject({id:moneyAccountId,serviceKind:"CARDHOLDER",services:[{id:serviceId,kind:"CARDHOLDER"}]});
