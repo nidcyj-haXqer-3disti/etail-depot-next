@@ -13,7 +13,7 @@ import {WorkspaceIcon} from "./navigation";
 import {useMerchantNavigationLock} from "./merchant-navigation-state";
 import "./merchant-entry.css";
 import {requestFailure} from "../api-feedback";
-type Props={kind:"MERCHANT"}|{kind:"TERMINAL";merchantServiceId:string;merchantName:string};
+type Props=({kind:"MERCHANT"}|{kind:"TERMINAL";merchantServiceId:string;merchantName:string})&{prominent?:boolean};
 type Result={merchantId:string;nextHref:string;status:"DRAFT"};
 function savedDestination(value:string){const url=new URL(value,"https://etail.invalid");if(!value.startsWith("/")||value.startsWith("//")||url.origin!=="https://etail.invalid"||url.hash)throw new Error("Invalid merchant destination");return customerHref(url.pathname,url.searchParams);}
 async function createPrimary(body:Record<string,unknown>):Promise<Result> {
@@ -44,7 +44,7 @@ export function MerchantCreate(props:Props) {
   }catch(failure){if(retrying&&failure instanceof WorkspaceCommandError&&[401,403,404].includes(failure.status??0))setAccessDenied(true);if(failure instanceof WorkspaceCommandError&&!failure.uncertain&&!retrying)setAttempt(null);setError(failure instanceof Error?failure.message:"We couldn’t confirm this request. Retry to recover the saved result.");}
   finally{setBusy(false);}
  }
- return <>{props.kind==="TERMINAL"&&!attempt&&!savedHref?<Link className="consumer-button consumer-button-secondary" href={customerHref("/merchant-services",createQuery)}>Create terminal</Link>:<Button variant="secondary" onClick={()=>{if(!attempt&&!savedHref){setName("");setIntendedUse("OTHER");setError("");setAccessDenied(false);setLeavingUnconfirmed(false);}setOpen(true);}}>{attempt?`Resume ${label} request`:isPrimary?"Add your business":"Create terminal"}</Button>}
+ return <>{props.kind==="TERMINAL"&&!attempt&&!savedHref?<Link className={`consumer-button consumer-button-${props.prominent?"primary":"secondary"}`} href={customerHref("/merchant-services",createQuery)}>Create terminal</Link>:<Button variant={props.prominent?"primary":"secondary"} onClick={()=>{if(!attempt&&!savedHref){setName("");setIntendedUse("OTHER");setError("");setAccessDenied(false);setLeavingUnconfirmed(false);}setOpen(true);}}>{attempt?`Resume ${label} request`:isPrimary?"Add your business":"Create terminal"}</Button>}
   <WorkspaceDialog open={open} onClose={close} title={unavailable?"We couldn’t confirm this request":isPrimary?"Name your business":"Create terminal"} serviceName={isPrimary||unavailable?"Accept payments":props.merchantName}>
    {unavailable?<><Feedback kind="error" message={error}/><p>Your access has changed, so we cannot show whether this request was saved. Check the same request again when you have access.</p><p>Leaving this page does not cancel the request. Check your saved business details when your access is restored.</p><div className="mn-actions"><Button busy={busy} onClick={()=>void save()}>Check request again</Button><Button variant="quiet" disabled={busy} onClick={()=>{setOpen(false);setLeavingUnconfirmed(true);router.push("/services");}}>Leave for now</Button></div></>:<>
     <Feedback kind="error" message={error}/>

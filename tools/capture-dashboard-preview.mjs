@@ -246,7 +246,7 @@ try{
     await capture(page,role,width,'card-list',customerHref('/cardholder-services',{view:'cards'}),async page=>{
      await expect(cardMenu(page).getByRole('link')).toHaveText(cardLinks);
      await expect(cardMenu(page).getByRole('link',{name:'Cards',exact:true})).toHaveAttribute('aria-current','page');
-     if(own)await expect(page.getByRole('navigation',{name:'Card management',exact:true}).getByRole('link')).toHaveText(['Card list','Cardholders','Card history']);
+     if(own)await expect(page.getByRole('navigation',{name:'Card management',exact:true}).getByRole('link')).toHaveText(['Cardholders','Card history']);
      else await expect(page.getByRole('navigation',{name:'Card management',exact:true})).toHaveCount(0);
      await expect(page.getByRole('navigation',{name:'Card ownership',exact:true})).toHaveCount(own?1:0);
      await expect(page.getByRole('link',{name:'Add card',exact:true})).toHaveCount(own?1:0);
@@ -271,6 +271,18 @@ try{
      await expect(page.getByRole('dialog',{name:'Freeze card?',exact:true})).toBeVisible();
     });
     if(own){
+     await capture(page,role,width,'card-limit-edit',customerHref('/cardholder-services',{view:'cards',focus:ids.secondaryCardId}),async page=>{
+      const limit=page.getByRole('article',{name:'Card spending limit',exact:true});
+      await limit.getByRole('button',{name:/^Change spending limit for /}).click();
+      await expect(limit.getByRole('textbox',{name:'Total limit (USD)',exact:true})).toBeVisible();
+      await expect(limit.getByRole('textbox',{name:'Total limit (USD)',exact:true})).toBeFocused();
+      await expect(limit.getByRole('button',{name:'Review',exact:true})).toBeVisible();
+      await expect(limit.getByRole('button',{name:'Cancel',exact:true})).toBeVisible();
+     });
+     await capture(page,role,width,'card-history-directory','/cardholder-services/card-requests',async page=>{
+      await expect(page.getByRole('heading',{name:'Card history',level:1,exact:true})).toBeVisible();
+      await expect(page.getByRole('link',{name:'Add card',exact:true})).toHaveCount(1);
+     });
      await capture(page,role,width,'card-for-others-detail',customerHref('/cardholder-services',{view:'cards',focus:ids.secondaryCardId}),async page=>{
       const detail=page.getByRole('region',{name:'Card management details',exact:true});
       await expect(detail.getByRole('article',{name:'Card spending limit',exact:true})).toBeVisible();
@@ -472,7 +484,7 @@ finally{
 }
 const projectionComparisons=preserved.reduce((total,item)=>total+item.reads,0);
 const expandedComplete=!allPages||['public','auth','services','security','invitations','card-activity','card-reports','card-help','membership','card-history','terminal-activity','terminal-help','terminal-disputes','operator','checkout','receipt-denied','payer-dispute','not-found'].every(family=>extendedFamilies.has(family));
-const summary={result:checks.length===120+expandedExpected&&expandedComplete&&!checks.some(item=>item.failed)&&!errors.length&&preserved.length===(allPages?3:2)&&(allPages?projectionComparisons>23:projectionComparisons===23)&&preserved.every(item=>item.unchanged)&&beforeSource?.hash===afterSource?.hash?'PASS':'FAIL',mode:allPages?'all-pages':'dashboard',screens:checks.length,baseScreens:checks.filter(item=>!item.family).length,expandedExpected,failed:checks.filter(item=>item.failed).length,runtimeOrGuardErrors:errors.length,fixtureSignIns:signIns,projectionComparisons,source:{before:beforeSource,after:afterSource,unchanged:!!beforeSource&&beforeSource.hash===afterSource?.hash},normalization:allPages?'Only projection asOf timestamps are omitted. Reports are visually captured; their generated clock is not included in the before/after API digest. All captured projection business fields and array order are compared.':'Only projection asOf timestamps are omitted. No report endpoint is captured; all business fields and array order are compared.',preserved,...(allPages?{families:[...extendedFamilies].sort(),coverageGaps}: {})};
+const summary={result:checks.length===126+expandedExpected&&expandedComplete&&!checks.some(item=>item.failed)&&!errors.length&&preserved.length===(allPages?3:2)&&(allPages?projectionComparisons>23:projectionComparisons===23)&&preserved.every(item=>item.unchanged)&&beforeSource?.hash===afterSource?.hash?'PASS':'FAIL',mode:allPages?'all-pages':'dashboard',screens:checks.length,baseScreens:checks.filter(item=>!item.family).length,expandedExpected,failed:checks.filter(item=>item.failed).length,runtimeOrGuardErrors:errors.length,fixtureSignIns:signIns,projectionComparisons,source:{before:beforeSource,after:afterSource,unchanged:!!beforeSource&&beforeSource.hash===afterSource?.hash},normalization:allPages?'Only projection asOf timestamps are omitted. Reports are visually captured; their generated clock is not included in the before/after API digest. All captured projection business fields and array order are compared.':'Only projection asOf timestamps are omitted. No report endpoint is captured; all business fields and array order are compared.',preserved,...(allPages?{families:[...extendedFamilies].sort(),coverageGaps}: {})};
 try{assert(outputReady,'ARTIFACT_DIRECTORY_NOT_CREATED');await writePrivate('checks.json',JSON.stringify({summary,checks,errors},null,2)+'\n');}catch{summary.result='FAIL';}
 console.log(JSON.stringify({result:summary.result,screens:summary.screens,failed:summary.failed,runtimeOrGuardErrors:summary.runtimeOrGuardErrors,sourceUnchanged:summary.source.unchanged,artifactDirectory:path.relative(root,output)}));
 if(summary.result!=='PASS')process.exitCode=1;

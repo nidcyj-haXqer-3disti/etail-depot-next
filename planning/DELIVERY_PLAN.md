@@ -1,4 +1,12 @@
+## D85 active presentation slice
+
+Simplify the confirmed funding return, Cards directory/limit controls, Merchant statement/terminal directory and landing illustration. Preserve recovery URLs, authoritative balances, authorization and accounting effects. Affected desktop/mobile/accessibility workflows and the preserved local preview are verified:128 cases,8 final reruns,126 dashboard states and27 public states pass. No financial migration or publication in this slice. See [evidence](../docs/SIMPLER_DASHBOARD_EVIDENCE.md). D84 secured-card design remains pending the collateral-to-limit decision.
+
 # Etail Depot — active delivery plan
+
+> **D84 active assignment — 17 September 2026 (Tokyo):** [Secured-card design](../docs/SECURED_CARD_EXPERIENCE_DESIGN.md) records the user-confirmed monthly pay-in-full/optional early repayment direction. Deposit/limit terms remain pending; current runtime money is prepaid until an implemented, verified cutover. Complete the independently requested family/business copy and Merchant visual alignment now, preserving D73 ownership, separate service money and total card allowances. [Status](STATUS.md) distinguishes local changes from published D83.
+
+> **D83 publication update — 17 September 2026 (Tokyo):** D82–D83 presentation cleanup is published through reviewed PR26 and exact-source Netlify deploy `6aaabc9ab5e2833789718dc1`. GitHub checks and offline packaging passed; all186 final hosted checks and44 responsive public captures pass. The exact current deploy and unchanged access were reverified after acceptance. [Current status](STATUS.md) and [whole-site evidence](../docs/ALL_PAGES_PRESENTATION_REVIEW.md) supersede the historical pre-publication status below. No schema, financial behavior or authority model changed.
 
 > **D81 active override — 14 September 2026 (Tokyo):** [Cohesive service experience](../docs/COHESIVE_SERVICE_EXPERIENCE.md) governs channel marketing and sharing, modern dashboards, actual service settings, clean customer paths and versioned personal profile editing. D73 authority/money, D76 exact invitations and D80 unified card/terminal workspaces remain. Implementation and local verification are complete; see D81 delivery evidence. Review/publication remains separate, and no D81 deployment is claimed.
 

@@ -23,6 +23,12 @@ test("one Merchant menu opens a complete exact terminal and business-only accoun
  expect(await navigation.evaluate(node=>node.scrollWidth<=node.clientWidth+1)).toBe(true);
  if(viewport)await page.setViewportSize(viewport);
  await expect(page.getByRole("heading",{name:"Account statement",exact:true})).toBeVisible();
+ const statement=page.getByRole("region",{name:"Account statement",exact:true});
+ await expect(statement.locator(".ms-about")).not.toHaveAttribute("open");
+ await expect(statement.getByRole("navigation",{name:"Statement pages",exact:true})).toHaveCount(0);
+ await statement.locator(".ms-about > summary").focus();await page.keyboard.press("Enter");
+ await expect(statement.locator(".ms-about")).toContainText("Internal transfers do not add to money in or out.");
+ await statement.locator(".ms-about > summary").click();
  await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toHaveCount(0);
  await navigation.getByRole("link",{name:"Terminals",exact:true}).click();
  await page.getByRole("navigation",{name:"Terminal use",exact:true}).getByRole("link",{name:"For others",exact:true}).click();
@@ -83,7 +89,12 @@ test("owner can manage every flat terminal while a terminal user sees only assig
  await expect(page.getByRole("heading",{name:"Terminals",exact:true})).toBeVisible();
  await expect(page.getByRole("heading",{name:unit.displayName,exact:true})).toBeVisible();
  await expect(page.getByRole("article").getByRole("heading",{name:master.displayName,exact:true})).toBeVisible();
- await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toBeVisible();
+ await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toHaveCount(1);
+ await expect(page.locator(".md-header").getByRole("link",{name:"Create terminal",exact:true})).toBeVisible();
+ const terminalRows=page.locator(".md-terminal-list article");
+ await expect(terminalRows).toHaveCount(2);
+ await expect(terminalRows.getByRole("link")).toHaveCount(2);
+ await expect(terminalRows.getByRole("button")).toHaveCount(0);
  await page.getByRole("link",{name:unit.displayName,exact:true}).click();
  await page.getByRole("group",{name:"Terminal sections",exact:true}).getByRole("link",{name:"Activity",exact:true}).click();
  await expect(page.getByRole("heading",{name:unit.displayName,exact:true})).toBeVisible();
@@ -119,6 +130,11 @@ test("merchant activity keeps exact terminal scope, dates, pages and receipts wh
  await expect(page).toHaveURL(url=>matchesQuery(url,query));
  expect(new URL(page.url()).searchParams.get("status")).toBe("COLLECTED");
  const table=page.getByRole("table");await expect(table.locator("tbody tr")).toHaveCount(25);
+ await expect(table.getByRole("columnheader")).toHaveText(["Date","Record","Money in","Money out"]);
+ const firstRecord=table.locator("tbody tr").first();
+ await expect(firstRecord.locator(".ms-record-context .consumer-status")).toHaveText("Completed");
+ await expect(firstRecord.locator('td[data-label="Money in"]')).toHaveText("$12.50");
+ await expect(firstRecord.locator('td[data-label="Money out"]')).toHaveText("—");
  await page.getByRole("link",{name:"Older records",exact:true}).click();await expect(table.locator("tbody tr")).toHaveCount(1);
  await page.reload();expect(new URL(page.url()).searchParams.get("page")).toBe("2");
  const data=await page.request.get(`/api/v1/merchants/dashboard?${query}&page=2`);expect(data.status()).toBe(200);

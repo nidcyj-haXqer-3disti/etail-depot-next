@@ -24,4 +24,4 @@ All actions, routes, API calls, capability checks, saved request identities, exa
 
 Verification artifacts: `artifacts/d82-copy-verification/` and `artifacts/d81-dashboard-preview-d82-copy-final/checks.json`. Final production build and scoped lint both exit 0. Manual visual review covers card settings, merchant overview/settings/channels and Profile at desktop and mobile widths.
 
-D81 remains live. These local edits do not establish a new hosted deployment.
+At local verification, D81 remained live. D82 was subsequently included in the user-approved, verified D83 publication: [release evidence](ALL_PAGES_PRESENTATION_REVIEW.md#verified-publication), PR26 and Netlify deploy `6aaabc9ab5e2833789718dc1`.

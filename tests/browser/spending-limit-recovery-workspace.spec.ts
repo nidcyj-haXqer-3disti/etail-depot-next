@@ -30,8 +30,9 @@ test("a lost card allowance result hides card details after denial and retries w
  await page.goto(`/cardholder-services?card=${card.id}`);
  const dialog=page.getByRole("dialog"),row=page.getByRole("region",{name:"Card management details",exact:true}).getByRole("article",{name:"Card spending limit",exact:true});
  await row.getByRole("button",{name:`Change spending limit for ${card.nickname}`,exact:true}).click();
- await row.getByRole("textbox",{name:`New total spending limit for ${card.nickname}`,exact:true}).fill("17.23");
- await row.getByRole("button",{name:"Review spending limit",exact:true}).click();
+ await expect(row.getByRole("textbox",{name:"Total limit (USD)",exact:true})).toBeFocused();
+ await row.getByRole("textbox",{name:"Total limit (USD)",exact:true}).fill("17.23");
+ await row.getByRole("button",{name:"Review",exact:true}).click();
  await expect(row).toContainText("$17.23");
  await page.route(`**${path}`,async route=>{
   if(route.request().method()!=="PUT"){await route.continue();return;}
@@ -40,7 +41,7 @@ test("a lost card allowance result hides card details after denial and retries w
   if(attempts.length===1){expect(response.status()).toBe(200);expect(cardSpendingSchema.parse(await response.json())).toMatchObject({cardId:card.id,allowance:{minor:"1723"},version:2});await route.fulfill({status:200,json:{}});}
   else await route.fulfill({response});
  });
- await row.getByRole("button",{name:"Save spending limit",exact:true}).click();
+ await row.getByRole("button",{name:"Save limit",exact:true}).click();
  await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  await expect(row.getByRole("button",{name:"Cancel",exact:true})).toHaveCount(0);
  await page.getByRole("navigation",{name:"Cards and spending navigation",exact:true}).getByRole("link",{name:"Cards",exact:true}).click();
@@ -94,9 +95,10 @@ test("unconfirmed card limits survive browser navigation in the same tab and sig
  });
  const changeLimit=async(amount:string)=>{
   await row.getByRole("button",{name:`Change spending limit for ${card.nickname}`,exact:true}).click();
-  await row.getByRole("textbox",{name:`New total spending limit for ${card.nickname}`,exact:true}).fill(amount);
-  await row.getByRole("button",{name:"Review spending limit",exact:true}).click();
-  await row.getByRole("button",{name:"Save spending limit",exact:true}).click();
+  await expect(row.getByRole("textbox",{name:"Total limit (USD)",exact:true})).toBeFocused();
+  await row.getByRole("textbox",{name:"Total limit (USD)",exact:true}).fill(amount);
+  await row.getByRole("button",{name:"Review",exact:true}).click();
+  await row.getByRole("button",{name:"Save limit",exact:true}).click();
   await expect(row.getByRole("button",{name:"Retry saved spending limit",exact:true})).toBeEnabled();
  };
  await changeLimit("17.23");

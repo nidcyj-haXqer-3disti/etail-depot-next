@@ -105,14 +105,15 @@ for(const phase of ["review","confirmation"] as const)test(`malformed funding ${
   await expect(panel).toContainText("$42.37");
   await panel.getByRole("button",{name:"Confirm and add money",exact:true}).click();
  }
- await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
+ await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);
+ await expect(page.getByRole("region",{name:"Card account balance",exact:true})).toContainText("$42.37");
  expect(statuses).toEqual([200,404,200]);expect(attempts[1]).toEqual(attempts[0]);expect(attempts[2]).toEqual(attempts[0]);
- expect(new URL(page.url()).searchParams.get("review")).toBe(intentId);expect(page.url()).toBe(savedUrl);
  const read=await page.request.get(`${base}/${intentId}`);expect(read.status()).toBe(200);
  const saved=moneyFundingIntentSchema.parse(await read.json());expect(saved.id).toBe(intentId);expect(saved.receipt).not.toBeNull();
  expect(saved.receipt).toMatchObject({moneyAccountId:account.id,amount:{minor:amount},status:"COMPLETED"});
  if(firstReceiptId)expect(saved.receipt!.id).toBe(firstReceiptId);
  expect(saved.receipt!.id).toBe(storedIntents[0]!.confirmCommandId);
+ await page.goto(savedUrl);await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
  await expect(panel).toContainText(saved.receipt!.reference);
  await page.reload();expect(page.url()).toBe(savedUrl);
  await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();

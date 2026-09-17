@@ -51,7 +51,23 @@ async function open(page,url){const response=await page.goto(origin+url,{waitUnt
 async function capture(page,{screen,url,width,sampleData=false,viewport=true,fullPage=true}){
  current={screen,width};await ready(page);
  await expect(page.locator('.sandbox-badge')).toHaveText('Sandbox');await expect(page.locator('.sandbox-badge')).toHaveCount(1);
- assert(!/\b(sandbox|demo|practice|fixture)\b/i.test(await page.locator('main').innerText()),'CUSTOMER_ENVIRONMENT_COPY');
+ // Keep the same exact network-credential disclosures required by public-foundation.spec.ts.
+ // Every other occurrence of internal environment language remains a failure.
+ const cardDisclosure='The cards shown in this sandbox are not live Visa credentials.';
+ const disclosures={
+  '/':[cardDisclosure],'/card-services':[],
+  '/payment-services':['Visa, Mastercard, American Express and Discover test cards are available in this sandbox.'],
+  '/help':[cardDisclosure,'This sandbox uses clearly marked test cards and never asks for real card details.'],
+  '/login':[],
+ };
+ let editorialText=(await page.locator('main').textContent())??'';
+ const pathname=new URL(url,origin).pathname;
+ assert(Object.hasOwn(disclosures,pathname),'UNEXPECTED_PUBLIC_PAGE');
+ for(const disclosure of disclosures[pathname]){
+  assert(editorialText.split(disclosure).length===2,'NETWORK_DISCLOSURE_MISSING_OR_REPEATED');
+  editorialText=editorialText.replace(disclosure,'');
+ }
+ assert(!/\b(sandbox|demo|practice|fixture)\b/i.test(editorialText),'CUSTOMER_ENVIRONMENT_COPY');
  await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
  const files=[];
  if(viewport){const file=`${screen}-${width}-viewport.png`;await writePrivate(file,await page.screenshot({animations:'disabled',timeout:15_000}));files.push(file);screenshots++;}
@@ -88,17 +104,17 @@ try{
  for(const width of widths){
   await page.setViewportSize({width,height:900});current={screen:'home-cardholder-sample-data',width};
   await open(page,'/');
-  const preview=page.getByRole('group',{name:'Service dashboard preview',exact:true});
-  await expect(preview).toBeVisible();await expect(page.getByRole('region',{name:'Cardholder dashboard example',exact:true})).toBeVisible();
-  await expect(page.getByRole('tablist',{name:'Payment channel examples',exact:true}).getByRole('tab')).toHaveCount(7);
+  const preview=page.getByRole('group',{name:'Cards and payments',exact:true});
+  await expect(preview).toBeVisible();await expect(page.getByRole('region',{name:'Cards dashboard',exact:true})).toBeVisible();
+  await expect(page.getByRole('tablist',{name:'Ways to share a payment request',exact:true}).getByRole('tab')).toHaveCount(7);
   await capture(page,{screen:'home-cardholder-sample-data',url:'/',width,sampleData:true});
-  current={screen:'home-merchant-sample-data',width};await preview.getByRole('button',{name:'Merchant',exact:true}).click();
-  await expect(page.getByRole('region',{name:'Merchant dashboard example',exact:true})).toBeVisible();
-  await expect(page.getByRole('region',{name:'Cardholder dashboard example',exact:true})).toHaveCount(0);
+  current={screen:'home-merchant-sample-data',width};await preview.getByRole('button',{name:'Payments',exact:true}).click();
+  await expect(page.getByRole('region',{name:'Payments dashboard',exact:true})).toBeVisible();
+  await expect(page.getByRole('region',{name:'Cards dashboard',exact:true})).toHaveCount(0);
   assert(new URL(page.url()).pathname==='/','SAMPLE_PREVIEW_NAVIGATED');
   await capture(page,{screen:'home-merchant-sample-data',url:'/',width,sampleData:true,fullPage:false});
-  await preview.getByRole('button',{name:'Cardholder',exact:true}).click();
-  await expect(page.getByRole('region',{name:'Cardholder dashboard example',exact:true})).toBeVisible();
+  await preview.getByRole('button',{name:'Cards',exact:true}).click();
+  await expect(page.getByRole('region',{name:'Cards dashboard',exact:true})).toBeVisible();
   for(const [screen,url] of [['cards','/card-services'],['payments','/payment-services'],['help','/help'],['login','/login']]){
    current={screen,width};await open(page,url);if(screen==='login')await expect(page.getByRole('heading',{name:'Sign in with email',exact:true})).toBeVisible();
    await capture(page,{screen,url,width});

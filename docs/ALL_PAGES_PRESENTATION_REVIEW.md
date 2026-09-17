@@ -58,3 +58,11 @@ D81 remains deployed. D82/D83 are local edits, not a new hosted release.
 ## Publication authorization
 
 The user requested deployment after reviewing the completed local cleanup. Independent source review found no blocking regression, privacy or accessibility issue. Publication will use the bound GitHub repository and existing Netlify site after exact-source checks, with existing visitor access retained. Hosted results are recorded separately from the local evidence above.
+
+## Verified publication
+
+The user-approved release is published through [PR26](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/26), merged commit `5df50a5f7b9f621ddf283ddd71b5f2aed795bfc7`, source tree `0e47dcf91cc8a570d5254d86ffacda228ee4a4b4`. GitHub run `35116777146` passed the complete release workflow, including all260 desktop/mobile and30 accessibility cases in one run. Its checked merge, reviewed head, final main and873-file source archive match. Offline Netlify packaging also passed; the isolated package dependency-path failure and successful repair are retained in `artifacts/d83-offline-package-receipt.json`.
+
+Netlify deploy `6aaabc9ab5e2833789718dc1` published at15:59:09.752UTC on16 September2026 and was confirmed current again after acceptance. No database migrations, data reset or access-setting changes occurred; Netlify created an on-publish snapshot. All186 final hosted read-only checks and44 responsive public captures pass with zero issues. The first run completed the same checks but flagged three expected404 console messages because HTTP/2 supplied an empty status phrase; its evidence is preserved. An independently reviewed, one-line verifier correction accepts that phrase only for the exact synthetic missing-page navigation, while retaining all status, asset, API, host and runtime guards. No application correction or additional deployment was needed. The deployed version and unchanged visitor access were reverified after acceptance. Actual hosted password/mailbox use and authenticated customer writes are not claimed.
+
+Final receipts: `artifacts/d83-publication.json` and `artifacts/d83-hosted-acceptance-http2-verified/checks.json`. These post-publication notes record evidence; they do not alter the deployed application source or the exact-source provenance above.

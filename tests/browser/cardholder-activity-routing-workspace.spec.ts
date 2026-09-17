@@ -62,7 +62,7 @@ test("an older selected-card activity link opens the canonical activity view and
   await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services/cards"&&!url.searchParams.has("view")&&!url.searchParams.has("focus")&&!url.searchParams.has("activityCard"));
   await expect(page.getByRole("navigation",{name:"Card ownership",exact:true})).toHaveCount(0);
   await expect(page.getByRole("navigation",{name:"Card management",exact:true})).toHaveCount(0);
-  await expect(page.getByRole("searchbox",{name:"Search your cards",exact:true})).toBeVisible();
+  await expect(page.getByRole("searchbox",{name:"Search cards",exact:true})).toBeVisible();
   await expect(page.getByRole("link",{name:new RegExp(`^Open ${own.card.nickname},`)})).toBeVisible();
   await expect(page.locator("main")).not.toContainText(foreign.card.nickname);
 });

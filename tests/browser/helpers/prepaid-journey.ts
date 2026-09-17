@@ -101,20 +101,31 @@ export async function addMoney(page:Page,serviceId:string,amount="50.00"){
   const confirming=responseFor(page,`/api/v1${base}/funding/intents/${intent.id}`);
   await panel.getByRole("button",{name:"Confirm and add money",exact:true}).click();
   const confirmed=await confirming;expect(confirmed.status()).toBe(200);
-  const receipt=moneyTopupReceiptSchema.parse(await confirmed.json());
+  await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);
+  await expect(page.getByRole("heading",{name:"Account home",exact:true})).toBeVisible();
+  // The confirmed top-up returns with a full document navigation. Read the exact
+  // saved review through APIRequestContext; its body outlives the old document.
+  const savedResponse=await page.request.get(`/api/v1${base}/funding/intents/${intent.id}`);
+  expect(savedResponse.status()).toBe(200);
+  const saved=moneyFundingIntentSchema.parse(await savedResponse.json());
+  expect(saved).toMatchObject({id:intent.id,moneyAccountId,receiptId:intent.receiptId,amount:intent.amount});
+  const receipt=moneyTopupReceiptSchema.parse(saved.receipt);
   expect(receipt).toMatchObject({id:intent.receiptId,moneyAccountId,amount:intent.amount,status:"COMPLETED"});
-  await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
-  await expect(panel).toContainText(receipt.reference);
+  const fundedResponse=await page.request.get(`/api/v1${base}`);expect(fundedResponse.status()).toBe(200);
+  const funded=moneyOverviewSchema.parse(await fundedResponse.json());
+  expect(funded).toMatchObject({id:moneyAccountId,serviceKind:"CARDHOLDER",services:[{id:serviceId,kind:"CARDHOLDER"}]});
+  await expect(homeBalance).toContainText(funded.available.formatted);
+  await expect(homeBalance.getByRole("link",{name:"Money activity",exact:true})).toHaveAttribute("href",base);
 }
 export async function setCardAllowance(page:Page,serviceId:string,cardId:string,name:string,amount="25.00"){
   await page.goto(`/cardholder-services?card=${cardId}`);
   const control=page.getByRole("region",{name:"Card management details",exact:true}).getByRole("article",{name:"Card spending limit",exact:true});
   await control.getByRole("button",{name:"Change spending limit for "+name,exact:true}).click();
-  await control.getByRole("textbox",{name:"New total spending limit for "+name,exact:true}).fill(amount);
-  await control.getByRole("button",{name:"Review spending limit",exact:true}).click();
+  await control.getByRole("textbox",{name:"Total limit (USD)",exact:true}).fill(amount);
+  await control.getByRole("button",{name:"Review",exact:true}).click();
   await expect(control).toContainText("It does not add money or reset past spending, including refunded purchases.");
   const saving=responseFor(page,`/api/v1/cardholder-services/${serviceId}/cards/${cardId}/spending-limit`,"PUT");
-  await control.getByRole("button",{name:"Save spending limit",exact:true}).click();
+  await control.getByRole("button",{name:"Save limit",exact:true}).click();
   expect((await saving).status()).toBe(200);
   await expect(control.locator(".funds-limit-value")).toHaveText("$"+amount);
 }

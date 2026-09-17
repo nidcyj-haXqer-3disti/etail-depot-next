@@ -82,13 +82,15 @@ test("funding waits for its saved review navigation before confirming and recove
  await expect(panel.getByRole("link",{name:"Change amount",exact:true})).toHaveCount(0);
  expect(confirmations).toEqual([{path:`${base}/${preparedId}`,body:{}}]);
  expect((await getCardholderFunds(primary.personId,primary.serviceId)).available.minor).toBe(amount);
- await retry.click();
- await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
- expect(confirmations).toHaveLength(2);expect(confirmations[1]).toEqual(confirmations[0]);
  expect(page.url()).toBe(savedUrl);
+ await retry.click();
+ await expect(page).toHaveURL(url=>url.pathname==="/cardholder-services"&&!url.search);
+ await expect(page.getByRole("region",{name:"Card account balance",exact:true})).toContainText("$73.61");
+ expect(confirmations).toHaveLength(2);expect(confirmations[1]).toEqual(confirmations[0]);
  const read=await page.request.get(`${base}/${preparedId}`);expect(read.status()).toBe(200);
  const saved=moneyFundingIntentSchema.parse(await read.json());
  expect(saved.receipt?.id).toBe(receiptId);
+ await page.goto(savedUrl);await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();
  await expect(panel).toContainText(saved.receipt!.reference);
  await page.reload();expect(page.url()).toBe(savedUrl);
  await expect(panel.getByRole("heading",{name:"Money added",exact:true})).toBeVisible();

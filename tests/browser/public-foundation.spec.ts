@@ -31,7 +31,7 @@ test("a new visitor can compare services before signing in", async ({ page }) =>
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Get paid\.\s*Keep it simple\.$/);
   await expect(mainNavigation.getByRole("link",{name:"Accept payments",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.getByRole("heading",{name:"Account owner",exact:true})).toBeVisible();
-  await expect(page.getByRole("heading",{name:"People you invite",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Team members",exact:true})).toBeVisible();
   await page.getByRole("link",{name:"Open your payments",exact:true}).click();
   await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.searchParams.get("next")==="/merchant-services");
   expect(errors).toEqual([]);

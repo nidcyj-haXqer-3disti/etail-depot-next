@@ -2,9 +2,9 @@ import type { Metadata, MetadataRoute } from "next";
 import targets from "../../../project-targets.json" with { type: "json" };
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Prepaid cards for your people and business payment tools", description: "Manage prepaid cards and spending limits for family or teams. Collect payments with links, invoices and QR codes, and keep card and payment balances separate." },
-  "/card-services": { title: "Cards for your family, team and trusted people", description: "Add money, create cards and set a total spending limit for each card. Your people see their own purchases while you manage the shared card balance." },
-  "/payment-services": { title: "Accept payments with links, invoices and QR codes", description: "Create payment requests, share links or QR codes and track receipts. Invite people to help collect payments while you control the payment balance." },
+  "/": { title: "Prepaid cards and payment tools for family or business", description: "Manage prepaid cards and spending limits for family or teams. Collect payments with links, invoices and QR codes, and keep card and payment balances separate." },
+  "/card-services": { title: "Cards for your family or business", description: "Add money, create cards and set a total spending limit for each card. Each cardholder sees their own purchases while you manage the shared card balance." },
+  "/payment-services": { title: "Accept payments with links, invoices and QR codes", description: "Create payment requests, share links or QR codes and track receipts. Give your team access to collect payments while you control the payment balance." },
   "/help": { title: "Help with cards and payments", description: "Learn how Etail Depot card controls, payment tools and shared access work. Find clear answers about your services and account." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;

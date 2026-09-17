@@ -18,7 +18,7 @@ test("account preferences keep an exact saved request through navigation, access
   await getDb().update(services).set({displayName:accountName}).where(eq(services.id,owner.serviceId));
   const holder=await cardPerson("Invited preference reader");await enrollCardholder(owner.personId,owner.serviceId,holder);
   const path=`/api/v1/cardholder-services/${owner.serviceId}/preferences/notifications`,settingsHref=`/cardholder-services/settings?context=${owner.serviceId}`;
-  const attempts:unknown[]=[],readPaths:string[]=[];
+  const attempts:unknown[]=[],readPaths:string[]=[],outcomes:Array<{status:number;code?:string}>=[];
   page.on("request",request=>{if(request.method()==="GET"&&new URL(request.url()).pathname.startsWith("/api/v1/"))readPaths.push(new URL(request.url()).pathname);});
   await signInPerson(page,owner.personId);await page.goto(settingsHref);
   const details=page.getByRole("region",{name:"Account details",exact:true}),preferences=page.getByRole("region",{name:"Notification preferences",exact:true});
@@ -32,6 +32,7 @@ test("account preferences keep an exact saved request through navigation, access
   await page.route(`**${path}`,async route=>{
     if(route.request().method()!=="PUT"){await route.continue();return;}
     attempts.push(route.request().postDataJSON());const response=await route.fetch();
+    outcomes.push({status:response.status(),...(response.status()===409?{code:(await response.json()).error?.code}:{})});
     if(attempts.length===1){expect(response.status()).toBe(200);await route.fulfill({status:200,json:{}});}
     else await route.fulfill({response});
   });
@@ -62,9 +63,21 @@ test("account preferences keep an exact saved request through navigation, access
   expect(await getDb().select().from(workspaceCommands).where(eq(workspaceCommands.commandId,original.commandId))).toHaveLength(1);
   expect((await getNotificationPreferences(owner.personId,owner.serviceId)).preferences).toMatchObject({version:2,serviceActivity:false});
   expect((await getNotificationPreferences(holder,owner.serviceId)).preferences).toMatchObject({version:1,serviceActivity:true});
-  await saveNotificationPreferences(owner.personId,owner.serviceId,{commandId:randomUUID(),expectedPersonId:owner.personId,expectedVersion:2,serviceActivity:true,cardControls:true,caseUpdates:true});
+  // Success feedback precedes the background route refresh. Finish a full reload
+  // at version 2 before staging the remote edit, so this form is actually stale.
+  await page.reload();
+  await expect(activity).not.toBeChecked();await expect(activity).toBeEnabled();
+  await expect(preferences.getByRole("checkbox",{name:/^Card controls/})).toBeChecked();
+  await expect(preferences.getByRole("button",{name:"Save preferences",exact:true})).toBeEnabled();
+  expect(await saveNotificationPreferences(owner.personId,owner.serviceId,{commandId:randomUUID(),expectedPersonId:owner.personId,expectedVersion:2,serviceActivity:true,cardControls:true,caseUpdates:true})).toMatchObject({version:3});
   await preferences.getByRole("checkbox",{name:/^Card controls/}).uncheck();
   await preferences.getByRole("button",{name:"Save preferences",exact:true}).click();
+  await expect.poll(()=>outcomes.length).toBe(4);
+  expect(outcomes[3]).toEqual({status:409,code:"STALE_VERSION"});
+  const staleCommand=notificationCommandSchema.parse(attempts[3]);
+  expect(staleCommand).toMatchObject({expectedPersonId:owner.personId,expectedVersion:2,serviceActivity:false,cardControls:false,caseUpdates:true});
+  expect(await getDb().select().from(workspaceCommands).where(eq(workspaceCommands.commandId,staleCommand.commandId))).toHaveLength(0);
+  expect((await getNotificationPreferences(owner.personId,owner.serviceId)).preferences).toMatchObject({version:3,serviceActivity:true,cardControls:true,caseUpdates:true});
   await expect(preferences.getByRole("button",{name:"Save preferences",exact:true})).toBeDisabled();
   await expect(preferences.getByRole("button",{name:"Retry saved preferences",exact:true})).toHaveCount(0);
   await preferences.getByRole("button",{name:"Reload saved preferences",exact:true}).click();
