@@ -45,7 +45,8 @@ test("account preferences keep an exact saved request through navigation, access
   expect(readPaths).toContain(path);expect(readPaths.some(value=>value.endsWith("/workspace"))).toBe(false);
   const nav=page.getByRole("navigation",{name:"Cards and spending navigation",exact:true});
   await nav.getByRole("link",{name:"Account home",exact:true}).click();
-  await expect(page.getByRole("region",{name:"Your card account",exact:true})).toContainText(accountName);
+  await expect(page.getByRole("region",{name:"Your card account",exact:true})).toBeVisible();
+  await expect(nav.getByRole("link",{name:"Account settings",exact:true})).toHaveAttribute("href",settingsHref);
   await nav.getByRole("link",{name:"Account settings",exact:true}).click();
   await expect(retry).toBeEnabled();await expect(activity).toBeDisabled();expect(attempts).toHaveLength(1);
   const grant=and(eq(permissionGrants.personId,owner.personId),eq(permissionGrants.serviceId,owner.serviceId),eq(permissionGrants.action,"notifications.manage"));

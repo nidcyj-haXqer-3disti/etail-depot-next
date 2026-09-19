@@ -34,20 +34,26 @@ type MoneyAccountProps=MoneyHomeProps&{task:Task|null;review:Review|null;showBac
 export function MoneyAccountHome({account,returnTo=null,settlements=[],settlementsUnavailable=false}:MoneyHomeProps){
  const merchant=account.serviceKind==="MERCHANT",router=useRouter(),[refreshing,startRefresh]=useTransition();
  const href=(values:Record<string,string>={})=>moneyAccountHref(account.id,returnTo,values);
- return <section className="money-home" aria-label={merchant?`${account.displayName} balance`:"Card account balance"}>
-  <div className="money-balance">
-   <div><span>{merchant?account.displayName:"Available to spend"}</span><strong>{account.available.formatted}</strong><p>{merchant?"Available for payout · Current balance, across all dates":"One balance for your cards. Each card has its own spending limit."}</p></div>
-   <div className="money-actions">
-    {!merchant&&account.canAddMoney&&<Link className="consumer-button consumer-button-primary" href={href({task:"add"})}>Add money</Link>}
-    {merchant&&account.canWithdraw&&<Link className="consumer-button consumer-button-primary" href={href({task:"withdraw"})}>Request payout</Link>}
-    <Link className="money-activity-link" href={href(merchant?{history:"payouts"}:{})}>{merchant?"Payout history":"Money activity"}</Link>
-    {(merchant||account.pendingWithdrawals.minor!=="0")&&<span>{merchant?"Payouts pending":"Returns in progress"}: {account.pendingWithdrawals.formatted}</span>}
-   </div>
+ if(merchant)return <section className="money-home money-payout-account" aria-label={`${account.displayName} balance`}>
+  <header className="money-payout-business"><h3>{account.displayName}</h3><span>Current balance · across all dates</span></header>
+  <div className="money-payout-summary">
+   <dl><div><dt>Available for payout</dt><dd>{account.available.formatted}</dd></div><div><dt>Payouts pending</dt><dd>{account.pendingWithdrawals.formatted}</dd></div></dl>
+   <div className="money-payout-actions">{account.canWithdraw&&<Link className="consumer-button consumer-button-primary" href={href({task:"withdraw"})}>Request payout</Link>}<Link className="money-activity-link" href={href({history:"payouts"})}>Payout history</Link></div>
   </div>
-  {merchant&&<details className="money-settlements money-incoming"><summary>Incoming payments <span>View settlements by terminal</span></summary><div>
+  <details className="money-settlements money-incoming"><summary>Incoming payments <span>View settlements by terminal</span></summary><div>
    <p>Confirmed customer payments settle into your available balance before you request a payout.</p>
    {settlementsUnavailable?<><p role="status">Incoming payments are temporarily unavailable. Your available balance is shown above.</p><Button variant="secondary" busy={refreshing} onClick={()=>startRefresh(()=>router.refresh())}>Reload incoming payments</Button></>:settlements.length?settlements.map(terminal=><MerchantOperations key={terminal.workspace.merchant.id} workspace={terminal.workspace} initial={terminal.operations} section="balance" showAdministration returnTo={returnTo}/>):<p>No terminal settlements are available.</p>}
-  </div></details>}
+  </div></details>
+ </section>;
+ return <section className="money-home" aria-label="Card account balance">
+  <div className="money-balance">
+   <div><span>Available to spend</span><strong>{account.available.formatted}</strong><p>One balance for your cards. Each card has its own spending limit.</p></div>
+   <div className="money-actions">
+    {account.canAddMoney&&<Link className="consumer-button consumer-button-primary" href={href({task:"add"})}>Add money</Link>}
+    <Link className="money-activity-link" href={href()}>Money activity</Link>
+    {account.pendingWithdrawals.minor!=="0"&&<span>Returns in progress: {account.pendingWithdrawals.formatted}</span>}
+   </div>
+  </div>
  </section>;
 }
 export function MoneyAccountPage(props:MoneyAccountProps){

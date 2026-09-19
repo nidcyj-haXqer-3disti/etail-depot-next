@@ -1,7 +1,7 @@
 import {customerRouteQuery} from "../../src/shared/customer-routes";
 import {closeDatabase} from "../../src/platform/database/client";
 import {signInPerson} from "./helpers/prepaid";
-import {expect,test} from "@playwright/test";
+import {expect,test,type Page} from "@playwright/test";
 import {merchantDashboardProjectionSchema} from "../../src/modules/acquiring/dashboard-contracts";
 import {merchantAccessFixture} from "../helpers/merchant-access";
 import {terminalCheckoutFixture,payTerminal} from "../helpers/terminal-checkout";
@@ -9,8 +9,15 @@ import {randomUUID} from "node:crypto";
 import {completeSetup} from "../helpers/acquiring";
 import {getMerchantBusinessDetails,updateMerchantSetup,submitMerchantSetup} from "../../src/modules/acquiring/service";
 import {parseMerchantActivityFilters} from "../../src/shared/merchant-activity";
+import {createPrimaryMerchant} from "../../src/modules/services/create-merchant";
+import {listOwnedMoneyAccounts} from "../../src/modules/money/service";
 
 function matchesQuery(url:URL,expected:URLSearchParams){const actual=parseMerchantActivityFilters(customerRouteQuery(url.pathname,url.searchParams));return [...expected].every(([key,value])=>String(actual[key as keyof typeof actual])===value);}
+async function statementFilters(page:Page){
+ const disclosure=page.locator(".ms-filter-options");
+ if(await disclosure.getAttribute("open")===null)await disclosure.locator("summary").click();
+ await expect(page.getByRole("form",{name:"Filter account statement",exact:true})).toBeVisible();
+}
 test.afterAll(closeDatabase);
 test("one Merchant menu opens a complete exact terminal and business-only account settings",async({page})=>{
  const {merchant,master,unit,operator}=await merchantAccessFixture();
@@ -24,11 +31,17 @@ test("one Merchant menu opens a complete exact terminal and business-only accoun
  if(viewport)await page.setViewportSize(viewport);
  await expect(page.getByRole("heading",{name:"Account statement",exact:true})).toBeVisible();
  const statement=page.getByRole("region",{name:"Account statement",exact:true});
- await expect(statement.locator(".ms-about")).not.toHaveAttribute("open");
+ await expect(statement.locator(".ms-filter-options")).not.toHaveAttribute("open");
+ await expect(statement.getByRole("form",{name:"Filter account statement",exact:true})).not.toBeVisible();
+ await expect(statement.locator(".ms-totals,.ms-count,.ms-about")).toHaveCount(0);
  await expect(statement.getByRole("navigation",{name:"Statement pages",exact:true})).toHaveCount(0);
- await statement.locator(".ms-about > summary").focus();await page.keyboard.press("Enter");
- await expect(statement.locator(".ms-about")).toContainText("Internal transfers do not add to money in or out.");
- await statement.locator(".ms-about > summary").click();
+ await statement.locator(".ms-filter-options > summary").focus();await page.keyboard.press("Enter");
+ await expect(statement.getByRole("form",{name:"Filter account statement",exact:true})).toBeVisible();
+ await statement.locator(".ms-filter-options > summary").click();
+ const payout=page.getByRole("region",{name:"Payout",exact:true});
+ await expect(payout).toHaveCount(1);await expect(payout.getByRole("link",{name:"Request payout",exact:true})).toHaveCount(1);
+ await expect(page.locator(".md-dashboard > section")).toHaveCount(2);
+ await expect(payout.locator(".money-incoming")).not.toHaveAttribute("open");
  await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toHaveCount(0);
  await navigation.getByRole("link",{name:"Terminals",exact:true}).click();
  await page.getByRole("navigation",{name:"Terminal use",exact:true}).getByRole("link",{name:"For others",exact:true}).click();
@@ -63,6 +76,10 @@ test("one Merchant menu opens a complete exact terminal and business-only accoun
  await expect(page).toHaveURL(url=>`${url.pathname}${url.search}`===accountReturn);
  await signInPerson(page,operator.personId);await page.goto("/merchant-services");
  await expect(navigation.getByRole("link")).toHaveText(["Overview","Terminals"]);
+ await expect(page.getByRole("region",{name:"Payout",exact:true})).toHaveCount(0);
+ await expect(page.locator(".money-home,.money-incoming")).toHaveCount(0);
+ await expect(page.getByText("Optional: add your own business",{exact:true})).toHaveCount(0);
+ await navigation.getByRole("link",{name:"Terminals",exact:true}).click();
  const optionalBusiness=page.locator("details").filter({has:page.getByText("Optional: add your own business",{exact:true})});
  await expect(optionalBusiness).not.toHaveAttribute("open");
  await optionalBusiness.locator("summary").focus();await page.keyboard.press("Enter");
@@ -70,8 +87,7 @@ test("one Merchant menu opens a complete exact terminal and business-only accoun
  const enrollment=page.getByRole("dialog",{name:"Name your business",exact:true});
  await expect(enrollment.getByRole("textbox",{name:"Business name",exact:true})).toBeVisible();
  await enrollment.getByRole("button",{name:"Cancel",exact:true}).click();
- await navigation.getByRole("link",{name:"Terminals",exact:true}).click();
- await expect(optionalBusiness).toHaveCount(0);
+ await expect(optionalBusiness).toHaveCount(1);
  await expect(page.getByRole("navigation",{name:"Terminal use",exact:true})).toHaveCount(0);
  await page.getByRole("link",{name:unit.displayName,exact:true}).click();
  await expect(page.getByRole("link",{name:"Request payout",exact:true})).toHaveCount(0);
@@ -121,20 +137,19 @@ test("merchant activity keeps exact terminal scope, dates, pages and receipts wh
  const today=new Date().toISOString().slice(0,10),query=new URLSearchParams({view:`merchant:${f.merchant.serviceId}`,period:"custom",from:today,to:today,q:f.channel.description,status:"COLLECTED",activity:"payments"});
  await page.goto(`/merchant-services?${query}`);
  await expect(page.getByRole("heading",{name:"Overview",level:1,exact:true})).toBeVisible();
+ await statementFilters(page);
  await expect(page.getByRole("combobox",{name:"Show",exact:true})).toHaveValue(`merchant:${f.merchant.serviceId}`);
  await expect(page.getByRole("searchbox",{name:"Find a record",exact:true})).toHaveValue(f.channel.description);
- // Submitting either form must keep the other investigation filters.
- await page.getByRole("button",{name:"Show",exact:true}).click();
- await expect(page).toHaveURL(url=>matchesQuery(url,query));
+ // Scope, date and search now submit together without dropping saved status filters.
  await page.getByRole("button",{name:"Search statement",exact:true}).click();
  await expect(page).toHaveURL(url=>matchesQuery(url,query));
  expect(new URL(page.url()).searchParams.get("status")).toBe("COLLECTED");
  const table=page.getByRole("table");await expect(table.locator("tbody tr")).toHaveCount(25);
- await expect(table.getByRole("columnheader")).toHaveText(["Date","Record","Money in","Money out"]);
+ await expect(table.getByRole("columnheader")).toHaveText(["Date","Description","Credit","Debit"]);
  const firstRecord=table.locator("tbody tr").first();
  await expect(firstRecord.locator(".ms-record-context .consumer-status")).toHaveText("Completed");
- await expect(firstRecord.locator('td[data-label="Money in"]')).toHaveText("$12.50");
- await expect(firstRecord.locator('td[data-label="Money out"]')).toHaveText("—");
+ await expect(firstRecord.locator('td[data-label="Credit"]')).toHaveText("$12.50");
+ await expect(firstRecord.locator('td[data-label="Debit"]')).toHaveText("—");
  await page.getByRole("link",{name:"Older records",exact:true}).click();await expect(table.locator("tbody tr")).toHaveCount(1);
  await page.reload();expect(new URL(page.url()).searchParams.get("page")).toBe("2");
  const data=await page.request.get(`/api/v1/merchants/dashboard?${query}&page=2`);expect(data.status()).toBe(200);
@@ -158,31 +173,36 @@ test("merchant activity keeps exact terminal scope, dates, pages and receipts wh
  // The old page has the same money and filter controls while this client
  // navigation is pending. Wait for the new query's keyed form before editing.
  await expect(page).toHaveURL(url=>url.pathname==="/merchant-services"&&url.searchParams.get("section")==="overview"&&url.searchParams.get("page")==="2"&&matchesQuery(url,query));
+ await statementFilters(page);
  await expect(page.getByRole("form",{name:"Filter account statement",exact:true}).locator('input[name="section"]')).toHaveValue("overview");
  await expect(table.locator("tbody tr")).toHaveCount(1);
  await page.locator(".money-incoming > summary").click();
  await expect(page.getByRole("region",{name:`Settlement for ${f.unit.displayName}`,exact:true})).toContainText("$325.00");
 
+ await statementFilters(page);
  await page.getByRole("searchbox",{name:"Find a record",exact:true}).fill("No matching order");
  await page.getByRole("button",{name:"Search statement",exact:true}).click();
  await expect(page).toHaveURL(url=>url.searchParams.get("q")==="No matching order"&&url.searchParams.get("view")===`merchant:${f.merchant.serviceId}`&&url.searchParams.get("section")==="overview"&&url.searchParams.get("status")==="COLLECTED"&&!url.searchParams.has("page"));
  await expect(page.getByRole("heading",{name:"No records match these filters",exact:true})).toBeVisible();
+ await statementFilters(page);
  await page.getByRole("combobox",{name:"When",exact:true}).selectOption("last7");
  await page.getByRole("button",{name:"Search statement",exact:true}).click();
  await expect(page).toHaveURL(url=>url.searchParams.get("period")==="last7"&&url.searchParams.get("q")==="No matching order"&&!url.searchParams.has("from")&&!url.searchParams.has("to"));
+ await statementFilters(page);
  await expect(page.getByRole("searchbox",{name:"Find a record",exact:true})).toHaveValue("No matching order");
  const refundQuery=new URL(page.url());refundQuery.searchParams.set("section","activity");refundQuery.searchParams.set("activity","refunds");
  await page.goto(`${refundQuery.pathname}${refundQuery.search}`);
+ await statementFilters(page);
  await expect(page.getByRole("searchbox",{name:"Find a record",exact:true})).toHaveValue("No matching order");
  await expect(page.getByRole("heading",{name:"No records match these filters",exact:true})).toBeVisible();
  await page.getByRole("searchbox",{name:"Find a record",exact:true}).fill("");
  await page.getByRole("combobox",{name:"When",exact:true}).selectOption("lastMonth");
  await page.getByRole("button",{name:"Search statement",exact:true}).click();
  await expect(page).toHaveURL(url=>url.searchParams.get("activity")==="refunds"&&url.searchParams.get("period")==="lastMonth"&&!url.searchParams.get("q"));
- await page.reload();
+ await page.reload();await statementFilters(page);
  await expect(page.getByRole("combobox",{name:"When",exact:true})).toHaveValue("lastMonth");
  await page.getByRole("combobox",{name:"Show",exact:true}).selectOption(`unit:${f.unit.id}`);
- await page.getByRole("button",{name:"Show",exact:true}).click();
+ await page.getByRole("button",{name:"Search statement",exact:true}).click();
  await expect(page).toHaveURL(url=>url.searchParams.get("activity")==="refunds"&&url.searchParams.get("period")==="lastMonth"&&url.searchParams.get("view")===`unit:${f.unit.id}`&&!url.searchParams.has("page"));
  const investigation=new URL(page.url());
  await page.getByRole("navigation",{name:"Merchant account navigation",exact:true}).getByRole("link",{name:"Terminals",exact:true}).click();
@@ -210,9 +230,34 @@ test("saved Channels links open the unified explicit terminal list before creati
  await expect(page.getByRole("region",{name:"Selected payment terminal",exact:true})).toContainText(unit.displayName);
  await signInPerson(page,operator.personId);await page.goto("/merchant-services?section=channels");
  await expect(page.getByRole("button",{name:"Add your business",exact:true})).toHaveCount(0);
- await expect(page.getByText("Optional: add your own business",{exact:true})).toHaveCount(0);
+ await expect(page.locator(".md-optional-enrollment")).not.toHaveAttribute("open");
  await expect(chooser.getByRole("link",{name:unit.displayName,exact:true})).toBeVisible();
  await expect(chooser.getByRole("link",{name:master.displayName,exact:true})).toHaveCount(0);
  await expect(page.getByRole("link",{name:"Create terminal",exact:true})).toHaveCount(0);
  expect((await page.request.get(`/api/v1/merchants/${master.id}`)).status()).toBe(404);
+});
+
+
+test("one Payout area keeps each owned business balance and action exact",async({page})=>{
+ const {merchant,unit}=await merchantAccessFixture();
+ await createPrimaryMerchant(merchant.personId,{commandId:randomUUID(),displayName:"Second independent business"});
+ const accounts=(await listOwnedMoneyAccounts(merchant.personId)).filter(account=>account.serviceKind==="MERCHANT");
+ expect(accounts).toHaveLength(2);
+ await signInPerson(page,merchant.personId);await page.goto("/merchant-services");
+ const payout=page.getByRole("region",{name:"Payout",exact:true});
+ await expect(payout).toHaveCount(1);await expect(payout.locator(".money-payout-account")).toHaveCount(2);
+ await expect(payout.getByRole("link",{name:"Request payout",exact:true})).toHaveCount(2);
+ for(const account of accounts){
+  const balance=payout.getByRole("region",{name:`${account.displayName} balance`,exact:true});
+  await expect(balance.getByRole("heading",{name:account.displayName,exact:true})).toBeVisible();
+  await expect(balance.locator(".money-payout-summary dl > div").first().locator("dd")).toHaveText(account.available.formatted);
+  await expect(balance.getByRole("link",{name:"Request payout",exact:true})).toHaveAttribute("href",new RegExp(`^/money-accounts/${account.id}/withdraw\\?`));
+ }
+ await statementFilters(page);await page.getByRole("combobox",{name:"Show",exact:true}).selectOption(`unit:${unit.id}`);
+ await page.getByRole("button",{name:"Search statement",exact:true}).click();
+ await expect(page).toHaveURL(url=>url.searchParams.get("view")===`unit:${unit.id}`);
+ await expect(payout.locator(".money-payout-account")).toHaveCount(1);
+ await expect(payout).not.toContainText("Second independent business");
+ await expect(page.getByRole("region",{name:"Account statement",exact:true})).toContainText("Terminal records only. Business payouts are not included.");
+ await expect(payout).toContainText("Current balance · across all dates");
 });

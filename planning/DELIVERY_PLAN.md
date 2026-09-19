@@ -1,6 +1,10 @@
-## D85 active presentation slice
+## D86 local review — minimal service overviews complete
 
-Simplify the confirmed funding return, Cards directory/limit controls, Merchant statement/terminal directory and landing illustration. Preserve recovery URLs, authoritative balances, authorization and accounting effects. Affected desktop/mobile/accessibility workflows and the preserved local preview are verified:128 cases,8 final reruns,126 dashboard states and27 public states pass. No financial migration or publication in this slice. See [evidence](../docs/SIMPLER_DASHBOARD_EVIDENCE.md). D84 secured-card design remains pending the collateral-to-limit decision.
+The user’s [presentation contract](../docs/MINIMAL_SERVICE_OVERVIEWS.md) is implemented and locally verified:292 desktop/mobile/accessibility cases,30 affected public cases,126 guarded dashboard states,27 final public states and10 final chrome breakpoints pass. Deployment is now explicitly authorized. Complete exact-source CI, isolated Netlify packaging, reviewed merge and live acceptance; preserve D85 release evidence. No financial or database cutover.
+
+## D85 published — presentation cleanup complete
+
+The requested D84–D85 copy, styling and dashboard simplification is published through reviewed PR27 and Netlify deploy `6aab7282e2d64d0f3e1b7337`. Full exact-source CI and isolated packaging pass;186 final hosted checks and44 responsive captures pass. No migrations, data reset or access-setting changes. [Release evidence](../docs/SIMPLER_DASHBOARD_EVIDENCE.md) records both corrected test races and exact source identity. D84 secured-card financial design remains pending the collateral-to-limit decision; current runtime is prepaid.
 
 # Etail Depot — active delivery plan
 

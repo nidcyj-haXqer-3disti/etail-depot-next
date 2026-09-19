@@ -5,6 +5,7 @@ import { Icon } from "./icon";
 import { ServiceNavigation } from "./service-navigation";
 import { PublicNavigation } from "./public-navigation";
 import "./services.css";
+import "./public-chrome.css";
 
 export function Header({ authenticated = false, activeService }: { authenticated?: boolean; activeService?: "CARDHOLDER" | "MERCHANT" }) {
   return <header className={`site-header ${authenticated ? "account-header" : "public-header"}`}><div className="header-inner"><Link href={authenticated ? "/services" : "/"} className="brand-link" aria-label="Etail Depot home"><Image src="/brand/logo.png" alt="Etail Depot" width={799} height={148} priority className="brand-logo" /></Link>{authenticated ? <ServiceNavigation activeService={activeService} /> : <PublicNavigation />}<div className="header-actions"><span className="sandbox-badge"><span aria-hidden="true" />Sandbox</span>{authenticated ? <AccountMenu /> : <Link className="header-sign-in" href="/login">Sign in <Icon name="arrow" /></Link>}</div></div></header>;
@@ -12,7 +13,7 @@ export function Header({ authenticated = false, activeService }: { authenticated
 
 function Footer() {
   return <footer className="site-footer public-footer">
-    <div className="public-footer-main page-container"><div><Link href="/" className="footer-brand">Etail Depot</Link><p>Cards for family and business. More ways to get paid.</p><p className="footer-copyright">© Etail Depot</p></div><nav aria-label="Explore Etail Depot"><Link href="/card-services">Cards & spending</Link><Link href="/payment-services">Accept payments</Link><Link href="/help">Help center</Link><Link href="/login">Sign in</Link></nav></div>
+    <div className="public-footer-main page-container"><div className="public-chrome-row"><Link href="/" className="footer-brand brand-link"><Image src="/brand/logo.png" alt="Etail Depot" width={799} height={148} className="brand-logo" /></Link><PublicNavigation label="Explore Etail Depot" /><Link className="header-sign-in" href="/login">Sign in <Icon name="arrow" /></Link></div><div className="public-footer-note"><p>For your family or business.</p><p className="footer-copyright">© Etail Depot</p></div></div>
   </footer>;
 }
 
