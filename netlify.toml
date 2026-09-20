@@ -1,6 +1,6 @@
 [build]
-  # Keep automatic publication off until the hosted slice has been reviewed.
-  # Netlify build hooks bypass ignore; do not configure hooks for this foundation.
+  # Public-only website. Keep automatic publication off pending reviewed release.
+  # Netlify build hooks bypass ignore; do not configure unattended release hooks.
   ignore = "exit 0"
 command = "pnpm build"
 publish = ".next"
@@ -8,6 +8,14 @@ publish = ".next"
 [build.environment]
 NODE_VERSION = "24.19.0"
 PNPM_VERSION = "11.19.0"
+
+# D122: search launch for this exact production site. Preview contexts stay excluded.
+# Matching production-only Functions values are configured through the Netlify API;
+# netlify.toml environment settings apply to builds, not function runtime.
+[context.production.environment]
+APP_ENV = "production"
+ETAIL_SEARCH_CONTEXT = "production"
+ETAIL_PUBLIC_ORIGIN = "https://etail-depot-next.netlify.app"
 
 [functions]
 node_bundler = "esbuild"

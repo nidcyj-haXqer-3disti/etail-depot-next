@@ -1,4 +1,14 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+import { openMainNavigation } from "./public-header";
+
+async function expectLoadedNetworkMarks(group: Locator) {
+  await expect(group.getByRole("img")).toHaveCount(4);
+  for (const network of ["Visa", "Mastercard", "American Express", "Discover"]) {
+    const mark = group.getByRole("img", {name:network, exact:true});
+    await expect(mark).toBeVisible();
+    await expect.poll(() => mark.evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0 && image.naturalHeight > 0)).toBe(true);
+  }
+}
 
 async function preventMutationRequests(page: Page) {
   const mutations: string[] = [];
@@ -14,53 +24,202 @@ async function preventMutationRequests(page: Page) {
   return mutations;
 }
 
-test("a new visitor can compare services before signing in", async ({ page }) => {
+test("the shared company header stays consistent and its compact menu works with keyboard, pointer and resizing", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  const routes = ["/", "/payment-services", "/card-services", "/help", "/privacy", "/terms", "/missing-header-review-page"];
+  for (const route of routes) {
+    await page.goto(route);
+    const header = page.getByRole("banner");
+    const home = header.getByRole("link", { name: "Etail Depot home", exact: true });
+    await expect(home).toHaveAttribute("href", "/");
+    await expect(home).toBeVisible();
+    await expect(home.getByRole("img", { name: "Etail Depot", exact: true })).toBeVisible();
+    await expect(header).not.toContainText("by Etail Depot");
+    await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
+    const navigation = await openMainNavigation(page);
+    await expect(navigation.getByRole("link")).toHaveText(["Payments", "Cards", "Help"]);
+    for (const [index, destination] of ["/payment-services", "/card-services", "/help"].entries()) {
+      await expect(navigation.getByRole("link").nth(index)).toHaveAttribute("href", destination);
+    }
+    const current = navigation.locator('[aria-current="page"]');
+    if (["/payment-services", "/card-services", "/help"].includes(route)) await expect(current).toHaveAttribute("href", route);
+    else await expect(current).toHaveCount(0);
+    const action = header.getByRole("link", { name: "Open Trolleys", exact: true });
+    await expect(action).toBeVisible();
+    await expect(action).toHaveAttribute("href", "https://trolleys.ai");
+    await expect(action).toHaveAttribute("referrerpolicy", "no-referrer");
+    await expect(action).toHaveAttribute("rel", /\bnoreferrer\b/);
+    await expect(header.getByRole("link", { name: "Contact Ledgix", exact: true })).toHaveCount(0);
+  }
+
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto("/");
+  const header = page.getByRole("banner");
+  const menu = header.getByRole("button", { name: "Menu", exact: true });
+  const navigation = header.getByRole("navigation", { name: "Main navigation" });
+  await expect(menu).toBeVisible();
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await expect(navigation).toBeHidden();
+  const controlledId = await menu.getAttribute("aria-controls");
+  expect(controlledId).toBeTruthy();
+  await expect(page.locator(`[id="${controlledId}"]`)).toHaveCount(1);
+  const menuBox = (await menu.boundingBox())!;
+  expect(menuBox.width).toBeGreaterThanOrEqual(44);
+  expect(menuBox.height).toBeGreaterThanOrEqual(44);
+
+  await menu.focus();
+  await page.keyboard.press("Enter");
+  await expect(menu).toHaveAttribute("aria-expanded", "true");
+  await expect(navigation).toBeVisible();
+  await page.keyboard.press("Tab");
+  await expect(navigation.getByRole("link").first()).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await expect(navigation).toBeHidden();
+  await expect(menu).toBeFocused();
+
+  await page.keyboard.press("Space");
+  await expect(menu).toHaveAttribute("aria-expanded", "true");
+  await page.getByRole("heading", { level: 1 }).click();
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await expect(navigation).toBeHidden();
+
+  await menu.click();
+  await navigation.getByRole("link", { name: "Payments", exact: true }).click();
+  await expect(page).toHaveURL(/\/payment-services$/);
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await expect(navigation).toBeHidden();
+  await expect(header.getByRole("link", { name: "Etail Depot home", exact: true }).getByRole("img", { name: "Etail Depot", exact: true })).toBeVisible();
+
+  await menu.click();
+  await page.setViewportSize({ width: 960, height: 900 });
+  await expect(menu).toBeHidden();
+  await expect(navigation).toBeVisible();
+  await page.setViewportSize({ width: 959, height: 900 });
+  await expect(menu).toBeVisible();
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await expect(navigation).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test("legal documents are reachable without sign-in and retain their search visibility", async ({ page, request }) => {
+  const mutations = await preventMutationRequests(page);
+  const privateReads: string[] = [];
+  page.on("request", request => {
+    if (new URL(request.url()).pathname.startsWith("/api/")) privateReads.push(request.url());
+  });
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Footer legal" }).getByRole("link", { name: "Privacy", exact: true }).click();
+  await expect(page).toHaveURL(/\/privacy$/);
+  for (const [path, title] of [["/privacy", "Privacy Policy"], ["/terms", "Terms of Use"]]) {
+    if (path === "/terms") await page.getByRole("navigation", { name: "Legal documents" }).getByRole("link", { name: "Terms", exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(title!);
+    await expect(page.getByRole("complementary", { name: "Review status" })).toHaveCount(0);
+    await expect(page).toHaveTitle(new RegExp(`^${title}`));
+    expect(await page.title()).not.toMatch(/draft|review/i);
+    await expect(page.locator(".legal-document-date")).toHaveText("Last updated September 20, 2026");
+    for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
+      await expect(page.locator(selector)).toHaveAttribute("content", title!);
+    }
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etail-depot-next.netlify.app${path}`);
+    await expect(page.locator('form, script[type="application/ld+json"]')).toHaveCount(0);
+    expect(await page.locator("main").innerText()).not.toMatch(/\b(draft|demo|sandbox|simulated|fictional|proposed)\b|not yet taken effect/i);
+    await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("forthcoming Ledgix card service");
+    if (path === "/privacy") {
+      await expect(page.getByRole("region",{name:"Your choices and privacy requests",exact:true})).toContainText("this website, Ledgix or Trolleys");
+    } else {
+      await expect(page.getByRole("region",{name:"Trolleys · Payments",exact:true})).toContainText("do not create a payment request or record a transaction");
+    }
+    const cards = page.locator(".legal-brand").filter({ hasText: "Etail Depot US, Inc. DBA Ledgix" });
+    await expect(cards).toContainText("ledgix.com · Coming soon");
+    await expect(cards.getByRole("link")).toHaveCount(0);
+    await expect(page.locator(".legal-brand").filter({ hasText: "Etail Depot US, Inc. DBA Trolleys" }).getByRole("link")).toHaveAttribute("href", "https://trolleys.ai");
+    const emailDestinations = await page.locator('a[href^="mailto:"]').evaluateAll(links => [...new Set(links.map(link => link.getAttribute("href")))].sort());
+    expect(emailDestinations).toEqual(["mailto:compliance@etaildepot.com", "mailto:ledgix@etaildepot.com", "mailto:trolleys@etaildepot.com"]);
+    const mobileContents = page.locator("summary").filter({ hasText: "On this page" });
+    if (await mobileContents.isVisible()) {
+      await mobileContents.focus();
+      await page.keyboard.press("Enter");
+      await expect(mobileContents.locator("..")).toHaveAttribute("open", "");
+    }
+    const contents = page.getByRole("navigation", { name: "On this page" });
+    for (const link of await contents.getByRole("link").all()) {
+      const destination = (await link.getAttribute("href"))!;
+      await expect(page.locator(destination)).toHaveCount(1);
+    }
+    await contents.getByRole("link", { name: "Contact us", exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}#contact$`));
+    const contacts = page.getByRole("region", { name: "Contact us", exact: true });
+    await expect(contacts).toContainText("Washington, DC");
+    for (const email of ["ledgix@etaildepot.com", "trolleys@etaildepot.com", "compliance@etaildepot.com"]) {
+      await expect(contacts.getByRole("link", { name: email, exact: true })).toHaveAttribute("href", `mailto:${email}`);
+    }
+    await page.getByRole("link", { name: "Back to top", exact: true }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+  }
+  const sitemap = await request.get("/sitemap.xml");
+  expect(sitemap.ok()).toBe(true);
+  expect(await sitemap.text()).not.toMatch(/<loc>.*\/(privacy|terms)/);
+  expect(privateReads).toEqual([]);
+  expect(mutations).toEqual([]);
+});
+
+test("a new visitor can compare available payments and upcoming cards without a local login", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.goto("/");
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Shared spending\.\s*Simple payments\.\s*You’re in control\.$/);
-  const mainNavigation = page.getByRole("navigation", {name:"Main navigation"});
-  await mainNavigation.getByRole("link", {name:"Cards & spending",exact:true}).click();
+  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Get paid\.\s*Keep going\.$/);
+  await expectLoadedNetworkMarks(page.getByLabel("Accepted card networks", {exact:true}));
+  const mainNavigation = await openMainNavigation(page);
+  await mainNavigation.getByRole("link", {name:"Cards",exact:true}).click();
   await expect(page).toHaveURL(/\/card-services$/);
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Their own card\.\s*Your peace of mind\.$/);
-  await expect(mainNavigation.getByRole("link",{name:"Cards & spending"})).toHaveAttribute("aria-current","page");
-  await expect(page.getByRole("heading",{name:"Cardholder",exact:true})).toBeVisible();
-  await expect(page.getByRole("heading",{name:"Account owner",exact:true})).toBeVisible();
-  await mainNavigation.getByRole("link",{name:"Accept payments",exact:true}).click();
+  await expect(page.getByRole("heading", {level:1})).toHaveText("Digital Wallet Card.");
+  await openMainNavigation(page);
+  await expect(mainNavigation.getByRole("link",{name:"Cards",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.locator("main")).toContainText("Coming soon");
+  await expect(page.locator("main")).toContainText("Applications are not open yet.");
+  for (const contact of await page.locator("main").getByRole("link",{name:"Contact Ledgix",exact:true}).all()) {
+    await expect(contact).toHaveAttribute("href", "mailto:ledgix@etaildepot.com");
+  }
+  await mainNavigation.getByRole("link",{name:"Payments",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-services$/);
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Get paid\.\s*Keep it simple\.$/);
-  await expect(mainNavigation.getByRole("link",{name:"Accept payments",exact:true})).toHaveAttribute("aria-current","page");
-  await expect(page.getByRole("heading",{name:"Account owner",exact:true})).toBeVisible();
-  await expect(page.getByRole("heading",{name:"Team members",exact:true})).toBeVisible();
-  await page.getByRole("link",{name:"Open your payments",exact:true}).click();
-  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.searchParams.get("next")==="/merchant-services");
+  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Accept payments\.\s*Your way\.$/);
+  await openMainNavigation(page);
+  await expect(mainNavigation.getByRole("link",{name:"Payments",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.locator("main")).toContainText("Available now");
+  const paymentEntry = page.locator(".consumer-hero-actions").getByRole("link",{name:"Open Trolleys",exact:true});
+  await expect(paymentEntry).toHaveAttribute("href", "https://trolleys.ai");
+  await expect(paymentEntry).toHaveAttribute("referrerpolicy", "no-referrer");
+  await expect(page.locator('a[href^="/login"], a[href^="/cardholder-services"], a[href^="/merchant-services"]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
 test("help topics and answers work with a keyboard without sign-in", async ({page}) => {
   await page.goto("/help");
-  await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Cards & spending"}).click();
+  await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Ledgix cards"}).click();
   await expect(page).toHaveURL(/\/help#cards$/);
-  const question=page.locator("summary").filter({hasText:"How do I freeze a card?"});
+  const question=page.locator("summary").filter({hasText:"Can I apply for a card now?"});
   await question.focus();await page.keyboard.press("Enter");
   await expect(question.locator("..")).toHaveAttribute("open","");
-  await expect(question.locator("..")).toContainText("A cardholder can freeze their own card.");
-  await expect(question.locator("..")).toContainText("If the account owner freezes it, only the owner can remove that restriction.");
+  await expect(question.locator("..")).toContainText("Digital Wallet Card is an upcoming virtual Visa secured credit card");
+  await expect(question.locator("..")).toContainText("Applications and card sign-in are not open yet.");
   await page.keyboard.press("Enter");
   await expect(question.locator("..")).not.toHaveAttribute("open","");
-  await page.getByRole("banner").getByRole("link",{name:"Sign in",exact:true}).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Sign-in help"}).click();
+  await expect(page).toHaveURL(/\/help#access$/);
+  const recovery=page.locator("summary").filter({hasText:"What if I cannot sign in to Trolleys?"});
+  await recovery.focus();await page.keyboard.press("Enter");
+  await expect(recovery.locator("..")).toContainText("Follow the recovery instructions supplied with your Trolleys account");
+  await expect(recovery.locator("..").getByRole("link",{name:"trolleys@etaildepot.com"})).toHaveAttribute("href","mailto:trolleys@etaildepot.com");
+  await openMainNavigation(page);
+  await expect(page.getByRole("banner").getByRole("link",{name:"Open Trolleys",exact:true})).toHaveAttribute("href", "https://trolleys.ai");
 });
 
 test("public pages have unique canonical metadata and no private data", async ({page,request}) => {
   const titles=new Set<string>();
-  const cardDisclosure = "The cards shown in this sandbox are not live Visa credentials.";
-  const approvedDisclosures: Record<string,string[]> = {
-    "/": [cardDisclosure],
-    "/card-services": [],
-    "/payment-services": ["Visa, Mastercard, American Express and Discover test cards are available in this sandbox."],
-    "/help": [cardDisclosure, "This sandbox uses clearly marked test cards and never asks for real card details."],
-  };
   for (const route of ["/","/card-services","/payment-services","/help"]) {
     await page.goto(route);
     titles.add(await page.title());
@@ -71,17 +230,16 @@ test("public pages have unique canonical metadata and no private data", async ({
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content",/noindex/);
     await expect(page.getByRole("heading",{level:1})).toHaveCount(1);
     const data=JSON.parse(await page.locator('script[type="application/ld+json"]').innerText());
-    expect(data["@graph"].at(-1).url).toBe(`https://etail-depot-next.netlify.app${route}`);
-    let editorialText = (await page.locator("main").textContent()) ?? "";
-    // Exact product disclosures prevent sample network cards being mistaken for live credentials.
-    // All other internal/fixture language and private data remain prohibited.
-    for (const disclosure of approvedDisclosures[route]!) {
-      expect(editorialText.split(disclosure)).toHaveLength(2);
-      editorialText = editorialText.replace(disclosure, "");
+    expect(data["@graph"].find((node: { "@type": string }) => node["@type"] === "WebPage").url).toBe(`https://etail-depot-next.netlify.app${route}`);
+    const editorialText = (await page.locator("main").textContent()) ?? "";
+    // Marketing describes the hosted services, never the local prototype's balances or controls.
+    expect(editorialText).not.toMatch(/\bprepaid\b/i);
+    if (route === "/" || route === "/card-services" || route === "/help") {
+      expect(editorialText).toContain("Visa secured credit card");
     }
     expect(editorialText).not.toMatch(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice|fixture/i);
-    await expect(page.locator(".sandbox-badge")).toHaveCount(1);
-    await expect(page.locator(".sandbox-badge")).toHaveText("Sandbox");
+    await expect(page.locator(".sandbox-badge")).toHaveCount(0);
+    await expect(page.getByRole("banner")).not.toContainText(/\bsandbox\b/i);
     await expect(page.getByRole("contentinfo").getByRole("link", {name:"Help center"})).toBeVisible();
   }
   expect(titles.size).toBe(4);
@@ -90,8 +248,11 @@ test("public pages have unique canonical metadata and no private data", async ({
   const robots=await request.get("/robots.txt");expect(robots.ok()).toBe(true);
   expect(await robots.text()).toContain("Disallow: /api/");
   await page.goto("/login");
+  await expect(page).toHaveURL(/\/help#access$/);
+  await expect(page.locator(".sandbox-badge")).toHaveCount(0);
+  await expect(page.getByRole("banner")).not.toContainText(/\bsandbox\b/i);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content",/noindex/);
-  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etail-depot-next.netlify.app/help");
   const image=await request.get("/opengraph-image");expect(image.ok()).toBe(true);
   expect(image.headers()["content-type"]).toBe("image/png");
 });
@@ -101,12 +262,18 @@ test("all seven payment channels show a clear checkout journey and work by keybo
   const mutations: string[] = [];
   const privateReads: string[] = [];
   const errors: string[] = [];
+  const providerRequests: {url:string;method:string;referer:string|null}[] = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.route("**/*", async route => {
     const request = route.request();
     if (!["GET", "HEAD", "OPTIONS"].includes(request.method())) {
       mutations.push(`${request.method()} ${request.url()}`);
       await route.abort("blockedbyclient");
+    } else if (new URL(request.url()).origin === "https://trolleys.ai") {
+      // Verify navigation without reaching a real provider account.
+      if (!request.isNavigationRequest()) { await route.fulfill({status:204,body:""}); return; }
+      providerRequests.push({url:request.url(), method:request.method(), referer:await request.headerValue("referer")});
+      await route.fulfill({status:200,contentType:"text/html",body:"<html><head><title>Captured handoff</title></head><body><h1>Payment service handoff captured</h1></body></html>"});
     } else if (new URL(request.url()).pathname.startsWith("/api/")) {
       privateReads.push(request.url());
       await route.abort("blockedbyclient");
@@ -114,17 +281,17 @@ test("all seven payment channels show a clear checkout journey and work by keybo
       await route.continue();
     }
   });
-  await page.goto("/");
+  await page.goto("/payment-services?handoff_probe=public-channel-check");
   const showcase = page.locator(".channel-showcase");
   const tablist = showcase.getByRole("tablist", {name:"Ways to share a payment request"});
   const channels = [
-    {name:"Text", content:"I’d like to place an order, please."},
-    {name:"Email", content:"Your order · Market bouquet"},
-    {name:"Invoice", content:"Include this payment request with your invoice."},
-    {name:"Bill", content:"Keep your bill and payment details together."},
-    {name:"Social", content:"READY WHEN YOU ARE"},
-    {name:"QR code", content:"On your phone. In a few simple steps."},
-    {name:"Website", content:"YOUR ORDER"},
+    {name:"Text", content:"Is Friday afternoon available?", context:"Appointment booking", description:"Consultation", amount:"$80.00"},
+    {name:"Email", content:"Order payment request", context:"Order payment request", description:"Custom stationery", amount:"$120.00"},
+    {name:"Invoice", content:"Project invoice", context:"Project invoice", description:"Design services", amount:"$480.00"},
+    {name:"Bill", content:"Service bill", context:"Service bill", description:"Garden care", amount:"$65.00"},
+    {name:"Social", content:"MAKE SOMETHING NEW", context:"Workshop booking", description:"Studio workshop", amount:"$45.00"},
+    {name:"QR code", content:"Scan to pay by card", context:"Counter payment", description:"Lunch order", amount:"$18.00"},
+    {name:"Website", content:"Online order", context:"Online order", description:"Homeware set", amount:"$64.00"},
   ];
   await expect(tablist.getByRole("tab")).toHaveCount(channels.length);
   await tablist.getByRole("tab", {name:"Text", exact:true}).focus();
@@ -142,12 +309,18 @@ test("all seven payment channels show a clear checkout journey and work by keybo
     await expect(panel).toBeVisible();
     await expect(panel).toHaveAttribute("aria-labelledby", (await tab.getAttribute("id"))!);
     await expect(panel.getByText(channel.content, {exact:true})).toBeVisible();
+    const medium = panel.locator(".channel-medium");
+    await expect(medium).toContainText(channel.context);
+    await expect(medium).toContainText(channel.description);
+    await expect(medium).toContainText(channel.amount);
+    const checkout = panel.locator(".channel-checkout");
+    await expect(checkout.getByText(channel.description, {exact:true})).toBeVisible();
+    await expect(checkout.getByText(channel.amount, {exact:true})).toBeVisible();
+    await expect(panel).not.toContainText("Your business");
     await expect(panel.getByRole("heading", {level:3})).toBeVisible();
-    await expect(panel.getByText("One simple card checkout", {exact:true})).toBeVisible();
-    await expect(panel.getByText("Your customer reviews the amount and pays.", {exact:true})).toBeVisible();
-    for (const network of ["Visa", "Mastercard", "American Express", "Discover"]) {
-      await expect(panel.getByText(network, {exact:true})).toBeVisible();
-    }
+    await expect(panel.getByText("Your customer pays", {exact:true})).toBeVisible();
+    await expect(panel.getByText("They review the amount and pay by card.", {exact:true})).toBeVisible();
+    await expectLoadedNetworkMarks(panel.getByRole("group", {name:"Card networks", exact:true}));
     await expect(panel.locator("input, textarea, select, form, button, a, [contenteditable=true]")).toHaveCount(0);
     expect(await showcase.textContent()).not.toMatch(/example|sample|sandbox|demo|fixture|no messages|no money|no .*collected/i);
     for (const other of channels.filter((_, otherIndex) => otherIndex !== index)) {
@@ -172,12 +345,19 @@ test("all seven payment channels show a clear checkout journey and work by keybo
   await page.keyboard.press("Tab");
   await expect(showcase.getByRole("tabpanel", {name:"Text", exact:true})).toBeFocused();
   await page.keyboard.press("Tab");
-  const openTools = showcase.getByRole("link", {name:"Open your payment tools", exact:true});
-  await expect(openTools).toBeFocused();
-  await expect(openTools).toHaveAttribute("href", "/merchant-services");
+  await expect(showcase.locator(":focus")).toHaveCount(0);
+  await expect(showcase.getByRole("link")).toHaveCount(0);
+  const openTools = page.locator(".consumer-hero-actions").getByRole("link", {name:"Open Trolleys", exact:true});
+  await expect(openTools).toHaveAttribute("href", "https://trolleys.ai");
+  await expect(openTools).toHaveAttribute("referrerpolicy", "no-referrer");
+  await expect(openTools).toHaveAttribute("rel", /\bnoreferrer\b/);
   expect(privateReads).toEqual([]);
+  await openTools.focus();
+  await expect(openTools).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.searchParams.get("next")==="/merchant-services");
+  await expect(page).toHaveURL("https://trolleys.ai/");
+  await expect(page.getByRole("heading", {name:"Payment service handoff captured",exact:true})).toBeVisible();
+  expect(providerRequests).toEqual([{url:"https://trolleys.ai/",method:"GET",referer:null}]);
   expect(mutations).toEqual([]);
   expect(privateReads).toEqual([]);
   expect(errors).toEqual([]);
@@ -186,7 +366,7 @@ test("all seven payment channels show a clear checkout journey and work by keybo
 test("payment channels keep their content and touch targets inside a 320px screen", async ({page}) => {
   await page.setViewportSize({width:320,height:900});
   const mutations = await preventMutationRequests(page);
-  await page.goto("/");
+  await page.goto("/payment-services");
   const showcase = page.locator(".channel-showcase");
   const tabs = showcase.getByRole("tab");
   for (const name of ["Text", "Email", "Invoice", "Bill", "Social", "QR code", "Website"]) {
@@ -210,126 +390,88 @@ test("payment channels keep their content and touch targets inside a 320px scree
   expect(mutations).toEqual([]);
 });
 
-test("a first-time visitor uses emailed callbacks instead of manual link entry without sending email", async ({page}) => {
-  const mutations = await preventMutationRequests(page);
-  const errors: string[] = [];
+test("the wallet setup guide explains both platforms without opening wallets or changing accounts", async ({page, context, baseURL}) => {
+  const mutations: string[] = [], privateReads: string[] = [], externalRequests: string[] = [], errors: string[] = [];
+  const origin = new URL(baseURL!).origin;
   page.on("pageerror", error => errors.push(error.message));
-  await page.goto("/login");
+  await context.route("**/*", async route => {
+    const request = route.request(), url = new URL(request.url());
+    if (!["GET", "HEAD", "OPTIONS"].includes(request.method())) {
+      mutations.push(`${request.method()} ${request.url()}`);
+      await route.abort("blockedbyclient");
+    } else if (/^\/api(?:\/|$)/.test(url.pathname)) {
+      privateReads.push(request.url());
+      await route.abort("blockedbyclient");
+    } else if (url.origin !== origin) {
+      externalRequests.push(request.url());
+      await route.abort("blockedbyclient");
+    } else await route.continue();
+  });
 
-  const signIn = page.getByRole("form", {name:"Sign in with email", exact:true});
-  await expect(signIn).toBeVisible();
-  await expect(signIn.getByLabel("Email address", {exact:true})).toBeDisabled();
-  await expect(signIn.getByLabel("Password", {exact:true})).toBeDisabled();
-  await expect(page.getByRole("button", {name:"I have a confirmation email", exact:true})).toHaveCount(0);
-  await expect(page.locator('input[name="emailLink"]')).toHaveCount(0);
+  for (const path of ["/", "/card-services"]) {
+    await page.goto(path);
+    const guide = page.locator(".wallet-card-art");
+    await expect(guide).toHaveCount(1);
+    const tablist = guide.getByRole("tablist", {name:"Wallet setup options", exact:true});
+    const apple = tablist.getByRole("tab", {name:"Apple Wallet", exact:true});
+    const google = tablist.getByRole("tab", {name:"Google Wallet", exact:true});
+    await expect(tablist.getByRole("tab")).toHaveCount(2);
+    const logo = guide.locator('img[src="/brand/ledgix-logo.png"]').first();
+    await expect(logo).toBeVisible();
+    await expect.poll(() => logo.evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0)).toBe(true);
 
-  await page.getByRole("button", {name:"Create a login", exact:true}).click();
-  const register = page.getByRole("form", {name:"Create your login", exact:true});
-  await expect(register).toBeVisible();
-  for (const name of ["Email address", "Password", "Confirm password"]) {
-    await expect(register.getByLabel(name, {exact:true})).toBeVisible();
-    await expect(register.getByLabel(name, {exact:true})).toBeDisabled();
+    const steps = ["Show step 1: Add card", "Show step 2: Verify", "Show step 3: Use wallet"];
+    async function expectStep(platform: "Apple Wallet" | "Google Wallet", step: number) {
+      const selected = platform === "Apple Wallet" ? apple : google;
+      const other = platform === "Apple Wallet" ? google : apple;
+      await expect(selected).toHaveAttribute("aria-selected", "true");
+      await expect(selected).toHaveAttribute("tabindex", "0");
+      await expect(other).toHaveAttribute("aria-selected", "false");
+      await expect(other).toHaveAttribute("tabindex", "-1");
+      const panel = guide.getByRole("tabpanel");
+      await expect(panel).toBeVisible();
+      await expect(panel).toHaveAttribute("aria-labelledby", (await selected.getAttribute("id"))!);
+      await expect(panel.getByRole("button")).toHaveCount(3);
+      for (const [index, name] of steps.entries()) {
+        await expect(panel.getByRole("button", {name, exact:true})).toHaveAttribute("aria-pressed", String(index === step));
+      }
+      const expected = step === 0 ? (platform === "Apple Wallet" ? "Debit or Credit Card" : "Payment card")
+        : step === 1 ? "issuer" : platform === "Apple Wallet" ? "Apple Pay" : "Google Pay";
+      await expect(panel.locator(".wallet-setup-description")).toContainText(expected);
+      await expect(guide.locator("form, input, textarea, select, iframe")).toHaveCount(0);
+      await expect(page).toHaveURL(new URL(path, origin).href);
+      expect(context.pages()).toHaveLength(1);
+    }
+
+    await expectStep("Apple Wallet", 0);
+    for (const [index, name] of steps.entries()) {
+      await guide.getByRole("tabpanel").getByRole("button", {name, exact:true}).click();
+      await expectStep("Apple Wallet", index);
+    }
+    await apple.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(google).toBeFocused();
+    await expectStep("Google Wallet", 0);
+    for (const [index, name] of steps.entries()) {
+      await guide.getByRole("tabpanel").getByRole("button", {name, exact:true}).click();
+      await expectStep("Google Wallet", index);
+    }
+    await google.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(apple).toBeFocused();
+    await expectStep("Apple Wallet", 0);
+    await page.keyboard.press("ArrowLeft");
+    await expect(google).toBeFocused();
+    await expectStep("Google Wallet", 0);
+    await page.keyboard.press("Home");
+    await expect(apple).toBeFocused();
+    await expectStep("Apple Wallet", 0);
+    await page.keyboard.press("End");
+    await expect(google).toBeFocused();
+    await expectStep("Google Wallet", 0);
   }
-  await expect(register.getByRole("button", {name:"Create login", exact:true})).toBeDisabled();
-  await page.getByRole("button", {name:"Back to sign in", exact:true}).click();
-  await expect(signIn).toBeVisible();
-  await expect(page.getByLabel("Confirm password", {exact:true})).toHaveCount(0);
-
-  await page.getByRole("button", {name:"Forgot your password?", exact:true}).click();
-  const recover = page.getByRole("form", {name:"Reset your password", exact:true});
-  await expect(recover).toBeVisible();
-  await expect(recover.getByLabel("Email address", {exact:true})).toBeDisabled();
-  await expect(recover.getByLabel("Password", {exact:true})).toHaveCount(0);
-  await expect(recover.getByRole("button", {name:"Send reset email", exact:true})).toBeDisabled();
-  await expect(page.getByRole("button", {name:"I have a reset email", exact:true})).toHaveCount(0);
-  // A synthetic callback supplies the link privately; unavailable email access
-  // still prevents confirmation/reset writes. Nothing is pasted or submitted.
-  await page.goto("/login#recovery_token=synthetic-public-callback");
-  const reset = page.getByRole("form", {name:"Choose a new password", exact:true});
-  await expect(reset).toBeVisible();
-  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.hash==="");
-  await expect(reset.getByLabel("Password reset link", {exact:true})).toHaveCount(0);
-  for (const name of ["New password", "Confirm password"]) {
-    await expect(reset.getByLabel(name, {exact:true})).toBeVisible();
-    await expect(reset.getByLabel(name, {exact:true})).toBeDisabled();
-  }
-  await expect(reset.getByRole("button", {name:"Save new password", exact:true})).toBeDisabled();
-  await page.getByRole("button", {name:"Request a new reset email", exact:true}).click();
-  await expect(recover).toBeVisible();
-  await page.getByRole("button", {name:"Back to sign in", exact:true}).click();
-
-  await page.goto("/login#confirmation_token=synthetic-public-callback");
-  const confirmation = page.getByRole("form", {name:"Confirm your email", exact:true});
-  await expect(confirmation).toBeVisible();
-  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.hash==="");
-  await expect(confirmation.getByLabel("Confirmation link", {exact:true})).toHaveCount(0);
-  await expect(confirmation.getByRole("button", {name:"Confirm email", exact:true})).toBeDisabled();
-  await page.getByRole("button", {name:"Back to registration", exact:true}).click();
-  await expect(register).toBeVisible();
-  await page.getByRole("button", {name:"Back to sign in", exact:true}).click();
-  await expect(signIn).toBeVisible();
-  await expect(page).toHaveURL(/\/login$/);
   expect(mutations).toEqual([]);
+  expect(privateReads).toEqual([]);
+  expect(externalRequests).toEqual([]);
   expect(errors).toEqual([]);
-});
-
-test("an invalid email callback is removed before login and shows a recoverable error without authenticating", async ({page}) => {
-  const mutations = await preventMutationRequests(page);
-  const requests: string[] = [];
-  const errors: string[] = [];
-  page.on("request", request => requests.push(request.url()));
-  page.on("pageerror", error => errors.push(error.message));
-  // Deliberately invalid syntax: this is neither a real token nor valid input to the email-link parser.
-  await page.goto("/#confirmation_token=%21invalid-public-test%21");
-  await expect(page).toHaveURL(url => url.pathname === "/login" && url.hash === "");
-  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
-  const alert = page.getByRole("main").getByRole("alert");
-  await expect(alert).toHaveText("This email link is not supported. Open the link in your latest confirmation or password reset email.");
-  await expect(alert).toBeFocused();
-  await page.getByRole("button", {name:"Forgot your password?", exact:true}).click();
-  await expect(page.getByRole("form", {name:"Reset your password", exact:true})).toBeVisible();
-  await expect(alert).toHaveCount(0);
-  expect(requests.every(url => !url.includes("invalid-public-test") && !url.includes("confirmation_token"))).toBe(true);
-  expect(mutations).toEqual([]);
-  expect(errors).toEqual([]);
-});
-
-test("header sign-in and history update the idle registration form without authentication requests", async ({page}) => {
-  const mutations = await preventMutationRequests(page);
-  await page.goto("/login?mode=register");
-  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toBeVisible();
-  await page.getByRole("banner").getByRole("link", {name:"Sign in", exact:true}).click();
-  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.search==="");
-  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
-  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toHaveCount(0);
-  await page.goBack();
-  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.search==="?mode=register");
-  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toBeVisible();
-  await page.goForward();
-  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
-  expect(mutations).toEqual([]);
-});
-
-test("registration links only choose the initial form and emailed callbacks take precedence", async ({page}) => {
-  const mutations = await preventMutationRequests(page);
-  await page.goto("/login?mode=register");
-  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toBeVisible();
-  await expect(page.locator('input[name="emailLink"]')).toHaveCount(0);
-  for (const query of ["mode=confirm", "mode=reset", "mode=unexpected", "mode=register&mode=register"]) {
-    await page.goto(`/login?${query}`);
-    await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
-  }
-  await page.goto("/login?mode=register#confirmation_token=synthetic-public-mode-callback");
-  await expect(page.getByRole("form", {name:"Confirm your email", exact:true})).toBeVisible();
-  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.search==="?mode=register"&&url.hash==="");
-  await expect(page.getByRole("form", {name:"Create your login", exact:true})).toHaveCount(0);
-  await page.getByRole("banner").getByRole("link", {name:"Sign in", exact:true}).click();
-  await expect(page).toHaveURL(url=>url.pathname==="/login"&&url.search===""&&url.hash==="");
-  await expect(page.getByRole("form", {name:"Confirm your email", exact:true})).toBeVisible();
-  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toHaveCount(0);
-  await page.getByRole("button", {name:"Back to sign in", exact:true}).click();
-  await expect(page.getByRole("form", {name:"Sign in with email", exact:true})).toBeVisible();
-  await expect(page.locator('input[name="emailLink"]')).toHaveCount(0);
-  expect(await page.evaluate(()=>localStorage.length+sessionStorage.length)).toBe(0);
-  expect(mutations).toEqual([]);
 });

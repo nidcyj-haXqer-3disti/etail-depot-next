@@ -1,0 +1,36 @@
+{
+  "recordedAt": "2026-09-20",
+  "mode": "BEGIN TRANSACTION READ ONLY",
+  "customerRowsRead": false,
+  "databaseWrites": false,
+  "databases": [
+    {
+      "database": "etail_depot_next_services_preview",
+      "databaseOwner": "etail_local",
+      "postgresVersion": "18.6",
+      "generationMarker": "ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-d69:preview",
+      "sourceMigrations": 24,
+      "migrationReceipts": 24,
+      "migrationMismatchCount": 0,
+      "pendingMigrations": 0,
+      "publicTables": 96,
+      "constraints": 1245,
+      "unvalidatedConstraints": 0,
+      "disabledCustomTriggers": 0
+    },
+    {
+      "database": "etail_depot_next_services_test",
+      "databaseOwner": "etail_local",
+      "postgresVersion": "18.6",
+      "generationMarker": "ETAIL_DEPOT_NEXT_GREENFIELD_2026:fresh-services-d69:test",
+      "sourceMigrations": 24,
+      "migrationReceipts": 24,
+      "migrationMismatchCount": 0,
+      "pendingMigrations": 0,
+      "publicTables": 96,
+      "constraints": 1245,
+      "unvalidatedConstraints": 0,
+      "disabledCustomTriggers": 0
+    }
+  ]
+}

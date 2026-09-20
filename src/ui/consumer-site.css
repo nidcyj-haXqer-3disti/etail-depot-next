@@ -1,0 +1,123 @@
+/* Shared discovery/product layout. Channels and site chrome have their own owners. */
+.consumer-page {
+  --home-ink: var(--public-ink);
+  --home-muted: var(--public-muted);
+  --home-line: var(--public-line);
+  --consumer-title: clamp(3.25rem, 5vw, 4.5rem);
+  --consumer-heading: clamp(2rem, 3.1vw, 2.75rem);
+  --consumer-body: 16px;
+  --consumer-small: 13px;
+  --consumer-space: 80px;
+  --consumer-art-height: 480px;
+  color: var(--home-ink);
+  background: #fff;
+  font-family: var(--public-font);
+}
+.consumer-page .page-container { max-width: var(--public-max); padding-inline: var(--public-gutter); }
+.consumer-page .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .09em; line-height: 1.6; color: var(--home-muted); }
+.consumer-page h1, .consumer-page h2 { font-weight: 500; text-wrap: balance; }
+.consumer-page .button { min-height: 48px; padding: 13px 20px; border-radius: var(--public-control-radius); font-size: 14px; font-weight: 600; gap: 16px; }
+.consumer-page .button.primary { background: var(--home-ink); color: #fff; border: 1px solid var(--home-ink); }
+.consumer-page .button.primary:hover { background: var(--public-hover); }
+.consumer-page .button.secondary { background: #fff; color: var(--home-ink); border-color: #aabbb0; }
+.consumer-page .button.secondary:hover { background: #f5f7f0; }
+.consumer-page a:focus-visible, .consumer-page button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 4px; }
+.consumer-text-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font-size: 14px; font-weight: 600; }
+.consumer-text-link .icon { width: 18px; height: 18px; }
+.consumer-text-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+.consumer-product-eyebrow { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+.consumer-product-eyebrow .service-availability { padding: 4px 10px; font-size: 12px; }
+
+/* One clear payment proposition, supported by an editorial photograph. */
+.consumer-hero { background: var(--public-paper); }
+.consumer-hero-grid { display: grid; grid-template-columns: 1.04fr 1fr; align-items: center; gap: 64px; padding-block: 56px 48px; }
+.consumer-hero-copy { padding-block: 16px; min-width: 0; }
+.consumer-hero h1 { font-size: var(--consumer-title); line-height: 1.08; letter-spacing: -.045em; margin-top: 24px; }
+.consumer-hero h1 > span { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--public-accent); letter-spacing: -.045em; }
+.consumer-hero-copy > p { max-width: 42ch; font-size: 17px; line-height: 1.7; color: var(--home-muted); margin-top: 24px; }
+.consumer-hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-top: 28px; }
+.consumer-hero-visual { position: relative; isolation: isolate; overflow: hidden; height: var(--consumer-art-height); margin: 0; border-radius: var(--public-radius); background: var(--public-ink); }
+.consumer-hero-visual > img { object-fit: cover; object-position: center; }
+.consumer-networks { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.5fr); align-items: center; gap: 48px; border-top: 1px solid var(--home-line); padding-block: 28px; }
+.consumer-networks > p { max-width: 24ch; font-size: 24px; font-weight: 500; line-height: 1.35; letter-spacing: -.025em; color: var(--home-ink); text-wrap: balance; }
+.consumer-networks .network-brands-accepted { width: 100%; justify-self: end; }
+
+/* Channels explain the product through concrete customer moments. */
+.consumer-channels { padding-block: var(--consumer-space); scroll-margin-top: 28px; }
+.consumer-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 48px; margin-bottom: 32px; }
+.consumer-section-heading h2 { font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; margin-top: 16px; }
+.consumer-section-heading h2 > span { color: var(--public-accent); }
+.consumer-section-heading > p { max-width: 34ch; color: var(--home-muted); font-size: var(--consumer-body); line-height: 1.7; margin-bottom: 4px; }
+
+/* Upcoming cards have their own deliberate, quieter product moment. */
+.consumer-card-section { background: var(--public-tint); }
+.consumer-card-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; padding-block: var(--consumer-space); }
+.consumer-card-visual { min-width: 0; }
+.consumer-card-copy h2 { font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; margin-top: 16px; }
+.consumer-card-copy h2 > span { font-family: Georgia, serif; font-style: italic; color: var(--public-accent); }
+.consumer-card-copy > p { font-size: var(--consumer-body); line-height: 1.7; color: var(--home-muted); margin-top: 24px; max-width: 41ch; }
+
+.consumer-page .public-faq-section { padding-block: var(--consumer-space); margin: 0 auto; border-top: 0; grid-template-columns: .85fr 1.15fr; gap: 64px; }
+.consumer-page .public-faq-section h2 { font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; margin-top: 16px; }
+.consumer-page .public-faq-section h2 > span { color: var(--public-accent); }
+.consumer-page .public-faq-section .consumer-text-link { margin-top: 24px; }
+.consumer-page .public-questions summary { min-height: 72px; font-size: var(--consumer-body); font-weight: 500; }
+.consumer-page .public-questions p { font-size: var(--consumer-body); line-height: 1.7; color: var(--home-muted); }
+.consumer-final-wrap { padding-bottom: 48px; }
+.consumer-final { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; border-top: 1px solid var(--home-line); padding-top: 48px; }
+.consumer-final h2 { font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; margin-top: 16px; }
+.consumer-final h2 > span { color: var(--public-accent); }
+.consumer-final > div:last-child { justify-self: end; }
+.consumer-final p:not(.eyebrow) { color: var(--home-muted); font-size: var(--consumer-body); line-height: 1.7; margin-bottom: 24px; }
+
+@media (max-width:1100px) {
+  .consumer-page { --consumer-title: 60px; --consumer-art-height: 440px; }
+  .consumer-hero-grid { gap: 36px; }
+  .consumer-hero-actions { gap: 12px 18px; }
+  .consumer-hero-actions .button { padding-inline: 18px; }
+  .consumer-card-grid { gap: 45px; }
+  .consumer-page .public-faq-section { gap: 50px; }
+}
+@media (max-width:850px) {
+  .consumer-page { --consumer-title: 52px; --consumer-space: 64px; --consumer-art-height: 440px; }
+  .consumer-hero-grid { gap: 28px; padding-block: 40px; }
+  .consumer-hero-copy > p { font-size: 16px; }
+  .consumer-product-eyebrow { gap: 12px; }
+  .consumer-networks { gap: 24px; }
+  .consumer-networks > p { font-size: 22px; }
+  .consumer-section-heading { gap: 30px; }
+  .consumer-section-heading > p { max-width: 30ch; }
+  .consumer-card-grid { gap: 32px; }
+  .consumer-page .public-faq-section { gap: 32px; }
+}
+@media (max-width:680px) {
+  .consumer-page { --consumer-title: 52px; --consumer-heading: 32px; --consumer-body: 15px; --consumer-space: 48px; --consumer-art-height: 400px; }
+  .consumer-hero-grid { grid-template-columns: 1fr; padding-block: 40px 30px; gap: 28px; }
+  .consumer-hero-copy { padding: 0; }
+  .consumer-hero-copy > p { max-width: 38ch; font-size: 16px; margin-top: 20px; }
+  .consumer-hero-actions { margin-top: 24px; gap: 10px 20px; }
+  .consumer-page .button { padding-inline: 18px; }
+  .consumer-hero-visual > img { object-position: 50% 45%; }
+  .consumer-networks { grid-template-columns: minmax(0,1fr); gap: 20px; padding-block: 26px; }
+  .consumer-networks > p { max-width: none; font-size: 20px; text-wrap: pretty; }
+  .consumer-section-heading { display: block; margin-bottom: 28px; }
+  .consumer-section-heading > p { max-width: 43ch; margin-top: 20px; }
+  .consumer-card-grid { grid-template-columns: 1fr; gap: 32px; }
+  .consumer-card-visual { order: 2; }
+  .consumer-page .public-faq-section { grid-template-columns: 1fr; gap: 24px; }
+  .consumer-page .public-faq-section .consumer-text-link { margin-top: 16px; }
+  .consumer-page .public-questions summary { min-height: 68px; }
+  .consumer-final-wrap { padding-bottom: 32px; }
+  .consumer-final { grid-template-columns: 1fr; gap: 24px; padding-top: 32px; }
+  .consumer-final > div:last-child { justify-self: start; }
+  .consumer-final p:not(.eyebrow) { margin-bottom: 24px; }
+}
+@media (max-width:360px) {
+  .consumer-page { --consumer-title: 44px; }
+}
+
+/* Product pages continue the same editorial system as the homepage. */
+.consumer-product-hero h1 { font-size: min(var(--consumer-title), 64px); }
+.consumer-product-note { max-width: 42ch; margin-top: 20px; font-size: var(--consumer-small); line-height: 1.6; color: var(--home-muted); }
+.consumer-product-section { padding-block: var(--consumer-space); scroll-margin-top: 24px; }
+.consumer-closing-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }

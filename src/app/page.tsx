@@ -1,33 +1,47 @@
-import Image from "next/image";
 import Link from "next/link";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
 import { Shell } from "@/ui/shell";
 import { Icon } from "@/ui/icon";
 import { PublicQuestions } from "@/ui/public-site";
-import { PaymentChannelPreview } from "@/ui/payment-channel-preview";
-import { ServiceDashboardPreview } from "@/ui/service-dashboard-preview";
-import { EmailCallbackBridge } from "@/ui/email-callback-bridge";
-import targets from "../../project-targets.json";
+import { PaymentArtwork, ServiceStatus } from "@/ui/service-entry";
+import { WalletCardArt } from "@/ui/wallet-card-art";
+import { PaymentHighlights } from "@/ui/payment-highlights";
 import "@/ui/public-site.css";
-import "@/ui/consumer-home.css";
+import { ConsumerHero, ConsumerNetworks } from "@/ui/consumer-layout";
 
 export const metadata = publicPageMetadata("/");
 
 export default function HomePage() {
-  return <Shell><EmailCallbackBridge providerOrigin={targets.netlify.canonical_origin} /><PublicPageStructuredData path="/" />
-    <section className="consumer-hero" aria-labelledby="welcome-title"><div className="page-container consumer-hero-grid">
-      <div className="consumer-hero-copy"><p className="eyebrow">FOR YOUR FAMILY OR BUSINESS</p><h1 id="welcome-title">Shared spending.<br /><span>Simple payments.</span><br />You’re in control.</h1><p>Create Visa cards for your family or team, with a spending limit for each card. Accept payments by link, invoice or QR code, and give your team access to collect them.</p><div className="consumer-hero-actions"><Link href="/login?mode=register" className="button primary">Create your login <Icon name="arrow" /></Link><a href="#choose-your-service" className="consumer-text-link">Find your service <Icon name="arrow" /></a></div></div>
-      <ServiceDashboardPreview />
-    </div></section>
-    <nav className="consumer-task-bar page-container" aria-label="Popular tasks"><Link href="/cardholder-services"><Icon name="card" /><span>Open your cards</span><Icon name="arrow" /></Link><Link href="/card-services"><Icon name="person" /><span>Explore shared cards</span><Icon name="arrow" /></Link><Link href="/merchant-services"><Icon name="shop" /><span>Open your payments</span><Icon name="arrow" /></Link><Link href="/help"><Icon name="message" /><span>Get help</span><Icon name="arrow" /></Link></nav>
-    <section className="consumer-products page-container" id="choose-your-service" aria-labelledby="services-title"><div className="consumer-section-heading"><div><p className="eyebrow">CARDS & PAYMENTS</p><h2 id="services-title">Choose your service.</h2></div><p>One login for cards, payments, or both.</p></div><div className="consumer-product-grid">
-      <article className="consumer-product-card"><div className="consumer-product-top"><Icon name="card" /><span>Cards & spending</span></div><h3>Their own cards.<br />Your clear overview.</h3><p>Add money to one shared balance. Create cards for family or team members and choose how much each card can spend.</p><ul className="consumer-product-benefits"><li><Icon name="check" /><span>Set a total spending limit for each card.</span></li><li><Icon name="check" /><span>Give each person a private card dashboard.</span></li><li><Icon name="check" /><span>Review activity or freeze a card anytime.</span></li></ul><Link href="/card-services" className="consumer-product-link">Explore cards <Icon name="arrow" /></Link></article>
-      <article className="consumer-product-card consumer-merchant-card"><div className="consumer-product-top"><Icon name="shop" /><span>Accept payments</span></div><h3>More ways to get paid.<br />One place to keep track.</h3><p>Let customers pay by card without an Etail Depot login. Give your team access to collect payments while you control the money.</p><ul className="consumer-product-benefits"><li><Icon name="check" /><span>Share links, invoices and QR codes.</span></li><li><Icon name="check" /><span>Create payment terminals for you and your team.</span></li><li><Icon name="check" /><span>Track payments, refunds and payouts in one place.</span></li></ul><Link href="/payment-services" className="consumer-product-link">Explore payment tools <Icon name="arrow" /></Link></article>
-    </div></section>
-    <section className="consumer-channels" aria-labelledby="channels-title"><div className="page-container consumer-channel-grid"><div><p className="eyebrow">MEET CUSTOMERS WHERE THEY ARE</p><h2 id="channels-title">Get paid.<br />Wherever you connect.</h2><p>Text it. Email it. Add it to an invoice or your website. Choose the way that works for your customer.</p><p className="consumer-channel-detail">Every channel leads to the same clear card checkout.</p><Link href="/payment-services" className="consumer-text-link">Explore ways to get paid <Icon name="arrow" /></Link></div><PaymentChannelPreview /></div></section>
-    <section className="consumer-people page-container" aria-labelledby="people-title"><figure><Image src="/marketing/people-together.webp" alt="People collaborating at a flower and ceramics shop" fill sizes="(max-width: 760px) 100vw, 45vw" /><figcaption>For your family and your team.</figcaption></figure><div><p className="eyebrow">TOGETHER, WITH CLEAR BOUNDARIES</p><h2 id="people-title">Share the everyday.<br />Keep access personal.</h2><p>Give family members or team members a card for purchases. Give your team access to collect customer payments. You choose who has access.</p><ul><li><Icon name="check" /><span>You see the overview.</span></li><li><Icon name="check" /><span>Each cardholder sees their own cards and spending.</span></li><li><Icon name="check" /><span>People collecting payments see only the terminals shared with them.</span></li><li><Icon name="check" /><span>Your card balance and payment balance stay separate.</span></li></ul><Link href="/help#access" className="consumer-text-link">See who can access what <Icon name="arrow" /></Link></div></section>
-    <section className="public-section page-container public-faq-section" aria-labelledby="questions-title"><div><p className="eyebrow">HERE TO HELP</p><h2 id="questions-title">Your questions,<br /> answered.</h2><Link href="/help" className="welcome-text-link">Visit the help center <Icon name="arrow" /></Link></div><PublicQuestions /></section>
-    <section className="page-container consumer-final-wrap"><div className="consumer-final"><div><p className="eyebrow">GET STARTED</p><h2>Ready when you are.</h2><p>Create a login, confirm your email and choose your service.</p></div><div><Link href="/login?mode=register" className="button primary">Create your login <Icon name="arrow" /></Link><Link href="/login" className="consumer-final-signin">Already have a login? Sign in</Link></div></div></section>
+  return <Shell>
+    <PublicPageStructuredData path="/" />
+    <div className="consumer-page consumer-home">
+      <ConsumerHero service="payments" title={<>Get paid.<br /><span>Keep going.</span></>}
+        description="Payment links for your next booking, invoice or sale. Create a request, share it your way and let your customer pay by card."
+        visual={<PaymentArtwork />}
+        footer={<ConsumerNetworks />}
+      />
+
+      <section className="consumer-channels page-container" id="payment-channels" aria-labelledby="channels-title">
+        <div className="consumer-section-heading"><div><p className="eyebrow">More ways to get paid</p><h2 id="channels-title">Made for the way<br /><span>you do business.</span></h2></div><Link href="/payment-services#payment-channels" className="consumer-text-link consumer-channel-heading-link">See ways to get paid<Icon name="arrow" /></Link></div>
+        <PaymentHighlights />
+      </section>
+
+      <section className="consumer-card-section" aria-labelledby="ledgix-title">
+        <div className="page-container consumer-card-grid">
+          <div className="consumer-card-visual"><WalletCardArt compact /></div>
+          <div className="consumer-card-copy">
+            <div className="consumer-product-eyebrow"><p className="eyebrow">Ledgix · Cards</p><ServiceStatus service="cards" /></div>
+            <h2 id="ledgix-title">Your everyday card.<br /><span>Made for your wallet.</span></h2>
+            <p>Meet the Ledgix Digital Wallet Card. A virtual Visa secured credit card for your family or business, with Apple Wallet and Google Wallet support.</p>
+            <Link href="/card-services" className="consumer-text-link">Explore Digital Wallet Card<Icon name="arrow" /></Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="public-section page-container public-faq-section" aria-labelledby="questions-title">
+        <div><p className="eyebrow">A little clarity</p><h2 id="questions-title">Good questions.<br />{" "}<span>Clear answers.</span></h2><Link href="/help" className="consumer-text-link">Visit the help center<Icon name="arrow" /></Link></div><PublicQuestions />
+      </section>
+    </div>
   </Shell>;
 }

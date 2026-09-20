@@ -1,14 +1,26 @@
-import Link from "next/link";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
+import { hostedServices } from "@/shared/hosted-services";
 import { Shell } from "@/ui/shell";
-import { Icon } from "@/ui/icon";
-import { ProductPreview, ServiceSteps, StartExploring } from "@/ui/public-site";
-import "@/ui/public-site.css";
+import { PaymentChannelPreview } from "@/ui/payment-channel-preview";
+import { PaymentJourneyArt } from "@/ui/payment-journey-art";
+import { PaymentUseCases } from "@/ui/product-use-cases";
+import { PaymentPortalLink } from "@/ui/service-entry";
+import { ConsumerHero, ConsumerClosing } from "@/ui/consumer-layout";
+
 export const metadata = publicPageMetadata("/payment-services");
 export default function PaymentServicesPage() {
-  return <Shell><PublicPageStructuredData path="/payment-services" /><section className="welcome-hero page-container public-service-hero"><div className="welcome-copy"><p className="eyebrow">ACCEPT PAYMENTS</p><h1>Get paid.<br /><span>Keep it simple.</span></h1><p className="welcome-description">Accept card payments for something you sell or a service you provide. Share the link and see when your customer pays. Give your team access to collect payments while you stay in control of the money.</p><div className="welcome-actions"><Link href="/merchant-services" className="button primary">Open your payments <Icon name="arrow" /></Link><Link href="/help#payments" className="welcome-text-link">Get payment help</Link></div></div><ProductPreview variant="payments" /></section>
-    <section className="page-container public-section"><div className="public-section-heading"><div><p className="eyebrow">ONE PLACE TO KEEP TRACK</p><h2>From payment link to receipt.</h2></div></div><div className="everyday-grid"><article><span className="public-icon"><Icon name="arrow" /></span><h3>Share a link. Let customers pay.</h3><p>Choose the amount and describe what the payment is for. Share the payment link in a text, email, invoice, bill, social post or website, or display a QR code for customers to scan.</p></article><article><span className="public-icon"><Icon name="grid" /></span><h3>Find any payment</h3><p>See which payments have arrived, find a receipt and follow refunds or payouts. Search by date or payment details.</p></article><article><span className="public-icon"><Icon name="shop" /></span><h3>Give your team access</h3><p>Create a payment terminal for a team member or location—an online place to collect payments and keep their records together. Invite a team member to use it while you see payments from all your terminals.</p></article></div></section>
-    <section className="page-container public-section public-role-section"><div><p className="eyebrow">A CLEAR VIEW FOR EVERYONE</p><h2>Your business.<br />Access for your team.</h2><p className="public-section-copy">All your payment terminals belong to one business and use one payment balance. You choose who can collect payments. Only you, the account owner, can manage the money.</p></div><div className="public-role-cards"><article><h3>Account owner</h3><p>See all payments, give your team access and decide when to move received payments into your payment balance. You control refunds and payouts.</p></article><article><h3>Team members</h3><p>Create payment requests, see receipts and respond when a customer questions a payment. Each person sees only the terminals shared with them and cannot move money or give others access.</p></article></div></section>
-    <section className="page-container public-section"><div className="public-section-heading"><div><p className="eyebrow">GETTING STARTED</p><h2>Three steps to get paid.</h2></div></div><ServiceSteps items={[{ title: "Create a payment request", text: "Set up your business and first payment terminal. Enter what the customer is paying for and the amount." },{ title: "Share the link", text: "Make the payment link available, then copy it into a message, invoice or website. You can also share a QR code. Your customer opens the link to pay." },{ title: "Track the payment", text: "See the payment and receipt in your dashboard. Review received payments and move them into your payment balance when you are ready. Your card balance stays separate." }]} /><p className="public-section-copy"><strong>How customers pay:</strong> Customers review your checkout and pay with a major-network card without creating an Etail Depot login. Visa, Mastercard, American Express and Discover test cards are available in this sandbox.</p></section><StartExploring /></Shell>;
+  return <Shell><PublicPageStructuredData path="/payment-services" /><div className="consumer-page consumer-product consumer-payments">
+    <ConsumerHero product service="payments" title={<>Accept payments.<br /><span>Your way.</span></>}
+      description="Create a payment request and share it by text, email, invoice or QR code. Your customer reviews the amount and pays by card."
+      actions={<PaymentPortalLink />}
+      note={<div className="consumer-product-note">Continue at {hostedServices.payments.portalDomain} to get started.</div>}
+      visual={<PaymentJourneyArt />}
+    />
+    <PaymentUseCases />
+    <section className="page-container consumer-product-section" id="payment-channels" aria-labelledby="payment-channels-title">
+      <div className="consumer-section-heading"><div><p className="eyebrow">Payment links</p><h2 id="payment-channels-title">One link.<br /><span>Seven ways to share.</span></h2></div><p>Choose an option to see a payment example.</p></div><PaymentChannelPreview />
+    </section>
+    <ConsumerClosing eyebrow="Get started" title={<>Your payments.<br /><span>One place to manage them.</span></>} description="Visit Trolleys to apply for payment services."><PaymentPortalLink /></ConsumerClosing>
+  </div></Shell>;
 }

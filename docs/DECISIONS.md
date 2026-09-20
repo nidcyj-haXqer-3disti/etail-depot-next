@@ -1,5 +1,139 @@
 # Decision register
 
+## D122 — authorize indexing and deployment of the reviewed public website
+
+21 September 2026. The user explicitly approves search indexing and deployment to the existing bound Netlify site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`, canonical origin `https://etail-depot-next.netlify.app`. Publish search metadata for the four reviewed information pages: Home, Payments, Cards and Help. Keep Privacy, Terms, 404, retired routes and non-production environments noindex. This supersedes the earlier publication/indexing hold for the approved release, without enabling unattended publication, changing DNS or launching vendor services.
+
+Use unique, factual page titles/descriptions, fixed canonical URLs, consistent social metadata and Organization/WebSite/WebPage structured data with the confirmed company legal name; add breadcrumbs to the three non-home indexed pages. The production guard requires the recorded approval/site/origin, `NODE_ENV=production`, `APP_ENV=production` and `ETAIL_SEARCH_CONTEXT=production`; if Netlify `CONTEXT` is supplied it must also equal `production`. Netlify functions do not receive `CONTEXT`, so the custom production setting is required in both build and function scopes. API updates successfully configured production-only `APP_ENV`, `ETAIL_SEARCH_CONTEXT` and `ETAIL_PUBLIC_ORIGIN` for those scopes. No secrets or private account data are needed.
+
+Full current-source verification, the reviewed GitHub PR/merge, source-tree matching, deployment and hosted search checks are pending. Local checks and environment updates alone do not establish a published release. Google Search Console submission, actual indexing and rankings are unverified. Preserve public-only runtime, coming-soon Ledgix, fixed provider/contact links and all existing records. [Release evidence and limits](RELEASE_READINESS_REVIEW.md).
+
+## D121 — preserve the approved design and prepare a verified public release
+
+20 September 2026. The user approves the marketing pages and shared chrome, requesting a final detailed review and deployment readiness. Limit changes to concrete copy, legal-scope and image-delivery improvements. A read-only vendor visit shows the approved Trolleys root as a marketing/application destination; the user confirms no separate sign-in URL. Keep the URL and remove promises that it opens merchant sign-in. Privacy/Terms cover the illustrative wallet guide and actual website/hosting boundaries. Preserve archived records, disconnected database runtime, coming-soon Ledgix, publication hold and noindex. [Review and validation evidence](RELEASE_READINESS_REVIEW.md) separates local package readiness from deployment and vendor/legal acceptance.
+
+## D120 — recognizable wallet marks and task-based service names
+
+20 September 2026. Add official Apple Pay and Google Pay marks to the selected wallet illustration using unchanged vendor SVGs and their clear-space guidance. Preserve the Apple Wallet / Google Wallet setup labels and public illustration boundary. Remove the repeated email sentence from the Cards closing, keeping Contact Ledgix as its action. Use Payments / Cards in shared navigation to match the footer and help visitors identify services before learning their product brands. The company logo and Trolleys/Ledgix names in product content stay in place. [Asset provenance](WALLET_SETUP_GUIDE.md) and current status record evidence. No deployment, provisioning, account or data change.
+
+## D119 — illustrate wallet setup with the supplied Ledgix logo
+
+20 September 2026. The user asks for Apple/Google wallet provisioning artwork and provides the Ledgix logo. Replace the static oversized-card presentation with a local interactive guide, platform tabs and three explanatory steps mirrored inside an original phone illustration. Use the unmodified supplied logo on a light virtual-card face and the existing official Visa asset. Follow official wallet-app manual-entry and issuer-verification guidance, without inventing provider portal buttons, verification methods or automatic activation. Preserve product availability, Apple/Google-only scope and public/provider/data boundaries. [Research, interaction and logo provenance](WALLET_SETUP_GUIDE.md). Current status records tests and visual review; no deployment or financial action.
+
+## D118 — finished Ledgix card design; wallet provisioning only
+
+20 September 2026. The user rejects the generic “Card illustration” and clarifies that WeChat Pay card linking should not be promoted as digital-wallet provisioning. Replace the earlier small card/phone sketch with a prominent, detailed Ledgix card face and more realistic device framing, using CSS/SVG and the existing official Visa asset. One reusable card face appears both in the wallet and enlarged; no fake card numbers, customer identity, issuer approval or provider account screenshot. Remove the visible caption. Limit public wallet copy to Apple Wallet and Google Wallet; remove WeChat/mainland-China marketing across the homepage, Cards, FAQ, Help and one Terms paragraph, and reduce card use cases and wallet choices to two. Preserve payment marketing, shared chrome, secured-credit wording and coming-soon state. Current status records validation; no issuance, provider, data or publication change.
+
+## D117 — product marketing grounded in recognizable uses
+
+20 September 2026. Research payment collection and mobile-card contexts using Federal Reserve, provider and merchant studies, with their sample and causality limits recorded in [the research/design brief](PRODUCT_MARKETING_USE_CASES.md). Emphasize booking deposits, completed-work invoices and pop-up/social orders for Trolleys; everyday, online and eligible mainland-China merchant purchases for Ledgix. These are useful cases supported by confirmed capabilities, not proven product-market fit or a ranking of Etail demand. Keep the names Trolleys Payments and Ledgix Digital Wallet Card, accepted headings, company header/footer, two-step payment artwork and virtual-card phone artwork. Add three coordinated generated photographs, three decorative homepage vignettes, shared product use-case sections and one contextual homepage detail link per service. Simplify channel narratives without changing their keyboard behavior or provider boundary. Retire the old homepage photo and overlay/feature-grid CSS. [Asset prompts and provenance](artwork/d117-assets.json) record generation and WebP encoding. Current status records checks and responsive review. No database, provider, publication or card-availability change.
+
+## D116 — Digital Wallet Card product marketing
+
+20 September 2026. The user clarifies that Ledgix's card is virtual and names it Digital Wallet Card. The user separately confirms that i2c has confirmed Apple Wallet, Google Wallet and WeChat Pay support for the program. Rebuild card marketing around the virtual card and wallet use while retaining Visa secured credit as the financial type, deposit/repayment separation and upcoming availability. Distinguish card addition to Apple/Google wallets from card linking to WeChat Pay; state device, region and card eligibility conditions. Use one generic phone/card illustration across product and homepage card section, remove old physical-card artwork, and align public copy/metadata/Terms. Preserve payment design and shared chrome. [Design and official-source evidence](DIGITAL_WALLET_CARD.md). No launch, provider configuration, financial runtime or data change.
+
+## D115 — keep the two-step payment artwork
+
+20 September 2026. The user specifically prefers D113's illustrated two-step payment journey over the restored three-step prose list. Restore `PaymentJourneyArt` within the earlier Payments page, retaining “Accept payments. Your way.” and the accepted channel examples, homepage, Cards page and shared chrome. Remove the retired prose-list styling. Keep the illustration's network marks compact through scoped selectors compatible with the earlier shared styles. The artwork is a static payment example, with no inputs, provider call or payment submission. Local verification is recorded in current status; no deployment or data/provider change.
+
+## D114 — restore the previous version and separate artwork exploration
+
+20 September 2026. The user finds D113 less successful and asks to go back, then clarifies that the earlier product pages should remain: “Accept payments. Your way.” and “Your next card.” Restore source/tests to D112 `da7cc4f`, including previous artwork and channel styling. Keep D113 in Git and documentation as review history. Reconsider only the homepage marketing artwork: a candid business-owner/customer exchange supporting “Get paid. Keep going.” Preserve the product pages and shared header/footer. A three-panel exploration generated before this clarification remains outside the application; it does not replace website assets or establish approved product imagery. [Direction](MARKETING_ARTWORK_DIRECTION.md). No deployment, provider or database change.
+
+## D113 — coordinated product storytelling and original artwork
+
+20 September 2026. The user accepts the clean pages but finds their overall presentation below the Stripe/Amex reference and authorizes a coordinated redesign. Preserve the accepted shared company header/footer and palette. Introduce both services together on the homepage, demonstrate a fixed request-to-checkout payment example, improve the seven-channel presentation, and give the forthcoming secured card original code-native artwork and a concise explanation. Remove repeated templates, old artwork/styles and unnecessary prose. Actual product availability, approved contacts/provider destinations and public-only boundaries remain. [Design and references](PUBLIC_PRODUCT_STORYTELLING.md); verification is recorded in current status. No deployment or financial/provider change is included.
+
+## D112 — the same company header on every page
+
+20 September 2026. The user corrects D111: product pages must use the homepage header and Etail Depot company logo, without Trolleys/Ledgix identity replacements or by Etail Depot attribution. Use one unconditional header and navigation with the same Open Trolleys action; only active-page state varies. Remove the superseded identity styles and service-context props. Preserve product-specific content/contact actions inside each page, the mobile menu and the accepted footer. Local verification is recorded in current status; no publication or external resource change.
+
+## D111 — product identities and compact header navigation
+
+20 September 2026. The user approves updating the header after discussing how product names should appear. General pages retain the Etail Depot logo and use Trolleys Payments / Ledgix Cards / Help navigation. Product pages show Trolleys or Ledgix with a smaller by Etail Depot home link and neutral Payments / Cards / Help navigation. Keep the existing service-specific action and approved destinations. Center desktop navigation and use a single-row mobile header with an accessible expandable menu. Preserve the footer the user already likes. Full verification, responsive geometry and visual review pass; [design and evidence](PRODUCT_HEADER_DESIGN.md). No provider, database, push or deployment change.
+
+## D110 — consolidate homepage service actions
+
+20 September 2026. The user identifies repeated service links and notes on the landing page. Remove both homepage action rows and their explanatory notes, plus the repetitive closing payment CTA. Keep availability badges, shared navigation/contact access and contextual FAQs. D106's explicit homepage hero CTA requirement is superseded; product-page entry actions remain. Make hero actions optional without rendering an empty spacer and retire unused homepage-only CSS. Local build, browser/accessibility and responsive checks pass. No publication or resource changes.
+
+## D109 — one alignment system for public headers and footers
+
+20 September 2026. The user requests precise header/footer alignment on all pages. Keep D107's identical footer content and D108's public-only boundary. Correct the existing logo's transparent inset in CSS, share brand/grid tokens, align footer headings and link rows, organize mobile links vertically, match legal text sizing and stabilize active navigation widths. Grow short page content to keep the footer at the viewport bottom. Existing product content and destinations remain. Full checks and independent visual review pass; [alignment evidence](PUBLIC_CHROME_ALIGNMENT.md). No publication or resource changes.
+
+## D108 — retire the local account application
+
+20 September 2026. In response to the complete code/database/link cleanup request, the user selected **public website and vendor links only**, explicitly preserving existing database records. This supersedes all historical internal Cardholder/Merchant, authentication, financial-provider and management-workflow requirements in the active release. Keep six public pages, one shared design and fixed vendor/contact entrances. Remove old application source, routes, SDKs, scripts and tests; retain the complete old application in Git and byte-verified database definitions in an inactive archive. Do not migrate or delete records, reconfigure hosted Identity, change DNS or publish as part of source cleanup.
+
+The public app has no registration, sessions, financial APIs or database connection. Old bookmarks redirect to fixed local product/help anchors; old financial URLs and writes return 410. Privacy/Terms reflect this scope and retained historical information. Current source, browser, accessibility, dependency, build, visual and package checks replace the obsolete backend test matrix. All future releases must exclude archives/private files and unexpected account routes from deployable artifacts. [Architecture, evidence and limitations](PUBLIC_SITE_ARCHITECTURE.md).
+
+## D107 — one footer across all public pages
+
+20 September 2026. The user identifies a different footer on Payments. Remove service-specific footer branches rather than vary content by route. Use neutral service/contact labels, identical support links and a single operator copyright row; the full DBA descriptions remain in Privacy and Terms. Product-specific header actions and the absence of authenticated dashboard footers are unchanged. Verification is recorded in `artifacts/d107-checks/`. No provider, data, push or deployment change.
+
+## D106 — distinguish learning about payments from opening the service
+
+20 September 2026. Make the homepage a concise overview, with direct Trolleys access and one secondary learning link. Put the full channel examples and request/share/track explanation on Payments; remove repeated sections and photography. Standardize the external action as Open Trolleys without changing its guarded destination. [Scope and evidence](PUBLIC_PAYMENT_JOURNEY.md). Preserve brand separation, availability, routes, provider/data behavior and shared public styling; deployment is separate.
+
+## D105 — one product focus per product page
+
+20 September 2026. Remove opposite-brand body/closing content from Cards and Payments. Scope existing public chrome through a typed service context: Cards receives Contact Ledgix, product contacts/disclosures mention only the relevant brand, and neutral Payments/Cards navigation remains. General public pages and authenticated workspaces are preserved. [Scope and verification](FOCUSED_PRODUCT_PAGES.md). No product availability, financial, provider, data or deployment change.
+
+## D104 — footer alignment and narrow-screen fit
+
+20 September 2026. Keep the accepted compact footer while correcting specific micro-layout issues: desktop legal/copyright baseline alignment, mobile first/second navigation widths, lower-row wrapping and whole company-name display. Preserve all content, links and 44px targets. [Evidence](PUBLIC_FOOTER_MICRO_REVIEW.md) includes an initial 320px fractional-width wrap and the final passing correction. No header, product, financial, data or deployment change.
+
+## D103 — refine the visual hierarchy without changing content
+
+20 September 2026. The user accepts the landing content and design direction but finds typography and artwork inconsistent. Use a smaller hero scale, common section headings and body text, legible supporting labels, consistent spacing and calmer artwork. Keep shared product-page framing and all accepted content, authentic network marks, contacts, destinations and behavior. [Scope and verification](PUBLIC_VISUAL_BALANCE.md). No data, provider or deployment changes.
+
+## D102 — balance acceptance copy with network marks
+
+20 September 2026. The user identifies an undersized caption beside the network logos. Replace it with “Accept major credit and debit cards.”, increase its weight/contrast and size to 24/22/20px, compact the accepted-network tiles, and use one shared consumer component across homepage and Payments. Keep authentic artwork proportions and the compact checkout variant unchanged. Build, focused lint and ten responsive/accessibility checks pass at 320, 390, 768, 1024 and 1440px across both routes. Manual desktop/tablet/mobile review passes. The initial accessibility helper required an explicit browser context; corrected harness passes without application changes. Evidence: `artifacts/d102-checks/`. No provider, data or deployment change.
+
+## D101 — website legal copy and presentation
+
+20 September 2026. The user requests removing the Privacy/Terms draft notices and updating language for recent product changes. Remove review UI and metadata, use “Last updated,” simplify repeated account-tool wording and clarify website-versus-product notices without disclaiming Etail Depot’s own responsibilities. Keep Trolleys availability, forthcoming Visa secured Ledgix cards, contact identities, truthful retained-data/cookie disclosures and existing search visibility. Payment examples illustrate rather than initiate transactions. [Review record](WEBSITE_LEGAL_REFRESH.md). No effective-date assertion, acceptance flow, provider/data change or deployment.
+
+## D100 — remove the duplicate hero teaser
+
+20 September 2026. Keep the homepage hero focused on Trolleys payments by removing its secondary Ledgix teaser and unused styles. The Cards navigation and dedicated Ledgix section provide card discovery. Production build, focused lint and desktop/mobile checks pass; preview refreshed. No provider, data or deployment change.
+
+## D99 — public chrome and micro-level consistency
+
+20 September 2026. The user requests redesigned standardized header/footer and a detailed public-interface review. Scope common font/color/layout tokens to unauthenticated page framing and public chrome, preserve authenticated workspace styling, and extend aligned typography to Help/legal/access pages. Use matching light surfaces and logo sizes, compact footer groups, clear email actions and visible inline links. Improve small text, consistent focus/artwork framing and specific payment examples without changing product capabilities or provider handoffs. [Implementation and evidence](PUBLIC_DETAIL_POLISH.md). This supersedes the previous dark public footer. No financial, data or deployment change.
+
+## D98 — shared discovery and product design
+
+20 September 2026. The user identifies a style disconnect between the homepage and two product pages. Move them to one public typography/spacing/surface system and shared hero/closing components, retaining accepted content and exact product availability/provider destinations. Reuse product artwork, align content with the existing header/footer, and add counterpart product links to the closing sections. [Implementation and local evidence](COHESIVE_PUBLIC_PRODUCTS.md). No authenticated service, financial, data or deployment change.
+
+## D97 — original network marks
+
+20 September 2026. Replace text and CSS imitations with locally served, original Visa, Mastercard, American Express and Discover artwork from network-owned sources. One shared component owns accessible names, proportions and placement across public acceptance, channel previews, merchant settings and Visa card illustrations. Preserve semantic network names in checkout controls and financial records. [Provenance and verification](NETWORK_BRAND_ASSETS.md). No provider, data, financial or deployment change.
+
+## D96 — compact footer density
+
+20 September 2026. The user finds D95 footer spacing excessive. Reduce its padding and repeated copy, retain all link destinations and legal wording, and arrange mobile links in labeled rows with 44px touch targets. Tighten the adjacent landing-page gap. This is a presentation-only follow-up; no header, provider, authentication, financial or deployment changes. [Evidence](PUBLIC_EXPERIENCE_REFINEMENT.md#d96--compact-footer-follow-up).
+
+## D95 — polished public discovery and no environment badge
+
+20 September 2026. The user explicitly removes Sandbox wording from the customer interface and requests a stronger landing/header/footer with distinct payment-channel examples. Remove the shared header badge and obsolete styles; preserve real-money prohibitions and all authorization/financial behavior. Lead with Trolleys payments, keep Ledgix visibly coming soon, group footer navigation, and use descriptive activities rather than fictional named businesses or seven repeated generic business labels. [Implemented design and acceptance](PUBLIC_EXPERIENCE_REFINEMENT.md) records local verification and source limits. No provider activation, data change, push or deployment is implied.
+
+## D94 — separate provider-hosted cards and payments
+
+20 September 2026. The user confirms separate vendors host sign-in, dashboards and operations: i2c for cards and Infinicept for payments. Payments are ready and cards are coming soon. The final card domain correction is **ledgix.com**, with **ledgix@etaildepot.com** for inquiries. Rebuild the public site as product discovery and handoff: Trolleys uses **https://trolleys.ai**, without guessed login paths or customer parameters; Ledgix offers contact rather than a current application. Broad payment channels, card networks and team access are user-confirmed; precise vendor roles and financial terms are not inferred. [Implementation and evidence](PROVIDER_HOSTED_PUBLIC_JOURNEY.md) records verified public journeys, preserved local recovery/data, removed dashboard simulations and updated legal scope. No provider integration, financial cutover, external domain configuration or deployment is claimed.
+
+## D93 — consistent Visa secured credit card identity
+
+20 September 2026. The user's explicit correction supersedes obsolete public prepaid product wording. Share the Visa secured credit card name across landing/product copy, FAQs, search/social metadata and social artwork. Replace the settings and future refund-description product label with neutral card account balance wording while preserving actual money behavior and historical records. The secured deposit, credit and repayment lifecycle remains the separate D84 implementation scope, not a label-only conversion. [Scope and verification](SECURED_CARD_PRODUCT_COPY.md). No provider activation or deployment is included.
+
+## D92 — shared operator, distinct Ledgix and Trolleys services
+
+20 September 2026. The user confirms Etail Depot US, Inc. DBA Ledgix for cards at ledgix.com and DBA Trolleys for payments at trolleys.ai. Ledgix inquiries go to ledgix@etaildepot.com, Trolleys inquiries to trolleys@etaildepot.com, and privacy/legal/compliance to compliance@etaildepot.com. Use a shared corporate policy/website-terms structure and reusable identity/contact content; preserve separate balances, enrollment and resource access. Write finished customer prose, retaining one truthful current financial-availability disclosure and concise review status. Existing denied-resource mutation boundaries and real-money prohibition remain. [Scope, primary references and remaining legal work](LEDGIX_TROLLEYS_LEGAL.md). No DNS/mailbox deployment or new effective agreement is authorized or implied.
+
+## D91 — original Privacy and Terms drafts grounded in the current app
+
+20 September 2026. The user requests American Express-like Privacy and Terms and confirms Etail Depot US, Inc., Washington, DC. Use the reference's readable topic organization, then write original disclosures from the actual identity, card, merchant, sharing, support and cookie implementations. Propose mailbox names `privacy` and `legal` without inventing a domain or pretending they receive messages. Implement `/privacy` and `/terms` as explicitly dated review drafts with footer links, noindex metadata independent of marketing release, and no acceptance mechanism. The current sandbox/prepaid model is factual; the future secured charge-card proposal is not an operating agreement. [Research, implementation evidence and remaining decisions](PRIVACY_TERMS_REVIEW.md). This supersedes D90's wait for external policy URLs, without establishing legal approval, provider changes or deployment.
+
 ## D84 — separate collateral, card debt and repayment
 
 17 September 2026 (Tokyo). The user identifies the intended card product as secured Visa credit/charge rather than prepaid, then confirms monthly pay-in-full with optional earlier/manual daily repayments. Visa is the network; the issuer/program and deposit-to-limit policy are not selected by that label. [D84 design](SECURED_CARD_EXPERIENCE_DESIGN.md) records the proposed shared-account model, exact-resource privacy, total card allowances, separate collateral/receivables/payments, statement allocation and data-preserving cutover. Preserve pending/late event reconciliation and owner collection-only access when spending is restricted. Do not relabel the existing prepaid balance as collateral or debt before the chosen financial model is implemented. Landing audience language and Merchant visual alignment are verified locally:84 targeted cases,8 final affected reruns,120 dashboard states and27 public states pass. [Local evidence](FAMILY_BUSINESS_STYLE_EVIDENCE.md) preserves capture-helper corrections and the final settings clipping fix. No runtime financial/schema or hosted change is established.
@@ -444,3 +578,29 @@ Remove the repeated Cardholder home identity introduction. Merchant Overview con
 Local acceptance passes292 desktop/mobile/accessibility cases,30 affected public cases, production builds and126 guarded dashboard captures with23 unchanged projections. Visual review corrected tablet Sign in wrapping and mobile FAQ spacing. Final public/breakpoint evidence is recorded in the contract; no migration, data reset or deployment accompanies D86 local review.
 
 After local review the user explicitly requested deployment. Proceed through the bound repository’s reviewed PR and exact-source checks, then publish only to the existing `etail-depot-next` site with unchanged access controls. Record verified deployment separately from authorization.
+
+19 September2026: D86 publication completed through PR28 (`564efaeef0306fa83c6c3f5ce8c10e5c6ec686cb`) and Netlify deploy `6aae8c43b7fae63bdf4df26e`. Exact-source GitHub CI and isolated Netlify packaging pass; all189 live checks and47 public screenshots pass. Checked, merged and uploaded trees match `3a4bdb86065638429ca126f9f5bc070d2c552afd`. No database migration or access change; existing financial/data boundaries remain. See the D86 contract and `artifacts/d86-publication.json` for precise validation scope.
+
+## D87 — refined consumer landing (19 September2026)
+
+The accepted content and matching public header/footer remain. Rebuild the homepage's visual hierarchy, product artwork and channel presentation, preserving the two service journeys, anonymous illustration boundary and responsive/accessible controls. Scope all new styling to the landing page. No financial model, database, private dashboard or provider change is included. [Design and verification](REFINED_CONSUMER_LANDING.md) records local acceptance separately from the published D86 baseline.
+
+Local acceptance is complete: lint, types, architecture, production build,30 public browser/accessibility tests,27 public capture states and77 channel states pass. Final visual review corrected tablet paragraph alignment and dark-surface focus contrast. The local preview is ready; no D87 publication is claimed.
+
+## D88 — simple service workspaces (19 September2026)
+
+Use one shared Stripe-informed layout for Cardholder and Merchant: compact authenticated header, desktop sidebar, focused page heading, neutral account surfaces and denser resource/statement rows. Move the existing authorized Payout area above the Merchant statement; preserve all records and scope restrictions. Keep the two existing service menus, resource creation/sharing, profile/settings distinction and command/recovery ownership. No financial model, database or permission change. [Scope and acceptance](SIMPLE_SERVICE_WORKSPACES.md) records local verification independently from deployment; the completed D87 landing remains in the candidate.
+
+Local acceptance is complete. Lint, types, architecture and production build pass. Existing browser/accessibility coverage passes across the complete and corrected affected runs, followed by 126 final preserved-data states and 48 responsive transition states. Corrections address task-search placement, notice contrast, statement link targets and phone activity alignment. D86 remains published; D87–D88 are available in the local preview for review.
+
+## D89 — neutral public shop identity (20 September 2026)
+
+At the user's request, replace “Maya’s Flower Shop” and the generic “Flower shop” identity with “Your shop” in public payment illustrations. The landing dashboard, all seven channel presentations and payment-services illustration stay consistent. Keep product examples, layout, interactions and actual customer business names unchanged. Focused lint, production build and eight existing affected desktop/mobile tests pass; update the existing expected label without adding a test that merely mirrors this copy change. This is a local wording update, with no database change or deployment.
+
+Follow-up verification: inspect the user's open local tab when reported copy differs from the rebuilt application. The previous document remained loaded; reloading the same tab visibly corrected it. All seven channel panels were checked in that tab and show “Your shop” without Maya. Preserve the existing copy change; no cache-policy alteration or extra application change is warranted.
+
+Final terminology refinement, 20 September 2026: use “Your business” instead of “Your shop” at the user's suggestion. It includes retail, services, freelancers and teams while keeping the example identity neutral. Apply it to the dashboard illustration, shared seven-channel example and payment-services illustration. Focused lint, production build and all eight affected desktop/mobile tests pass again; existing product descriptions and customer account data stay intact. This remains a local update.
+
+## D90 — grouped public footer (20 September 2026)
+
+Replace the header-shaped public footer with a brand introduction, Services / Support / Account groups and a separate copyright row. Retain the same brand, colors and gutters, the existing header, and no footer in authenticated dashboards. Only link to implemented destinations. The user will supply approved Privacy Policy and Terms URLs for the lower row; no invented legal/company/contact information. Build, focused lint and all 40 relevant existing browser/accessibility checks pass, followed by manual review at five widths. [Design and acceptance](PUBLIC_FOOTER_DESIGN.md). No deployment or business/data changes.

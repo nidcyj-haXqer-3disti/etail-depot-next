@@ -1,6 +1,138 @@
-## D86 local review — minimal service overviews complete
+## D121 — final public release preparation
 
-The user’s [presentation contract](../docs/MINIMAL_SERVICE_OVERVIEWS.md) is implemented and locally verified:292 desktop/mobile/accessibility cases,30 affected public cases,126 guarded dashboard states,27 final public states and10 final chrome breakpoints pass. Deployment is now explicitly authorized. Complete exact-source CI, isolated Netlify packaging, reviewed merge and live acceptance; preserve D85 release evidence. No financial or database cutover.
+Preserve the accepted three-page design and shared chrome. Complete a detailed responsive, accessibility, copy, link, legal, backend and archive review; correct concrete findings. Verify the complete test/build sequence and a freshly generated Netlify package for the exact bound site, with archived/private source excluded. Align wording with the observed vendor destination and the user's confirmation that no separate sign-in URL exists. Record source/artifact evidence and remaining external limits in [the release review](../docs/RELEASE_READINESS_REVIEW.md). Leave publication and indexing unchanged.
+
+## D120 — wallet marks and service navigation
+
+Use official Apple Pay and Google Pay SVG marks inside the existing wallet guide with unchanged brand artwork and balanced visible size. Remove the duplicate Cards email sentence without an empty layout spacer. Use Payments / Cards in shared header navigation, matching the footer while keeping product brands in content. Verify shared navigation, wallet behavior and desktop/mobile presentation; record actual results in current status. No deployment or provider change.
+
+## D119 — wallet setup illustration
+
+Use the supplied Ledgix logo and replace the static card rendering with an accessible Apple/Google wallet setup guide on the homepage and Cards. Show adding the virtual card, issuer verification and use after completed setup; keep illustrated controls separate from real guide controls. Follow [official-source setup guidance](../docs/WALLET_SETUP_GUIDE.md), preserve public-only boundaries and verify keyboard/state behavior, no external/API effects, supplied-logo loading and all responsive states. Record actual validation in current status. Publication is separate.
+
+## D118 — Ledgix card presentation and wallet scope
+
+Replace the generic card illustration with a detailed reusable Ledgix virtual-card design and remove its caption. Restrict public wallet marketing to Apple Wallet and Google Wallet, remove the WeChat/mainland-China use case, and align the homepage, Cards, FAQ, Help and targeted Terms wording. Keep coming-soon cards, secured-credit rules and existing payment pages/chrome. Verify the public checks and inspect both card-art sizes across mobile/tablet/desktop. Current status records actual evidence; no publication or financial activation is included.
+
+## D117 — researched use cases and coordinated product artwork
+
+Apply the [marketing research and design](../docs/PRODUCT_MARKETING_USE_CASES.md) to all three public marketing pages. Preserve accepted hero headings, shared company chrome, two-step payment and wallet artwork. Introduce practical use-case vignettes on the homepage, one product detail link per service, and editorial photo/use-case sections on Payments and Cards. Refresh all seven channel narratives; remove the unused homepage photo and presentation styles. Keep fixed provider handoffs, upcoming cards, secured-credit and wallet conditions, public-only architecture and search visibility. Verify existing public checks and visually inspect the three pages at mobile/tablet/desktop widths. Record actual results in current status; deployment is separate.
+
+## D116 — Digital Wallet Card
+
+Rebuild the Cards marketing page around the virtual Digital Wallet Card, its three operator-confirmed wallet options and a clear secured-credit explanation. Use a reusable phone/card illustration on the product page and existing homepage card section. Align FAQ, Help, metadata and targeted Terms wording; remove physical-card presentation code. Preserve D115 payment artwork and the accepted shared header/footer. [Design and evidence boundaries](../docs/DIGITAL_WALLET_CARD.md). Verification and preview status are recorded in current status; publication remains separate.
+
+## D115 — illustrated payment journey
+
+Replace only the Payments hero's three prose steps with the selected two-step artwork: create/share a request, then customer checkout. Retain the earlier page copy and all other accepted pages. Remove unused prose-list styles and verify the artwork in the restored layout across phone, tablet and desktop. Current status records evidence; publication remains separate.
+
+## D114 — restore the earlier pages; focus future artwork on the homepage
+
+The user explicitly selects the earlier Payments and Cards pages and requests the earlier homepage back. Active source/tests are restored exactly to `da7cc4f`. Preserve those product pages and the shared company header/footer. The [homepage artwork brief](../docs/MARKETING_ARTWORK_DIRECTION.md) proposes one human business exchange within the accepted composition; no new artwork is integrated. Current status records completed verification and preview refresh. Publication remains separate.
+
+## D112 — one company header
+
+Apply the homepage's Etail Depot logo, navigation and action to every public route. Remove product identity branches and unused styles while retaining mobile interactions, product-focused bodies and the accepted footer. This supersedes D111's product branding variation. Local validation and preview refresh are recorded in current status; publication remains separate.
+
+## D111 — clear product identities in the header
+
+Keep Etail Depot on general pages; use Trolleys and Ledgix with by Etail Depot on their respective product pages. Center desktop navigation and provide a compact mobile menu with keyboard and dismissal behavior. Preserve the accepted footer and fixed product destinations. All 83 unit/browser/accessibility tests and 70 responsive header states pass, along with the full build/security/package pipeline. [Design and evidence](../docs/PRODUCT_HEADER_DESIGN.md). Preview refreshed; publication remains separate.
+
+## D110 — concise homepage navigation
+
+Remove repeated homepage service action rows, availability sentences and the closing payment CTA. Keep badges and use shared header/footer navigation; retain product-page actions. Lint, types, build, 38 browser/accessibility cases and four responsive captures pass. Evidence is recorded in current status. Publication remains separate.
+
+## D109 — consistent header/footer alignment
+
+Preserve shared content and public-only scope while aligning visible logo edges, navigation, footer groups and legal text across all pages. The complete public verification pipeline and 91 responsive alignment checks pass; visual review is complete. [Details](../docs/PUBLIC_CHROME_ALIGNMENT.md). Local preview is refreshed; publication is separate.
+
+## D108 — public website and vendor links only
+
+The user explicitly chose a public-only release. Remove the internal account application and backend; preserve existing database records and immutable migration/schema history outside deployment. Maintain the six public pages, shared design, fixed service handoffs and privacy/legal disclosures. Old account bookmarks resolve to local information; retired APIs and transaction links return Gone. Local lint, types, 43 unit, 38 browser/accessibility, security, 28 visual states and offline Netlify packaging pass. See [current architecture](../docs/PUBLIC_SITE_ARCHITECTURE.md) and [status](STATUS.md) for scope, evidence and hosted-resource limits. Publication remains separate.
+
+## D107 — one consistent public footer
+
+All public routes use the same footer, neutral service/contact labels and copyright/legal row. D105's per-product footer variations are retired; product headers and bodies retain their existing focus. Build, lint, 28 browser/accessibility cases and 21 footer consistency/target-size checks pass. Preview refreshed; deployment remains separate.
+
+## D106 — a clear payment discovery journey
+
+The homepage introduces the services and the Payments page explains the seven channel options. “How payments work” opens the explanation; every “Open Trolleys” action opens the approved payment website directly. [Scope and evidence](../docs/PUBLIC_PAYMENT_JOURNEY.md). Build, lint, types, architecture, 42 browser/accessibility cases and eight responsive states pass. Independent review is complete and the local preview is refreshed. Deployment remains separate.
+
+## D105 — focused product pages
+
+Each product page focuses on its own brand and action, with scoped header/footer content and neutral shared navigation. [Scope and evidence](../docs/FOCUSED_PRODUCT_PAGES.md). Build, lint, types, architecture, 48 browser/accessibility cases, eight final affected cases and eight responsive states pass. Local preview is refreshed; deployment remains separate.
+
+## D104 — footer detail refinement
+
+The compact footer now has aligned desktop legal text, balanced mobile navigation tracks and deliberate company-name wrapping. [Verification](../docs/PUBLIC_FOOTER_MICRO_REVIEW.md) covers all public routes and key breakpoints. Preserve the content, destinations, header and absence of authenticated footers. Local preview is refreshed; deployment remains separate.
+
+## D103 — coherent public typography and artwork
+
+Keep the accepted content and direction, while narrowing the type scale, improving small-text readability, aligning section rhythm and balancing the photo/card/channel illustrations. Apply shared refinements to the homepage and both product pages to preserve visual continuity. [Scope and evidence](../docs/PUBLIC_VISUAL_BALANCE.md). Build, lint, types, 42 browser/accessibility checks and 74 responsive states pass. Independent visual review is complete; preview refreshed. Deployment remains separate.
+
+## D102 — payment-network strip proportions
+
+Homepage and Payments now share larger, direct acceptance copy and a more compact logo row. Build, focused lint and ten responsive/accessibility checks pass. Preserve original artwork and separate channel-preview sizing. Local preview is refreshed; deployment is separate.
+
+## D101 — Privacy and Terms refresh
+
+Remove public draft notices and align both legal documents with the separately hosted Trolleys and forthcoming Ledgix services. Preserve the confirmed operator/contacts, accurate website data and cookie disclosures, and applicable product agreements. [Scope and evidence](../docs/WEBSITE_LEGAL_REFRESH.md). Production build, lint, types, architecture and all eight affected browser/accessibility checks pass. The local preview is refreshed; no deployment is included.
+
+## D100 — focused homepage hero
+
+The duplicate Ledgix teaser is removed from the payment hero. Keep card discovery in the Cards navigation and dedicated Ledgix section. Locally verified; deployment is separate.
+
+## D99 — standardized public chrome and detail polish
+
+The [public detail refinement](../docs/PUBLIC_DETAIL_POLISH.md) is implemented and locally verified. Preserve the shared public theme, compact light header/footer, readable links and concrete payment examples. Authenticated workspaces retain their own theme. D94 provider separation, D97 original marks and D98 product framing remain; deployment is separate.
+
+## D98 — coordinated public product pages
+
+The [shared landing/product design](../docs/COHESIVE_PUBLIC_PRODUCTS.md) is implemented and locally verified. Preserve one public visual system and shared hero/closing components across discovery, Trolleys and Ledgix. D94 provider separation/availability and D97 original network assets remain. Deployment is separate.
+
+## D97 — authentic card-network artwork
+
+Use the networks’ original artwork in a shared local component, replacing text/CSS imitations across acceptance and card illustrations. Preserve original artwork, accessible labels and responsive placement. [D97 evidence](../docs/NETWORK_BRAND_ASSETS.md). No financial, provider or deployment change.
+
+## D96 — compact footer
+
+The user's footer-density refinement is implemented and locally verified. Preserve the compact labeled mobile rows, retained legal/service links and accessible touch targets. [D96 evidence](../docs/PUBLIC_EXPERIENCE_REFINEMENT.md#d96--compact-footer-follow-up). D95's remaining public design and D94 provider separation are unchanged; deployment remains separate.
+
+## D95 — refined public experience
+
+The [landing and public-chrome refinement](../docs/PUBLIC_EXPERIENCE_REFINEMENT.md) is implemented and locally verified. Keep the D94 separate provider destinations and availability, the distinct activity-based channel illustrations and the explicit removal of the shared Sandbox badge. Current financial guards, existing local recovery, account data and legal/noindex boundaries are unchanged. The final candidate is ready for review; deployment remains separate.
+
+## D94 — provider-hosted public journey
+
+The [provider-hosted public journey](../docs/PROVIDER_HOSTED_PUBLIC_JOURNEY.md) is implemented and locally verified. Public discovery leads to Trolleys at its approved root; Ledgix is coming soon with a card contact action. The user confirmed the final **ledgix.com** domain, i2c card provider, Infinicept payment provider and broad payment capabilities. Landing, products, Help, navigation, metadata and legal scope agree; existing local recovery and account data remain intact. No new in-house secured ledger is required for this marketing/handoff direction. Actual provider account acceptance, any future path-based hosting, retirement of the retained local application, legal effectiveness and deployment remain separate work.
+
+## D93 — Visa secured credit card wording
+
+The [product copy correction](../docs/SECURED_CARD_PRODUCT_COPY.md) is implemented and locally verified across marketing, FAQs, metadata, settings and future refund text. Preserve the current financial behavior and historical records; the separate D84 secured-credit ledger, deposit and repayment cutover remains unfinished. This copy update adds no activation or deployment.
+
+## D92 — Ledgix and Trolleys legal identity
+
+The [confirmed DBA/contact structure](../docs/LEDGIX_TROLLEYS_LEGAL.md) and production-style legal wording are implemented and locally verified. Public identity is informational only; no external domain, email, authentication or financial activation. Keep the policy review/release boundary and internal unresolved operational/legal decisions explicit.
+
+## D91 — Privacy and Terms review pages
+
+The [legal-page drafts](../docs/PRIVACY_TERMS_REVIEW.md) implement the user's requested American Express-informed organization using original copy and audited Etail behavior. Local build, source, browser, accessibility and visual checks pass. Company contact details, operational privacy decisions and qualified legal review remain prerequisites for effective policy publication; no acceptance or live-product agreement is inferred. Preserve prior local work and the D86 hosted baseline.
+
+## D90 — grouped public footer
+
+The [public footer refinement](../docs/PUBLIC_FOOTER_DESIGN.md) is implemented and locally verified. Services, Support and Account links use existing destinations; the user will provide approved Privacy/Terms URLs for the lower row. D87–D89 remain in the local candidate. D86 remains published until a separately authorized release.
+
+## D88 — simple service workspaces
+
+The [shared dashboard layout](../docs/SIMPLE_SERVICE_WORKSPACES.md) for Cardholder and Merchant is implemented and locally verified, including owner/recipient desktop/mobile journeys and accessible controls. All 292 distinct browser/accessibility cases have passing evidence across the full and corrected runs, and 174 responsive capture states pass. D87's completed landing is retained. The complete local candidate is ready for review before separately authorized publication.
+
+## D87 — refined consumer landing
+
+The [refined consumer landing](../docs/REFINED_CONSUMER_LANDING.md) is implemented and locally verified. Existing public tests, source checks and production build pass; responsive review covers27 public states plus77 channel states across11 widths. The completed local preview is ready for user review. Existing financial work and publication remain separately scoped; D86 is still the published revision.
+
+## D86 published — minimal service overviews complete
+
+The user’s [presentation contract](../docs/MINIMAL_SERVICE_OVERVIEWS.md) is published through reviewed PR28 and Netlify deploy `6aae8c43b7fae63bdf4df26e`. Exact-source CI and isolated Netlify packaging pass. All189 live checks and47 public screenshots pass; current deployment and unchanged access are verified after acceptance. No migration, reset or financial-model cutover. Preserve D85 release history and the separately recorded local dashboard evidence.
 
 ## D85 published — presentation cleanup complete
 
@@ -87,3 +219,6 @@ The final candidate needs relevant lint/types, domain and PostgreSQL integration
 ## Remaining requirements and decisions
 
 Keep original M0–M7 IDs and the 90-task `amex-public-v2` inventory. The denominator/gates do not shrink when a feature is deferred. Plans, source economics and the shared Premier annual cap are separate from services/cards. D69 resolves active prepaid group funding and UTC person spending limits; it does not resolve broader fee rounding, membership-year, sponsor attribution or supervised/facility economics. Real rails, licensing/verification, external delivery and public release keep their existing boundaries.
+## D113 — coordinated public product presentation
+
+Replace repetitive page framing with a two-service homepage, a product-led Payments page and a focused forthcoming Cards page. Use original code-native artwork, practical copy and the existing accessible channel journey. Keep the shared company header/footer, approved service entrances and public-only scope. [Design](../docs/PUBLIC_PRODUCT_STORYTELLING.md); current status records the completed checks. Publication remains separate.

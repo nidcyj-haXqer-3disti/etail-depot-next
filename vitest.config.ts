@@ -3,5 +3,5 @@ import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
-  test: { include: ['tests/{unit,integration,concurrency,contracts}/**/*.test.ts'], testTimeout: 15000, hookTimeout: 20000, fileParallelism: false },
+  test: { include: ['tests/unit/**/*.test.ts'], testTimeout: 15000, fileParallelism: false },
 });

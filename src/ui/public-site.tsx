@@ -1,32 +1,37 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Icon } from "./icon";
-
-/** Decorative product illustration, separate from authenticated account data. */
-export function ProductPreview({ variant = "cards" }: { variant?: "cards" | "payments" }) {
-  return <figure className={`product-preview product-preview-${variant}`} aria-label={variant === "cards" ? "Illustration of card controls and payment organization" : "Illustration of payment links and receipts"}>
-    <div className="preview-orbit" aria-hidden="true" /><div className="preview-orbit preview-orbit-two" aria-hidden="true" />
-    {variant === "cards" ? <div className="preview-card" aria-hidden="true"><div className="preview-card-top"><span>Etail Depot</span><span>VISA</span></div><Image src="/brand/symbol.png" alt="" width={180} height={113} className="preview-symbol" priority /><div className="preview-card-bottom"><span>Your day.<br />Your way.</span><Icon name="lock" /></div></div> : <div className="preview-card preview-request-illustration" aria-hidden="true"><div className="preview-card-top"><span>Payment request</span></div><strong className="preview-request-amount">$25.00</strong><div className="preview-card-bottom"><span>Maya’s Flower Shop<br />Weekend flowers</span><Icon name="link" /></div></div>}
-    <div className="preview-controls" aria-hidden="true"><div className="preview-panel-heading"><span className="preview-circle"><Icon name="check" /></span><div><strong>{variant === "cards" ? "You’re in control" : "Your business, in view"}</strong><span>{variant === "cards" ? "Your card. Your next move." : "Keep each payment close."}</span></div></div><div className="preview-task"><span><Icon name="grid" />{variant === "cards" ? "Card activity" : "Payment links"}</span><Icon name="arrow" /></div><div className="preview-task"><span><Icon name={variant === "cards" ? "lock" : "shop"} />{variant === "cards" ? "Card controls" : "Your payment terminals"}</span><Icon name="arrow" /></div></div>
-    <div className="preview-payment" aria-hidden="true"><span className="preview-circle"><Icon name="shop" /></span><div><strong>Payments, together</strong><span>Links · Invoices · QR codes</span></div></div>
-  </figure>;
-}
+import { cardProduct } from "@/shared/card-product";
+import { hostedServices } from "@/shared/hosted-services";
 
 const commonQuestions = [
- {question:"What can I do with Etail Depot?",answer:"Add money, create Visa cards for family members or team members, and choose their spending limits. You can also create payment requests for products or services and give your team access to collect payments. You control the money in each account."},
- {question:"Who can see my cards and payments?",answer:"As the account owner, you see all your cards or payment terminals. Each cardholder sees only their own cards and purchases. Team members collecting payments see only their assigned terminals and cannot move money."},
- {question:"Do spending limits reset each month?",answer:"No. Each card has a total spending limit that stays in place until you change it. For example, spending $200 of a $1,000 limit leaves $800, as long as there is enough money in the shared card balance. Refunds restore the balance but do not restore the used limit."},
- {question:"Where can these cards be used?",answer:"The product is a Visa prepaid card, designed for purchases wherever Visa is accepted, subject to the card’s controls and available balance. The cards shown in this sandbox are not live Visa credentials."},
- {question:"Do payments I receive add money to my cards?",answer:"No. Money you add funds your cards. Customer payments stay separate, and only you can manage refunds and payouts from your payment account."},
- {question:"Can someone have both a card and payment tools?",answer:"Yes. Invite them to each separately. They can see their own cards and the payment terminals assigned to them. Each invitation explains what they can do."},
- {question:"How do I get started?",answer:"Create a login, confirm your email and choose Cards & spending or Accept payments. You can invite people when you are ready. Use the same website on your phone; no app installation is needed."},
+  {
+    question: "Which services are available?",
+    answer: `Trolleys payments are available now. Ledgix ${cardProduct.name} is coming soon. Explore each product here, then continue to its service website when it is available.`,
+  },
+  {
+    question: "How can I accept payments?",
+    answer: <>Visit <a href={hostedServices.payments.portalUrl} referrerPolicy="no-referrer" rel="external noreferrer">Trolleys</a> to apply for payment services. Once your account is approved, share payment links, QR codes or invoices, accept major card networks and give your team access.</>,
+  },
+  {
+    question: "Will cards and payments use the same sign-in?",
+    answer: "No. Ledgix and Trolleys have separate service websites, sign-ins and dashboards. You do not need to create an Etail Depot website login before continuing to Trolleys.",
+  },
+  {
+    question: "When can I apply for a card?",
+    answer: <>Ledgix {cardProduct.name} is coming soon. Applications are not open yet. For card inquiries, contact <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}</a>.</>,
+  },
+  {
+    question: "Which digital wallets can I use?",
+    answer: "When the card service is available, eligible cards can be added to Apple Wallet or Google Wallet. Support depends on the card, device and region.",
+  },
+  {
+    question: "How does a secured credit card work?",
+    answer: `${cardProduct.name} is a virtual ${cardProduct.creditType}. A security deposit backs the credit account. Purchases create a balance that you repay separately. The card’s product agreement explains the deposit, credit limit, fees and repayment terms.`,
+  },
+  {
+    question: "How can I get help?",
+    answer: <>For payments, contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a>. For cards, contact <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}</a>.</>,
+  },
 ];
+
 export function PublicQuestions() {
   return <div className="public-questions">{commonQuestions.map(item => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}</p></details>)}</div>;
-}
-export function StartExploring() {
-  return <section className="page-container public-final-section"><div className="public-final"><div><p className="eyebrow">YOUR NEXT STEP</p><h2>Picture what you could do together.</h2><p>Create a login, confirm your email and choose your service.</p></div><Link href="/login?mode=register" className="button primary">Create your login <Icon name="arrow" /></Link></div></section>;
-}
-export function ServiceSteps({ items }: { items: { title: string; text: string }[] }) {
-  return <ol className="public-steps">{items.map((item, index) => <li key={item.title}><span className="everyday-number">0{index + 1}</span><div><h3>{item.title}</h3><p>{item.text}</p></div></li>)}</ol>;
 }
