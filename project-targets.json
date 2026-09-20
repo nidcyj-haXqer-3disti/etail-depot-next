@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "project_key": "ETAIL_DEPOT_NEXT_GREENFIELD_2026",
-  "delivery": "fresh-sandbox",
+  "delivery": "public-website-provider-handoff",
   "github": {
     "owner": "nidcyj-haXqer-3disti",
     "repository_name": "etail-depot-next",
@@ -15,11 +15,12 @@
     "canonical_origin": "https://etail-depot-next.netlify.app"
   },
   "isolation": {
-    "new_database_required": true,
-    "new_identity_required": true,
+    "new_database_required": false,
+    "new_identity_required": false,
     "new_secrets_required": true,
     "import_old_customer_data": false,
-    "copy_old_application_code": false
+    "copy_old_application_code": false,
+    "existing_project_resources_preserved": true
   },
   "release": {
     "real_money_allowed": false,
@@ -46,5 +47,5 @@
       "etail-depot-webapp.netlify.app"
     ]
   },
-  "binding_instructions": "Names are unreserved. Verify owner/availability; abort on unrelated collisions. After creation, record actual stable IDs and read back metadata before mutations. Do not remove denied targets. Local guard checks are not remote authorization."
+  "binding_instructions": "Resources already exist. Use the recorded repository and site IDs; verify identity before mutations. This public website must not connect to existing database or Identity resources; preserve those resources and their records. Any future credentials must be project-specific. Do not reuse legacy resources or remove denied targets. Local checks are not remote authorization."
 }

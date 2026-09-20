@@ -6,20 +6,20 @@ body:
     id: outcome
     attributes:
       label: Outcome and source
-      description: Requirement, original source section/cell, selected account/service boundary.
+      description: User requirement, affected public pages and approved service destinations.
     validations:
       required: true
   - type: textarea
     id: acceptance
     attributes:
-      label: Acceptance IDs and dependencies
-      description: Existing backlog IDs; permitted/denied paths; money/privacy impact.
+      label: Acceptance and boundaries
+      description: Expected behavior, preserved content, accessibility and privacy impact. No local account or financial backend.
     validations:
       required: true
   - type: textarea
     id: evidence
     attributes:
       label: Evidence needed
-      description: Real tests, exact SHA, migration/policy and hosted checks where applicable.
+      description: Relevant browser and accessibility checks, exact commit, deployment-package review and any vendor checks not performed.
     validations:
       required: true

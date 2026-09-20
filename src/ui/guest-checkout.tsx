@@ -1,9 +1,0 @@
-import Link from "next/link";
-import type {GuestOrderProjection} from "@/modules/acquiring/guest-contracts";
-import "./guest-checkout.css";
-function when(value:string){return new Intl.DateTimeFormat("en-US",{dateStyle:"medium",timeStyle:"short"}).format(new Date(value));}
-function MerchantSummary({name,primary}:{name:string;primary:string}){return <div className="gc-merchant"><span className="gc-avatar" aria-hidden="true">{name.slice(0,1)}</span><div><strong>{name}</strong>{primary!==name&&<p>For {primary}</p>}</div></div>;}
-
-
-/** Retained receipt is read-only. New payments start from the merchant's current published offer. */
-export function GuestOrder({initial:order}:{initial:GuestOrderProjection}){const receipt=order.receipt;return <div className="gc-page"><section className="gc-card"><h1>{receipt?"Your saved receipt":"This checkout has closed"}</h1><MerchantSummary name={order.merchantName} primary={order.primaryMerchantName}/><p>{order.description}</p>{receipt?<dl><dt>Amount</dt><dd>{receipt.amount.formatted}</dd><dt>Reference</dt><dd>{receipt.reference}</dd><dt>Status</dt><dd>{receipt.status.toLowerCase()}</dd><dt>Recorded</dt><dd>{when(receipt.createdAt)}</dd>{receipt.refund&&<><dt>Refund</dt><dd>{receipt.refund.amount.formatted} · {when(receipt.refund.createdAt)}</dd></>}</dl>:<p>Open a current payment link to pay the business.</p>}<Link href={order.freshRequestHref}>Back to payment request</Link></section></div>;}

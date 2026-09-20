@@ -1,0 +1,246 @@
+#!/usr/bin/env node
+/** Compile and inspect the approved public search release locally; never publish or contact a provider. */
+import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { createServer } from "node:net";
+import path from "node:path";
+import { setTimeout as delay } from "node:timers/promises";
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const targets = JSON.parse(readFileSync(path.join(root, "project-targets.json"), "utf8"));
+const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
+assert.equal(process.version, `v${manifest.engines.node}`, "Use the pinned project Node.js runtime.");
+assert.equal(targets.project_key, "ETAIL_DEPOT_NEXT_GREENFIELD_2026");
+assert.equal(targets.netlify.site_id, "cbbb6c24-9dbc-43a2-9234-e4357b5b5280");
+assert.equal(targets.netlify.canonical_origin, "https://etail-depot-next.netlify.app");
+assert.equal(targets.release.real_money_allowed, false);
+
+const canonicalOrigin = targets.netlify.canonical_origin;
+const publicPaths = ["/", "/card-services", "/payment-services", "/help"];
+const port = 3101;
+const localOrigin = `http://127.0.0.1:${port}`;
+const nextCli = path.join(root, "node_modules/next/dist/bin/next");
+const buildEnv = {
+  ...process.env,
+  NODE_ENV: "production", APP_ENV: "production", CONTEXT: "production",
+  ETAIL_SEARCH_CONTEXT: "production", SITE_ID: targets.netlify.site_id,
+  ETAIL_PUBLIC_ORIGIN: canonicalOrigin, NEXT_TELEMETRY_DISABLED: "1",
+};
+// Netlify Functions receive SITE_ID and the production-scoped custom marker, but not CONTEXT.
+const runtimeEnv = { ...buildEnv };
+delete runtimeEnv.CONTEXT;
+const children = new Set();
+let interrupted = false;
+
+function startNext(args, env) {
+  const child = spawn(process.execPath, [nextCli, ...args], { cwd: root, env, stdio: "inherit", detached: process.platform !== "win32" });
+  const job = { child, finished: false, result: null, done: null };
+  job.done = new Promise(resolve => {
+    const finish = result => { job.finished = true; job.result = result; children.delete(job); resolve(result); };
+    child.once("error", error => finish({ error }));
+    child.once("close", (code, signal) => finish({ code, signal }));
+  });
+  children.add(job);
+  return job;
+}
+function signalJob(job, signal) {
+  if (job.finished || !job.child.pid) return;
+  try {
+    if (process.platform === "win32") job.child.kill(signal);
+    else process.kill(-job.child.pid, signal);
+  } catch (error) { if (error.code !== "ESRCH") throw error; }
+}
+async function stopJob(job) {
+  signalJob(job, "SIGTERM");
+  const timeout = setTimeout(() => signalJob(job, "SIGKILL"), 5000);
+  try { await job.done; } finally { clearTimeout(timeout); }
+}
+function interrupt() {
+  interrupted = true;
+  for (const job of children) signalJob(job, "SIGTERM");
+}
+process.once("SIGINT", interrupt);
+process.once("SIGTERM", interrupt);
+
+async function requireFreePort() {
+  const probe = createServer();
+  await new Promise((resolve, reject) => {
+    probe.once("error", reject);
+    probe.listen(port, "127.0.0.1", () => probe.close(error => error ? reject(error) : resolve()));
+  });
+}
+async function localFetch(route) {
+  assert.ok(route.startsWith("/") && !route.startsWith("//"), "Only local paths may be requested.");
+  return fetch(`${localOrigin}${route}`, { redirect: "manual", signal: AbortSignal.timeout(15000) });
+}
+async function waitForServer(job) {
+  for (let attempt = 0; attempt < 180; attempt++) {
+    assert.equal(interrupted, false, "Production SEO verification was interrupted.");
+    assert.equal(job.finished, false, `Fresh SEO server exited before readiness: ${JSON.stringify(job.result)}`);
+    try {
+      const response = await fetch(`${localOrigin}/`, { redirect: "manual", signal: AbortSignal.timeout(1000) });
+      await response.arrayBuffer();
+      if (response.status === 200) return;
+    } catch { /* A fresh server may still be binding its local port. */ }
+    await delay(250);
+  }
+  throw new Error("Fresh production SEO server did not become ready.");
+}
+function decode(value) {
+  return value.replace(/&(#x[\da-f]+|#\d+|amp|quot|apos|lt|gt);/gi, (_, entity) => {
+    if (entity[0] === "#") return String.fromCodePoint(entity[1].toLowerCase() === "x" ? Number.parseInt(entity.slice(2), 16) : Number.parseInt(entity.slice(1), 10));
+    return { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">" }[entity.toLowerCase()];
+  });
+}
+function attributes(tag) {
+  return Object.fromEntries([...tag.matchAll(/([^\s=<>]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].map(match => [match[1].toLowerCase(), decode(match[2] ?? match[3])]));
+}
+function documentMetadata(html, route) {
+  const head = html.match(/<head(?:\s[^>]*)?>([\s\S]*?)<\/head>/i)?.[1];
+  assert.ok(head, `${route}: HTML head is missing.`);
+  const metas = [...head.matchAll(/<meta\b[^>]*>/gi)].map(match => attributes(match[0]));
+  const links = [...head.matchAll(/<link\b[^>]*>/gi)].map(match => attributes(match[0]));
+  const titles = [...head.matchAll(/<title(?:\s[^>]*)?>([\s\S]*?)<\/title>/gi)].map(match => decode(match[1]).trim());
+  const metaValues = (key, value) => metas.filter(meta => meta[key]?.toLowerCase() === value).map(meta => meta.content ?? "");
+  return { metas, links, titles, metaValues };
+}
+function forbidsIndexing(value) { return /(?:^|[\s,:])(?:noindex|none)(?:$|[\s,])/i.test(value); }
+function assertIndexable(response, metadata, route) {
+  assert.equal(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), false, `${route}: HTTP header blocks indexing.`);
+  for (const name of ["robots", "googlebot"]) {
+    const values = metadata.metaValues("name", name);
+    assert.equal(values.length, 1, `${route}: expected exactly one ${name} meta tag.`);
+    const directives = values[0].toLowerCase().split(/\s*,\s*/);
+    assert.ok(directives.includes("index") && directives.includes("follow"), `${route}: ${name} must allow index and follow.`);
+    assert.equal(forbidsIndexing(values[0]), false, `${route}: ${name} blocks indexing.`);
+  }
+}
+function schemaNodes(html) {
+  return [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+    .filter(match => attributes(match[1]).type === "application/ld+json")
+    .flatMap(match => {
+      const data = JSON.parse(match[2]);
+      return Array.isArray(data) ? data : data["@graph"] ?? [data];
+    });
+}
+function checkSchema(html, route, description) {
+  const nodes = schemaNodes(html);
+  const node = type => {
+    const matches = nodes.filter(entry => entry["@type"] === type || (Array.isArray(entry["@type"]) && entry["@type"].includes(type)));
+    assert.equal(matches.length, 1, `${route}: expected one ${type} schema node.`);
+    return matches[0];
+  };
+  const organization = node("Organization"), website = node("WebSite"), page = node("WebPage");
+  assert.equal(organization.name, "Etail Depot");
+  assert.equal(organization.legalName, "Etail Depot US, Inc.");
+  assert.equal(organization.url, `${canonicalOrigin}/`);
+  assert.equal(new URL(organization.logo).origin, canonicalOrigin);
+  assert.equal(website.name, "Etail Depot");
+  assert.equal(website.url, `${canonicalOrigin}/`);
+  assert.equal(website.publisher?.["@id"], organization["@id"]);
+  assert.equal(page.url, new URL(route, canonicalOrigin).href);
+  assert.equal(page.description, description);
+  assert.equal(page.isPartOf?.["@id"], website["@id"]);
+  if (route !== "/") {
+    const crumbs = node("BreadcrumbList").itemListElement;
+    assert.equal(crumbs.length, 2, `${route}: breadcrumb must reflect Home and this page.`);
+    for (const [index, crumb] of crumbs.entries()) {
+      assert.equal(crumb["@type"], "ListItem");
+      assert.equal(crumb.position, index + 1);
+      assert.ok(typeof crumb.name === "string" && crumb.name.trim());
+      const item = typeof crumb.item === "string" ? crumb.item : crumb.item?.["@id"];
+      assert.equal(item, new URL(index ? route : "/", canonicalOrigin).href);
+    }
+  }
+  assert.equal(nodes.some(entry => ["Offer", "AggregateRating", "Review", "ApplyAction"].includes(entry["@type"])), false, `${route}: unapproved offer or endorsement markup.`);
+}
+
+async function verifyResponses() {
+  const titles = new Set(), descriptions = new Set();
+  for (const route of publicPaths) {
+    const response = await localFetch(route);
+    assert.equal(response.status, 200, `${route}: public page must return 200 without a redirect.`);
+    assert.equal(response.headers.has("set-cookie"), false, `${route}: public pages must not create sessions.`);
+    const html = await response.text(), metadata = documentMetadata(html, route);
+    assertIndexable(response, metadata, route);
+    assert.equal(metadata.titles.length, 1, `${route}: expected one title.`);
+    assert.ok(metadata.titles[0].trim(), `${route}: empty title.`);
+    const description = metadata.metaValues("name", "description");
+    assert.equal(description.length, 1, `${route}: expected one description.`);
+    assert.ok(description[0].trim(), `${route}: empty description.`);
+    titles.add(metadata.titles[0]); descriptions.add(description[0]);
+    const canonicals = metadata.links.filter(link => link.rel === "canonical");
+    assert.equal(canonicals.length, 1, `${route}: expected one canonical.`);
+    assert.equal(new URL(canonicals[0].href).href, new URL(route, canonicalOrigin).href);
+    assert.deepEqual(metadata.metaValues("property", "og:image"), [`${canonicalOrigin}/opengraph-image`]);
+    assert.deepEqual(metadata.metaValues("name", "twitter:image"), [`${canonicalOrigin}/opengraph-image`]);
+    checkSchema(html, route, description[0]);
+  }
+  assert.equal(titles.size, publicPaths.length, "Public titles must be distinct.");
+  assert.equal(descriptions.size, publicPaths.length, "Public descriptions must be distinct.");
+
+  const sitemapResponse = await localFetch("/sitemap.xml");
+  assert.equal(sitemapResponse.status, 200);
+  const sitemap = await sitemapResponse.text();
+  const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => decode(match[1]));
+  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the four reviewed canonical pages.");
+  const robotsResponse = await localFetch("/robots.txt");
+  assert.equal(robotsResponse.status, 200);
+  const robots = await robotsResponse.text();
+  assert.match(robots, /^User-Agent:\s*\*\s*$/im);
+  assert.match(robots, /^Allow:\s*\/\s*$/im);
+  assert.doesNotMatch(robots, /^Disallow:\s*\/\s*$/im);
+  assert.deepEqual([...robots.matchAll(/^Sitemap:\s*(\S+)\s*$/gim)].map(match => match[1]), [`${canonicalOrigin}/sitemap.xml`]);
+
+  const image = await localFetch("/opengraph-image");
+  assert.equal(image.status, 200);
+  assert.match(image.headers.get("content-type") ?? "", /^image\/png(?:;|$)/i);
+  assert.equal(forbidsIndexing(image.headers.get("x-robots-tag") ?? ""), false, "Approved social image must not carry noindex.");
+  const bytes = Buffer.from(await image.arrayBuffer());
+  assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
+
+  for (const route of ["/privacy", "/terms", "/production-seo-missing-page"]) {
+    const response = await localFetch(route);
+    assert.equal(response.status, route.includes("missing-page") ? 404 : 200, `${route}: unexpected status.`);
+    const metadata = documentMetadata(await response.text(), route);
+    const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
+    assert.ok(values.some(forbidsIndexing), `${route}: must remain noindex.`);
+  }
+  const redirectFamilies = ["cardholder-services", "cards", "merchant-services", "merchants", "login", "profile", "security", "shared-access", "invitations", "operations", "money-accounts", "accounts", "services"];
+  for (const family of [...redirectFamilies, "api", "checkout", "pay", "payments"]) {
+    const response = await localFetch(`/${family}/seo-test?token=synthetic-test`);
+    assert.equal(response.status, redirectFamilies.includes(family) ? 307 : 410, `/${family}: retirement response changed.`);
+    assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `/${family}: retired response must remain noindex.`);
+    assert.equal(response.headers.has("set-cookie"), false);
+    if (response.status === 307) {
+      assert.ok(response.headers.get("location"), `/${family}: missing redirect destination.`);
+      const destination = new URL(response.headers.get("location"), localOrigin);
+      assert.equal(destination.origin, localOrigin); assert.equal(destination.search, "");
+    }
+    await response.arrayBuffer();
+  }
+  console.log("Production SEO passed: four indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+}
+
+try {
+  await requireFreePort();
+  console.log("Building the exact approved site in production mode for rendered SEO verification.");
+  const build = startNext(["build"], buildEnv);
+  const result = await build.done;
+  assert.equal(interrupted, false, "Production SEO verification was interrupted.");
+  if (result.error) throw result.error;
+  assert.equal(result.code, 0, `Production SEO build failed (${result.signal ?? result.code}).`);
+  const server = startNext(["start", "--hostname", "127.0.0.1", "--port", String(port)], runtimeEnv);
+  await waitForServer(server);
+  await verifyResponses();
+} catch (error) {
+  console.error(error);
+  process.exitCode = 1;
+} finally {
+  await Promise.all([...children].map(stopJob));
+  process.removeListener("SIGINT", interrupt);
+  process.removeListener("SIGTERM", interrupt);
+}

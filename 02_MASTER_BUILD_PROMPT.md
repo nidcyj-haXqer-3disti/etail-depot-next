@@ -1,5 +1,7 @@
 # Etail Depot — current project prompt
 
+> **D108 scope supersedes this historical application brief:** The user selected public website and vendor links only. Follow [the current public architecture](docs/PUBLIC_SITE_ARCHITECTURE.md), README and status. The account/financial requirements below are preserved history, not active implementation instructions. Existing database records remain preserved and disconnected from the public application.
+
 > **D80 active override — 13 September 2026:** [Unified resource workspaces](docs/UNIFIED_RESOURCE_WORKSPACES.md) makes cards and terminals follow the same create-for-self/others, detail, controls and sharing pattern. Card details contain their own controls and invitations; Merchant Overview is one credit/debit statement, with Terminals owning channels and assigned people. Personal profile/login and service account settings remain separate. D73 money/authority and D76 contact-bound invitations remain.
 
 > **D79 active override — 13 September 2026:** [Consolidated service workflows](docs/CONSOLIDATED_SERVICE_WORKFLOWS.md) puts card Add money on Account home and Return unused money in owner settings; card filters describe use rather than names. Merchant has one Overview / Payments / Team & terminals / Channels / Settings menu, with balance and payouts on Overview and terminal context inside the same workspace. Existing financial, permission and recovery rules remain.

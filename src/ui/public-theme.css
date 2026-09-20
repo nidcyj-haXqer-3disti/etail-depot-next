@@ -1,0 +1,49 @@
+/* Shared theme for the public website. */
+:where(.public-header, .public-main, .public-footer) {
+  --public-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --public-max: 1248px;
+  --public-gutter: 32px;
+  --public-brand-width: 176px;
+  --public-chrome-gap: 40px;
+  --public-ink: #183d35;
+  --public-muted: #586960;
+  --public-accent: #527254;
+  --public-line: #dce3dc;
+  --public-paper: #f7f6f2;
+  --public-tint: #eef1e8;
+  --public-hover: #285c49;
+  --public-focus: #217262;
+  --public-radius: 10px;
+  --public-control-radius: 7px;
+  font-family: var(--public-font);
+  color: var(--public-ink);
+}
+.public-main {
+  flex: 1;
+  --max: var(--public-max);
+  --ink: var(--public-ink);
+  --muted: var(--public-muted);
+  --line: var(--public-line);
+  --teal: var(--public-accent);
+  background: #fff;
+}
+.public-main .page-container { padding-inline: var(--public-gutter); }
+.public-main a:focus-visible, .public-main button:focus-visible, .public-main summary:focus-visible,
+.public-main input:focus-visible, .public-main select:focus-visible, .public-main textarea:focus-visible {
+  outline: 3px solid var(--public-focus);
+  outline-offset: 4px;
+}
+.public-main p { text-wrap: pretty; }
+@media (max-width: 1000px) {
+  :where(.public-header, .public-main, .public-footer) { --public-gutter: 24px; --public-brand-width: 160px; --public-chrome-gap: 24px; }
+}
+@media (max-width: 760px) {
+  :where(.public-header, .public-main, .public-footer) { --public-brand-width: 150px; }
+}
+@media (max-width: 360px) {
+  :where(.public-header, .public-main, .public-footer) { --public-gutter: 18px; --public-brand-width: 128px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:has(.public-main) { scroll-behavior: auto; }
+  .public-header *, .public-main *, .public-footer * { transition: none !important; }
+}

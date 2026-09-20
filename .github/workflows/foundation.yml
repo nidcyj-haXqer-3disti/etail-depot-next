@@ -1,256 +1,71 @@
-name: Two-service sandbox checks
+name: Public website checks
 
 on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, "codex/**", "feature/**"]
+    branches: [main, "codex/**"]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: foundation-${{ github.workflow }}-${{ github.ref }}
+  group: public-website-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  foundation:
-    name: Application and PostgreSQL checks
+  public-website:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 25
     env:
       CI: "true"
       APP_ENV: test
-      ETAIL_PUBLIC_ORIGIN: http://127.0.0.1:3100
-      ENABLE_REAL_MONEY: "false"
-      ENABLE_LOCAL_FIXTURE_IDENTITY: "true"
       NEXT_TELEMETRY_DISABLED: "1"
-      # Fictional credentials belong only to this disposable CI service.
-      DATABASE_URL: postgresql://etail_ci:etail_ci_disposable_fixture@127.0.0.1:5432/etail_depot_next_services_test
-    services:
-      postgres:
-        image: postgres:18.6
-        env:
-          POSTGRES_DB: etail_depot_next_services_test
-          POSTGRES_USER: etail_ci
-          POSTGRES_PASSWORD: etail_ci_disposable_fixture
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U etail_ci -d etail_depot_next_services_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 12
-    defaults:
-      run:
-        shell: bash
     steps:
-      # Action release tags and full commit IDs verified against official GitHub
-      # release/tag metadata on 2026-09-08. This workflow never deploys or merges.
-      - name: Check out the exact workflow commit
+      # Pinned, previously verified official action revisions. No release credentials.
+      - name: Check out the exact commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: nidcyj-haXqer-3disti/etail-depot-next
           ref: ${{ github.sha }}
           persist-credentials: false
           fetch-depth: 1
-
       - name: Set up pinned Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24.19.0
           package-manager-cache: false
-
       - name: Set up pinned pnpm
         uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:
           version: 11.19.0
           install: false
           cache: false
-
-      - name: Verify repository binding and prepare sanitized evidence
-        id: evidence
+      - name: Verify repository and runtime binding
         run: |
-          set -euo pipefail
           node --input-type=module <<'NODE'
           import assert from 'node:assert/strict';
-          import { createHash } from 'node:crypto';
           import { execFileSync } from 'node:child_process';
-          import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-          import path from 'node:path';
+          import { readFileSync } from 'node:fs';
           const targets = JSON.parse(readFileSync('project-targets.json', 'utf8'));
           assert.equal(process.env.GITHUB_REPOSITORY, 'nidcyj-haXqer-3disti/etail-depot-next');
           assert.equal(String(targets.github.repository_id), process.env.GITHUB_REPOSITORY_ID);
           assert.equal(targets.release.real_money_allowed, false);
           assert.equal(process.version, 'v24.19.0');
-          const pnpm = execFileSync('pnpm', ['--version'], { encoding: 'utf8' }).trim();
-          assert.equal(pnpm, '11.19.0');
-          const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-          assert.equal(commit, process.env.GITHUB_SHA);
-          const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { encoding: 'utf8' }).trim();
-          const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
-          const sha256 = filename => createHash('sha256').update(readFileSync(filename)).digest('hex');
-          function sqlFiles(directory) {
-            return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
-              assert.equal(entry.isSymbolicLink(), false);
-              const filename = path.join(directory, entry.name);
-              return entry.isDirectory() ? sqlFiles(filename) : entry.isFile() && filename.endsWith('.sql') ? [filename] : [];
-            }).sort();
-          }
-          const migrations = sqlFiles('netlify/database/migrations');
-          assert.ok(migrations.length > 0);
-          mkdirSync('artifacts/foundation', { recursive: true });
-          writeFileSync('artifacts/foundation/identity.json', JSON.stringify({
-            checkedAt: new Date().toISOString(), repository: process.env.GITHUB_REPOSITORY,
-            repositoryId: process.env.GITHUB_REPOSITORY_ID, checkedCommit: commit, checkedTree: tree,
-            pullRequestHead: event.pull_request?.head?.sha ?? null,
-            runUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-            runAttempt: process.env.GITHUB_RUN_ATTEMPT, node: process.version, pnpm,
-            runner: { os: process.env.RUNNER_OS, arch: process.env.RUNNER_ARCH, image: process.env.ImageOS, imageVersion: process.env.ImageVersion },
-            lockfileSha256: sha256('pnpm-lock.yaml'),
-            migrations: migrations.map(filename => ({ filename, sha256: sha256(filename) })),
-            database: { purpose: 'ephemeral-fictional-CI-only', name: 'etail_depot_next_services_test', expectedVersion: '18.6' },
-            identity: 'isolated-fixture-only', realMoney: false, hostedValidation: 'not-run',
-          }, null, 2) + '\n');
+          assert.equal(execFileSync('pnpm', ['--version'], { encoding: 'utf8' }).trim(), '11.19.0');
+          assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(), process.env.GITHUB_SHA);
+          console.log('Exact repository, commit, runtime and disabled financial-release boundary verified.');
           NODE
-          cat > "$RUNNER_TEMP/foundation-checks.sh" <<'BASH'
-          run_check() {
-            local label="$1"
-            shift
-            local raw="$RUNNER_TEMP/foundation-${label}.raw.log"
-            local started
-            started="$(date -u +%FT%TZ)"
-            export PLAYWRIGHT_JUNIT_OUTPUT_FILE="$RUNNER_TEMP/foundation-${label}.raw.xml"
-            export PLAYWRIGHT_HTML_OUTPUT_DIR="$RUNNER_TEMP/foundation-${label}-html"
-            printf 'Running foundation check: %s\n' "$label"
-            local result=0
-            "$@" > "$raw" 2>&1 || result=$?
-            node --input-type=module - "$label" "$result" "$started" "$raw" "$PLAYWRIGHT_JUNIT_OUTPUT_FILE" "$@" <<'NODE'
-          import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-          const [label, status, startedAt, rawLog, rawXml, ...command] = process.argv.slice(2);
-          function redact(value) {
-            return value
-              .replace(/\u001b\[[0-9;]*m/g, '')
-              .replace(/\bpostgres(?:ql)?:\/\/[^\s"'<>]+/gi, '[REDACTED_DATABASE_URL]')
-              .replace(/((?:__Host-)?etail_session=)[^;\s"'<>]+/g, '$1[REDACTED]')
-              .replace(/\bBearer\s+[A-Za-z0-9._~-]+/gi, 'Bearer [REDACTED]')
-              .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g, '[REDACTED_PROVIDER_TOKEN]')
-              .replace(/(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])/g, '[REDACTED_OPAQUE_VALUE]')
-              .replace(/((?:access_token|refresh_token|password)\s*["']?\s*[:=]\s*["'])[^"']*/gi, '$1[REDACTED]');
-          }
-          const log = redact(readFileSync(rawLog, 'utf8'));
-          writeFileSync(`artifacts/foundation/${label}.log`, log);
-          process.stdout.write(log);
-          if (existsSync(rawXml)) writeFileSync(`artifacts/foundation/${label}.xml`, redact(readFileSync(rawXml, 'utf8')));
-          writeFileSync(`artifacts/foundation/${label}.json`, JSON.stringify({
-            command: command.map(redact), exitCode: Number(status), startedAt, completedAt: new Date().toISOString(),
-          }, null, 2) + '\n');
-          NODE
-            return "$result"
-          }
-          BASH
-          printf 'BASH_ENV=%s\n' "$RUNNER_TEMP/foundation-checks.sh" >> "$GITHUB_ENV"
-
-      - name: Install the exact dependency lockfile
-        id: install
-        run: run_check install pnpm install --frozen-lockfile
-
-      - name: Install Chromium and its runner dependencies
-        id: browser_install
-        run: run_check browser-install pnpm exec playwright install --with-deps chromium
-
-      - name: Record the actual disposable PostgreSQL engine
-        id: database_identity
-        run: |
-          node --input-type=module <<'NODE'
-          import assert from 'node:assert/strict';
-          import { readFileSync, writeFileSync } from 'node:fs';
-          import pg from 'pg';
-          const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
-          try {
-            await client.connect();
-            const { rows: [database] } = await client.query("SELECT version() AS engine, current_setting('server_version') AS version, current_database() AS name");
-            assert.match(database.version, /^18\.6(?:\s|$)/);
-            assert.equal(database.name, 'etail_depot_next_services_test');
-            const filename = 'artifacts/foundation/identity.json';
-            const evidence = JSON.parse(readFileSync(filename, 'utf8'));
-            Object.assign(evidence.database, database);
-            writeFileSync(filename, JSON.stringify(evidence, null, 2) + '\n');
-          } catch {
-            console.error('Disposable PostgreSQL engine verification failed; no connection details were logged.');
-            process.exitCode = 1;
-          } finally { await client.end(); }
-          NODE
-
-      - name: Lint
-        id: lint
-        run: run_check lint pnpm lint
-      - name: Typecheck
-        id: typecheck
-        run: run_check typecheck pnpm typecheck
-      - name: Unit tests
-        id: unit
-        run: run_check unit pnpm test:unit
-      - name: Real PostgreSQL integration tests
-        id: integration
-        run: run_check integration pnpm test:integration
-      - name: Real PostgreSQL concurrency tests
-        id: concurrency
-        run: run_check concurrency pnpm test:concurrency
-      - name: Adapter and API contracts
-        id: contracts
-        run: run_check contracts pnpm test:contracts
-      - name: Source architecture boundaries
-        id: architecture
-        run: run_check architecture pnpm test:architecture
-      - name: Production Next.js build
-        id: build
-        run: run_check build pnpm build
-      - name: API tests against the built application
-        id: api
-        run: run_check api pnpm test:api --reporter=list,junit
-      - name: Desktop and mobile browser tests
-        id: e2e
-        run: run_check e2e pnpm test:e2e --reporter=list,junit
-      - name: Automated accessibility checks
-        id: accessibility
-        run: run_check accessibility pnpm test:a11y --reporter=list,junit
-      - name: Source security and dependency audit
-        id: security
-        run: run_check security pnpm test:security
-      - name: Handoff helper regression tests
-        id: handoff
-        run: run_check handoff python3 tools/test-handoff.py
-
-      - name: Record outcomes and evidence hashes
-        if: always() && steps.evidence.outcome == 'success'
-        env:
-          CHECK_OUTCOMES: >-
-            {"install":"${{ steps.install.outcome }}","browserInstall":"${{ steps.browser_install.outcome }}","databaseIdentity":"${{ steps.database_identity.outcome }}","lint":"${{ steps.lint.outcome }}","typecheck":"${{ steps.typecheck.outcome }}","unit":"${{ steps.unit.outcome }}","integration":"${{ steps.integration.outcome }}","concurrency":"${{ steps.concurrency.outcome }}","contracts":"${{ steps.contracts.outcome }}","architecture":"${{ steps.architecture.outcome }}","build":"${{ steps.build.outcome }}","api":"${{ steps.api.outcome }}","e2e":"${{ steps.e2e.outcome }}","accessibility":"${{ steps.accessibility.outcome }}","security":"${{ steps.security.outcome }}","handoff":"${{ steps.handoff.outcome }}"}
-        run: |
-          node --input-type=module <<'NODE'
-          import { createHash } from 'node:crypto';
-          import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
-          const directory = 'artifacts/foundation';
-          const outcomes = JSON.parse(process.env.CHECK_OUTCOMES);
-          const checkedCommit = JSON.parse(readFileSync(`${directory}/identity.json`, 'utf8')).checkedCommit;
-          writeFileSync(`${directory}/outcomes.json`, JSON.stringify({ checkedCommit, outcomes, complete: Object.values(outcomes).every(value => value === 'success') }, null, 2) + '\n');
-          const files = readdirSync(directory).filter(name => /\.(json|log|xml)$/.test(name)).sort();
-          const hashes = files.map(filename => `${createHash('sha256').update(readFileSync(`${directory}/${filename}`)).digest('hex')}  ${filename}`);
-          writeFileSync(`${directory}/SHA256SUMS`, hashes.join('\n') + '\n');
-          NODE
-
-      - name: Upload only sanitized foundation evidence
-        if: always() && steps.evidence.outcome == 'success'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: foundation-${{ github.sha }}-${{ github.run_attempt }}
-          path: |
-            artifacts/foundation/*.json
-            artifacts/foundation/*.log
-            artifacts/foundation/*.xml
-            artifacts/foundation/SHA256SUMS
-          if-no-files-found: error
-          retention-days: 14
-          include-hidden-files: false
+      - name: Install the exact lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Verify the public website
+        run: pnpm verify:public
+      - name: Verify the approved production search release
+        run: pnpm test:seo:production
+      - name: Package for the bound Netlify site without publishing
+        run: pnpm package:netlify
+      - name: Verify deployment route and file boundaries
+        run: pnpm verify:package

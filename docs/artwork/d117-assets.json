@@ -1,0 +1,23 @@
+{
+  "method": "Built-in image generation; WebP encoding with Sharp",
+  "assets": [
+    {
+      "key": "business-handoff",
+      "prompt": "Use case: photorealistic-natural. Asset: premium Etail Depot homepage editorial photograph, no typography. Create one photorealistic candid photograph of an independent homeware business owner handing a neatly wrapped ceramic purchase in a kraft paper bag to a customer across a natural oak counter. A warm human moment of finishing a sale, not people posing at a phone. Modern small studio, ivory plaster, restrained forest-green clothing, shelves with a few handmade objects softly blurred. Two adults, believable hands and expressions, textured paper and natural skin. Medium framing, both the handoff and faces near the central crop-safe area so it works in a nearly square desktop hero and a tall mobile crop. Soft side-window light, premium editorial composition, calm warm ivory/green palette. Landscape 3:2, high resolution. No words, logos, signs, payment UI, brand marks, visible card numbers, fake success indicators or collage. One photograph only.",
+      "source": "/Users/yu/.codex/generated_images/01a0804d-84a3-73c2-b819-693f4edfdd05/exec-c176be2b-4ed3-4cd5-abe5-f29f3b4b925a.png",
+      "output": "public/marketing/business-handoff-v1.webp"
+    },
+    {
+      "key": "work-and-payment",
+      "prompt": "Use case: photorealistic-natural. Asset: Trolleys Payments product-page editorial photograph. Create one premium candid photograph of an independent interior designer and a client reviewing finished material samples and a small portfolio at a clear oak worktable in a bright professional studio. The work behind a payment: a calm productive conversation after a project milestone. Ivory walls, a few muted green and warm neutral fabric samples, an unobtrusive closed or obliquely viewed laptop with no readable screen. Two adults, medium-close framing, natural gestures and realistic hands, quiet confident mood. Subjects and work arranged centrally, safe for square cropping. Soft daylight, subtle fine grain, tactile paper and fabrics, warm ivory and forest-green palette coordinated with a premium financial-services website. Landscape 3:2, high resolution. No typography, logos, charts, identifiable customer information, fake invoices, visible numbers, illustrations or collage. One photograph only.",
+      "source": "/Users/yu/.codex/generated_images/01a0804d-84a3-73c2-b819-693f4edfdd05/exec-9e74b1a1-a6e0-4086-af42-2c03a851a955.png",
+      "output": "public/marketing/work-and-payment-v1.webp"
+    },
+    {
+      "key": "everyday-wallet",
+      "prompt": "Use case: photorealistic-natural. Asset: Ledgix Digital Wallet Card product-page lifestyle photograph. Create one premium photorealistic editorial close-up of an adult customer's hand holding a slim modern phone just above a small unbranded contactless card reader at a neighborhood coffee counter. A coffee cup and a paper bag in the softly blurred background establish an ordinary daily purchase. Phone angled naturally with its back toward the camera; no readable screen or invented app UI. Realistic fingers and grip, plausible device-to-reader distance. Warm natural window light, ivory ceramic, oak counter, quiet forest-green clothing accents, careful depth of field and authentic textures. Central crop-safe composition suitable for square and landscape crops. Landscape 3:2, high resolution. No logos, readable text, payment-network marks, transaction amounts, success indicators, fake approval, collage or floating interface panels. One photograph only.",
+      "source": "/Users/yu/.codex/generated_images/01a0804d-84a3-73c2-b819-693f4edfdd05/exec-e142166a-ef84-4bac-a148-93ab87ea2a8b.png",
+      "output": "public/marketing/everyday-wallet-v1.webp"
+    }
+  ]
+}

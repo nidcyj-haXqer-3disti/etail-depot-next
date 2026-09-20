@@ -1,14 +1,37 @@
 import Link from "next/link";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
+import { cardProduct } from "@/shared/card-product";
 import { Shell } from "@/ui/shell";
 import { Icon } from "@/ui/icon";
-import { ProductPreview, ServiceSteps, StartExploring } from "@/ui/public-site";
-import "@/ui/public-site.css";
+import { CardContactLink } from "@/ui/service-entry";
+import { WalletCardArt } from "@/ui/wallet-card-art";
+import { WalletUseCases } from "@/ui/product-use-cases";
+import { ConsumerHero, ConsumerClosing } from "@/ui/consumer-layout";
+import "@/ui/card-services.css";
+
 export const metadata = publicPageMetadata("/card-services");
 export default function CardServicesPage() {
-  return <Shell><PublicPageStructuredData path="/card-services" /><section className="welcome-hero page-container public-service-hero"><div className="welcome-copy"><p className="eyebrow">CARDS & SPENDING</p><h1>Their own card.<br /><span>Your peace of mind.</span></h1><p className="welcome-description">Give family members or team members their own card. Add money to one shared card balance and set how much each card can spend. They see their own purchases; you see the full picture.</p><div className="welcome-actions"><Link href="/cardholder-services" className="button primary">Open your cards <Icon name="arrow" /></Link><Link href="/help#cards" className="welcome-text-link">Get card help</Link></div></div><ProductPreview /></section>
-    <section className="page-container public-section"><div className="public-section-heading"><div><p className="eyebrow">THE EVERYDAY ESSENTIALS</p><h2>A little independence. A clear connection.</h2></div></div><div className="everyday-grid"><article><span className="public-icon"><Icon name="grid" /></span><h3>Keep spending in view</h3><p>See every card and purchase in one place. Each card has its own total spending limit and uses the money in your shared card balance. The person using a card sees only their own cards and spending.</p></article><article><span className="public-icon"><Icon name="lock" /></span><h3>Take control quickly</h3><p>Want to pause spending? Choose Freeze card. You can unfreeze it when you are ready. Card details and recent purchases are in the same place.</p></article><article><span className="public-icon"><Icon name="person" /></span><h3>Make sharing clear</h3><p>Create a Visa card and set its total spending limit. Open the card to invite its cardholder by email, text or social sharing. They accept through their own login and see only their cards and purchases.</p></article></div></section>
-    <section className="page-container public-section public-role-section"><div><p className="eyebrow">YOUR ACCESS, EXPLAINED</p><h2>One shared balance.<br />A private view for each person.</h2><p className="public-section-copy">You choose who gets a card and how much each card can spend. Each person sees only their own cards and purchases.</p></div><div className="public-role-cards"><article><h3>Account owner</h3><p>Add money, create cards, set each card’s total spending limit and manage invitations. You can manage all the cards without having a card yourself.</p></article><article><h3>Cardholder</h3><p>See your cards, purchases and how much you can spend. Other people’s cards and the shared balance remain private.</p></article></div></section>
-    <section className="page-container public-section"><div className="public-section-heading"><div><p className="eyebrow">GETTING STARTED</p><h2>Start with you. Share when you’re ready.</h2></div></div><ServiceSteps items={[{ title: "Set up your cards", text: "Open Cards & spending and name your account. You can create a card for yourself or invite someone to use one." },{ title: "Add money and set spending limits", text: "Add money to your shared card balance. Give each card a total spending limit. Limits do not reset monthly; they stay in place until you change them." },{ title: "Invite a cardholder", text: "Open a created card and choose Invite cardholder. Enter their email and share the invitation. They sign in with that email, accept and go straight to their own card." }]} /></section><StartExploring /></Shell>;
+  return <Shell><PublicPageStructuredData path="/card-services" /><div className="consumer-page consumer-product consumer-cards">
+    <ConsumerHero product service="cards" title={<>Digital Wallet <br /><span>Card.</span></>}
+      description={<>A virtual {cardProduct.creditType} for your family or business. Carry it on your phone. Pay in stores and online.</>}
+      actions={<><CardContactLink /><Link href="/help#cards" className="consumer-text-link">Card questions<Icon name="arrow" /></Link></>}
+      note={<div className="consumer-product-note">Applications are not open yet.</div>}
+      visual={<WalletCardArt />}
+    />
+    <WalletUseCases />
+    <section className="page-container consumer-product-section" id="wallets" aria-labelledby="wallet-options-title">
+      <div className="consumer-section-heading"><div><p className="eyebrow">Made for your wallet</p><h2 id="wallet-options-title">Your card. <br /><span>A familiar way to pay.</span></h2></div><p>Bring Ledgix to the wallet you already use.</p></div>
+      <div className="wallet-options-grid">
+        <article><h3>Apple Wallet</h3><p>Add your card and use Apple Pay in stores, in apps and online.</p><span>On compatible Apple devices</span></article>
+        <article><h3>Google Wallet</h3><p>Keep your card on your Android phone and tap to pay where Google Pay is accepted.</p><span>On compatible Android devices</span></article>
+      </div>
+      <p className="wallet-eligibility">Wallet availability and features depend on your device, location and card eligibility.</p>
+    </section>
+    <section className="wallet-credit-section" aria-labelledby="wallet-credit-title"><div className="page-container wallet-credit-grid">
+      <div><p className="eyebrow">The account behind your card</p><h2 id="wallet-credit-title">Digital convenience. <br /><span>Secured credit.</span></h2><p>Your security deposit backs your credit account. Purchases create a balance to repay; your deposit stays separate from those repayments.</p></div>
+      <div className="wallet-account-summary"><Icon name="lock" /><h3>Your account stays with Ledgix.</h3><p>Use your wallet to pay. Sign in to Ledgix for your card account, activity and support when the service launches.</p><p className="wallet-account-note">Eligibility, account controls and full product terms will be available at launch.</p></div>
+    </div></section>
+    <ConsumerClosing eyebrow="Stay in touch" title={<>Meet your next <br /><span>everyday card.</span></>}><CardContactLink /></ConsumerClosing>
+  </div></Shell>;
 }

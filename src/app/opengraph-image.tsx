@@ -1,17 +1,20 @@
 import { ImageResponse } from "next/og";
-import { publicIndexingEnabled } from "@/modules/public-site/metadata";
+import { publicIndexingEnabled, publicSocialImage } from "@/modules/public-site/metadata";
+import { cardProduct } from "@/shared/card-product";
 
-export const alt = "Etail Depot — Card services and payment services";
+export const alt = publicSocialImage.alt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+// Evaluate the same release guard as robots/sitemap at runtime, not once during a local package build.
+export const dynamic = "force-dynamic";
 
 /** One generic brand image; no request parameters, external assets or customer information. */
 export default function OpenGraphImage() {
   return new ImageResponse(
     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#f4f5ee", padding: "64px 76px", color: "#153c31", fontFamily: "sans-serif" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 32, fontWeight: 700 }}><span style={{ width: 14, height: 32, background: "#51764b", borderRadius: 7 }} />Etail Depot</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 22 }}><div style={{ display: "flex", flexDirection: "column", fontSize: 70, lineHeight: 1.08, letterSpacing: "-3px", fontWeight: 700 }}><span>Cards for family and teams.</span><span>More ways to get paid.</span></div><div style={{ fontSize: 29, color: "#4b6358" }}>Card services · Payment services</div></div>
-      <div style={{ display: "flex", fontSize: 23, color: "#4b6358", borderTop: "1px solid #cad4c7", paddingTop: 23 }}>Cards for family and business. More ways to get paid.</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 22 }}><div style={{ display: "flex", flexDirection: "column", fontSize: 70, lineHeight: 1.08, letterSpacing: "-3px", fontWeight: 700 }}><span>Payments for your business.</span><span>Cards for what’s next.</span></div><div style={{ fontSize: 29, color: "#4b6358" }}>Trolleys payments · Available now</div></div>
+      <div style={{ display: "flex", fontSize: 23, color: "#4b6358", borderTop: "1px solid #cad4c7", paddingTop: 23 }}>{`Ledgix ${cardProduct.pluralName} · Coming soon`}</div>
     </div>,
     { ...size, headers: publicIndexingEnabled() ? {} : { "X-Robots-Tag": "noindex, nofollow" } },
   );

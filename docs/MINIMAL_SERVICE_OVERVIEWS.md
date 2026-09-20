@@ -2,6 +2,14 @@
 
 17 September 2026. The user requests removal of the repeated Cardholder home identity block, a Merchant overview containing Credit/Debit records and one Payout area, and a more consistent landing-page layout.
 
+## Published and verified — 19 September 2026
+
+[PR28](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/28) merged as `564efaeef0306fa83c6c3f5ce8c10e5c6ec686cb`. Successful GitHub run `35190507048` checked test merge `c828c471cb6b17d74ba29fcf2d0a6c5f88cbeaf2`; its tree, reviewed feature, merged main and880-file source upload all match `3a4bdb86065638429ca126f9f5bc070d2c552afd`. The run passed671 unit,275 PostgreSQL integration,42 concurrency,12 contracts,9 API,262 desktop/mobile,30 accessibility and35 handoff tests, plus lint, types, architecture, production build and security/dependency checks. Isolated offline Netlify packaging also passed.
+
+Netlify deploy `6aae8c43b7fae63bdf4df26e` published on the bound site at `2026-09-19T13:21:53.074Z`. The provider applied no database migrations and created its on-publish snapshot. Visitor access remains unchanged. All189 live acceptance checks and47 public screenshots passed with zero issues; the exact deployment was verified current again after acceptance. Source files and executable modes were checked before upload; all880 reviewed files remained unchanged after upload, with only the provider's correct site-state metadata added.
+
+Live acceptance covers public layouts, seven payment-channel previews, anonymous API/document/native-route boundaries and enabled sign-in/registration/recovery controls. It submits no forms, reads no customer records and does not establish actual hosted email delivery or authenticated customer money execution. Private dashboard behavior retains the separate local/CI evidence below. Receipt: `artifacts/d86-publication.json`; live evidence: `artifacts/d86-hosted-acceptance-verified/checks.json`. The earlier local-review and release-authorization notes below preserve their chronology.
+
 ## Experience contract
 
 - Cardholder Home starts with the existing account balance and its actions. Remove the visible “Your card account”, account display-name heading and owner-name introduction. Keep account/owner facts in Account settings, and preserve the recipient’s resource-specific context.

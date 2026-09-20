@@ -1,0 +1,437 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-20",
+  "sourceCommit": "111b703d9793c53d414f6c1ab0ec8985a5e54095",
+  "reason": "D108 public website and vendor links only; database records preserved",
+  "migrationCount": 24,
+  "migrations": [
+    {
+      "original": "netlify/database/migrations/20260909163953_fresh_two_services/migration.sql",
+      "archived": "archive/database/migrations/20260909163953_fresh_two_services/migration.sql",
+      "bytes": 76501,
+      "sha256": "68cea8773d1e4b0722a674e7db798baf46665be9300e2b070d4894c50fc40fe4"
+    },
+    {
+      "original": "netlify/database/migrations/20260909163953_fresh_two_services/snapshot.json",
+      "archived": "archive/database/migrations/20260909163953_fresh_two_services/snapshot.json",
+      "bytes": 240159,
+      "sha256": "4eab443c99a7ffaa0d276c4cece07816626e251c85112a3cc0f97098b32c8eb4"
+    },
+    {
+      "original": "netlify/database/migrations/20260909164651_merchant_resume_remove_empty_history/migration.sql",
+      "archived": "archive/database/migrations/20260909164651_merchant_resume_remove_empty_history/migration.sql",
+      "bytes": 924,
+      "sha256": "c2f2407c4c132d385008f51de02048e07cacd5199c778d6b38d6e1cccb970fbf"
+    },
+    {
+      "original": "netlify/database/migrations/20260909164651_merchant_resume_remove_empty_history/snapshot.json",
+      "archived": "archive/database/migrations/20260909164651_merchant_resume_remove_empty_history/snapshot.json",
+      "bytes": 231398,
+      "sha256": "9cfec680880c811c288ce28133f3e39f5a0a1036e4e23980b0924931435cc477"
+    },
+    {
+      "original": "netlify/database/migrations/20260909170721_retire_disputes_require_card_request/migration.sql",
+      "archived": "archive/database/migrations/20260909170721_retire_disputes_require_card_request/migration.sql",
+      "bytes": 1582,
+      "sha256": "d226018584f6c08019b3dcf162e249c32c66aa5557d55d6402236c9d6c79e373"
+    },
+    {
+      "original": "netlify/database/migrations/20260909170721_retire_disputes_require_card_request/snapshot.json",
+      "archived": "archive/database/migrations/20260909170721_retire_disputes_require_card_request/snapshot.json",
+      "bytes": 222402,
+      "sha256": "515af83405c5c08a44ab8008c70a40d6cd16b6c246d29f69c0515fcbc0b64696"
+    },
+    {
+      "original": "netlify/database/migrations/20260910035626_email_authentication_throttle/migration.sql",
+      "archived": "archive/database/migrations/20260910035626_email_authentication_throttle/migration.sql",
+      "bytes": 451,
+      "sha256": "ba01adecf292674c016ba25cc009c882d060b5e2513beb40de39eb9483e1a94e"
+    },
+    {
+      "original": "netlify/database/migrations/20260910035626_email_authentication_throttle/snapshot.json",
+      "archived": "archive/database/migrations/20260910035626_email_authentication_throttle/snapshot.json",
+      "bytes": 224620,
+      "sha256": "e08a78bf0422b134e9056ba6fc42dd53b386b807869575631cf38e213a29d86f"
+    },
+    {
+      "original": "netlify/database/migrations/20260910040841_unresolved_password_reset_guard/migration.sql",
+      "archived": "archive/database/migrations/20260910040841_unresolved_password_reset_guard/migration.sql",
+      "bytes": 733,
+      "sha256": "9bf62ac75b81e8cf878aae787668d89c097a6d04a0a3c789a79ff5fcd06ad884"
+    },
+    {
+      "original": "netlify/database/migrations/20260910040841_unresolved_password_reset_guard/snapshot.json",
+      "archived": "archive/database/migrations/20260910040841_unresolved_password_reset_guard/snapshot.json",
+      "bytes": 227822,
+      "sha256": "a389495e86e1a7bdba41571a177b49684e03d0cc4cac8456fcf188e93883dbee"
+    },
+    {
+      "original": "netlify/database/migrations/20260910074843_hosted-sandbox-participation/migration.sql",
+      "archived": "archive/database/migrations/20260910074843_hosted-sandbox-participation/migration.sql",
+      "bytes": 651,
+      "sha256": "bb730852ef707e7cedfe7dfcbd7ec41d0f9104169d212c2d65c4690c0febbf99"
+    },
+    {
+      "original": "netlify/database/migrations/20260910074843_hosted-sandbox-participation/snapshot.json",
+      "archived": "archive/database/migrations/20260910074843_hosted-sandbox-participation/snapshot.json",
+      "bytes": 231535,
+      "sha256": "9eaf579600549baa4386e9d278ffc19c83c2eedf191f241878fb58268fc5eeae"
+    },
+    {
+      "original": "netlify/database/migrations/20260911103124_merchant-support/migration.sql",
+      "archived": "archive/database/migrations/20260911103124_merchant-support/migration.sql",
+      "bytes": 2053,
+      "sha256": "e776f1d3ae3a1b07c44abd50b9efd81046c3f1587b5eb9f56ba04d1ae03a0843"
+    },
+    {
+      "original": "netlify/database/migrations/20260911103124_merchant-support/snapshot.json",
+      "archived": "archive/database/migrations/20260911103124_merchant-support/snapshot.json",
+      "bytes": 235492,
+      "sha256": "ee1b59334dc9761a0c59debbcff3576ff3f7480c88581837248ab4e6a7ce098b"
+    },
+    {
+      "original": "netlify/database/migrations/20260911104524_card_restriction_ownership/migration.sql",
+      "archived": "archive/database/migrations/20260911104524_card_restriction_ownership/migration.sql",
+      "bytes": 723,
+      "sha256": "efecb6eba6a42edb545e5404beaf06d2181b4e71cab6017c2188c32c20052298"
+    },
+    {
+      "original": "netlify/database/migrations/20260911104524_card_restriction_ownership/snapshot.json",
+      "archived": "archive/database/migrations/20260911104524_card_restriction_ownership/snapshot.json",
+      "bytes": 236629,
+      "sha256": "f098d71f4ecd3b9e48899dbb127235c289265a05541343fc93e09eb62e7764a3"
+    },
+    {
+      "original": "netlify/database/migrations/20260911105542_guest_checkout/migration.sql",
+      "archived": "archive/database/migrations/20260911105542_guest_checkout/migration.sql",
+      "bytes": 11275,
+      "sha256": "bbcd77cdc6a914e80ee63ac90972892f2c53ee74d137cedbbdd365192667fb9a"
+    },
+    {
+      "original": "netlify/database/migrations/20260911105542_guest_checkout/snapshot.json",
+      "archived": "archive/database/migrations/20260911105542_guest_checkout/snapshot.json",
+      "bytes": 267331,
+      "sha256": "80d37e0c7f3a02e6c4fb7913a18e9ddf15f7b019fc018265372a9a1c59d8616f"
+    },
+    {
+      "original": "netlify/database/migrations/20260911174038_amusing_black_tom/migration.sql",
+      "archived": "archive/database/migrations/20260911174038_amusing_black_tom/migration.sql",
+      "bytes": 34518,
+      "sha256": "f93507cda4885d9a436afac4a6ee3c323ba36d5e331b29a4c949c47a203fabf3"
+    },
+    {
+      "original": "netlify/database/migrations/20260911174038_amusing_black_tom/snapshot.json",
+      "archived": "archive/database/migrations/20260911174038_amusing_black_tom/snapshot.json",
+      "bytes": 307907,
+      "sha256": "6877f02427b066598c9a724393df5b6f4fc501d396bdd707cf8daf9591cccbac"
+    },
+    {
+      "original": "netlify/database/migrations/20260911175800_prepaid_primary_record_guard/migration.sql",
+      "archived": "archive/database/migrations/20260911175800_prepaid_primary_record_guard/migration.sql",
+      "bytes": 1209,
+      "sha256": "11efb91eee347dad31ff34329b46f89ff3dea6032d5a042d11be7efda3c36689"
+    },
+    {
+      "original": "netlify/database/migrations/20260911180000_prepaid_checkout_publication_scope/migration.sql",
+      "archived": "archive/database/migrations/20260911180000_prepaid_checkout_publication_scope/migration.sql",
+      "bytes": 1908,
+      "sha256": "2803cad70e6c974c9715c86735e4ed3b1f02096daba2fa3bdb43b829feb964d1"
+    },
+    {
+      "original": "netlify/database/migrations/20260911181901_youthful_venom/migration.sql",
+      "archived": "archive/database/migrations/20260911181901_youthful_venom/migration.sql",
+      "bytes": 11680,
+      "sha256": "72ae69818eb8df18c94c8ebfee3b6227b73ae4b099d2dc482924569262d17cfd"
+    },
+    {
+      "original": "netlify/database/migrations/20260911181901_youthful_venom/snapshot.json",
+      "archived": "archive/database/migrations/20260911181901_youthful_venom/snapshot.json",
+      "bytes": 310559,
+      "sha256": "126c37aee70398c7857c2fdbea2c3842a0e7a6bc36ded289cf862d3f6f743f4f"
+    },
+    {
+      "original": "netlify/database/migrations/20260912055940_owner_cards_terminals/migration.sql",
+      "archived": "archive/database/migrations/20260912055940_owner_cards_terminals/migration.sql",
+      "bytes": 80666,
+      "sha256": "15f205d4a89a59a4877185f27513f4e51515b67c987773754406ed07447175f1"
+    },
+    {
+      "original": "netlify/database/migrations/20260912055940_owner_cards_terminals/snapshot.json",
+      "archived": "archive/database/migrations/20260912055940_owner_cards_terminals/snapshot.json",
+      "bytes": 374902,
+      "sha256": "d7dfab482e09aa304ab51e52933b958eeb04adc6f2abcf337ed2bb78565fa6c0"
+    },
+    {
+      "original": "netlify/database/migrations/20260912060900_terminal_setup_invitations/migration.sql",
+      "archived": "archive/database/migrations/20260912060900_terminal_setup_invitations/migration.sql",
+      "bytes": 2906,
+      "sha256": "1829f327909fd3e8e4f695ab06e95bdd13b16319154db9e867ad1b3a1fd6f2f4"
+    },
+    {
+      "original": "netlify/database/migrations/20260912061133_dispute_history_record_scope/migration.sql",
+      "archived": "archive/database/migrations/20260912061133_dispute_history_record_scope/migration.sql",
+      "bytes": 1447,
+      "sha256": "22819031ccb6ede9cd480533be72be45dcfb8526c59db1377df1357a8cd049f9"
+    },
+    {
+      "original": "netlify/database/migrations/20260912061200_money_owner_membership/migration.sql",
+      "archived": "archive/database/migrations/20260912061200_money_owner_membership/migration.sql",
+      "bytes": 1627,
+      "sha256": "f810c3287b874b726d3e95cdc663976e5935c3f7d9b2ebcd812866b734795639"
+    },
+    {
+      "original": "netlify/database/migrations/20260912160000_card_recipient_assignment/migration.sql",
+      "archived": "archive/database/migrations/20260912160000_card_recipient_assignment/migration.sql",
+      "bytes": 3617,
+      "sha256": "987941f9cdc9607ba1e1fb79185aec1379437e552ec9f683840fe264550759f6"
+    },
+    {
+      "original": "netlify/database/migrations/20260912160100_verified_invitation_contacts/migration.sql",
+      "archived": "archive/database/migrations/20260912160100_verified_invitation_contacts/migration.sql",
+      "bytes": 1634,
+      "sha256": "7bddee6356b2b658d00c73911bad70eddbc41db494c88eaa8d489e7a97704b3d"
+    },
+    {
+      "original": "netlify/database/migrations/20260912160200_resource_invitations/migration.sql",
+      "archived": "archive/database/migrations/20260912160200_resource_invitations/migration.sql",
+      "bytes": 3718,
+      "sha256": "7453c890db06c79d6a09266b79faee63ce68c512c2eb7c4b1f159163dcbbc99c"
+    },
+    {
+      "original": "netlify/database/migrations/20260912160300_network_checkout/migration.sql",
+      "archived": "archive/database/migrations/20260912160300_network_checkout/migration.sql",
+      "bytes": 23417,
+      "sha256": "43677bcc23ba717f254a156a6e8b3e9f578ef79a77beb3a94b574bc005db1a7d"
+    },
+    {
+      "original": "netlify/database/migrations/20260912160300_network_checkout/snapshot.json",
+      "archived": "archive/database/migrations/20260912160300_network_checkout/snapshot.json",
+      "bytes": 411728,
+      "sha256": "d63e0b98f931b438159716a08014a63e7316ab6dd0d42b44c06e02688f0055e8"
+    },
+    {
+      "original": "netlify/database/migrations/20260912160400_network_provenance_scope/migration.sql",
+      "archived": "archive/database/migrations/20260912160400_network_provenance_scope/migration.sql",
+      "bytes": 4935,
+      "sha256": "6c1a74383b2aa26b320930e7d5bada4520fc4990d5e1f3fb9b224a56ca6dd499"
+    },
+    {
+      "original": "netlify/database/migrations/20260913130000_terminal_intended_use/migration.sql",
+      "archived": "archive/database/migrations/20260913130000_terminal_intended_use/migration.sql",
+      "bytes": 1407,
+      "sha256": "1e305c522fea5cc2914b66cb23a9354b55095aa4c1ebbfe9e5a4f3d8bc27d46d"
+    },
+    {
+      "original": "netlify/database/migrations/20260913130000_terminal_intended_use/snapshot.json",
+      "archived": "archive/database/migrations/20260913130000_terminal_intended_use/snapshot.json",
+      "bytes": 412177,
+      "sha256": "7b7ff037d0c479120205f3863382fe6ac971136414636faec0191c0b3d3afa79"
+    },
+    {
+      "original": "netlify/database/migrations/20260913145657_personal_profile/migration.sql",
+      "archived": "archive/database/migrations/20260913145657_personal_profile/migration.sql",
+      "bytes": 850,
+      "sha256": "a5670f8ffa0a7499ae2d23fcc6bac5a83862c69729d5e144efead5fbd84b2bf2"
+    },
+    {
+      "original": "netlify/database/migrations/20260913145657_personal_profile/snapshot.json",
+      "archived": "archive/database/migrations/20260913145657_personal_profile/snapshot.json",
+      "bytes": 415678,
+      "sha256": "4bf304e4675aa47e44b7458f90518cce561f46f4d4a1cf1f25d1bfc9d2c15913"
+    }
+  ],
+  "schemaSources": [
+    {
+      "original": "src/modules/access/schema.ts",
+      "archived": "archive/database/source/src/modules/access/schema.ts",
+      "bytes": 6771,
+      "sha256": "7792db04d92c3587970a85c4421dc4262e648aa52edb512be9e6839600afba34"
+    },
+    {
+      "original": "src/modules/access/terminal-cutover.sql",
+      "archived": "archive/database/source/src/modules/access/terminal-cutover.sql",
+      "bytes": 8176,
+      "sha256": "5159fd97dfaa530339f02d914a5c47651fb4249c5d3044362219eddafdac7e47"
+    },
+    {
+      "original": "src/modules/acquiring/card-checkout-schema.ts",
+      "archived": "archive/database/source/src/modules/acquiring/card-checkout-schema.ts",
+      "bytes": 896,
+      "sha256": "a9f9e8fe4a9c3c8f697934e48434ad2f79703fd3f7058e0de21e34fdec6ca177"
+    },
+    {
+      "original": "src/modules/acquiring/constraints.sql",
+      "archived": "archive/database/source/src/modules/acquiring/constraints.sql",
+      "bytes": 6583,
+      "sha256": "5aca0dd1ae4be24c5c949a17f4585e5bcd20428a9ce46ca1a69f53b25fddb28d"
+    },
+    {
+      "original": "src/modules/acquiring/guest-schema.ts",
+      "archived": "archive/database/source/src/modules/acquiring/guest-schema.ts",
+      "bytes": 5128,
+      "sha256": "47d0a027d03a485f0186d6f769046729a56cd06f8260224c7b68a5366417b34d"
+    },
+    {
+      "original": "src/modules/acquiring/network-schema.ts",
+      "archived": "archive/database/source/src/modules/acquiring/network-schema.ts",
+      "bytes": 4603,
+      "sha256": "bfffa99a1267e82c9f0ed85cc2ae80da5fe4def52ad004802cd2576c1ab3b449"
+    },
+    {
+      "original": "src/modules/acquiring/operations-constraints.sql",
+      "archived": "archive/database/source/src/modules/acquiring/operations-constraints.sql",
+      "bytes": 7765,
+      "sha256": "0944e4bb9a729b1d918220a0a2fcb39d97883c377b995b46517dcbbf873c09e1"
+    },
+    {
+      "original": "src/modules/acquiring/operations-schema.ts",
+      "archived": "archive/database/source/src/modules/acquiring/operations-schema.ts",
+      "bytes": 8060,
+      "sha256": "7fe91b8bdcffcda9561392d599cd724fedd3167a9a927ca1ec1c5d48e19711ab"
+    },
+    {
+      "original": "src/modules/acquiring/schema.ts",
+      "archived": "archive/database/source/src/modules/acquiring/schema.ts",
+      "bytes": 10304,
+      "sha256": "ef08082dd9d6a1c2f384d89bdbc70ae4c6aa5f26669a7a33ab8fcf726cf537bd"
+    },
+    {
+      "original": "src/modules/acquiring/settlement-schema.ts",
+      "archived": "archive/database/source/src/modules/acquiring/settlement-schema.ts",
+      "bytes": 4119,
+      "sha256": "a58530a44406ecdfef56462cd8ae4edd6fd188eeb1e0b2dbf68a175ff633d570"
+    },
+    {
+      "original": "src/modules/acquiring/terminal-constraints.sql",
+      "archived": "archive/database/source/src/modules/acquiring/terminal-constraints.sql",
+      "bytes": 13433,
+      "sha256": "0b75bca144191f8bb7ecfee363c3b87efe851d0c66279ae73b7cbd2718902865"
+    },
+    {
+      "original": "src/modules/acquiring/terminal-cutover.sql",
+      "archived": "archive/database/source/src/modules/acquiring/terminal-cutover.sql",
+      "bytes": 1863,
+      "sha256": "62409f93121bcfa50053d37e9e230934213d0141ec9fcfdc5629c9ab9bb153a2"
+    },
+    {
+      "original": "src/modules/cases/schema.ts",
+      "archived": "archive/database/source/src/modules/cases/schema.ts",
+      "bytes": 4561,
+      "sha256": "cffe73ab04438e864e6d1ebdacb0e88a2d0e41ba947954e28acf2cf175df81b4"
+    },
+    {
+      "original": "src/modules/disputes/constraints.sql",
+      "archived": "archive/database/source/src/modules/disputes/constraints.sql",
+      "bytes": 7297,
+      "sha256": "bc1502cca40c1300bfd37786ac511cb1994a6fd8c857b021f438ad43c27433a7"
+    },
+    {
+      "original": "src/modules/disputes/schema.ts",
+      "archived": "archive/database/source/src/modules/disputes/schema.ts",
+      "bytes": 3215,
+      "sha256": "bb148225761134769d9f98481c3b62fefa16ed7df6cbbd0297147b9ca1b3edf0"
+    },
+    {
+      "original": "src/modules/identity/contact-schema.ts",
+      "archived": "archive/database/source/src/modules/identity/contact-schema.ts",
+      "bytes": 1496,
+      "sha256": "c0eaa051355da59d8673d951411696761784c1ece25fd2d41e43b5f55fe6dc39"
+    },
+    {
+      "original": "src/modules/identity/profile-schema.ts",
+      "archived": "archive/database/source/src/modules/identity/profile-schema.ts",
+      "bytes": 740,
+      "sha256": "c5a79808d23ba2ca132c569516605226a8da4af1b9f8775e7c4882c75c2ccc00"
+    },
+    {
+      "original": "src/modules/identity/schema.ts",
+      "archived": "archive/database/source/src/modules/identity/schema.ts",
+      "bytes": 1666,
+      "sha256": "17aea49ea11492c263033dbf41694c63d16d4f874c8622beb4c7e67ea03f0c2f"
+    },
+    {
+      "original": "src/modules/ledger/constraints.sql",
+      "archived": "archive/database/source/src/modules/ledger/constraints.sql",
+      "bytes": 3543,
+      "sha256": "69e8895df61cff5fe74e0d54596cad6b310291073f5b406cd171b6c2248ac7cb"
+    },
+    {
+      "original": "src/modules/ledger/schema.ts",
+      "archived": "archive/database/source/src/modules/ledger/schema.ts",
+      "bytes": 3688,
+      "sha256": "0cfb721b24f0e63263e3da212752c301b918b0923a49c7b59faa03f8d848e594"
+    },
+    {
+      "original": "src/modules/money/constraints.sql",
+      "archived": "archive/database/source/src/modules/money/constraints.sql",
+      "bytes": 17132,
+      "sha256": "43bf952a6a7a6d6147bc286e73563baadcb57d1f33553e774b5e7eede9cdf0d1"
+    },
+    {
+      "original": "src/modules/money/schema.ts",
+      "archived": "archive/database/source/src/modules/money/schema.ts",
+      "bytes": 5745,
+      "sha256": "0a8063c3046728b2629cede71019a26d058d8e45d5218c3ba200b177dc923d7a"
+    },
+    {
+      "original": "src/modules/operations/schema.ts",
+      "archived": "archive/database/source/src/modules/operations/schema.ts",
+      "bytes": 1617,
+      "sha256": "79d22af2b092385bdfa9a1302c187cfa2850021302dc5fa5a2d8c024f6141b60"
+    },
+    {
+      "original": "src/modules/reports/schema.ts",
+      "archived": "archive/database/source/src/modules/reports/schema.ts",
+      "bytes": 2401,
+      "sha256": "157e4cbeedc8eab6c9c2948290e9e0dc28711024e6b52423300a3bd2ada749a5"
+    },
+    {
+      "original": "src/modules/sandbox/schema.ts",
+      "archived": "archive/database/source/src/modules/sandbox/schema.ts",
+      "bytes": 828,
+      "sha256": "6cea9ec9cfadaddfe9843975620129bc617e94aa662f58c2469439e9ed4b38b2"
+    },
+    {
+      "original": "src/modules/services/schema.ts",
+      "archived": "archive/database/source/src/modules/services/schema.ts",
+      "bytes": 1469,
+      "sha256": "f88baa18a00c1a64418a6193e80fb71a4ae1abcc02bb39270e21bd1a0fb2c426"
+    },
+    {
+      "original": "src/modules/workspace/card-limit-cutover.sql",
+      "archived": "archive/database/source/src/modules/workspace/card-limit-cutover.sql",
+      "bytes": 10004,
+      "sha256": "fa61f58b2993cc2a00f405db08ddae202a8046c926fe82c43599f46bda244f0e"
+    },
+    {
+      "original": "src/modules/workspace/funding-schema.ts",
+      "archived": "archive/database/source/src/modules/workspace/funding-schema.ts",
+      "bytes": 4266,
+      "sha256": "2ea0f29e917069e6576829b40be2f31e9b683bf209568e798b157045cd6fa768"
+    },
+    {
+      "original": "src/modules/workspace/prepaid-constraints.sql",
+      "archived": "archive/database/source/src/modules/workspace/prepaid-constraints.sql",
+      "bytes": 26643,
+      "sha256": "d98b5069d4a042c0bd4fd4bf5e4131f6d87df6efecfd371c047c8793a412441a"
+    },
+    {
+      "original": "src/platform/database/schema.ts",
+      "archived": "archive/database/source/src/platform/database/schema.ts",
+      "bytes": 10110,
+      "sha256": "94b758bbcc6cee0b8dc02f1d49d887612696fa0d6faf60621dd53d72104caf02"
+    },
+    {
+      "original": "src/platform/database/service-constraints.sql",
+      "archived": "archive/database/source/src/platform/database/service-constraints.sql",
+      "bytes": 1349,
+      "sha256": "f89bb5371b54b7f79e9cc8372720eb806a2cebd0035f2189882b8306b04ce60e"
+    },
+    {
+      "original": "drizzle.config.ts",
+      "archived": "archive/database/source/drizzle.config.ts",
+      "bytes": 904,
+      "sha256": "3d9628849582a3fac67af7b1c946289f552d61b0ff5d43f81f9120f3be516029"
+    }
+  ]
+}

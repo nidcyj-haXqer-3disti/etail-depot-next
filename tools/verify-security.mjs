@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-/** Scoped M0 source checks; dependency audit and runtime security tests are separate. */
+/** Public website source checks; dependency and packaged-artifact audits remain separate. */
 import assert from "node:assert/strict";
 import { promises as fs, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import vm from "node:vm";
+import { execFileSync } from "node:child_process";
 import ts from "typescript";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -81,27 +81,6 @@ function sourceFindings(filename, text) {
   return findings;
 }
 
-/** Execute the actual pure runtime configuration module with isolated env inputs. */
-function loadConfiguration(filename, cache = new Map()) {
-  if (cache.has(filename)) return cache.get(filename).exports;
-  if (filename === path.join(root, "project-targets.json")) return JSON.parse(readFileSync(filename, "utf8"));
-  if (!filename.startsWith(path.join(root, "src") + path.sep) || !filename.endsWith(".ts")) {
-    throw new Error("CONFIGURATION_DEPENDENCY_NOT_PURE");
-  }
-  const source = readFileSync(filename, "utf8");
-  const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
-  const evaluatedModule = { exports: {} };
-  cache.set(filename, evaluatedModule);
-  const localRequire = (specifier) => {
-    if (!specifier.startsWith(".")) throw new Error("CONFIGURATION_EXTERNAL_DEPENDENCY");
-    const stem = path.resolve(path.dirname(filename), specifier);
-    return loadConfiguration(path.extname(stem) ? stem : `${stem}.ts`, cache);
-  };
-  const context = vm.createContext({ module: evaluatedModule, exports: evaluatedModule.exports, require: localRequire, URL, process: { env: Object.freeze({}) } });
-  new vm.Script(compiled, { filename: relative(filename) }).runInContext(context, { timeout: 1_000 });
-  return evaluatedModule.exports;
-}
-
 function selfTest() {
   const example = path.join(root, "src/example.ts");
   assert.equal(sourceFindings(example, 'const credential = "' + "ghp_" + "A1".repeat(20) + '";')[0].code, "GITHUB_TOKEN");
@@ -124,31 +103,21 @@ if (!process.argv.includes("--self-test")) {
       errors.push(`${relative(filename)}:${finding.line} ${finding.code}: Review the credential/exposure boundary. Matched contents are redacted.`);
     }
   }
-  let runtimeCases = 0;
-  try {
-    const config = loadConfiguration(path.join(root, "src/platform/config.ts"));
-    assert.equal(config.ENABLE_REAL_MONEY, false);
-    assert.equal(typeof config.getRuntimeConfig, "function");
-    for (const flag of [undefined, "false"]) {
-      const env = { APP_ENV: "test", ETAIL_PUBLIC_ORIGIN: "http://127.0.0.1:3000" };
-      if (flag !== undefined) env.ENABLE_REAL_MONEY = flag;
-      assert.equal(config.getRuntimeConfig(env).realMoney, false);
-      runtimeCases++;
+  const targets = JSON.parse(readFileSync(path.join(root, "project-targets.json"), "utf8"));
+  assert.equal(targets.project_key, "ETAIL_DEPOT_NEXT_GREENFIELD_2026");
+  assert.equal(targets.netlify.site_id, "cbbb6c24-9dbc-43a2-9234-e4357b5b5280");
+  assert.equal(targets.netlify.canonical_origin, "https://etail-depot-next.netlify.app");
+  assert.equal(targets.release.real_money_allowed, false);
+  const tracked = execFileSync("git", ["ls-files", "-z"], { cwd: root, encoding: "utf8" }).split("\0").filter(Boolean);
+  for (const name of tracked) {
+    if (/(?:^|\/)(?:\.env(?:\.[^/]*)?|\.local|\.netlify)(?:\/|$)/.test(name) && !name.endsWith(".env.example")) {
+      errors.push(`${name}: TRACKED_PRIVATE_CONFIGURATION: Private configuration must remain outside source control.`);
     }
-    for (const flag of ["true", "TRUE", "1", "yes"]) {
-      let rejected = false;
-      try { config.getRuntimeConfig({ APP_ENV: "test", ETAIL_PUBLIC_ORIGIN: "http://127.0.0.1:3000", ENABLE_REAL_MONEY: flag }); }
-      catch (error) { rejected = error?.code === "REAL_MONEY_DISABLED"; }
-      assert.equal(rejected, true);
-      runtimeCases++;
-    }
-  } catch {
-    errors.push("src/platform/config.ts:1 REAL_MONEY_GUARD_FAILED: Actual runtime configuration must export false and reject every tested enabling value.");
   }
-  console.log(`M0 security scope: ${filenames.length} source/configuration/test files inspected; ${runtimeCases} actual real-money configuration cases verified. Detected credential values are never printed.`);
-  console.log("Excludes ignored local environments, build outputs, dependencies and original source archives. Dependency audit, hosted Identity lifecycle, penetration testing and later financial security remain separate required evidence.");
+  console.log(`Public security scope: ${filenames.length} active source/configuration/test files inspected; bound site and disabled financial release verified.`);
+  console.log("Credential values are never printed. Ignored local environments, archives, build outputs and dependencies are excluded; package audits and deployment artifact checks run separately.");
   if (errors.length) {
     errors.forEach((error) => console.error(error));
     process.exitCode = 1;
-  } else console.log("M0 scoped security checks passed.");
+  } else console.log("Public source security checks passed.");
 }

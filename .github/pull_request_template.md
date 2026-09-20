@@ -1,22 +1,19 @@
-## Outcome and source
-Backlog IDs / acceptance IDs / source references:
+## Outcome
+Describe the user-visible change and its source requirement.
 
-## One authoritative implementation
-Owning module/command/policy; proof this does not add a competing card flow:
+## Implementation
+Explain changes to public pages, shared styling, approved destinations or retired-route handling.
 
-## Data, security and financial impact
-New-project migrations, exact-money invariants, authorization/negative tests, provider replay:
+## Verification
+Record commands, exit statuses, source revision and relevant browser, accessibility and package evidence.
 
-## Executed verification
-Commands / exit codes / source SHA / runtime / database / test counts / artifact links:
-
-## Not verified or blocked
-Name failed, skipped, manual and hosted checks honestly:
+## Limits
+Identify checks not performed, including hosted vendor flows or production deployment.
 
 ## Release boundaries
-- [ ] Only the explicitly bound NEW repository/site is targeted.
-- [ ] No old data/code/secrets, live-money providers or unapproved SMTP/DNS changes.
-- [ ] No credentials or actual customer data in diff, fixtures or artifacts.
-- [ ] Single card workflow and central policy remain enforced.
-- [ ] planning/STATUS.md and acceptance evidence updated.
-- [ ] Review/merge/publication approval obtained where required.
+- [ ] Only the approved repository and Netlify site are targeted.
+- [ ] No local account application, financial APIs, database connection or new customer-data collection.
+- [ ] No credentials, customer records or archived database files enter the deployment package.
+- [ ] Public links, mobile layouts, accessibility and package checks pass.
+- [ ] Current status and decision records reflect the change.
+- [ ] Review and publication follow the user's authorization.
