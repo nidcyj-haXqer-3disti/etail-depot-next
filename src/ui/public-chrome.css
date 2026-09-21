@@ -156,7 +156,6 @@
   .public-footer-main { padding-block: 20px 12px; }
   .public-footer-grid { grid-template-columns: 1fr; gap: 12px; }
   .public-footer-navigation { grid-template-columns: .8fr 1fr 1.4fr; gap: 12px; padding: 0; }
-  .public-footer-group a { white-space: nowrap; }
   .public-footer-bottom { gap: 4px 24px; }
 }
 @media (max-width: 640px) {

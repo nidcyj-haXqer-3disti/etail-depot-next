@@ -17,30 +17,31 @@ export default function HomePage() {
     <PublicPageStructuredData path="/" />
     <div className="consumer-page consumer-home">
       <ConsumerHero service="payments" title={<>Get paid.<br /><span>Keep going.</span></>}
-        description="Payment links for your next booking, invoice or sale. Create a request, share it your way and let your customer pay by card."
+        description="Accept card payments for bookings, invoices and sales. Share a payment link by text, email or QR code."
+        actions={<Link href="/payment-services" className="button primary">Explore payments<Icon name="arrow" /></Link>}
         visual={<PaymentArtwork />}
         footer={<ConsumerNetworks />}
       />
 
       <section className="consumer-channels page-container" id="payment-channels" aria-labelledby="channels-title">
-        <div className="consumer-section-heading"><div><p className="eyebrow">More ways to get paid</p><h2 id="channels-title">Made for the way<br /><span>you do business.</span></h2></div><Link href="/payment-services#payment-channels" className="consumer-text-link consumer-channel-heading-link">See ways to get paid<Icon name="arrow" /></Link></div>
+        <div className="consumer-section-heading"><h2 id="channels-title">Payments for everyday business.</h2></div>
         <PaymentHighlights />
       </section>
 
       <section className="consumer-card-section" aria-labelledby="ledgix-title">
         <div className="page-container consumer-card-grid">
-          <div className="consumer-card-visual"><WalletCardArt compact /></div>
+          <div className="consumer-card-visual"><WalletCardArt compact variant="preview" /></div>
           <div className="consumer-card-copy">
             <div className="consumer-product-eyebrow"><p className="eyebrow">Ledgix · Cards</p><ServiceStatus service="cards" /></div>
-            <h2 id="ledgix-title">Your everyday card.<br /><span>Made for your wallet.</span></h2>
-            <p>Meet the Ledgix Digital Wallet Card. A virtual Visa secured credit card for your family or business, with Apple Wallet and Google Wallet support.</p>
-            <Link href="/card-services" className="consumer-text-link">Explore Digital Wallet Card<Icon name="arrow" /></Link>
+            <h2 id="ledgix-title">Secured credit.<br /><span>Made for your wallet.</span></h2>
+            <p>Meet Ledgix Digital Wallet Card. A virtual Visa secured credit card for everyday purchases, with Apple Wallet and Google Wallet support.</p>
+            <Link href="/card-services" className="consumer-text-link">Meet the card<Icon name="arrow" /></Link>
           </div>
         </div>
       </section>
 
       <section className="public-section page-container public-faq-section" aria-labelledby="questions-title">
-        <div><p className="eyebrow">A little clarity</p><h2 id="questions-title">Good questions.<br />{" "}<span>Clear answers.</span></h2><Link href="/help" className="consumer-text-link">Visit the help center<Icon name="arrow" /></Link></div><PublicQuestions />
+        <div><h2 id="questions-title">A little more clarity.</h2><Link href="/help" className="consumer-text-link">Visit the help center<Icon name="arrow" /></Link></div><PublicQuestions />
       </section>
     </div>
   </Shell>;

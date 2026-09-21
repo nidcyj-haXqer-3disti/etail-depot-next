@@ -22,6 +22,7 @@ const topics = [
     questions: [
       { q: "Can I apply for a card now?", a: `Ledgix ${cardProduct.name} is an upcoming virtual ${cardProduct.creditType} for compatible digital wallets. Applications and card sign-in are not open yet. The card service will have its own sign-in and dashboard.` },
       { q: "Which digital wallets are supported?", a: "When the card service is available, eligible cards can be added to Apple Wallet or Google Wallet. Support depends on the card, device and region." },
+      { q: "How does the security deposit work?", a: "A security deposit backs the credit account. Purchases create a balance that you repay separately. The card agreement will explain the deposit, credit limit and repayment terms." },
       { q: "Where can I ask about Ledgix?", a: <>Email <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}</a> for card inquiries.</> },
     ],
   },

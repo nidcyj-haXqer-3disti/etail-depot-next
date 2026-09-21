@@ -1,6 +1,6 @@
 # Public website release review
 
-## D122 — authorized search launch and deployment, in progress
+## D122 — public search release deployed and verified
 
 21 September 2026. The user explicitly approves indexing and deploying the reviewed public website to `https://etail-depot-next.netlify.app`, site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`, team `685ae8f4e6ce519ecf6b267d`. This supersedes the D121 release/indexing hold for this candidate. The approved indexed pages are `/`, `/payment-services`, `/card-services` and `/help`; Privacy, Terms, 404, retired routes and all preview/local environments remain noindex. No custom-domain, DNS, vendor activation or financial change is authorized by this release.
 
@@ -10,7 +10,13 @@ Production-only `APP_ENV=production`, `ETAIL_SEARCH_CONTEXT=production` and `ETA
 
 **Local verification passed:** lint, types, 67 unit cases, 24 desktop/mobile cases, 18 accessibility cases, public architecture, dependency/security review (no known vulnerabilities), production SEO HTTP checks and Netlify packaging. The production checker verifies four indexable pages, schema/canonical/social metadata, exact sitemap and noindex legal/404/17 retired route families, with runtime `CONTEXT` absent. Output inspection confirms 11 routes, one server archive (1,337 entries), 17 proxy routes and 72 public/static files. Initial checker assertions were corrected to normalize equivalent root URLs and resolve valid relative redirect locations; application behavior did not change. Evidence: `artifacts/d122-checks/verify-release.log`, `production-seo-final.log` and `package.log`.
 
-**Pending:** GitHub PR review, passing CI and merge with matching source trees; upload of the reviewed source to the exact site; a ready/current production-deploy receipt; hosted verification of canonicals, robots, sitemap, social/structured metadata, public pages and retirement responses. Automatic publication remains held. Do not treat the successful environment updates or D121's local evidence as completion of these steps.
+**Published and verified:** [PR #29](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/29) passed all GitHub CI steps in run `35519223125`, job `106100288172`, and merged as `51e4717f3cc466f60c9081147cde58a6d7f0a079`. Local release commit `621ffb25755d661855e52d04caa35d93fba4aab4`, remote feature commit, CI merge, merged main and uploaded source all match tree `e0857da627ca1b4defcdea06f144ceb242a9d9f3`. A pristine 371-file Git archive was uploaded; its tracked files remained unchanged and the provider added only `.netlify/state.json`.
+
+Netlify production deploy `6aaffadab7fae6eb884df1af` (build `6aaffadab7fae6eb884df1ad`) is **ready and current**, published 20 September 2026 at 15:26:02 UTC / 21 September in the local timezone. Visitor access is unchanged. Hosted HTTP checks passed for four indexable pages, canonical/schema/social metadata, sitemap/robots, the social image and noindex legal/404/17 retired route families. Hosted visual checks passed all 14 desktop/mobile scenarios with six screenshots, no overflow, unloaded visible images, JavaScript errors, account cookies or prohibited requests.
+
+The initial mobile smoke harness clicked at DOMContentLoaded before React had attached; diagnostic evidence reproduces the early click and confirms first-click success after load, without retries. The final harness waits for load; no application change was made to hide this condition. Local packaging contains one application server function; Netlify additionally reports its platform-managed `emails` helper. No message was sent and no platform extension was changed. Netlify reports no database migration files for this deployment.
+
+Release/CI/hosted evidence is recorded in `artifacts/d122-checks/publication.json`, `github-release.json`, `github-ci.log`, `hosted-seo.log`, `hosted-visual-final.log` and `hosted-visual/summary.json`. These closeout documentation updates follow publication; they do not change the deployed application. Automatic publication remains held.
 
 Google Search Console submission, actual Google indexing and rankings are not verified. Index eligibility does not guarantee any of them. No vendor account, mailbox delivery, hosted customer database, DNS, provider agreement or legal-compliance audit is added by this work. Ledgix remains coming soon; public-only and record-preservation boundaries remain intact.
 

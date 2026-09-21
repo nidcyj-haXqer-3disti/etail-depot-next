@@ -4,13 +4,13 @@ import { NetworkBrands } from "./network-brands";
 import "./consumer-site.css";
 
 /** Shared framing for the public product pages. */
-export function ConsumerHero({service,title,description,actions,visual,note,footer,product=false}: {
-  service:"cards"|"payments";title:ReactNode;description:ReactNode;actions?:ReactNode;visual:ReactNode;note?:ReactNode;footer?:ReactNode;product?:boolean;
+export function ConsumerHero({service,title,description,actions,visual,note,footer,product=false,productLabel}: {
+  service:"cards"|"payments";title:ReactNode;description:ReactNode;actions?:ReactNode;visual:ReactNode;note?:ReactNode;footer?:ReactNode;product?:boolean;productLabel?:string;
 }) {
   return <section className={`consumer-hero${product ? " consumer-product-hero" : ""}`} aria-labelledby="welcome-title">
     <div className="page-container consumer-hero-grid">
       <div className="consumer-hero-copy">
-        <div className="consumer-product-eyebrow"><p className="eyebrow">{service === "cards" ? "Ledgix · Cards" : "Trolleys · Payments"}</p><ServiceStatus service={service}/></div>
+        <div className="consumer-product-eyebrow"><p className="eyebrow">{productLabel ?? (service === "cards" ? "Ledgix · Cards" : "Trolleys Payments")}</p><ServiceStatus service={service}/></div>
         <h1 id="welcome-title">{title}</h1>
         <p>{description}</p>
         {actions && <div className="consumer-hero-actions">{actions}</div>}
@@ -20,13 +20,6 @@ export function ConsumerHero({service,title,description,actions,visual,note,foot
     </div>
     {footer && <div className="page-container">{footer}</div>}
   </section>;
-}
-
-export function ConsumerClosing({eyebrow,title,description,children}: {eyebrow:string;title:ReactNode;description?:ReactNode;children:ReactNode}) {
-  return <section className="page-container consumer-final-wrap"><div className="consumer-final">
-    <div><p className="eyebrow">{eyebrow}</p><h2>{title}</h2></div>
-    <div>{description && <p>{description}</p>}<div className="consumer-closing-actions">{children}</div></div>
-  </div></section>;
 }
 
 export function ConsumerNetworks() {

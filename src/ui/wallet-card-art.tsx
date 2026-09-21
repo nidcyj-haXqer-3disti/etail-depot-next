@@ -36,13 +36,34 @@ function LedgixCardFace() {
   </div>;
 }
 
-/** A navigable setup guide. Only its illustration changes; it never provisions a card. */
-export function WalletCardArt({ compact = false }: { compact?: boolean }) {
+function WalletProductPreview({ compact }: { compact: boolean }) {
+  return <figure className={`wallet-product-art${compact ? " wallet-product-art-compact" : ""}`} aria-label="Ledgix Digital Wallet Card for Apple Wallet and Google Wallet">
+    <div className="wallet-product-device" aria-hidden="true">
+      <div className="wallet-product-screen">
+        <span className="wallet-product-camera" />
+        <div className="wallet-product-card"><LedgixCardFace /></div>
+        <div className="wallet-product-marks">
+          {wallets.map(name => {
+            const mark = payMarks[name];
+            return <Image key={name} unoptimized loading="eager" src={mark.src} width={mark.width} height={mark.height} className={mark.className} alt="" />;
+          })}
+        </div>
+        <span className="wallet-product-home" />
+      </div>
+    </div>
+  </figure>;
+}
+
+/** Preview introduces the product; the guide changes only its illustration and never provisions a card. */
+export function WalletCardArt({ compact = false, variant = "guide" }: { compact?: boolean; variant?: "guide" | "preview" }) {
+  return variant === "preview" ? <WalletProductPreview compact={compact} /> : <WalletSetupGuide compact={compact} />;
+}
+
+function WalletSetupGuide({ compact }: { compact: boolean }) {
   const [wallet, setWallet] = useState<Wallet>("Apple Wallet");
   const [step, setStep] = useState(0);
   const id = useId();
   const guide = guides[wallet][step]!;
-  const payMark = payMarks[wallet];
   function selectWallet(next: Wallet) { setWallet(next); setStep(0); }
   function handleKeys(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     const next = event.key === "Home" ? 0 : event.key === "End" ? wallets.length - 1 : event.key === "ArrowRight" ? (index + 1) % wallets.length : event.key === "ArrowLeft" ? (index + wallets.length - 1) % wallets.length : null;
@@ -53,7 +74,6 @@ export function WalletCardArt({ compact = false }: { compact?: boolean }) {
     tabs?.[next]?.focus();
   }
   return <div className={`wallet-card-art${compact ? " wallet-card-art-compact" : ""}`}>
-    <p className="wallet-setup-heading">Add your card to a wallet</p>
     <div className="wallet-setup-tabs" role="tablist" aria-label="Wallet setup options">
       {wallets.map((name, index) => <button type="button" role="tab" key={name} id={`${id}-wallet-${index}`} aria-selected={wallet === name} aria-controls={`${id}-panel`} tabIndex={wallet === name ? 0 : -1} onClick={() => selectWallet(name)} onKeyDown={event => handleKeys(event, index)}>{name}</button>)}
     </div>
@@ -68,7 +88,13 @@ export function WalletCardArt({ compact = false }: { compact?: boolean }) {
             <div className="wallet-setup-screen-heading"><span>{guide.screen}</span>{step === 0 ? <b>+</b> : <Icon name={step === 1 ? "lock" : "card"} />}</div>
             <div className="wallet-setup-card-wrap"><LedgixCardFace /></div>
             <div className="wallet-setup-screen-info">
-              <div className="wallet-setup-pay-mark"><Image unoptimized src={payMark.src} width={payMark.width} height={payMark.height} className={payMark.className} alt="" /></div>
+              <div className="wallet-setup-pay-mark">
+                {/* Keep each decoded logo on its own image when the wallet changes. */}
+                {wallets.map(name => {
+                  const mark = payMarks[name];
+                  return <Image key={name} unoptimized loading="eager" hidden={wallet !== name} src={mark.src} width={mark.width} height={mark.height} className={mark.className} alt="" />;
+                })}
+              </div>
               <strong>{guide.option}</strong>
             </div>
             <div className="wallet-setup-screen-action">{guide.action}{step === 0 && <Icon name="arrow" />}</div>

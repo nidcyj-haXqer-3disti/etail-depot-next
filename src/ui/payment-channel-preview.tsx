@@ -9,10 +9,10 @@ import "./payment-channel-preview.css";
 
 type ChannelStory = {title:string;detail:string;context:string;description:string;amount:string};
 const stories:Record<ChannelPresentation,ChannelStory> = {
- SMS:{title:"Request a booking payment",detail:"Text a payment link for a booking. Your customer reviews the amount and pays by card.",context:"Appointment booking",description:"Consultation",amount:"$80.00"},
+ SMS:{title:"Request a booking payment",detail:"Text a payment link for a booking or agreed deposit.",context:"Appointment booking",description:"Consultation",amount:"$80.00"},
  EMAIL:{title:"Email a payment request",detail:"Email the order details with a payment link so your customer can review and pay.",context:"Order payment request",description:"Custom stationery",amount:"$120.00"},
  INVOICE:{title:"Get paid for completed work",detail:"Add a payment link to an invoice showing the work completed and the amount due.",context:"Project invoice",description:"Design services",amount:"$480.00"},
- BILL:{title:"Make a service bill easy to pay",detail:"Share a service bill with a payment link. Your customer reviews the charges and pays by card.",context:"Service bill",description:"Garden care",amount:"$65.00"},
+ BILL:{title:"Make a service bill easy to pay",detail:"Share a service bill with a payment link.",context:"Service bill",description:"Garden care",amount:"$65.00"},
  SOCIAL:{title:"Turn a conversation into an order",detail:"Share a payment link in a post or direct message so customers can review the offer and pay.",context:"Workshop booking",description:"Studio workshop",amount:"$45.00"},
  QR:{title:"Take payments in person",detail:"Display a QR code at your counter or on a table. Customers scan it to review the amount and pay by card.",context:"Counter payment",description:"Lunch order",amount:"$18.00"},
  WEB:{title:"Connect your site to checkout",detail:"Add a payment link or button to your website so customers can continue to card checkout.",context:"Online order",description:"Homeware set",amount:"$64.00"},
@@ -27,7 +27,6 @@ function ChannelIllustration({channel,story}:{channel:ChannelPresentation;story:
  if(channel==="SMS") return <div className="channel-medium marketing-message">
   <div className="marketing-medium-title"><span className="marketing-medium-icon"><Icon name="message"/></span><span><strong>{story.context}</strong><small>Text message</small></span></div>
   <div className="marketing-message-thread"><p className="marketing-incoming">Is Friday afternoon available?</p><div className="marketing-outgoing"><p>Yes. Here’s the payment link for your consultation.</p><PaymentLinkCard story={story}/></div></div>
-  <span className="marketing-message-status">Delivered</span>
  </div>;
  if(channel==="EMAIL") return <div className="channel-medium marketing-email">
   <div className="marketing-email-subject"><Icon name="mail"/><strong>{story.context}</strong></div>

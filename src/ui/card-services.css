@@ -1,34 +1,29 @@
-/* Wallet choice and secured-account explanation within the shared public layout. */
-.wallet-options-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 38px; }
-.wallet-options-grid article { display: flex; flex-direction: column; min-width: 0; border-top: 1px solid var(--public-line); padding-top: 28px; }
-.wallet-options-grid h3 { font-size: 25px; line-height: 1.3; letter-spacing: -.03em; font-weight: 500; }
-.wallet-options-grid p { flex: 1; margin-top: 16px; font-size: var(--consumer-body); line-height: 1.7; color: var(--public-muted); }
-.wallet-options-grid article > span { display: block; margin-top: 22px; font-size: 12px; line-height: 1.6; color: var(--public-muted); }
-.wallet-eligibility { margin-top: 32px; font-size: 13px; line-height: 1.65; color: var(--public-muted); max-width: 75ch; }
-.wallet-credit-section { background: var(--public-tint); }
-.wallet-credit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; padding-block: 64px; }
-.wallet-credit-grid h2 { font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; margin-top: 16px; }
-.wallet-credit-grid h2 > span { color: var(--public-accent); }
-.wallet-credit-grid p:not(.eyebrow) { margin-top: 24px; font-size: var(--consumer-body); line-height: 1.7; color: var(--public-muted); max-width: 43ch; }
-.wallet-account-summary { padding-left: 40px; border-left: 1px solid var(--public-line); }
-.wallet-account-summary > .icon { width: 24px; height: 24px; color: var(--public-accent); margin-bottom: 20px; }
-.wallet-account-summary h3 { font-size: 24px; line-height: 1.35; letter-spacing: -.025em; font-weight: 500; }
-.wallet-credit-grid .wallet-account-note { font-size: 13px; max-width: 48ch; margin-top: 20px; }
-.consumer-cards .consumer-final-wrap { padding-top: 48px; }
-.consumer-cards .consumer-final { padding-top: 0; border-top: 0; }
+/* Product understanding comes before the wallet setup guide. */
+.wallet-credit-section { padding-block: var(--consumer-space); }
+.wallet-credit-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; list-style: none; margin: 0; padding: 0; }
+.wallet-credit-steps li { min-width: 0; padding-top: 24px; border-top: 1px solid var(--public-line); }
+.wallet-credit-number { display: block; margin-bottom: 24px; color: var(--public-accent); font-size: 13px; line-height: 1.5; font-weight: 600; font-variant-numeric: tabular-nums; }
+.wallet-credit-steps h3 { font-size: 23px; line-height: 1.3; letter-spacing: -.025em; font-weight: 500; }
+.wallet-credit-steps p { margin-top: 14px; font-size: var(--consumer-body); line-height: 1.7; color: var(--public-muted); max-width: 36ch; }
+.wallet-guide-section { background: var(--public-tint); scroll-margin-top: 24px; }
+.wallet-guide-grid { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 64px; align-items: center; padding-block: var(--consumer-space); }
+.wallet-guide-copy h2 { margin-top: 16px; font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; }
+.wallet-guide-copy > p:not(.eyebrow) { max-width: 35ch; margin-top: 24px; font-size: var(--consumer-body); line-height: 1.7; color: var(--public-muted); }
+.wallet-guide-copy > .wallet-guide-note { font-size: 13px; line-height: 1.65; }
+.wallet-guide-section .wallet-card-art { background: #fff; }
+@media (max-width: 1000px) {
+  .wallet-guide-grid { gap: 36px; }
+  .wallet-credit-steps { gap: 24px; }
+  .wallet-credit-steps h3 { font-size: 21px; }
+}
 @media (max-width: 850px) {
-  .wallet-options-grid { gap: 24px; }
-  .wallet-options-grid h3 { font-size: 22px; }
-  .wallet-credit-grid { gap: 36px; }
-  .wallet-account-summary { padding-left: 28px; }
+  .wallet-guide-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .wallet-guide-copy > p:not(.eyebrow) { max-width: 56ch; margin-top: 18px; }
+  .wallet-guide-copy > .wallet-guide-note { margin-top: 12px; }
 }
 @media (max-width: 680px) {
-  .wallet-options-grid, .wallet-credit-grid { grid-template-columns: 1fr; }
-  .wallet-options-grid { gap: 28px; }
-  .wallet-options-grid article { padding-top: 22px; }
-  .wallet-options-grid article > span { margin-top: 14px; }
-  .wallet-credit-grid { gap: 32px; padding-block: 48px; }
-  .wallet-account-summary { padding: 28px 0 0; border-left: 0; border-top: 1px solid var(--public-line); }
-  .wallet-credit-grid p:not(.eyebrow) { margin-top: 18px; }
-  .consumer-cards .consumer-final-wrap { padding-top: 32px; }
+  .wallet-credit-steps { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .wallet-credit-steps li { position: relative; padding: 22px 0 0 42px; }
+  .wallet-credit-number { position: absolute; top: 26px; left: 0; margin: 0; }
+  .wallet-credit-steps p { max-width: 45ch; margin-top: 10px; }
 }
