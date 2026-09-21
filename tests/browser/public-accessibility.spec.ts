@@ -7,15 +7,13 @@ for (const width of [1440,390,320]) {
     test(`consumer ${route} is readable and accessible at ${width}px`,async({page})=>{
       await page.setViewportSize({width,height:900});
       await page.goto(route);await page.evaluate(()=>document.fonts.ready);
-      const question=page.locator("summary:visible:not(.wallet-guide-disclosure > summary)").first();
+      const question=page.locator("summary:visible:not(.wallet-guide-disclosure > summary):not(.recognition-receipt > summary)").first();
       if(await question.count())await question.click();
       if(route==="/card-services"){
         if(width<851)await page.locator(".wallet-guide-disclosure summary").click();
         await expect(page.locator(".wallet-card-art")).toBeVisible();
       }
       if(route==="/payment-services"){
-        const expand=page.locator(".channel-showcase").getByRole("button",{name:"Show example",exact:true});
-        if(await expand.isVisible())await expand.click();
         await expect(page.locator(".marketing-channel-journey")).toBeVisible();
       }
       const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
@@ -35,10 +33,10 @@ for (const width of [1440,390,320]) {
 }
 
 for(const width of [1440,320]){
-  for(const {name:saleType,description,amount,purchase,reference} of [
-    {name:"Goods",description:"Homeware set",amount:"$64.00",purchase:"Homeware set · 1 set",reference:"ORDER-1048"},
-    {name:"Services",description:"Design services",amount:"$480.00",purchase:"Design services · Project payment",reference:"PROJECT-2086"},
-    {name:"Information",description:"Market research briefing",amount:"$35.00",purchase:"Market research · 1 briefing",reference:"BRIEF-3012"},
+  for(const {name:saleType,description,amount,purchase,reference,fulfillment} of [
+    {name:"Goods",description:"Homeware set",amount:"$64.00",purchase:"Homeware set · 1 set",reference:"ORDER-1048",fulfillment:[["Delivery","Delivered · 20 Sep"]]},
+    {name:"Services",description:"Design services",amount:"$480.00",purchase:"Design services · Project payment",reference:"PROJECT-2086",fulfillment:[["Work completed","19 Sep"]]},
+    {name:"Information",description:"Market research briefing",amount:"$35.00",purchase:"Market research · 1 briefing",reference:"BRIEF-3012",fulfillment:[["Supplied","Email · 18 Sep"],["As of","18 Sep, 9:00 AM ET"]]},
   ]){
     test(`${saleType} sharing and purchase recognition remain accessible at ${width}px`,async({page})=>{
       await page.setViewportSize({width,height:900});
@@ -53,8 +51,6 @@ for(const width of [1440,320]){
       await expect(selection).not.toBeChecked();
       await expect(selection).toHaveAccessibleName("Dispute readiness");
       await expect(selection).toHaveAccessibleDescription(/\S+/);
-      const expand=panel.getByRole("button",{name:"Show example",exact:true});
-      if(await expand.isVisible())await expand.click();
       const channels=panel.getByRole("tablist",{name:"Ways to share a payment request",exact:true});
       for(const name of ["Text","Email","Social","QR code","Website"]){
         const channel=channels.getByRole("tab",{name,exact:true});
@@ -83,13 +79,29 @@ for(const width of [1440,320]){
         const example=artwork.getByRole("article",{name:`${name} example`,exact:true});
         await expect(example).toBeVisible();
         await expect(example).toContainText(amount);
-        await expect(example.getByRole("term")).toHaveText(["Purchase","Reference"]);
-        await expect(example.getByRole("definition")).toHaveText([purchase,reference]);
+        const record=example.locator(".dispute-purchase-details");
+        await expect(record.getByRole("term")).toHaveText(["Purchase","Reference",...fulfillment.map(([label])=>label)]);
+        await expect(record.getByRole("definition")).toHaveText([purchase,reference,...fulfillment.map(([,value])=>value)]);
         await expect(artwork.locator("figcaption")).toContainText("Illustrative banking experience");
         await expect(selection).toBeChecked();
         const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
         expect(result.violations.map(({id,nodes})=>({id,nodes:nodes.map(node=>node.target)}))).toEqual([]);
         expect(await page.evaluate(()=>Math.max(document.body.scrollWidth,document.documentElement.scrollWidth)-innerWidth)).toBeLessThanOrEqual(1);
+        if(name==="Customer view"){
+          const receipt=example.locator("details.recognition-receipt");
+          const summary=receipt.locator("summary");
+          await summary.focus();
+          await page.keyboard.press("Enter");
+          await expect(receipt).not.toHaveAttribute("open");
+          await expect(record).toBeHidden();
+          const collapsedResult=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
+          expect(collapsedResult.violations.map(({id,nodes})=>({id,nodes:nodes.map(node=>node.target)}))).toEqual([]);
+          await page.keyboard.press("Space");
+          await expect(receipt).toHaveAttribute("open","");
+          await expect(record).toBeVisible();
+          await expect(summary).toBeFocused();
+          await expect(selection).toBeChecked();
+        }
       }
     });
   }

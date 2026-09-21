@@ -1,3 +1,31 @@
+# D151 — prepare the verified candidate for release
+
+Freeze D146–D150 on the existing feature branch, prepare the review PR and verify its exact-source checks. Validate a fresh source archive separately from the clean upload directory, preserve source hashes and confirm the existing repository/site identities. Keep production unchanged; record preparation results in [status](STATUS.md).
+
+# D150 — verify and polish the three public journeys
+
+Audit Home, Payments and Cards for consistent framing, type, buttons, marketing language and artwork across desktop, tablet, phone and expanded text spacing. Remove retired-login explanations and duplicate checkout prompts, share one plain-language fee basis, and make the mobile channel rail easier to discover. Preserve D146–D149. Run public-site release checks and record actual evidence in [status](STATUS.md); do not deploy.
+
+# D149 — align card details and secured-credit artwork
+
+Replace the bare fact strip and flowchart with three balanced offer cards and a purchase-to-repayment illustration that keeps the deposit separate. Reuse the Ledgix card face, preserve all financial terms and test desktop/phone/text-spacing layouts, accessibility and public-site boundaries. Record actual verification in [status](STATUS.md); deployment remains separate.
+
+# D148 — visual payment browsing
+
+Replace plain sale/channel tabs with a media-gallery presentation: visual category cards, one featured share-to-checkout example and a thumbnail channel rail. Keep the journey visible on phones, keyboard control and active-thumbnail visibility across resizing. Verify all sale/channel combinations, text spacing, mobile overflow boundaries, public behavior, accessibility and builds. Preserve D146/D147 and record actual results; publication remains separate.
+
+# D147 — remove vendor-facing public copy
+
+Remove vendor-charge rows, labels and unnecessary sourcing language from the public pages. Align calculator output, optional-service pricing, Help, Privacy and Terms. Remove unused estimate state and styles, preserve exact arithmetic and fee exclusions, then verify the public routes, calculator, mobile layout and release build. Record results in [status](STATUS.md); no publication included.
+
+# D146 — make both banking examples recognizable
+
+Rebuild the customer illustration as a phone transaction-detail screen and the bank illustration as an inquiry workspace. Add coherent merchant, date, masked-card, purchase and fulfillment context; preserve the shared example and offer. Verify keyboard disclosure, cross-view context, narrow-screen/text-spacing geometry, accessibility and build boundaries. Record actual results in [status](STATUS.md). Publication remains separate.
+
+# D145 — deploy the reviewed PR #32 candidate
+
+Merge the exact passing PR, publish an immutable source-only archive to the bound Netlify site, verify ready/current identity, and run read-only hosted desktop/mobile and SEO/route acceptance. Preserve prior preparation diagnostics, source hashes and the existing live site during retry. Record deployment results in [status](STATUS.md); no database or provider operation is part of this release.
+
 # D144 — prepare the release candidate
 
 Freeze D141–D143, record exact local and remote source identity, open the review pull request and verify CI. Build a pristine source archive and Netlify package without modifying the live preview or publishing. Preserve the D143 full-suite and visual evidence when source hashes match; run the complete remote checks on the candidate. Record readiness and any remaining release step in [status](STATUS.md).

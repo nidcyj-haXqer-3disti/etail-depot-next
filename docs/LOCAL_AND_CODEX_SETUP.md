@@ -4,7 +4,7 @@ D139 maintainer refresh · 21 September 2026
 
 The application already exists. D108 limits it to public pages and fixed vendor links. Read [AGENTS.md](../AGENTS.md), [project targets](../project-targets.json), [source precedence](SOURCE_PRECEDENCE.md) and [current status](../planning/STATUS.md) first. Do not scaffold a replacement repository, reconnect PostgreSQL or Identity, or restore the retired account application.
 
-D140 / PR #31 is the verified live release, Netlify deploy `6ab0d438588dbc2adeb59f78`. Current status records exact-source checks and hosted verification; future publication still requires authorization.
+D145 / PR #32 is the verified live release, Netlify deploy `6ab1259130acf81c435375b6`. Current status records exact-source checks and hosted verification; future publication still requires authorization.
 
 ## Pinned workspace
 

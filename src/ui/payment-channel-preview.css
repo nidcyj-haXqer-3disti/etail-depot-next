@@ -1,19 +1,63 @@
-/* Public payment-sharing illustrations and their accessible channel selector. */
-.channel-marketing.channel-showcase { min-width: 0; max-width: none; width: 100%; border: 1px solid #d9ded7; border-radius: var(--public-radius,10px); background: #fff; color: #173f34; box-shadow: 0 18px 50px -38px #14362c45; overflow: hidden; }
-.marketing-example-toggle { display: none; }
-.channel-marketing .channel-tabs { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); padding: 16px 24px 0; gap: 2px; }
-.channel-marketing .channel-tabs button { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; min-width: 44px; padding: 14px 8px; border: 0; border-bottom: 2px solid transparent; border-radius: 5px 5px 0 0; background: transparent; font: inherit; font-size: 14px; font-weight: 550; line-height: 1.4; color: #53665b; gap: 8px; cursor: pointer; }
-.channel-marketing .channel-tabs button { white-space: nowrap; }
-.channel-marketing .channel-tabs .icon { width: 16px; height: 16px; flex-shrink: 0; }
-.channel-marketing .channel-tabs button[aria-selected=true] { background: #f3f6f0; color: #173f34; border-bottom-color: #2d5c45; }
-.channel-marketing .channel-tabs button:hover { color: #173f34; background: #f6f7f3; }
-.channel-marketing .channel-tabs button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: -4px; }
-.channel-marketing .marketing-channel-panel { display: grid; grid-template-columns: minmax(0,1fr); gap: 32px; min-width: 0; padding: 36px 44px 44px; border-top: 1px solid #e2e6de; background: radial-gradient(ellipse at 28% 65%,#e5eddc 0,transparent 58%),#f7f8f4; }
-.channel-marketing .marketing-channel-panel:focus-visible { outline: 3px solid #176b55; outline-offset: -5px; }
-.marketing-channel-copy { min-width: 0; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; }
-.marketing-channel-copy h3 { font-size: 28px; line-height: 1.2; font-weight: 500; letter-spacing: -.035em; white-space: pre-line; }
-.marketing-channel-copy > p { font-size: 15px; line-height: 1.7; color: #5b6c60; max-width: 40ch; margin: 0; justify-self: end; }
-.marketing-channel-journey { display: grid; grid-template-columns: minmax(0,1fr) 64px minmax(0,1fr); align-items: center; gap: 24px; min-width: 0; width: 100%; max-width: 880px; margin-inline: auto; }
+/* A featured payment example with an accessible thumbnail channel rail. */
+.channel-marketing.channel-showcase { display: grid; grid-template-columns: minmax(0,1fr) 272px; gap: 24px; min-width: 0; width: 100%; color: #173f34; }
+.channel-selector { grid-column: 2; grid-row: 1; min-width: 0; }
+.channel-selector-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 4px 4px 15px; font-size: 13px; font-weight: 550; line-height: 1.5; }
+.channel-selector-heading small { font-size: 11px; font-weight: 400; color: #697668; }
+.channel-marketing .channel-tabs { display: grid; gap: 10px; padding: 4px; }
+.channel-marketing .channel-tabs button { position: relative; display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 94px; padding: 7px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: #274d3b; font: inherit; text-align: left; cursor: pointer; }
+.channel-marketing .channel-tabs button:hover { background: #f3f6ef; }
+.channel-marketing .channel-tabs button[aria-selected=true] { background: #f0f4e9; border-color: #58744f; box-shadow: inset 0 0 0 1px #58744f; }
+.channel-marketing .channel-tabs button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 2px; }
+.channel-thumbnail-caption { display: grid; gap: 5px; min-width: 0; padding-right: 12px; }
+.channel-thumbnail-caption strong { font-size: 14px; font-weight: 550; line-height: 1.5; }
+.channel-thumbnail-caption small { color: #64735d; font-size: 11px; line-height: 1.5; }
+.channel-selected-mark { display: none; position: absolute; top: 8px; right: 8px; place-items: center; width: 14px; height: 14px; border-radius: 50%; color: #fff; background: #42653c; }
+.channel-selected-mark .icon { width: 9px; height: 9px; }
+.channel-tabs button[aria-selected=true] .channel-selected-mark { display: grid; }
+.channel-thumbnail { position: relative; display: grid; place-items: center; flex: 0 0 88px; width: 88px; height: 72px; border-radius: 6px; overflow: hidden; background: #dfe9dd; }
+.channel-thumbnail[data-channel=EMAIL] { background: #e8e4d8; }
+.channel-thumbnail[data-channel=SOCIAL] { background: #e7dedb; }
+.channel-thumbnail[data-channel=QR] { background: #e2e5da; }
+.channel-thumbnail[data-channel=WEB] { background: #dce5e7; }
+.thumbnail-phone { width: 32px; height: 59px; padding: 6px 4px; border: 2px solid #5c7362; border-radius: 6px; background: #fff; box-shadow: 4px 5px 10px #46634e20; transform: rotate(-7deg); }
+.thumbnail-phone > i { display: block; width: 9px; height: 2px; margin: -2px auto 6px; border-radius: 2px; background: #819282; }
+.thumbnail-phone > span { display: block; width: 16px; height: 8px; margin-bottom: 4px; border-radius: 3px; background: #e7ebe3; }
+.thumbnail-phone > span:nth-of-type(2) { margin-left: auto; background: #ccdcbf; }
+.thumbnail-phone > b { display: grid; place-items: center; width: 18px; height: 15px; margin-left: auto; border-radius: 3px; background: #e5eedf; }
+.thumbnail-phone .icon { width: 10px; height: 10px; color: #627d54; }
+.thumbnail-email { width: 56px; height: 45px; padding: 7px; border-radius: 4px; background: #fffdf6; box-shadow: 4px 5px 10px #6b675020; transform: rotate(-5deg); }
+.thumbnail-email .icon { display: block; width: 14px; height: 12px; margin-bottom: 4px; color: #8b8364; }
+.thumbnail-email i { display: block; width: 100%; height: 2px; margin-bottom: 3px; background: #d9d7c7; }
+.thumbnail-email i:nth-of-type(2) { width: 65%; }
+.thumbnail-email b { display: block; width: 22px; height: 6px; border-radius: 2px; background: #6f795c; }
+.thumbnail-social { width: 41px; height: 53px; padding: 5px; border-radius: 4px; background: #fff9f6; box-shadow: 4px 5px 10px #805f5920; transform: rotate(6deg); }
+.thumbnail-social > i { display: block; width: 6px; height: 6px; border-radius: 50%; margin-bottom: 4px; background: #b38d7f; }
+.thumbnail-social > span { display: block; height: 20px; border-radius: 2px; background: radial-gradient(circle at 65% 30%,#e4c2ab 0 25%,transparent 27%),linear-gradient(135deg,#89755b 45%,#d9b5a1 46%); }
+.thumbnail-social > b { display: block; width: 80%; height: 2px; margin-top: 4px; background: #d0bcb0; }
+.thumbnail-social > b:last-child { width: 55%; }
+.thumbnail-qr { display: grid; justify-items: center; gap: 5px; width: 42px; height: 54px; padding: 8px 5px; border-radius: 3px; background: #fffef7; box-shadow: 4px 5px 10px #616d4920; transform: rotate(-5deg); }
+.thumbnail-qr .icon { width: 28px; height: 28px; color: #576447; }
+.thumbnail-qr i { width: 18px; height: 2px; background: #bec6ad; }
+.thumbnail-web { width: 65px; height: 44px; padding: 5px; border-radius: 4px; background: #f8fcfc; box-shadow: 4px 5px 10px #47666d20; transform: rotate(5deg); }
+.thumbnail-web > i { display: block; width: 100%; height: 3px; margin-bottom: 5px; border-bottom: 1px solid #d1dedf; }
+.thumbnail-web > span { display: flex; gap: 5px; height: 17px; }
+.thumbnail-web b:first-child { width: 22px; border-radius: 2px; background: #abc3c3; }
+.thumbnail-web b:last-child { width: 26px; height: 3px; background: #c4d2ce; box-shadow: 0 6px #e0e8e3; }
+.thumbnail-web em { display: block; height: 6px; width: 31px; margin: 4px auto 0; border-radius: 2px; background: #51756f; }
+.channel-marketing .marketing-channel-panel { grid-column: 1; grid-row: 1; min-width: 0; border: 1px solid #d8e0d3; border-radius: 16px; background: #f0f4e9; overflow: hidden; }
+.channel-marketing .marketing-channel-panel[data-channel=EMAIL] { background: #f3f1e9; }
+.channel-marketing .marketing-channel-panel[data-channel=SOCIAL] { background: #f3eeeb; }
+.channel-marketing .marketing-channel-panel[data-channel=QR] { background: #f0f3e9; }
+.channel-marketing .marketing-channel-panel[data-channel=WEB] { background: #eef3f3; }
+.channel-marketing .marketing-channel-panel:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 4px; }
+.marketing-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 24px; border-bottom: 1px solid #dce3d7; background: #ffffffa6; font-size: 12px; line-height: 1.5; }
+.marketing-preview-heading > span { display: flex; align-items: center; gap: 8px; font-weight: 550; }
+.marketing-preview-heading .icon { width: 15px; height: 15px; }
+.marketing-preview-heading small { color: #627461; font-size: 11px; }
+.marketing-channel-copy { padding: 24px 28px; border-top: 1px solid #dce3d7; background: #fff; }
+.marketing-channel-copy h3 { font-size: 23px; line-height: 1.3; font-weight: 500; letter-spacing: -.025em; }
+.marketing-channel-copy > p { font-size: 13px; line-height: 1.7; color: #60715d; margin: 8px 0 0; max-width: 64ch; }
+.marketing-channel-journey { display: grid; grid-template-columns: minmax(0,1fr) 28px minmax(0,1fr); align-items: center; gap: 14px; min-width: 0; min-height: 460px; width: 100%; padding: 28px; margin-inline: auto; }
 .channel-marketing .channel-medium { width: 100%; min-width: 0; max-width: none; border: 1px solid #e0e5dd; border-radius: var(--public-radius,10px); background: #fff; box-shadow: 0 18px 32px -28px #32473580; font-size: 12px; line-height: 1.7; overflow: hidden; overflow-wrap: anywhere; }
 .channel-marketing .channel-medium p { margin: 0; }
 .channel-marketing .channel-medium .icon { flex-shrink: 0; width: 17px; height: 17px; }
@@ -57,7 +101,7 @@
 .marketing-social-caption { padding: 18px 16px; }
 .marketing-social-caption > p { font-size: 12px; color: #5d6e5a; padding-bottom: 14px; }
 .channel-marketing .marketing-counter { max-width: 300px; margin-inline: auto; padding: 28px 22px; border-radius: 6px; text-align: center; background: #fffefa; }
-.channel-marketing .marketing-counter h4 { margin-top: 17px; font-family: Georgia,serif; font-size: 22px; font-weight: 400; line-height: 1.2; letter-spacing: -.025em; }
+.channel-marketing .marketing-counter h4 { margin: 17px 0 0; font-family: Georgia,serif; font-size: 22px; font-weight: 400; line-height: 1.2; letter-spacing: -.025em; }
 .marketing-qr-art { display: grid; place-items: center; width: 142px; height: 142px; max-width: 100%; margin: 24px auto 18px; border: 1px solid #d5deca; border-radius: 10px; background: #fff; }
 .channel-marketing .marketing-qr-art > .icon { width: 109px; height: 109px; stroke-width: 1.3; }
 .marketing-counter-amount { display: grid; gap: 7px; }
@@ -79,7 +123,7 @@
 .marketing-product-symbol > span:last-child { width: 30px; }
 .marketing-product-services { background: #e8eee1; }
 .marketing-order-product > div:last-child { min-width: 0; }
-.channel-marketing .marketing-order-product h4 { font-size: 20px; line-height: 1.2; font-weight: 500; letter-spacing: -.025em; }
+.channel-marketing .marketing-order-product h4 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 500; letter-spacing: -.025em; }
 .marketing-order-product > div:last-child > span { display: block; font-size: 12px; line-height: 1.6; color: #67765f; margin-top: 8px; }
 .marketing-order-product strong { display: block; font-size: 14px; font-weight: 550; margin-top: 12px; }
 .marketing-web-body > .marketing-line-item { padding-top: 20px; margin: 23px 0 17px; border-top: 1px solid #e1e6da; }
@@ -89,7 +133,7 @@
 .channel-marketing .marketing-payment-view { min-width: 0; padding: 24px; border: 1px solid #dbe4d5; border-radius: 12px; background: #fffefa; box-shadow: 0 18px 40px -28px #163d3480; }
 .marketing-checkout-icon { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid #d4dfcb; border-radius: 10px; color: #48703e; background: #f7faf3; }
 .marketing-checkout-icon .icon { width: 20px; height: 20px; }
-.marketing-payment-view h4 { margin-top: 24px; font-size: 22px; line-height: 1.25; font-weight: 550; letter-spacing: -.025em; }
+.marketing-payment-view h4 { margin: 24px 0 0; font-size: 22px; line-height: 1.25; font-weight: 550; letter-spacing: -.025em; }
 .marketing-payment-view > p { font-size: 12px; line-height: 1.7; color: #60725b; margin-top: 9px; }
 .marketing-payment-summary { display: grid; gap: 11px; padding-block: 22px; border-bottom: 1px solid #d9e2d1; }
 .marketing-payment-summary > span { min-width: 0; font-size: 12px; color: #4c6247; }
@@ -112,42 +156,51 @@
 .marketing-checkout-heading > .icon { flex: 0 0 14px; width: 14px; height: 14px; color: #65775b; }
 .marketing-checkout-icon { flex: 0 0 36px; }
 @media(max-width:1100px) {
- .channel-marketing .marketing-channel-panel { grid-template-columns: 1fr; gap: 30px; padding: 32px; }
- .marketing-channel-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; }
- .marketing-channel-copy > p { max-width: 44ch; }
- .marketing-channel-journey { grid-template-columns: minmax(0,1fr) 36px minmax(0,1fr); gap: 16px; }
- .channel-marketing .marketing-payment-view { padding: 27px; }
+ .channel-marketing.channel-showcase { grid-template-columns: minmax(0,1fr) 232px; gap: 16px; }
+ .channel-thumbnail { flex-basis: 72px; width: 72px; height: 64px; }
+ .channel-thumbnail-caption small { font-size: 10px; }
+ .marketing-channel-journey { padding: 24px 18px; gap: 10px; grid-template-columns: minmax(0,1fr) 16px minmax(0,1fr); }
+ .channel-marketing .marketing-payment-view { padding: 20px 16px; }
+ .marketing-channel-connector > .icon { width: 24px; height: 24px; padding: 4px; }
+ .marketing-payment-link { flex-wrap: wrap; }
+ .marketing-link-icon { display: none; }
 }
-@media(max-width:800px) {
- .channel-marketing .channel-tabs { display: flex; flex-wrap: wrap; padding: 20px 19px; gap: 6px; }
- .channel-marketing .channel-tabs button { min-height: 44px; border: 1px solid #dce3d4; border-radius: 5px; padding: 9px 10px; gap: 6px; }
- .channel-marketing .channel-tabs button[aria-selected=true] { background: #264f3b; border-color: #264f3b; color: white; }
- .channel-marketing .channel-tabs .icon { width: 14px; height: 14px; }
+@media(max-width:960px) {
+ .channel-marketing.channel-showcase { display: flex; flex-direction: column; gap: 18px; }
+ .channel-selector { width: 100%; }
+ .channel-selector-heading { padding-bottom: 10px; }
+ .channel-marketing .channel-tabs { display: flex; gap: 10px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: #bdcbb5 transparent; padding: 4px 4px 10px; scroll-padding-inline: 4px; }
+ .channel-marketing .channel-tabs button { display: grid; flex: 0 0 138px; align-content: start; gap: 9px; padding: 7px; }
+ .channel-thumbnail { width: 100%; height: 76px; }
+ .channel-thumbnail-caption { padding: 0 3px 2px; }
+ .channel-thumbnail-caption strong { font-size: 13px; }
+ .channel-thumbnail-caption small { display: none; }
+ .channel-selected-mark { top: 12px; right: 12px; }
+ .marketing-channel-journey { padding: 28px; grid-template-columns: minmax(0,1fr) 40px minmax(0,1fr); gap: 22px; }
+ .marketing-payment-link { flex-wrap: nowrap; }
 }
 @media(max-width:650px) {
- .channel-marketing.channel-showcase { border-radius: var(--public-radius,10px); }
- .channel-marketing .marketing-channel-panel { padding: 27px 21px; gap: 26px; }
- .marketing-channel-copy { display: block; }
- .marketing-channel-copy h3 { font-size: 24px; }
- .marketing-channel-copy > p { margin-top: 16px; max-width: 45ch; }
- .marketing-example-toggle { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 44px; width: 100%; margin-top: 20px; padding: 11px 14px; border: 1px solid #d6ded0; border-radius: 6px; background: #fff; color: #173f34; font: inherit; font-size: 14px; font-weight: 550; line-height: 1.5; cursor: pointer; }
- .marketing-example-toggle > span { font-size: 19px; line-height: 1; }
- .marketing-example-toggle:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 3px; }
- .marketing-channel-journey { grid-template-columns: 1fr; gap: 20px; max-width: 360px; }
- .marketing-channel-journey[data-expanded=false] { display: none; }
- .channel-marketing .marketing-channel-panel { min-height: 0; }
- .marketing-channel-connector { width: 44px; justify-self: center; transform: rotate(90deg); }
- .channel-marketing .marketing-payment-view { padding: 24px; }
- .marketing-payment-summary { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
- .marketing-payment-summary strong { white-space: nowrap; }
+ /* A partially visible next thumbnail makes horizontal browsing apparent. */
+ .channel-marketing .channel-tabs button { flex-basis: clamp(104px, calc((100% - 24px) / 2.5), 160px); }
+ .channel-thumbnail { height: 68px; }
+ .marketing-channel-journey { grid-template-columns: minmax(0,1fr); gap: 16px; min-height: 0; padding: 22px; max-width: 430px; }
+ .marketing-channel-connector { width: 32px; height: 32px; justify-self: center; transform: rotate(90deg); }
+ .marketing-preview-heading { padding: 15px 20px; }
+ .marketing-channel-copy { padding: 22px; }
+ .marketing-channel-copy h3 { font-size: 21px; }
+ .channel-marketing .marketing-payment-view { padding: 22px; }
+ .marketing-payment-view h4 { margin-top: 18px; font-size: 20px; }
+ .marketing-payment-summary { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding-block: 18px; }
+ .marketing-payment-summary strong { font-size: 25px; white-space: nowrap; }
+ .marketing-payment-receipt { margin-top: 14px; padding-top: 14px; }
+ .marketing-journey-step { margin-bottom: 12px; }
 }
 @media(max-width:370px) {
- .channel-marketing .channel-tabs { padding-inline: 14px; gap: 5px; }
- .channel-marketing .channel-tabs button { padding-inline: 9px; }
- .channel-marketing .marketing-channel-panel { padding-inline: 15px; }
+ .marketing-channel-journey { padding: 18px 14px; }
+ .marketing-preview-heading { padding: 14px; }
+ .marketing-channel-copy { padding: 20px 16px; }
  .channel-marketing .marketing-payment-view { padding: 20px 16px; }
  .marketing-payment-link { gap: 5px; padding-inline: 8px; }
- .marketing-link-icon { display: none; }
  .marketing-social-poster { padding-inline: 20px; }
 }
 

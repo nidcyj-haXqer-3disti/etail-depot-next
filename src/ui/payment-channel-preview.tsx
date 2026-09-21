@@ -41,7 +41,7 @@ function ChannelIllustration({ channel, purpose, example }: { channel: ChannelPr
     <div className="marketing-social-heading"><span><Icon name="person" />{example.context}</span><span aria-hidden="true">•••</span></div><div className="marketing-social-poster"><span className="marketing-poster-orbit marketing-poster-orbit-one" aria-hidden="true" /><span className="marketing-poster-orbit marketing-poster-orbit-two" aria-hidden="true" /><span className="marketing-document-kicker">PAY BY CARD</span><strong>{example.description}</strong><span>{example.amount}</span></div><div className="marketing-social-caption"><p>View the details and continue to payment.</p><PaymentLinkCard example={example} /></div>
   </div>;
   if (channel === "QR") return <div className="channel-medium marketing-counter">
-    <span className="marketing-document-kicker">{example.context}</span><h4>Scan to open<br />your payment.</h4><div className="marketing-qr-art" aria-hidden="true"><Icon name="qr" /></div><div className="marketing-counter-amount"><span>{example.description}</span><strong>{example.amount}</strong></div><span className="marketing-counter-instruction"><Icon name="card" />Scan to pay by card</span>
+    <span className="marketing-document-kicker">{example.context}</span><h4>Scan to pay.</h4><div className="marketing-qr-art" aria-hidden="true"><Icon name="qr" /></div><div className="marketing-counter-amount"><span>{example.description}</span><strong>{example.amount}</strong></div><span className="marketing-counter-instruction"><Icon name="card" />Credit and debit cards accepted</span>
   </div>;
   return <div className="channel-medium marketing-website">
     <div className="marketing-browser" aria-hidden="true"><span /><span /><span /><div><Icon name="lock" />Payment summary</div></div><div className="marketing-web-body"><span className="marketing-document-kicker">{example.context}</span><div className="marketing-order-product">{purpose === "goods" ? <div className="marketing-parcel" aria-hidden="true"><span /></div> : <div className={`marketing-product-symbol marketing-product-${purpose}`} aria-hidden="true"><Icon name={purpose === "information" ? "document" : "person"} /><span /><span /></div>}<div><h4>{example.description}</h4><span>{example.quantity}</span><strong>{example.amount}</strong></div></div><div className="marketing-line-item"><span>Total</span><b>{example.amount}</b></div><PaymentLinkCard example={example} label="Continue to payment" /></div>
@@ -50,20 +50,20 @@ function ChannelIllustration({ channel, purpose, example }: { channel: ChannelPr
 
 export function PaymentChannelPreview({ purpose }: PaymentChannelPreviewProps) {
   const [selected, setSelected] = useState<ChannelPresentation>("SMS");
-  const [expanded, setExpanded] = useState(false);
   const id = useId();
   const example = { ...paymentExamples[purpose], amount: formatUsdCents(paymentExamples[purpose].amountCents) };
   const story = stories[selected];
 
   return <div className="channel-showcase channel-marketing">
     <PaymentChannelTabs value={selected} onChange={setSelected} idPrefix={id} />
-    <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-${selected}`} tabIndex={0} className="channel-panel marketing-channel-panel">
-      <div className="marketing-channel-copy"><h3>{story.title}</h3><p>{story.detail}</p><button type="button" className="marketing-example-toggle" aria-expanded={expanded} aria-controls={`${id}-journey`} onClick={() => setExpanded(value => !value)}>{expanded ? "Hide example" : "Show example"}<span aria-hidden="true">{expanded ? "−" : "+"}</span></button></div>
-      <div id={`${id}-journey`} className="marketing-channel-journey" data-expanded={expanded}>
+    <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-${selected}`} tabIndex={0} className="channel-panel marketing-channel-panel" data-channel={selected}>
+      <div className="marketing-preview-heading"><span><Icon name={selected === "SMS" ? "message" : selected === "EMAIL" ? "mail" : selected === "QR" ? "qr" : selected === "WEB" ? "link" : "person"} />{selected === "SMS" ? "Text" : selected === "EMAIL" ? "Email" : selected === "QR" ? "QR code" : selected === "WEB" ? "Website" : "Social"}</span><small>{example.name} · {example.amount}</small></div>
+      <div id={`${id}-journey`} className="marketing-channel-journey">
         <div className="marketing-channel-source"><p className="marketing-journey-step"><span>01</span>You share</p><ChannelIllustration channel={selected} purpose={purpose} example={example} /></div>
         <span className="marketing-channel-connector" aria-hidden="true"><Icon name="arrow" /></span>
-        <div className="marketing-channel-destination"><p className="marketing-journey-step"><span>02</span>Your customer pays</p><div className="channel-checkout marketing-payment-view"><div className="marketing-checkout-heading"><span className="marketing-checkout-icon"><Icon name="card" /></span><span>Card checkout<small>{example.context}</small></span><Icon name="lock" /></div><h4>Review your payment.</h4><p>Review the purchase. Pay by card.</p><div className="marketing-payment-summary"><span>{example.description}</span><strong>{example.amount}</strong></div><NetworkBrands /><div className="marketing-payment-finish" aria-hidden="true"><Icon name="lock" /><span>Pay {example.amount}</span><Icon name="arrow" /></div><div className="marketing-payment-receipt"><Icon name="document" /><div><span>After successful payment</span><strong>Payment receipt included</strong></div></div></div></div>
+        <div className="marketing-channel-destination"><p className="marketing-journey-step"><span>02</span>Your customer pays</p><div className="channel-checkout marketing-payment-view"><div className="marketing-checkout-heading"><span className="marketing-checkout-icon"><Icon name="card" /></span><span>Card checkout<small>{example.context}</small></span><Icon name="lock" /></div><h4>Your payment.</h4><p>Check the details, then pay by card.</p><div className="marketing-payment-summary"><span>{example.description}</span><strong>{example.amount}</strong></div><NetworkBrands /><div className="marketing-payment-finish" aria-hidden="true"><Icon name="lock" /><span>Pay {example.amount}</span><Icon name="arrow" /></div><div className="marketing-payment-receipt"><Icon name="document" /><div><span>After successful payment</span><strong>Payment receipt included</strong></div></div></div></div>
       </div>
+      <div className="marketing-channel-copy"><h3>{story.title}</h3><p>{story.detail}</p></div>
     </div>
   </div>;
 }

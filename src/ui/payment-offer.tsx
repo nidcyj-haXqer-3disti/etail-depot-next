@@ -19,7 +19,7 @@ export function PaymentOffer({saleRecords,onSaleRecordsChange}: {saleRecords: bo
     <details className="offer-details"><summary>Additional fees & refunds<span aria-hidden="true">+</span></summary><div className="offer-details-body">
       <dl className="fee-exceptions"><div><dt>International cards</dt><dd>+{fees.internationalRateLabel}</dd></div><div><dt>Currency conversion, when required</dt><dd>+{fees.conversionRateLabel}</dd></div><div><dt>Manually entered cards</dt><dd>+{fees.manualEntryRateLabel}</dd></div><div><dt>Disputes received</dt><dd>${fees.disputeFeeDollars} each</dd></div><div><dt>Manually countering a dispute</dt><dd>${fees.disputeResponseFeeDollars}; returned if you win</dd></div></dl>
       <p>Original processing and currency-conversion fees are not returned when a payment is refunded. Network charges and optional services may add costs; review the applicable terms. Sharing a link by text does not include a messaging subscription.</p>
-      <p>{saleRecordsOffer.name} adds a {saleRecordsOffer.rateLabel} Trolleys service fee on eligible enrolled successful-payment volume, plus quoted vendor charges. Review your eligibility, vendor quote and service refund terms before enrollment.</p>
+      <p>The {saleRecordsOffer.name} fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Review eligibility, applicable charges and service refund terms before enrollment.</p>
       <a className="consumer-text-link" href={hostedServices.payments.contactHref}>Ask about fees<Icon name="arrow" /></a>
     </div></details>
   </section>;

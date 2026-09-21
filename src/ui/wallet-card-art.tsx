@@ -27,7 +27,7 @@ const guides = {
   ],
 } as const;
 
-function LedgixCardFace() {
+export function LedgixCardFace() {
   return <div className="ledgix-wallet-card">
     <div className="ledgix-wallet-card-accent" />
     <Image className="ledgix-wallet-card-logo" src="/brand/ledgix-logo.png" alt="" width={512} height={182} unoptimized />

@@ -13,15 +13,15 @@ export function PaymentFeeEstimate({saleRecords, onSaleRecordsChange}: {saleReco
     <div className="fee-input"><span aria-hidden="true">$</span><input id="payment-amount" type="text" inputMode="decimal" autoComplete="off" value={amount} onChange={event => setAmount(event.target.value)} maxLength={9} aria-describedby={estimate ? "fee-estimate-note" : "fee-estimate-error fee-estimate-note"} aria-invalid={!estimate} /></div>
     <fieldset className="fee-service-option"><legend>Optional service</legend>
       <label className="fee-checkbox"><input id="addon-sale-records" type="checkbox" checked={saleRecords} onChange={event => onSaleRecordsChange(event.target.checked)} aria-describedby="sale-records-estimate-price" />{saleRecordsOffer.name}</label>
-      <p className="fee-estimate-note" id="sale-records-estimate-price">{saleRecordsOffer.rateLabel} of eligible enrolled successful-payment volume, plus quoted vendor charges. Processing fees also apply.</p>
+      <p className="fee-estimate-note" id="sale-records-estimate-price">{saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Payment processing is separate.</p>
     </fieldset>
     <div className="fee-result" aria-live="polite" aria-atomic="true">
       {estimate ? <dl>
         <div><dt>Processing fee</dt><dd>−{formatUsdCents(estimate.processingCents)}</dd></div>
-        {saleRecords && <><div><dt>Trolleys service fee</dt><dd>−{formatUsdCents(estimate.serviceCents)}</dd></div><div className="fee-vendor-charges"><dt>Vendor charges</dt><dd>{saleRecordsOffer.vendorChargesLabel}</dd></div></>}
-        <div className="fee-net"><dt>{estimate.vendorFeeUnknown ? "Before vendor charges" : "After processing"}</dt><dd>{formatUsdCents(estimate.subtotalCents)}</dd></div>
+        {saleRecords && <div><dt>Trolleys service fee</dt><dd>−{formatUsdCents(estimate.serviceCents)}</dd></div>}
+        <div className="fee-net"><dt>Estimated remaining</dt><dd>{formatUsdCents(estimate.subtotalCents)}</dd></div>
       </dl> : <p className="fee-error" id="fee-estimate-error">Enter an amount from $1 to $100,000, with up to two decimal places.</p>}
     </div>
-    <p className="fee-estimate-note" id="fee-estimate-note">{saleRecords && "Quoted vendor charges are not deducted from the amount shown. "}Estimate excludes international, conversion, manual-entry and other applicable charges. Selecting this example does not enroll you or charge a fee.</p>
+    <p className="fee-estimate-note" id="fee-estimate-note">Estimate excludes international, conversion, manual-entry and other applicable charges. Selecting this example does not enroll you or charge a fee.</p>
   </div>;
 }

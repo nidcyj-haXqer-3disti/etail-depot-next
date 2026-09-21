@@ -1,15 +1,22 @@
 /* Product understanding comes before the wallet setup guide. */
 .wallet-credit-section { padding-block: var(--consumer-space); }
 .card-details-section { padding-top: var(--consumer-space); scroll-margin-top: 28px; }
-.card-details-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.35fr); gap: 36px; margin: 0; }
-.card-details-grid > div { min-width: 0; padding-top: 24px; border-top: 1px solid var(--public-line); }
-.card-details-grid dt { color: var(--public-muted); font-size: 14px; line-height: 1.5; }
-.card-details-grid dd { margin: 16px 0 0; }
-.card-details-grid strong { display: block; font-size: 30px; line-height: 1.3; letter-spacing: -.025em; font-weight: 500; font-variant-numeric: tabular-nums; }
-.card-detail-note { display: block; margin-top: 8px; font-size: 13px; line-height: 1.65; color: var(--public-muted); }
-.card-detail-fees { display: flex; flex-wrap: wrap; gap: 16px 36px; }
-.card-detail-repayment strong { max-width: 22ch; font-size: 23px; line-height: 1.4; }
-.card-details-disclosure { max-width: 85ch; margin-top: 28px; font-size: 13px; line-height: 1.7; color: var(--public-muted); }
+.card-details-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr); gap: 14px; margin: 0; }
+.card-details-grid > div { min-width: 0; padding: 26px 28px 28px; border: 1px solid #dbe3d8; border-radius: 14px; background: #f7f8f2; }
+.card-details-grid > div.card-detail-deposit { background: #edf2e6; }
+.card-details-grid > div.card-detail-repayment { background: #f4f6f4; }
+.card-details-grid dt { display: flex; align-items: center; gap: 10px; color: #526b55; font-size: 13px; line-height: 1.5; }
+.card-detail-symbol { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border: 1px solid #d3decc; border-radius: 9px; background: #ffffffa3; }
+.card-detail-symbol .icon { width: 17px; height: 17px; }
+.card-details-grid dd { margin: 25px 0 0; }
+.card-details-grid strong { display: block; font-size: 42px; line-height: 1.15; letter-spacing: -.035em; font-weight: 500; font-variant-numeric: tabular-nums; }
+.card-detail-note { display: block; margin-top: 10px; font-size: 13px; line-height: 1.65; color: var(--public-muted); }
+.card-details-grid dd > p { margin-top: 5px; color: var(--public-muted); font-size: 12px; line-height: 1.65; }
+.card-detail-fees { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card-detail-fees > span + span { padding-left: 20px; border-left: 1px solid #d6dfd0; }
+.card-detail-repayment strong { max-width: 13ch; padding-top: 2px; font-size: 27px; line-height: 1.3; letter-spacing: -.025em; }
+.card-detail-repayment .card-detail-note { max-width: 25ch; margin-top: 14px; }
+.card-details-disclosure { max-width: 90ch; margin-top: 20px; font-size: 12px; line-height: 1.7; color: var(--public-muted); }
 .wallet-guide-section { background: var(--public-tint); scroll-margin-top: 24px; }
 .wallet-guide-grid { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 64px; align-items: center; padding-block: var(--consumer-space); }
 .wallet-guide-copy h2 { margin-top: 16px; font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; }
@@ -28,8 +35,8 @@
 .wallet-guide-content { padding-top: 20px; }
 @media (max-width: 1000px) {
   .wallet-guide-grid { gap: 36px; }
-  .card-details-grid { gap: 24px; }
-  .card-detail-fees { column-gap: 24px; }
+  .card-details-grid { gap: 12px; }
+  .card-details-grid > div { padding: 22px; }
 }
 @media (max-width: 850px) {
   .wallet-guide-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
@@ -37,11 +44,23 @@
   .wallet-guide-copy > p.wallet-guide-note { margin-top: 12px; }
 }
 @media (max-width: 680px) {
-  .card-details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 20px; }
-  .card-details-grid > div { padding-top: 20px; }
-  .card-details-grid dd { margin-top: 12px; }
-  .card-details-grid strong { font-size: 26px; }
-  .card-detail-fees { column-gap: 20px; }
+  .card-details-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+  .card-details-grid > div { padding: 20px; }
+  .card-details-grid dt { align-items: flex-start; flex-direction: column; gap: 12px; font-size: 12px; }
+  .card-details-grid dd { margin-top: 20px; }
+  .card-details-grid strong { font-size: 32px; }
+  .card-detail-fees { gap: 16px 10px; grid-template-columns: minmax(0,1fr); }
+  .card-detail-fees > span { display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; }
+  .card-detail-fees > span + span { padding-left: 0; border-left: 0; }
+  .card-detail-fees .card-detail-note { margin: 0; font-size: 11px; }
   .card-detail-repayment { grid-column: 1 / -1; }
-  .card-detail-repayment strong { max-width: none; font-size: 21px; }
+  .card-details-grid .card-detail-repayment dt { flex-direction: row; align-items: center; }
+  .card-detail-repayment strong { max-width: none; font-size: 24px; }
+  .card-detail-repayment .card-detail-note { max-width: none; margin-top: 10px; }
+}
+@media (max-width: 370px) {
+  .card-details-grid { gap: 10px; }
+  .card-details-grid > div { padding: 17px 14px; }
+  .card-details-grid strong { font-size: 29px; }
+  .card-detail-repayment strong { font-size: 23px; }
 }

@@ -1,36 +1,44 @@
 import { Icon } from "./icon";
+import { LedgixCardFace } from "./wallet-card-art";
 import { productFacts } from "@/shared/product-facts";
+import { formatUsdCents } from "@/modules/public-site/fee-estimate";
 import "./secured-credit-art.css";
 
+const exampleAmount = formatUsdCents(6400);
 const purchaseSteps = [
-  { title: "Purchases", description: "Pay with your card.", icon: "card" },
-  { title: "Statement", description: "See what you owe.", icon: "document" },
-  { title: "Repayment", description: `${productFacts.cards.repayment}.`, icon: "arrow" },
+  { title: "Use your card", description: "Pay with your digital wallet card.", kind: "purchase" },
+  { title: "Review your statement", description: "See the purchases you need to repay.", kind: "statement" },
+  { title: "Pay in full", description: "Repay your statement balance each month. Earlier or daily payments are optional.", kind: "repayment" },
 ] as const;
 
-/** Explains collateral separately from the purchase bill; it contains no account controls. */
+function PurchaseIllustration({kind}: {kind: (typeof purchaseSteps)[number]["kind"]}) {
+  return <div className={`secured-step-art secured-step-art-${kind}`} aria-hidden="true">
+    {kind === "purchase" ? <>
+      <div className="secured-mini-phone"><i /><span>Wallet</span><div className="secured-mini-card"><LedgixCardFace /></div><div className="secured-mini-phone-lines"><b /><b /></div><em /></div>
+      <div className="secured-purchase-tag"><Icon name="card" /><span>Purchase<strong>{exampleAmount}</strong></span></div>
+    </> : kind === "statement" ? <div className="secured-statement-paper"><span>Card statement</span><strong>{exampleAmount}</strong><small>Purchase balance</small><div className="secured-paper-lines"><i /><i /></div><div className="secured-paper-total"><span>Pay in full</span><Icon name="document" /></div></div>
+      : <div className="secured-repayment-paper"><span className="secured-payment-check"><Icon name="check" /></span><span>Payment received</span><strong>{exampleAmount}</strong><div><span>Purchase balance</span><b>{formatUsdCents(0)}</b></div></div>}
+  </div>;
+}
+
+/** One illustrative purchase cycle. The separate deposit never pays the purchase bill. */
 export function SecuredCreditArt() {
   return <figure className="secured-credit-art" aria-label="Security deposit and card repayment explained">
-    <div className="secured-credit-lane secured-credit-deposit">
-      <div className="secured-credit-lane-heading"><Icon name="lock" /><h3>Security deposit</h3></div>
-      <div className="secured-credit-deposit-flow">
-        <p className="secured-credit-deposit-node">Deposit held</p>
-        <div className="secured-credit-backing"><span>backs</span><Icon name="arrow" /></div>
-        <p className="secured-credit-deposit-node">Card account</p>
+    <div className="secured-credit-scene">
+      <div className="secured-credit-deposit">
+        <div className="secured-deposit-art" aria-hidden="true"><div className="secured-deposit-sheet"><span>Security deposit</span><strong>${productFacts.cards.minimumDepositDollars}</strong><small>Minimum deposit</small><i /><i /></div><span className="secured-deposit-lock"><Icon name="lock" /></span></div>
+        <div className="secured-deposit-copy"><p>YOUR SECURITY DEPOSIT</p><h3>Backing for <br />your account.</h3><span>Purchases create a separate balance to repay.</span></div>
+      </div>
+      <div className="secured-credit-purchases">
+        <div className="secured-cycle-heading"><span>Purchases &amp; repayment</span><small>One purchase, from start to finish</small></div>
+        <ol className="secured-credit-purchase-flow" role="list">
+          {purchaseSteps.map((step, index) => <li key={step.kind}>
+            <PurchaseIllustration kind={step.kind} />
+            <div className="secured-credit-step"><span className="secured-step-number">0{index + 1}</span><div><h3>{step.title}</h3><p>{step.description}</p></div></div>
+          </li>)}
+        </ol>
       </div>
     </div>
-    <div className="secured-credit-lane secured-credit-purchases">
-      <h3>Purchases &amp; repayment</h3>
-      <ol className="secured-credit-purchase-flow" role="list">
-        {purchaseSteps.map((step, index) => <li key={step.title}>
-          <div className="secured-credit-step">
-            <span className="secured-credit-step-icon"><Icon name={step.icon} /></span>
-            <div><h4>{step.title}</h4><p>{step.description}</p></div>
-          </div>
-          {index < purchaseSteps.length - 1 && <span className="secured-credit-flow-arrow"><Icon name="arrow" /></span>}
-        </li>)}
-      </ol>
-    </div>
-    <figcaption>Your security deposit does not pay your purchase bill.</figcaption>
+    <figcaption><Icon name="info" /><span>Example: a {exampleAmount} purchase is repaid separately. Your security deposit does not pay your purchase bill.</span></figcaption>
   </figure>;
 }

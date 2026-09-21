@@ -35,8 +35,7 @@
 .offer-details-body .consumer-text-link { margin-top: 12px; }
 @media (max-width: 850px) { .payment-price-card, .fee-estimate { padding: 24px; } }
 @media (max-width: 680px) {
-  .payment-offer-grid { grid-template-columns: minmax(0, 1fr); }
-  .payment-offer-grid { gap: 16px; }
+  .payment-offer-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .payment-price-card, .fee-estimate { padding: 24px 20px; }
   .payment-inclusions > div, .fee-exceptions > div { gap: 16px; }
   .payment-inclusions dt, .fee-exceptions dt { max-width: 58%; }
@@ -49,6 +48,4 @@
 .fee-checkbox input { flex: 0 0 18px; }
 
 .fee-service-option > .fee-estimate-note { color: var(--public-muted); font-size: 12px; line-height: 1.7; margin-block: 6px 18px; }
-.fee-vendor-charges { color: var(--public-muted); line-height: 1.6; }
-.fee-vendor-charges dd { max-width: 60%; }
 @media (max-width: 400px) { .fee-result .fee-net { font-size: 16px; } }

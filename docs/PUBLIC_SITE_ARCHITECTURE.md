@@ -2,7 +2,7 @@
 
 D108 public-only scope · Updated for D138 and the D139 review, 21 September 2026
 
-The user explicitly selected **public website and vendor links only**, with existing database records preserved. This supersedes every older instruction to retain or restore the internal Etail account application. D140 / PR #31 publishes the verified D139 candidate as Netlify deploy `6ab0d438588dbc2adeb59f78`. See [current status](../planning/STATUS.md).
+The user explicitly selected **public website and vendor links only**, with existing database records preserved. This supersedes every older instruction to retain or restore the internal Etail account application. D145 / PR #32 publishes the verified D141–D143 candidate as Netlify deploy `6ab1259130acf81c435375b6`. See [current status](../planning/STATUS.md).
 
 ## One small application
 
@@ -38,4 +38,4 @@ Automatic publication remains held. Manual publication follows the reviewed work
 
 ## Evidence and limits
 
-[Current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) record the verified D140 publication of the reviewed D139 candidate. Record actual commands, failures, reruns, source identities and limitations there. Older evidence remains dated history and cannot establish the current candidate's acceptance or vendor end-to-end behavior.
+[Current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) record the verified D145 publication of the reviewed D141–D143 candidate. Record actual commands, failures, reruns, source identities and limitations there. Older evidence remains dated history and cannot establish the current candidate's acceptance or vendor end-to-end behavior.
