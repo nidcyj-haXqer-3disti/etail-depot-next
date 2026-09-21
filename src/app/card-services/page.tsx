@@ -16,7 +16,7 @@ import "@/ui/card-services.css";
 export const metadata = publicPageMetadata("/card-services");
 export default function CardServicesPage() {
   return <Shell><PublicPageStructuredData path="/card-services" /><div className="consumer-page consumer-product consumer-cards">
-    <ConsumerHero product service="cards" productLabel={`Ledgix ${cardProduct.name}`} title={<>Secured credit. <br /><span>Made for your wallet.</span></>}
+    <ConsumerHero product service="cards" productLabel={`Ledgix · ${cardProduct.name}`} title={<>Secured credit. <br /><span>Made for your wallet.</span></>}
       description={<>A virtual {cardProduct.creditType} for Apple Wallet and Google Wallet. Keep your card on your phone and pay in stores, in apps and online where supported.</>}
       actions={<><CardContactLink /><a href="#card-details" className="consumer-text-link">View card details<Icon name="arrow" /></a></>}
       note={<div className="consumer-product-note">Applications are not open yet.</div>}
@@ -40,7 +40,7 @@ export default function CardServicesPage() {
       <WalletGuide><WalletCardArt /></WalletGuide>
     </div></section>
     <section className="page-container public-section public-faq-section" aria-labelledby="card-questions-title">
-      <div><p className="eyebrow">Before you get started</p><h2 id="card-questions-title">Card questions.</h2><Link href="/help#cards" className="consumer-text-link">More card help<Icon name="arrow" /></Link></div>
+      <div><h2 id="card-questions-title">Good to know.</h2><Link href="/help#cards" className="consumer-text-link">Card help<Icon name="arrow" /></Link></div>
       <div className="public-questions">
         <details><summary>Can I apply now?<span aria-hidden="true">+</span></summary><p>Applications are not open yet. Contact Ledgix with questions about the upcoming card.</p></details>
         <details><summary>When is the security deposit returned?<span aria-hidden="true">+</span></summary><p>Deposit-return conditions and timing will be set out in the card agreement before applications open. Your security deposit is separate from repayments for purchases.</p></details>

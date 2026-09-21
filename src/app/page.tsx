@@ -36,7 +36,7 @@ export default function HomePage() {
             <div className="consumer-product-eyebrow"><p className="eyebrow">Ledgix · Cards</p><ServiceStatus service="cards" /></div>
             <h2 id="ledgix-title">Secured credit.<br /><span>Made for your wallet.</span></h2>
             <p>Meet Ledgix Digital Wallet Card. A virtual Visa secured credit card for Apple Wallet and Google Wallet, with a ${productFacts.cards.minimumDepositDollars} minimum security deposit and no annual or monthly fee.</p>
-            <Link href="/card-services" className="consumer-text-link">Meet the card<Icon name="arrow" /></Link>
+            <Link href="/card-services" className="consumer-text-link">Explore cards<Icon name="arrow" /></Link>
           </div>
         </div>
       </section>

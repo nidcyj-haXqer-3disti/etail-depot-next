@@ -33,31 +33,18 @@
 .fee-exceptions { max-width: 720px; display: grid; gap: 14px; font-size: 14px; line-height: 1.6; }
 .offer-details-body > p { max-width: 80ch; font-size: 14px; line-height: 1.7; color: var(--public-muted); margin-top: 24px; }
 .offer-details-body .consumer-text-link { margin-top: 12px; }
-.payment-aftercare { padding-block: var(--consumer-space); background: var(--public-tint); scroll-margin-top: 28px; }
-.payment-money-flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; padding: 0; margin: 0; list-style: none; }
-.payment-money-flow li { min-width: 0; border-top: 1px solid #bdcbbb; padding-top: 24px; }
-.payment-flow-icon { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #bdcbbb; border-radius: 50%; background: #fff; margin-bottom: 24px; }
-.payment-flow-icon .icon { width: 20px; height: 20px; }
-.payment-money-flow h3 { margin-top: 12px; font-size: 21px; font-weight: 500; line-height: 1.35; letter-spacing: -.025em; }
-.payment-money-flow li > p:last-child { margin-top: 12px; color: var(--public-muted); font-size: 15px; line-height: 1.7; max-width: 36ch; }
-.payment-timing-note { margin-top: 32px; padding-top: 24px; border-top: 1px solid #bdcbbb; font-size: 13px; color: var(--public-muted); line-height: 1.7; max-width: 90ch; }
-@media (max-width: 850px) { .payment-price-card, .fee-estimate { padding: 24px; } .payment-money-flow { gap: 24px; } }
+@media (max-width: 850px) { .payment-price-card, .fee-estimate { padding: 24px; } }
 @media (max-width: 680px) {
-  .payment-offer-grid, .payment-money-flow { grid-template-columns: minmax(0, 1fr); }
+  .payment-offer-grid { grid-template-columns: minmax(0, 1fr); }
   .payment-offer-grid { gap: 16px; }
   .payment-price-card, .fee-estimate { padding: 24px 20px; }
-  .payment-money-flow li { position: relative; padding-left: 60px; }
-  .payment-flow-icon { position: absolute; top: 24px; left: 0; width: 40px; height: 40px; }
-  .payment-money-flow li > p:last-child { max-width: none; }
   .payment-inclusions > div, .fee-exceptions > div { gap: 16px; }
   .payment-inclusions dt, .fee-exceptions dt { max-width: 58%; }
 }
 
 .fee-service-option { border: 0; padding: 0; margin: 20px 0 0; min-width: 0; }
 .fee-service-option legend { font-size: 14px; font-weight: 500; line-height: 1.7; }
-.fee-service-option legend span { color: var(--public-muted); font-size: 12px; font-weight: 400; margin-left: 8px; }
 .fee-service-option .fee-checkbox { margin-top: 0; }
-.fee-checkbox > span { margin-left: auto; }
 .fee-result dd { text-align: right; }
 .fee-checkbox input { flex: 0 0 18px; }
 

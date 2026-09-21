@@ -355,8 +355,8 @@ test("all five payment channels show a clear checkout journey and work by keyboa
     const panel = showcase.getByRole("tabpanel", {name:channel.name, exact:true});
     await expect(panel).toBeVisible();
     await expect(panel).toHaveAttribute("aria-labelledby", (await tab.getAttribute("id"))!);
-    await expect(panel.getByText(channel.content, {exact:true})).toBeVisible();
     const medium = panel.locator(".channel-medium");
+    await expect(medium.getByText(channel.content, {exact:true})).toBeVisible();
     await expect(medium).toContainText("Homeware order");
     await expect(medium).toContainText("Homeware set");
     await expect(medium).toContainText("$64.00");
@@ -365,8 +365,8 @@ test("all five payment channels show a clear checkout journey and work by keyboa
     await expect(checkout.getByText("$64.00", {exact:true})).toBeVisible();
     await expect(panel).not.toContainText("Your business");
     await expect(panel.getByRole("heading", {level:3})).toBeVisible();
-    await expect(panel.getByText("Your customer pays", {exact:true})).toBeVisible();
-    await expect(panel.getByText("They review the amount and pay by card.", {exact:true})).toBeVisible();
+    await expect(panel.locator(".marketing-channel-destination > .marketing-journey-step")).toContainText("Your customer pays");
+    await expect(panel.getByText("Review the purchase. Pay by card.", {exact:true})).toBeVisible();
     await expectLoadedNetworkMarks(panel.getByRole("group", {name:"Card networks", exact:true}));
     await expect(panel.locator("input, textarea, select, form, button:not(.marketing-example-toggle), a, [contenteditable=true]")).toHaveCount(0);
     await expect(panel.locator(".marketing-example-toggle")).toHaveCount(1);

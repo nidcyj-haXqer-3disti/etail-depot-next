@@ -4,7 +4,7 @@ D139 maintainer refresh · 21 September 2026
 
 D108 public-only scope governs this runbook. The repository and site already exist; there is no provisioning, database migration, Identity setup, account acceptance or financial activation step. Read [source precedence](SOURCE_PRECEDENCE.md), [current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) before preparing a release.
 
-**Recorded release state:** D129 / PR #30 remains the last live release, Netlify deploy `6ab0a14c5b7bbcea34221b79`. D139 is the polished local candidate with final local verification complete. It has not been published. These are recorded facts, not a new remote-state inspection.
+**Recorded release state:** D140 / PR #31 is published, Netlify deploy `6ab0d438588dbc2adeb59f78`. Exact-source CI, clean packaging and hosted desktop/mobile/SEO checks passed; ready/current status was re-read after acceptance. See current status for the release evidence and limitations.
 
 ## Existing target and preserved boundaries
 

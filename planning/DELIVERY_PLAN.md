@@ -1,3 +1,19 @@
+# D144 — prepare the release candidate
+
+Freeze D141–D143, record exact local and remote source identity, open the review pull request and verify CI. Build a pristine source archive and Netlify package without modifying the live preview or publishing. Preserve the D143 full-suite and visual evidence when source hashes match; run the complete remote checks on the candidate. Record readiness and any remaining release step in [status](STATUS.md).
+
+# D143 — harmonize the three public product pages
+
+Review Home, Payments and Cards together across desktop, tablet and phone sizes; preserve each page’s purpose and D142’s richer artwork. Apply targeted shared typography/control/spacing fixes, clear audience-consistent wording and aligned product/support labels. Verify all public routes, keyboard flows, links, accessibility and production packaging; record actual results in [status](STATUS.md). Publication remains separate.
+
+# D142 — show the value of payments and Dispute readiness
+
+Rebuild the Payments product story with more substantial sharing artwork and a connected merchant-to-bank illustration. Explain what the optional 0.4% buys and show an exact monetary example without presenting vendor fees as included. Recheck synchronized examples, keyboard/touch controls, responsive framing, text spacing, accessibility and package boundaries. Keep D140 live pending a separate release. [Design and evidence](../docs/PAYMENTS_VALUE_EXPERIENCE.md).
+
+# D141 — focused Payments-page refinement
+
+Shorten repeated marketing copy, consolidate payout guidance into four practical FAQs and simplify pricing and artwork. Preserve interactive examples, commercial disclosures, existing anchors and public-only boundaries. Remove retired component styles, verify desktop/mobile/accessibility behavior and inspect the final responsive layout. Record actual results in [status](STATUS.md); D140 remains live until a subsequent authorized release.
+
 # D140 — publish the reviewed public website
 
 Release the accepted D139 candidate through a reviewed PR, exact-source CI and the bound Netlify site. Verify hosted pages, interactions, metadata, headers and retirement routes without executing vendor or database operations. Preserve the existing access/search configuration and record the deployment result.

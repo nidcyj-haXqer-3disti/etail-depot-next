@@ -83,8 +83,8 @@ for(const width of [1440,320]){
         const example=artwork.getByRole("article",{name:`${name} example`,exact:true});
         await expect(example).toBeVisible();
         await expect(example).toContainText(amount);
-        await expect(example.getByRole("term")).toHaveText(["Purchase","Reference","Business"]);
-        await expect(example.getByRole("definition")).toHaveText([purchase,reference,"Your business"]);
+        await expect(example.getByRole("term")).toHaveText(["Purchase","Reference"]);
+        await expect(example.getByRole("definition")).toHaveText([purchase,reference]);
         await expect(artwork.locator("figcaption")).toContainText("Illustrative banking experience");
         await expect(selection).toBeChecked();
         const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();

@@ -2,7 +2,7 @@
 
 The public website for Etail Depot US, Inc., introducing **Trolleys payments** and forthcoming **Ledgix Visa secured credit cards**. Payment account setup, sign-in and dashboards are hosted at the vendor service. This application contains product information, help, legal pages and fixed service links only.
 
-**Release status:** D129 / PR #30 is the last recorded live release. D139 is the polished local release candidate; final local verification is complete. Follow [current status](planning/STATUS.md) for actual verification and publication evidence.
+**Release status:** D140 / PR #31 is published and verified. Netlify deploy `6ab0d438588dbc2adeb59f78` contains the reviewed product journeys and final responsive polish. Follow [current status](planning/STATUS.md) for actual verification and publication evidence.
 
 ## Run locally
 
@@ -46,7 +46,7 @@ The checks cover types, lint, public-only boundaries, unit/browser/accessibility
 
 ## Release boundaries
 
-The only approved repository and site are recorded in [project-targets.json](project-targets.json). D122 authorized search indexing for Home, Payments, Cards and Help at `https://etail-depot-next.netlify.app` in the bound production environment; previews, legal pages, 404 and retired routes remain noindex. Netlify automatic publication remains held. Manual publication follows the reviewed release workflow and the user's authorization for that candidate. The D139 candidate has not been published. Local checks do not publish the website or establish Google indexing.
+The only approved repository and site are recorded in [project-targets.json](project-targets.json). D122 authorized search indexing for Home, Payments, Cards and Help at `https://etail-depot-next.netlify.app` in the bound production environment; previews, legal pages, 404 and retired routes remain noindex. Netlify automatic publication remains held. Manual publication follows the reviewed release workflow and the user's authorization for that candidate. D140 published the reviewed D139 candidate. Local checks do not publish the website or establish Google indexing.
 
 Search release requires the recorded approval, exact site/origin and production environment checks. Production-scoped `APP_ENV`, `ETAIL_SEARCH_CONTEXT` and `ETAIL_PUBLIC_ORIGIN` are configured for both Netlify builds and functions. Any supplied Netlify `CONTEXT` must also be production; functions do not receive that variable. See [release evidence and remaining checks](docs/RELEASE_READINESS_REVIEW.md), including the unverified Search Console/indexing status.
 

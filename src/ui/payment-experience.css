@@ -5,100 +5,67 @@
 .sale-type-tabs button:hover { background: var(--public-paper); color: var(--public-ink); }
 .sale-type-tabs button[aria-selected=true] { background: var(--public-ink); color: #fff; }
 .sale-type-tabs .icon { width: 18px; height: 18px; flex: 0 0 18px; }
-.sale-type-tabs button:focus-visible, .dispute-art-switch button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 3px; }
+.sale-type-tabs button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 3px; }
 .sale-type-panel { min-width: 0; }
 .sale-type-panel:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 6px; border-radius: 6px; }
-.payment-use-case { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; padding-block: 30px; }
-.payment-use-case h3 { max-width: 26ch; font-size: 26px; font-weight: 500; line-height: 1.35; letter-spacing: -.025em; }
-.payment-use-case p { max-width: 56ch; color: var(--public-muted); font-size: 15px; line-height: 1.7; }
+.payment-use-case { margin: 0; padding-block: 20px; color: var(--public-muted); font-size: 15px; line-height: 1.7; }
+/* Dispute readiness is a product story: price, connected purchase and outcomes. */
 .dispute-readiness-section { --public-focus: #e5ecd9; position: relative; padding-block: var(--consumer-space); background: #143e35; color: #fff; }
-.dispute-readiness-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 48px; margin-bottom: 48px; }
-.dispute-readiness-heading .eyebrow { color: #c5d7c6; }
+.dispute-readiness-heading { display: grid; grid-template-columns: minmax(0,1fr) 290px; align-items: center; gap: 80px; margin-bottom: 48px; }
+.consumer-payments .dispute-readiness-heading .eyebrow { color: #c5d7c6; }
 .dispute-readiness-heading h2 { margin-top: 18px; font-size: clamp(32px,3.5vw,46px); font-weight: 500; letter-spacing: -.04em; line-height: 1.16; text-wrap: balance; }
 .dispute-readiness-heading h2 > span { color: #c5d7b4; }
-.dispute-price { border-left: 1px solid #54766a; padding-left: 32px; min-width: 216px; }
-.dispute-price > span { display: block; font-size: 12px; line-height: 1.6; color: #c5d7c6; }
-.dispute-price > strong { display: block; margin: 8px 0; font-size: 44px; line-height: 1.15; letter-spacing: -.035em; font-weight: 500; }
-.dispute-price > p { font-size: 12px; line-height: 1.6; color: #d3dfd6; }
-.dispute-price > a { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; font-size: 13px; font-weight: 500; color: #fff; }
+.dispute-introduction { max-width: 53ch; margin-top: 24px; color: #d3dfd6; font-size: 16px; line-height: 1.75; }
+.dispute-price { min-width: 0; padding: 26px 28px; border: 1px solid #56786c; border-radius: 12px; background: #1d493e; }
+.dispute-price > span { display: block; font-size: 12px; line-height: 1.6; color: #d3dfd6; }
+.dispute-price > strong { display: block; margin: 9px 0; font-size: 46px; line-height: 1.15; letter-spacing: -.035em; font-weight: 500; }
+.dispute-price > p { font-size: 12px; line-height: 1.65; color: #d3dfd6; }
+.dispute-price-example { display: flex; align-items: center; gap: 14px; padding-top: 18px; margin-top: 18px; border-top: 1px solid #547569; }
+.dispute-price-example > strong { font-size: 24px; line-height: 1.4; font-weight: 500; letter-spacing: -.025em; }
+.dispute-price-example > span { font-size: 11px; line-height: 1.6; color: #d3dfd6; }
+.dispute-price .dispute-price-extra { margin-top: 16px; color: #fff; }
+.dispute-price > a { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; margin-top: 4px; font-size: 13px; font-weight: 500; color: #fff; }
 .dispute-price > a .icon { width: 16px; height: 16px; }
-.dispute-readiness-grid { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 72px; align-items: center; }
-.dispute-intro { color: #dce7df; font-size: 17px; line-height: 1.7; max-width: 48ch; }
-.dispute-benefits { display: grid; gap: 30px; list-style: none; padding: 0; margin: 34px 0 0; }
-.dispute-benefits li { display: flex; align-items: flex-start; gap: 18px; }
-.dispute-benefits li > span { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border: 1px solid #56786c; border-radius: 10px; color: #c5d7b4; }
+.dispute-benefits { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 36px; list-style: none; padding: 0; margin: 42px 0 0; }
+.dispute-benefits li { min-width: 0; }
+.dispute-benefits li > span { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid #56786c; border-radius: 10px; color: #c5d7b4; margin-bottom: 16px; }
 .dispute-benefits .icon { width: 20px; height: 20px; }
 .dispute-benefits h3 { font-size: 17px; line-height: 1.5; letter-spacing: -.015em; font-weight: 500; }
 .dispute-benefits p { margin-top: 8px; max-width: 48ch; font-size: 14px; line-height: 1.7; color: #c7d8ce; }
-.dispute-art { min-width: 0; padding: 24px; margin: 0; border: 1px solid #5b7c6e; border-radius: 16px; background: #234f43; }
-.dispute-art-switch { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; border-radius: 8px; background: #163e34; padding: 5px; margin-bottom: 22px; }
-.dispute-art-switch button { min-width: 0; min-height: 44px; padding: 10px; border: 0; border-radius: 5px; background: transparent; color: #d1e0d5; font: inherit; font-size: 13px; line-height: 1.5; cursor: pointer; }
-.dispute-art-switch button[aria-pressed=true] { background: #e5ecd9; color: #183f32; font-weight: 500; }
-.dispute-art-switch button:hover:not([aria-pressed=true]) { background: #305b4c; }
-.dispute-art-window { min-width: 0; background: #fff; color: var(--public-ink); border-radius: 9px; box-shadow: 0 16px 40px -20px #061c1880; }
-.dispute-art-windowbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; border-bottom: 1px solid var(--public-line); font-size: 12px; line-height: 1.6; }
-.dispute-art-windowbar > span:first-child { display: flex; align-items: center; gap: 8px; font-weight: 500; }
-.dispute-art-windowbar .icon { width: 15px; height: 15px; }
-.dispute-art-windowbar > span:last-child { font-size: 10px; color: var(--public-muted); }
-.dispute-art-window article { padding: 26px; min-height: 362px; }
-.dispute-merchant { display: flex; align-items: center; gap: 12px; }
-.dispute-merchant-symbol { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 10px; background: var(--public-tint); }
-.dispute-merchant-symbol .icon { width: 22px; height: 22px; }
-.dispute-merchant > span:last-child { display: grid; gap: 4px; }
-.dispute-merchant strong { font-size: 14px; font-weight: 500; line-height: 1.5; }
-.dispute-merchant small { font-size: 11px; line-height: 1.5; color: var(--public-muted); }
-.dispute-charge { display: flex; align-items: baseline; gap: 12px; margin: 26px 0 24px; }
-.dispute-charge > strong { font-size: 36px; line-height: 1.15; font-weight: 500; letter-spacing: -.04em; }
-.dispute-charge > span { font-size: 11px; color: var(--public-muted); }
-.dispute-purchase-details { display: grid; font-size: 12px; line-height: 1.7; }
-.dispute-purchase-details > div { display: grid; grid-template-columns: 76px minmax(0,1fr); gap: 20px; padding-block: 12px; border-top: 1px solid var(--public-line); }
-.dispute-purchase-details dt { color: var(--public-muted); }
-.dispute-purchase-details dd { margin: 0; text-align: right; }
-.dispute-context-note { display: flex; align-items: flex-start; gap: 10px; background: #f3f5ec; padding: 14px; border-radius: 6px; margin-top: 16px; font-size: 11px; line-height: 1.65; }
-.dispute-context-note .icon { width: 16px; height: 16px; flex: 0 0 16px; margin-top: 1px; }
-.dispute-inquiry { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin: -4px 0 20px; border: 1px solid #d6dfcc; border-radius: 6px; background: #f8f9f5; font-size: 13px; line-height: 1.7; }
-.dispute-inquiry .icon { width: 16px; height: 16px; flex: 0 0 16px; }
-.dispute-art-connection { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 22px; font-size: 11px; line-height: 1.6; color: #d7e4db; }
-.dispute-art-connection > span { display: flex; align-items: center; gap: 6px; }
-.dispute-art-connection .icon { width: 14px; height: 14px; flex: 0 0 14px; }
-.dispute-art-connection > strong { color: #fff; font-size: 12px; font-weight: 500; }
-.dispute-art figcaption { margin-top: 18px; color: #c7d8ce; font-size: 10px; line-height: 1.7; text-align: center; }
-.dispute-service-note { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; padding-top: 24px; margin-top: 40px; border-top: 1px solid #56776b; }
+.dispute-service-note { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; padding-top: 24px; margin-top: 36px; border-top: 1px solid #56776b; }
 .dispute-service-note > p { max-width: 85ch; font-size: 12px; line-height: 1.7; color: #c7d8ce; }
 .dispute-service-note > a { display: inline-flex; align-items: center; gap: 12px; flex: 0 0 auto; font-size: 12px; min-height: 44px; color: #fff; }
 .dispute-service-note > a .icon { width: 16px; height: 16px; }
 @media (max-width: 1000px) {
- .dispute-readiness-grid { gap: 36px; grid-template-columns: minmax(0,1fr) minmax(0,1.1fr); }
- .dispute-art { padding: 18px; }
- .dispute-art-window article { padding: 22px; }
- .dispute-benefits { gap: 24px; }
+ .dispute-readiness-heading { gap: 36px; grid-template-columns: minmax(0,1fr) 260px; }
+ .dispute-price { padding: 24px; }
  .dispute-service-note { flex-direction: column; gap: 8px; }
+ .dispute-benefits { gap: 24px; }
 }
 @media (max-width: 760px) {
  .sale-type-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; }
  .sale-type-tabs button { gap: 7px; padding: 10px 6px; font-size: 13px; border-radius: 8px; }
  .sale-type-tabs .icon { width: 16px; height: 16px; flex-basis: 16px; }
- .payment-use-case { grid-template-columns: minmax(0,1fr); gap: 12px; padding-block: 24px; }
- .payment-use-case h3 { font-size: 24px; }
  .dispute-readiness-heading { grid-template-columns: minmax(0,1fr); gap: 28px; margin-bottom: 28px; }
  .dispute-readiness-heading h2 { font-size: 32px; }
- .dispute-price { border-left: 0; border-top: 1px solid #56776b; padding: 20px 0 0; min-width: 0; }
- .dispute-price > strong { font-size: 36px; }
- .dispute-readiness-grid { grid-template-columns: minmax(0,1fr); gap: 32px; }
- .dispute-intro { font-size: 16px; }
- .dispute-benefits { gap: 24px; margin-top: 28px; }
- .dispute-benefits h3 { font-size: 16px; }
- .dispute-benefits p { font-size: 14px; }
- .dispute-art-window article { min-height: 0; }
+ .dispute-heading-break { display: none; }
+ .dispute-introduction { font-size: 15px; margin-top: 20px; }
+ .dispute-price { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); column-gap: 24px; padding: 22px; }
+ .dispute-price > span { grid-column: 1 / -1; }
+ .dispute-price > strong { grid-column: 1; font-size: 38px; }
+ .dispute-price > p:not(.dispute-price-extra) { grid-column: 1; }
+ .dispute-price-example { grid-column: 2; grid-row: 2 / 4; display: grid; align-content: center; gap: 5px; margin: 9px 0 0; padding: 0 0 0 20px; border-top: 0; border-left: 1px solid #547569; }
+ .dispute-price .dispute-price-extra, .dispute-price > a { grid-column: 1 / -1; }
+ .dispute-benefits { grid-template-columns: minmax(0,1fr); gap: 24px; margin-top: 30px; }
+ .dispute-benefits li { display: flex; align-items: flex-start; gap: 16px; }
+ .dispute-benefits li > span { flex: 0 0 40px; margin: 0; }
  .dispute-service-note { margin-top: 28px; }
 }
 @media (max-width: 400px) {
  .sale-type-tabs button { flex-direction: column; gap: 6px; }
- .dispute-art { padding: 14px; }
- .dispute-art-windowbar { padding: 14px; }
- .dispute-art-window article { padding: 18px; }
- .dispute-purchase-details > div { grid-template-columns: 60px minmax(0,1fr); gap: 12px; }
- .dispute-charge { flex-wrap: wrap; gap: 8px; }
- .dispute-art-connection { gap: 8px; font-size: 10px; }
- .dispute-art-connection > strong { font-size: 11px; }
+ .dispute-price { column-gap: 14px; padding: 20px; }
+ .dispute-price-example { padding-left: 14px; }
 }
+
+.consumer-page.consumer-payments .public-faq-section { padding-top: 0; }
+.consumer-payments #payouts { scroll-margin-top: 28px; }

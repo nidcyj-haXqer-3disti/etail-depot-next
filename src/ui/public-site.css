@@ -39,7 +39,7 @@
   list-style: none;
 }
 .public-questions summary::-webkit-details-marker { display: none; }
-.public-questions summary > span { font-size: 23px; line-height: 1; font-weight: 400; color: #476d5d; transition: transform .15s; }
+.public-questions summary > span { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; margin-inline-end: 6px; font-size: 23px; line-height: 1; font-weight: 400; color: #476d5d; transition: transform .15s; }
 .public-questions details[open] summary > span { transform: rotate(45deg); }
 .public-questions details > p { color: var(--muted); line-height: 1.85; font-size: 14px; margin: 0 0 24px; max-width: 62ch; }
 .public-questions details > p a {
