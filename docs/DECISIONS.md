@@ -1,12 +1,22 @@
 # Decision register
 
+## D124 — keep each wallet logo tied to its own image
+
+Publication authorization: the user explicitly requests deployment after local review. Proceed through reviewed source, exact-commit checks and the existing Netlify target; record success only after hosted verification.
+
+21 September 2026. Fix the user-reported Apple Pay flash when Google Wallet is selected by rendering two stable, eagerly loaded images and hiding the inactive wallet's mark. Do not reuse a decoded image element for the other brand or introduce loading timers. Preserve layout, official assets, accessible controls and all provider boundaries. [Verification](WALLET_SETUP_GUIDE.md) includes delayed loading, late completion and repeated switches on both routes. Locally verified; no deployment or backend change.
+
+## D123 — diagnose the error metric before changing application behavior
+
+21 September 2026. The reported Netlify percentage is an HTTP request metric. The observed window contains 100 client disconnections (90 automated-browser requests), four expected 410 responses from release checks and no 5xx responses. Sampled canceled background requests overlap D122 visual verification; all-request attribution and the separate iOS client cause remain unverified. Preserve truthful retirement/404 responses and normal application behavior rather than changing them to lower the displayed percentage. [Evidence and interpretation](DEPLOYMENT_ERROR_RATE_REVIEW.md). Documentation-only closeout; the existing D122 deployment remains unchanged.
+
 ## D122 — authorize indexing and deployment of the reviewed public website
 
 21 September 2026. The user explicitly approves search indexing and deployment to the existing bound Netlify site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`, canonical origin `https://etail-depot-next.netlify.app`. Publish search metadata for the four reviewed information pages: Home, Payments, Cards and Help. Keep Privacy, Terms, 404, retired routes and non-production environments noindex. This supersedes the earlier publication/indexing hold for the approved release, without enabling unattended publication, changing DNS or launching vendor services.
 
 Use unique, factual page titles/descriptions, fixed canonical URLs, consistent social metadata and Organization/WebSite/WebPage structured data with the confirmed company legal name; add breadcrumbs to the three non-home indexed pages. The production guard requires the recorded approval/site/origin, `NODE_ENV=production`, `APP_ENV=production` and `ETAIL_SEARCH_CONTEXT=production`; if Netlify `CONTEXT` is supplied it must also equal `production`. Netlify functions do not receive `CONTEXT`, so the custom production setting is required in both build and function scopes. API updates successfully configured production-only `APP_ENV`, `ETAIL_SEARCH_CONTEXT` and `ETAIL_PUBLIC_ORIGIN` for those scopes. No secrets or private account data are needed.
 
-Full current-source verification, the reviewed GitHub PR/merge, source-tree matching, deployment and hosted search checks are pending. Local checks and environment updates alone do not establish a published release. Google Search Console submission, actual indexing and rankings are unverified. Preserve public-only runtime, coming-soon Ledgix, fixed provider/contact links and all existing records. [Release evidence and limits](RELEASE_READINESS_REVIEW.md).
+Local and GitHub verification passed. PR #29 merged; reviewed/tested/merged/uploaded source trees match. Netlify deploy `6aaffadab7fae6eb884df1af` is ready/current; hosted search checks and 14 desktop/mobile visual scenarios passed. Google Search Console submission, actual indexing and rankings are unverified. Preserve public-only runtime, coming-soon Ledgix, fixed provider/contact links and all existing records. [Release evidence and limits](RELEASE_READINESS_REVIEW.md).
 
 ## D121 — preserve the approved design and prepare a verified public release
 

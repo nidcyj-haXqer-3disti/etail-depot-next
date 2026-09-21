@@ -42,7 +42,6 @@ export function WalletCardArt({ compact = false }: { compact?: boolean }) {
   const [step, setStep] = useState(0);
   const id = useId();
   const guide = guides[wallet][step]!;
-  const payMark = payMarks[wallet];
   function selectWallet(next: Wallet) { setWallet(next); setStep(0); }
   function handleKeys(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     const next = event.key === "Home" ? 0 : event.key === "End" ? wallets.length - 1 : event.key === "ArrowRight" ? (index + 1) % wallets.length : event.key === "ArrowLeft" ? (index + wallets.length - 1) % wallets.length : null;
@@ -68,7 +67,13 @@ export function WalletCardArt({ compact = false }: { compact?: boolean }) {
             <div className="wallet-setup-screen-heading"><span>{guide.screen}</span>{step === 0 ? <b>+</b> : <Icon name={step === 1 ? "lock" : "card"} />}</div>
             <div className="wallet-setup-card-wrap"><LedgixCardFace /></div>
             <div className="wallet-setup-screen-info">
-              <div className="wallet-setup-pay-mark"><Image unoptimized src={payMark.src} width={payMark.width} height={payMark.height} className={payMark.className} alt="" /></div>
+              <div className="wallet-setup-pay-mark">
+                {/* Keep each decoded logo on its own image when the wallet changes. */}
+                {wallets.map(name => {
+                  const mark = payMarks[name];
+                  return <Image key={name} unoptimized loading="eager" hidden={wallet !== name} src={mark.src} width={mark.width} height={mark.height} className={mark.className} alt="" />;
+                })}
+              </div>
               <strong>{guide.option}</strong>
             </div>
             <div className="wallet-setup-screen-action">{guide.action}{step === 0 && <Icon name="arrow" />}</div>
