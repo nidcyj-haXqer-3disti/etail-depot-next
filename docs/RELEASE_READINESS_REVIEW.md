@@ -1,6 +1,56 @@
-## D144 — release preparation
+## D150 — three-page production polish complete locally
 
-D141–D143 are being frozen as the next review candidate. Verified GitHub/Netlify identities match the target file, the local base equals remote main by tree, and D143 tested source hashes remain unchanged. Complete the feature pull request, exact-source CI and pristine packaging before declaring preparation complete. D140 remains live; merge and publication are separate pending actions. See [status](../planning/STATUS.md) and `artifacts/d144-checks/`.
+Home, Payments and Cards now use tighter, consistent marketing copy. The review removed retired-login explanations and duplicate checkout prompts, shared one plain-language fee basis with Help/Terms, and made phone channel browsing more apparent. Approved artwork, brand framing, product terms and public-only boundaries remain intact.
+
+**All release gates pass:** 86 unit tests, 44 browser flows, 24 accessibility cases, security/dependency review, production SEO and Next/Netlify packaging. **78 alignment/text-spacing and 91 channel-selection scenarios** pass. Initial outdated copy assertions were corrected and the full suite rerun successfully. Independent copy and visual review found no remaining material issue. [Status](../planning/STATUS.md) records diagnostics, exact evidence and browser limitations.
+
+**Verified local candidate; not published. D145 / PR #32 remains live.** No database or provider change and no new financial promise. Publication requires the next release step for this candidate.
+
+## D149 — card artwork ready for local review
+
+The Cards offer now uses three aligned fact cards, followed by separate deposit artwork and one illustrated purchase-to-repayment example. Financial terms and material disclosures are unchanged. The existing Ledgix face and page palette are reused.
+
+**Full verification passes:** 86 unit, 44 browser and 24 accessibility tests, security/dependency review, production SEO and Next/Netlify packaging. Final lint/build and **26 responsive/text-spacing checks** include the last heading-whitespace correction. Initial small-screen illustration clipping was corrected; final rendered text, images and artwork fit. [Status](../planning/STATUS.md) records exact evidence and sequencing.
+
+**Local candidate only; D145 / PR #32 remains live.** No database or provider change. Independent design review and Chromium desktop/mobile verification do not establish legal, financial or cross-browser certification.
+
+## D148 — payment gallery ready for local review
+
+Goods / Services / Information are illustrated category cards. A large share-to-checkout preview pairs with five channel thumbnails in a desktop side rail and mobile horizontal rail. Artwork stays visible on phones, keyboard controls and selected-thumbnail visibility are retained, and the prior banking and fee-copy changes remain intact.
+
+**Full `pnpm verify` passes:** 86 unit, 44 browser and 24 accessibility cases, security/dependency review, production SEO and Next/Netlify builds. **241 responsive/state/text-spacing checks** pass, including active-channel desktop-to-phone resizing and tablist orientation. Final and independent visual reviews found no blocking issue. [Status](../planning/STATUS.md) records evidence and remaining qualitative limits.
+
+**Local candidate only; D145 / PR #32 remains live.** No provider/database/account or commercial-policy change. Public illustration verification uses Chromium with mobile emulation.
+
+## D147 — customer-facing pricing copy verified locally
+
+Vendor-charge rows and sourcing labels are removed across public pricing, Help and website notices. Calculator output is **Estimated remaining**, with displayed fees and applicable-charge exclusions preserved. Privacy retains meaningful information-handling disclosures in plain language. Existing rates, Order Insight scope and D146 artwork are unchanged.
+
+**Full `pnpm verify` passes:** 86 unit, 44 browser and 24 accessibility cases, security/dependency review, production SEO and Next/Netlify packaging. All **22 responsive page/state checks** pass; desktop/phone fee artwork and independent copy review found no material issue. [Status](../planning/STATUS.md) records the initial nonvisible-SEO-text diagnostic and evidence.
+
+**Local only; D145 / PR #32 remains live.** No account/database/vendor action or deployment. Copy removal does not establish all-inclusive commercial terms or legal certification.
+
+## D146 — realistic banking artwork ready for local review
+
+The customer view is now a phone transaction with expandable purchase details; the bank view is a separate inquiry workspace with a customer question, merchant response and review progression. Shared Goods / Services / Information records preserve coherent amounts, references and fulfillment context. Neutral visual treatment and an illustration caption avoid implying a specific bank interface or dispute outcome. Existing offer and public-only boundaries are preserved.
+
+**Final `pnpm verify` passes:** 86 unit tests, 44 desktop/mobile flows, 24 accessibility cases, security/dependency review, production SEO and Next/Netlify packaging. **162 responsive/text-spacing scenarios** pass across nine widths, with no checked content overflow or browser errors. Independent source/visual review and final desktop connector inspection found no material issue. [Status](../planning/STATUS.md) records initial geometry diagnostics and exact evidence.
+
+**Local candidate; not deployed. D145 / PR #32 remains live.** No database, provider, commercial or policy change. Coverage is Chromium desktop/mobile emulation of the public website, not certification of vendor banking interfaces or financial flows.
+
+## D145 — PR #32 published and verified
+
+Netlify deploy `6ab1259130acf81c435375b6` is ready/current after publication and hosted acceptance. PR #32 merged as `a7bebcdae4f686e187613ec2ac78c8dc76bde8bb`; exact source tree `d59501d52bbb428740abbe6cdab113f5cb07ced8` matches passing CI and the immutable 415-file upload. All **12 desktop/mobile scenarios, 82 interaction/state checks and 27 SEO/route requests pass**, with no browser/request errors. Repeated wallet switching has zero mismatches across 222 observations; 74 screenshots support the visual review.
+
+An initial upload of the validation folder returned HTTP 500; no deployment was created. A fresh source-only extraction removed generated build output while preserving all source hashes, and the retry succeeded. [Status](../planning/STATUS.md) and `artifacts/d145-checks/release.json` record exact identities, diagnostics and acceptance evidence. No database, vendor, access, DNS or environment change. Chromium desktop/mobile emulation only. These post-publication records are separate from the immutable deployed source.
+
+## D144 — deployment package ready
+
+[PR #32](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/32) is ready for review. Every check in GitHub run `35599596219` passes; the local commit, remote head and CI test merge have the same tree `d59501d52bbb428740abbe6cdab113f5cb07ced8`. The isolated 415-file source package built successfully without source drift. Existing D143 visual/full-suite evidence remains valid because every recorded application/test hash matches. Independent release audit found no blockers.
+
+The exact bound repository/site/team were verified. No database, vendor or environment action is required. [Status](../planning/STATUS.md) records source identities, logs and initial preparation diagnostics; `artifacts/d144-checks/release-preparation.json` is the receipt. This closeout is local evidence outside the frozen PR source.
+
+**Ready for reviewed publication; not merged or deployed.** D140 / PR #31 remains live. User requested preparation, so production publication remains pending. Coverage is the public website in Chromium desktop/mobile emulation, not vendor financial flows or legal certification.
 
 ## D143 — cross-page consistency candidate verified
 

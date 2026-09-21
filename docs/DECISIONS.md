@@ -1,5 +1,35 @@
 # Decision register
 
+## D151 — prepare the D146–D150 release candidate
+
+21 September 2026. The user asks to get ready to deploy. Prepare a feature PR and independently verified source archive/package for the accepted banking illustrations, payment gallery, card artwork and three-page polish. Match the passing local source hashes, remote tree and CI-tested candidate. Keep clean upload source separate from build validation output. This request covers release preparation; merge and public deployment remain pending the next release instruction. Preserve D145 / PR #32 live, existing customer records, environment/access/DNS settings and external financial services.
+
+## D150 — focused consistency polish across Home, Payments and Cards
+
+21 September 2026. Keep the accepted three-page design. Replace vague or repeated payment copy with “One payment link. More ways to get paid.”, “Scan to pay.” and one checkout instruction. Remove explanations of the retired Etail website login from Home, Payments and Help. Reuse a single plain-language fee basis across the value panel, estimator, fee disclosure, Help and Terms: the amount of eligible, successful payments enrolled in the service. Preserve all prices, separate processing, other-charge exclusions, optional enrollment and coverage limits. Shorten the card repayment step without changing full monthly repayment or optional daily/early payment.
+
+Increase the phone channel thumbnail width responsively so the following option is visibly partial, signaling horizontal browsing. Keep selected-tab reveal, keyboard semantics, page structure and artwork intact. Independent copy and visual reviews found no other material inconsistency; complete browser, accessibility, SEO, security and package evidence belongs in [status](../planning/STATUS.md). No database, backend, provider or deployment operation is included.
+
+## D149 — one visual story for card terms and repayment
+
+21 September 2026. Use three framed offer cards for deposit, fees and repayment, followed by a separate deposit panel and an ordered wallet purchase → statement → repayment illustration. Reuse the existing Ledgix card face and show a single explicitly labeled $64 example. Content-driven artwork heights and earlier mobile stacking accommodate text spacing without cropping. Preserve the $200 minimum deposit, $0 annual/monthly fees, monthly full repayment, optional early/daily payments and pending final terms. Avoid deposit-custody or deposit-to-limit promises; no fake operational controls or backend changes. [Design](CARD_DETAILS_EXPERIENCE.md); results in [status](../planning/STATUS.md). No deployment included.
+
+## D148 — browse payment examples as a media gallery
+
+21 September 2026. Use distinct Goods / Services / Information category thumbnails and one large payment preview, with Text / Email / Social / QR code / Website thumbnail choices alongside it on desktop and above it in a horizontal mobile rail. The illustration remains the two-step share → card checkout journey; no fake video/play action, engagement count or social affiliation is introduced. Thumbnail artwork is native HTML/CSS, with accessible tab names and decorative images hidden from assistive technology. Both arrow axes and Home/End navigate channels; a resize observer preserves the selected thumbnail in view and keeps orientation semantics aligned. Remove the old mobile expansion control so artwork is immediately available. Preserve shared purchase selection, D146 banking views, D147 fee presentation and the public-only runtime. [Design](PAYMENT_MEDIA_GALLERY.md); verification in [status](../planning/STATUS.md).
+
+## D147 — customer pricing without vendor operations language
+
+21 September 2026. The user explicitly removes “Vendor charges — Additional · quote required” and related vendor language. Remove the extra row, sourcing labels, unused boolean/offer property and styles. Show processing, the optional Trolleys service fee and **Estimated remaining**. Public content retains separate processing, applicable-charge exclusions and service terms reviewed before enrollment; no all-inclusive fee or upstream-cost waiver is invented. Privacy explains information handling by functional service categories without unnecessary vendor names; operator responsibilities, customer rights, product boundaries and Order Insight attribution remain. D146 artwork and all prior local work are preserved. Verification is recorded in [status](../planning/STATUS.md); publication remains separate.
+
+## D146 — realistic transaction recognition and inquiry tools
+
+21 September 2026. The two banking examples should behave and read as different interfaces: a phone transaction with a purchase disclosure, and a support workspace that connects the customer question to a merchant response. Reuse one purchase record, adding illustrative dates, masked card, statement name, fulfillment context and support. Services/Information detail is a design application of merchant-provided context; no specific issuer screen, API field guarantee or dispute result is claimed. [Design and primary sources](BANKING_RECOGNITION_EXPERIENCE.md). Keep the existing offer and public-only/provider boundaries. Local implementation and verification only; D145 remains live.
+
+## D145 — publish PR #32
+
+21 September 2026. The user authorizes deployment of the prepared candidate. Merge PR #32 only at its reviewed head, preserve identical local/remote/CI/uploaded source, and publish to the bound Netlify site. Use a fresh source-only extraction for upload: the Netlify helper excludes node_modules and .netlify but does not exclude generated .next output. Keep build validation in a separate directory. Preserve the public-only runtime, archived data, production search/access settings and vendor services. Record actual publication and hosted acceptance in [status](../planning/STATUS.md).
+
 ## D144 — prepare the reviewed website for deployment
 
 21 September 2026. Freeze the D141–D143 public-site changes on the existing feature branch, prepare a reviewable pull request, verify remote CI against the candidate, and produce a clean source/build package. The repository and Netlify site were re-read and match project-targets.json; remote main has the same source tree as the local base. D143 application-source hashes still match the passing verification receipt. Preparation does not merge or publish. D140 / PR #31 remains the live release; no provider, database, access, DNS or environment mutation. Record final artifacts and CI outcomes in [status](../planning/STATUS.md).

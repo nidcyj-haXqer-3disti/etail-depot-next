@@ -1,11 +1,36 @@
 .payment-sharing, .dispute-readiness-section { scroll-margin-top: 28px; }
 .payment-anchor { position: absolute; top: 0; scroll-margin-top: 28px; }
-.sale-type-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--public-line); padding-bottom: 16px; }
-.sale-type-tabs button { display: flex; align-items: center; justify-content: center; gap: 10px; min-width: 0; min-height: 48px; padding: 12px 22px; border: 1px solid transparent; border-radius: 24px; background: transparent; color: var(--public-muted); font: inherit; font-size: 15px; font-weight: 500; line-height: 1.4; cursor: pointer; }
-.sale-type-tabs button:hover { background: var(--public-paper); color: var(--public-ink); }
-.sale-type-tabs button[aria-selected=true] { background: var(--public-ink); color: #fff; }
-.sale-type-tabs .icon { width: 18px; height: 18px; flex: 0 0 18px; }
+/* Visual categories keep the sale separate from the way its link is shared. */
+.sale-type-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.sale-type-tabs button { position: relative; display: flex; align-items: center; gap: 16px; min-width: 0; min-height: 100px; padding: 10px; text-align: left; border: 1px solid #dbe2d7; border-radius: 13px; background: #fff; color: var(--public-ink); font: inherit; cursor: pointer; }
+.sale-type-tabs button:hover { border-color: #9daf9f; background: #f9faf6; }
+.sale-type-tabs button[aria-selected=true] { border-color: #345b46; box-shadow: inset 0 0 0 1px #345b46; background: #f3f6ed; }
 .sale-type-tabs button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 3px; }
+.sale-choice-caption { display: grid; min-width: 0; gap: 5px; padding-right: 20px; }
+.sale-choice-caption strong { font-size: 16px; line-height: 1.5; font-weight: 550; }
+.sale-choice-caption small { font-size: 11px; line-height: 1.5; color: #627362; }
+.sale-choice-check { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 17px; height: 17px; border: 1px solid #d0dace; border-radius: 50%; background: #fff; }
+.sale-choice-check .icon { width: 11px; height: 11px; visibility: hidden; }
+.sale-type-tabs button[aria-selected=true] .sale-choice-check { background: #345b46; border-color: #345b46; color: white; }
+.sale-type-tabs button[aria-selected=true] .sale-choice-check .icon { visibility: visible; }
+.sale-thumbnail { position: relative; flex: 0 0 92px; display: grid; place-items: center; width: 92px; height: 78px; border-radius: 7px; overflow: hidden; background: #e6e2d4; }
+.sale-thumbnail[data-sale=services] { background: #dce6e2; }
+.sale-thumbnail[data-sale=information] { background: #e0e0e9; }
+.sale-parcel { position: absolute; width: 40px; height: 35px; left: 17px; top: 32px; border-radius: 2px; background: #b99262; box-shadow: 7px 7px 12px #71663b25, inset -6px 0 #a48055; transform: rotate(-7deg); }
+.sale-parcel i { display: block; height: 100%; width: 7px; margin-left: 15px; background: #e4cf9b; }
+.sale-bag { position: absolute; width: 28px; height: 40px; top: 23px; right: 13px; background: #f8f5e7; border-radius: 2px; box-shadow: 4px 7px 12px #71663b20; transform: rotate(8deg); }
+.sale-bag i { position: absolute; top: -8px; left: 8px; width: 12px; height: 14px; border: 2px solid #b9a887; border-bottom: 0; border-radius: 8px 8px 0 0; }
+.sale-calendar { position: relative; width: 47px; height: 52px; border-radius: 5px; background: #fff; box-shadow: 5px 7px 12px #3b71552b; transform: rotate(-8deg); }
+.sale-calendar > i { display: block; height: 13px; border-radius: 5px 5px 0 0; background: #416a59; }
+.sale-calendar > span { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; padding: 9px; }
+.sale-calendar b { height: 6px; border-radius: 2px; background: #d9e4db; }
+.sale-calendar .icon { position: absolute; right: -9px; bottom: -3px; width: 24px; height: 24px; padding: 5px; color: #fff; background: #597c62; border-radius: 50%; }
+.sale-report { position: relative; width: 43px; height: 55px; padding: 9px; background: #fafaf5; border-radius: 3px; box-shadow: 5px 7px 12px #58587125, -5px -3px 0 #b9bccf; transform: rotate(8deg); }
+.sale-report > i { display: block; width: 100%; height: 3px; background: #6c7794; margin-bottom: 4px; }
+.sale-report > i:nth-child(2) { width: 60%; background: #c9cddd; }
+.sale-report > span { display: flex; align-items: flex-end; gap: 3px; height: 20px; margin-top: 5px; border-bottom: 1px solid #aeb8c9; }
+.sale-report b { flex: 1; height: 40%; background: #a0aac3; }
+.sale-report b:nth-child(2) { height: 70%; }.sale-report b:nth-child(3) { height: 55%; }.sale-report b:nth-child(4) { height: 90%; background: #59698f; }
 .sale-type-panel { min-width: 0; }
 .sale-type-panel:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 6px; border-radius: 6px; }
 .payment-use-case { margin: 0; padding-block: 20px; color: var(--public-muted); font-size: 15px; line-height: 1.7; }
@@ -43,9 +68,13 @@
  .dispute-benefits { gap: 24px; }
 }
 @media (max-width: 760px) {
- .sale-type-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; }
- .sale-type-tabs button { gap: 7px; padding: 10px 6px; font-size: 13px; border-radius: 8px; }
- .sale-type-tabs .icon { width: 16px; height: 16px; flex-basis: 16px; }
+ .sale-type-tabs { gap: 8px; }
+ .sale-type-tabs button { display: grid; align-content: start; gap: 10px; padding: 6px 6px 10px; border-radius: 10px; }
+ .sale-thumbnail { width: 100%; height: 78px; }
+ .sale-choice-caption { padding: 0 3px; }
+ .sale-choice-caption strong { font-size: 13px; }
+ .sale-choice-caption small { display: none; }
+ .sale-choice-check { top: 12px; right: 12px; }
  .dispute-readiness-heading { grid-template-columns: minmax(0,1fr); gap: 28px; margin-bottom: 28px; }
  .dispute-readiness-heading h2 { font-size: 32px; }
  .dispute-heading-break { display: none; }
@@ -62,7 +91,14 @@
  .dispute-service-note { margin-top: 28px; }
 }
 @media (max-width: 400px) {
- .sale-type-tabs button { flex-direction: column; gap: 6px; }
+ .sale-type-tabs { gap: 6px; }
+ .sale-type-tabs button { padding: 5px 5px 9px; gap: 8px; }
+ .sale-thumbnail { height: 66px; }
+ .sale-choice-caption { padding: 0; }
+ .sale-choice-caption strong { font-size: 11px; }
+ .sale-choice-check { top: 9px; right: 9px; width: 15px; height: 15px; }
+ .sale-parcel { left: 7px; top: 27px; width: 34px; height: 29px; }
+ .sale-bag { right: 9px; top: 20px; width: 24px; height: 34px; }
  .dispute-price { column-gap: 14px; padding: 20px; }
  .dispute-price-example { padding-left: 14px; }
 }

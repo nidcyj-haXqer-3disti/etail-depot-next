@@ -5,7 +5,7 @@ test("optional dispute readiness keeps price and Order Insight coverage limits v
   const network=page.locator("#dispute-readiness");
   await expect(network.locator(".dispute-price")).toContainText("Optional service");
   await expect(network.locator(".dispute-price")).toContainText("+0.4%");
-  await expect(network.locator(".dispute-price")).toContainText("Plus vendor fees and processing");
+  await expect(network.locator(".dispute-price")).toContainText("Payment processing is separate");
   const limits=network.locator(".dispute-service-note");
   await expect(limits).toBeVisible();
   await expect(limits).toContainText("eligible enrolled payments");
@@ -20,19 +20,19 @@ test("optional dispute readiness keeps price and Order Insight coverage limits v
   await expect(page.getByRole("checkbox",{name:"Dispute readiness",exact:true})).not.toBeChecked();
 });
 
-test("fees separate the 0.4 percent markup from unknown vendor charges and recover invalid input", async ({page}) => {
+test("fees show only processing and the optional Trolleys service and recover invalid input", async ({page}) => {
   const mutations:string[]=[];
   page.on("request",request=>{if(!["GET","HEAD","OPTIONS"].includes(request.method()))mutations.push(request.url());});
   await page.goto("/payment-services");
   const estimate=page.locator(".fee-estimate");
   await expect(estimate).toContainText("$96.80");
-  await expect(estimate).not.toContainText("Additional · quote required");
+  await expect(estimate.locator("dl dt")).toHaveText(["Processing fee", "Estimated remaining"]);
   await estimate.locator("#addon-sale-records").check();
   await expect(estimate).toContainText("$96.40");
   await expect(estimate).toContainText("−$0.40");
-  await expect(estimate).toContainText("Additional · quote required");
-  await expect(estimate.locator(".fee-net")).toContainText("Before vendor charges");
-  await expect(estimate).toContainText("Quoted vendor charges are not deducted from the amount shown");
+  await expect(estimate.locator("dl dt")).toHaveText(["Processing fee", "Trolleys service fee", "Estimated remaining"]);
+  await expect(page.locator("main")).not.toContainText(/vendor|quote required/i);
+  await expect(estimate).toContainText("other applicable charges");
   await expect(estimate).toContainText("Selecting this example does not enroll you or charge a fee");
   const amount=estimate.getByLabel("Payment amount USD");
   await amount.fill("1.001");
@@ -48,7 +48,7 @@ test("fees separate the 0.4 percent markup from unknown vendor charges and recov
   await expect(page.locator("main")).not.toContainText(/Enhanced receipt|Invoice add-on|Agreement add-on|1.5% in document fees/);
   await estimate.locator("#addon-sale-records").uncheck();
   await expect(estimate).toContainText("$970.70");
-  await expect(estimate).not.toContainText("Additional · quote required");
+  await expect(estimate.locator("dl dt")).toHaveText(["Processing fee", "Estimated remaining"]);
   const payouts=page.locator("#payouts");
   await payouts.locator("summary").click();
   await expect(payouts.locator("p")).toBeVisible();

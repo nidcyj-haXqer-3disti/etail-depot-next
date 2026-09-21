@@ -329,15 +329,13 @@ test("all five payment channels show a clear checkout journey and work by keyboa
   await page.goto("/payment-services?handoff_probe=public-channel-check");
   const showcase = page.locator(".channel-showcase");
   const tablist = showcase.getByRole("tablist", {name:"Ways to share a payment request", exact:true});
-  const expandExample = showcase.getByRole("button", {name:"Show example", exact:true});
-  if (await expandExample.isVisible()) await expandExample.click();
   await expect(page.getByRole("tablist", {name:"What you sell", exact:true}).getByRole("tab", {name:"Goods", exact:true})).toHaveAttribute("aria-selected", "true");
   await expect(showcase.getByRole("combobox")).toHaveCount(0);
   const channels = [
     {name:"Text", content:"How can I pay for the homeware set?"},
     {name:"Email", content:"PAYMENT REQUEST"},
     {name:"Social", content:"PAY BY CARD"},
-    {name:"QR code", content:"Scan to pay by card"},
+    {name:"QR code", content:"Credit and debit cards accepted"},
     {name:"Website", content:"Homeware order"},
   ];
   await expect(tablist.getByRole("tab")).toHaveCount(channels.length);
@@ -366,10 +364,9 @@ test("all five payment channels show a clear checkout journey and work by keyboa
     await expect(panel).not.toContainText("Your business");
     await expect(panel.getByRole("heading", {level:3})).toBeVisible();
     await expect(panel.locator(".marketing-channel-destination > .marketing-journey-step")).toContainText("Your customer pays");
-    await expect(panel.getByText("Review the purchase. Pay by card.", {exact:true})).toBeVisible();
+    await expect(panel.getByText("Check the details, then pay by card.", {exact:true})).toBeVisible();
     await expectLoadedNetworkMarks(panel.getByRole("group", {name:"Card networks", exact:true}));
-    await expect(panel.locator("input, textarea, select, form, button:not(.marketing-example-toggle), a, [contenteditable=true]")).toHaveCount(0);
-    await expect(panel.locator(".marketing-example-toggle")).toHaveCount(1);
+    await expect(panel.locator("input, textarea, select, form, button, a, [contenteditable=true]")).toHaveCount(0);
     await expect(panel.locator(".marketing-channel-journey").getByRole("button")).toHaveCount(0);
     expect(await showcase.textContent()).not.toMatch(/sample|sandbox|demo|fixture|no messages|no money|no .*collected/i);
     for (const other of channels.filter((_, otherIndex) => otherIndex !== index)) {
@@ -394,11 +391,6 @@ test("all five payment channels show a clear checkout journey and work by keyboa
   await page.keyboard.press("Tab");
   await expect(showcase.getByRole("tabpanel", {name:"Text", exact:true})).toBeFocused();
   await page.keyboard.press("Tab");
-  const collapseExample = showcase.getByRole("button", {name:"Hide example", exact:true});
-  if (await collapseExample.isVisible()) {
-    await expect(collapseExample).toBeFocused();
-    await page.keyboard.press("Tab");
-  }
   await expect(showcase.locator(":focus")).toHaveCount(0);
   await expect(showcase.getByRole("link")).toHaveCount(0);
   const openTools = page.locator(".consumer-hero-actions").getByRole("link", {name:"Get started with Trolleys", exact:true});
@@ -422,10 +414,11 @@ test("payment channels keep their content and touch targets inside a 320px scree
   const mutations = await preventMutationRequests(page);
   await page.goto("/payment-services");
   const showcase = page.locator(".channel-showcase");
-  await showcase.getByRole("button", {name:"Show example", exact:true}).click();
+  await expect(showcase.locator(".marketing-channel-journey")).toBeVisible();
   const tabs = showcase.getByRole("tab");
   for (const name of ["Text", "Email", "Social", "QR code", "Website"]) {
-    await tabs.filter({hasText:new RegExp(`^${name}$`)}).click();
+    const selected = showcase.getByRole("tab", {name,exact:true});
+    await selected.click();
     const panel = showcase.getByRole("tabpanel", {name,exact:true});
     await expect(panel).toBeVisible();
     await expect(panel.locator(".channel-medium")).toBeVisible();
@@ -440,9 +433,13 @@ test("payment channels keep their content and touch targets inside a 320px scree
       const bounds = (await tab.boundingBox())!;
       expect(bounds.height).toBeGreaterThanOrEqual(44);
       expect(bounds.width).toBeGreaterThanOrEqual(44);
-      expect(bounds.x).toBeGreaterThanOrEqual(0);
-      expect(bounds.x+bounds.width).toBeLessThanOrEqual(320);
     }
+    const railBounds = (await showcase.locator(".channel-tabs").boundingBox())!;
+    const selectedBounds = (await selected.boundingBox())!;
+    expect(selectedBounds.x).toBeGreaterThanOrEqual(railBounds.x - 1);
+    expect(selectedBounds.x + selectedBounds.width).toBeLessThanOrEqual(railBounds.x + railBounds.width + 1);
+    expect(selectedBounds.x).toBeGreaterThanOrEqual(0);
+    expect(selectedBounds.x + selectedBounds.width).toBeLessThanOrEqual(320);
   }
   expect(mutations).toEqual([]);
 });

@@ -77,7 +77,7 @@ test("public service discovery shows availability and support without local acco
       const signInQuestion=page.locator("summary").filter({hasText:"Will cards and payments use the same sign-in?"});
       await signInQuestion.click();
       await expect(signInQuestion.locator("..")).toHaveAttribute("open","");
-      await expect(signInQuestion.locator("..")).toContainText("Trolleys and Ledgix use separate service accounts. Card account access will open when Ledgix launches.");
+      await expect(signInQuestion.locator("..")).toContainText("No. Payments are managed through Trolleys. Card account access will be available through Ledgix when the service launches.");
     }else if(path==="/card-services"){
       await expect(page.getByRole("banner").getByRole("link",{name:"Open Trolleys",exact:true})).toHaveAttribute("href","https://trolleys.ai");
       await expect(page.locator("main")).toContainText("Coming soon");

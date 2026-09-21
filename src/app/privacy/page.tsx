@@ -11,7 +11,7 @@ const sections: LegalSection[] = [
       <p>Etail Depot US, Inc. (“Etail Depot”, “we” or “us”) operates Ledgix for cards and Trolleys for payments. Ledgix and Trolleys are trade names of the same company, not separate legal entities.</p>
       <LegalBrands />
       <p>This policy explains how we handle information when you browse this website or contact us. This website provides product information and links; it does not offer account registration, card management or payment processing.</p>
-      <p>Trolleys payments and the forthcoming Ledgix card service use separate hosted platforms. For product account records, cookies and information handling by Etail Depot and the relevant providers, review the privacy notices presented within that product when it is available. This website policy does not replace those notices or change our responsibilities for information we handle.</p>
+      <p>Trolleys payments and the forthcoming Ledgix card service have separate product websites. For account records, cookies and information handling by Etail Depot and its service partners, review the privacy notices presented within that product when it is available. This website policy does not replace those notices or change our responsibilities for information we handle.</p>
       <p>Following a product link does not combine accounts or sign you in. Review the notices at your destination before providing personal or financial information.</p>
     </>,
   },
@@ -20,10 +20,10 @@ const sections: LegalSection[] = [
       <p>The information we receive depends on how you use this website or contact us:</p>
       <ul>
         <li><strong>Contact information.</strong> Your email address, the service you ask about, messages and other information you choose to send us.</li>
-        <li><strong>Technical information.</strong> Our hosting provider may process IP addresses, browser details, request times and other connection information to deliver and protect the website.</li>
+        <li><strong>Technical information.</strong> Companies that help us deliver and protect this website may process IP addresses, browser details, request times and other connection information.</li>
         <li><strong>Earlier website records.</strong> If you previously used account features hosted on this website, related identity, access, activity and support records may remain in restricted storage. Those features are no longer available here.</li>
       </ul>
-      <p>Opening a service link does not send records from earlier website accounts to the hosted product platform. Information you provide on a product’s website is handled under the notices presented there.</p>
+      <p>Opening a service link does not send records from earlier website accounts to the product you visit. Information you provide on a product’s website is handled under the notices presented there.</p>
       <p>Do not include passwords, complete card or bank account numbers, government identification or other sensitive information in a contact message.</p>
     </>,
   },
@@ -40,18 +40,18 @@ const sections: LegalSection[] = [
   },
   {
     id: "sharing", title: "Who can see your information", content: <>
-      <p><strong>Website providers.</strong> We use Netlify to host and deliver this website. This website does not provide customer accounts or sign-in. The product notices describe the providers and information-sharing arrangements for separately hosted Ledgix and Trolleys services.</p>
+      <p><strong>Website services.</strong> Companies that help us host, deliver and protect this website may handle the technical information described above. This website does not provide customer accounts or sign-in. Ledgix and Trolleys product notices describe the service partners involved and how information is shared within each product.</p>
       <p><strong>Support.</strong> Authorized staff can review records within their assigned support responsibilities. Include only the information needed to explain your inquiry.</p>
-      <p><strong>Information you share.</strong> Email links open your email application. The message and information you send are handled by your email provider and the recipient. Product links open the relevant service website; they do not include your earlier account details or website query parameters.</p>
+      <p><strong>Information you share.</strong> Email links open your email application. The message and information you send are handled by your email service and the recipient. Product links open the relevant service website; they do not include your earlier account details or website query parameters.</p>
       <p><strong>Dispute readiness.</strong> Trolleys’ optional service uses its live Order Insight integration to share supported merchant, transaction and order details with participating banks for purchase recognition and eligible fraud-dispute prevention. Review the Trolleys product notices and service terms for the information involved, access, sharing and applicable permissions. This public website does not collect sale records or send example information to Order Insight or banks.</p>
       <p><strong>Legal and security matters.</strong> Information may need to be disclosed to comply with applicable law or valid legal process, or to investigate fraud, unauthorized access or threats to the service. Requests about these disclosures should be directed to our compliance contact.</p>
     </>,
   },
   {
     id: "cookies", title: "Cookies and website activity", content: <>
-      <p>This website does not set sign-in or payment cookies. Its payment and Dispute readiness examples, fee calculator and wallet setup guide do not collect card details or store customer information. Example selections and calculator amounts stay in your browser and are not sent to us or saved by this website. The examples use fixed illustrative information; they do not track fulfillment or purchase access, record customer acceptance, send documents or enroll you in a service. Our hosting provider may process technical information for website delivery, security and traffic measurement.</p>
+      <p>This website does not set sign-in or payment cookies. Its payment and Dispute readiness examples, fee calculator and wallet setup guide do not collect card details or store customer information. Example selections and calculator amounts stay in your browser and are not sent to us or saved by this website. The examples use fixed illustrative information; they do not track fulfillment or purchase access, record customer acceptance, send documents or enroll you in a service. The companies supporting this website may process technical information for delivery, security and traffic measurement.</p>
       <p>Cookies from earlier website account features may remain in your browser until they expire or you clear them. The current website does not use or renew those account cookies. Clearing cookies does not delete retained records.</p>
-      <p>Separately hosted Ledgix and Trolleys websites have their own cookie practices and controls.</p>
+      <p>The Ledgix and Trolleys product websites have their own cookie practices and controls.</p>
     </>,
   },
   {
@@ -64,7 +64,7 @@ const sections: LegalSection[] = [
   {
     id: "security-retention", title: "Security and record retention", content: <>
       <p>We use hosting security controls and restrict access to retained information. Keep product passwords and confirmation or recovery links private. No website can guarantee complete security.</p>
-      <p>Retiring website features does not automatically delete their historical records. Retained information is separate from this public website and remains subject to access controls and applicable retention obligations. Product-specific notices describe retention for separately hosted records.</p>
+      <p>Retiring website features does not automatically delete their historical records. Retained information is separate from this public website and remains subject to access controls and applicable retention obligations. Product-specific notices describe how account records are retained.</p>
       <p>For information about a record’s retention or to request its deletion, contact our compliance team. Relevant considerations include the record type, account relationships, security needs, unresolved requests and applicable legal obligations. No single retention period applies to every record.</p>
     </>,
   },

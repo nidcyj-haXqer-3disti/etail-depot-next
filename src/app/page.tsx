@@ -18,7 +18,7 @@ export default function HomePage() {
     <PublicPageStructuredData path="/" />
     <div className="consumer-page consumer-home">
       <ConsumerHero service="payments" title={<>Get paid.<br /><span>Keep going.</span></>}
-        description="Take card payments for bookings, services and sales. Send a link by text or email, or let customers scan a QR code."
+        description="Accept card payments for bookings, services and sales. Send a link by text or email, or let customers scan a QR code."
         actions={<Link href="/payment-services" className="button primary">Explore payments<Icon name="arrow" /></Link>}
         visual={<PaymentArtwork />}
         footer={<ConsumerNetworks />}

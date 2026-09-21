@@ -14,7 +14,6 @@ export function estimateDomesticCardFee(amount: string, saleRecords = false) {
     processingCents,
     serviceCents,
     subtotalCents: amountCents - processingCents - serviceCents,
-    vendorFeeUnknown: saleRecords,
   };
 }
 

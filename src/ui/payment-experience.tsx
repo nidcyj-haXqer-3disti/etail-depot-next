@@ -12,7 +12,15 @@ import { Icon } from "./icon";
 import "./payment-experience.css";
 
 const saleTypes = Object.keys(paymentExamples) as PaymentExamplePurpose[];
-const typeIcons = { goods: "box", services: "person", information: "insight" } as const;
+const typeDescriptions = { goods: "Products & orders", services: "Projects & appointments", information: "Research & insights" } as const;
+
+function SaleThumbnail({type}: {type: PaymentExamplePurpose}) {
+  return <span className="sale-thumbnail" data-sale={type} aria-hidden="true">
+    {type === "goods" ? <><span className="sale-parcel"><i /></span><span className="sale-bag"><i /></span></>
+      : type === "services" ? <span className="sale-calendar"><i /><span><b /><b /><b /><b /><b /><b /></span><Icon name="person" /></span>
+      : <span className="sale-report"><i /><i /><span><b /><b /><b /><b /></span><em /></span>}
+  </span>;
+}
 const serviceExample = estimateDomesticCardFee("100", true)!;
 
 export function PaymentExperience() {
@@ -24,9 +32,9 @@ export function PaymentExperience() {
 
   return <div className="payment-experience">
     <section className="page-container consumer-product-section payment-sharing" id="payment-channels" aria-labelledby="payment-channels-title">
-      <div className="consumer-section-heading"><div><p className="eyebrow">Built around your business</p><h2 id="payment-channels-title">Meet your customer.<br /><span>Make the payment easy.</span></h2></div><p>Share one payment link by text, email, social, QR code or your website.</p></div>
+      <div className="consumer-section-heading"><div><p className="eyebrow">Built around your business</p><h2 id="payment-channels-title">One payment link.<br /><span>More ways to get paid.</span></h2></div><p>Share one payment link by text, email, social, QR code or your website.</p></div>
       <div className="sale-type-tabs" role="tablist" aria-label="What you sell">
-        {saleTypes.map((type, index) => <button key={type} type="button" role="tab" id={`${id}-${type}`} aria-selected={purpose === type} aria-controls={`${id}-sale`} tabIndex={purpose === type ? 0 : -1} ref={element => {tabs.current[index] = element;}} onClick={() => setPurpose(type)} onKeyDown={event => {
+        {saleTypes.map((type, index) => <button key={type} type="button" role="tab" id={`${id}-${type}`} aria-label={paymentExamples[type].name} aria-selected={purpose === type} aria-controls={`${id}-sale`} tabIndex={purpose === type ? 0 : -1} ref={element => {tabs.current[index] = element;}} onClick={() => setPurpose(type)} onKeyDown={event => {
           let next = index;
           if (event.key === "ArrowRight") next = (index + 1) % saleTypes.length;
           else if (event.key === "ArrowLeft") next = (index + saleTypes.length - 1) % saleTypes.length;
@@ -34,7 +42,7 @@ export function PaymentExperience() {
           else if (event.key === "End") next = saleTypes.length - 1;
           else return;
           event.preventDefault(); setPurpose(saleTypes[next]!); tabs.current[next]?.focus();
-        }}><Icon name={typeIcons[type]} /><span>{paymentExamples[type].name}</span></button>)}
+        }}><SaleThumbnail type={type} /><span className="sale-choice-caption"><strong>{paymentExamples[type].name}</strong><small>{typeDescriptions[type]}</small></span><span className="sale-choice-check" aria-hidden="true"><Icon name="check" /></span></button>)}
       </div>
       <div className="sale-type-panel" role="tabpanel" id={`${id}-sale`} aria-labelledby={`${id}-${purpose}`} tabIndex={0}>
         <p className="payment-use-case">{example.benefit}</p>
@@ -47,11 +55,11 @@ export function PaymentExperience() {
       <div className="page-container">
         <div className="dispute-readiness-heading">
           <div><p className="eyebrow">Trolleys · Dispute readiness</p><h2 id="dispute-readiness-title">Make your sale clear.<br /><span>Before doubt becomes<br className="dispute-heading-break" /> a dispute.</span></h2><p className="dispute-introduction">A charge shows an amount. Order Insight helps show the purchase behind it—connecting your sale details to participating banks when a customer has questions.</p></div>
-          <div className="dispute-price"><span>Optional service</span><strong>+{saleRecordsOffer.rateLabel}</strong><p>Trolleys fee on eligible enrolled<br />successful-payment volume.</p><div className="dispute-price-example"><strong>{formatUsdCents(serviceExample.serviceCents)}</strong><span>Trolleys fee on a {formatUsdCents(serviceExample.amountCents)} payment</span></div><p className="dispute-price-extra">Plus vendor fees and processing</p><a href="#fees">Estimate your fees<Icon name="arrow" /></a></div>
+          <div className="dispute-price"><span>Optional service</span><strong>+{saleRecordsOffer.rateLabel}</strong><p>{saleRecordsOffer.feeBasis}.</p><div className="dispute-price-example"><strong>{formatUsdCents(serviceExample.serviceCents)}</strong><span>Trolleys fee on a {formatUsdCents(serviceExample.amountCents)} payment</span></div><p className="dispute-price-extra">Payment processing is separate</p><a href="#fees">Estimate your fees<Icon name="arrow" /></a></div>
         </div>
         <DisputeReadinessArt purpose={purpose} />
         <ul className="dispute-benefits">
-          <li><span><Icon name="business" /></span><div><h3>Help customers remember.</h3><p>Connect a statement charge to your business and what was purchased, in supported banking experiences.</p></div></li>
+          <li><span><Icon name="business" /></span><div><h3>Help customers remember.</h3><p>Help customers recognize your business and their purchase when reviewing a charge at a participating bank.</p></div></li>
           <li><span><Icon name="bank" /></span><div><h3>Give the bank more context.</h3><p>Make merchant, transaction and purchase details available through Order Insight to help answer payment inquiries.</p></div></li>
           <li><span><Icon name="shield" /></span><div><h3>Get ahead of eligible fraud disputes.</h3><p>Qualifying Visa online fraud disputes may be deflected before a chargeback with the required transaction history and evidence.</p></div></li>
         </ul>

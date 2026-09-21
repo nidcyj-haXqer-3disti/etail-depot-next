@@ -25,14 +25,14 @@ export default function CardServicesPage() {
     <section className="page-container card-details-section" id="card-details" aria-labelledby="card-details-title">
       <div className="consumer-section-heading"><div><h2 id="card-details-title">The details, up front.</h2></div></div>
       <dl className="card-details-grid">
-        <div><dt>Security deposit</dt><dd><strong>{"$" + productFacts.cards.minimumDepositDollars}</strong><span className="card-detail-note">Minimum deposit</span></dd></div>
-        <div><dt>Account fees</dt><dd className="card-detail-fees"><span><strong>{"$" + productFacts.cards.annualFeeDollars}</strong><span className="card-detail-note">Annual fee</span></span><span><strong>{"$" + productFacts.cards.monthlyFeeDollars}</strong><span className="card-detail-note">Monthly fee</span></span></dd></div>
-        <div className="card-detail-repayment"><dt>Repayment</dt><dd><strong>{productFacts.cards.repayment}</strong><span className="card-detail-note">Earlier or daily payments are optional.</span></dd></div>
+        <div className="card-detail-deposit"><dt><span className="card-detail-symbol"><Icon name="lock" /></span>Security deposit</dt><dd><strong>{"$" + productFacts.cards.minimumDepositDollars}</strong><span className="card-detail-note">Minimum deposit</span><p>Backs your card account.</p></dd></div>
+        <div><dt><span className="card-detail-symbol"><Icon name="card" /></span>Account fees</dt><dd className="card-detail-fees"><span><strong>{"$" + productFacts.cards.annualFeeDollars}</strong><span className="card-detail-note">Annual fee</span></span><span><strong>{"$" + productFacts.cards.monthlyFeeDollars}</strong><span className="card-detail-note">Monthly fee</span></span></dd></div>
+        <div className="card-detail-repayment"><dt><span className="card-detail-symbol"><Icon name="document" /></span>Repayment</dt><dd><strong>{productFacts.cards.repayment}</strong><span className="card-detail-note">Earlier or daily payments are optional.</span></dd></div>
       </dl>
       <p className="card-details-disclosure">Final eligibility, credit limits, other charges and deposit-return terms will be provided before applications open.</p>
     </section>
-    <section className="page-container wallet-credit-section" aria-labelledby="wallet-credit-title">
-      <div className="consumer-section-heading"><div><p className="eyebrow">Deposit and repayment</p><h2 id="wallet-credit-title">How secured credit works.</h2></div></div>
+    <section className="page-container wallet-credit-section" id="secured-credit" aria-labelledby="wallet-credit-title">
+      <div className="consumer-section-heading"><div><h2 id="wallet-credit-title">How secured credit works.</h2></div><p>Your deposit backs the account. Your payments cover what you spend.</p></div>
       <SecuredCreditArt />
     </section>
     <section className="wallet-guide-section" id="wallets" aria-labelledby="wallet-guide-title"><div className="page-container wallet-guide-grid">

@@ -8,22 +8,19 @@ describe("public fee estimate", () => {
       processingCents: 320,
       serviceCents: 0,
       subtotalCents: 9680,
-      vendorFeeUnknown: false,
     });
     expect(estimateDomesticCardFee("100", false)).toEqual(estimateDomesticCardFee("100"));
   });
 
-  it("adds only the quoted Trolleys service fee and preserves unknown vendor charges", () => {
+  it("estimates displayed processing and optional service fees", () => {
     const estimate = estimateDomesticCardFee("100", true);
     expect(estimate).toEqual({
       amountCents: 10000,
       processingCents: 320,
       serviceCents: 40,
       subtotalCents: 9640,
-      vendorFeeUnknown: true,
     });
     expect(estimate).not.toHaveProperty("netCents");
-    expect(estimate).not.toHaveProperty("vendorFeeCents");
   });
 
   it.each([
@@ -33,16 +30,15 @@ describe("public fee estimate", () => {
     {amount: " 9.99 ", amountCents: 999, processingCents: 59, serviceCents: 4, subtotalCents: 936},
     {amount: "100000", amountCents: 10000000, processingCents: 290030, serviceCents: 40000, subtotalCents: 9669970},
   ])("rounds the service and processing fees separately for $amount", ({amount, ...fees}) => {
-    expect(estimateDomesticCardFee(amount, true)).toEqual({...fees, vendorFeeUnknown: true});
+    expect(estimateDomesticCardFee(amount, true)).toEqual(fees);
   });
 
-  it("keeps vendor charges unknown even when the rounded Trolleys fee is zero", () => {
+  it("rounds a sub-cent optional service fee to zero", () => {
     expect(estimateDomesticCardFee("1", true)).toEqual({
       amountCents: 100,
       processingCents: 33,
       serviceCents: 0,
       subtotalCents: 67,
-      vendorFeeUnknown: true,
     });
   });
 
