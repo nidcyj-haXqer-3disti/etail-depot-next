@@ -13,9 +13,9 @@ export function PaymentHighlights() {
     </article>
     <article>
       <div className="payment-highlight-art payment-highlight-invoice" aria-hidden="true">
-        <div className="payment-story-invoice"><div><Icon name="document" /><span>Invoice</span></div><p>Design project</p><div className="payment-story-total"><span>Amount due</span><strong>$480.00</strong></div><span className="payment-story-pay">Pay by card<Icon name="arrow" /></span></div>
+        <div className="payment-story-invoice"><div><Icon name="document" /><span>Payment request</span></div><p>Design project</p><div className="payment-story-total"><span>Amount due</span><strong>$480.00</strong></div><span className="payment-story-pay">Pay by card<Icon name="arrow" /></span></div>
       </div>
-      <h3>Invoices for your work</h3><p>Give customers a way to pay by card from your invoice.</p>
+      <h3>Payments for your work</h3><p>Send a payment request for the work you deliver.</p>
     </article>
     <article>
       <div className="payment-highlight-art payment-highlight-counter" aria-hidden="true">

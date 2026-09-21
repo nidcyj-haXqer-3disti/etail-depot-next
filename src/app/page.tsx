@@ -7,6 +7,7 @@ import { PublicQuestions } from "@/ui/public-site";
 import { PaymentArtwork, ServiceStatus } from "@/ui/service-entry";
 import { WalletCardArt } from "@/ui/wallet-card-art";
 import { PaymentHighlights } from "@/ui/payment-highlights";
+import { productFacts } from "@/shared/product-facts";
 import "@/ui/public-site.css";
 import { ConsumerHero, ConsumerNetworks } from "@/ui/consumer-layout";
 
@@ -17,7 +18,7 @@ export default function HomePage() {
     <PublicPageStructuredData path="/" />
     <div className="consumer-page consumer-home">
       <ConsumerHero service="payments" title={<>Get paid.<br /><span>Keep going.</span></>}
-        description="Accept card payments for bookings, invoices and sales. Share a payment link by text, email or QR code."
+        description="Take card payments for bookings, services and sales. Send a link by text or email, or let customers scan a QR code."
         actions={<Link href="/payment-services" className="button primary">Explore payments<Icon name="arrow" /></Link>}
         visual={<PaymentArtwork />}
         footer={<ConsumerNetworks />}
@@ -34,14 +35,14 @@ export default function HomePage() {
           <div className="consumer-card-copy">
             <div className="consumer-product-eyebrow"><p className="eyebrow">Ledgix · Cards</p><ServiceStatus service="cards" /></div>
             <h2 id="ledgix-title">Secured credit.<br /><span>Made for your wallet.</span></h2>
-            <p>Meet Ledgix Digital Wallet Card. A virtual Visa secured credit card for everyday purchases, with Apple Wallet and Google Wallet support.</p>
+            <p>Meet Ledgix Digital Wallet Card. A virtual Visa secured credit card for Apple Wallet and Google Wallet, with a ${productFacts.cards.minimumDepositDollars} minimum security deposit and no annual or monthly fee.</p>
             <Link href="/card-services" className="consumer-text-link">Meet the card<Icon name="arrow" /></Link>
           </div>
         </div>
       </section>
 
       <section className="public-section page-container public-faq-section" aria-labelledby="questions-title">
-        <div><h2 id="questions-title">A little more clarity.</h2><Link href="/help" className="consumer-text-link">Visit the help center<Icon name="arrow" /></Link></div><PublicQuestions />
+        <div><h2 id="questions-title">Find your next step.</h2><Link href="/help" className="consumer-text-link">Visit the help center<Icon name="arrow" /></Link></div><PublicQuestions />
       </section>
     </div>
   </Shell>;

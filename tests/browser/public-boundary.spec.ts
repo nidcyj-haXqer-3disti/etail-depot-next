@@ -10,7 +10,14 @@ test("public pages and every internal link resolve without account APIs or cooki
     const response = await page.goto(path);
     expect(response!.status()).toBe(200);
     expect(response!.headers()["set-cookie"]).toBeUndefined();
-    await expect(page.locator("form,input,iframe")).toHaveCount(0);
+    await expect(page.locator("form,iframe")).toHaveCount(0);
+    if (path === "/payment-services") {
+      // Local estimate controls never submit, enroll in Dispute readiness or create an account.
+      await expect(page.locator("input")).toHaveCount(2);
+      await expect(page.locator('.fee-estimate input#payment-amount[type="text"]')).toHaveCount(1);
+      await expect(page.locator('.fee-estimate input#addon-sale-records[type="checkbox"]')).toHaveCount(1);
+      await expect(page.locator("select, textarea, [contenteditable=true]")).toHaveCount(0);
+    } else await expect(page.locator("input")).toHaveCount(0);
     const links = await page.locator("a[href]").evaluateAll(nodes => nodes.map(node => new URL(node.getAttribute("href")!, location.href)).filter(url => url.origin === location.origin).map(url => url.pathname + url.search + url.hash));
     for (const link of links) destinations.add(link);
     for (const image of await page.getByRole("img").all()) {

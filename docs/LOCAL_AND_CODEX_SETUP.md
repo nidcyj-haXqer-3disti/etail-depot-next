@@ -1,3 +1,61 @@
+# Local and CI setup for the public website
+
+D139 maintainer refresh · 21 September 2026
+
+The application already exists. D108 limits it to public pages and fixed vendor links. Read [AGENTS.md](../AGENTS.md), [project targets](../project-targets.json), [source precedence](SOURCE_PRECEDENCE.md) and [current status](../planning/STATUS.md) first. Do not scaffold a replacement repository, reconnect PostgreSQL or Identity, or restore the retired account application.
+
+D129 / PR #30 is the last recorded live release. D139 is the reviewed local candidate. Its verification evidence is recorded in current status; publication remains separate.
+
+## Pinned workspace
+
+Use Node **24.19.0**, pnpm **11.19.0** and the existing `pnpm-lock.yaml`. Next.js, React, the Netlify adapter and tooling are pinned in `package.json`; install the frozen lockfile without replacing dependencies or adding another package manager.
+
+Work in the existing `etail-depot-next` repository on a feature branch. The only bound GitHub repository is `nidcyj-haXqer-3disti/etail-depot-next` (ID `1361184741`), and the only bound Netlify site is `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`. Preserve every excluded resource in `project-targets.json`.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm preview
+```
+
+The production preview listens at `http://127.0.0.1:3100`. For development, use `pnpm dev --port 3100` instead. No database service, account fixture, authentication tenant, migration, seed or payment credential is required. `.env.example` documents optional local settings; do not copy production search markers or old account secrets into local configuration.
+
+## Verification
+
+Stop the task's own preview before verification and keep ports **3100 and 3101** free. Install the pinned Playwright Chromium browser when absent:
+
+```sh
+pnpm exec playwright install chromium
+pnpm verify
+```
+
+The GitHub workflow uses `pnpm exec playwright install --with-deps chromium` on its Linux runner. The complete verification sequence is:
+
+```sh
+pnpm verify:public
+pnpm test:seo:production
+pnpm package:netlify
+pnpm verify:package
+```
+
+Public checks cover lint, types, unit behavior, architecture, a production build, browser journeys, accessibility and source/dependency security. The SEO check builds and serves a temporary local production-configured instance on port 3101. Packaging uses the pinned Netlify adapter offline for the exact site; artifact inspection excludes private and archived inputs. None of these commands publishes, creates accounts, enrolls a service or changes stored records.
+
+The workflow in `.github/workflows/foundation.yml` checks the exact repository, commit, Node and pnpm versions, installs the frozen lockfile and runs the same gates with read-only repository permissions. Do not restore historical database/API/authentication test scripts to satisfy old task inventories. Record actual failures, reruns and remaining gaps in `planning/STATUS.md` and the decision log.
+
+## Preserved resources and publication
+
+`archive/database` holds immutable schema/migration history, not a data backup. Existing databases and Identity records remain outside this runtime. Do not open them, run archived tools, apply migrations or change provider settings as part of setup or verification.
+
+Production search permits only Home, Payments, Cards and Help for the exact approved site and environment. Local/preview, legal, 404 and retired pages remain noindex. Keep the guard intact. Manual publication follows the [reviewed deployment runbook](NETLIFY_DEPLOYMENT.md) and authorization already recorded for that candidate; a passing local check is not publication authorization.
+
+## Historical setup archive
+
+The text below predates D108. It is retained as historical source material only: its scaffold, database, Identity and command instructions are retired and must not be executed for this public website.
+
+<details>
+<summary>Retired setup brief — historical text</summary>
+
+````markdown
 # Codex/local environment setup
 
 ## No runtime assumptions from the old project
@@ -49,3 +107,6 @@ Start with M0–M1 and the canonical Cards slice, then follow dependencies. A ta
 [C1] https://learn.chatgpt.com/docs/environments/cloud-environment
 [C3] https://learn.chatgpt.com/docs/codex/cli
 [N1] https://docs.netlify.com/build/data-and-storage/netlify-database/getting-started/
+````
+
+</details>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { legalPageMetadata } from "@/modules/public-site/legal-metadata";
 import { cardProduct } from "@/shared/card-product";
+import { saleRecordsOffer } from "@/shared/product-facts";
 import { LegalDocument, type LegalSection } from "@/ui/legal-document";
 import { LegalBrands, LegalContacts } from "@/ui/legal-identity";
 
@@ -43,15 +44,20 @@ const sections: LegalSection[] = [
       <p>Eligible cards can be added to Apple Wallet or Google Wallet. Availability depends on card, device and regional compatibility and the applicable service’s terms.</p>
       <p>The wallet setup guide explains typical steps. It does not collect card details, add a card to a wallet or confirm eligibility. Follow the instructions in your wallet app and from your card issuer.</p>
       <p>A security deposit backs the credit account. Purchases create a balance that must be repaid separately from the security deposit.</p>
-      <p>The card product’s agreement will govern eligibility, security deposits, credit limits, repayment, cardholder access and available controls. Product information on this website does not establish a credit account or promise specific terms.</p>
+      <p>The <Link href="/card-services#card-details">card details</Link> describe the published deposit, fee and repayment offer. The card agreement and disclosures provided before enrollment will govern eligibility, credit limits, all charges, repayment, deposit return, cardholder access and available controls. Review them before opening an account. This website does not establish a credit account.</p>
       <p>Contacting Ledgix with an inquiry does not submit a card application, reserve approval or enroll you in a mailing list.</p>
     </>,
   },
   {
     id: "payments", title: "Trolleys · Payments", content: <>
       <p>Continue to the Trolleys hosted service for enrollment, sign-in and payment account management.</p>
-      <p>The applicable service agreement governs accepted payment methods, payment channels, account permissions, fees, refunds, disputes, settlement and payouts. This website does not set those terms or perform those account actions.</p>
-      <p>Payment examples on this website illustrate ways to request payment. Example amounts, items, messages and payment statuses are illustrative and do not create a payment request or record a transaction.</p>
+      <p>The <Link href="/payment-services#fees">fees and payouts</Link> section describes the published standard pricing and its scope. Review the merchant agreement and disclosures before enrollment for the terms that apply to your account, including accepted payment methods, account permissions, all fees, refunds, disputes, settlement and payouts. This website does not perform those account actions.</p>
+      <p>Payment examples on this website illustrate ways to request payment for goods, services and information. Information can include research, insights or advice delivered as a report, briefing or consultation. Example amounts, items, messages and payment statuses are illustrative and do not create a payment request or record a transaction.</p>
+      <p>Trolleys’ optional {saleRecordsOffer.name} service uses its live Order Insight integration to share supported merchant, transaction and order details with participating banks. It helps customers recognize purchases and can prevent eligible Visa fraud disputes when the required transaction history and data qualify. Basic transaction receipts remain included without this service.</p>
+      <p>The Trolleys service fee is {saleRecordsOffer.rateLabel} of eligible enrolled successful-payment volume, plus quoted Order Insight vendor charges. Payment processing is separate. Review the service agreement for merchant enrollment, transaction coverage, billing, refund treatment and information sharing. Selecting or previewing {saleRecordsOffer.name} on this website does not enroll you, accept a contract or create a charge.</p>
+      <p>The website examples use fixed illustrative information. They do not collect actual sale records, generate or deliver documents, collect a signature, establish customer consent, share records with banks or submit dispute evidence. Payment and fulfillment are separate events that require accurate records; payment alone does not establish delivery, quality or a promised result.</p>
+      <p>{saleRecordsOffer.name} does not cover every bank, payment or dispute reason and does not guarantee an outcome. Refund programs and managed responses to existing chargebacks are separate services. Merchants remain responsible for accurate records, appropriate terms, fulfillment and timely responses. Website examples are not legal advice.</p>
+      <p>The fee calculator shows the displayed processing fee, the Trolleys {saleRecordsOffer.name} fee if selected, and the estimated amount remaining before quoted vendor charges and other applicable fees. It does not confirm a settlement amount or predict when funds will reach your bank. Check your service agreement and account records for an actual payment’s charges and status.</p>
       <p>Use the service’s recorded statuses and instructions to confirm an action’s outcome. A link to Trolleys does not enroll you in Ledgix, connect account balances or transfer funds between the two products.</p>
     </>,
   },

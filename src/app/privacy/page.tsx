@@ -43,12 +43,13 @@ const sections: LegalSection[] = [
       <p><strong>Website providers.</strong> We use Netlify to host and deliver this website. This website does not provide customer accounts or sign-in. The product notices describe the providers and information-sharing arrangements for separately hosted Ledgix and Trolleys services.</p>
       <p><strong>Support.</strong> Authorized staff can review records within their assigned support responsibilities. Include only the information needed to explain your inquiry.</p>
       <p><strong>Information you share.</strong> Email links open your email application. The message and information you send are handled by your email provider and the recipient. Product links open the relevant service website; they do not include your earlier account details or website query parameters.</p>
+      <p><strong>Dispute readiness.</strong> Trolleys’ optional service uses its live Order Insight integration to share supported merchant, transaction and order details with participating banks for purchase recognition and eligible fraud-dispute prevention. Review the Trolleys product notices and service terms for the information involved, access, sharing and applicable permissions. This public website does not collect sale records or send example information to Order Insight or banks.</p>
       <p><strong>Legal and security matters.</strong> Information may need to be disclosed to comply with applicable law or valid legal process, or to investigate fraud, unauthorized access or threats to the service. Requests about these disclosures should be directed to our compliance contact.</p>
     </>,
   },
   {
     id: "cookies", title: "Cookies and website activity", content: <>
-      <p>This website does not set sign-in or payment cookies. Its payment examples and wallet setup guide do not collect card details or store customer information. Our hosting provider may process technical information for website delivery, security and traffic measurement.</p>
+      <p>This website does not set sign-in or payment cookies. Its payment and Dispute readiness examples, fee calculator and wallet setup guide do not collect card details or store customer information. Example selections and calculator amounts stay in your browser and are not sent to us or saved by this website. The examples use fixed illustrative information; they do not track fulfillment or purchase access, record customer acceptance, send documents or enroll you in a service. Our hosting provider may process technical information for website delivery, security and traffic measurement.</p>
       <p>Cookies from earlier website account features may remain in your browser until they expire or you clear them. The current website does not use or renew those account cookies. Clearing cookies does not delete retained records.</p>
       <p>Separately hosted Ledgix and Trolleys websites have their own cookie practices and controls.</p>
     </>,
@@ -68,8 +69,8 @@ const sections: LegalSection[] = [
     </>,
   },
   {
-    id: "family-access", title: "Family use and children’s information", content: <>
-      <p>References to family use do not establish eligibility for a child’s account. Do not submit a child’s personal information unless the relevant service expressly provides an eligible, authorized guardian process.</p>
+    id: "family-access", title: "Children’s information", content: <>
+      <p>Do not submit a child’s personal information unless the relevant service expressly provides an eligible, authorized guardian process.</p>
       <p>If you believe a child’s information has been submitted without appropriate authorization, contact our compliance team and identify the service involved. Do not include sensitive documents in your initial email.</p>
     </>,
   },

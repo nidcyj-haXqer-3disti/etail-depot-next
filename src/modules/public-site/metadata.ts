@@ -4,9 +4,9 @@ import { legalIdentity } from "@/shared/legal-identity";
 import targets from "../../../project-targets.json" with { type: "json" };
 
 export const PUBLIC_PAGES = {
-  "/": { title: `Trolleys payments & Ledgix ${cardProduct.name}`, description: `Accept payments with links, QR codes and invoices from Trolleys. Explore the upcoming Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType}.` },
+  "/": { title: `Trolleys payments & Ledgix ${cardProduct.name}`, description: `Accept payments with links and QR codes from Trolleys. Explore the upcoming Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType}.` },
   "/card-services": { title: `Ledgix ${cardProduct.name} — Coming soon`, description: `Meet Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType} for Apple Wallet and Google Wallet. Coming soon. Contact Ledgix to learn more.` },
-  "/payment-services": { title: "Trolleys payment links, QR codes & invoices", description: "Get paid by card through payment links, QR codes and invoices. Share by text, email, social media or your website. Visit Trolleys to apply." },
+  "/payment-services": { title: "Trolleys payments & dispute readiness", description: "Request payment with links and QR codes. Add Dispute readiness to help customers recognize purchases and prevent eligible fraud disputes through Order Insight." },
   "/help": { title: "Help with payments and cards", description: `Contact Trolleys for payment support or Ledgix for ${cardProduct.name} inquiries. Find product access guidance and company compliance contacts.` },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;

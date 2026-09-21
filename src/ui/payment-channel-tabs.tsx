@@ -7,8 +7,6 @@ import { Icon } from "./icon";
 const channels = [
   { id: "SMS", name: "Text", icon: "message" },
   { id: "EMAIL", name: "Email", icon: "mail" },
-  { id: "INVOICE", name: "Invoice", icon: "document" },
-  { id: "BILL", name: "Bill", icon: "document" },
   { id: "SOCIAL", name: "Social", icon: "person" },
   { id: "QR", name: "QR code", icon: "qr" },
   { id: "WEB", name: "Website", icon: "link" },

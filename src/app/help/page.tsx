@@ -1,8 +1,10 @@
+import Link from "next/link";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
 import { cardProduct } from "@/shared/card-product";
 import { hostedServices } from "@/shared/hosted-services";
 import { legalIdentity } from "@/shared/legal-identity";
+import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
 import { Shell } from "@/ui/shell";
 import { Icon } from "@/ui/icon";
 import "@/ui/public-site.css";
@@ -14,6 +16,15 @@ const topics = [
     id: "payments", label: "Trolleys payments", link: hostedServices.payments.portalUrl, action: "Open Trolleys",
     questions: [
       { q: "Where do I sign in and manage payments?", a: "Use the account access instructions supplied by Trolleys. If you are new to the service, visit its website to apply. You do not need an Etail Depot website login." },
+      { q: "What does it cost to accept payments?", a: <>For US businesses, domestic online card payments in USD cost {productFacts.payments.cardRateLabel} per successful payment. The standard setup fee is ${productFacts.payments.setupFeeDollars}, and the monthly fee is ${productFacts.payments.monthlyFeeDollars}. Basic transaction receipts are included. See <Link href="/payment-services#fees">fees and payouts</Link> for optional services and other costs to review.</> },
+      { q: "What is Dispute readiness?", a: <>Trolleys’ optional {saleRecordsOffer.name} service uses Order Insight to share purchase details with participating banks and help customers recognize charges. Eligible Visa fraud disputes may be prevented when the required transaction history and data qualify. Basic payment receipts remain included without this service. <Link href="/payment-services#dispute-readiness">See how it works</Link>.</> },
+      { q: "What does Dispute readiness cost?", a: <>The Trolleys service fee is {saleRecordsOffer.rateLabel} of eligible enrolled successful-payment volume, plus quoted Order Insight vendor charges. Payment processing is separate. See <Link href="/payment-services#fees">fees and estimates</Link>. Selecting the website example does not enroll you or create a charge.</> },
+      { q: "How does Order Insight help with a payment inquiry?", a: "Trolleys’ Order Insight integration is live. Supported merchant, payment and order details help participating banks and customers identify a purchase. Coverage depends on merchant enrollment, the payment and available records. The examples on this website do not share actual customer or purchase information." },
+      { q: "What happens when I explore the payment examples?", a: "The examples illustrate payments for goods, services and information using fixed sample details. Your selections stay in this browser. They do not send payment requests, collect customer information, create sale records or enroll you in a service." },
+      { q: "What does the Information example cover?", a: "Research, insights, analysis or advice delivered through a report, briefing or consultation. Specify what the customer will receive, its scope, delivery timing and any access conditions." },
+      { q: "Does Dispute readiness prevent every dispute?", a: "No. Purchase recognition and eligible Visa fraud-dispute prevention do not cover every bank, payment or dispute reason. A dispute can still proceed, and no outcome is guaranteed. Refund programs and managed responses to existing chargebacks are separate services. Follow your account’s instructions and deadlines if a dispute occurs." },
+      { q: "When does a payment reach my bank?", a: <>A successful payment and a bank payout are different steps. Check the payment and payout status in your Trolleys account and follow its timing and any review requirements. Learn more about <Link href="/payment-services#payouts">payouts</Link>.</> },
+      { q: "How do I handle a refund or dispute?", a: "Follow the instructions in your Trolleys account to request a refund or respond to a dispute. Review the applicable fees, required information and deadlines there. Contact the payments team if you need help." },
       { q: "Who can help with my payment account?", a: <>Use the support options in your Trolleys account or email <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a>. Do not include passwords or full card details.</> },
     ],
   },
@@ -22,7 +33,8 @@ const topics = [
     questions: [
       { q: "Can I apply for a card now?", a: `Ledgix ${cardProduct.name} is an upcoming virtual ${cardProduct.creditType} for compatible digital wallets. Applications and card sign-in are not open yet. The card service will have its own sign-in and dashboard.` },
       { q: "Which digital wallets are supported?", a: "When the card service is available, eligible cards can be added to Apple Wallet or Google Wallet. Support depends on the card, device and region." },
-      { q: "How does the security deposit work?", a: "A security deposit backs the credit account. Purchases create a balance that you repay separately. The card agreement will explain the deposit, credit limit and repayment terms." },
+      { q: "How does the security deposit work?", a: <>The minimum security deposit is ${productFacts.cards.minimumDepositDollars}. It backs the credit account; it does not pay for purchases. Purchases create a balance that you repay separately. See <Link href="/card-services#card-details">card details</Link> and review the card agreement for credit limits and deposit-return conditions.</> },
+      { q: "What are the card fees and repayment terms?", a: <>The annual fee is ${productFacts.cards.annualFeeDollars}, and the monthly fee is ${productFacts.cards.monthlyFeeDollars}. {productFacts.cards.repayment}. You can also make payments earlier or daily. See <Link href="/card-services#card-details">card details</Link> and review the full charges and conditions in the card agreement when the service launches.</> },
       { q: "Where can I ask about Ledgix?", a: <>Email <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}</a> for card inquiries.</> },
     ],
   },
@@ -30,7 +42,7 @@ const topics = [
     id: "access", label: "Sign-in help",
     questions: [
       { q: "What if I cannot sign in to Trolleys?", a: <>Follow the recovery instructions supplied with your Trolleys account, or contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> for help. Etail Depot does not collect your service password here.</> },
-      { q: "Does one service account give me access to the other?", a: "No. Cards and payments are separate services. Each has its own registration, sign-in and account access. A Trolleys account does not create a Ledgix account." },
+      { q: "Does one service account give me access to the other?", a: "No. A Trolleys account does not create a Ledgix account. Ledgix registration and sign-in will be separate when the card service launches." },
     ],
   },
 ];
