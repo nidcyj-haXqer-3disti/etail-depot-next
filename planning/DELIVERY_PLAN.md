@@ -1,3 +1,35 @@
+# D140 — publish the reviewed public website
+
+Release the accepted D139 candidate through a reviewed PR, exact-source CI and the bound Netlify site. Verify hosted pages, interactions, metadata, headers and retirement routes without executing vendor or database operations. Preserve the existing access/search configuration and record the deployment result.
+
+# D139 — final review before deployment
+
+Review all public pages and shared chrome, correct concrete copy/interaction/responsive issues, verify public-only backend and archived-data preservation, and refresh current maintainer runbooks. Run full local release gates on the polished candidate, inspect responsive artwork/headers/footers and record exact evidence. Keep vendor-hosted services outside this runtime and publish only on the user’s subsequent release instruction. [Status](STATUS.md); [release review](../docs/RELEASE_READINESS_REVIEW.md).
+
+# D138 — available Dispute readiness and coordinated marketing
+
+Rebuild the public Payments page around getting paid, recognizable purchases and optional dispute readiness; polish Home and Cards in the existing design system. Remove the retired document catalog and reflect the operator-confirmed live approved Order Insight integration in product facts and policies. Preserve supported coverage, additional vendor charges, exact local estimates and public-only data boundaries. Verify browser behavior, accessibility, responsive layout, metadata and production packaging. [Implementation](../docs/DISPUTE_READINESS_MARKETING.md); [verification status](STATUS.md). Deployment remains a separate step.
+
+# D137 — optional Sale Records journey completed locally
+
+The user-approved Order Insight research and payment-page rebuild are complete. Follow [the implementation](../docs/TROLLEYS_SALE_RECORDS.md), [product-line research](../docs/research/d137-order-insight.md) and the verified [status](STATUS.md). One optional 0.4% Trolleys fee plus separately quoted vendor charges replaces D133–D136's three independent document fees. Integrated verification and responsive review pass. The public-only website, fixed handoffs and preserved archived records remain the architecture. Actual provider enrollment/integration, price lifecycle and supplier requirements remain future service work; publication is separate.
+
+## D136 — explain the transaction and the work each add-on handles
+
+Replace the digital-content category with Information across examples, policies and tests. Display six underlying detail questions and illustrative terms for all three sale types; carry those same terms into the Agreement preview. Explain concrete recordkeeping, billing and acceptance outputs, show fee amounts without changing approved rates, and preserve included receipts and independent choices. Verify copy consistency, type switching, mobile/text-spacing layout, accessible descriptions, no provider effects and deployment packaging. [Implementation](../docs/PAYMENT_TRANSACTION_DETAILS.md).
+
+## D135 — implement the fulfillment-aware payment page
+
+Apply the accepted D134 research to the public Payments page: three sale types, three document previews, five channels, independent fees and relevant delivery records. Remove the duplicate scenario control, preserve compact mobile artwork and shared chrome, align Help/Privacy/Terms, and verify cross-control consistency, accessibility, responsive layout and the public-only build package. Keep provider integration and publication separate. [Implementation report](../docs/PAYMENT_PAGE_REBUILD.md).
+
+## D133 — optional documents and five delivery channels
+
+Deliver independent document selection, stacked exact-cent estimates, truthful pre-payment and post-payment previews, and five channels with shared scenario facts. Prepare original templates, a dispute evidence matrix and a vendor handoff contract. Update Help/Privacy/Terms and verify all public, responsive, accessibility and package boundaries. Keep basic receipts included and mark add-ons coming soon until the hosted service is integrated and reviewed. No document delivery, signature collection, billing or database runtime is activated. [Implementation report](../docs/PAYMENT_DOCUMENTS_IMPLEMENTATION.md).
+
+## D132 — implement the accepted advanced public-product plan
+
+Deliver the approved offer explanation and local fee estimator, coherent seven-format scenarios, payment aftermath, secured-credit artwork, compact wallet guide and aligned Help/Privacy/Terms. Preserve the accepted header/footer and public-only runtime. Validate interactions, accessibility, responsive artwork, exact currency estimates, metadata and deployment packaging. Keep unverified provider facts and optional notification setup visible as dependencies; do not invent live email collection. Customer-task validation is needed before claiming a measured 9/10 score. See [implementation report](../docs/PRODUCT_CONFIDENCE_IMPLEMENTATION.md).
+
 ## D128 — final public-page detail review
 
 Preserve D127’s accepted three-page design and review all six public pages, shared chrome, copy and policy consistency. Correct responsive/text-spacing issues and redundant language; keep service boundaries and records intact. Local checks and preview are complete; [status](STATUS.md) records evidence. Publication remains separate.

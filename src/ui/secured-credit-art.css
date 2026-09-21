@@ -1,0 +1,43 @@
+/* Two distinct money relationships, presented as an explanation rather than an account screen. */
+.secured-credit-art { container-type: inline-size; display: grid; gap: 14px; min-width: 0; width: 100%; margin: 0; color: var(--public-ink); font-family: var(--public-font); }
+.secured-credit-lane { min-width: 0; border: 1px solid var(--public-line); border-radius: var(--public-radius, 10px); padding: 26px 28px; }
+.secured-credit-art h3 { margin: 0; font-size: 18px; line-height: 1.4; letter-spacing: -.02em; font-weight: 500; }
+.secured-credit-deposit { display: flex; align-items: center; gap: 32px; background: var(--public-tint); }
+.secured-credit-lane-heading { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+.secured-credit-lane-heading > .icon { width: 20px; height: 20px; color: var(--public-accent); flex-shrink: 0; }
+.secured-credit-deposit-flow { display: grid; grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr); align-items: center; gap: 18px; flex: 1; min-width: 0; max-width: 620px; margin-left: auto; }
+.secured-credit-deposit-node { display: grid; place-items: center; min-height: 56px; margin: 0; padding: 12px; border: 1px solid #d5dfd2; border-radius: 6px; background: #ffffffb8; font-size: 15px; line-height: 1.5; text-align: center; }
+.secured-credit-backing { display: grid; justify-items: center; gap: 2px; color: var(--public-accent); font-size: 12px; line-height: 1.5; }
+.secured-credit-backing > .icon { width: 32px; height: 18px; }
+.secured-credit-purchases { background: #fff; }
+.secured-credit-purchase-flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 42px; list-style: none; margin: 24px 0 0; padding: 0; }
+.secured-credit-purchase-flow > li { position: relative; min-width: 0; }
+.secured-credit-step { display: flex; align-items: flex-start; gap: 14px; min-width: 0; }
+.secured-credit-step > div { min-width: 0; }
+.secured-credit-step-icon { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; border: 1px solid #dce5dd; border-radius: 9px; background: #f5f7f1; color: var(--public-accent); }
+.secured-credit-step-icon > .icon { width: 19px; height: 19px; }
+.secured-credit-step h4 { margin: 0; font-size: 17px; font-weight: 500; line-height: 1.4; letter-spacing: -.015em; }
+.secured-credit-step p { margin: 7px 0 0; max-width: 24ch; font-size: 14px; line-height: 1.6; color: var(--public-muted); }
+.secured-credit-flow-arrow { position: absolute; right: -30px; top: 10px; color: #789079; }
+.secured-credit-flow-arrow > .icon { display: block; width: 18px; height: 18px; }
+.secured-credit-art > figcaption { padding: 4px 2px 0; color: var(--public-muted); font-size: 14px; line-height: 1.6; }
+@container (max-width: 800px) {
+  .secured-credit-deposit { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .secured-credit-deposit-flow { width: 100%; max-width: none; margin: 0; }
+  .secured-credit-purchase-flow { gap: 30px; }
+  .secured-credit-step { flex-direction: column; gap: 12px; }
+  .secured-credit-flow-arrow { right: -24px; }
+}
+@container (max-width: 540px) {
+  .secured-credit-lane { padding: 20px; }
+  .secured-credit-art h3 { font-size: 17px; }
+  .secured-credit-deposit-flow { grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr); gap: 10px; }
+  .secured-credit-deposit-node { padding: 10px 8px; font-size: 14px; }
+  .secured-credit-backing > .icon { width: 26px; }
+  .secured-credit-purchase-flow { grid-template-columns: minmax(0, 1fr); gap: 30px; margin-top: 22px; }
+  .secured-credit-step { flex-direction: row; gap: 13px; }
+  .secured-credit-step h4 { font-size: 16px; }
+  .secured-credit-step p { margin-top: 5px; }
+  .secured-credit-flow-arrow { top: auto; right: auto; bottom: -25px; left: 11px; transform: rotate(90deg); }
+  .secured-credit-art > figcaption { font-size: 13px; }
+}

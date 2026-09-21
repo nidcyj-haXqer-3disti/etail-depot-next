@@ -1,0 +1,29 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import type { ReactNode } from "react";
+
+/** Native disclosure works without JavaScript; wider screens open it after hydration. */
+export function WalletGuide({ children }: { children: ReactNode }) {
+  const disclosure = useRef<HTMLDetailsElement>(null);
+  const userChoseVisibility = useRef(false);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 851px)");
+    const matchViewport = () => {
+      if (disclosure.current && !userChoseVisibility.current) disclosure.current.open = desktop.matches;
+    };
+    matchViewport();
+    desktop.addEventListener("change", matchViewport);
+    return () => desktop.removeEventListener("change", matchViewport);
+  }, []);
+
+  return <details className="wallet-guide-disclosure" ref={disclosure}>
+    <summary onClick={() => { userChoseVisibility.current = true; }}>
+      <span className="wallet-guide-label-closed">View wallet setup</span>
+      <span className="wallet-guide-label-open">Hide wallet setup</span>
+      <span className="wallet-guide-disclosure-icon" aria-hidden="true">+</span>
+    </summary>
+    <div className="wallet-guide-content">{children}</div>
+  </details>;
+}

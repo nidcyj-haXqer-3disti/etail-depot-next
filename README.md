@@ -2,6 +2,8 @@
 
 The public website for Etail Depot US, Inc., introducing **Trolleys payments** and forthcoming **Ledgix Visa secured credit cards**. Payment account setup, sign-in and dashboards are hosted at the vendor service. This application contains product information, help, legal pages and fixed service links only.
 
+**Release status:** D129 / PR #30 is the last recorded live release. D139 is the polished local release candidate; final local verification is complete. Follow [current status](planning/STATUS.md) for actual verification and publication evidence.
+
 ## Run locally
 
 Use Node **24.19.0** and pnpm **11.19.0**:
@@ -21,7 +23,7 @@ Open `http://127.0.0.1:3100`. No database, authentication tenant, payment creden
 | `src/app` | Six public pages, metadata routes, global styles and 404 |
 | `src/ui` | Public layout, brand artwork, channel illustrations and legal/help components |
 | `src/shared` | Confirmed product/contact details, public channel types and retired bookmark destinations |
-| `src/modules/public-site` | Search/social metadata and the explicit indexing boundary |
+| `src/modules/public-site` | Search/social metadata, the indexing guard, illustrative purchase examples and local fee calculations |
 | `src/proxy.ts` | Read-only retirement responses for old account, payment and API URLs |
 | `public` | Local brand assets, official network marks and marketing photography |
 | `tests` | Public journeys, links, accessibility, metadata and retired-route checks |
@@ -35,15 +37,16 @@ The previous account backend is retained in Git at `111b703d9793c53d414f6c1ab0ec
 
 ```sh
 pnpm verify:public
+pnpm test:seo:production
 pnpm package:netlify
 pnpm verify:package
 ```
 
-The checks cover types, lint, public-only boundaries, unit/browser/accessibility tests, dependencies, production build and local Netlify packaging. Run them with port 3100 free. `pnpm verify` runs the complete sequence. No command publishes the website.
+The checks cover types, lint, public-only boundaries, unit/browser/accessibility tests, dependencies, production build, the production search guard and local Netlify packaging. Run them with ports 3100 and 3101 free. `pnpm verify` runs the complete sequence. These commands do not publish the website.
 
 ## Release boundaries
 
-The only approved repository and site are recorded in [project-targets.json](project-targets.json). D122 records the user's 21 September 2026 approval to index and deploy the reviewed website at `https://etail-depot-next.netlify.app`. Only Home, Payments, Cards and Help are eligible for indexing in the bound production environment; previews, legal pages, 404 and retired routes remain noindex. Netlify automatic publication remains held. Current verification, GitHub review/merge and the manual deployment are still pending; passing local checks does not publish the website or establish Google indexing.
+The only approved repository and site are recorded in [project-targets.json](project-targets.json). D122 authorized search indexing for Home, Payments, Cards and Help at `https://etail-depot-next.netlify.app` in the bound production environment; previews, legal pages, 404 and retired routes remain noindex. Netlify automatic publication remains held. Manual publication follows the reviewed release workflow and the user's authorization for that candidate. The D139 candidate has not been published. Local checks do not publish the website or establish Google indexing.
 
 Search release requires the recorded approval, exact site/origin and production environment checks. Production-scoped `APP_ENV`, `ETAIL_SEARCH_CONTEXT` and `ETAIL_PUBLIC_ORIGIN` are configured for both Netlify builds and functions. Any supplied Netlify `CONTEXT` must also be production; functions do not receive that variable. See [release evidence and remaining checks](docs/RELEASE_READINESS_REVIEW.md), including the unverified Search Console/indexing status.
 

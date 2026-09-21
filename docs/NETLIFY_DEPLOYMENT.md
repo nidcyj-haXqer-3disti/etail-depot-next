@@ -1,3 +1,72 @@
+# Public website Netlify deployment runbook
+
+D139 maintainer refresh · 21 September 2026
+
+D108 public-only scope governs this runbook. The repository and site already exist; there is no provisioning, database migration, Identity setup, account acceptance or financial activation step. Read [source precedence](SOURCE_PRECEDENCE.md), [current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) before preparing a release.
+
+**Recorded release state:** D129 / PR #30 remains the last live release, Netlify deploy `6ab0a14c5b7bbcea34221b79`. D139 is the polished local candidate with final local verification complete. It has not been published. These are recorded facts, not a new remote-state inspection.
+
+## Existing target and preserved boundaries
+
+[project-targets.json](../project-targets.json) is authoritative. Before any authorized remote mutation, verify the actual resource identity against these bindings:
+
+| Resource | Exact binding |
+| --- | --- |
+| GitHub repository | `nidcyj-haXqer-3disti/etail-depot-next` |
+| Repository ID | `1361184741` |
+| Netlify site | `etail-depot-next` |
+| Site ID | `cbbb6c24-9dbc-43a2-9234-e4357b5b5280` |
+| Team ID | `685ae8f4e6ce519ecf6b267d` |
+| Public origin | `https://etail-depot-next.netlify.app` |
+
+Never provision replacements or modify the excluded repositories/sites/domains, including the older Etail projects and `etaildepot.com` / `www.etaildepot.com`. Preserve existing databases, Identity records, visitor access, DNS and provider configuration. Do not change plans, purchase services, expose credentials or remove the denied-resource list.
+
+Trolleys links remain exactly `https://trolleys.ai`, without forwarded input or referrers. Ledgix cards remain coming soon with inquiries at `ledgix@etaildepot.com`. The optional Order Insight marketing demonstration does not create a vendor connection or authorize enrollment/testing against a vendor account.
+
+## Local build and review gates
+
+Use Node **24.19.0**, pnpm **11.19.0**, the existing lockfile and `@netlify/plugin-nextjs` **5.15.13**. The configured build command is `pnpm build`, publish directory `.next`, and the adapter generates the application server and retirement proxy. Do not add custom functions, archived APIs or `netlify/database` paths.
+
+With ports 3100 and 3101 free, run:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm verify:public
+pnpm test:seo:production
+pnpm package:netlify
+pnpm verify:package
+```
+
+`pnpm verify` runs the four verification/package commands in order. `package:netlify` binds `NETLIFY_SITE_ID` to the recorded site and invokes the local offline production-context build. It does not deploy. Never substitute old `.next` or `.netlify` output for the source under review.
+
+Package inspection requires the reviewed public routes, one generated Next.js server handler and the 17 retirement-proxy route families. It checks server ZIP entry names, traces, static files and edge manifests for private or archived inputs. Confirm the exact source/commit/tree and record checks, failures, reruns and remaining limitations. Database records and archived migrations are not build inputs and must not be touched.
+
+## Production search configuration
+
+D122 authorizes indexing only `/`, `/payment-services`, `/card-services` and `/help` at the bound production origin. Legal pages, 404, retired routes and local/preview environments remain noindex. Actual search indexing and ranking are not established by a successful build or deployment.
+
+The existing guard requires the recorded approval, exact site/origin, `NODE_ENV=production`, `APP_ENV=production`, `ETAIL_SEARCH_CONTEXT=production`, matching `SITE_ID` and `ETAIL_PUBLIC_ORIGIN`. Any supplied Netlify `CONTEXT` must be `production`; it is absent in Functions. The custom production markers must therefore apply to both builds and functions. `netlify.toml` configures build values; it does not supply function-runtime environment settings. Inspect only necessary nonsecret release settings during an authorized release review and preserve the preview guard. Do not copy production markers into local environment files or expose server secrets through client variables.
+
+## Reviewed manual publication
+
+Automatic publication remains held by the existing `build.ignore` setting. Build hooks can bypass that setting; do not add unattended hooks or a deployment step to the read-only CI workflow.
+
+1. Complete the local candidate and review its exact diff, test results and package boundaries on a feature branch. Prepare a reviewable result before any permission request.
+2. Confirm the user's recorded authorization covers this candidate's publication. Use authorization already granted; the runbook and passing checks do not themselves grant it. If authorization is absent, finish preparation and request it before the remote publication step.
+3. Follow the repository PR/check/review workflow, bind passing CI to the exact candidate and merge only within the applicable approval. Do not force-push, bypass protections or silently merge feature work into main.
+4. Manually publish the reviewed source to the existing bound Netlify site using the authorized release mechanism. Verify the repository/site identities immediately before mutation and preserve source identity between the reviewed, CI-tested and published revisions. Preserve visitor access and environment scope; do not add database or provider operations.
+5. Record the deployment ID, source identity, build outcome and read-back status. Verify public pages, search metadata, links, security headers, responsive interactions and retired-route responses. Public acceptance checks must not create accounts, transmit payment details, send messages or submit vendor actions. Link success does not prove a hosted financial workflow.
+
+Stop if identity, source, checks or authorization do not match. A failed release is not permission to use an excluded site, create replacement resources, change access/DNS or restore the retired backend. Any rollback must follow the authorized site-release workflow and preserve database/provider resources; no database restoration is part of a public-site rollback.
+
+## Historical deployment archive
+
+The text below predates the D108 public-only application. Its provisioning, database, Identity, secret creation, simulated money and authenticated acceptance steps are retired. Preserve it as historical context only; use the current instructions above for this website.
+
+<details>
+<summary>Retired application deployment brief — historical text</summary>
+
+````markdown
 # New-project Netlify deployment runbook
 
 > **Historical provisioning/model descriptions; retained release safeguards.** Follow [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) for the current model and existing owned deployment. References below to an unreserved slug, new provisioning, three account types or unimplemented hosting describe earlier stages; do not reprovision or attach another project from those instructions.
@@ -88,3 +157,6 @@ References (checked 2026-09-08; verify again during implementation):
 - [N3] https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/
 - [N4] https://docs.netlify.com/manage/security/secure-access-to-sites/identity/registration-login/
 - [N8] https://docs.netlify.com/build/environment-variables/overview/
+````
+
+</details>

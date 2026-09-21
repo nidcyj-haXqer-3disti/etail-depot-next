@@ -9,7 +9,7 @@ const commonQuestions = [
   },
   {
     question: "Will cards and payments use the same sign-in?",
-    answer: "No. Ledgix and Trolleys have separate service websites, sign-ins and dashboards. You do not need to create an Etail Depot website login before continuing to Trolleys.",
+    answer: "No. Trolleys and Ledgix use separate service accounts. Card account access will open when Ledgix launches. You do not need an Etail Depot website login to continue to Trolleys.",
   },
 ];
 
