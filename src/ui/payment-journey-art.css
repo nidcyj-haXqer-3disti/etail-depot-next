@@ -1,4 +1,4 @@
-/* A code-native illustration. All elements are static, with no checkout inputs. */
+/* Local story selection changes the illustration, never a payment or account. */
 .payment-journey-art {
   position: relative;
   container-type: inline-size;
@@ -10,7 +10,37 @@
   overflow: hidden;
   isolation: isolate;
 }
-.payment-journey-scene { position: relative; height: 480px; }
+.payment-journey-selector {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 292px;
+  margin: 16px auto 0;
+  padding: 4px;
+  border: 1px solid #d3ddcd;
+  border-radius: 8px;
+  background: #f6f8f1;
+}
+.payment-journey-selector > button {
+  min-height: 44px;
+  min-width: 0;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #526657;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.payment-journey-selector > button:hover { background: #e8ede4; }
+.payment-journey-selector > button[aria-selected="true"] { background: var(--public-ink, #183d35); color: #fff; }
+.payment-journey-art .payment-journey-selector > button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 2px; }
+.payment-journey-scene { position: relative; height: 440px; }
+.payment-journey-scene:focus-visible { outline: 3px solid var(--public-focus); outline-offset: -5px; border-radius: 8px; }
 .payment-journey-orbit {
   position: absolute;
   width: 530px;
@@ -100,6 +130,7 @@
   .payment-journey-art > figcaption { left: 18px; bottom: 13px; }
 }
 @container (max-width: 320px) {
+  .payment-journey-selector { margin-inline: 16px; }
   .payment-journey-request { width: calc(100% - 36px); padding-inline: 16px; }
   .payment-journey-checkout { width: calc(100% - 52px); padding: 16px; }
   .payment-journey-connector { left: 26px; }

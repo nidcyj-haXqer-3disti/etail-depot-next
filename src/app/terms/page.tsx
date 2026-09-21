@@ -51,7 +51,7 @@ const sections: LegalSection[] = [
     id: "payments", title: "Trolleys · Payments", content: <>
       <p>Continue to the Trolleys hosted service for enrollment, sign-in and payment account management.</p>
       <p>The applicable service agreement governs accepted payment methods, payment channels, account permissions, fees, refunds, disputes, settlement and payouts. This website does not set those terms or perform those account actions.</p>
-      <p>Payment-channel examples on this website illustrate ways to request payment. Example amounts, items, messages and payment statuses are illustrative and do not create a payment request or record a transaction.</p>
+      <p>Payment examples on this website illustrate ways to request payment. Example amounts, items, messages and payment statuses are illustrative and do not create a payment request or record a transaction.</p>
       <p>Use the service’s recorded statuses and instructions to confirm an action’s outcome. A link to Trolleys does not enroll you in Ledgix, connect account balances or transfer funds between the two products.</p>
     </>,
   },
@@ -92,5 +92,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function TermsPage() {
-  return <LegalDocument title="Terms of Use" description="Using the Etail Depot website and accessing separately hosted product services." updated="September 20, 2026" currentPage="terms" sections={sections} />;
+  return <LegalDocument title="Terms of Use" description="Using the Etail Depot website and accessing separately hosted product services." updated="September 21, 2026" currentPage="terms" sections={sections} />;
 }

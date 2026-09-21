@@ -16,14 +16,14 @@ const sections: LegalSection[] = [
     </>,
   },
   {
-    id: "information", title: "Information we collect", content: <>
+    id: "information", title: "Information we handle", content: <>
       <p>The information we receive depends on how you use this website or contact us:</p>
       <ul>
         <li><strong>Contact information.</strong> Your email address, the service you ask about, messages and other information you choose to send us.</li>
         <li><strong>Technical information.</strong> Our hosting provider may process IP addresses, browser details, request times and other connection information to deliver and protect the website.</li>
         <li><strong>Earlier website records.</strong> If you previously used account features hosted on this website, related identity, access, activity and support records may remain in restricted storage. Those features are no longer available here.</li>
       </ul>
-      <p>Following a service link does not transfer earlier website records to Ledgix or Trolleys. Information you provide on a product’s website is handled under the notices presented there.</p>
+      <p>Opening a service link does not send records from earlier website accounts to the hosted product platform. Information you provide on a product’s website is handled under the notices presented there.</p>
       <p>Do not include passwords, complete card or bank account numbers, government identification or other sensitive information in a contact message.</p>
     </>,
   },
@@ -40,7 +40,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "sharing", title: "Who can see your information", content: <>
-      <p><strong>Website providers.</strong> We use Netlify to host and deliver this website. The public website does not connect to an account database or authenticate customers. The product notices describe the providers and information-sharing arrangements for separately hosted Ledgix and Trolleys services.</p>
+      <p><strong>Website providers.</strong> We use Netlify to host and deliver this website. This website does not provide customer accounts or sign-in. The product notices describe the providers and information-sharing arrangements for separately hosted Ledgix and Trolleys services.</p>
       <p><strong>Support.</strong> Authorized staff can review records within their assigned support responsibilities. Include only the information needed to explain your inquiry.</p>
       <p><strong>Information you share.</strong> Email links open your email application. The message and information you send are handled by your email provider and the recipient. Product links open the relevant service website; they do not include your earlier account details or website query parameters.</p>
       <p><strong>Legal and security matters.</strong> Information may need to be disclosed to comply with applicable law or valid legal process, or to investigate fraud, unauthorized access or threats to the service. Requests about these disclosures should be directed to our compliance contact.</p>
@@ -82,5 +82,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function PrivacyPage() {
-  return <LegalDocument title="Privacy Policy" description="Information and choices on the Etail Depot website and links to our product services." updated="September 20, 2026" currentPage="privacy" sections={sections} />;
+  return <LegalDocument title="Privacy Policy" description="Information and choices on the Etail Depot website and links to our product services." updated="September 21, 2026" currentPage="privacy" sections={sections} />;
 }

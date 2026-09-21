@@ -3,12 +3,12 @@
   --home-ink: var(--public-ink);
   --home-muted: var(--public-muted);
   --home-line: var(--public-line);
-  --consumer-title: clamp(3.25rem, 5vw, 4.5rem);
-  --consumer-heading: clamp(2rem, 3.1vw, 2.75rem);
+  --consumer-title: clamp(2.75rem, 4.5vw, 4rem);
+  --consumer-heading: clamp(2rem, 3.1vw, 2.5rem);
   --consumer-body: 16px;
   --consumer-small: 13px;
-  --consumer-space: 80px;
-  --consumer-art-height: 480px;
+  --consumer-space: 72px;
+  --consumer-art-height: 440px;
   color: var(--home-ink);
   background: #fff;
   font-family: var(--public-font);
@@ -30,7 +30,7 @@
 
 /* One clear payment proposition, supported by an editorial photograph. */
 .consumer-hero { background: var(--public-paper); }
-.consumer-hero-grid { display: grid; grid-template-columns: 1.04fr 1fr; align-items: center; gap: 64px; padding-block: 56px 48px; }
+.consumer-hero-grid { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr); align-items: center; gap: 48px; padding-block: 56px 48px; }
 .consumer-hero-copy { padding-block: 16px; min-width: 0; }
 .consumer-hero h1 { font-size: var(--consumer-title); line-height: 1.08; letter-spacing: -.045em; margin-top: 24px; }
 .consumer-hero h1 > span { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--public-accent); letter-spacing: -.045em; }
@@ -63,15 +63,9 @@
 .consumer-page .public-faq-section .consumer-text-link { margin-top: 24px; }
 .consumer-page .public-questions summary { min-height: 72px; font-size: var(--consumer-body); font-weight: 500; }
 .consumer-page .public-questions p { font-size: var(--consumer-body); line-height: 1.7; color: var(--home-muted); }
-.consumer-final-wrap { padding-bottom: 48px; }
-.consumer-final { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; border-top: 1px solid var(--home-line); padding-top: 48px; }
-.consumer-final h2 { font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; margin-top: 16px; }
-.consumer-final h2 > span { color: var(--public-accent); }
-.consumer-final > div:last-child { justify-self: end; }
-.consumer-final p:not(.eyebrow) { color: var(--home-muted); font-size: var(--consumer-body); line-height: 1.7; margin-bottom: 24px; }
 
 @media (max-width:1100px) {
-  .consumer-page { --consumer-title: 60px; --consumer-art-height: 440px; }
+  .consumer-page { --consumer-art-height: 420px; }
   .consumer-hero-grid { gap: 36px; }
   .consumer-hero-actions { gap: 12px 18px; }
   .consumer-hero-actions .button { padding-inline: 18px; }
@@ -79,7 +73,7 @@
   .consumer-page .public-faq-section { gap: 50px; }
 }
 @media (max-width:850px) {
-  .consumer-page { --consumer-title: 52px; --consumer-space: 64px; --consumer-art-height: 440px; }
+  .consumer-page { --consumer-space: 56px; --consumer-art-height: 400px; }
   .consumer-hero-grid { gap: 28px; padding-block: 40px; }
   .consumer-hero-copy > p { font-size: 16px; }
   .consumer-product-eyebrow { gap: 12px; }
@@ -91,7 +85,7 @@
   .consumer-page .public-faq-section { gap: 32px; }
 }
 @media (max-width:680px) {
-  .consumer-page { --consumer-title: 52px; --consumer-heading: 32px; --consumer-body: 15px; --consumer-space: 48px; --consumer-art-height: 400px; }
+  .consumer-page { --consumer-heading: 32px; --consumer-body: 15px; --consumer-space: 48px; --consumer-art-height: 360px; }
   .consumer-hero-grid { grid-template-columns: 1fr; padding-block: 40px 30px; gap: 28px; }
   .consumer-hero-copy { padding: 0; }
   .consumer-hero-copy > p { max-width: 38ch; font-size: 16px; margin-top: 20px; }
@@ -107,17 +101,8 @@
   .consumer-page .public-faq-section { grid-template-columns: 1fr; gap: 24px; }
   .consumer-page .public-faq-section .consumer-text-link { margin-top: 16px; }
   .consumer-page .public-questions summary { min-height: 68px; }
-  .consumer-final-wrap { padding-bottom: 32px; }
-  .consumer-final { grid-template-columns: 1fr; gap: 24px; padding-top: 32px; }
-  .consumer-final > div:last-child { justify-self: start; }
-  .consumer-final p:not(.eyebrow) { margin-bottom: 24px; }
 }
-@media (max-width:360px) {
-  .consumer-page { --consumer-title: 44px; }
-}
-
 /* Product pages continue the same editorial system as the homepage. */
 .consumer-product-hero h1 { font-size: min(var(--consumer-title), 64px); }
 .consumer-product-note { max-width: 42ch; margin-top: 20px; font-size: var(--consumer-small); line-height: 1.6; color: var(--home-muted); }
 .consumer-product-section { padding-block: var(--consumer-space); scroll-margin-top: 24px; }
-.consumer-closing-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }

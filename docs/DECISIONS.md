@@ -1,8 +1,30 @@
 # Decision register
 
+## D129 — publish the reviewed public-product release
+
+21 September 2026. After the completed D128 review, the user requests deployment. Release the accepted D127/D128 pages, policies and responsive corrections together with the retained D124 wallet-logo fix through the bound repository and existing Netlify site. Keep automatic publication disabled, visitor access unchanged, the exact production search policy and the public-only/archive boundary. Record successful checks, exact source trees, PR review/merge and the live deployment separately from this authorization.
+
+## D128 — final detail review preserves the accepted design
+
+21 September 2026. The user requests a microlevel review of line breaks, wording, layout and Privacy/Terms. Keep D127’s page roles and shared chrome; correct concrete mobile/tablet/text-spacing defects, remove redundant or unsupported illustration copy and align the policies with the same-company DBA and separately hosted product model. Update the policy revision dates to reflect the edits. Preserve retained records, financial-product availability and provider notices. Final browser/accessibility, build and responsive checks are recorded in [current status](../planning/STATUS.md); local review does not authorize publication or establish provider/legal approval.
+
+## D127 — implement the accepted decision journey in the existing public website
+
+21 September 2026. The user accepts D126 and asks to complete it. Implement Home discovery, Payments explanation/onboarding handoff and Cards secured-credit understanding before setup, while retaining the accepted shared chrome and assets. Home and product actions now have distinct purposes; the payment illustration adds keyboard-accessible local examples. Discovery artwork is display-only, and the sole detailed wallet guide follows the deposit explanation on Cards. Remove superseded closing/card sections and unused styles instead of retaining parallel layouts. Preserve exact guarded provider URLs, non-collecting examples, coming-soon cards, public-only runtime and existing records. [Current status](../planning/STATUS.md) records successful local checks and restored preview. No provider commercial terms, database migration, publication or renewed market-fit claim follows from this implementation.
+
+## D126 — show a focused public-product proposal before implementation
+
+21 September 2026. The user requests the proposed design and its rationale, clarifying that trolleys.ai will become vendor-hosted onboarding/dashboard and that its current marketing page is outside scope. Record [the public product proposal](PUBLIC_PRODUCT_PROPOSAL.md) and a separate interactive conversation preview. Preserve the accepted visual identity, service navigation, brand names and provider-owned account boundary. Give Home, Payments and Cards distinct decision roles; keep the two-step collection story separate from approval/payout and explain secured credit before wallet setup. No app redesign, new offer terms, subscription flow, database change or publication is authorized by this proposal request alone. D124's separate release remains pending.
+
+## D125 — evaluate product readiness before another redesign
+
+21 September 2026. The user asks for a professional assessment, ratings and improvement recommendations using American Express and Stripe as references. Record [the product design assessment](PRODUCT_DESIGN_ASSESSMENT.md) as advice, not a new implementation mandate. Separate public-site design quality from vendor product behavior and unproven product-market fit. Prioritize continuity of the confirmed offer/application journey, commercial clarity and customer evidence. No page, pricing, eligibility, provider configuration, tracking or publication change follows from this assessment alone.
+
 ## D124 — keep each wallet logo tied to its own image
 
 Publication authorization: the user explicitly requests deployment after local review. Proceed through reviewed source, exact-commit checks and the existing Netlify target; record success only after hosted verification.
+
+The release checks and independent review pass, but automatic approval review rejects immediate merge of PR #30 without the user's exact merge approval. Request that approval rather than publishing around the review gate. The reviewed candidate is preserved and the live D122 release is unchanged.
 
 21 September 2026. Fix the user-reported Apple Pay flash when Google Wallet is selected by rendering two stable, eagerly loaded images and hiding the inactive wallet's mark. Do not reuse a decoded image element for the other brand or introduce loading timers. Preserve layout, official assets, accessible controls and all provider boundaries. [Verification](WALLET_SETUP_GUIDE.md) includes delayed loading, late completion and repeated switches on both routes. Locally verified; no deployment or backend change.
 

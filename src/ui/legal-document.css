@@ -194,7 +194,7 @@
     cursor: pointer;
   }
   .legal-document-contents-mobile summary::-webkit-details-marker { display: none; }
-  .legal-document-contents-mobile summary > span { font-size: 20px; line-height: 1; font-weight: 400; }
+  .legal-document-contents-mobile summary > span { flex-shrink: 0; margin-inline: 10px; font-size: 20px; line-height: 1; font-weight: 400; }
   .legal-document-contents-mobile[open] summary > span { transform: rotate(45deg); }
   .legal-document-contents-mobile[open] { padding-bottom: 12px; }
   .legal-document-contents { position: static; max-height: none; overflow-y: visible; }

@@ -35,21 +35,8 @@ export function PaymentUseCases() {
     imageAlt="A designer and client reviewing work together"
     cases={[
       { title: "Bookings & deposits", description: "Send a payment link for an agreed deposit or booking amount by text or email.", icon: "message" },
-      { title: "Work well done", description: "Show the work completed, amount due and payment link on one invoice.", icon: "document" },
+      { title: "Invoices for completed work", description: "Show the work completed, amount due and payment link on one invoice.", icon: "document" },
       { title: "Pop-ups & social orders", description: "Display a QR code in person or share a link in a message. Customers pay on their phone.", icon: "qr" },
-    ]}
-  />;
-}
-
-export function WalletUseCases() {
-  return <ProductUseCases
-    id="wallet-use-cases-title"
-    title="A card for the everyday."
-    image="/marketing/everyday-wallet-v1.webp"
-    imageAlt="A customer using a phone at a coffee counter"
-    cases={[
-      { title: "Daily purchases", description: "Pay for coffee, groceries and everyday essentials with a compatible phone wherever your wallet is accepted.", icon: "card" },
-      { title: "Online checkout", description: "Use Apple Pay or Google Pay on participating websites and apps.", icon: "link" },
     ]}
   />;
 }

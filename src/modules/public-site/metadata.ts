@@ -5,7 +5,7 @@ import targets from "../../../project-targets.json" with { type: "json" };
 
 export const PUBLIC_PAGES = {
   "/": { title: `Trolleys payments & Ledgix ${cardProduct.name}`, description: `Accept payments with links, QR codes and invoices from Trolleys. Explore the upcoming Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType}.` },
-  "/card-services": { title: `Ledgix ${cardProduct.name} — Coming soon`, description: `Meet Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType} for compatible digital wallets. Coming soon. Contact Ledgix to learn more.` },
+  "/card-services": { title: `Ledgix ${cardProduct.name} — Coming soon`, description: `Meet Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType} for Apple Wallet and Google Wallet. Coming soon. Contact Ledgix to learn more.` },
   "/payment-services": { title: "Trolleys payment links, QR codes & invoices", description: "Get paid by card through payment links, QR codes and invoices. Share by text, email, social media or your website. Visit Trolleys to apply." },
   "/help": { title: "Help with payments and cards", description: `Contact Trolleys for payment support or Ledgix for ${cardProduct.name} inquiries. Find product access guidance and company compliance contacts.` },
 } as const;

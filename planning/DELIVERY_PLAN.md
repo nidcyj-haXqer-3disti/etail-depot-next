@@ -1,3 +1,11 @@
+## D128 — final public-page detail review
+
+Preserve D127’s accepted three-page design and review all six public pages, shared chrome, copy and policy consistency. Correct responsive/text-spacing issues and redundant language; keep service boundaries and records intact. Local checks and preview are complete; [status](STATUS.md) records evidence. Publication remains separate.
+
+## D127 — implement the accepted three-page proposal
+
+Apply [D126](../docs/PUBLIC_PRODUCT_PROPOSAL.md) in the existing public components: clear discovery and next steps, an accessible two-step payment example selector, concise service questions and secured-credit explanation before wallet setup. Retain accepted chrome/assets and D124's stable wallet image identities; remove sections/components made redundant by the new flow. Check supported pages, mobile/desktop interactions, accessibility, guarded provider links, search metadata, source boundaries and the local production package. Record actual evidence in STATUS. Provider onboarding, commercial-term approval, customer research and deployment remain separate from this public UI implementation.
+
 ## D121 — final public release preparation
 
 Preserve the accepted three-page design and shared chrome. Complete a detailed responsive, accessibility, copy, link, legal, backend and archive review; correct concrete findings. Verify the complete test/build sequence and a freshly generated Netlify package for the exact bound site, with archived/private source excluded. Align wording with the observed vendor destination and the user's confirmation that no separate sign-in URL exists. Record source/artifact evidence and remaining external limits in [the release review](../docs/RELEASE_READINESS_REVIEW.md). Leave publication and indexing unchanged.

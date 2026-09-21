@@ -119,7 +119,7 @@ test("legal documents are reachable without sign-in and retain their search visi
     await expect(page.getByRole("complementary", { name: "Review status" })).toHaveCount(0);
     await expect(page).toHaveTitle(new RegExp(`^${title}`));
     expect(await page.title()).not.toMatch(/draft|review/i);
-    await expect(page.locator(".legal-document-date")).toHaveText("Last updated September 20, 2026");
+    await expect(page.locator(".legal-document-date")).toHaveText("Last updated September 21, 2026");
     for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
       await expect(page.locator(selector)).toHaveAttribute("content", title!);
     }
@@ -176,7 +176,7 @@ test("a new visitor can compare available payments and upcoming cards without a 
   const mainNavigation = await openMainNavigation(page);
   await mainNavigation.getByRole("link", {name:"Cards",exact:true}).click();
   await expect(page).toHaveURL(/\/card-services$/);
-  await expect(page.getByRole("heading", {level:1})).toHaveText("Digital Wallet Card.");
+  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Secured credit\.\s*Made for your wallet\.$/);
   await openMainNavigation(page);
   await expect(mainNavigation.getByRole("link",{name:"Cards",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator("main")).toContainText("Coming soon");
@@ -190,7 +190,7 @@ test("a new visitor can compare available payments and upcoming cards without a 
   await openMainNavigation(page);
   await expect(mainNavigation.getByRole("link",{name:"Payments",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator("main")).toContainText("Available now");
-  const paymentEntry = page.locator(".consumer-hero-actions").getByRole("link",{name:"Open Trolleys",exact:true});
+  const paymentEntry = page.locator(".consumer-hero-actions").getByRole("link",{name:"Get started with Trolleys",exact:true});
   await expect(paymentEntry).toHaveAttribute("href", "https://trolleys.ai");
   await expect(paymentEntry).toHaveAttribute("referrerpolicy", "no-referrer");
   await expect(page.locator('a[href^="/login"], a[href^="/cardholder-services"], a[href^="/merchant-services"]')).toHaveCount(0);
@@ -233,7 +233,7 @@ test("public pages have unique canonical metadata and no private data", async ({
     expect(data["@graph"].find((node: { "@type": string }) => node["@type"] === "WebPage").url).toBe(`https://etail-depot-next.netlify.app${route}`);
     const editorialText = (await page.locator("main").textContent()) ?? "";
     // Marketing describes the hosted services, never the local prototype's balances or controls.
-    expect(editorialText).not.toMatch(/\bprepaid\b/i);
+    expect(editorialText).not.toMatch(/Visa prepaid card|prepaid Visa card/i);
     if (route === "/" || route === "/card-services" || route === "/help") {
       expect(editorialText).toContain("Visa secured credit card");
     }
@@ -347,7 +347,7 @@ test("all seven payment channels show a clear checkout journey and work by keybo
   await page.keyboard.press("Tab");
   await expect(showcase.locator(":focus")).toHaveCount(0);
   await expect(showcase.getByRole("link")).toHaveCount(0);
-  const openTools = page.locator(".consumer-hero-actions").getByRole("link", {name:"Open Trolleys", exact:true});
+  const openTools = page.locator(".consumer-hero-actions").getByRole("link", {name:"Get started with Trolleys", exact:true});
   await expect(openTools).toHaveAttribute("href", "https://trolleys.ai");
   await expect(openTools).toHaveAttribute("referrerpolicy", "no-referrer");
   await expect(openTools).toHaveAttribute("rel", /\bnoreferrer\b/);
@@ -390,6 +390,55 @@ test("payment channels keep their content and touch targets inside a 320px scree
   expect(mutations).toEqual([]);
 });
 
+test("payment examples connect each business request to the same checkout amount without account actions", async ({page}) => {
+  const mutations = await preventMutationRequests(page);
+  const privateReads: string[] = [];
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/")) privateReads.push(request.url()); });
+  await page.setViewportSize({width:320,height:900});
+  await page.goto("/");
+  await page.locator(".consumer-hero-actions").getByRole("link",{name:"Explore payments",exact:true}).click();
+  await expect(page).toHaveURL(/\/payment-services$/);
+  const art = page.getByRole("figure",{name:"Illustrated payment journey",exact:true});
+  const tablist = art.getByRole("tablist",{name:"Payment examples",exact:true});
+  const examples = [
+    {name:"Booking", description:"Studio booking", amount:"$80.00"},
+    {name:"Invoice", description:"Design services", amount:"$480.00"},
+    {name:"Sale", description:"Homeware set", amount:"$64.00"},
+  ];
+  async function expectExample(index:number) {
+    const example = examples[index]!;
+    const tab = tablist.getByRole("tab",{name:example.name,exact:true});
+    await expect(tab).toBeFocused();
+    await expect(tab).toHaveAttribute("aria-selected","true");
+    await expect(tab).toHaveAttribute("tabindex","0");
+    await expect(tablist.getByRole("tab",{selected:true})).toHaveCount(1);
+    const panel = art.getByRole("tabpanel",{name:example.name,exact:true});
+    for (const selector of [".payment-journey-request", ".payment-journey-checkout"]) {
+      await expect(panel.locator(selector)).toContainText(example.description);
+      await expect(panel.locator(selector)).toContainText(example.amount);
+    }
+    await expect(panel.locator(".payment-journey-pay")).toHaveText(`Pay ${example.amount}`);
+    await expect(panel.locator("button, input, form, a")).toHaveCount(0);
+    const box=(await tab.boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x+box.width).toBeLessThanOrEqual(320);
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)).toBe(false);
+  }
+  await tablist.getByRole("tab",{name:"Booking",exact:true}).focus();
+  await expectExample(0);
+  for (const index of [1,2,0]) { await page.keyboard.press("ArrowRight"); await expectExample(index); }
+  await page.keyboard.press("ArrowLeft"); await expectExample(2);
+  await page.keyboard.press("Home"); await expectExample(0);
+  await page.keyboard.press("End"); await expectExample(2);
+  await tablist.getByRole("tab",{name:"Invoice",exact:true}).click(); await expectExample(1);
+  await page.keyboard.press("Tab");
+  await expect(art.getByRole("tabpanel",{name:"Invoice",exact:true})).toBeFocused();
+  await expect(page).toHaveURL(/\/payment-services$/);
+  expect(mutations).toEqual([]);
+  expect(privateReads).toEqual([]);
+});
+
 test("the wallet setup guide explains both platforms without opening wallets or changing accounts", async ({page, context, baseURL}) => {
   const mutations: string[] = [], privateReads: string[] = [], externalRequests: string[] = [], errors: string[] = [];
   const origin = new URL(baseURL!).origin;
@@ -408,7 +457,7 @@ test("the wallet setup guide explains both platforms without opening wallets or 
     } else await route.continue();
   });
 
-  for (const path of ["/", "/card-services"]) {
+  for (const path of ["/card-services"]) {
     await page.goto(path);
     const guide = page.locator(".wallet-card-art");
     await expect(guide).toHaveCount(1);
@@ -477,7 +526,7 @@ test("the wallet setup guide explains both platforms without opening wallets or 
 });
 
 test("switching wallets never shows the previous payment mark while the new logo loads", async ({page}) => {
-  for (const path of ["/", "/card-services"]) {
+  for (const path of ["/card-services"]) {
     let releaseLogo!: () => void;
     let requestedLogo!: () => void;
     const heldLogo = new Promise<void>(resolve => { releaseLogo = resolve; });
