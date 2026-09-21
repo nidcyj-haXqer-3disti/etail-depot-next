@@ -14,7 +14,7 @@ test("optional dispute readiness keeps price and Order Insight coverage limits v
   await expect(network.locator(".dispute-benefits")).toContainText("Qualifying Visa online fraud disputes");
   await expect(network.locator(".dispute-benefits")).toContainText("required transaction history and evidence");
   await expect(network.getByRole("link",{name:"Explore Order Insight at Visa",exact:true})).toHaveAttribute("href","https://www.visa.com/en-us/products/order-insight");
-  const coverage=page.locator("details").filter({has:page.locator("summary").filter({hasText:"Does it cover every dispute?"})});
+  const coverage=page.locator("details").filter({has:page.locator("summary").filter({hasText:"Does Dispute readiness cover every dispute?"})});
   await coverage.locator("summary").click();
   await expect(coverage).toContainText("Automatic refund programs and managed chargeback responses are separate services");
   await expect(page.getByRole("checkbox",{name:"Dispute readiness",exact:true})).not.toBeChecked();
@@ -49,7 +49,11 @@ test("fees separate the 0.4 percent markup from unknown vendor charges and recov
   await estimate.locator("#addon-sale-records").uncheck();
   await expect(estimate).toContainText("$970.70");
   await expect(estimate).not.toContainText("Additional · quote required");
-  await expect(page.locator("#payouts")).toContainText("First payouts");
+  const payouts=page.locator("#payouts");
+  await payouts.locator("summary").click();
+  await expect(payouts.locator("p")).toBeVisible();
+  await expect(payouts).toContainText("Payment confirmation, available funds and bank arrival are separate steps");
+  await expect(payouts).toContainText("First payouts");
   expect(mutations).toEqual([]);
   expect(await page.evaluate(()=>localStorage.length+sessionStorage.length)).toBe(0);
 });

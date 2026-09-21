@@ -1,10 +1,11 @@
 import { Icon } from "./icon";
+import { productFacts } from "@/shared/product-facts";
 import "./secured-credit-art.css";
 
 const purchaseSteps = [
-  { title: "Purchases", description: "Create an amount owed.", icon: "card" },
-  { title: "Statement", description: "Shows what to repay.", icon: "document" },
-  { title: "Repayment", description: "From your payment source.", icon: "arrow" },
+  { title: "Purchases", description: "Pay with your card.", icon: "card" },
+  { title: "Statement", description: "See what you owe.", icon: "document" },
+  { title: "Repayment", description: `${productFacts.cards.repayment}.`, icon: "arrow" },
 ] as const;
 
 /** Explains collateral separately from the purchase bill; it contains no account controls. */

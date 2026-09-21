@@ -1,6 +1,24 @@
 # Decision register
 
+## D144 — prepare the reviewed website for deployment
+
+21 September 2026. Freeze the D141–D143 public-site changes on the existing feature branch, prepare a reviewable pull request, verify remote CI against the candidate, and produce a clean source/build package. The repository and Netlify site were re-read and match project-targets.json; remote main has the same source tree as the local base. D143 application-source hashes still match the passing verification receipt. Preparation does not merge or publish. D140 / PR #31 remains the live release; no provider, database, access, DNS or environment mutation. Record final artifacts and CI outcomes in [status](../planning/STATUS.md).
+
+## D143 — consistent three-page presentation
+
+21 September 2026. Preserve the approved Home, Payments and Cards layouts while tightening one shared visual language. Move the fixed-size FAQ indicator treatment into shared styles, remove doubled FAQ link spacing and unnecessary top margins on headings without eyebrows, and repair the wallet guidance note’s CSS specificity. Align product-label punctuation, discovery/support labels and product FAQ headings. Use customer-directed language inside checkout, merchant-directed language for the Trolleys sale record, and plain purchase/statement/repayment steps on Cards. Approved commercial facts, fee exclusions, availability, providers, shared chrome and public-only boundaries are unchanged. Verification and initial findings are recorded in [status](../planning/STATUS.md). No deployment is included.
+
+## D142 — product depth through connected artwork
+
+21 September 2026. The user finds D141 too simple, especially its artwork and 0.4% marketing. Use connected product illustrations to explain how a shared payment becomes a checkout and how purchase context reaches participating banking experiences through Order Insight. Make the optional fee tangible with an exact-cent example from the existing estimator. Present recognition, inquiry support and conditional eligible Visa online fraud deflection as distinct benefits, without promising universal protection or dispute outcomes. Retain concise FAQs, shared chrome, approved pricing/provider destinations and public-only boundaries. [Design and evidence](PAYMENTS_VALUE_EXPERIENCE.md). No deployment is included.
+
+## D141 — concise Payments page
+
+21 September 2026. At the user’s request, polish the existing Payments page through subtraction: shorten its hero and channel copy, remove repetitive introductions and backward prompts, reduce duplicate purchase labels, and consolidate payout guidance into the FAQ. Preserve the two-step artwork, synchronized Goods / Services / Information examples, five channels, customer/bank views, exact fee estimation and approved offer. Compact network marks within the channel checkout; reserve space for FAQ indicators when text spacing grows. Clarify related Help/Terms pricing links and remove retired component styles. No provider, account, database, pricing-model or publication action. Verification and source identity are recorded in [status](../planning/STATUS.md).
+
 ## D140 — deploy the completed public-site candidate
+
+Publication completed: PR #31 passed exact-source GitHub checks and merged. Netlify deploy `6ab0d438588dbc2adeb59f78` is ready/current; all 12 hosted desktop/mobile scenarios, 80 interaction checks and 27 SEO/route requests pass. No migration, access, domain or provider change. [Release evidence](RELEASE_READINESS_REVIEW.md).
 
 21 September 2026. The user explicitly requests publication after D139’s final microlevel review. Release all accepted public product/marketing changes through the bound repository PR/check/review workflow and existing Netlify site, verify identical reviewed and uploaded source, and inspect the hosted result. Keep current visitor access, production search scope, archived database resources and separate vendor systems unchanged. This supersedes the prior preparation-only hold; actual deployment evidence is recorded separately.
 

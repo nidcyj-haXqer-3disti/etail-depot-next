@@ -1,6 +1,38 @@
-## D140 — authorized publication in progress
+## D144 — release preparation
 
-The user explicitly requests deploying the completed D139 candidate. Source and evidence hashes match the reviewed version, and independent review finds no release blockers. Proceed through exact-source GitHub checks and the existing Netlify site; hosted success and release identifiers will be recorded after read-back verification. No database, vendor service, access or DNS change is included.
+D141–D143 are being frozen as the next review candidate. Verified GitHub/Netlify identities match the target file, the local base equals remote main by tree, and D143 tested source hashes remain unchanged. Complete the feature pull request, exact-source CI and pristine packaging before declaring preparation complete. D140 remains live; merge and publication are separate pending actions. See [status](../planning/STATUS.md) and `artifacts/d144-checks/`.
+
+## D143 — cross-page consistency candidate verified
+
+Home, Payments and Cards now use aligned heading/FAQ spacing, product-label punctuation, exploration/support wording and artwork language. Shared FAQ sizing fixes a reproduced narrow-screen increased-text-spacing overflow; the wallet disclaimer has the intended secondary hierarchy. The approved Payments artwork, fees, availability and provider boundaries are preserved.
+
+**Full `pnpm verify` passes:** 86 unit tests, 44 desktop/mobile flows, 24 accessibility cases, security/dependency review, production SEO and Next/Netlify packaging. **78 alignment/text-spacing scenarios** pass across six public routes and eleven widths, with no checked overflow, broken targets/images or browser errors. Final desktop/tablet artwork and independent mobile review support the source and geometry checks. [Status](../planning/STATUS.md) records evidence and initial diagnostics.
+
+**Local review candidate; not deployed.** D140 / PR #31 remains live. No database or provider operation. Browser coverage is Chromium desktop/mobile emulation; these checks do not certify vendor financial flows, legal terms or subjective design quality.
+
+## D142 — richer Payments candidate verified
+
+The user-directed rebuild restores product depth through larger two-step sharing artwork, a connected Trolleys → Order Insight → bank illustration, distinct customer/bank views and a concrete optional-fee example. Approved pricing, separate vendor charges, eligibility/coverage limits and concise FAQs remain. Independent source review confirms the marketing stays within the verified product scope; final visual review corrected contrast and spacing specificity.
+
+**Full `pnpm verify` passes:** 86 unit tests, 44 desktop/mobile flows, 24 accessibility cases, security/dependency review, production SEO and Next/Netlify packaging. All **119 production-mode responsive/interaction/text-spacing scenarios** pass with no checked layout or JavaScript/console errors. [Status](../planning/STATUS.md) records initial diagnostics, exact scope and artifacts. [Design](PAYMENTS_VALUE_EXPERIENCE.md).
+
+**Local review candidate; not deployed.** D140 / PR #31 remains the published release. Public-only runtime and preserved data/provider boundaries are unchanged. Browser coverage is Chromium with mobile emulation; financial/provider operation and legal certification remain outside these checks.
+
+## D141 — Payments-page polish ready for review
+
+The focused Payments refinement is complete: repeated marketing copy and duplicate artwork labels removed, payout guidance consolidated into four FAQs, checkout network marks balanced, pricing simplified and related Help/Terms link labels clarified. The approved offer, fee/coverage disclosures, interactive examples and public-only data boundaries remain intact.
+
+Final command runs pass all release gates: **86 unit tests, 44 desktop/mobile flows, 24 accessibility cases**, security/dependency review, production SEO, Next/Netlify builds and artifact inspection. All **56 responsive and increased-text-spacing scenarios** pass across seven widths. Independent source and desktop/phone visual reviews found no remaining actionable issue. Earlier stale test selectors and FAQ-indicator overflow were corrected; diagnostic logs are retained. [Status](../planning/STATUS.md) and `artifacts/d141-checks/implementation.json` identify exact source and verification evidence.
+
+**Local candidate only; not deployed.** D140 / PR #31 remains the recorded public release. No database, provider, financial, access or domain changes. Browser coverage is Chromium desktop/mobile emulation; this is not certification of vendor services or legal agreements.
+
+## D140 — published and verified
+
+21 September 2026. [PR #31](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/31) merged as `a07112bfb8b3889b5c59ab61632f4e7f7ee1610e` after every check in GitHub run `35569814703` passed. Local commit `f31f57e41b321567f90388dd0ba9e629259132fe`, remote feature `157a207149e64c7072f74cde1d0ec58f56d95b48` and the pristine 413-file upload represent reviewed tree `4cba63b529ef7321c5ec959770990647b39d41cb`. The test merge used those exact head/base revisions. A clean-source Next/Netlify package check passed; uploaded file hashes stayed unchanged.
+
+Netlify deploy `6ab0d438588dbc2adeb59f78` published at **06:53:38.640 UTC** and was confirmed ready/current after acceptance. All **12 desktop/mobile page scenarios, 80 interaction checks and 27 hosted SEO/route requests** pass; 74 screenshots were recorded. No JavaScript errors, failed/aborted browser requests or pending requests at teardown. Final phone payment artwork and desktop recognition artwork were visually inspected. The initial browser harness flagged canonical root slash formatting and decorative scroll extents; focused geometry proved content fits, narrowly corrected checks passed, and the initial results are preserved. No application correction or additional deployment was required.
+
+Visitor access, DNS, search scope, vendor services and preserved database resources are unchanged; no migrations applied. Coverage is Chromium desktop/mobile emulation of the public website, not vendor financial-flow testing. Receipt and logs: `artifacts/d140-checks/release.json`, `github-ci.log`, `pristine-package.log`, `hosted-seo.json`, `hosted-visual/summary.json`, `hosted-initial/` and `faq-geometry.json`. Post-publication documentation records the release locally and is not part of the uploaded source.
 
 ## D139 — final local release review passed
 

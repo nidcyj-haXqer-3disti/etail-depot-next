@@ -69,7 +69,7 @@ test("public service discovery shows availability and support without local acco
       await expect(paymentSummary.locator("a, button, input, form")).toHaveCount(0);
       await expect(cards).toContainText("Ledgix");
       await expect(cards).toContainText("Coming soon");
-      await expect(cards.getByRole("link",{name:"Meet the card",exact:true})).toHaveAttribute("href","/card-services");
+      await expect(cards.getByRole("link",{name:"Explore cards",exact:true})).toHaveAttribute("href","/card-services");
       await expect(cards.locator(".wallet-product-art")).toHaveCount(1);
       await expect(cards.locator("button, form, input")).toHaveCount(0);
       await expect(page.locator(".wallet-card-art")).toHaveCount(0);
@@ -86,12 +86,10 @@ test("public service discovery shows availability and support without local acco
       await expect(page.locator("main").getByRole("link",{name:/apply|create|sign in/i})).toHaveCount(0);
     }else if(path==="/payment-services"){
       await expect(page.locator("main")).toContainText("Available now");
-      await expect(page.locator(".consumer-product-note")).toHaveText("Continue to Trolleys to apply for payments.");
       await expect(page.locator(".consumer-hero-actions").getByRole("link")).toHaveCount(2);
       await expect(page.locator(".consumer-hero-actions").getByRole("link",{name:"Get started with Trolleys",exact:true})).toHaveAttribute("href","https://trolleys.ai");
       await expect(page.locator(".consumer-hero-actions").getByRole("link",{name:"View pricing",exact:true})).toHaveAttribute("href","#fees");
       await expect(page.locator("main").getByRole("link",{name:"Explore payments",exact:true})).toHaveCount(0);
-      await expect(page.locator("main").getByRole("link",{name:"Explore Dispute readiness",exact:true})).toHaveAttribute("href","#dispute-readiness");
     }
     expect(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth)).toBe(false);
   }
