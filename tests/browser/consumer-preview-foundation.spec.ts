@@ -65,7 +65,7 @@ test("public service discovery shows availability and support without local acco
       await expect(page.getByRole("tablist",{name:"Ways to share a payment request",exact:true})).toHaveCount(0);
       await expect(page.locator(".channel-showcase")).toHaveCount(0);
       const paymentSummary=page.locator(".consumer-payment-summary");
-      await expect(paymentSummary.getByRole("heading",{level:3})).toHaveText(["Booking deposits","Payments for your work","Sales wherever you are"]);
+      await expect(paymentSummary.getByRole("heading",{level:3})).toHaveText(["Booking deposits","Work and expertise","Sales wherever you are"]);
       await expect(paymentSummary.locator("a, button, input, form")).toHaveCount(0);
       await expect(cards).toContainText("Ledgix");
       await expect(cards).toContainText("Coming soon");
@@ -74,10 +74,10 @@ test("public service discovery shows availability and support without local acco
       await expect(cards.locator("button, form, input")).toHaveCount(0);
       await expect(page.locator(".wallet-card-art")).toHaveCount(0);
       await expect(cards.locator(".consumer-availability-note")).toHaveCount(0);
-      const signInQuestion=page.locator("summary").filter({hasText:"Will cards and payments use the same sign-in?"});
+      const signInQuestion=page.locator("summary").filter({hasText:"Where will I manage my services?"});
       await signInQuestion.click();
       await expect(signInQuestion.locator("..")).toHaveAttribute("open","");
-      await expect(signInQuestion.locator("..")).toContainText("No. Payments are managed through Trolleys. Card account access will be available through Ledgix when the service launches.");
+      await expect(signInQuestion.locator("..")).toContainText("Manage payments through Trolleys. Card account access will be available through Ledgix when the service launches. Each service has its own sign-in.");
     }else if(path==="/card-services"){
       await expect(page.getByRole("banner").getByRole("link",{name:"Open Trolleys",exact:true})).toHaveAttribute("href","https://trolleys.ai");
       await expect(page.locator("main")).toContainText("Coming soon");
@@ -96,7 +96,7 @@ test("public service discovery shows availability and support without local acco
   await page.goto("/");
   await (await openMainNavigation(page)).getByRole("link",{name:"Payments",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-services$/);
-  await expect(page.getByRole("tablist",{name:"Ways to share a payment request",exact:true}).getByRole("tab")).toHaveCount(5);
+  await expect(page.getByRole("tablist",{name:"Ways to share a payment request",exact:true}).getByRole("tab")).toHaveCount(6);
   await expect(page.locator("main").getByRole("link",{name:"Explore payments",exact:true})).toHaveCount(0);
   await expect(page.locator(".channel-showcase").getByRole("link")).toHaveCount(0);
   const navigation=await openMainNavigation(page);

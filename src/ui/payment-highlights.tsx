@@ -1,3 +1,5 @@
+import { paymentExamples } from "@/modules/public-site/payment-examples";
+import { formatUsdCents } from "@/modules/public-site/fee-estimate";
 import { Icon } from "./icon";
 import "./payment-highlights.css";
 
@@ -12,10 +14,10 @@ export function PaymentHighlights() {
       <h3>Booking deposits</h3><p>Send a request when your customer is ready to book.</p>
     </article>
     <article>
-      <div className="payment-highlight-art payment-highlight-invoice" aria-hidden="true">
-        <div className="payment-story-invoice"><div><Icon name="document" /><span>Payment request</span></div><p>Design project</p><div className="payment-story-total"><span>Amount due</span><strong>$480.00</strong></div><span className="payment-story-pay">Pay by card<Icon name="arrow" /></span></div>
+      <div className="payment-highlight-art payment-highlight-request" aria-hidden="true">
+        <div className="payment-story-paper"><div><Icon name="document" /><span>Payment request</span></div><p>{paymentExamples.information.description}</p><div className="payment-story-total"><span>Amount due</span><strong>{formatUsdCents(paymentExamples.information.amountCents)}</strong></div><span className="payment-story-pay">Pay by card<Icon name="arrow" /></span></div>
       </div>
-      <h3>Payments for your work</h3><p>Send a payment request for the work you deliver.</p>
+      <h3>Work and expertise</h3><p>Request payment for a project, report or consultation.</p>
     </article>
     <article>
       <div className="payment-highlight-art payment-highlight-counter" aria-hidden="true">

@@ -1,4 +1,5 @@
 import { legalPageMetadata } from "@/modules/public-site/legal-metadata";
+import { saleRecordsOffer } from "@/shared/product-facts";
 import { legalIdentity } from "@/shared/legal-identity";
 import { LegalDocument, type LegalSection } from "@/ui/legal-document";
 import { LegalBrands, LegalContacts } from "@/ui/legal-identity";
@@ -43,13 +44,13 @@ const sections: LegalSection[] = [
       <p><strong>Website services.</strong> Companies that help us host, deliver and protect this website may handle the technical information described above. This website does not provide customer accounts or sign-in. Ledgix and Trolleys product notices describe the service partners involved and how information is shared within each product.</p>
       <p><strong>Support.</strong> Authorized staff can review records within their assigned support responsibilities. Include only the information needed to explain your inquiry.</p>
       <p><strong>Information you share.</strong> Email links open your email application. The message and information you send are handled by your email service and the recipient. Product links open the relevant service website; they do not include your earlier account details or website query parameters.</p>
-      <p><strong>Dispute readiness.</strong> Trolleys’ optional service uses its live Order Insight integration to share supported merchant, transaction and order details with participating banks for purchase recognition and eligible fraud-dispute prevention. Review the Trolleys product notices and service terms for the information involved, access, sharing and applicable permissions. This public website does not collect sale records or send example information to Order Insight or banks.</p>
+      <p><strong>{saleRecordsOffer.brandName}.</strong> Trolleys’ optional service uses its live Order Insight integration to share supported merchant, transaction and order details with participating banks for purchase recognition and prevention of eligible fraud disputes. Review the Trolleys product notices and service terms for the information involved, access, sharing and applicable permissions. This public website does not collect sale records or send example information to Order Insight or banks.</p>
       <p><strong>Legal and security matters.</strong> Information may need to be disclosed to comply with applicable law or valid legal process, or to investigate fraud, unauthorized access or threats to the service. Requests about these disclosures should be directed to our compliance contact.</p>
     </>,
   },
   {
     id: "cookies", title: "Cookies and website activity", content: <>
-      <p>This website does not set sign-in or payment cookies. Its payment and Dispute readiness examples, fee calculator and wallet setup guide do not collect card details or store customer information. Example selections and calculator amounts stay in your browser and are not sent to us or saved by this website. The examples use fixed illustrative information; they do not track fulfillment or purchase access, record customer acceptance, send documents or enroll you in a service. The companies supporting this website may process technical information for delivery, security and traffic measurement.</p>
+      <p>This website does not set sign-in or payment cookies. Its payment and {saleRecordsOffer.name} examples, fee calculator and wallet setup guide do not collect card details or store customer information. Example selections and calculator amounts stay in your browser and are not sent to us or saved by this website. The examples use fixed illustrative information; they do not track fulfillment or purchase access, record customer acceptance, send documents or enroll you in a service. The companies supporting this website may process technical information for delivery, security and traffic measurement.</p>
       <p>Cookies from earlier website account features may remain in your browser until they expire or you clear them. The current website does not use or renew those account cookies. Clearing cookies does not delete retained records.</p>
       <p>The Ledgix and Trolleys product websites have their own cookie practices and controls.</p>
     </>,

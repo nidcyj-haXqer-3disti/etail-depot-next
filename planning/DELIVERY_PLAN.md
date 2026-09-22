@@ -1,6 +1,60 @@
+# D162 — prepare the verified release candidate
+
+Freeze the D153–D161 source on its feature branch, create a review PR, verify exact-tree CI and a pristine Netlify package, and preserve a separate source-only upload directory. Record source identities, actual checks and remaining publication steps in [status](STATUS.md). Preserve the live D152 release; no merge or deployment requested.
+
+# D161 — three-page craft and readiness review
+
+Review product positioning, typography, artwork, links, Help, Terms and Privacy together. Correct repetition and stale application language, retain truthful product qualifications, and audit the public-only runtime and disconnected database archive. Run final public/browser/accessibility/security/production-search/package checks and record actual evidence in [status](STATUS.md). Keep the local preview reviewable; publication remains separate.
+
+Completed locally: all applicable verification gates, 48 responsive/text-spacing states and independent archive review pass. The three product journeys and legal/help language are aligned; all 71 archived database files remain intact. Production SEO and Netlify package inspection now cover the updated candidate. Preview is running; no deployment performed.
+
+# D160 — rebuild the Payments page
+
+Reorganize the promise, Two Step illustration, Clarity continuation, pricing and practical questions into one coherent page. Match Two Step's product artwork to the banking experience, preserve all selected-purchase interactions and public-only boundaries, and verify the complete public site plus responsive/keyboard/text-spacing states. Keep the approved fees and all material disclosures. Refresh the local preview; no deployment requested. [Status](STATUS.md) records actual completion evidence.
+
+Completed locally: production build, all affected browser flows, 24 accessibility cases and 90 final visual-geometry scenarios pass. Source/security, pricing, link and archive boundaries remain intact. Preview is running; no deployment performed.
+
+# D159 — correct the Two Step base rate
+
+Apply the user's 2.9% + 30¢ correction through the existing shared offer and calculator; preserve no monthly fee, Two Step packaging and optional Clarity. Recheck the fee arithmetic and affected browser flows, then refresh the local preview. No layout rebuild, provider billing change or publication. [Status](STATUS.md) records verification.
+
+Completed locally: lint/types, 86 unit tests, production build and four affected desktop/mobile flows pass. The local preview is refreshed; no deployment performed.
+
+# D158 — implement the approved Two Step offer
+
+Update the shared public offer to 3.0% + 30¢, no monthly fee and creation/sharing included. Synchronize fee calculations, offer copy, Help and Terms; keep optional Clarity at +0.4% and all other approved scopes. Verify rounding, optional selection, invalid-input recovery and responsive presentation. No subscription, active billing, database or provider changes. [Status](STATUS.md) records actual checks; publication remains separate.
+
+Completed locally: production build, 86 unit tests, 44 browser flows across the initial/corrected runs, 24 accessibility cases, source/dependency security and four responsive visual states pass. Final production-search and Netlify-package checks remain part of the next release preparation.
+
+# D156 — affordable membership proposal
+
+Completed: replace the $49 candidate with the user's approximate $5/month or $36/year direction, calculate the implications and explain why processing discounts need separate cost validation. [Revision](../docs/TROLLEYS_MEMBERSHIP_PRICING.md). Keep public rates unchanged; subscription benefits, processing terms and implementation remain to be decided.
+
+# D155 — Two Step economics proposal
+
+Research current US payment-link pricing, collection demand and software monetization. Propose core pricing, optional Clarity treatment, unit economics and customer validation using explicit assumptions; preserve existing public prices, application code and hosted services. Completed research and the 81-case arithmetic model are recorded in [status](STATUS.md) and [the proposal](../docs/TROLLEYS_ECONOMIC_PROPOSAL.md). Commercial adoption and implementation require a subsequent decision supported by actual supplier terms.
+
+# D154 — commercial Clarity presentation
+
+Remove the duplicate fee example and pricing jump link from the optional-service introduction. Use Trolleys Clarity consistently, with the headline The story behind the payment, a compact optional rate and light framing around the existing banking artwork. Align Help, Privacy, Terms and metadata labels. Preserve fee arithmetic, eligibility, coverage limits and public-only behavior; verify responsive presentation, accessibility and the release package. Publication remains separate.
+
+Completed locally: full public-site verification and 20 independent responsive/view/text-spacing scenarios pass. Current status records evidence and limitations.
+
+# D153 — one memorable Create → Share experience
+
+Research payment-link journeys and naming through primary sources. Consolidate sale selection, request details and sharing choices into one **Trolleys Two-Step** illustration, preserving the same purchase through checkout and dispute-readiness examples. Use an extensible channel registry with Copy link, Text, Email, Social, QR code and Website; remove the previous duplicate diagrams and fixed count. Verify all type/channel combinations, keyboard use, responsive/text-spacing geometry and the complete public-site checks. Record actual results in [status](STATUS.md). Local implementation only; D152 remains published.
+
+Completed locally: the full public-site suite, 180 responsive/state scenarios and 20 final centering/focus checks pass. Research, implementation and verification evidence are recorded in current status.
+
+# D152 — deploy the approved PR #33 release
+
+Completed: expected-head PR merge, exact-tree publication, current-site confirmation and hosted desktop/mobile/SEO acceptance. Failed first attempt and unchanged-source retry are preserved in [status](STATUS.md). No database or provider changes.
+
 # D151 — prepare the verified candidate for release
 
 Freeze D146–D150 on the existing feature branch, prepare the review PR and verify its exact-source checks. Validate a fresh source archive separately from the clean upload directory, preserve source hashes and confirm the existing repository/site identities. Keep production unchanged; record preparation results in [status](STATUS.md).
+
+Completed: PR #33, passing GitHub CI, clean source archive and isolated Netlify package are ready. Review/merge/publication await the next deployment instruction; D145 remains live.
 
 # D150 — verify and polish the three public journeys
 

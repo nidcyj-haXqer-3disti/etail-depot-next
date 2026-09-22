@@ -40,7 +40,7 @@ export function DisputeReadinessArt({purpose}: {purpose: PaymentExamplePurpose})
 
   return <figure className="dispute-art recognition-art" aria-label="Order Insight purchase recognition example">
     <div className="recognition-toolbar">
-      <p>Give the payment its story.</p>
+      <p>From your sale to their transaction details.</p>
       <div className="dispute-art-switch recognition-switch" role="group" aria-label="Explore purchase recognition">
         {(["Customer view", "Bank inquiry"] as const).map(name => <button key={name} type="button" aria-pressed={view === name} aria-controls={`${id}-view`} onClick={() => setView(name)}>{name}</button>)}
       </div>

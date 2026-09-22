@@ -1,8 +1,66 @@
 # Decision register
 
+## D162 — prepare the verified public-site release
+
+22 September 2026. The user requests deployment preparation. Freeze D153–D161 as a reviewable feature candidate, confirm repository and site identities, bind CI and a pristine Netlify package to the same source tree, and retain a separate source-only upload directory. Preserve the approved offer, public-only runtime, existing data/resources and live D152 release. Preparation authorizes the feature PR, not merge or publication. Record actual results in status and release evidence.
+
+## D161 — craft a coherent new-entrant experience
+
+22 September 2026. The user requests a microlevel three-page, notice and technical review, with the positioning of a distinctive new entrant. Preserve the accepted D160 layout and approved offer; express the difference through clear product actions and truthful specifics, not unsubstantiated novelty or superiority. [Positioning](PRODUCT_POSITIONING.md) records page roles and commercial vocabulary. Connect the homepage to Two Step, show information/expertise alongside bookings and sales, simplify the card introduction while retaining monthly repayment, align the hero paper color and FAQ hierarchy, remove redundant Help language and correct retired-feature references in Terms. Preserve Privacy when its actual practices have not changed. Audit the disconnected archive and public-only runtime; verify the full build, search and Netlify package. No publication requested.
+
+## D160 — one coherent Payments page
+
+22 September 2026. The user requests a full Payments-page design rebuild while retaining the approved content, using the realistic banking illustration as the visual reference for Two Step. Organize the page as **request and share → customer payment → purchase recognition → fees and practical questions**. Show the core rate with the opening promise; reserve the complete estimate and exceptions for pricing. Preserve exactly two numbered merchant actions and the unnumbered buyer outcome.
+
+Replace the disconnected white request/gallery panels with a single forest-green product canvas: a recognizable request workspace, integrated sale choices, a channel selector and contextual recipient previews. Match the banking artwork's palette, borders, screen chrome, proportions and typography. Keep one selected purchase across the request, sharing, checkout summary and Clarity. Present Clarity as the continuation after payment, with concise benefit columns and the existing coverage/fee basis. Pricing becomes one connected offer-and-estimate panel. Shared Home/Cards chrome, provider entrances, approved pricing, terms, archive and public-only runtime remain unchanged. No deployment requested; actual checks are recorded in [status](../planning/STATUS.md).
+
+## D159 — Two Step base rate corrected to 2.9%
+
+22 September 2026. The user explicitly replaces 3.0% with **2.9% + 30¢ per successful domestic online card payment, with no monthly fee**. Set the shared public rate to 290 basis points and keep D158's product name, included creation/sharing and optional Clarity at 40 basis points. Help and pricing read the shared value; the website Terms link to that offer without hardcoding a rate. Update existing numeric and browser expectations, including half-cent rounding. Preserve all unrelated candidate work and historical decisions. Local implementation only; no provider, database, subscription or publication action.
+
+## D158 — approved Two Step public offer
+
+22 September 2026. The user selects **Trolleys Two Step, 3.0% + 30¢ per successful domestic online card payment, no monthly fee, Create and Share included**. Use a single 300-basis-point base rate plus 30¢; do not add a second 0.1% or introduce a membership. Keep the $0 setup fee, basic receipts and separately optional Clarity at 40 basis points. The fee estimate rounds the base and optional service independently under the existing exact-cent policy.
+
+Name the base package consistently in pricing, the estimator, Help and website Terms, with an updated Terms revision date. Remove redundant link/sharing and monthly-fee rows from the price card while preserving material scope and additional-fee disclosures. Operator approval of the public offer does not configure the hosted processor or prove supplier margins. Historical D155–D157 alternatives stay available as research. Verification belongs in [status](../planning/STATUS.md); publication was not requested.
+
+## D157 — compare transaction and membership pricing
+
+22 September 2026. The user asks whether monthly membership, an additional 0.1% or 10¢ better fits Create and Share. Record the [comparison](TROLLEYS_MEMBERSHIP_PRICING.md#d157-comparison-membership-01-or-10) as research, not a selected price. Recommend testing successful-payment pricing for the core product without a mandatory subscription: a percentage increment for a broad payment mix, with a fixed increment worth comparing for service tickets above $100. Keep an optional membership for distinct verified recurring tools. Current fees and application behavior remain unchanged. Independent calculation confirms the ticket and monthly fee crossovers; competitor inclusion patterns do not prove Trolleys willingness to pay.
+
+## D156 — affordable membership direction
+
+22 September 2026. The user prefers approximately $5 paid monthly or $3/month paid yearly, replacing the $49 subscription candidate. [The revised proposal](TROLLEYS_MEMBERSHIP_PRICING.md) expresses annual billing as $36/year, a $24/40% saving versus 12 monthly payments. Recommend optional software membership with the same standard processing rate across billing periods; a 40bp discount cannot be presumed to be funded by a $3–$5 subscription. This benefit/rate structure remains a recommendation, not user-approved provider configuration. Current 2.9% + 30¢ and optional Clarity remain unchanged; the earlier 3.3% proposal is still unapproved. Independent Decimal review confirms annual savings, fee crossover and cost-sensitivity examples. No application or deployment change.
+
+## D155 — research the Two Step commercial model
+
+22 September 2026. The user asks for market analysis and an economic proposal because Create and Share should be the main revenue product. [The proposal](TROLLEYS_ECONOMIC_PROPOSAL.md) recommends testing a $0-monthly bundled Two Step price of 3.3% + 30¢ for successful domestic online card payments, with the existing Clarity +0.4% independently optional. A later $49/month + 2.9% + 30¢ candidate depends on actual wholesale costs and recurring merchant value. These are hypotheses, not selected or published commercial terms. The current rate and all application/provider behavior remain unchanged.
+
+Primary-source competitor and demand research supports payment collection as the outcome to monetize; generic link creation is usually included. Model costs explicitly, distinguish merchant fee billings from accounting revenue and contribution from profit, and preserve uncertainty about actual Infinicept terms and customer willingness to pay. The 81-case Decimal model and independent arithmetic review support the scenario calculations only. No deployment, new software capability, guarantee of merchant savings or financial forecast follows from this task.
+
+## D154 — Trolleys Clarity commercial presentation
+
+22 September 2026. The user removes the $0.40 fee-on-$100 example, processing sentence and estimator link from the optional-service introduction, and requests a more commercial product line without dash punctuation. Use **Trolleys Clarity** as the brand label and **Clarity** as the short shared name. Headline: **The story behind the payment.** Explain purchase recognition and bank inquiries in ordinary language; retain participating-bank, payment-eligibility and conditional fraud-deflection boundaries. [Visa Order Insight](https://www.visa.com/en-us/products/order-insight), reviewed 22 September 2026, supports those functions; no insurance, guaranteed result, expanded coverage or new integration is claimed.
+
+Replace the dark full-width section and large price card with a light two-column introduction, compact optional 0.4% rate/basis, the existing framed banking illustration and three aligned benefit cards. Keep detailed processing fees and exclusions in the pricing section. Remove unused example calculations/styles and use the same service name in the calculator, Help, Privacy, Terms and search metadata. Preserve existing fragment URLs. Display Trolleys Two Step without a hyphen; preserve its interaction and shared purchase context. This is a local presentation change, not a price, legal-duty, backend or deployment change. Verification belongs in [status](../planning/STATUS.md).
+
+## D153 — one Trolleys Two-Step experience
+
+22 September 2026. Keep **Trolleys Payments** as the product and use **Trolleys Two-Step** for its illustrated merchant journey: **Create** a request for Goods, Services or Information; **Share** the same payment link in the customer's preferred context. Place the buyer's checkout outside the numbered steps as an outcome. Consolidate the prior hero, sale-choice section and channel gallery into one full-width composition; keep one shared purchase state across the request, sharing artwork, checkout summary and bank-recognition example.
+
+Use a shared extensible registry for Copy link, Text, Email, Social, QR code and Website. The gallery previews one presentation at a time while explaining that the same link can be shared in several places. Copy link is an illustration of a general sharing action, not a new automated delivery integration. Avoid a hardcoded channel count. Preserve accessible selection and focus, horizontal rail browsing and selected-option visibility on resize.
+
+Primary-source research supports this recognizable create/share pattern. Avoid network-specific Tap to Pay / Click to Pay branding and the closely used Share2Pay name. The proposed experience name is not trademark-cleared or evidence of improved conversion. [Research](research/d153-trolleys-two-step.md) records eight primary sources, naming alternatives and limitations. Confirmed fees, product availability, policies, fixed destinations and public-only runtime remain unchanged. No publication is included; verification belongs in [status](../planning/STATUS.md).
+
+## D152 — publish the approved PR #33 candidate
+
+21 September 2026. The user explicitly says “now deploy.” Publish the exact D151-verified tree after merging PR #33 with its expected-head guard. Keep immutable source separate from local closeout documents and generated validation output. Preserve the existing site, visitor access, approved search scope and all database/provider resources. Hosted acceptance must verify the new release before reporting completion. Completed: Netlify deploy `6ab146f61a7d282bab60350e` is ready/current; all 12 hosted scenarios and 27 SEO/route requests pass. An unchanged-source retry succeeded after the first hosted attempt failed. Preserve both attempts and the unavailable first-build root cause in the release evidence.
+
 ## D151 — prepare the D146–D150 release candidate
 
 21 September 2026. The user asks to get ready to deploy. Prepare a feature PR and independently verified source archive/package for the accepted banking illustrations, payment gallery, card artwork and three-page polish. Match the passing local source hashes, remote tree and CI-tested candidate. Keep clean upload source separate from build validation output. This request covers release preparation; merge and public deployment remain pending the next release instruction. Preserve D145 / PR #32 live, existing customer records, environment/access/DNS settings and external financial services.
+
+Completed: PR #33, exact-source GitHub run `35614129578`, isolated offline package validation and independent source-only archive verification all pass. Freeze tree `c54917a1eaa9ea3c84d10699a67f5928b9aca5be`; retain preparation closeout as local evidence outside that immutable candidate. [Status](../planning/STATUS.md) records diagnostics and the publication boundary.
 
 ## D150 — focused consistency polish across Home, Payments and Cards
 

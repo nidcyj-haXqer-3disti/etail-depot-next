@@ -40,7 +40,7 @@ export default function CardServicesPage() {
       <WalletGuide><WalletCardArt /></WalletGuide>
     </div></section>
     <section className="page-container public-section public-faq-section" aria-labelledby="card-questions-title">
-      <div><h2 id="card-questions-title">Good to know.</h2><Link href="/help#cards" className="consumer-text-link">Card help<Icon name="arrow" /></Link></div>
+      <div><p className="eyebrow">Before you apply</p><h2 id="card-questions-title">Good to know.</h2><Link href="/help#cards" className="consumer-text-link">Card help<Icon name="arrow" /></Link></div>
       <div className="public-questions">
         <details><summary>Can I apply now?<span aria-hidden="true">+</span></summary><p>Applications are not open yet. Contact Ledgix with questions about the upcoming card.</p></details>
         <details><summary>When is the security deposit returned?<span aria-hidden="true">+</span></summary><p>Deposit-return conditions and timing will be set out in the card agreement before applications open. Your security deposit is separate from repayments for purchases.</p></details>

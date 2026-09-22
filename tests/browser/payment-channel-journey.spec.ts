@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
-const channels = ["Text", "Email", "Social", "QR code", "Website"] as const;
+const channels = ["Copy link", "Text", "Email", "Social", "QR code", "Website"] as const;
 const recognitionViews = ["Customer view", "Bank inquiry"] as const;
 const examples = [
   { name: "Goods", description: "Homeware set", amount: "$64.00", purchase: "Homeware set · 1 set", reference: "ORDER-1048", fulfillment: [["Delivery", "Delivered · 20 Sep"]] },
@@ -27,16 +27,18 @@ async function browserStorage(page: Page) {
   return page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage } }));
 }
 
-async function expectMatchingExample(showcase: Locator, example: (typeof examples)[number]) {
-  const panel = showcase.getByRole("tabpanel");
-  for (const selector of [".channel-medium", ".marketing-payment-summary"]) {
-    await expect(panel.locator(selector)).toContainText(example.description);
-    await expect(panel.locator(selector)).toContainText(example.amount);
+async function expectMatchingExample(page: Page, example: (typeof examples)[number]) {
+  const figure = page.getByRole("figure", { name: "Illustrated payment journey", exact: true });
+  for (const selector of [".payment-request-preview", ".channel-medium", ".marketing-payment-summary"]) {
+    const content = figure.locator(selector);
+    await expect(content).toContainText(example.description);
+    await expect(content).toContainText(example.amount);
+    for (const other of examples.filter(item => item.name !== example.name)) {
+      await expect(content).not.toContainText(other.description);
+      await expect(content).not.toContainText(other.amount);
+    }
   }
-  for (const other of examples.filter(item => item.name !== example.name)) {
-    await expect(panel).not.toContainText(other.description);
-    await expect(panel).not.toContainText(other.amount);
-  }
+  await expect(figure.locator(".payment-request-preview")).toContainText(example.reference);
 }
 
 async function expectMatchingRecognition(art: Locator, example: (typeof examples)[number]) {
@@ -57,29 +59,30 @@ test("sharing and purchase recognition preserve one purchase without enrollment"
   await page.goto("/payment-services");
   const initialStorage = await browserStorage(page);
   const experience = page.locator(".payment-experience");
-  const types = experience.getByRole("tablist", { name: "What you sell", exact: true });
-  const showcase = experience.locator(".channel-showcase");
+  const types = page.getByRole("tablist", { name: "What you sell", exact: true });
+  const showcase = page.locator(".channel-showcase");
   const delivery = showcase.getByRole("tablist", { name: "Ways to share a payment request", exact: true });
   const art = experience.locator(".dispute-art");
   const views = art.getByRole("group", { name: "Explore purchase recognition", exact: true });
   const option = page.locator("#addon-sale-records");
   const hero = page.getByRole("figure", { name: "Illustrated payment journey", exact: true });
-  const heroTypes = hero.getByRole("tablist", { name: "Payment examples", exact: true });
+  await expect(hero).toHaveCount(1);
+  await expect(hero).toHaveAttribute("id", "payment-channels");
+  await expect(types).toHaveCount(1);
+  await expect(page.getByRole("tablist", { name: "Payment examples", exact: true })).toHaveCount(0);
+  await expect(hero.locator(".payment-create-step, .payment-share-step")).toHaveCount(2);
+  await expect(hero.locator(".payment-create-step").getByRole("heading", { name: "Create your request", exact: true })).toBeVisible();
+  await expect(hero.locator(".payment-share-step").getByRole("heading", { name: "Share your way", exact: true })).toBeVisible();
   await expect(types.getByRole("tab")).toHaveCount(3);
-  await expect(delivery.getByRole("tab")).toHaveCount(5);
+  await expect(delivery.getByRole("tab")).toHaveCount(channels.length);
+  await expect(delivery).toHaveAttribute("aria-orientation", "horizontal");
+  await expect(delivery.getByRole("tab", { name: "Copy link", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(views.getByRole("button")).toHaveCount(2);
   for (const example of examples) {
-    await heroTypes.getByRole("tab", { name: example.name, exact: true }).click();
-    await expect(types.getByRole("tab", { name: example.name, exact: true })).toHaveAttribute("aria-selected", "true");
-    await expectMatchingExample(showcase, example);
-    await expectMatchingRecognition(art, example);
-  }
-  for (const example of examples) {
     await types.getByRole("tab", { name: example.name, exact: true }).click();
-    await expect(experience.locator(".sale-type-panel")).toHaveAccessibleName(example.name);
-    await expect(heroTypes.getByRole("tab", { name: example.name, exact: true })).toHaveAttribute("aria-selected", "true");
-    await expect(hero.getByRole("tabpanel")).toContainText(example.description);
-    await expect(hero.getByRole("tabpanel")).toContainText(example.amount);
+    await expect(hero.locator(".sale-type-panel")).toHaveAccessibleName(example.name);
+    await expectMatchingExample(page, example);
+    await expect(delivery.getByRole("tab", { name: example.name === "Goods" ? "Copy link" : "Website", exact: true })).toHaveAttribute("aria-selected", "true");
     for (const view of recognitionViews) {
       const button = views.getByRole("button", { name: view, exact: true });
       await button.click();
@@ -109,17 +112,20 @@ test("sharing and purchase recognition preserve one purchase without enrollment"
     for (const channel of channels) {
       await delivery.getByRole("tab", { name: channel, exact: true }).click();
       await expect(showcase.getByRole("tabpanel")).toHaveAccessibleName(channel);
-      await expectMatchingExample(showcase, example);
+      await expectMatchingExample(page, example);
       await expectMatchingRecognition(art, example);
-      await expect(showcase.locator(".marketing-payment-receipt")).toContainText("Payment receipt included");
+      await expect(hero.locator(".two-step-outcome")).toContainText("Payment receipt included");
       await expect(option).not.toBeChecked();
     }
   }
   const journey = showcase.locator(".marketing-channel-journey");
-  await expect(journey.locator("a, button, input, textarea, form, iframe")).toHaveCount(0);
+  const outcome = hero.locator(".two-step-outcome");
+  await expect(outcome).toContainText("Your customer opens the link and pays by card.");
+  await expect(hero.locator(".payment-request-preview, .marketing-channel-journey, .two-step-outcome").locator("a, button, input, textarea, form, iframe")).toHaveCount(0);
+  await expect(journey.locator(".marketing-journey-step, .channel-checkout")).toHaveCount(0);
   await expect(art.locator("article a, article button, article input, form, iframe")).toHaveCount(0);
   for (const name of ["Visa", "Mastercard", "American Express", "Discover"]) {
-    const image = journey.getByRole("img", { name, exact: true });
+    const image = outcome.getByRole("img", { name, exact: true });
     await expect(image).toBeVisible();
     await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth > 0)).toBe(true);
   }
@@ -133,8 +139,8 @@ test("optional fee selection changes only the estimate and never enrolls a payme
   await page.goto("/payment-services");
   const initialStorage = await browserStorage(page);
   const experience = page.locator(".payment-experience");
-  const types = experience.getByRole("tablist", { name: "What you sell", exact: true });
-  const showcase = experience.locator(".channel-showcase");
+  const types = page.getByRole("tablist", { name: "What you sell", exact: true });
+  const showcase = page.locator(".channel-showcase");
   const art = experience.locator(".dispute-art");
   const estimate = experience.locator(".fee-estimate");
   const option = estimate.locator("#addon-sale-records");
@@ -143,28 +149,30 @@ test("optional fee selection changes only the estimate and never enrolls a payme
   await types.getByRole("tab", { name: "Information", exact: true }).click();
   await showcase.getByRole("tab", { name: "Website", exact: true }).click();
   await art.getByRole("button", { name: "Bank inquiry", exact: true }).click();
-  await expectMatchingExample(showcase, examples[2]);
+  await expectMatchingExample(page, examples[2]);
   await expectMatchingRecognition(art, examples[2]);
-  const checkoutBefore = await showcase.locator(".marketing-channel-journey").innerHTML();
+  const illustration = page.getByRole("figure", { name: "Illustrated payment journey", exact: true });
+  const checkoutBefore = await illustration.innerHTML();
   const recognitionBefore = await art.innerHTML();
   await option.check();
   await expect(estimate.locator(".fee-net")).toContainText("$96.40");
   await expect(estimate).toContainText("Selecting this example does not enroll you or charge a fee");
-  expect(await showcase.locator(".marketing-channel-journey").innerHTML()).toBe(checkoutBefore);
+  expect(await illustration.innerHTML()).toBe(checkoutBefore);
   expect(await art.innerHTML()).toBe(recognitionBefore);
   await estimate.getByLabel("Payment amount USD").fill("480");
   await expect(estimate.locator(".fee-net")).toContainText("$463.86");
-  expect(await showcase.locator(".marketing-channel-journey").innerHTML()).toBe(checkoutBefore);
+  expect(await illustration.innerHTML()).toBe(checkoutBefore);
   expect(await art.innerHTML()).toBe(recognitionBefore);
   await option.uncheck();
   await expect(estimate.locator(".fee-net")).toContainText("$465.78");
-  expect(await showcase.locator(".marketing-channel-journey").innerHTML()).toBe(checkoutBefore);
+  expect(await illustration.innerHTML()).toBe(checkoutBefore);
   expect(await art.innerHTML()).toBe(recognitionBefore);
   await option.check();
   expect(await browserStorage(page)).toEqual(initialStorage);
   await page.reload();
   await expect(option).not.toBeChecked();
   await expect(types.getByRole("tab", { name: "Goods", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(showcase.getByRole("tab", { name: "Copy link", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(art.getByRole("button", { name: "Customer view", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expect(estimate.getByLabel("Payment amount USD")).toHaveValue("100");
   expect(observed.unexpected).toEqual([]);
@@ -176,8 +184,8 @@ test("mobile sharing stays visible and its selected channel and recognition view
   await page.setViewportSize({ width: 320, height: 900 });
   await page.goto("/payment-services");
   const experience = page.locator(".payment-experience");
-  const types = experience.getByRole("tablist", { name: "What you sell", exact: true });
-  const showcase = experience.locator(".channel-showcase");
+  const types = page.getByRole("tablist", { name: "What you sell", exact: true });
+  const showcase = page.locator(".channel-showcase");
   const journey = showcase.locator(".marketing-channel-journey");
   const art = experience.locator(".dispute-art");
   await expect(journey).toBeVisible();
@@ -186,14 +194,14 @@ test("mobile sharing stays visible and its selected channel and recognition view
   await expect(journey).toBeVisible();
   for (const name of channels) {
     await showcase.getByRole("tab", { name, exact: true }).click();
-    await expectMatchingExample(showcase, examples[2]);
+    await expectMatchingExample(page, examples[2]);
     for (const view of recognitionViews) {
       await art.getByRole("button", { name: view, exact: true }).click();
       await expectMatchingRecognition(art, examples[2]);
-      const geometry = await experience.evaluate(node => ({
+      const geometry = await page.locator("main").evaluate(node => ({
         documentOverflow: document.documentElement.scrollWidth > window.innerWidth,
         containerOverflow: node.scrollWidth > node.clientWidth,
-        contentOverflow: [...node.querySelectorAll(".channel-medium, .channel-checkout, .marketing-payment-link, .dispute-art, .dispute-art-window, .recognition-phone, .recognition-bank, .recognition-receipt")].some(element => element.scrollWidth > element.clientWidth + 1),
+        contentOverflow: [...node.querySelectorAll(".payment-request-preview, .channel-medium, .marketing-payment-summary, .marketing-payment-link, .two-step-outcome, .dispute-art, .dispute-art-window, .recognition-phone, .recognition-bank, .recognition-receipt")].some(element => element.scrollWidth > element.clientWidth + 1),
         controlsFit: [...node.querySelectorAll("[role=tab], .dispute-art-switch button")].every(element => {
           const rect = element.getBoundingClientRect();
           const inRail = element.closest(".channel-tabs") !== null;
@@ -212,7 +220,9 @@ test("mobile sharing stays visible and its selected channel and recognition view
   await expect(types.getByRole("tab", { name: "Information", exact: true })).toHaveAttribute("aria-selected", "true");
   await page.setViewportSize({ width: 1440, height: 1000 });
   await expect(journey).toBeVisible();
-  await expectMatchingExample(showcase, examples[2]);
+  await expectMatchingExample(page, examples[2]);
+  await expect(showcase.getByRole("tab", { name: "Website", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(showcase.getByRole("tablist")).toHaveAttribute("aria-orientation", "horizontal");
   expect(observed.unexpected).toEqual([]);
   expect(observed.errors).toEqual([]);
 });
@@ -222,7 +232,7 @@ test("sale, delivery and purchase details support keyboard navigation without ac
   await page.goto("/payment-services");
   const initialStorage = await browserStorage(page);
   const experience = page.locator(".payment-experience");
-  const types = experience.getByRole("tablist", { name: "What you sell", exact: true });
+  const types = page.getByRole("tablist", { name: "What you sell", exact: true });
   await types.getByRole("tab", { name: "Goods", exact: true }).focus();
   for (const [key, name] of [["ArrowRight", "Services"], ["End", "Information"], ["ArrowRight", "Goods"], ["ArrowLeft", "Information"]] as const) {
     await page.keyboard.press(key);
@@ -230,21 +240,34 @@ test("sale, delivery and purchase details support keyboard navigation without ac
     await expect(types.getByRole("tab", { name, exact: true })).toHaveAttribute("aria-selected", "true");
     await expect(types.locator('[role="tab"][tabindex="0"]')).toHaveCount(1);
   }
-  const showcase = experience.locator(".channel-showcase");
+  const showcase = page.locator(".channel-showcase");
   const art = experience.locator(".dispute-art");
   const delivery = showcase.getByRole("tablist", { name: "Ways to share a payment request", exact: true });
   await delivery.getByRole("tab", { name: "Website", exact: true }).focus();
-  for (const [key, name] of [["ArrowRight", "Text"], ["ArrowLeft", "Website"], ["ArrowDown", "Text"], ["ArrowUp", "Website"], ["Home", "Text"], ["End", "Website"]] as const) {
+  for (const [key, name] of [["ArrowRight", "Copy link"], ["ArrowLeft", "Website"], ["ArrowDown", "Copy link"], ["ArrowUp", "Website"], ["Home", "Copy link"], ["End", "Website"]] as const) {
     await page.keyboard.press(key);
     const active = delivery.getByRole("tab", { name, exact: true });
     await expect(active).toBeFocused();
     await expect(active).toHaveAttribute("aria-selected", "true");
     await expect(delivery.locator('[role="tab"][tabindex="0"]')).toHaveCount(1);
-    const tabBounds = (await active.boundingBox())!;
-    const railBounds = (await delivery.boundingBox())!;
-    expect(tabBounds.x).toBeGreaterThanOrEqual(railBounds.x - 1);
-    expect(tabBounds.x + tabBounds.width).toBeLessThanOrEqual(railBounds.x + railBounds.width + 1);
-    await expectMatchingExample(showcase, examples[2]);
+    const { tabBounds, railBounds, focusRing } = await active.evaluate(element => {
+      const style = getComputedStyle(element);
+      const tab = element.getBoundingClientRect();
+      const rail = element.closest('[role="tablist"]')!.getBoundingClientRect();
+      // Read both rectangles in the same frame: focusing can also scroll the page.
+      return {
+        tabBounds: { x: tab.x, y: tab.y, width: tab.width, height: tab.height },
+        railBounds: { x: rail.x, y: rail.y, width: rail.width, height: rail.height },
+        focusRing: { style: style.outlineStyle, width: parseFloat(style.outlineWidth), extent: parseFloat(style.outlineWidth) + parseFloat(style.outlineOffset) },
+      };
+    });
+    expect(focusRing.style).not.toBe("none");
+    expect(focusRing.width).toBeGreaterThan(0);
+    expect(tabBounds.x - focusRing.extent).toBeGreaterThanOrEqual(railBounds.x - 1);
+    expect(tabBounds.x + tabBounds.width + focusRing.extent).toBeLessThanOrEqual(railBounds.x + railBounds.width + 1);
+    expect(tabBounds.y - focusRing.extent).toBeGreaterThanOrEqual(railBounds.y - 1);
+    expect(tabBounds.y + tabBounds.height + focusRing.extent).toBeLessThanOrEqual(railBounds.y + railBounds.height + 1);
+    await expectMatchingExample(page, examples[2]);
     await expectMatchingRecognition(art, examples[2]);
   }
   for (const [name, key] of [["Bank inquiry", "Enter"], ["Customer view", "Space"]] as const) {
@@ -280,7 +303,7 @@ test("sale, delivery and purchase details support keyboard navigation without ac
 
 test("both payment steps stay readable when descriptions wrap or text spacing grows", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  for (const width of [320, 390, 640, 1024, 1440]) {
+  for (const width of [320, 390, 640, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/payment-services");
     const hero = page.getByRole("figure", { name: "Illustrated payment journey", exact: true });
@@ -289,8 +312,8 @@ test("both payment steps stay readable when descriptions wrap or text spacing gr
       for (const example of examples) {
         await hero.getByRole("tab", { name: example.name, exact: true }).click();
         const geometry = await hero.evaluate(node => {
-          const request = node.querySelector(".payment-journey-request")!.getBoundingClientRect();
-          const checkout = node.querySelector(".payment-journey-checkout")!.getBoundingClientRect();
+          const request = node.querySelector(".payment-create-step")!.getBoundingClientRect();
+          const checkout = node.querySelector(".payment-share-step")!.getBoundingClientRect();
           const container = node.getBoundingClientRect();
           return {
             stepsOverlap: request.left < checkout.right && request.right > checkout.left && request.top < checkout.bottom && request.bottom > checkout.top,

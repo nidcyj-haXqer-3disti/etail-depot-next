@@ -1,0 +1,39 @@
+/* Payments has one editorial sequence; shared company chrome remains unchanged. */
+.consumer-payments .consumer-hero { background: var(--public-paper); }
+.consumer-page.consumer-payments .consumer-hero-grid { grid-template-columns: minmax(0,1fr); gap: 40px; padding-block: 56px 64px; }
+.consumer-payments .consumer-hero-copy { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); gap: 0 80px; align-items: start; padding: 0; }
+.consumer-payments .consumer-product-eyebrow { grid-column: 1/-1; margin-bottom: 22px; }
+.consumer-payments .consumer-hero h1 { grid-column: 1; grid-row: 2/5; margin: 0; }
+.consumer-payments .consumer-hero-copy > p { grid-column: 2; margin: 0; max-width: 42ch; }
+.consumer-payments .consumer-hero-actions { grid-column: 2; margin-top: 22px; }
+.consumer-payments .consumer-hero-copy > .payment-hero-price { margin-top: 22px; font-size: 12px; line-height: 1.8; }
+.payment-hero-price strong { color: var(--public-ink); font-weight: 600; }
+.consumer-payments .payment-offer-section { border-top: 1px solid var(--public-line); }
+.consumer-payments .payment-offer-grid { gap: 0; border: 1px solid #cad7c4; border-radius: 16px; background: #f4f6ee; }
+.consumer-payments .payment-price-card, .consumer-payments .fee-estimate { border: 0; border-radius: 0; padding: 36px; }
+.consumer-payments .payment-price-card { background: transparent; }
+.consumer-payments .fee-estimate { border-left: 1px solid #cad7c4; border-radius: 0 16px 16px 0; background: #fff; }
+.consumer-payments .payment-inclusions { margin-block: 28px; gap: 0; }
+.consumer-payments .payment-inclusions > div { border-top: 1px solid #d5dfcf; padding-block: 14px; }
+.consumer-payments .payment-inclusions > div:last-child { border-bottom: 1px solid #d5dfcf; }
+.consumer-payments .payment-offer-section .consumer-section-heading { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); gap: 80px; align-items: end; }
+.consumer-payments .payment-offer-section .consumer-section-heading > p { max-width: 42ch; margin: 0; }
+.consumer-page.consumer-payments .public-faq-section { padding-top: 0; }
+.consumer-payments #payouts { scroll-margin-top: 28px; }
+@media (max-width:1100px) {
+ .consumer-payments .consumer-hero-copy, .consumer-payments .payment-offer-section .consumer-section-heading { column-gap: 40px; }
+ .consumer-payments .payment-price-card, .consumer-payments .fee-estimate { padding: 28px; }
+}
+@media (max-width:850px) {
+ .consumer-page.consumer-payments .consumer-hero-grid { gap: 32px; padding-block: 40px 48px; }
+ .consumer-payments .consumer-hero-copy { display: block; max-width: 620px; }
+ .consumer-payments .consumer-product-eyebrow { margin-bottom: 20px; }
+ .consumer-payments .consumer-hero-copy > p { margin-top: 22px; }
+ .consumer-payments .consumer-hero-copy > .payment-hero-price { margin-top: 18px; }
+ .consumer-payments .payment-offer-section .consumer-section-heading { grid-template-columns: minmax(0,1fr); gap: 20px; }
+}
+@media (max-width:680px) {
+ .consumer-payments .payment-offer-grid { grid-template-columns: minmax(0,1fr); }
+ .consumer-payments .payment-price-card, .consumer-payments .fee-estimate { padding: 26px 22px; }
+ .consumer-payments .fee-estimate { border-left: 0; border-top: 1px solid #cad7c4; border-radius: 0 0 16px 16px; }
+}

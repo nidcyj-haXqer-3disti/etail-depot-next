@@ -1,8 +1,9 @@
 /** Operator-selected public offer. This is not a processor configuration or card agreement. */
 export const productFacts = {
-  version: "2026-09-21.7",
+  version: "2026-09-22.3",
   currency: "USD",
   payments: {
+    offerName: "Trolleys Two Step",
     cardRateLabel: "2.9% + 30¢",
     cardRateBasisPoints: 290,
     cardFixedFeeCents: 30,
@@ -27,18 +28,18 @@ export const productFacts = {
 
 /** Provenance stays available for content review; no provider capability is inferred from a benchmark. */
 export const productFactEvidence = {
-  approvedBy: "Etail Depot operator, D132 pricing, D137 optional-service pricing, D138 live integration approval and D147 customer-facing fee language",
-  reviewedOn: "2026-09-21",
+  approvedBy: "Etail Depot operator, D132 card and additional-payment pricing, D137 optional-service pricing, D138 live integration approval, D147 customer-facing fee language, D154 commercial presentation, D158 Two Step packaging and D159 base pricing",
+  reviewedOn: "2026-09-22",
   payments: {
     source: ["https://stripe.com/pricing"],
-    approval: "D132 selects Stripe US standard processing. D137 sets a 0.4% Trolleys service fee on eligible enrolled successful-payment volume. D138 names the service Dispute readiness and records the operator's confirmation that the Order Insight integration is live and approved. D147 removes vendor-charge line items and sourcing language from the public offer. Only displayed processing and service fees are calculated; applicable account charges remain governed by the disclosed service agreement. This editorial change does not establish an all-inclusive price or waive unverified upstream costs.",
+    approval: "D159 sets the operator-selected Trolleys Two Step rate to 2.9% + 30 cents per successful domestic online card payment, preserving D158's no monthly fee and included creation/sharing. No separate 0.1% charge or membership is added. D132's other selected fees remain. D137 sets a separate optional 0.4% Trolleys service fee on eligible enrolled successful-payment volume. D138 records the operator's confirmation that the Order Insight integration is live and approved. D154 names that service Trolleys Clarity without changing its price or coverage. D147 removes vendor-charge line items and sourcing language from the public offer. Only displayed base and service fees are calculated; applicable account charges remain governed by the disclosed service agreement. Public offer approval does not configure provider billing or waive unverified upstream costs.",
     processingConfigurationIndependentlyVerified: false,
     orderInsight: {
       status: "Live and approved",
       evidence: "Operator confirmation: Integration is live and approved.",
       independentlyTested: false,
     },
-    unresolved: ["Program eligibility and restricted industries", "Payout timing and reserves", "Merchant-specific enrollment and transaction coverage", "Vendor quote, billing basis and applicable charges", "Dispute readiness fee lifecycle and refund terms", "Optional services and network charges"],
+    unresolved: ["Program eligibility and restricted industries", "Payout timing and reserves", "Merchant-specific enrollment and transaction coverage", "Vendor quote, billing basis and applicable charges", "Clarity fee lifecycle and refund terms", "Optional services and network charges"],
   },
   cards: {
     source: "Operator explicitly selected $200 minimum deposit, $0 annual/monthly fee and full monthly repayment.",
@@ -48,7 +49,8 @@ export const productFactEvidence = {
 } as const;
 
 export const saleRecordsOffer = {
-  name: "Dispute readiness",
+  name: "Clarity",
+  brandName: "Trolleys Clarity",
   availability: "Available",
   rateLabel: productFacts.payments.saleRecordsRateLabel,
   rateBasisPoints: productFacts.payments.saleRecordsRateBasisPoints,

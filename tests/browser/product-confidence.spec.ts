@@ -5,7 +5,11 @@ test("optional dispute readiness keeps price and Order Insight coverage limits v
   const network=page.locator("#dispute-readiness");
   await expect(network.locator(".dispute-price")).toContainText("Optional service");
   await expect(network.locator(".dispute-price")).toContainText("+0.4%");
-  await expect(network.locator(".dispute-price")).toContainText("Payment processing is separate");
+  await expect(network.locator(".dispute-price")).not.toContainText("Payment processing is separate");
+  await expect(network.locator(".dispute-product-name")).toHaveText("Trolleys Clarity");
+  await expect(network.locator(".dispute-price-example")).toHaveCount(0);
+  await expect(network.getByRole("link", {name:"Estimate your fees",exact:true})).toHaveCount(0);
+  await expect(page.locator("#fees")).toContainText("Payment processing is separate");
   const limits=network.locator(".dispute-service-note");
   await expect(limits).toBeVisible();
   await expect(limits).toContainText("eligible enrolled payments");
@@ -14,23 +18,27 @@ test("optional dispute readiness keeps price and Order Insight coverage limits v
   await expect(network.locator(".dispute-benefits")).toContainText("Qualifying Visa online fraud disputes");
   await expect(network.locator(".dispute-benefits")).toContainText("required transaction history and evidence");
   await expect(network.getByRole("link",{name:"Explore Order Insight at Visa",exact:true})).toHaveAttribute("href","https://www.visa.com/en-us/products/order-insight");
-  const coverage=page.locator("details").filter({has:page.locator("summary").filter({hasText:"Does Dispute readiness cover every dispute?"})});
+  const coverage=page.locator("details").filter({has:page.locator("summary").filter({hasText:"Does Clarity prevent every dispute?"})});
   await coverage.locator("summary").click();
   await expect(coverage).toContainText("Automatic refund programs and managed chargeback responses are separate services");
-  await expect(page.getByRole("checkbox",{name:"Dispute readiness",exact:true})).not.toBeChecked();
+  await expect(page.getByRole("checkbox",{name:"Clarity",exact:true})).not.toBeChecked();
 });
 
-test("fees show only processing and the optional Trolleys service and recover invalid input", async ({page}) => {
+test("fees show Two Step and optional Clarity and recover invalid input", async ({page}) => {
   const mutations:string[]=[];
   page.on("request",request=>{if(!["GET","HEAD","OPTIONS"].includes(request.method()))mutations.push(request.url());});
   await page.goto("/payment-services");
+  const offer=page.locator(".payment-price-card");
+  await expect(offer.getByRole("heading",{name:"Trolleys Two Step",exact:true})).toBeVisible();
+  await expect(offer.locator(".payment-base-rate")).toHaveText("2.9% + 30¢");
+  await expect(offer).toContainText("No monthly fee. Create and share included.");
   const estimate=page.locator(".fee-estimate");
   await expect(estimate).toContainText("$96.80");
-  await expect(estimate.locator("dl dt")).toHaveText(["Processing fee", "Estimated remaining"]);
+  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Estimated remaining"]);
   await estimate.locator("#addon-sale-records").check();
   await expect(estimate).toContainText("$96.40");
   await expect(estimate).toContainText("−$0.40");
-  await expect(estimate.locator("dl dt")).toHaveText(["Processing fee", "Trolleys service fee", "Estimated remaining"]);
+  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Clarity", "Estimated remaining"]);
   await expect(page.locator("main")).not.toContainText(/vendor|quote required/i);
   await expect(estimate).toContainText("other applicable charges");
   await expect(estimate).toContainText("Selecting this example does not enroll you or charge a fee");
@@ -48,7 +56,7 @@ test("fees show only processing and the optional Trolleys service and recover in
   await expect(page.locator("main")).not.toContainText(/Enhanced receipt|Invoice add-on|Agreement add-on|1.5% in document fees/);
   await estimate.locator("#addon-sale-records").uncheck();
   await expect(estimate).toContainText("$970.70");
-  await expect(estimate.locator("dl dt")).toHaveText(["Processing fee", "Estimated remaining"]);
+  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Estimated remaining"]);
   const payouts=page.locator("#payouts");
   await payouts.locator("summary").click();
   await expect(payouts.locator("p")).toBeVisible();

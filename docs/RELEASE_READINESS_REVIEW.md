@@ -1,3 +1,51 @@
+## D161 — public-site craft and package checks complete
+
+22 September 2026. Home, Payments and Cards now share more precise positioning, consistent examples, balanced artwork frames, commercial terminology and FAQ hierarchy. Help and Terms match the actual public-site and separate product-account boundaries; Privacy was reviewed without changing its text. The approved 2.9% + 30¢ Two Step offer and separately optional +0.4% Clarity remain unchanged.
+
+All applicable local gates pass: lint/types, 86 unit tests, 44 browser cases across the initial/corrected runs, 24 accessibility checks, security/dependency audit, production SEO, Next build and offline Netlify packaging. The initial two Help copy assertions were corrected to the intended wording and rerun successfully. Final visual checks cover 48 responsive/text-spacing states; measured header/footer/content edges align and no overflow is detected. Independent audit confirms all 71 database archive files are intact and the active runtime remains public-only.
+
+[Current status](../planning/STATUS.md) and `artifacts/d161-checks/implementation.json` record commands, source identities, diagnostics and limits. The package has 11 routes, one server archive, 17 retirement route families and 78 public/static files. The normal local preview was rebuilt after packaging.
+
+**Ready for local review; not committed, pushed, merged or deployed.** D152 / PR #33 remains the recorded live release. These checks do not establish hosted service operation, legal certification or market fit. Future publication requires the existing reviewed release process and final source identity verification.
+
+## D159 — corrected base rate verified locally
+
+22 September 2026. Two Step now uses the explicitly requested 2.9% + 30¢ rate, preserving its no-monthly-fee packaging and optional Clarity. Lint, types, 86 unit tests, production build and four affected browser flows pass. Independent source review confirms matching labels and calculations. The local preview is refreshed; hosted billing and deployment are unchanged. Production-search and Netlify packaging must cover the final source before a release. [Current status](../planning/STATUS.md).
+
+## D158 — local pricing update verified
+
+22 September 2026. The selected Two Step offer is now 3.0% + 30¢, with no monthly fee and creation/sharing included. Shared facts, calculator, Help and Terms are aligned; optional Clarity remains separate. Local lint/types, 86 unit tests, production build, 44 browser flows across the initial/corrected runs, 24 accessibility checks and source/dependency security pass. Four responsive pricing states and Help/Terms were inspected. See [current status](../planning/STATUS.md) for diagnostics and evidence. This does not publish a release or configure hosted billing. Run production-search and Netlify packaging against the final source before the next deployment; older package evidence does not cover this updated source.
+
+## D154 — Trolleys Clarity presentation verified locally
+
+The optional service now uses Trolleys Clarity, a concise commercial headline and lighter framing matched to the Payments page. The quoted $0.40 example, processing sentence and estimator link are removed from the introduction. The rate/basis remain visible and detailed pricing stays in its existing section. Help, Privacy, Terms and metadata use the same service name. Coverage and fee terms are unchanged.
+
+Full verification passes: **86 unit, 44 browser and 24 accessibility tests**, security/dependency review, production SEO and Next/Netlify packaging. Independent review passed **20 responsive/view/text-spacing scenarios**, with manual contrast follow-up for gradient-backed artwork. [Status](../planning/STATUS.md) records the source, screenshot-only diagnostics and limits.
+
+**Ready for local review; not published.** D152 remains live; D153–D154 have no new remote PR, merge or deployment.
+
+## D153 — unified Payments experience verified locally
+
+**Trolleys Two-Step** brings Create (Goods / Services / Information) and Share (six extensible channel presentations) into one interactive illustration. The buyer's checkout remains an unnumbered outcome. Duplicate diagrams and the fixed channel count are removed; the same purchase context continues into dispute-readiness artwork. [Research](research/d153-trolleys-two-step.md) records the naming decision and primary sources.
+
+Final full verification passes: **86 unit, 44 browser and 24 accessibility tests**, security/dependency review, production SEO and Next/Netlify packaging. Independent review covers **180 responsive/state/text-spacing scenarios plus 20 final centering/focus checks**. [Status](../planning/STATUS.md) records the corrected focus framing, test-measurement diagnostic and exact evidence. No active database, policy, pricing or provider change.
+
+**Ready for local review; not published.** D152 / PR #33 remains live. No new source commit, remote PR or deployment exists for D153; reviewed publication is a separate step.
+
+## D152 — PR #33 published and verified
+
+Netlify deploy `6ab146f61a7d282bab60350e` is ready/current. PR #33 merge `338cc6bcf72f6152f2a4b24e5c9ae391fb00a988` has the same verified source tree as D151. All 12 hosted desktop/mobile scenarios, 84 state checks and 27 SEO/route requests pass. Wallet switching has zero mismatches across 262 observations.
+
+The first hosted build failed without publication; an unchanged-source retry succeeded after platform service errors/rate limiting. No application or scanner setting was changed. [Status](../planning/STATUS.md) and `artifacts/d152-checks/release.json` record identities, diagnostics and limits. No database, provider, access, DNS or environment change.
+
+## D151 — deployment candidate ready
+
+[PR #33](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/33) contains the accepted banking examples, payment gallery, card artwork and three-page polish. Every check in GitHub run `35614129578` passes. Local source, remote head and CI test merge share tree `c54917a1eaa9ea3c84d10699a67f5928b9aca5be`.
+
+The isolated 418-file archive built successfully, original source hashes remain unchanged, and its source-only upload directory has no generated content. Independent review confirms all D150 application/test hashes still match. [Status](../planning/STATUS.md) records exact identities, initial preparation diagnostics, limitations and evidence. These closeout records sit outside the frozen candidate.
+
+**Ready for reviewed deployment; not merged or published.** D145 / PR #32 remains live. No database, provider, access, DNS or environment operation is required for this public website release.
+
 ## D150 — three-page production polish complete locally
 
 Home, Payments and Cards now use tighter, consistent marketing copy. The review removed retired-login explanations and duplicate checkout prompts, shared one plain-language fee basis with Help/Terms, and made phone channel browsing more apparent. Approved artwork, brand framing, product terms and public-only boundaries remain intact.

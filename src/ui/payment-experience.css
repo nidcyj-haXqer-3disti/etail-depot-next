@@ -1,107 +1,38 @@
-.payment-sharing, .dispute-readiness-section { scroll-margin-top: 28px; }
+.dispute-readiness-section { position: relative; scroll-margin-top: 28px; padding-block: var(--consumer-space); background: #fff; color: var(--public-ink); }
 .payment-anchor { position: absolute; top: 0; scroll-margin-top: 28px; }
-/* Visual categories keep the sale separate from the way its link is shared. */
-.sale-type-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
-.sale-type-tabs button { position: relative; display: flex; align-items: center; gap: 16px; min-width: 0; min-height: 100px; padding: 10px; text-align: left; border: 1px solid #dbe2d7; border-radius: 13px; background: #fff; color: var(--public-ink); font: inherit; cursor: pointer; }
-.sale-type-tabs button:hover { border-color: #9daf9f; background: #f9faf6; }
-.sale-type-tabs button[aria-selected=true] { border-color: #345b46; box-shadow: inset 0 0 0 1px #345b46; background: #f3f6ed; }
-.sale-type-tabs button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 3px; }
-.sale-choice-caption { display: grid; min-width: 0; gap: 5px; padding-right: 20px; }
-.sale-choice-caption strong { font-size: 16px; line-height: 1.5; font-weight: 550; }
-.sale-choice-caption small { font-size: 11px; line-height: 1.5; color: #627362; }
-.sale-choice-check { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 17px; height: 17px; border: 1px solid #d0dace; border-radius: 50%; background: #fff; }
-.sale-choice-check .icon { width: 11px; height: 11px; visibility: hidden; }
-.sale-type-tabs button[aria-selected=true] .sale-choice-check { background: #345b46; border-color: #345b46; color: white; }
-.sale-type-tabs button[aria-selected=true] .sale-choice-check .icon { visibility: visible; }
-.sale-thumbnail { position: relative; flex: 0 0 92px; display: grid; place-items: center; width: 92px; height: 78px; border-radius: 7px; overflow: hidden; background: #e6e2d4; }
-.sale-thumbnail[data-sale=services] { background: #dce6e2; }
-.sale-thumbnail[data-sale=information] { background: #e0e0e9; }
-.sale-parcel { position: absolute; width: 40px; height: 35px; left: 17px; top: 32px; border-radius: 2px; background: #b99262; box-shadow: 7px 7px 12px #71663b25, inset -6px 0 #a48055; transform: rotate(-7deg); }
-.sale-parcel i { display: block; height: 100%; width: 7px; margin-left: 15px; background: #e4cf9b; }
-.sale-bag { position: absolute; width: 28px; height: 40px; top: 23px; right: 13px; background: #f8f5e7; border-radius: 2px; box-shadow: 4px 7px 12px #71663b20; transform: rotate(8deg); }
-.sale-bag i { position: absolute; top: -8px; left: 8px; width: 12px; height: 14px; border: 2px solid #b9a887; border-bottom: 0; border-radius: 8px 8px 0 0; }
-.sale-calendar { position: relative; width: 47px; height: 52px; border-radius: 5px; background: #fff; box-shadow: 5px 7px 12px #3b71552b; transform: rotate(-8deg); }
-.sale-calendar > i { display: block; height: 13px; border-radius: 5px 5px 0 0; background: #416a59; }
-.sale-calendar > span { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; padding: 9px; }
-.sale-calendar b { height: 6px; border-radius: 2px; background: #d9e4db; }
-.sale-calendar .icon { position: absolute; right: -9px; bottom: -3px; width: 24px; height: 24px; padding: 5px; color: #fff; background: #597c62; border-radius: 50%; }
-.sale-report { position: relative; width: 43px; height: 55px; padding: 9px; background: #fafaf5; border-radius: 3px; box-shadow: 5px 7px 12px #58587125, -5px -3px 0 #b9bccf; transform: rotate(8deg); }
-.sale-report > i { display: block; width: 100%; height: 3px; background: #6c7794; margin-bottom: 4px; }
-.sale-report > i:nth-child(2) { width: 60%; background: #c9cddd; }
-.sale-report > span { display: flex; align-items: flex-end; gap: 3px; height: 20px; margin-top: 5px; border-bottom: 1px solid #aeb8c9; }
-.sale-report b { flex: 1; height: 40%; background: #a0aac3; }
-.sale-report b:nth-child(2) { height: 70%; }.sale-report b:nth-child(3) { height: 55%; }.sale-report b:nth-child(4) { height: 90%; background: #59698f; }
-.sale-type-panel { min-width: 0; }
-.sale-type-panel:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 6px; border-radius: 6px; }
-.payment-use-case { margin: 0; padding-block: 20px; color: var(--public-muted); font-size: 15px; line-height: 1.7; }
-/* Dispute readiness is a product story: price, connected purchase and outcomes. */
-.dispute-readiness-section { --public-focus: #e5ecd9; position: relative; padding-block: var(--consumer-space); background: #143e35; color: #fff; }
-.dispute-readiness-heading { display: grid; grid-template-columns: minmax(0,1fr) 290px; align-items: center; gap: 80px; margin-bottom: 48px; }
-.consumer-payments .dispute-readiness-heading .eyebrow { color: #c5d7c6; }
-.dispute-readiness-heading h2 { margin-top: 18px; font-size: clamp(32px,3.5vw,46px); font-weight: 500; letter-spacing: -.04em; line-height: 1.16; text-wrap: balance; }
-.dispute-readiness-heading h2 > span { color: #c5d7b4; }
-.dispute-introduction { max-width: 53ch; margin-top: 24px; color: #d3dfd6; font-size: 16px; line-height: 1.75; }
-.dispute-price { min-width: 0; padding: 26px 28px; border: 1px solid #56786c; border-radius: 12px; background: #1d493e; }
-.dispute-price > span { display: block; font-size: 12px; line-height: 1.6; color: #d3dfd6; }
-.dispute-price > strong { display: block; margin: 9px 0; font-size: 46px; line-height: 1.15; letter-spacing: -.035em; font-weight: 500; }
-.dispute-price > p { font-size: 12px; line-height: 1.65; color: #d3dfd6; }
-.dispute-price-example { display: flex; align-items: center; gap: 14px; padding-top: 18px; margin-top: 18px; border-top: 1px solid #547569; }
-.dispute-price-example > strong { font-size: 24px; line-height: 1.4; font-weight: 500; letter-spacing: -.025em; }
-.dispute-price-example > span { font-size: 11px; line-height: 1.6; color: #d3dfd6; }
-.dispute-price .dispute-price-extra { margin-top: 16px; color: #fff; }
-.dispute-price > a { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; margin-top: 4px; font-size: 13px; font-weight: 500; color: #fff; }
-.dispute-price > a .icon { width: 16px; height: 16px; }
-.dispute-benefits { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 36px; list-style: none; padding: 0; margin: 42px 0 0; }
-.dispute-benefits li { min-width: 0; }
-.dispute-benefits li > span { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid #56786c; border-radius: 10px; color: #c5d7b4; margin-bottom: 16px; }
-.dispute-benefits .icon { width: 20px; height: 20px; }
+.dispute-readiness-heading { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); align-items: start; gap: 80px; margin-bottom: 36px; }
+.dispute-product-name { display: flex; align-items: center; gap: 10px; font-size: 16px; line-height: 1.6; font-weight: 600; letter-spacing: -.015em; }
+.dispute-product-name .icon { width: 18px; height: 18px; }
+.dispute-readiness-heading h2 { margin-top: 18px; font-size: var(--consumer-heading); font-weight: 500; letter-spacing: -.035em; line-height: 1.2; text-wrap: balance; }
+.dispute-readiness-heading h2 > span { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--public-accent); }
+.dispute-intro-details { min-width: 0; }
+.dispute-introduction { max-width: 49ch; color: var(--public-muted); font-size: 16px; line-height: 1.75; }
+.dispute-price { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: baseline; gap: 6px 16px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--public-line); }
+.dispute-price > span { font-size: 12px; line-height: 1.6; color: var(--public-muted); }
+.dispute-price > strong { font-size: 24px; line-height: 1.4; letter-spacing: -.025em; font-weight: 500; }
+.dispute-price > p { grid-column: 1 / -1; max-width: 52ch; font-size: 12px; line-height: 1.65; color: var(--public-muted); }
+.dispute-benefits { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 28px; list-style: none; padding: 0; margin: 24px 0 0; }
+.dispute-benefits li { min-width: 0; padding: 24px 24px 0 0; border-top: 1px solid var(--public-line); }
+.dispute-benefits li > span { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; color: var(--public-accent); background: #eaf0e3; margin-bottom: 18px; }
+.dispute-benefits .icon { width: 18px; height: 18px; }
 .dispute-benefits h3 { font-size: 17px; line-height: 1.5; letter-spacing: -.015em; font-weight: 500; }
-.dispute-benefits p { margin-top: 8px; max-width: 48ch; font-size: 14px; line-height: 1.7; color: #c7d8ce; }
-.dispute-service-note { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; padding-top: 24px; margin-top: 36px; border-top: 1px solid #56776b; }
-.dispute-service-note > p { max-width: 85ch; font-size: 12px; line-height: 1.7; color: #c7d8ce; }
-.dispute-service-note > a { display: inline-flex; align-items: center; gap: 12px; flex: 0 0 auto; font-size: 12px; min-height: 44px; color: #fff; }
+.dispute-benefits p { margin-top: 8px; max-width: 48ch; font-size: 14px; line-height: 1.7; color: var(--public-muted); }
+.dispute-service-note { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; padding-top: 16px; margin-top: 20px; }
+.dispute-service-note > p { max-width: 85ch; font-size: 12px; line-height: 1.7; color: var(--public-muted); }
+.dispute-service-note > a { display: inline-flex; align-items: center; gap: 12px; flex: 0 0 auto; font-size: 12px; min-height: 44px; color: var(--public-ink); }
 .dispute-service-note > a .icon { width: 16px; height: 16px; }
 @media (max-width: 1000px) {
- .dispute-readiness-heading { gap: 36px; grid-template-columns: minmax(0,1fr) 260px; }
- .dispute-price { padding: 24px; }
+ .dispute-readiness-heading { gap: 40px; }
  .dispute-service-note { flex-direction: column; gap: 8px; }
- .dispute-benefits { gap: 24px; }
+ .dispute-benefits { gap: 14px; }
+ .dispute-benefits li { padding: 20px 10px 0 0; }
 }
 @media (max-width: 760px) {
- .sale-type-tabs { gap: 8px; }
- .sale-type-tabs button { display: grid; align-content: start; gap: 10px; padding: 6px 6px 10px; border-radius: 10px; }
- .sale-thumbnail { width: 100%; height: 78px; }
- .sale-choice-caption { padding: 0 3px; }
- .sale-choice-caption strong { font-size: 13px; }
- .sale-choice-caption small { display: none; }
- .sale-choice-check { top: 12px; right: 12px; }
- .dispute-readiness-heading { grid-template-columns: minmax(0,1fr); gap: 28px; margin-bottom: 28px; }
- .dispute-readiness-heading h2 { font-size: 32px; }
- .dispute-heading-break { display: none; }
- .dispute-introduction { font-size: 15px; margin-top: 20px; }
- .dispute-price { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); column-gap: 24px; padding: 22px; }
- .dispute-price > span { grid-column: 1 / -1; }
- .dispute-price > strong { grid-column: 1; font-size: 38px; }
- .dispute-price > p:not(.dispute-price-extra) { grid-column: 1; }
- .dispute-price-example { grid-column: 2; grid-row: 2 / 4; display: grid; align-content: center; gap: 5px; margin: 9px 0 0; padding: 0 0 0 20px; border-top: 0; border-left: 1px solid #547569; }
- .dispute-price .dispute-price-extra, .dispute-price > a { grid-column: 1 / -1; }
- .dispute-benefits { grid-template-columns: minmax(0,1fr); gap: 24px; margin-top: 30px; }
- .dispute-benefits li { display: flex; align-items: flex-start; gap: 16px; }
- .dispute-benefits li > span { flex: 0 0 40px; margin: 0; }
- .dispute-service-note { margin-top: 28px; }
+ .dispute-readiness-heading { grid-template-columns: minmax(0,1fr); gap: 24px; margin-bottom: 28px; }
+ .dispute-readiness-heading h2 { margin-top: 18px; }
+ .dispute-introduction { font-size: 15px; }
+ .dispute-price { margin-top: 20px; }
+ .dispute-benefits { grid-template-columns: minmax(0,1fr); gap: 12px; margin-top: 18px; }
+ .dispute-benefits li { display: flex; align-items: flex-start; gap: 16px; padding: 20px 0 10px; }
+ .dispute-benefits li > span { flex: 0 0 36px; margin: 0; }
 }
-@media (max-width: 400px) {
- .sale-type-tabs { gap: 6px; }
- .sale-type-tabs button { padding: 5px 5px 9px; gap: 8px; }
- .sale-thumbnail { height: 66px; }
- .sale-choice-caption { padding: 0; }
- .sale-choice-caption strong { font-size: 11px; }
- .sale-choice-check { top: 9px; right: 9px; width: 15px; height: 15px; }
- .sale-parcel { left: 7px; top: 27px; width: 34px; height: 29px; }
- .sale-bag { right: 9px; top: 20px; width: 24px; height: 34px; }
- .dispute-price { column-gap: 14px; padding: 20px; }
- .dispute-price-example { padding-left: 14px; }
-}
-
-.consumer-page.consumer-payments .public-faq-section { padding-top: 0; }
-.consumer-payments #payouts { scroll-margin-top: 28px; }
