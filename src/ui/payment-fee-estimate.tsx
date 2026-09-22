@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { estimateDomesticCardFee, formatUsdCents } from "@/modules/public-site/fee-estimate";
-import { saleRecordsOffer } from "@/shared/product-facts";
+import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
 
 export function PaymentFeeEstimate({saleRecords, onSaleRecordsChange}: {saleRecords: boolean; onSaleRecordsChange: (enabled: boolean) => void}) {
   const [amount, setAmount] = useState("100");
@@ -17,11 +17,11 @@ export function PaymentFeeEstimate({saleRecords, onSaleRecordsChange}: {saleReco
     </fieldset>
     <div className="fee-result" aria-live="polite" aria-atomic="true">
       {estimate ? <dl>
-        <div><dt>Processing fee</dt><dd>−{formatUsdCents(estimate.processingCents)}</dd></div>
-        {saleRecords && <div><dt>Trolleys service fee</dt><dd>−{formatUsdCents(estimate.serviceCents)}</dd></div>}
+        <div><dt>{productFacts.payments.offerName}</dt><dd>−{formatUsdCents(estimate.processingCents)}</dd></div>
+        {saleRecords && <div><dt>{saleRecordsOffer.name}</dt><dd>−{formatUsdCents(estimate.serviceCents)}</dd></div>}
         <div className="fee-net"><dt>Estimated remaining</dt><dd>{formatUsdCents(estimate.subtotalCents)}</dd></div>
       </dl> : <p className="fee-error" id="fee-estimate-error">Enter an amount from $1 to $100,000, with up to two decimal places.</p>}
     </div>
-    <p className="fee-estimate-note" id="fee-estimate-note">Estimate excludes international, conversion, manual-entry and other applicable charges. Selecting this example does not enroll you or charge a fee.</p>
+    <p className="fee-estimate-note" id="fee-estimate-note">Estimate excludes international, conversion, manual entry and other applicable charges. Selecting this example does not enroll you or charge a fee.</p>
   </div>;
 }

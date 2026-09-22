@@ -162,7 +162,7 @@ test("legal documents are reachable without sign-in and retain their search visi
     await expect(page.getByRole("complementary", { name: "Review status" })).toHaveCount(0);
     await expect(page).toHaveTitle(new RegExp(`^${title}`));
     expect(await page.title()).not.toMatch(/draft|review/i);
-    await expect(page.locator(".legal-document-date")).toHaveText("Last updated September 21, 2026");
+    await expect(page.locator(".legal-document-date")).toHaveText(path === "/terms" ? "Last updated September 22, 2026" : "Last updated September 21, 2026");
     await expect(page.locator("main")).toContainText("live Order Insight integration");
     await expect(page.locator("main")).not.toContainText("integration are not confirmed");
     for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
@@ -231,7 +231,7 @@ test("a new visitor can compare available payments and upcoming cards without a 
   }
   await mainNavigation.getByRole("link",{name:"Payments",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-services$/);
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Accept payments\.\s*Your way\.$/);
+  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Create\. Share\.\s*Get paid\.$/);
   await openMainNavigation(page);
   await expect(mainNavigation.getByRole("link",{name:"Payments",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator("main")).toContainText("Available now");
@@ -250,7 +250,7 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
   await question.focus();await page.keyboard.press("Enter");
   await expect(question.locator("..")).toHaveAttribute("open","");
   await expect(question.locator("..")).toContainText("Digital Wallet Card is an upcoming virtual Visa secured credit card");
-  await expect(question.locator("..")).toContainText("Applications and card sign-in are not open yet.");
+  await expect(question.locator("..")).toContainText("Applications are not open yet. You’ll manage your card account through Ledgix when it launches.");
   await page.keyboard.press("Enter");
   await expect(question.locator("..")).not.toHaveAttribute("open","");
   await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Sign-in help"}).click();
@@ -303,7 +303,7 @@ test("public pages have unique canonical metadata and no private data", async ({
 });
 
 
-test("all five payment channels show a clear checkout journey and work by keyboard without private reads or changes", async ({page}) => {
+test("all six payment channels share one request and work by keyboard without private reads or changes", async ({page}) => {
   const mutations: string[] = [];
   const privateReads: string[] = [];
   const errors: string[] = [];
@@ -327,19 +327,21 @@ test("all five payment channels show a clear checkout journey and work by keyboa
     }
   });
   await page.goto("/payment-services?handoff_probe=public-channel-check");
-  const showcase = page.locator(".channel-showcase");
+  const figure = page.getByRole("figure", {name:"Illustrated payment journey", exact:true});
+  const showcase = figure.locator(".channel-showcase");
   const tablist = showcase.getByRole("tablist", {name:"Ways to share a payment request", exact:true});
   await expect(page.getByRole("tablist", {name:"What you sell", exact:true}).getByRole("tab", {name:"Goods", exact:true})).toHaveAttribute("aria-selected", "true");
   await expect(showcase.getByRole("combobox")).toHaveCount(0);
   const channels = [
+    {name:"Copy link", content:"Your payment link"},
     {name:"Text", content:"How can I pay for the homeware set?"},
-    {name:"Email", content:"PAYMENT REQUEST"},
+    {name:"Email", content:"Payment request"},
     {name:"Social", content:"PAY BY CARD"},
     {name:"QR code", content:"Credit and debit cards accepted"},
     {name:"Website", content:"Homeware order"},
   ];
   await expect(tablist.getByRole("tab")).toHaveCount(channels.length);
-  await tablist.getByRole("tab", {name:"Text", exact:true}).focus();
+  await tablist.getByRole("tab", {name:"Copy link", exact:true}).focus();
   async function expectChannel(index: number) {
     const channel = channels[index]!;
     const tab = tablist.getByRole("tab", {name:channel.name, exact:true});
@@ -354,18 +356,20 @@ test("all five payment channels show a clear checkout journey and work by keyboa
     await expect(panel).toBeVisible();
     await expect(panel).toHaveAttribute("aria-labelledby", (await tab.getAttribute("id"))!);
     const medium = panel.locator(".channel-medium");
-    await expect(medium.getByText(channel.content, {exact:true})).toBeVisible();
+    if (channel.content) await expect(medium.getByText(channel.content, {exact:true})).toBeVisible();
     await expect(medium).toContainText("Homeware order");
     await expect(medium).toContainText("Homeware set");
     await expect(medium).toContainText("$64.00");
-    const checkout = panel.locator(".channel-checkout");
-    await expect(checkout.getByText("Homeware set", {exact:true})).toBeVisible();
-    await expect(checkout.getByText("$64.00", {exact:true})).toBeVisible();
+    const outcome = figure.locator(".two-step-outcome");
+    await expect(outcome.locator(".marketing-payment-summary")).toContainText("Homeware set");
+    await expect(outcome.locator(".marketing-payment-summary")).toContainText("$64.00");
+    await expect(outcome).toContainText("Your customer opens the link and pays by card.");
+    await expect(outcome).toContainText("Payment receipt included");
     await expect(panel).not.toContainText("Your business");
+    await expect(panel.getByRole("heading", {level:3})).toHaveCount(1);
     await expect(panel.getByRole("heading", {level:3})).toBeVisible();
-    await expect(panel.locator(".marketing-channel-destination > .marketing-journey-step")).toContainText("Your customer pays");
-    await expect(panel.getByText("Check the details, then pay by card.", {exact:true})).toBeVisible();
-    await expectLoadedNetworkMarks(panel.getByRole("group", {name:"Card networks", exact:true}));
+    await expect(panel.locator(".marketing-journey-step, .channel-checkout")).toHaveCount(0);
+    await expectLoadedNetworkMarks(outcome.getByRole("group", {name:"Card networks", exact:true}));
     await expect(panel.locator("input, textarea, select, form, button, a, [contenteditable=true]")).toHaveCount(0);
     await expect(panel.locator(".marketing-channel-journey").getByRole("button")).toHaveCount(0);
     expect(await showcase.textContent()).not.toMatch(/sample|sandbox|demo|fixture|no messages|no money|no .*collected/i);
@@ -389,7 +393,7 @@ test("all five payment channels show a clear checkout journey and work by keyboa
   await page.keyboard.press("Home");
   await expectChannel(0);
   await page.keyboard.press("Tab");
-  await expect(showcase.getByRole("tabpanel", {name:"Text", exact:true})).toBeFocused();
+  await expect(showcase.getByRole("tabpanel", {name:"Copy link", exact:true})).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(showcase.locator(":focus")).toHaveCount(0);
   await expect(showcase.getByRole("link")).toHaveCount(0);
@@ -413,20 +417,21 @@ test("payment channels keep their content and touch targets inside a 320px scree
   await page.setViewportSize({width:320,height:900});
   const mutations = await preventMutationRequests(page);
   await page.goto("/payment-services");
-  const showcase = page.locator(".channel-showcase");
+  const figure = page.getByRole("figure", {name:"Illustrated payment journey", exact:true});
+  const showcase = figure.locator(".channel-showcase");
   await expect(showcase.locator(".marketing-channel-journey")).toBeVisible();
   const tabs = showcase.getByRole("tab");
-  for (const name of ["Text", "Email", "Social", "QR code", "Website"]) {
+  for (const name of ["Copy link", "Text", "Email", "Social", "QR code", "Website"]) {
     const selected = showcase.getByRole("tab", {name,exact:true});
     await selected.click();
     const panel = showcase.getByRole("tabpanel", {name,exact:true});
     await expect(panel).toBeVisible();
     await expect(panel.locator(".channel-medium")).toBeVisible();
-    await expect(panel.locator(".channel-checkout")).toBeVisible();
-    const overflow = await showcase.evaluate(node => ({
+    await expect(figure.locator(".two-step-outcome")).toBeVisible();
+    const overflow = await figure.evaluate(node => ({
       document: document.documentElement.scrollWidth > window.innerWidth,
       panel: node.scrollWidth > node.clientWidth,
-      content: [...node.querySelectorAll(".channel-medium, .channel-checkout")].some(element => element.scrollWidth > element.clientWidth),
+      content: [...node.querySelectorAll(".payment-request-preview, .channel-medium, .marketing-payment-summary, .two-step-outcome")].some(element => element.scrollWidth > element.clientWidth),
     }));
     expect(overflow).toEqual({document:false,panel:false,content:false});
     for (const tab of await tabs.all()) {
@@ -453,11 +458,13 @@ test("payment examples connect each business request to the same checkout amount
   await page.locator(".consumer-hero-actions").getByRole("link",{name:"Explore payments",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-services$/);
   const art = page.getByRole("figure",{name:"Illustrated payment journey",exact:true});
-  const tablist = art.getByRole("tablist",{name:"Payment examples",exact:true});
+  const tablist = art.getByRole("tablist",{name:"What you sell",exact:true});
+  await expect(tablist).toHaveCount(1);
+  await expect(art.locator(".payment-create-step, .payment-share-step")).toHaveCount(2);
   const examples = [
-    {name:"Goods", description:"Homeware set", amount:"$64.00"},
-    {name:"Services", description:"Design services", amount:"$480.00"},
-    {name:"Information", description:"Market research briefing", amount:"$35.00"},
+    {name:"Goods", description:"Homeware set", amount:"$64.00", reference:"ORDER-1048"},
+    {name:"Services", description:"Design services", amount:"$480.00", reference:"PROJECT-2086"},
+    {name:"Information", description:"Market research briefing", amount:"$35.00", reference:"BRIEF-3012"},
   ];
   async function expectExample(index:number) {
     const example = examples[index]!;
@@ -467,11 +474,11 @@ test("payment examples connect each business request to the same checkout amount
     await expect(tab).toHaveAttribute("tabindex","0");
     await expect(tablist.getByRole("tab",{selected:true})).toHaveCount(1);
     const panel = art.getByRole("tabpanel",{name:example.name,exact:true});
-    for (const selector of [".payment-journey-request", ".payment-journey-checkout"]) {
-      await expect(panel.locator(selector)).toContainText(example.description);
-      await expect(panel.locator(selector)).toContainText(example.amount);
+    for (const selector of [".payment-request-preview", ".channel-medium", ".marketing-payment-summary"]) {
+      await expect(art.locator(selector)).toContainText(example.description);
+      await expect(art.locator(selector)).toContainText(example.amount);
     }
-    await expect(panel.locator(".payment-journey-pay")).toHaveText(`Pay ${example.amount}`);
+    await expect(panel.locator(".payment-request-preview")).toContainText(example.reference);
     await expect(panel.locator("button, input, form, a")).toHaveCount(0);
     const box=(await tab.boundingBox())!;
     expect(box.height).toBeGreaterThanOrEqual(44);

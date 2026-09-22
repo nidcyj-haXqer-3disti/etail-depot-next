@@ -8,8 +8,8 @@ const commonQuestions = [
     answer: "Card applications are not open yet. Explore the Cards page for the product and wallet experience.",
   },
   {
-    question: "Will cards and payments use the same sign-in?",
-    answer: "No. Payments are managed through Trolleys. Card account access will be available through Ledgix when the service launches.",
+    question: "Where will I manage my services?",
+    answer: "Manage payments through Trolleys. Card account access will be available through Ledgix when the service launches. Each service has its own sign-in.",
   },
 ];
 

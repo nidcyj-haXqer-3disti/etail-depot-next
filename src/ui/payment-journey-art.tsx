@@ -4,76 +4,70 @@ import { useId, useRef } from "react";
 import { paymentExamples, type PaymentExamplePurpose } from "@/modules/public-site/payment-examples";
 import { formatUsdCents } from "@/modules/public-site/fee-estimate";
 import { usePaymentExample } from "./payment-example-context";
+import { PaymentChannelPreview } from "./payment-channel-preview";
 import { Icon } from "./icon";
 import { NetworkBrands } from "./network-brands";
 import "./payment-journey-art.css";
 
-const examples = (Object.keys(paymentExamples) as PaymentExamplePurpose[]).map(purpose => ({ purpose, ...paymentExamples[purpose] }));
+const saleTypes = Object.keys(paymentExamples) as PaymentExamplePurpose[];
+const typeDescriptions = { goods: "Products & orders", services: "Projects & appointments", information: "Research & insights" } as const;
 
-/** Local examples of collection; selecting a story never creates a payment. */
+function SaleThumbnail({ type }: { type: PaymentExamplePurpose }) {
+  return <span className="sale-thumbnail" data-sale={type} aria-hidden="true">
+    {type === "goods" ? <><span className="sale-parcel"><i /></span><span className="sale-bag"><i /></span></>
+      : type === "services" ? <span className="sale-calendar"><i /><span><b /><b /><b /><b /><b /><b /></span><Icon name="person" /></span>
+      : <span className="sale-report"><i /><i /><span><b /><b /><b /><b /></span><em /></span>}
+  </span>;
+}
+
+/** One local marketing example: two merchant actions, followed by customer checkout. */
 export function PaymentJourneyArt() {
   const { purpose, setPurpose } = usePaymentExample();
-  const selected = examples.findIndex(example => example.purpose === purpose);
   const id = useId();
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
-  const example = examples[selected]!;
+  const example = paymentExamples[purpose];
   const amount = formatUsdCents(example.amountCents);
 
-  return <figure className="payment-journey-art" aria-label="Illustrated payment journey">
-    <div className="payment-journey-selector" role="tablist" aria-label="Payment examples">
-      {examples.map((item, index) => <button
-        key={item.name}
-        type="button"
-        role="tab"
-        id={`${id}-${index}`}
-        aria-selected={selected === index}
-        aria-controls={`${id}-panel`}
-        tabIndex={selected === index ? 0 : -1}
-        ref={element => { tabs.current[index] = element; }}
-        onClick={() => setPurpose(item.purpose)}
-        onKeyDown={event => {
-          let next = index;
-          if (event.key === "ArrowRight") next = (index + 1) % examples.length;
-          else if (event.key === "ArrowLeft") next = (index + examples.length - 1) % examples.length;
-          else if (event.key === "Home") next = 0;
-          else if (event.key === "End") next = examples.length - 1;
-          else return;
-          event.preventDefault();
-          setPurpose(examples[next]!.purpose);
-          tabs.current[next]?.focus();
-        }}
-      >{item.name}</button>)}
+  return <figure className="payment-journey-art payment-two-step" id="payment-channels" aria-label="Illustrated payment journey">
+    <div className="two-step-signature"><span><Icon name="link" />Trolleys Two Step</span><p>Explore a payment from request to checkout.</p></div>
+    <div className="two-step-stages">
+      <section className="payment-create-step" aria-labelledby={`${id}-create`}>
+        <div className="two-step-heading"><span aria-hidden="true">01</span><div><h2 id={`${id}-create`}>Create your request</h2><p>Choose what you sell. Add the details and amount.</p></div></div>
+        <div className="request-workspace">
+          <div className="request-workspace-chrome"><span><Icon name="business" />Trolleys</span><span>New payment request</span></div>
+          <div className="request-workspace-body">
+          <div className="sale-type-tabs" role="tablist" aria-label="What you sell">
+            {saleTypes.map((type, index) => <button key={type} type="button" role="tab" id={`${id}-${type}`} aria-label={paymentExamples[type].name} aria-selected={purpose === type} aria-controls={`${id}-sale`} tabIndex={purpose === type ? 0 : -1} ref={element => { tabs.current[index] = element; }} onClick={() => setPurpose(type)} onKeyDown={event => {
+              let next = index;
+              if (event.key === "ArrowRight") next = (index + 1) % saleTypes.length;
+              else if (event.key === "ArrowLeft") next = (index + saleTypes.length - 1) % saleTypes.length;
+              else if (event.key === "Home") next = 0;
+              else if (event.key === "End") next = saleTypes.length - 1;
+              else return;
+              event.preventDefault(); setPurpose(saleTypes[next]!); tabs.current[next]?.focus();
+            }}><SaleThumbnail type={type} /><strong>{paymentExamples[type].name}</strong><span className="sale-choice-check" aria-hidden="true"><Icon name="check" /></span></button>)}
+          </div>
+          <div className="sale-type-panel" role="tabpanel" id={`${id}-sale`} aria-labelledby={`${id}-${purpose}`} tabIndex={0}>
+            <p className="payment-use-case">{typeDescriptions[purpose]}</p>
+            <div className="payment-request-preview">
+              <dl><div><dt>Payment for</dt><dd>{example.description}</dd></div><div><dt>Details</dt><dd>{example.quantity}</dd></div><div><dt>Reference</dt><dd>{example.orderReference}</dd></div></dl>
+              <div className="request-preview-amount"><span>Amount</span><strong>{amount}</strong></div>
+              <div className="request-preview-link"><Icon name="check" /><span>Payment link ready to share</span><Icon name="arrow" /></div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </section>
+      <section className="payment-share-step" aria-labelledby={`${id}-share`}>
+        <div className="two-step-heading"><span aria-hidden="true">02</span><div><h2 id={`${id}-share`}>Share your way</h2><p>Use the same link in more than one place.</p></div></div>
+        <PaymentChannelPreview purpose={purpose} />
+      </section>
     </div>
-    <div className="payment-journey-scene" id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-${selected}`} tabIndex={0}>
-      <div className="payment-journey-orbit" aria-hidden="true" />
-      <div className="payment-journey-request">
-        <p className="payment-journey-stage"><span>01</span> You create and share</p>
-        <div className="payment-journey-request-copy">
-          <p>{example.description}</p>
-          <strong>{amount}</strong>
-        </div>
-        <div className="payment-journey-share" aria-hidden="true">
-          <span><Icon name="message" /></span>
-          <span><Icon name="mail" /></span>
-          <span><Icon name="qr" /></span>
-          <span><Icon name="link" /></span>
-        </div>
-      </div>
-      <div className="payment-journey-connector" aria-hidden="true"><Icon name="arrow" /></div>
-      <div className="payment-journey-checkout">
-        <p className="payment-journey-stage"><span>02</span> Your customer pays</p>
-        <div className="payment-journey-order">
-          <span className="payment-journey-studio" aria-hidden="true">{example.purpose === "goods" ? <><span /><span /><span /></> : <Icon name={example.purpose === "information" ? "document" : "person"} />}</span>
-          <p>{example.description}</p>
-        </div>
-        <strong className="payment-journey-total">{amount}</strong>
-        <div className="payment-journey-card-details">
-          <Icon name="card" /><span>Credit or debit card</span><Icon name="lock" />
-        </div>
-        <NetworkBrands label="Illustrated checkout card networks" />
-        <div className="payment-journey-pay" aria-hidden="true">Pay {amount} <Icon name="arrow" /></div>
-      </div>
+    <div className="two-step-outcome">
+      <div className="two-step-customer"><span><Icon name="card" /></span><div><strong>Your customer opens the link and pays by card.</strong><p>Payment receipt included.</p></div></div>
+      <div className="marketing-payment-summary"><span>{example.description}</span><strong>{amount}</strong></div>
+      <NetworkBrands label="Card networks" />
     </div>
-    <figcaption>Payment example</figcaption>
+    <figcaption>Payment example. Create and share requests from your Trolleys account after approval and setup.</figcaption>
   </figure>;
 }

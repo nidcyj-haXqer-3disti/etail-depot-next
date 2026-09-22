@@ -45,23 +45,29 @@ for(const width of [1440,320]){
       const type=page.getByRole("tablist",{name:"What you sell",exact:true}).getByRole("tab",{name:saleType,exact:true});
       await type.click();
       await expect(type).toHaveAttribute("aria-selected","true");
-      const panel=page.locator(".sale-type-panel");
+      const figure=page.getByRole("figure",{name:"Illustrated payment journey",exact:true});
+      const panel=figure.locator(".sale-type-panel");
       await expect(panel).toHaveAccessibleName(saleType);
+      await expect(panel.locator(".payment-request-preview")).toContainText(description);
+      await expect(panel.locator(".payment-request-preview")).toContainText(amount);
+      await expect(panel.locator(".payment-request-preview")).toContainText(reference);
       const selection=page.locator(".fee-estimate input#addon-sale-records");
       await expect(selection).not.toBeChecked();
-      await expect(selection).toHaveAccessibleName("Dispute readiness");
+      await expect(selection).toHaveAccessibleName("Clarity");
       await expect(selection).toHaveAccessibleDescription(/\S+/);
-      const channels=panel.getByRole("tablist",{name:"Ways to share a payment request",exact:true});
-      for(const name of ["Text","Email","Social","QR code","Website"]){
+      const channels=figure.getByRole("tablist",{name:"Ways to share a payment request",exact:true});
+      await expect(channels).toHaveAttribute("aria-orientation","horizontal");
+      for(const name of ["Copy link","Text","Email","Social","QR code","Website"]){
         const channel=channels.getByRole("tab",{name,exact:true});
         await channel.click();
         await expect(channel).toHaveAttribute("aria-selected","true");
         await expect(channels.locator('[role="tab"][aria-selected="true"]')).toHaveCount(1);
-        await expect(panel.locator(".channel-panel")).toHaveAccessibleName(name);
-        await expect(panel.locator(".marketing-channel-journey")).toBeVisible();
-        await expect(panel.locator(".channel-medium")).toContainText(description);
-        await expect(panel.locator(".marketing-payment-summary")).toContainText(description);
-        await expect(panel.locator(".marketing-payment-summary")).toContainText(amount);
+        await expect(figure.locator(".channel-panel")).toHaveAccessibleName(name);
+        await expect(figure.locator(".marketing-channel-journey")).toBeVisible();
+        await expect(figure.locator(".channel-medium")).toContainText(description);
+        await expect(figure.locator(".channel-medium")).toContainText(amount);
+        await expect(figure.locator(".marketing-payment-summary")).toContainText(description);
+        await expect(figure.locator(".marketing-payment-summary")).toContainText(amount);
         await expect(selection).not.toBeChecked();
         const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
         expect(result.violations.map(({id,nodes})=>({id,nodes:nodes.map(node=>node.target)}))).toEqual([]);

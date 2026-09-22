@@ -5,6 +5,7 @@
 .payment-price-card h3, .fee-estimate h3 { font-size: 22px; font-weight: 500; letter-spacing: -.025em; line-height: 1.3; }
 .payment-price-card > .payment-base-rate { margin: 24px 0 8px; font-size: clamp(36px, 4vw, 48px); line-height: 1.2; letter-spacing: -.04em; color: var(--public-ink); font-weight: 500; }
 .payment-price-card > p, .fee-estimate > p { color: var(--public-muted); font-size: 15px; line-height: 1.6; }
+.payment-price-card > .payment-offer-summary { margin-top: 20px; color: var(--public-ink); }
 .fee-estimate > p { margin-top: 8px; }
 .payment-inclusions { display: grid; gap: 16px; margin: 28px 0; font-size: 14px; line-height: 1.5; }
 .payment-inclusions > div, .fee-exceptions > div { display: flex; justify-content: space-between; gap: 24px; }

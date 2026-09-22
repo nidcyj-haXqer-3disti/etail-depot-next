@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { legalPageMetadata } from "@/modules/public-site/legal-metadata";
 import { cardProduct } from "@/shared/card-product";
-import { saleRecordsOffer } from "@/shared/product-facts";
+import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
 import { LegalDocument, type LegalSection } from "@/ui/legal-document";
 import { LegalBrands, LegalContacts } from "@/ui/legal-identity";
 
@@ -27,7 +27,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "login", title: "Service access and responsibilities", content: <>
-      <p>Trolleys provides sign-in and account management through its website. Ledgix card access will be available when the card service launches. Earlier Etail Depot website accounts and invitations no longer provide access here and do not sign you in to either product. Follow the enrollment and recovery instructions for the service you use.</p>
+      <p>For Trolleys sign-in and account management, follow the access instructions supplied with your account. If you are new to the service, visit Trolleys to apply. Ledgix card access will be available when the card service launches. Earlier Etail Depot website accounts and invitations no longer provide access here and do not sign you in to either product.</p>
       <ul>
         <li>Use an email address you control and complete any required confirmation.</li>
         <li>Keep passwords, confirmation links and recovery links private. Each person must use their own login.</li>
@@ -51,13 +51,13 @@ const sections: LegalSection[] = [
   {
     id: "payments", title: "Trolleys · Payments", content: <>
       <p>Continue to Trolleys for enrollment, sign-in and payment account management.</p>
-      <p>The <Link href="/payment-services#fees">payment pricing</Link> section describes the published standard pricing and its scope. Review the merchant agreement and disclosures before enrollment for the terms that apply to your account, including accepted payment methods, account permissions, all fees, refunds, disputes, settlement and payouts. This website does not perform those account actions.</p>
+      <p>{productFacts.payments.offerName} includes payment-request creation and sharing in its published payment fee, with no monthly fee. The <Link href="/payment-services#fees">payment pricing</Link> section describes the rate and its scope. Review the merchant agreement and disclosures before enrollment for the terms that apply to your account, including accepted payment methods, account permissions, all fees, refunds, disputes, settlement and payouts. This website does not perform those account actions.</p>
       <p>Payment examples on this website illustrate ways to request payment for goods, services and information. Information can include research, insights or advice delivered as a report, briefing or consultation. Example amounts, items, messages and payment statuses are illustrative and do not create a payment request or record a transaction.</p>
       <p>Trolleys’ optional {saleRecordsOffer.name} service uses its live Order Insight integration to share supported merchant, transaction and order details with participating banks. It helps customers recognize purchases and can prevent eligible Visa fraud disputes when the required transaction history and data qualify. Basic transaction receipts remain included without this service.</p>
       <p>The Trolleys service fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Payment processing is separate. Applicable charges and service terms are disclosed before enrollment. Review the service agreement for transaction coverage, billing, refund treatment and information sharing. Selecting or previewing {saleRecordsOffer.name} on this website does not enroll you, accept a contract or create a charge.</p>
       <p>The website examples use fixed illustrative information. They do not collect actual sale records, generate or deliver documents, collect a signature, establish customer consent, share records with banks or submit dispute evidence. Payment and fulfillment are separate events that require accurate records; payment alone does not establish delivery, quality or a promised result.</p>
       <p>{saleRecordsOffer.name} does not cover every bank, payment or dispute reason and does not guarantee an outcome. Refund programs and managed responses to existing chargebacks are separate services. Merchants remain responsible for accurate records, appropriate terms, fulfillment and timely responses. Website examples are not legal advice.</p>
-      <p>The fee calculator estimates only the displayed processing fee and the Trolleys {saleRecordsOffer.name} fee if selected. The remaining amount excludes any other applicable charges; it is not a guaranteed settlement amount or a prediction of when funds will reach your bank. Check your service agreement and account records for an actual payment’s charges and status.</p>
+      <p>The fee calculator estimates only the displayed {productFacts.payments.offerName} payment fee and the {saleRecordsOffer.name} fee if selected. The remaining amount excludes any other applicable charges; it is not a guaranteed settlement amount or a prediction of when funds will reach your bank. Check your service agreement and account records for an actual payment’s charges and status.</p>
       <p>Use the service’s recorded statuses and instructions to confirm an action’s outcome. A link to Trolleys does not enroll you in Ledgix, connect account balances or transfer funds between the two products.</p>
     </>,
   },
@@ -65,11 +65,10 @@ const sections: LegalSection[] = [
     id: "acceptable-use", title: "Responsible use", content: <>
       <p>Use this website lawfully. Do not:</p>
       <ul>
-        <li>Impersonate another person or access cards, terminals or records without authorization.</li>
-        <li>Bypass security controls, misuse recovery links or interfere with the service.</li>
-        <li>Send deceptive payment requests, unlawful content, unsolicited invitations or harmful software.</li>
-        <li>Collect another person’s information without permission or expose private records through public links.</li>
-        <li>Misrepresent a transaction’s status, the availability of funds or the approval of a financial product.</li>
+        <li>Impersonate another person or submit false or misleading information when contacting us.</li>
+        <li>Attempt unauthorized access, bypass security controls or interfere with this website.</li>
+        <li>Send unlawful content, unsolicited messages or harmful software.</li>
+        <li>Collect or disclose another person’s information without authorization.</li>
       </ul>
     </>,
   },
@@ -98,5 +97,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function TermsPage() {
-  return <LegalDocument title="Terms of Use" description="Using the Etail Depot website and accessing our product services." updated="September 21, 2026" currentPage="terms" sections={sections} />;
+  return <LegalDocument title="Terms of Use" description="Using the Etail Depot website and accessing our product services." updated="September 22, 2026" currentPage="terms" sections={sections} />;
 }

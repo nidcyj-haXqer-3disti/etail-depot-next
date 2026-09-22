@@ -1,12 +1,11 @@
 "use client";
 
 import { useId, useState } from "react";
-import type { ChannelPresentation } from "@/shared/channel-presentation";
+import { paymentChannels, type ChannelPresentation } from "@/shared/channel-presentation";
 import { paymentExamples, type PaymentExamplePurpose } from "@/modules/public-site/payment-examples";
 import { formatUsdCents } from "@/modules/public-site/fee-estimate";
 import { Icon } from "./icon";
 import { PaymentChannelTabs } from "./payment-channel-tabs";
-import { NetworkBrands } from "./network-brands";
 import "./payment-channel-preview.css";
 
 type ExampleDetails = (typeof paymentExamples)[PaymentExamplePurpose] & { amount: string };
@@ -15,13 +14,6 @@ export type PaymentChannelPreviewProps = {
   purpose: PaymentExamplePurpose;
 };
 
-const stories: Record<ChannelPresentation, { title: string; detail: string }> = {
-  SMS: { title: "Send a payment request", detail: "Share the amount and a payment link by text." },
-  EMAIL: { title: "Put the details in an email", detail: "Send your customer the payment details and a link to checkout." },
-  SOCIAL: { title: "Share where you connect", detail: "Add your payment link to a post or direct message." },
-  QR: { title: "Let customers scan to pay", detail: "Display a QR code that opens the payment page on their phone." },
-  WEB: { title: "Connect your site to checkout", detail: "Add a payment link or button to your website." },
-};
 
 function PaymentLinkCard({ example, label = "Pay by card" }: { example: ExampleDetails; label?: string }) {
   return <div className="marketing-payment-link"><span className="marketing-link-icon"><Icon name="link" /></span><span><strong>{label}</strong><small>{example.description}</small></span><b>{example.amount}</b><Icon name="arrow" /></div>;
@@ -29,13 +21,22 @@ function PaymentLinkCard({ example, label = "Pay by card" }: { example: ExampleD
 
 /** Illustrations only: selecting a format never sends a request or opens checkout. */
 function ChannelIllustration({ channel, purpose, example }: { channel: ChannelPresentation; purpose: PaymentExamplePurpose; example: ExampleDetails }) {
+  if (channel === "LINK") return <div className="channel-medium marketing-portable-link">
+    <span className="portable-link-emblem"><Icon name="link" /></span>
+    <span className="marketing-document-kicker">{example.context}</span>
+    <strong>{example.description}</strong><b>{example.amount}</b>
+    <div className="portable-link-address"><Icon name="lock" /><span>Your payment link</span><Icon name="layers" /></div>
+    <div className="portable-link-destinations" aria-hidden="true"><Icon name="message" /><Icon name="mail" /><Icon name="qr" /><Icon name="business" /></div>
+  </div>;
   if (channel === "SMS") return <div className="channel-medium marketing-message">
+    <div className="sharing-phone-status" aria-hidden="true"><span>9:41</span><i /><span className="sharing-phone-battery" /></div>
     <div className="marketing-medium-title"><span className="marketing-medium-icon"><Icon name="message" /></span><span><strong>{example.context}</strong><small>Text message</small></span></div>
     <div className="marketing-message-thread"><p className="marketing-incoming">{example.question}</p><div className="marketing-outgoing"><p>Here’s your payment link.</p><PaymentLinkCard example={example} /></div></div>
+    <div className="sharing-phone-home" aria-hidden="true" />
   </div>;
   if (channel === "EMAIL") return <div className="channel-medium marketing-email">
     <div className="marketing-email-subject"><Icon name="mail" /><strong>{example.context}</strong></div>
-    <div className="marketing-email-body"><span className="marketing-document-kicker">PAYMENT REQUEST</span><strong>Your payment details.</strong><p>Review the amount, then pay by card.</p><div className="marketing-line-item"><span>{example.description}</span><b>{example.amount}</b></div><PaymentLinkCard example={example} /></div>
+    <div className="marketing-email-body"><span className="marketing-document-kicker">Payment request</span><strong>Your payment details.</strong><p>Review the amount, then pay by card.</p><PaymentLinkCard example={example} /></div>
   </div>;
   if (channel === "SOCIAL") return <div className="channel-medium marketing-social">
     <div className="marketing-social-heading"><span><Icon name="person" />{example.context}</span><span aria-hidden="true">•••</span></div><div className="marketing-social-poster"><span className="marketing-poster-orbit marketing-poster-orbit-one" aria-hidden="true" /><span className="marketing-poster-orbit marketing-poster-orbit-two" aria-hidden="true" /><span className="marketing-document-kicker">PAY BY CARD</span><strong>{example.description}</strong><span>{example.amount}</span></div><div className="marketing-social-caption"><p>View the details and continue to payment.</p><PaymentLinkCard example={example} /></div>
@@ -49,21 +50,16 @@ function ChannelIllustration({ channel, purpose, example }: { channel: ChannelPr
 }
 
 export function PaymentChannelPreview({ purpose }: PaymentChannelPreviewProps) {
-  const [selected, setSelected] = useState<ChannelPresentation>("SMS");
+  const [selected, setSelected] = useState<ChannelPresentation>("LINK");
   const id = useId();
   const example = { ...paymentExamples[purpose], amount: formatUsdCents(paymentExamples[purpose].amountCents) };
-  const story = stories[selected];
+  const channel = paymentChannels.find(item => item.id === selected)!;
 
   return <div className="channel-showcase channel-marketing">
     <PaymentChannelTabs value={selected} onChange={setSelected} idPrefix={id} />
     <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-${selected}`} tabIndex={0} className="channel-panel marketing-channel-panel" data-channel={selected}>
-      <div className="marketing-preview-heading"><span><Icon name={selected === "SMS" ? "message" : selected === "EMAIL" ? "mail" : selected === "QR" ? "qr" : selected === "WEB" ? "link" : "person"} />{selected === "SMS" ? "Text" : selected === "EMAIL" ? "Email" : selected === "QR" ? "QR code" : selected === "WEB" ? "Website" : "Social"}</span><small>{example.name} · {example.amount}</small></div>
-      <div id={`${id}-journey`} className="marketing-channel-journey">
-        <div className="marketing-channel-source"><p className="marketing-journey-step"><span>01</span>You share</p><ChannelIllustration channel={selected} purpose={purpose} example={example} /></div>
-        <span className="marketing-channel-connector" aria-hidden="true"><Icon name="arrow" /></span>
-        <div className="marketing-channel-destination"><p className="marketing-journey-step"><span>02</span>Your customer pays</p><div className="channel-checkout marketing-payment-view"><div className="marketing-checkout-heading"><span className="marketing-checkout-icon"><Icon name="card" /></span><span>Card checkout<small>{example.context}</small></span><Icon name="lock" /></div><h4>Your payment.</h4><p>Check the details, then pay by card.</p><div className="marketing-payment-summary"><span>{example.description}</span><strong>{example.amount}</strong></div><NetworkBrands /><div className="marketing-payment-finish" aria-hidden="true"><Icon name="lock" /><span>Pay {example.amount}</span><Icon name="arrow" /></div><div className="marketing-payment-receipt"><Icon name="document" /><div><span>After successful payment</span><strong>Payment receipt included</strong></div></div></div></div>
-      </div>
-      <div className="marketing-channel-copy"><h3>{story.title}</h3><p>{story.detail}</p></div>
+      <div className="marketing-channel-journey"><ChannelIllustration channel={selected} purpose={purpose} example={example} /></div>
+      <div className="marketing-channel-copy"><h3>{channel.title}</h3><p>{channel.detail}</p></div>
     </div>
   </div>;
 }
