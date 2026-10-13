@@ -10,6 +10,17 @@ PNPM_VERSION = "11.19.0"
 # Static export does not require the Next server adapter.
 NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
+# Preserve the enabled platform integration, using the reviewed locked version.
+# The second plugin protects its generated handler and checks the final bundle.
+[[plugins]]
+package = "@netlify/plugin-emails"
+
+[[plugins]]
+package = "./netlify/plugins/public-release"
+
+[functions.emails]
+node_bundler = "esbuild"
+
 # D122: only this approved production site's discovery pages may be indexed.
 # The edge boundary checks trusted site/deploy context and scoped runtime markers again.
 [context.production.environment]

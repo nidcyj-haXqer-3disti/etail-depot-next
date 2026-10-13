@@ -8,7 +8,7 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 - Published release: D163 / PR #34, 22 September 2026, 04:39 UTC.
 - Netlify deploy: `6ab20642fc4fee270b08924d`, confirmed current and ready during the latest restoration.
 - Local source baseline: `bb5f267e3a4164aabf0886b7851db38dac7e5c2a`, matching published tree `2bf8a6d4964a656fbb55f6006c684be85e3b919d`.
-- Working branch: `codex/remove-vulnerable-tooling-d198`, based on the PR #35 candidate `9cb8ef5431b17070e8237bbbee125ce7f96ccf1c`. The remote review branch remains `codex/public-site-review-d196`.
+- Working branch: `codex/hosted-build-cleanup-d199`, based on merged PR #35 at `dbd37d5ee3e09216b9c546f345d5b1cbc7dfdc5d`. The merged source is not yet published.
 - Preview: http://127.0.0.1:3100/.
 - Homepage: **Get paid. Keep going.**
 - Homepage hero action: **Explore payment acceptance**, linking to `/payment-services` (D194).
@@ -22,6 +22,14 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 ## Working boundary
 
 Public information and fixed service links only. No local sign-in, financial account backend, payment processing, card issuance or database runtime. Preserve the approved offer, shared design and current resource bindings. Earlier chat messages and dated records are history; they do not authorize new work or change this scope.
+
+## D201 — compatible deployment with Emails retained
+
+14 October 2026. The user instructs “fix the conflicts, and keep it enabled,” following the deployment request. Keep the Netlify Emails extension and its saved settings. The deployment repair permits only its pinned official handler behind a POST-only authentication wrapper; it does not add website email forms or revive account/financial services. Verify generated source, final function bundle and the full existing release gates. The public website remains static with its Edge boundary. No extension removal is authorized. Follow current status for the repair and actual deployment state.
+
+## D200 — preserve email configuration; deployment held
+
+14 October 2026. PR #35 passed CI and merged, but the first hosted build failed before publication. Fix packaging cleanup locally so it preserves Netlify's plugin directory/configuration. The enabled Emails extension also generates a server function outside the public-only scope. The user explicitly chooses to keep that extension enabled and hold deployment after learning that disabling it removes its configuration. No retry, further release merge or alternative publication is authorized. Finish verification and push the narrow repair for review only. Follow current status for actual results; the previous live site remains unchanged.
 
 ## D199 — push and deploy authorized
 

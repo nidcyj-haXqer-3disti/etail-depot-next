@@ -15,7 +15,7 @@ export function publicSourceFingerprint(root) {
       else if (entry.isFile()) files.push(name);
     }
   }
-  for (const dir of ["src", "public", "tools", "tests", "patches", ".github", "netlify/edge-functions"]) walk(dir);
+  for (const dir of ["src", "public", "tools", "tests", "patches", ".github", "netlify"]) walk(dir);
   for (const file of ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "next.config.ts", "netlify.toml", "project-targets.json", "tsconfig.json", "playwright.config.ts", "vitest.config.ts", "eslint.config.mjs", ".nvmrc"]) {
     if (existsSync(path.join(root, file))) files.push(file);
   }

@@ -1,0 +1,461 @@
+
+import {createRequire as ___nfyCreateRequire} from "module";
+import {fileURLToPath as ___nfyFileURLToPath} from "url";
+import {dirname as ___nfyPathDirname} from "path";
+let __filename=___nfyFileURLToPath(import.meta.url);
+let __dirname=___nfyPathDirname(___nfyFileURLToPath(import.meta.url));
+let require=___nfyCreateRequire(import.meta.url);
+
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined") return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
+});
+var __commonJS = (cb, mod) => function __require2() {
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+
+// artifacts/d201-email-compat/bundle-fixture/.netlify/functions-internal/emails/vendor.cjs
+var require_vendor = __commonJS({
+  "artifacts/d201-email-compat/bundle-fixture/.netlify/functions-internal/emails/vendor.cjs"(exports) {
+    "use strict";
+    var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
+      function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+          resolve(value);
+        });
+      }
+      return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+        function step(result) {
+          result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    };
+    var __importDefault = exports && exports.__importDefault || function(mod) {
+      return mod && mod.__esModule ? mod : { "default": mod };
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.getEmailFromPath = void 0;
+    var fs_1 = __importDefault(__require("fs"));
+    var path_1 = __require("path");
+    var https_1 = __importDefault(__require("https"));
+    var getEmailFromPath = (path) => {
+      let fileFound;
+      fs_1.default.readdirSync(path).forEach((file) => {
+        if (fileFound !== void 0) {
+          return;
+        }
+        const fileType = file.split(".").pop();
+        const filename = file.replace(/^.*[\\/]/, "").split(".")[0];
+        if (filename === "index") {
+          if (fileType === "mjml" || fileType === "html") {
+            const fileContents = fs_1.default.readFileSync(`${path}/${file}`, "utf8");
+            fileFound = { file: fileContents, type: fileType };
+          }
+        }
+      });
+      return fileFound;
+    };
+    exports.getEmailFromPath = getEmailFromPath;
+    var allowedPreviewEnvironments = ["deploy-preview", "branch-deploy", "dev"];
+    var getMissingConfig = () => {
+      var _a;
+      const missingConfig = {};
+      let validConfig = true;
+      if (!process.env.NETLIFY_EMAILS_PROVIDER) {
+        missingConfig.NETLIFY_EMAILS_PROVIDER = true;
+        validConfig = false;
+      }
+      if (!process.env.NETLIFY_EMAILS_PROVIDER_API_KEY) {
+        missingConfig.NETLIFY_EMAILS_PROVIDER_API_KEY = true;
+        validConfig = false;
+      }
+      if (((_a = process.env.NETLIFY_EMAILS_PROVIDER) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "mailgun") {
+        if (!process.env.NETLIFY_EMAILS_MAILGUN_HOST_REGION) {
+          missingConfig.NETLIFY_EMAILS_MAILGUN_HOST_REGION = true;
+          validConfig = false;
+        }
+        if (!process.env.NETLIFY_EMAILS_MAILGUN_DOMAIN) {
+          missingConfig.NETLIFY_EMAILS_MAILGUN_DOMAIN = true;
+          validConfig = false;
+        }
+      }
+      if (!process.env.NETLIFY_EMAILS_SECRET) {
+        missingConfig.NETLIFY_EMAILS_SECRET = true;
+        validConfig = false;
+      }
+      return validConfig ? false : missingConfig;
+    };
+    var makeRenderTemplateRequest = (fileFound, parameters) => __awaiter(void 0, void 0, void 0, function* () {
+      const renderRequest = {
+        template: fileFound.file,
+        siteId: process.env.SITE_ID,
+        type: fileFound.type,
+        showParameterDictionary: false,
+        parameters
+      };
+      return yield new Promise((resolve, reject) => {
+        const renderReq = https_1.default.request({
+          hostname: "netlify-integration-emails.netlify.app",
+          path: "/.netlify/functions/render",
+          method: "POST",
+          headers: {
+            "site-id": process.env.SITE_ID,
+            "Content-Type": "application/json"
+          }
+        }, (res) => {
+          let data = "";
+          res.on("data", (chunk) => {
+            data += chunk;
+          });
+          res.on("end", () => {
+            var _a;
+            const response = JSON.parse(data);
+            resolve(Object.assign(Object.assign({}, response), { status: (_a = res.statusCode) !== null && _a !== void 0 ? _a : 500 }));
+          });
+        });
+        renderReq.on("error", (error) => {
+          return reject(error);
+        });
+        renderReq.write(JSON.stringify(renderRequest));
+        renderReq.end();
+      });
+    });
+    var makeSendEmailRequest = (mailRequest) => __awaiter(void 0, void 0, void 0, function* () {
+      return yield new Promise((resolve, reject) => {
+        const sendReq = https_1.default.request({
+          hostname: "netlify-integration-emails.netlify.app",
+          path: "/.netlify/functions/send",
+          method: "POST",
+          headers: {
+            "site-id": process.env.SITE_ID,
+            "Content-Type": "application/json"
+          }
+        }, (res) => {
+          let data = "";
+          res.on("data", (chunk) => {
+            data += chunk;
+          });
+          res.on("end", () => {
+            var _a;
+            const response = JSON.parse(data);
+            const sendEmailResponse = {
+              message: response.message,
+              status: (_a = res.statusCode) !== null && _a !== void 0 ? _a : 500
+            };
+            resolve(sendEmailResponse);
+          });
+        });
+        sendReq.on("error", (error) => {
+          return reject(error);
+        });
+        sendReq.write(JSON.stringify(mailRequest));
+        sendReq.end();
+      });
+    });
+    var jsonResponse = (body, status) => new Response(JSON.stringify(body), {
+      status,
+      headers: { "Content-Type": "application/json" }
+    });
+    var htmlResponse = (html) => new Response(html, { status: 200, headers: { "Content-Type": "text/html" } });
+    exports.default = (req) => __awaiter(void 0, void 0, void 0, function* () {
+      var _a, _b, _c, _d;
+      console.log(`Email handler received email request from path ${req.url}`);
+      const missingConfig = getMissingConfig();
+      const providerApiKey = process.env.NETLIFY_EMAILS_PROVIDER_API_KEY;
+      const providerName = process.env.NETLIFY_EMAILS_PROVIDER;
+      const emailTemplatesDirectory = (_a = process.env.NETLIFY_EMAILS_DIRECTORY) !== null && _a !== void 0 ? _a : "./emails";
+      const emailPath = (_b = req.url.match(/emails\/([A-z-]*)[?]?/)) === null || _b === void 0 ? void 0 : _b[1];
+      if (missingConfig) {
+        const missingConfigString = Object.keys(missingConfig).map((key) => {
+          if (missingConfig[key]) {
+            return key;
+          }
+          return "";
+        }).join(", ");
+        console.error(`Email handler detected missing configuration: ${missingConfigString}`);
+        if (req.method === "POST") {
+          return jsonResponse({
+            message: `The emails integration is not configured correctly. We have detected the following configuration is missing: ${missingConfigString}`
+          }, 400);
+        }
+        return htmlResponse(`
+          <html>
+            <head>
+            <link rel="stylesheet" href="https://netlify-integration-emails.netlify.app/main.css">
+            <script>
+              missingConfig = ${JSON.stringify(missingConfig)}
+              siteId = ${JSON.stringify(process.env.SITE_ID)}
+              templateName = ${JSON.stringify(emailPath)}
+            </script>
+            <script defer src='https://netlify-integration-emails.netlify.app/index.js'></script>
+            </head>
+            <div id='app'></div>
+          </html>
+          `);
+      }
+      if (req.method === "GET") {
+        const showEmailPreview = allowedPreviewEnvironments.includes(process.env.CONTEXT);
+        if (!showEmailPreview) {
+          return jsonResponse({
+            message: `Email previews are not allowed in the ${process.env.CONTEXT} environment`
+          }, 400);
+        }
+        if (!fs_1.default.existsSync(emailTemplatesDirectory)) {
+          return jsonResponse({
+            message: `Email templates directory ${emailTemplatesDirectory} does not exist`
+          }, 400);
+        }
+        let emailTemplate;
+        if (emailPath !== void 0) {
+          if (!fs_1.default.existsSync((0, path_1.join)(emailTemplatesDirectory, emailPath))) {
+            console.log(`Preview path is not a valid email path - preview path received: ${emailPath}`);
+            return htmlResponse(`
+              <html>
+                <head>
+                <link rel="stylesheet" href="https://netlify-integration-emails.netlify.app/main.css">
+                <script>
+                  missingTemplate = ${JSON.stringify(true)}
+                  siteId = ${JSON.stringify(process.env.SITE_ID)}
+                  templateName = ${JSON.stringify(emailPath)}
+                  emailDirectory = ${JSON.stringify(emailTemplatesDirectory)}
+                </script>
+                <script defer src='https://netlify-integration-emails.netlify.app/index.js'></script>
+                </head>
+                <div id='app'></div>
+              </html>
+              `);
+          }
+          emailTemplate = (0, exports.getEmailFromPath)((0, path_1.join)(emailTemplatesDirectory, emailPath));
+          if (!emailTemplate) {
+            console.log(`No email template found for preview path - preview path received: ${emailPath}. Please ensure that an index.mjml or index.html file exists in the email template folder.`);
+            return htmlResponse(`
+              <html>
+                <head>
+                <link rel="stylesheet" href="https://netlify-integration-emails.netlify.app/main.css">
+                <script>
+                  missingTemplate = ${JSON.stringify(true)}
+                  siteId = ${JSON.stringify(process.env.SITE_ID)}
+                  templateName = ${JSON.stringify(emailPath)}
+                  emailDirectory = ${JSON.stringify(emailTemplatesDirectory)}
+                </script>
+                <script defer src='https://netlify-integration-emails.netlify.app/index.js'></script>
+                </head>
+                <div id='app'></div>
+              </html>
+              `);
+          }
+        }
+        const validEmailPaths = [];
+        fs_1.default.readdirSync(emailTemplatesDirectory).forEach((template) => {
+          if (fs_1.default.existsSync((0, path_1.join)(emailTemplatesDirectory, template, "index.html")) || fs_1.default.existsSync((0, path_1.join)(emailTemplatesDirectory, template, "index.mjml"))) {
+            validEmailPaths.push(template);
+          }
+        });
+        return htmlResponse(`
+        <html>
+          <head>
+          <link rel="stylesheet" href="https://netlify-integration-emails.netlify.app/main.css">
+          <script>
+            emailPaths =  ${JSON.stringify(validEmailPaths)}
+            template = ${JSON.stringify(emailTemplate === null || emailTemplate === void 0 ? void 0 : emailTemplate.file)}
+            templateType = ${JSON.stringify(emailTemplate === null || emailTemplate === void 0 ? void 0 : emailTemplate.type)}
+            siteId = ${JSON.stringify(process.env.SITE_ID)}
+            siteName = ${JSON.stringify(process.env.SITE_NAME)}
+            provider = ${JSON.stringify(providerName)}
+            emailDirectory = ${JSON.stringify(emailTemplatesDirectory)}
+            secret = ${JSON.stringify(process.env.NETLIFY_EMAILS_SECRET)}
+            url = ${JSON.stringify(process.env.URL)}
+            templateName = ${JSON.stringify(emailPath)}
+          </script>
+          <script defer src='https://netlify-integration-emails.netlify.app/index.js'></script>
+          </head>
+          <div id='app'></div>
+        </html>
+        `);
+      }
+      if (req.method === "POST") {
+        if (!process.env.NETLIFY_EMAILS_SECRET) {
+          return jsonResponse({
+            message: "Secret not set in NETLIFY_EMAILS_SECRET"
+          }, 400);
+        }
+        if (req.headers.get("netlify-emails-secret") !== process.env.NETLIFY_EMAILS_SECRET) {
+          return jsonResponse({
+            message: "Secret does not match"
+          }, 403);
+        }
+        if (!fs_1.default.existsSync(emailTemplatesDirectory)) {
+          return jsonResponse({
+            message: `Email templates directory ${emailTemplatesDirectory} does not exist`
+          }, 404);
+        }
+        const rawBody = yield req.text();
+        if (!rawBody) {
+          return jsonResponse({
+            message: "Request body required"
+          }, 400);
+        }
+        const requestBody = JSON.parse(rawBody);
+        if (!requestBody.from) {
+          console.log("From address is required");
+          return jsonResponse({
+            message: "From address is required"
+          }, 400);
+        }
+        if (!requestBody.to) {
+          console.log("To address is required");
+          return jsonResponse({
+            message: "To address is required"
+          }, 400);
+        }
+        if (!emailPath) {
+          console.error(`Email path is not specified`);
+          return jsonResponse({
+            message: "You have not specified the email you wish to send in the URL"
+          }, 400);
+        }
+        const fullEmailPath = `${emailTemplatesDirectory}/${emailPath}`;
+        const emailPathExists = fs_1.default.existsSync(fullEmailPath);
+        if (!emailPathExists) {
+          console.error(`Email path does not exist: ${fullEmailPath}`);
+          return jsonResponse({
+            message: `Email path ${fullEmailPath} does not exist`
+          }, 404);
+        }
+        const email = (0, exports.getEmailFromPath)(fullEmailPath);
+        if (!email) {
+          console.error(`No email file found in directory: ${fullEmailPath}`);
+          return jsonResponse({
+            message: `No email file found in directory: ${fullEmailPath}`
+          }, 404);
+        }
+        const renderResponseJson = yield makeRenderTemplateRequest(email, requestBody.parameters);
+        if ((_c = renderResponseJson.error) !== null && _c !== void 0 ? _c : !renderResponseJson.html) {
+          console.error(`Error rendering email template: ${JSON.stringify(renderResponseJson)}`);
+          return jsonResponse({
+            message: `Error rendering email template${renderResponseJson.error ? `: ${renderResponseJson.error}` : ""}`
+          }, renderResponseJson.status);
+        }
+        const renderedTemplate = renderResponseJson.html;
+        const configuration = {
+          providerName,
+          apiKey: providerApiKey,
+          mailgunDomain: process.env.NETLIFY_EMAILS_MAILGUN_DOMAIN,
+          mailgunHostRegion: process.env.NETLIFY_EMAILS_MAILGUN_HOST_REGION
+        };
+        const request = {
+          from: requestBody.from,
+          to: requestBody.to,
+          cc: requestBody.cc,
+          bcc: requestBody.bcc,
+          subject: (_d = requestBody.subject) !== null && _d !== void 0 ? _d : "",
+          html: renderedTemplate,
+          attachments: requestBody.attachments
+        };
+        const { message, status } = yield makeSendEmailRequest({
+          configuration,
+          request
+        });
+        if (status !== 200) {
+          console.error(`Error sending email: ${message}`);
+        }
+        return jsonResponse({
+          message
+        }, status);
+      }
+      return jsonResponse({
+        message: "Method not allowed"
+      }, 405);
+    });
+  }
+});
+
+// artifacts/d201-email-compat/bundle-fixture/.netlify/functions-internal/emails/index.mjs
+import { timingSafeEqual } from "node:crypto";
+var headers = {
+  "Content-Type": "application/json; charset=utf-8",
+  "Cache-Control": "no-store",
+  "X-Robots-Tag": "noindex, nofollow",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "no-referrer"
+};
+function createEmailHandler(loadHandler, readSecret) {
+  return async function emailHandler(request) {
+    if (request.method !== "POST") {
+      return new Response(request.method === "HEAD" ? null : JSON.stringify({ message: "Method not allowed." }), {
+        status: 405,
+        headers: { ...headers, Allow: "POST" }
+      });
+    }
+    const secret = readSecret();
+    if (!secret) return new Response(JSON.stringify({ message: "Email service unavailable." }), { status: 503, headers });
+    const supplied = request.headers.get("netlify-emails-secret") ?? "";
+    const expectedBytes = Buffer.from(secret);
+    const suppliedBytes = Buffer.from(supplied);
+    if (expectedBytes.length !== suppliedBytes.length || !timingSafeEqual(expectedBytes, suppliedBytes)) {
+      return new Response(JSON.stringify({ message: "Not authorized." }), { status: 403, headers });
+    }
+    try {
+      const handler = await loadHandler();
+      const response = await handler(request);
+      const securedHeaders = new Headers(response.headers);
+      for (const [name, value] of Object.entries(headers)) securedHeaders.set(name, value);
+      return new Response(response.body, { status: response.status, headers: securedHeaders });
+    } catch {
+      return new Response(JSON.stringify({ message: "Email request could not be completed." }), { status: 500, headers });
+    }
+  };
+}
+var index_default = createEmailHandler(async () => {
+  const vendor = await Promise.resolve().then(() => __toESM(require_vendor(), 1));
+  if (typeof vendor.default?.default !== "function") throw new Error("Unsupported email handler.");
+  return vendor.default.default;
+}, () => process.env.NETLIFY_EMAILS_SECRET);
+export {
+  createEmailHandler,
+  index_default as default
+};

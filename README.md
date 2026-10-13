@@ -2,7 +2,7 @@
 
 The public website for Etail Depot US, Inc., introducing **Trolleys payments** and forthcoming **Ledgix Visa secured credit cards**. Payment account setup, sign-in and dashboards are hosted at the vendor service. This application contains product information, help, legal pages and fixed service links only.
 
-**Release status:** D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. D198 is an unpublished tooling candidate that exports the existing Next.js pages and client interactions as static files, with one native Edge request boundary. The complete local verification sequence passes, including the full dependency audit with zero findings. Hosted verification and publication have not occurred. Local packaging is not publication approval. Read [current work context](docs/CURRENT_WORK_CONTEXT.md) and [status](planning/STATUS.md) for current evidence and limits.
+**Release status:** D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` remains live. PR #35's static-site and native Edge security remediation passed CI and merged with zero dependency advisories. Its first hosted build failed before publication. D201 directs a compatible repair that keeps the existing Netlify Emails extension enabled and preserves its settings. The reviewed release now allows only its pinned, authenticated POST handler alongside the public site; full local/CI and hosted checks must pass before publication. Read [current work context](docs/CURRENT_WORK_CONTEXT.md) and [status](planning/STATUS.md) for current evidence and limits.
 
 ## Run locally
 
@@ -25,6 +25,7 @@ Open `http://127.0.0.1:3100`. No database, authentication tenant, payment creden
 | `src/shared` | Confirmed product/contact details, public channel types, retired bookmark destinations and the search-release guard |
 | `src/modules/public-site` | Search/social metadata, illustrative purchase examples and local fee calculations |
 | `netlify/edge-functions/public-boundary.ts` | Read-only retirement responses, security headers and deployment-context search protection |
+| `netlify/email-compat`, `netlify/plugins/public-release` | Protect the existing platform email handler and verify its final hosted package; no website email form |
 | `public` | Local brand assets, official network marks and marketing photography |
 | `tests` | Public journeys, links, accessibility, metadata and retired-route checks |
 | `tools` | Static build/preview, local Edge packaging and source/dependency/artifact verification |
@@ -43,7 +44,7 @@ pnpm package:netlify
 pnpm verify:package
 ```
 
-The checks cover types, lint and `test:lint-tooling`, public-only boundaries, unit/browser/accessibility tests, dependencies, the static production build, search guard and local Netlify packaging. The supported `output: "export"` keeps the existing pages and interactions; original images are served directly without an image server. The pinned `@netlify/edge-bundler` 16.0.4 replaces the Next adapter and Netlify CLI. A scoped patch uses pinned Node 24’s stable filesystem glob API for Next lint root resolution; unsupported patterns fail closed and rule coverage is tested. Run them with ports 3100 and 3101 free. `pnpm verify` runs the complete sequence. `package:netlify` rebuilds a local production-review export and packages static files plus the single Edge boundary; it does not upload or publish them.
+The checks cover types, lint and `test:lint-tooling`, public-only boundaries, unit/browser/accessibility tests, dependencies, the static production build, search guard and local Netlify packaging. The supported `output: "export"` keeps the existing pages and interactions; original images are served directly without an image server. The pinned `@netlify/edge-bundler` 16.0.4 replaces the Next adapter and Netlify CLI. A scoped patch uses pinned Node 24’s stable filesystem glob API for Next lint root resolution; unsupported patterns fail closed and rule coverage is tested. Run them with ports 3100 and 3101 free. `pnpm verify` runs the complete sequence. `package:netlify` rebuilds a local production-review export and packages static files, the single Edge boundary and the strictly verified platform email source; it does not upload or publish them.
 
 ## Release boundaries
 

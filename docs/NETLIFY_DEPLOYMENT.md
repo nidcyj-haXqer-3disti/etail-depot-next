@@ -1,8 +1,8 @@
-> **Local security remediation, D198 / 14 October 2026:** D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` remains the published baseline. The local candidate removes the tooling behind both dependency findings; a fresh full audit reports zero known vulnerabilities. Follow [current status](../planning/STATUS.md) for the complete verification outcome. PR #35 still contains the earlier failing candidate until an authorized update. Local preparation does not publish this replacement.
+> **Keep-enabled repair, D201 / 14 October 2026:** The user requires fixing the deployment conflicts while retaining Netlify Emails and its settings. D201 permits only that pinned platform handler behind its reviewed POST-only authentication wrapper. Complete normal PR/check/package verification before the requested publication; never disable the extension or bypass failed gates. Follow [current status](../planning/STATUS.md) for actual outcomes and the live release.
 
 # Public website Netlify deployment runbook
 
-D198 static publication candidate · 14 October 2026
+D201 static website and retained platform Emails · 14 October 2026
 
 D108 public-only scope governs this runbook. The repository and site already exist; there is no provisioning, database migration, Identity setup, account acceptance or financial activation step. Read [source precedence](SOURCE_PRECEDENCE.md), [current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) before preparing a release.
 
@@ -27,7 +27,7 @@ Trolleys links remain exactly `https://trolleys.ai`, without forwarded input or 
 
 ## Local build and review gates
 
-Use Node **24.19.0**, pnpm **11.19.0**, the existing lockfile and `@netlify/edge-bundler` **16.0.4**. Next.js uses `output: 'export'`. The configured build command is `pnpm build && node tools/package-public-site.mjs`; publish files are in `.netlify/static`, with the required native request boundary in `.netlify/edge-functions-dist`. The old CLI and Next server adapter are removed. Do not reinstall them or add server functions, archived APIs or `netlify/database` paths.
+Use Node **24.19.0**, pnpm **11.19.0**, the existing lockfile, `@netlify/edge-bundler` **16.0.4** and `@netlify/plugin-emails` **2.0.1**. Next.js uses `output: 'export'`. The configured build command is `pnpm build && node tools/package-public-site.mjs`; publish files are in `.netlify/static`, with the required native request boundary in `.netlify/edge-functions-dist`. The Emails plugin runs before the local protection/verification plugin. Netlify’s [documented plugin ordering and TOML precedence](https://docs.netlify.com/extend/install-and-use/build-plugins/) keep the configured official plugin ahead of its verifier while the UI extension remains enabled. Its protected generated email handler is the only allowed server function. The old CLI and Next server adapter remain removed; do not add application functions, archived APIs or database paths.
 
 With ports 3100 and 3101 free, run:
 
@@ -53,19 +53,19 @@ The custom production markers must apply to both builds and the Functions scope,
 
 ## Reviewed manual publication
 
-Automatic publication remains held by the existing `build.ignore` setting. Build hooks can bypass that setting; do not add unattended hooks or a deployment step to the read-only CI workflow.
+Automatic Git builds remain held by the existing `build.ignore` setting. D199 confirmed that the dashboard's manual Trigger deploy action can still start a build; do not treat the ignore command as protection against manual publication. Build hooks can also bypass it. Do not add unattended hooks or a deployment step to the read-only CI workflow. D201 resumes the requested release only with Emails kept enabled and all normal gates satisfied.
 
 1. Complete the local candidate and review its exact diff, test results and package boundaries on a feature branch. Prepare a reviewable result before any permission request.
 2. Confirm the user's recorded authorization covers this candidate's publication. Use authorization already granted; the runbook and passing checks do not themselves grant it. If authorization is absent, finish preparation and request it before the remote publication step.
 3. Follow the repository PR/check/review workflow, bind passing CI to the exact candidate and merge only within the applicable approval. Do not force-push, bypass protections or silently merge feature work into main.
-4. Build and verify a fresh extraction of the reviewed commit. Publish the complete static-plus-Edge package to the existing bound site using a reviewed mechanism that preserves the contract below. Do not use a static-only upload or the removed CLI/adapter. Verify repository/site identities immediately before mutation and preserve source identity between review, CI and publication. Preserve visitor access and environment scope; do not add database or provider operations.
+4. Build and verify a fresh extraction of the reviewed commit. For D201, use the bound site’s reviewed Git build and manual dashboard Trigger deploy so the enabled Emails plugin and final onPostBuild verifier run. Preserve the complete static, Edge and protected email package. Do not use a static-only upload or the removed CLI/adapter. Verify repository/site identities immediately before mutation and preserve source identity between review, CI and publication. Preserve visitor access and environment scope; do not add database or provider operations.
 5. Record the deployment ID, source identity, build outcome and read-back status. Verify public pages, search metadata, links, security headers, responsive interactions and retired-route responses. Public acceptance checks must not create accounts, transmit payment details, send messages or submit vendor actions. Link success does not prove a hosted financial workflow.
 
 Stop if identity, source, checks or authorization do not match. A failed release is not permission to use an excluded site, create replacement resources, change access/DNS or restore the retired backend. Any rollback must follow the authorized site-release workflow and preserve database/provider resources; no database restoration is part of a public-site rollback.
 
-### Static plus Edge upload contract
+### Static and Edge artifact mapping
 
-The local packager produces verified publication artifacts, not an authenticated upload. A future API uploader must send ordinary SHA1 file digests for `.netlify/static/*`, and map every `.netlify/edge-functions-dist/*` entry (including `manifest.json`) to `.netlify/internal/edge-functions/*`. The deploy request must declare `edge_functions: { eszip2: SHA256(bundleBytes) }`, upload any requested Edge bundle to `/deploys/{deploy_id}/edge_functions/{code_sha}`, and include the resolved header configuration. Uploading only the visible HTML/assets loses the retirement and search protections and is prohibited.
+The local packager produces review artifacts, not an authenticated upload. D201 does not authorize a static-only or static/Edge-only upload that omits the retained email integration or its hosted verification. A future separately reviewed API uploader would also need to preserve the verified email function and configuration; no such uploader is part of this repair. For the static/Edge portion it must send ordinary SHA1 file digests for `.netlify/static/*`, and map every `.netlify/edge-functions-dist/*` entry (including `manifest.json`) to `.netlify/internal/edge-functions/*`. The deploy request must declare `edge_functions: { eszip2: SHA256(bundleBytes) }`, upload any requested Edge bundle to `/deploys/{deploy_id}/edge_functions/{code_sha}`, and include the resolved header configuration. Uploading only the visible HTML/assets loses the retirement and search protections and is prohibited.
 
 This contract follows Netlify's [official file mapping](https://github.com/netlify/cli/blob/main/src/utils/deploy/process-files.ts) and [Edge upload implementation](https://github.com/netlify/cli/blob/main/src/utils/deploy/upload-files.ts). Runtime environment scopes follow [official Edge guidance](https://docs.netlify.com/build/edge-functions/environment-variables/). No live upload or hosted compatibility claim accompanies D198's local checks; validate the exact remote configuration and post-deployment behavior during an authorized release.
 

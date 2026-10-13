@@ -34,6 +34,7 @@
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@netlify/edge-bundler": "16.0.4",
+    "@netlify/plugin-emails": "2.0.1",
     "@playwright/test": "1.63.0",
     "@types/node": "24.13.3",
     "@types/react": "19.2.18",
