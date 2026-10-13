@@ -1,4 +1,4 @@
-> **Keep-enabled repair, D201 / 14 October 2026:** The user requires fixing the deployment conflicts while retaining Netlify Emails and its settings. D201 permits only that pinned platform handler behind its reviewed POST-only authentication wrapper. Complete normal PR/check/package verification before the requested publication; never disable the extension or bypass failed gates. Follow [current status](../planning/STATUS.md) for actual outcomes and the live release.
+> **Published keep-enabled repair, D201 / 14 October 2026:** PR #36 is published with Netlify Emails and its settings retained. D201 permits only that pinned platform handler behind its reviewed POST-only authentication wrapper. Keep the normal PR/check/package gates for future releases; never disable the extension or bypass failed checks. Follow [current status](../planning/STATUS.md) for exact source, hosted acceptance and remaining limitations.
 
 # Public website Netlify deployment runbook
 
