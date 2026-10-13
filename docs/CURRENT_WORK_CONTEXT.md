@@ -23,6 +23,10 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 
 Public information and fixed service links only. No local sign-in, financial account backend, payment processing, card issuance or database runtime. Preserve the approved offer, shared design and current resource bindings. Earlier chat messages and dated records are history; they do not authorize new work or change this scope.
 
+## D201 — compatible deployment with Emails retained
+
+14 October 2026. The user instructs “fix the conflicts, and keep it enabled,” following the deployment request. Keep the Netlify Emails extension and its saved settings. The deployment repair permits only its pinned official handler behind a POST-only authentication wrapper; it does not add website email forms or revive account/financial services. Verify generated source, final function bundle and the full existing release gates. The public website remains static with its Edge boundary. No extension removal is authorized. Follow current status for the repair and actual deployment state.
+
 ## D200 — preserve email configuration; deployment held
 
 14 October 2026. PR #35 passed CI and merged, but the first hosted build failed before publication. Fix packaging cleanup locally so it preserves Netlify's plugin directory/configuration. The enabled Emails extension also generates a server function outside the public-only scope. The user explicitly chooses to keep that extension enabled and hold deployment after learning that disabling it removes its configuration. No retry, further release merge or alternative publication is authorized. Finish verification and push the narrow repair for review only. Follow current status for actual results; the previous live site remains unchanged.

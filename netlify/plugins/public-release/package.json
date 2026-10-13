@@ -1,0 +1,7 @@
+{
+  "name": "etail-public-release",
+  "private": true,
+  "type": "module",
+  "main": "index.mjs",
+  "version": "1.0.0"
+}

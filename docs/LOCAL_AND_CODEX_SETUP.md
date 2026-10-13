@@ -1,10 +1,10 @@
 # Local and CI setup for the public website
 
-D198 tooling candidate · 14 October 2026
+D201 keep-enabled email compatibility · 14 October 2026
 
 The application already exists. D108 limits it to public pages and fixed vendor links. Read [AGENTS.md](../AGENTS.md), [project targets](../project-targets.json), [source precedence](SOURCE_PRECEDENCE.md) and [current status](../planning/STATUS.md) first. Do not scaffold a replacement repository, reconnect PostgreSQL or Identity, or restore the retired account application.
 
-D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. The current working branch has unpublished refinements and a D198 static/Edge tooling candidate. The complete local verification sequence passes, including the full dependency audit with zero findings. Hosted verification and publication have not occurred. Follow current status for actual checks and remaining limitations. Local checks do not authorize publication.
+D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. The static/Edge security remediation is merged but its first hosted build failed before publication. D201 repairs compatibility while retaining the enabled Emails extension and its configuration. Check current status for the new candidate’s actual verification; older successful checks do not certify changed source. Follow current status for actual checks and remaining limitations. Local checks do not authorize publication.
 
 ## Pinned workspace
 
@@ -40,7 +40,7 @@ pnpm verify:package
 
 Public checks cover lint, `test:lint-tooling`, types, unit behavior, architecture, the static production build, browser journeys, accessibility and source/dependency security. The bounded Next lint patch replaces its root-directory glob dependency with pinned Node 24’s stable filesystem glob API. Representative rule violations, supported root patterns and fail-closed handling of unsupported patterns remain tested. Do not remove lint rules or audit findings to obtain a passing result.
 
-The SEO check builds and serves a temporary local production-configured instance on port 3101. `package:netlify` performs a fresh local production-review build, copies `out` into `.netlify/static`, adds the reviewed headers and bundles the single native public Edge boundary with the official pinned bundler. Initial bundling may need network access to retrieve official tooling/bootstrap resources. It does not invoke the retired CLI/adapter or publish a deployment. Artifact inspection requires current source/build identity, the exact public files, one Edge bundle and no server functions, private inputs or archived records. None of these commands creates accounts, enrolls a service or changes stored records.
+The SEO check builds and serves a temporary local production-configured instance on port 3101. `package:netlify` performs a fresh local production-review build, copies `out` into `.netlify/static`, adds the reviewed headers and bundles the single native public Edge boundary with the official pinned bundler. Initial bundling may need network access to retrieve official tooling/bootstrap resources. It does not invoke the retired CLI/adapter or publish a deployment. Artifact inspection requires current source/build identity, the exact public files, one Edge bundle and only the protected platform email handler, with no private inputs or archived records. The pinned official Emails 2.0.1 plugin runs before the local compatibility plugin. The final hosted function archive is checked during onPostBuild; unrelated functions fail verification. Tests use fictional credentials and mocked providers, never live email delivery. None of these commands creates accounts, enrolls a service or changes stored records.
 
 The workflow in `.github/workflows/foundation.yml` checks the exact repository, commit, Node and pnpm versions, installs the frozen lockfile and runs the same gates with read-only repository permissions. Do not restore historical database/API/authentication test scripts to satisfy old task inventories. Record actual failures, reruns and remaining gaps in `planning/STATUS.md` and the decision log.
 

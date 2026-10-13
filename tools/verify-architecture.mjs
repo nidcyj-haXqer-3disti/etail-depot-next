@@ -9,6 +9,7 @@ import ts from "typescript";
 import { boundarySource, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, publicSourcePath, retiredFamilies } from "./public-artifact-policy.ts";
 import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
+import { verifyPlatformEmail, verifyPlatformEmailBundle } from "./netlify-email-compat.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relative = filename => path.relative(root, filename).split(path.sep).join("/");
@@ -159,8 +160,12 @@ if (process.argv.includes("--artifacts")) {
   }
   assert.ok(staticNames.some(name => name.startsWith("_next/static/") && name.endsWith(".js")), "Client interaction assets are missing.");
 
-  // A static release must not carry a server function, an adapter source tree, or an old generated proxy.
-  for (const name of [".netlify/functions", ".netlify/functions-internal", ".netlify/dist", ".netlify/edge-functions"]) {
+  // Only the existing, pinned and protected platform Emails handler is permitted.
+  // Application server functions, retired adapters and unknown platform functions still fail.
+  verifyPlatformEmail(root, { required: true });
+  const functionsDist = process.argv.find(argument => argument.startsWith("--functions-dist="))?.slice("--functions-dist=".length);
+  if (functionsDist) verifyPlatformEmailBundle(root, functionsDist);
+  for (const name of [".netlify/dist", ".netlify/edge-functions", ...(!functionsDist ? [".netlify/functions"] : [])]) {
     if (existsSync(path.join(root, name))) fail(name, "UNEXPECTED_SERVER_OR_ADAPTER_ARTIFACT");
   }
   const distRoot = path.join(root, ".netlify/edge-functions-dist");
@@ -185,10 +190,10 @@ if (process.argv.includes("--artifacts")) {
   for (const signature of ["___netlify-server-handler", "___netlify-edge-handler-node-middleware", "@netlify/plugin-nextjs"]) {
     if (bundleText.includes(signature)) fail(relative(bundlePath), "RETIRED_ADAPTER_IN_EDGE_BUNDLE");
   }
-  console.log(`Artifact boundary checked ${routes.length} compiler routes, ${publicHtml.length} static pages, ${staticNames.length} static files, one public edge boundary covering ${retiredFamilies.length} retired families, and zero server functions.`);
+  console.log(`Artifact boundary checked ${routes.length} compiler routes, ${publicHtml.length} static pages, ${staticNames.length} static files, one public edge boundary covering ${retiredFamilies.length} retired families, and only the protected platform email handler.`);
 }
 
 if (failures.length) {
   for (const failure of [...new Set(failures)]) console.error(failure);
   process.exitCode = 1;
-} else console.log(`Public architecture checks passed: ${sources.length} source files; six public pages; no local account, payment, database or server-function runtime.`);
+} else console.log(`Public architecture checks passed: ${sources.length} application source files; six public pages; no local account, payment or database runtime.`);

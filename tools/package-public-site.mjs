@@ -8,6 +8,7 @@ import { canonicalOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } fr
 import { publicSecurityHeaders } from "../netlify/edge-functions/public-boundary.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { clearPublicPackageOutputs } from "./public-package-cleanup.ts";
+import { preparePlatformEmail } from "./netlify-email-compat.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
@@ -81,4 +82,5 @@ assert.equal(packaged.manifest.bundles.length, 1);
 assert.equal(packaged.manifest.bundles[0].format, "eszip2");
 assert.equal(publicSourceFingerprint(root), buildRecord.fingerprint, "Source changed during packaging; rebuild the candidate.");
 writeFileSync(path.join(netlifyDirectory, "public-build.json"), `${JSON.stringify(buildRecord, null, 2)}\n`);
-console.log(`Public static site packaged locally with one Edge boundary. Search indexing in the build: ${buildRecord.indexingEnabled ? "approved production" : "disabled"}. No deployment was performed.`);
+preparePlatformEmail(root);
+console.log(`Public static site packaged locally with one Edge boundary and the protected platform email handler. Search indexing in the build: ${buildRecord.indexingEnabled ? "approved production" : "disabled"}. No deployment was performed.`);

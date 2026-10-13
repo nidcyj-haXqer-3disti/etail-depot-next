@@ -53,7 +53,7 @@ function sourceFindings(filename, text) {
 
   if (/\.(?:tsx?|[cm]?js|jsx)$/.test(filename)) {
     const tree = ts.createSourceFile(filename, text, ts.ScriptTarget.Latest, true, filename.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
-    const applicationSource = (relative(filename).startsWith("src/") || relative(filename).startsWith("netlify/edge-functions/"));
+    const applicationSource = (relative(filename).startsWith("src/") || relative(filename).startsWith("netlify/"));
     function visit(node) {
       if (applicationSource && ts.isCallExpression(node)) {
         const callee = node.expression.getText(tree);
@@ -64,7 +64,7 @@ function sourceFindings(filename, text) {
             add(node.getStart(tree), "BROWSER_CREDENTIAL_STORAGE");
           }
         }
-        if (/^(?:console|logger)\.(?:log|info|warn|error|debug|trace)$/.test(callee) && node.arguments.some((argument) => !ts.isStringLiteralLike(argument) && /(?:password|accessToken|refreshToken|credentials|authorization|cookieHeader|sessionCookie|identityConfig)/i.test(argument.getText(tree)))) {
+        if (/^(?:console|logger)\.(?:log|info|warn|error|debug|trace)$/.test(callee) && node.arguments.some((argument) => !ts.isStringLiteralLike(argument) && /(?:password|secret|accessToken|refreshToken|credentials|authorization|cookieHeader|sessionCookie|identityConfig)/i.test(argument.getText(tree)))) {
           add(node.getStart(tree), "SECRET_LOGGING_ARGUMENT");
         }
       }
@@ -87,6 +87,7 @@ function selfTest() {
   assert.equal(sourceFindings(example, 'process.env.' + ["NEXT", "PUBLIC", "DATABASE", "URL"].join("_") + ";")[0].code, "PUBLIC_SECRET_ENV_NAME");
   assert.equal(sourceFindings(example, 'localStorage.setItem("identity", JSON.stringify(user));')[0].code, "BROWSER_CREDENTIAL_STORAGE");
   assert.equal(sourceFindings(example, 'console.error(accessToken);')[0].code, "SECRET_LOGGING_ARGUMENT");
+  assert.equal(sourceFindings(path.join(root, "netlify/email-compat/handler.mjs"), 'console.error(process.env.NETLIFY_EMAILS_SECRET);')[0].code, "SECRET_LOGGING_ARGUMENT");
   assert.equal(sourceFindings(example, 'const testLabel = "server-only-test-token"; const endpoint = "http://127.0.0.1:3000";').length, 0);
   assert.equal(sourceFindings(example, 'localStorage.setItem("theme", "light");').length, 0);
   console.log("Security detector self-tests passed (credential signatures, public env exposure, browser storage, secret logging, fictional-label false positives).");
@@ -94,7 +95,7 @@ function selfTest() {
 
 selfTest();
 if (!process.argv.includes("--self-test")) {
-  const filenames = (await Promise.all(["src", "tools", "tests", ".github", "public", "netlify/edge-functions"].map((name) => walk(path.join(root, name))))).flat();
+  const filenames = (await Promise.all(["src", "tools", "tests", ".github", "public", "netlify"].map((name) => walk(path.join(root, name))))).flat();
   for (const name of [".env.example", "next.config.ts", "next.config.mjs", "netlify.toml", "package.json"]) {
     try { await fs.access(path.join(root, name)); filenames.push(path.join(root, name)); } catch { /* Optional configuration file. */ }
   }
