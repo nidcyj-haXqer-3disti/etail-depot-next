@@ -1,3 +1,9 @@
+# Current work — deployed customer website
+
+D196 submits the prepared D195 public-site candidate to a GitHub review branch at the user’s request. D163 / PR #34 remains the recorded published baseline. Follow [the current work context](../docs/CURRENT_WORK_CONTEXT.md) and [status](STATUS.md); two unresolved dependency advisories still block release clearance. No merge or deployment is authorized.
+
+The dated entries below are delivery history, not a new execution queue.
+
 # D162 — prepare the verified release candidate
 
 Freeze the D153–D161 source on its feature branch, create a review PR, verify exact-tree CI and a pristine Netlify package, and preserve a separate source-only upload directory. Record source identities, actual checks and remaining publication steps in [status](STATUS.md). Preserve the live D152 release; no merge or deployment requested.

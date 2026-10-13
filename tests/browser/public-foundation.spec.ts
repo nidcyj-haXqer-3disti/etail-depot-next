@@ -31,7 +31,7 @@ async function openWalletSetup(page: Page) {
   if (page.viewportSize()!.width < 851) {
     await expect(guide).toBeHidden();
     const summary = disclosure.locator("summary");
-    await expect(summary).toHaveAccessibleName("View wallet setup");
+    await expect(summary).toHaveAccessibleName("View wallet preview");
     await summary.focus();
     await page.keyboard.press("Enter");
   }
@@ -53,7 +53,7 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.getByRole("link")).toHaveText(["Payments", "Cards", "Help"]);
+    await expect(navigation.getByRole("link")).toHaveText(["Payment acceptance", "Credit cards", "Help"]);
     for (const [index, destination] of ["/payment-services", "/card-services", "/help"].entries()) {
       await expect(navigation.getByRole("link").nth(index)).toHaveAttribute("href", destination);
     }
@@ -107,7 +107,7 @@ test("the shared company header stays consistent and its compact menu works with
   await expect(navigation).toBeHidden();
 
   await menu.click();
-  await navigation.getByRole("link", { name: "Payments", exact: true }).click();
+  await navigation.getByRole("link", { name: "Payment acceptance", exact: true }).click();
   await expect(page).toHaveURL(/\/payment-services$/);
   await expect(menu).toHaveAttribute("aria-expanded", "false");
   await expect(navigation).toBeHidden();
@@ -117,7 +117,7 @@ test("the shared company header stays consistent and its compact menu works with
   await page.setViewportSize({ width: 960, height: 900 });
   await expect(menu).toBeHidden();
   await expect(navigation).toBeVisible();
-  await expect(navigation.getByRole("link", { name: "Payments", exact: true })).toBeFocused();
+  await expect(navigation.getByRole("link", { name: "Payment acceptance", exact: true })).toBeFocused();
   await page.setViewportSize({ width: 959, height: 900 });
   await expect(menu).toBeVisible();
   await expect(menu).toHaveAttribute("aria-expanded", "false");
@@ -135,7 +135,7 @@ test("the shared company header stays consistent and its compact menu works with
   await expect(navigation).toBeHidden();
   await expect(menu).toBeFocused();
 
-  const pageAction = page.locator(".consumer-hero-actions").getByRole("link", { name: "Get started with Trolleys", exact: true });
+  const pageAction = page.locator(".consumer-hero-actions").getByRole("link", { name: "View pricing", exact: true });
   await pageAction.focus();
   await page.setViewportSize({ width: 960, height: 900 });
   await expect(pageAction).toBeFocused();
@@ -156,23 +156,24 @@ test("legal documents are reachable without sign-in and retain their search visi
   await page.getByRole("navigation", { name: "Footer legal" }).getByRole("link", { name: "Privacy", exact: true }).click();
   await expect(page).toHaveURL(/\/privacy$/);
   for (const [path, title] of [["/privacy", "Privacy Policy"], ["/terms", "Terms of Use"]]) {
+    const searchTitle = `${path === "/terms" ? "Website Terms of Use" : title} | Etail Depot`;
     if (path === "/terms") await page.getByRole("navigation", { name: "Legal documents" }).getByRole("link", { name: "Terms", exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`${path}$`));
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title!);
     await expect(page.getByRole("complementary", { name: "Review status" })).toHaveCount(0);
-    await expect(page).toHaveTitle(new RegExp(`^${title}`));
+    await expect(page).toHaveTitle(searchTitle);
     expect(await page.title()).not.toMatch(/draft|review/i);
-    await expect(page.locator(".legal-document-date")).toHaveText(path === "/terms" ? "Last updated September 22, 2026" : "Last updated September 21, 2026");
+    await expect(page.locator(".legal-document-date")).toHaveText("Last updated October 14, 2026");
     await expect(page.locator("main")).toContainText("live Order Insight integration");
     await expect(page.locator("main")).not.toContainText("integration are not confirmed");
     for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
-      await expect(page.locator(selector)).toHaveAttribute("content", title!);
+      await expect(page.locator(selector)).toHaveAttribute("content", searchTitle);
     }
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etail-depot-next.netlify.app${path}`);
     await expect(page.locator('form, script[type="application/ld+json"]')).toHaveCount(0);
     expect(await page.locator("main").innerText()).not.toMatch(/\b(draft|demo|sandbox|simulated|fictional)\b|not yet taken effect/i);
-    await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("forthcoming Ledgix card service");
+    await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("Ledgix card service");
     if (path === "/privacy") {
       await expect(page.getByRole("region",{name:"Your choices and privacy requests",exact:true})).toContainText("this website, Ledgix or Trolleys");
     } else {
@@ -198,7 +199,10 @@ test("legal documents are reachable without sign-in and retain their search visi
     await contents.getByRole("link", { name: "Contact us", exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`${path}#contact$`));
     const contacts = page.getByRole("region", { name: "Contact us", exact: true });
-    await expect(contacts).toContainText("Washington, DC");
+    await expect(contacts).toContainText("Washington DC 20036");
+    for (const [phone,href] of [["+1 202-449-4962","tel:+12024494962"],["+81 70-3537-2563","tel:+817035372563"]]) {
+      await expect(contacts.getByRole("link", { name: phone, exact: true })).toHaveAttribute("href", href);
+    }
     for (const email of ["ledgix@etaildepot.com", "trolleys@etaildepot.com", "compliance@etaildepot.com"]) {
       await expect(contacts.getByRole("link", { name: email, exact: true })).toHaveAttribute("href", `mailto:${email}`);
     }
@@ -219,23 +223,23 @@ test("a new visitor can compare available payments and upcoming cards without a 
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Get paid\.\s*Keep going\.$/);
   await expectLoadedNetworkMarks(page.getByLabel("Accepted card networks", {exact:true}));
   const mainNavigation = await openMainNavigation(page);
-  await mainNavigation.getByRole("link", {name:"Cards",exact:true}).click();
+  await mainNavigation.getByRole("link", {name:"Credit cards",exact:true}).click();
   await expect(page).toHaveURL(/\/card-services$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Secured credit\.\s*Made for your wallet\.$/);
   await openMainNavigation(page);
-  await expect(mainNavigation.getByRole("link",{name:"Cards",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(mainNavigation.getByRole("link",{name:"Credit cards",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator("main")).toContainText("Coming soon");
   await expect(page.locator("main")).toContainText("Applications are not open yet.");
   for (const contact of await page.locator("main").getByRole("link",{name:"Contact Ledgix",exact:true}).all()) {
     await expect(contact).toHaveAttribute("href", "mailto:ledgix@etaildepot.com");
   }
-  await mainNavigation.getByRole("link",{name:"Payments",exact:true}).click();
+  await mainNavigation.getByRole("link",{name:"Payment acceptance",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-services$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Create\. Share\.\s*Get paid\.$/);
   await openMainNavigation(page);
-  await expect(mainNavigation.getByRole("link",{name:"Payments",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(mainNavigation.getByRole("link",{name:"Payment acceptance",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator("main")).toContainText("Available now");
-  const paymentEntry = page.locator(".consumer-hero-actions").getByRole("link",{name:"Get started with Trolleys",exact:true});
+  const paymentEntry = page.locator(".consumer-hero-actions").getByRole("link",{name:"Continue to Trolleys",exact:true});
   await expect(paymentEntry).toHaveAttribute("href", "https://trolleys.ai");
   await expect(paymentEntry).toHaveAttribute("referrerpolicy", "no-referrer");
   await expect(page.locator('a[href^="/login"], a[href^="/cardholder-services"], a[href^="/merchant-services"]')).toHaveCount(0);
@@ -244,12 +248,27 @@ test("a new visitor can compare available payments and upcoming cards without a 
 
 test("help topics and answers work with a keyboard without sign-in", async ({page}) => {
   await page.goto("/help");
+  const support=page.getByRole("region",{name:"Support contacts",exact:true});
+  await expect(support.getByRole("heading",{level:2})).toHaveText(["Payment support","Card inquiries","Sign-in help"]);
+  for (const [heading,email] of [["Payment support","trolleys@etaildepot.com"],["Card inquiries","ledgix@etaildepot.com"]]) {
+    const contact=support.getByRole("article").filter({has:page.getByRole("heading",{name:heading,exact:true})});
+    await expect(contact.getByRole("link",{name:email,exact:true})).toBeVisible();
+    await expect(contact.getByRole("link",{name:email,exact:true})).toHaveAttribute("href",`mailto:${email}`);
+  }
+  const signInCard=support.getByRole("article").filter({has:page.getByRole("heading",{name:"Sign-in help",exact:true})});
+  await expect(signInCard.getByRole("link")).toHaveCount(1);
+  await signInCard.getByRole("link",{name:"Get sign-in help",exact:true}).click();
+  await expect(page).toHaveURL(/\/help#access$/);
+  await expect(page.locator("#access summary").filter({hasText:"Where do I sign in and manage payments?"})).toBeVisible();
+  await expect(page.locator(".help-support-notes").getByRole("link",{name:"compliance@etaildepot.com",exact:true})).toHaveAttribute("href","mailto:compliance@etaildepot.com");
+  expect(await support.evaluate(element=>(element.compareDocumentPosition(document.querySelector(".public-questions")!)&Node.DOCUMENT_POSITION_FOLLOWING)!==0)).toBe(true);
+  await expect(page.locator("details[open]")).toHaveCount(0);
   await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Ledgix cards"}).click();
   await expect(page).toHaveURL(/\/help#cards$/);
   const question=page.locator("summary").filter({hasText:"Can I apply for a card now?"});
   await question.focus();await page.keyboard.press("Enter");
   await expect(question.locator("..")).toHaveAttribute("open","");
-  await expect(question.locator("..")).toContainText("Digital Wallet Card is an upcoming virtual Visa secured credit card");
+  await expect(question.locator("..")).toContainText("Digital Wallet Card is a virtual Visa secured credit card");
   await expect(question.locator("..")).toContainText("Applications are not open yet. You’ll manage your card account through Ledgix when it launches.");
   await page.keyboard.press("Enter");
   await expect(question.locator("..")).not.toHaveAttribute("open","");
@@ -397,7 +416,7 @@ test("all six payment channels share one request and work by keyboard without pr
   await page.keyboard.press("Tab");
   await expect(showcase.locator(":focus")).toHaveCount(0);
   await expect(showcase.getByRole("link")).toHaveCount(0);
-  const openTools = page.locator(".consumer-hero-actions").getByRole("link", {name:"Get started with Trolleys", exact:true});
+  const openTools = page.locator(".consumer-hero-actions").getByRole("link", {name:"Continue to Trolleys", exact:true});
   await expect(openTools).toHaveAttribute("href", "https://trolleys.ai");
   await expect(openTools).toHaveAttribute("referrerpolicy", "no-referrer");
   await expect(openTools).toHaveAttribute("rel", /\bnoreferrer\b/);
@@ -455,7 +474,7 @@ test("payment examples connect each business request to the same checkout amount
   page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/")) privateReads.push(request.url()); });
   await page.setViewportSize({width:320,height:900});
   await page.goto("/");
-  await page.locator(".consumer-hero-actions").getByRole("link",{name:"Explore payments",exact:true}).click();
+  await page.locator(".consumer-hero-actions").getByRole("link",{name:"Explore payment acceptance",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-services$/);
   const art = page.getByRole("figure",{name:"Illustrated payment journey",exact:true});
   const tablist = art.getByRole("tablist",{name:"What you sell",exact:true});
@@ -523,7 +542,7 @@ test("the wallet setup guide explains both platforms without opening wallets or 
     await openWalletSetup(page);
     const guide = page.locator(".wallet-card-art");
     await expect(guide).toHaveCount(1);
-    const tablist = guide.getByRole("tablist", {name:"Wallet setup options", exact:true});
+    const tablist = guide.getByRole("tablist", {name:"Wallet preview options", exact:true});
     const apple = tablist.getByRole("tab", {name:"Apple Wallet", exact:true});
     const google = tablist.getByRole("tab", {name:"Google Wallet", exact:true});
     await expect(tablist.getByRole("tab")).toHaveCount(2);
@@ -582,11 +601,11 @@ test("the wallet setup guide explains both platforms without opening wallets or 
     await expectStep("Google Wallet", 0);
     if (page.viewportSize()!.width < 851) {
       const summary = page.locator(".wallet-guide-disclosure summary");
-      await expect(summary).toHaveAccessibleName("Hide wallet setup");
+      await expect(summary).toHaveAccessibleName("Hide wallet preview");
       await summary.focus();
       await page.keyboard.press("Space");
       await expect(guide).toBeHidden();
-      await expect(summary).toHaveAccessibleName("View wallet setup");
+      await expect(summary).toHaveAccessibleName("View wallet preview");
       await page.keyboard.press("Enter");
       await expect(guide).toBeVisible();
       await expectStep("Google Wallet", 0);

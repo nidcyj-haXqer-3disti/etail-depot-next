@@ -19,8 +19,6 @@
 .consumer-page .button { min-height: 48px; padding: 13px 20px; border-radius: var(--public-control-radius); font-size: 14px; font-weight: 600; gap: 16px; }
 .consumer-page .button.primary { background: var(--home-ink); color: #fff; border: 1px solid var(--home-ink); }
 .consumer-page .button.primary:hover { background: var(--public-hover); }
-.consumer-page .button.secondary { background: #fff; color: var(--home-ink); border-color: #aabbb0; }
-.consumer-page .button.secondary:hover { background: #f5f7f0; }
 .consumer-page a:focus-visible, .consumer-page button:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 4px; }
 .consumer-text-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font-size: 14px; font-weight: 600; }
 .consumer-text-link .icon { width: 18px; height: 18px; }
@@ -28,7 +26,7 @@
 .consumer-product-eyebrow { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
 .consumer-product-eyebrow .service-availability { padding: 4px 10px; font-size: 12px; }
 
-/* One clear payment proposition, supported by an editorial photograph. */
+/* One clear proposition, supported by the homepage's business photograph. */
 .consumer-hero { background: var(--public-paper); }
 .consumer-hero-grid { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr); align-items: center; gap: 48px; padding-block: 56px 48px; }
 .consumer-hero-copy { padding-block: 16px; min-width: 0; }
@@ -106,4 +104,3 @@
 /* Product pages continue the same editorial system as the homepage. */
 .consumer-product-hero h1 { font-size: min(var(--consumer-title), 64px); }
 .consumer-product-note { max-width: 42ch; margin-top: 20px; font-size: var(--consumer-small); line-height: 1.6; color: var(--home-muted); }
-.consumer-product-section { padding-block: var(--consumer-space); scroll-margin-top: 24px; }

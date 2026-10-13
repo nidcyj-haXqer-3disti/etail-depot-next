@@ -1,5 +1,33 @@
 import { test, expect } from "@playwright/test";
 
+test("payments explain Two Step, optional Clarity and pricing with a safe hero service entry", async ({page}) => {
+  await page.goto("/payment-services");
+  const fees=page.locator("#fees");
+  const continuation=page.locator(".consumer-hero-actions").getByRole("link",{name:"Continue to Trolleys",exact:true});
+  await expect(continuation).toHaveAttribute("href","https://trolleys.ai");
+  await expect(continuation).toHaveAttribute("referrerpolicy","no-referrer");
+  await expect(continuation).toHaveAttribute("rel",/\bnoreferrer\b/);
+  const sequence=await page.locator(".consumer-payments").evaluate(element=>{
+    const twoStep=element.querySelector("#payment-channels")!;
+    const clarity=element.querySelector("#dispute-readiness")!;
+    const pricing=element.querySelector("#fees")!;
+    const before=(first:Element,second:Element)=>(first.compareDocumentPosition(second)&Node.DOCUMENT_POSITION_FOLLOWING)!==0;
+    return {twoStepBeforeClarity:before(twoStep,clarity),clarityBeforePricing:before(clarity,pricing)};
+  });
+  expect(sequence).toEqual({twoStepBeforeClarity:true,clarityBeforePricing:true});
+  await expect(fees.getByRole("link",{name:"Continue to Trolleys",exact:true})).toHaveCount(0);
+  await fees.locator(".offer-details > summary").click();
+  await expect(fees.locator(".fee-exceptions")).toBeVisible();
+  await expect(fees).toContainText("Original processing and currency conversion fees are not returned");
+  await expect(fees).toContainText("eligible, successful payments enrolled in the service");
+  await page.locator(".consumer-hero-actions").getByRole("link",{name:"View pricing",exact:true}).click();
+  await expect(page).toHaveURL(/\/payment-services#fees$/);
+  await expect(fees.getByRole("heading",{name:"Know your fees.",exact:true})).toBeInViewport();
+  const questions=page.locator(".public-faq-section summary");
+  await expect(questions).toHaveCount(4);
+  await expect(questions).toContainText(["How do I get started?","When will I receive my money?","How do refunds and disputes work?","Does Clarity prevent every dispute?"]);
+});
+
 test("optional dispute readiness keeps price and Order Insight coverage limits visible", async ({page}) => {
   await page.goto("/payment-services");
   const network=page.locator("#dispute-readiness");
@@ -34,14 +62,14 @@ test("fees show Two Step and optional Clarity and recover invalid input", async 
   await expect(offer).toContainText("No monthly fee. Create and share included.");
   const estimate=page.locator(".fee-estimate");
   await expect(estimate).toContainText("$96.80");
-  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Estimated remaining"]);
+  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Amount after displayed fees"]);
   await estimate.locator("#addon-sale-records").check();
   await expect(estimate).toContainText("$96.40");
   await expect(estimate).toContainText("−$0.40");
-  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Clarity", "Estimated remaining"]);
+  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Clarity", "Amount after displayed fees"]);
   await expect(page.locator("main")).not.toContainText(/vendor|quote required/i);
   await expect(estimate).toContainText("other applicable charges");
-  await expect(estimate).toContainText("Selecting this example does not enroll you or charge a fee");
+  await expect(estimate).toContainText("Using this calculator does not enroll you in Clarity or charge a fee");
   const amount=estimate.getByLabel("Payment amount USD");
   await amount.fill("1.001");
   await expect(amount).toHaveAttribute("aria-invalid","true");
@@ -56,7 +84,7 @@ test("fees show Two Step and optional Clarity and recover invalid input", async 
   await expect(page.locator("main")).not.toContainText(/Enhanced receipt|Invoice add-on|Agreement add-on|1.5% in document fees/);
   await estimate.locator("#addon-sale-records").uncheck();
   await expect(estimate).toContainText("$970.70");
-  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Estimated remaining"]);
+  await expect(estimate.locator("dl dt")).toHaveText(["Trolleys Two Step", "Amount after displayed fees"]);
   const payouts=page.locator("#payouts");
   await payouts.locator("summary").click();
   await expect(payouts.locator("p")).toBeVisible();
@@ -76,5 +104,8 @@ test("cards separate the deposit from debt and keep material terms outside discl
   await expect(page.getByRole("link", {name:"Contact Ledgix",exact:true}).first()).toHaveAttribute("href", "mailto:ledgix@etaildepot.com");
   await expect(page.getByRole("heading", {level:1})).toContainText("Secured credit");
   await expect(page.locator("main")).toContainText("Applications are not open yet");
+  const preview=page.getByRole("region",{name:"Preview the wallet experience.",exact:true});
+  await expect(preview).toContainText("Applications are not open yet.");
+  await expect(preview.getByRole("link",{name:"Contact Ledgix",exact:true})).toHaveAttribute("href","mailto:ledgix@etaildepot.com");
   await expect(page.locator('form, input[type="email"]')).toHaveCount(0);
 });

@@ -17,5 +17,3 @@ export const hostedServices = {
     email: legalIdentity.brands[1].email,
   },
 } as const;
-
-export type PublicService = keyof typeof hostedServices;

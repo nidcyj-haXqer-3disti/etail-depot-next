@@ -103,14 +103,14 @@
 .channel-marketing { min-width: 0; }
 .channel-selector { min-width: 0; }
 .channel-tabs { display: flex; gap: 8px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: #9daf97 transparent; padding: 5px 5px 12px; margin: -5px -5px 10px; scroll-padding-inline: 5px; }
-.channel-tabs button { position: relative; display: grid; gap: 7px; justify-items: center; flex: 1 0 60px; min-width: 0; padding: 5px 5px 8px; border: 1px solid #6a886f; border-radius: 7px; background: #264f3e; color: #e9efdf; font: inherit; text-align: center; cursor: pointer; }
+.channel-tabs button { position: relative; display: grid; gap: 7px; justify-items: center; flex: 1 0 66px; min-width: 0; padding: 5px 5px 8px; border: 1px solid #6a886f; border-radius: 7px; background: #264f3e; color: #e9efdf; font: inherit; text-align: center; cursor: pointer; }
 .channel-tabs button:hover { background: #3b6048; border-color: #a7b5a0; }
 .consumer-page .channel-tabs button:focus-visible { outline: 3px solid #edf1d4; outline-offset: 1px; }
 .channel-tabs button[aria-selected=true] { border-color: #d3dfbd; box-shadow: inset 0 0 0 1px #d3dfbd; background: #e6eddb; color: #254537; }
 .channel-tabs .channel-thumbnail { width: 100%; height: 44px; flex: none; background: #dce5d4; }
 .channel-tabs .channel-thumbnail > span { transform: scale(.68); }
 .channel-thumbnail-caption { min-width: 0; max-width: 100%; }
-.channel-thumbnail-caption strong { font-size: 10px; font-weight: 550; line-height: 1.6; overflow-wrap: anywhere; display: block; }
+.channel-thumbnail-caption strong { font-size: 11px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; display: block; }
 .channel-selected-mark { display: none; position: absolute; right: 5px; top: 5px; width: 13px; height: 13px; border-radius: 50%; place-items: center; color: #fff; background: #42684a; }
 .channel-selected-mark .icon { width: 9px; height: 9px; }
 .channel-tabs button[aria-selected=true] .channel-selected-mark { display: grid; }

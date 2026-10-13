@@ -1,0 +1,47 @@
+diff --git a/dist/utils/get-root-dirs.js b/dist/utils/get-root-dirs.js
+--- a/dist/utils/get-root-dirs.js
++++ b/dist/utils/get-root-dirs.js
+@@ -8,12 +8,39 @@
+         return getRootDirs;
+     }
+ });
+-var _fastglob = require("fast-glob");
++var _fs = require("node:fs");
+ /**
+- * Process a Next.js root directory glob.
++ * Process trusted lint root paths with the project's pinned Node 24 runtime.
++ * Keep every Next rule; reject unverified glob syntax instead of missing roots.
++ * Supported: literal paths, *, ?, ** and simple comma-separated brace choices.
+  */ var processRootDir = function(rootDir) {
+-    return (0, _fastglob.globSync)(rootDir.replace(/\\/g, '/'), {
+-        onlyDirectories: true
++    var pattern = rootDir.replace(/\\/g, '/');
++    var unsupported = function() {
++        throw new Error("Next.js lint rootDir supports literal paths, *, ?, ** and simple comma-separated braces. Negative patterns, extglobs, character classes and nested/range braces require a reviewed glob implementation.");
++    };
++    if (!pattern || /(^|\/)!|[?*+@!]\(|[\[\]]/.test(pattern)) {
++        unsupported();
++    }
++    var unbraced = pattern.replace(/\{[^{}]*\}/g, function(group) {
++        if (!group.includes(',') || group.includes('..') || group.slice(1, -1).split(',').some(function(item) { return !item; })) {
++            unsupported();
++        }
++        return '';
++    });
++    if (/[{}]/.test(unbraced)) {
++        unsupported();
++    }
++    // Filter directory candidates ourselves so trailing slashes retain symlinks.
++    if (!/^(?:[A-Za-z]:)?\/$/.test(pattern)) {
++        pattern = pattern.replace(/\/+$/, '');
++    }
++    // fast-glob's terminal globstar excludes the base directory itself.
++    if (pattern === '**' || pattern.endsWith('/**')) {
++        pattern += '/*';
++    }
++    return _fs.globSync(pattern, { followSymlinks: true }).filter(function(filename) {
++        var entry = _fs.statSync(filename, { throwIfNoEntry: false });
++        return entry !== undefined && entry.isDirectory();
+     });
+ };
+ var getRootDirs = function(context) {

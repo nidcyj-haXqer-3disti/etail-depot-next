@@ -8,6 +8,7 @@ export function Icon({ name, className = "" }: { name: string; className?: strin
     link: <><path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m4 2 1-1a4 4 0 0 1 6 6l-5 5a4 4 0 0 1-6 0" /></>,
     person: <><circle cx="12" cy="7" r="3.5" /><path d="M5 21v-3a7 7 0 0 1 14 0v3" /></>,
     arrow: <><path d="M4 12h16m-6-6 6 6-6 6" /></>,
+    external: <><path d="M14 3h7v7M21 3 10 14M10 3H3v18h18v-7" /></>,
     lock: <><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></>,
     check: <path d="m5 12 4 4L19 6" />,
     box: <path d="m12 2 9 5v10l-9 5-9-5V7l9-5ZM3 7l9 5 9-5M12 12v10M7.5 4.5l9 5v5" />,

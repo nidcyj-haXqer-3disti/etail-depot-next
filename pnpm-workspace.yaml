@@ -3,20 +3,14 @@ packages:
 storeDir: .local/pnpm-store
 strictPeerDependencies: true
 overrides:
-  # CLI permits ^1.8.0; its build/telemetry peers require ~1.8.0.
-  netlify-cli@27.5.0>@opentelemetry/api: 1.8.0
-  # Security fixes; verified against the Netlify consumers' used APIs.
-  ipx@3.1.1>sharp: 0.35.4
-  netlify-cli@27.5.0>toml: 4.2.0
-  '@netlify/zip-it-and-ship-it@15.5.0>toml': 4.2.0
-packageExtensions:
-  # Keep the optional unstorage adapter on its declared supported Blobs major.
-  ipx@3.1.1:
-    dependencies:
-      '@netlify/blobs': 10.7.13
+  # Keep the existing compatible security fixes.
+  fast-uri@4.1.4: 4.1.5
+  minimatch@10.2.6>brace-expansion: 5.0.12
+  # This single-root lint plugin uses the pinned Node glob API instead.
+  '@next/eslint-plugin-next@16.3.8>fast-glob': '-'
+patchedDependencies:
+  '@next/eslint-plugin-next@16.3.8': patches/@next__eslint-plugin-next@16.3.8.patch
 allowBuilds:
   esbuild: true
-  netlify-cli: false
   sharp: true
-  unix-dgram: false
   unrs-resolver: true

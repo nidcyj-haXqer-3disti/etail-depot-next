@@ -29,10 +29,10 @@ export function PaymentJourneyArt() {
   const amount = formatUsdCents(example.amountCents);
 
   return <figure className="payment-journey-art payment-two-step" id="payment-channels" aria-label="Illustrated payment journey">
-    <div className="two-step-signature"><span><Icon name="link" />Trolleys Two Step</span><p>Explore a payment from request to checkout.</p></div>
+    <div className="two-step-signature"><h2><Icon name="link" />Trolleys Two Step</h2><p>Explore a payment from request to checkout.</p></div>
     <div className="two-step-stages">
       <section className="payment-create-step" aria-labelledby={`${id}-create`}>
-        <div className="two-step-heading"><span aria-hidden="true">01</span><div><h2 id={`${id}-create`}>Create your request</h2><p>Choose what you sell. Add the details and amount.</p></div></div>
+        <div className="two-step-heading"><span aria-hidden="true">01</span><div><h3 id={`${id}-create`}>Create your request</h3><p>Choose what you sell. Add the details and amount.</p></div></div>
         <div className="request-workspace">
           <div className="request-workspace-chrome"><span><Icon name="business" />Trolleys</span><span>New payment request</span></div>
           <div className="request-workspace-body">
@@ -52,22 +52,33 @@ export function PaymentJourneyArt() {
             <div className="payment-request-preview">
               <dl><div><dt>Payment for</dt><dd>{example.description}</dd></div><div><dt>Details</dt><dd>{example.quantity}</dd></div><div><dt>Reference</dt><dd>{example.orderReference}</dd></div></dl>
               <div className="request-preview-amount"><span>Amount</span><strong>{amount}</strong></div>
-              <div className="request-preview-link"><Icon name="check" /><span>Payment link ready to share</span><Icon name="arrow" /></div>
+              <div className="request-preview-link"><Icon name="check" /><span>Ready to share</span><Icon name="arrow" /></div>
             </div>
           </div>
           </div>
         </div>
       </section>
       <section className="payment-share-step" aria-labelledby={`${id}-share`}>
-        <div className="two-step-heading"><span aria-hidden="true">02</span><div><h2 id={`${id}-share`}>Share your way</h2><p>Use the same link in more than one place.</p></div></div>
+        <div className="two-step-heading"><span aria-hidden="true">02</span><div><h3 id={`${id}-share`}>Share your way</h3><p>Use the same link in more than one place.</p></div></div>
         <PaymentChannelPreview purpose={purpose} />
       </section>
     </div>
-    <div className="two-step-outcome">
-      <div className="two-step-customer"><span><Icon name="card" /></span><div><strong>Your customer opens the link and pays by card.</strong><p>Payment receipt included.</p></div></div>
-      <div className="marketing-payment-summary"><span>{example.description}</span><strong>{amount}</strong></div>
-      <NetworkBrands label="Card networks" />
-    </div>
+    <section className="two-step-outcome" aria-label="Illustrative customer checkout">
+      <div className="checkout-purchase">
+        <div className="two-step-customer"><span><Icon name="card" /></span><div><strong>Your customer opens the link and pays by card.</strong><p>Payment receipt included.</p></div></div>
+        <div className="marketing-payment-summary"><span>Your business</span><span className="checkout-purchase-name">{example.description}</span><strong>{amount}</strong></div>
+        <NetworkBrands label="Card networks" />
+      </div>
+      <div className="checkout-card-preview" role="img" aria-label={`Card-entry illustration for ${example.description}, ${amount}. Card number ending 4242, expiration and security code fields, and Pay ${amount}. No payment is made.`}>
+        <div className="checkout-preview-heading"><span>Pay by card</span><span>Checkout example</span></div>
+        <div className="checkout-field-group"><span>Card number</span><div className="checkout-field checkout-card-number"><span>•••• •••• •••• 4242</span><Icon name="card" /></div></div>
+        <div className="checkout-field-row">
+          <div className="checkout-field-group"><span>Expiration</span><div className="checkout-field">MM / YY</div></div>
+          <div className="checkout-field-group"><span>Security code</span><div className="checkout-field">•••</div></div>
+        </div>
+        <span className="checkout-pay-example">Pay {amount}<Icon name="lock" /></span>
+      </div>
+    </section>
     <figcaption>Payment example. Create and share requests from your Trolleys account after approval and setup.</figcaption>
   </figure>;
 }

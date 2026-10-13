@@ -1,5 +1,71 @@
 # Decision register
 
+## D199 — authorized push and publication of the repaired candidate
+
+14 October 2026. The user explicitly requests “push and deploy” after D198 resolves both dependency findings and all local gates pass. Update the existing PR #35 review branch with this exact repaired candidate, retain the full audit and CI rules, and verify passing checks before merging through the normal PR workflow. Publish the complete static-plus-Edge package to the existing bound Netlify site only after source/resource identity and runtime release markers match. This authorization supersedes D198’s local-only boundary and D197’s security hold for the successfully remediated candidate; it does not waive any failed gate or authorize other resource, database, provider, DNS or access changes. Record actual CI, merge, deployment and hosted acceptance results in current status.
+
+## D198 — remove the affected tooling without weakening the release gate
+
+14 October 2026. After the explanation of the two dependency findings, the user accepts investigation and replacement of the affected tooling. Work on an isolated local feature branch from the exact PR #35 candidate. Keep the current Next.js pages, React interactions, content, assets, offers and archived records. Use supported static export plus one native Netlify Edge handler preserving retired-link, security-header and search-context behavior; remove netlify-cli and the Next server adapter from the project and publication artifact. The only affected lint consumer uses a scoped patch replacing fast-glob with the pinned Node 24 directory-glob API, retaining the actual lint rules. Supported patterns are explicit and unsupported patterns fail closed. Keep the patch and targeted dependency removal visible in the lockfile; do not suppress advisories or mislabel a package version.
+
+Verify installation, lint coverage, types, unit/browser/accessibility cases, production/preview indexing, package contents and rendered preservation. Keep builds/tests sequential when they share generated output. Record actual failures, reruns, current audit and remaining operational limits in status. No new push, merge, publication, hosted service action or configuration change is included in this local remediation.
+
+## D197 — deployment authorization and unresolved release checks
+
+14 October 2026. The user requests deployment of the pushed D196 candidate. This supersedes the earlier no-publication instruction for deployment authorization, but does not itself resolve the failing security check. Prepare the exact commit for review as PR #35, verify the bound site and preserve all published data, access settings and resources. The fresh audit and official package/advisory checks still show two unresolved high-severity findings. After the specific one-time release-gate exception question, the user explicitly chooses to hold deployment until the security issues are resolved. No exception, audit suppression or repository-protection bypass is authorized. Keep PR #35 in draft and the live site unchanged; resume publication only after compatible remediation and passing verification. Actual evidence and limitations are recorded in current status.
+
+## D196 — submit the prepared candidate on a review branch
+
+14 October 2026. The user explicitly requests a push. The authorized destination is the verified private repository `nidcyj-haXqer-3disti/etail-depot-next` (ID 1361184741). Use `codex/public-site-review-d196` with published main `d3e0ac251e3e17d33cee0743923a9fcab5b17b21` as its parent so the review contains the current changes rather than the differing historical local commit chain. Preserve the existing local branch and all approved working content. Application files and D195's verified source fingerprint remain unchanged; only delivery records are added. No main update, force push, merge, publication or remote service/database change. Both unresolved dependency advisories remain documented and the full security gate remains enabled.
+
+## D195 — conservative cleanup and local release preparation
+
+14 October 2026. The user requests code cleanup and preparation for deployment. Remove only unused `PublicService`, unnecessary exports of module-local types, the unused inverse-network-mark option, an unused color variable, unused secondary-button/section rules and a duplicate Payments hero background rule. Preserve all current rendering, interactions, approved copy/fees, original brand/network/wallet/photo assets, public boundaries and historical records. Correct active release documentation that still claimed the local tree matched D163 or named older releases as current; leave dated historical evidence intact.
+
+Use pinned Node/pnpm and the frozen lockfile, run full public checks, production SEO, offline Netlify packaging and artifact verification, and compare actual rendered pages against the pre-cleanup version. Record source/package identities and actual outcomes in current status. The two unresolved dependency advisories remain explicit failures; no suppression or unsupported dependency replacement is authorized. This is preparation only, without commit, push, merge, publication or hosted resource changes.
+
+## D194 — homepage payment-acceptance action
+
+14 October 2026. Rename the homepage hero action to **Explore payment acceptance**, following the user's requested terminology and using the singular industry phrase. Preserve its `/payment-services` destination, artwork and styling. Update existing exact-label test locators. Local preview only; no deployment.
+
+## D193 — $35 for each dispute received
+
+14 October 2026. The user's “Disputes fee is $35” updates `productFacts.payments.disputeFeeDollars` from 15 to 35. The existing pricing row renders “Disputes received — $35 each.” Retain the separately described $15 manual-response charge and return-on-win condition; the instruction does not revise that fee. Help and legal pages link to payment pricing and contain no duplicated numeric dispute amount. Update the offer's revision/provenance, without changing other prices, examples, layout, notices, provider billing or deployment state.
+
+## D192 — investigate the two unresolved security advisories
+
+14 October 2026. Investigate compatible fixes for the two remaining high-severity dependency findings. Official GitHub records and public npm releases confirm no published patched version of node-forge or braces; the audit's suggested future versions are unavailable. Current parent releases do not remove both paths, and forcing IPX 4 would break the Netlify image package's imported API. Retain exact versions, the single lockfile and the full failing audit gate. No advisory suppression, invented version, custom cryptography patch or unsupported major override.
+
+Production audit zero is a dependency-manifest result, not a complete artifact guarantee: the Netlify adapter packages braces build-helper code even though the inspected server entry-point import graph does not reach it. Latest adapter 5.16.2 embeds identical braces modules. Record this distinction and the inspection limits in current status. No application, remote resource, publication or deployment change. A future candidate requires an actual compatible remediation and rerun of full verification.
+
+## D174 — category wording and artwork fit review
+
+13 October 2026. The user approves the Two Step artwork workflow, requests terminology research and an updated preview, then asks for a microlevel fit check against the current website. Retain **Goods / Services / Information** as illustrative sale choices, with one selected explanation: physical items and merchandise; appointments, projects and professional work; research, data, insights and advice. These are marketing examples, not an exhaustive economic, tax or card-network classification. Official Stripe product-model, Shopify digital-product and OECD product definitions informed the recommendation; Information remains broader than downloadable content.
+
+Refine the standalone desktop/mobile previews to match existing typography, optical logo alignment, focus styles and responsive spacing. Verify in a browser-only composition with the actual public homepage. This review does not install the artwork into the application, implement the remaining D172 proposals, push or deploy. Preserve the two merchant steps, selected purchase/amount, original assets, fixed service links and illustrative checkout boundary. Verification and actual limitations are in current status.
+
+## D173 — add online-payment artwork to the proposal
+
+13 October 2026. The user adds a benchmark of the current official Stripe Payments and Adyen online-payment presentation, followed by original desktop/mobile artwork concepts. Replace the homepage's physical-shop emphasis with the approved merchant Create → Share → customer checkout journey. Preserve the current words, typography/style, shared chrome, two Etail brand colors and authentic network/wallet assets. Avoid photography, floating decoration, excessive arrows and invented dashboards. This supplements D172; it does not revive D171's discarded page-wide visual redesign. No application change, push or deployment is authorized at this proposal stage.
+
+Created two standalone code-based concepts outside the application. The existing headline/support copy remain; one approved example is synchronized across the request, shared message and card checkout. Exactly two merchant steps are numbered. Confirmed Visa/Mastercard/American Express/Discover assets appear in payment context; wallet marks remain in the Ledgix context and are not used to infer merchant-wallet acceptance. See current status for research, responsive checks and limits.
+
+## D172 — retain the current design; revise the proposal's scope
+
+13 October 2026. The user rejects D171's homepage/color/type/artwork redesign and explicitly prefers the current visual and wording style. Retain the existing Home, header/footer, colors, typography and artwork. The user selects the proposed improvements to Payments information order, Cards wallet-guide wording, Help support discoverability, and Privacy/Terms orientation, and asks to see an updated proposal. These changes remain proposed, not implemented. Preserve approved offers, full disclosures, legal revision dates and product destinations. No push or deployment.
+
+## D171 — public website improvement proposal only
+
+13 October 2026. The user requests a six-page live review, five prioritized weaknesses and a proposed customer-facing homepage structure, exact copy, artwork and desktop/mobile layouts. Preserve Payments, Cards and Help navigation, the approved offers/disclosures and original logos; use #023941 and #0ACEA9 with white/neutral tints. Keep the current product-led scope: Trolleys US online payments and forthcoming Ledgix virtual Visa secured credit cards. The user explicitly requires the proposal before implementation and prohibits push/deployment. The proposed design is not an approved implementation plan. Live review observations and limitations are recorded in planning/STATUS.md; the application is unchanged.
+
+## D170 — focus the active project context
+
+23 September 2026. Remove unrelated project references from the README, working context, source precedence and current status/plan. Keep this conversation and workspace focused on the D163 customer-facing website. Move unrelated local review material outside the active folder with byte-verified preservation, retain Git recovery history under a neutral name and keep existing release/restoration evidence. Earlier chat messages cannot be edited by this agent; use the current context for future work. No application, resource, deployment or financial-offer change.
+
+## D169 — resume the last deployed website
+
+23 September 2026. Netlify read-back confirmed D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` remains current and ready. Restored local commit `bb5f267e3a4164aabf0886b7851db38dac7e5c2a`, whose tree `2bf8a6d4964a656fbb55f6006c684be85e3b919d` matches the published merge and all 426 uploaded source files. Work continues on `codex/resume-deployed-pr34`, with the verified preview on port 3100. No hosted rollback, new deployment, database, provider, access or DNS change occurred.
+
 ## D162 — prepare the verified public-site release
 
 22 September 2026. The user requests deployment preparation. Freeze D153–D161 as a reviewable feature candidate, confirm repository and site identities, bind CI and a pristine Netlify package to the same source tree, and retain a separate source-only upload directory. Preserve the approved offer, public-only runtime, existing data/resources and live D152 release. Preparation authorizes the feature PR, not merge or publication. Record actual results in status and release evidence.
@@ -693,7 +759,7 @@ D69 publication: draft PR14 records GitHub application `a97c8105ce8abcec2cfb84eb
 
 ## D70 — block financial confirmation during saved-review navigation
 
-12 September 2026. The user's reported CI exit1 exposed a checkout state-ownership race, reproduced deterministically in both checkout and Add money. Use React's pending navigation transition to keep confirmation handlers/controls blocked until the durable review page takes ownership. Preserve review-key changes, original command identity, server permission checks and financial writers. Do not hide the failure with longer timeouts or retries. The preceding build fails both held-response regressions; the corrected packaged application passes all18 targeted browser/accessibility cases. See `docs/CHECKOUT_NAVIGATION_FIX.md` and exact publication/workflow evidence.
+12 September 2026. The user's reported CI exit 1 exposed a checkout state-ownership race, reproduced deterministically in both checkout and Add money. Use React's pending navigation transition to keep confirmation handlers/controls blocked until the durable review page takes ownership. Preserve review-key changes, original command identity, server permission checks and financial writers. Do not hide the failure with longer timeouts or retries. The preceding build fails both held-response regressions; the corrected packaged application passes all18 targeted browser/accessibility cases. See `docs/CHECKOUT_NAVIGATION_FIX.md` and exact publication/workflow evidence.
 
 ## D71 — simplify entry and the two service dashboards (2026-09-12)
 
@@ -788,3 +854,100 @@ Final terminology refinement, 20 September 2026: use “Your business” instead
 ## D90 — grouped public footer (20 September 2026)
 
 Replace the header-shaped public footer with a brand introduction, Services / Support / Account groups and a separate copyright row. Retain the same brand, colors and gutters, the existing header, and no footer in authenticated dashboards. Only link to implemented destinations. The user will supply approved Privacy Policy and Terms URLs for the lower row; no invented legal/company/contact information. Build, focused lint and all 40 relevant existing browser/accessibility checks pass, followed by manual review at five widths. [Design and acceptance](PUBLIC_FOOTER_DESIGN.md). No deployment or business/data changes.
+
+
+## D175 — implement the focused website and artwork refinements
+
+13 October 2026. The user requests refinement of the whole public website based on the two agreed proposals. This authorizes local application of D172–D174, including the refined online-payment illustration, while preserving the accepted visual style. Customer navigation becomes Payment acceptance / Credit cards / Help; specific product names, payment terms and card terminology remain contextual. Full payment pricing precedes optional Clarity and the fixed service handoff follows pricing. Cards marks the wallet guide as a preview with closed applications, Help leads with contacts, and legal pages improve orientation while retaining complete approved text and dates. No application backend, database, financial operation, remote push or deployment is included. Verification and limitations are recorded in planning/STATUS.md.
+
+D175 verification: local refinement, 48 browser cases, 24 accessibility cases, 86 unit checks, build, SEO and offline package inspection pass. The dependency audit fails against unchanged pins (23 findings including 2 critical and 9 high); no dependency upgrade or release is included. Record exact limitations and corrected test/environment failures in planning/STATUS.md.
+
+## D176 — accepted commercial wording and conversion copy
+
+13 October 2026. Audited the six live public pages and compared the proposal with the D175 local candidate. The user accepts the commercial-copy proposal and asks for changes only. Apply the accepted US-business/USD introduction, concrete payment request flow, optional Clarity purchase recognition, clearer estimate label and account-approval handoff. On Cards clarify deposit backing, full statement repayment, annual/monthly fees and inquiry-only contact. Help gets a direct introduction. Existing Privacy/Terms orientation already matches the proposal; preserve full notices and dates.
+
+Preserve approved prices, Clarity eligibility/enrollment/data/evidence/outcome limits, Ledgix availability, pending terms, fixed destinations and all design/assets. No new financial, operational or legal benefit is invented. Local lint, typecheck, production build, eight relevant browser cases and 32 responsive/increased-spacing states pass. No application CSS, productFacts, dependencies or backend changes in this copy delta. No push or deployment. D175's dependency gate remains unresolved; this is not a fresh release certification. Evidence and actual check limitations are recorded in planning/STATUS.md and artifacts/d176-copy/.
+
+## D177 — remove duplicated hero pricing and refine page/artwork alignment
+
+13 October 2026. The user requests removal of the quoted price, inclusions and audience block from the Payment acceptance page opening, plus page/artwork layout refinement. Remove that hero note, its unused import and styles. Keep the complete fee section and qualifications. Preserve the existing visual identity, original artwork/logos and approved copy.
+
+Use shared grid rows to align card facts and footer links when labels wrap; keep fee rows compact, allow mobile footer columns to fit whole words, group the wallet contact explanation, align Help contact links, shorten the first Help FAQ gap and tighten legal subheading spacing. Increase payment illustration captions and channel labels to 12px and remove doubled spacing before Clarity. Home and the header need no structural change after review. Public-only scope, provider entrances and all offers/notices remain intact. Local validation and actual corrected layout findings are recorded in planning/STATUS.md; no push or deployment requested.
+
+## D178 — search visibility, trust and final-quality audit only
+
+13 October 2026. The user requests a live six-route audit, separate merchant/cardholder search-intent research, exact metadata/heading/link/FAQ recommendations and a prioritized correction list with evidence and acceptance criteria. Preserve existing visual identity, approved offers, fixed destinations, live-domain canonicals and indexing controls. No implementation or publication is authorized by this audit request.
+
+Live browser and source evidence are recorded separately from D175–D177's unpublished improvements. Recommend payment-link intent for merchants and virtual secured-credit intent for Ledgix prospects, without inferred keyword volumes, instant issuance, disposable card numbers, credit reporting or broader acceptance. Actual Google performance requires Search Console evidence. Operational privacy and product-contract unknowns must remain explicit; source inspection cannot establish hosted retention/access, mailbox handling or financial-service configuration. Verification, limitations and the outstanding dependency release gate are recorded in planning/STATUS.md.
+
+## D179 — implement the approved search, trust and quality proposal locally
+
+13 October 2026. The user accepts D178's proposal. Implement its exact six-route search titles/descriptions, descriptive headings, product decision FAQs and support/internal links. Preserve the accepted colors, artwork, original logos, public-only application, approved offers, complete legal notices/dates and provider entrances. Preserve all search approval guards, canonical bindings and indexing directives; no Search Console or hosted indexing changes are implied.
+
+Use absolute page titles to keep document and social branding consistent, including Home where the root layout's child title template does not apply. Correct generic-container accessibility labels with appropriate section/group semantics without changing visual layout. Verify gradient-text contrast independently of automated incomplete results. The accepted release-quality recommendation also permits verified compatible dependency patch maintenance using exact versions and one lockfile; do not suppress unresolved findings or install unverified/nonexistent fixes.
+
+Do not turn the audit's operational unknowns into public assurances. Keep a concise evidence checklist for retained records, hosted logs, email/address, privacy handling and product agreements; retain source/data isolation. Correct the stale consumer-search guide to reflect existing D122 production approval and unchanged local/preview exclusion. Verification, actual errors/reruns and remaining release gates belong in planning/STATUS.md. No push, merge or deployment is authorized.
+
+D179 outcome: local implementation and browser/accessibility/SEO/package checks pass. Verified patch maintenance reduced 23 dependency findings to two unpatched high-severity development-tooling findings; the full release gate remains nonzero and no finding was suppressed. Initial stale browser expectations were corrected and the four affected cases pass. See the D179 status entry for counts, evidence and operational limitations.
+
+## D180 — precision and consistency in existing artwork
+
+13 October 2026. The user explicitly approves the current artwork as the foundation and requests execution refinement, not replacement concepts. Keep the same scene content, composition, page relationships, product story, wording, offers, authentic marks and interactions. Scope styling to the existing Home payment illustration/use cases, Trolleys request/sharing/checkout and Clarity artwork, and Ledgix card/phone/wallet/secured-credit artwork. Use coherent Etail teal, neutral surfaces, restrained depth, consistent surface geometry and readable small labels; keep the original Ledgix blue card identity and third-party mark colors. Leave resolved details and non-artwork Help/legal/chrome intact.
+
+Capture the unchanged local D179 candidate first, then compare normal-size and double-resolution rendered details at 1440/390/320px with separate desktop 200% reflow evidence. Keep a local standalone review outside the active public route tree. Preview-only work does not trigger packaging, remote publication or product operations. The D179 two-tooling-advisory release limitation remains separate and unchanged. Record actual visual/check outcomes and conceptual limits in current status.
+
+D180 result: seven artwork CSS files refined, with original source copy/behavior/assets preserved. Matching normal/2× desktop/mobile comparisons and the local review gallery are complete; lint/build,48 browser cases and 24 accessibility cases pass. No release/publication action occurred. See current status for evidence, capture-environment issues and unchanged release limitations.
+
+## D181 — refine wording and artwork as one communication
+
+13 October 2026. The pasted user brief extends D180’s art-only scope to coordinated language and artwork refinement across Home, Payments, Cards, Help, Privacy and Terms. Use natural American English, concise concrete headings, accurate actions and terminology. Preserve the current positioning, audiences, approved prices/fee basis, qualifications, forthcoming card status, full repayment/deposit distinction, historical privacy commitments, obligations, page structure, scenes/assets and behavior. Keep illustrative controls distinct from actual payment, enrollment or provisioning. Substantive unknowns require evidence, not editorial assumptions.
+
+Before captures use the current D180 local candidate, not the older published D163 website. The six live pages were read separately; this work does not replace earlier accepted unpublished refinements. A standalone local review outside application routes includes identical-width sections, high-resolution details, editorial comparison and unresolved-fact notes. D181 changes 16 TSX files and two small CSS wrapping rules; original assets, financial facts/calculation/data, destinations, metadata and retirement proxy remain byte-identical. Existing tests are updated only for approved label/copy changes.
+
+Preserve existing legal dates: edits separate a dense privacy paragraph, align wallet-preview/no-guarantee phrasing and explicitly align eligible Visa online fraud scope already qualified on the product page. No rights, duties, historical-record practices or product-agreement distinctions are removed. Operational evidence remains open in OPERATIONAL_TRUST_REVIEW.md. This is a review preview, not a legal certification or release candidate. No push, merge, remote-resource change or deployment. Actual checks and limits are recorded in current status.
+
+## D182 — restore warm artwork colors to match the website
+
+13 October 2026. The user rejects the recent artwork background colors and prefers the old palette. Restore the pre-D180 warm sage, cream and forest color relationships across Home, Trolleys and Ledgix. Backgrounds, borders, muted labels, selection states and shadow hues should work together with the existing public theme. Home’s illustrated header and controls use the same forest ink as the page’s buttons; retain the restrained bright-green accent and all authentic brand colors. Do not recolor original assets or undo D180 geometry, larger text, optical placement, shadow construction or D181 copy refinements.
+
+Seven artwork CSS files change only color values, confirmed by normalized source comparison. Page/TSX text, interactions, facts, offers, assets and theme remain unchanged. Before/after rendered text matches across all nine primary page/viewport states. Lint/build, ten payment-channel browser cases and 24 accessibility cases pass; screenshots and comparison-gallery checks show no overflow or missing images. The latest local preview and color comparison are ready; no push, merge, publication, provider or data operation occurs. Current status records evidence and inherited release limitations.
+
+
+## D184 — retain the live Payments identity; illustrate customer card entry
+
+13 October 2026. The user accepts D183’s comparison and minimal proposal. Restore the live Payments page’s warm design, original sequence (Two Step, optional Clarity, pricing, four FAQs), layered artwork and concise language. Add card number/expiration/security code/Pay amount specimens to the existing customer-payment panel. This is an unnumbered outcome after two merchant steps, not a third merchant action or functioning checkout. Keep examples synchronized, authentic network marks, the approved fees/coverage qualifications, precise fee-estimate limitations, safe Trolleys entrance and accessible semantics.
+
+The only proposed label refinements are Ready to share, Manual dispute response and Continue to Trolleys. Preserve the current shared navigation and unrelated accepted local work. This decision supersedes previous local Payments order/copy/style refinements, not the entire application or maintenance history. Record actual verification in STATUS.md. Local preview only; no publication, push or deployment.
+
+
+## D185 — retain the Home scene and align its finish; minimal wording corrections
+
+14 October 2026. The follow-up asks about landing artwork and wording after D184. Keep the previously approved online-payment scene rather than silently reverting to the earlier photograph. Align warm surfaces, borders and restrained checkout depth to Payments without changing layout, offers, supported marks or behavior. Use Here’s your payment link and Explore the Ledgix card. Review the other pages but leave consistent wording and all substantive legal/financial terms unchanged. Manual-entry fee scope must be verified before naming it merchant-keyed. Record checks and evidence in current status. Local preview only, no push or deployment.
+
+
+## D187 — restore the live homepage’s hierarchy and photograph
+
+14 October 2026. The user again prefers the live homepage’s design, flow and visuals and accepts the recommendation to return to that foundation. Restore the published photograph, concise opening copy, relative scale, spacing, business examples and discovery flow. Remove the duplicate Home interactive payment walkthrough; keep the accepted D184 Payments page with static checkout card entry. Retain useful accuracy/accessibility/technical corrections, current shared navigation and the explicit forthcoming Ledgix/deposit/repayment explanation. Other five pages remain unchanged. This supersedes D175–D185’s Home illustration direction only; it is not a wholesale rollback of the local candidate.
+
+D186’s read-only live/local comparison identified the duplicated walkthrough’s extra vertical space (Home opening 675px versus 872px at 1440, and 1,035px versus 1,840px at 390). D187 restores the live opening dimensions and verifies all six public routes in rendered screenshots. Actual checks and the corrected accessibility test-selection error are recorded in planning/STATUS.md. Original photograph/logo assets remain intact. Local preview only; no GitHub push, deployment, commercial change, database access or provider operation.
+
+
+## D188 — remove repetitive card-availability adjectives
+
+14 October 2026. Remove repeated “forthcoming” and “upcoming” adjectives from card descriptions across Home, Cards, Help, legal orientation and accessible artwork labels. Keep Coming soon, explicit applications-closed notices and launch-dependent access/compatibility qualifications. Search descriptions use coming soon so they retain availability context outside the page. Preserve design, commercial terms, legal obligations/dates and all behavior. Local wording update only; no push or deployment.
+
+## D189 — simplify Help routing and remove the duplicate legal block
+
+14 October 2026. Remove the bottom Privacy and legal inquiries block from Help. Keep the existing top compliance contact, historical-record privacy request route and shared footer notices. Give the Sign-in help card one action to #access, consolidate sign-in questions there, and put payment pricing, payouts, refunds and account support before Clarity and website-example explanations. Preserve all answers’ financial meaning, availability, fixed destinations and the existing design. Local only; no push or deployment.
+
+## D190 — confirmed office contacts on Privacy and Terms
+
+14 October 2026. Add the user-supplied United States and International postal addresses and telephone numbers to Contact us on both legal pages, through one shared data source and component. Keep all three existing service/compliance email contacts. Use tap-to-call links, aligned desktop columns and stacked mobile addresses. Update the two notice revision dates to October 14, 2026 for this contact-information addition; no substantive obligations or commercial terms change. Contact display is user-confirmed; delivery/phone operations are not independently tested. Local only, no deployment.
+
+United States: 2001 L Street NW, Suite 500; Washington DC 20036; +1 202-449-4962. International: 〒105-6415 Tokyo, Minato-ku; Toranomon 1-17-1; Toranomon Hills Business Tower 15F; +81 70-3537-2563. These are user-provided contact details, not a new entity, service-hours promise or independently validated phone/postal service.
+
+## D191 — final six-page quality review
+
+14 October 2026. Preserve the accepted live-style Home, D184 Payments artwork/flow, Cards, shared colors, wording and support/legal layout. The user confirms the additional 0.5% fee applies only when the merchant enters card details; label it “Merchant-entered card payments,” with no fee change. Correct square favicon/touch-icon formatting using the unchanged Etail symbol in a square code-rendered canvas. Review all six pages for commercial consistency, accessibility, links, metadata, trust and public-only boundaries. All work remains local; no push, publication or indexing change. Actual checks and the two remaining development-tool advisory failures are recorded in planning/STATUS.md.
+
+The user confirms the manual-entry surcharge applies to merchant-entered card details, not customer-entered online checkout. This closes the earlier wording question without establishing independent processor configuration. Current Google favicon guidance requires a square supported image; the existing 800×484 source symbol stays unchanged, with 192×192 browser and 180×180 touch PNG derivatives rendered from a square SVG wrapper. No page artwork or third-party marks are replaced. All six pages’ offers, contacts, availability and disclosures are consistent in source/render review; unknown operational practices and search performance remain outside website verification.

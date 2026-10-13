@@ -7,7 +7,7 @@ import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
 export function PaymentFeeEstimate({saleRecords, onSaleRecordsChange}: {saleRecords: boolean; onSaleRecordsChange: (enabled: boolean) => void}) {
   const [amount, setAmount] = useState("100");
   const estimate = estimateDomesticCardFee(amount, saleRecords);
-  return <div className="fee-estimate" aria-labelledby="fee-estimate-title">
+  return <section className="fee-estimate" aria-labelledby="fee-estimate-title">
     <h3 id="fee-estimate-title">Estimate your fees.</h3>
     <label className="fee-input-label" htmlFor="payment-amount">Payment amount <span>USD</span></label>
     <div className="fee-input"><span aria-hidden="true">$</span><input id="payment-amount" type="text" inputMode="decimal" autoComplete="off" value={amount} onChange={event => setAmount(event.target.value)} maxLength={9} aria-describedby={estimate ? "fee-estimate-note" : "fee-estimate-error fee-estimate-note"} aria-invalid={!estimate} /></div>
@@ -19,9 +19,9 @@ export function PaymentFeeEstimate({saleRecords, onSaleRecordsChange}: {saleReco
       {estimate ? <dl>
         <div><dt>{productFacts.payments.offerName}</dt><dd>−{formatUsdCents(estimate.processingCents)}</dd></div>
         {saleRecords && <div><dt>{saleRecordsOffer.name}</dt><dd>−{formatUsdCents(estimate.serviceCents)}</dd></div>}
-        <div className="fee-net"><dt>Estimated remaining</dt><dd>{formatUsdCents(estimate.subtotalCents)}</dd></div>
+        <div className="fee-net"><dt>Amount after displayed fees</dt><dd>{formatUsdCents(estimate.subtotalCents)}</dd></div>
       </dl> : <p className="fee-error" id="fee-estimate-error">Enter an amount from $1 to $100,000, with up to two decimal places.</p>}
     </div>
-    <p className="fee-estimate-note" id="fee-estimate-note">Estimate excludes international, conversion, manual entry and other applicable charges. Selecting this example does not enroll you or charge a fee.</p>
-  </div>;
+    <p className="fee-estimate-note" id="fee-estimate-note">Estimate excludes international cards, currency conversion, manual card entry and other applicable charges. This is not a guaranteed payout. Using this calculator does not enroll you in Clarity or charge a fee.</p>
+  </section>;
 }

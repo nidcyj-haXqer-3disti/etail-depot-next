@@ -1,49 +1,22 @@
 import type { Metadata, MetadataRoute } from "next";
-import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
+import { productFacts } from "@/shared/product-facts";
 import { cardProduct } from "@/shared/card-product";
 import { legalIdentity } from "@/shared/legal-identity";
-import targets from "../../../project-targets.json" with { type: "json" };
+import { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
+export { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
+
+const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts.cards.monthlyFeeDollars
+  ? `$${productFacts.cards.annualFeeDollars} annual and monthly fees`
+  : `$${productFacts.cards.annualFeeDollars} annual fee and $${productFacts.cards.monthlyFeeDollars} monthly fee`;
 
 export const PUBLIC_PAGES = {
-  "/": { title: `Trolleys payments & Ledgix ${cardProduct.name}`, description: `Accept payments with links and QR codes from Trolleys. Explore the upcoming Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType}.` },
-  "/card-services": { title: `Ledgix ${cardProduct.name} — Coming soon`, description: `Meet Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType} for Apple Wallet and Google Wallet. Coming soon. Contact Ledgix to learn more.` },
-  "/payment-services": { title: `${productFacts.payments.offerName} payments & ${saleRecordsOffer.name}`, description: `Create a payment request and share a link or QR code with ${productFacts.payments.offerName}. Add optional ${saleRecordsOffer.name} to help customers recognize their purchases.` },
-  "/help": { title: "Help with payments and cards", description: `Contact Trolleys for payment support or Ledgix for ${cardProduct.name} inquiries. Find product access guidance and company compliance contacts.` },
+  "/": { title: "Online Payment Acceptance & Credit Cards", description: `Explore Trolleys for online payment acceptance and Ledgix, a virtual ${cardProduct.creditType} coming soon. Find product details, pricing and support.` },
+  "/card-services": { title: "Ledgix Virtual Secured Credit Card — Coming Soon", description: `Meet Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
+  "/payment-services": { title: "Trolleys Payment Links & QR Codes", description: "Accept online card payments with Trolleys payment links and QR codes. See domestic payment pricing, optional Clarity and how to get started." },
+  "/help": { title: "Trolleys Support & Ledgix Card Inquiries", description: "Find Trolleys payment support, Ledgix card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
-function boundCanonicalOrigin(): string {
-  const raw = targets.netlify.canonical_origin;
-  const parsed = new URL(raw);
-  if (targets.project_key !== "ETAIL_DEPOT_NEXT_GREENFIELD_2026" || !targets.netlify.site_id ||
-      parsed.protocol !== "https:" || parsed.origin !== raw || parsed.username || parsed.password ||
-      targets.denied.netlify_site_ids.includes(targets.netlify.site_id) || targets.denied.domains.includes(parsed.hostname)) {
-    throw new Error("Public metadata requires the recorded, isolated canonical site binding.");
-  }
-  return parsed.origin;
-}
-export const canonicalOrigin = boundCanonicalOrigin();
-
-export interface SearchReleaseApproval {
-  siteId: string;
-  canonicalOrigin: string;
-  reviewReference: string;
-}
-/** D122 explicitly authorizes indexing this recorded site; previews and local builds remain excluded. */
-export const PUBLIC_INDEXING_APPROVAL: SearchReleaseApproval = {
-  siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
-  canonicalOrigin: "https://etail-depot-next.netlify.app",
-  reviewReference: "D122 — user authorization to index and deploy, 2026-09-21",
-};
-type Environment = Readonly<Record<string, string | undefined>>;
-
-/** Pure guard for release review/tests; request URLs, forwarded hosts and search parameters are never inputs. */
-export function isApprovedSearchRelease(approval: SearchReleaseApproval | null, env: Environment): boolean {
-  return Boolean(approval && approval.siteId === targets.netlify.site_id && approval.canonicalOrigin === canonicalOrigin &&
-    approval.reviewReference.trim() && env.NODE_ENV === "production" && env.APP_ENV === "production" &&
-    env.ETAIL_SEARCH_CONTEXT === "production" && (!env.CONTEXT || env.CONTEXT === "production") &&
-    env.SITE_ID === targets.netlify.site_id && env.ETAIL_PUBLIC_ORIGIN === canonicalOrigin);
-}
 export function publicIndexingEnabled(): boolean {
   return isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, process.env);
 }
@@ -53,17 +26,17 @@ export const publicSocialImage = {
   url: `${canonicalOrigin}/opengraph-image`,
   width: 1200,
   height: 630,
-  alt: `Etail Depot — Trolleys payments available now; Ledgix ${cardProduct.pluralName} coming soon`,
+  alt: `Etail Depot — Trolleys payment acceptance available now; Ledgix ${cardProduct.pluralName} coming soon`,
 };
 export const rootMetadata: Metadata = {
   metadataBase: new URL(canonicalOrigin),
-  title: { default: "Etail Depot — Cards and payments", template: "%s | Etail Depot" },
+  title: { default: "Etail Depot — Payment acceptance and credit cards", template: "%s | Etail Depot" },
   description: PUBLIC_PAGES["/"].description,
   applicationName: "Etail Depot",
   robots: privateRobots,
-  icons: { icon: "/brand/symbol.png", apple: "/brand/symbol.png" },
-  openGraph: { type: "website", siteName: "Etail Depot", locale: "en_US", title: "Etail Depot — Cards and payments", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
-  twitter: { card: "summary_large_image", title: "Etail Depot — Cards and payments", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
+  icons: { icon: { url: "/brand/favicon-192.png", type: "image/png", sizes: "192x192" }, apple: { url: "/brand/apple-touch-icon.png", type: "image/png", sizes: "180x180" } },
+  openGraph: { type: "website", siteName: "Etail Depot", locale: "en_US", title: "Etail Depot — Payment acceptance and credit cards", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
+  twitter: { card: "summary_large_image", title: "Etail Depot — Payment acceptance and credit cards", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
 };
 
 export function publicPageUrl(path: PublicPath): string {
@@ -72,12 +45,14 @@ export function publicPageUrl(path: PublicPath): string {
 }
 export function publicPageMetadata(path: PublicPath): Metadata {
   const url = publicPageUrl(path), page = PUBLIC_PAGES[path];
+  const title = `${page.title} | Etail Depot`;
   return {
-    title: page.title, description: page.description,
+    // Absolute titles also brand Home, where the root layout's child template does not apply.
+    title: { absolute: title }, description: page.description,
     alternates: { canonical: url },
     robots: publicIndexingEnabled() ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } } : privateRobots,
-    openGraph: { type: "website", url, title: `${page.title} | Etail Depot`, description: page.description, siteName: "Etail Depot", locale: "en_US", images: [publicSocialImage] },
-    twitter: { card: "summary_large_image", title: `${page.title} | Etail Depot`, description: page.description, images: [publicSocialImage] },
+    openGraph: { type: "website", url, title, description: page.description, siteName: "Etail Depot", locale: "en_US", images: [publicSocialImage] },
+    twitter: { card: "summary_large_image", title, description: page.description, images: [publicSocialImage] },
   };
 }
 export function publicSitemap(): MetadataRoute.Sitemap {
@@ -96,7 +71,7 @@ export function publicPageJsonLd(path: PublicPath): string {
   const organizationId = `${canonicalOrigin}/#organization`;
   const websiteId = `${canonicalOrigin}/#website`;
   const breadcrumbId = `${url}#breadcrumb`;
-  const breadcrumbLabels = { "/card-services": "Cards", "/payment-services": "Payments", "/help": "Help" } as const;
+  const breadcrumbLabels = { "/card-services": "Credit cards", "/payment-services": "Payment acceptance", "/help": "Help" } as const;
   const data = {
     "@context": "https://schema.org", "@graph": [
       {

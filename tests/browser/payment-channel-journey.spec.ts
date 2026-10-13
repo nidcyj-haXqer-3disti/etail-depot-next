@@ -39,6 +39,10 @@ async function expectMatchingExample(page: Page, example: (typeof examples)[numb
     }
   }
   await expect(figure.locator(".payment-request-preview")).toContainText(example.reference);
+  const checkout = figure.getByRole("img", { name: `Card-entry illustration for ${example.description}, ${example.amount}. Card number ending 4242, expiration and security code fields, and Pay ${example.amount}. No payment is made.`, exact: true });
+  await expect(checkout).toBeVisible();
+  await expect(checkout.locator(".checkout-pay-example")).toHaveText(`Pay ${example.amount}`);
+  await expect(checkout.locator("input, button, form, a, [tabindex]")).toHaveCount(0);
 }
 
 async function expectMatchingRecognition(art: Locator, example: (typeof examples)[number]) {
@@ -156,7 +160,7 @@ test("optional fee selection changes only the estimate and never enrolls a payme
   const recognitionBefore = await art.innerHTML();
   await option.check();
   await expect(estimate.locator(".fee-net")).toContainText("$96.40");
-  await expect(estimate).toContainText("Selecting this example does not enroll you or charge a fee");
+  await expect(estimate).toContainText("Using this calculator does not enroll you in Clarity or charge a fee");
   expect(await illustration.innerHTML()).toBe(checkoutBefore);
   expect(await art.innerHTML()).toBe(recognitionBefore);
   await estimate.getByLabel("Payment amount USD").fill("480");

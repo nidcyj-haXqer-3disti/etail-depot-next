@@ -20,8 +20,8 @@ export function WalletGuide({ children }: { children: ReactNode }) {
 
   return <details className="wallet-guide-disclosure" ref={disclosure}>
     <summary onClick={() => { userChoseVisibility.current = true; }}>
-      <span className="wallet-guide-label-closed">View wallet setup</span>
-      <span className="wallet-guide-label-open">Hide wallet setup</span>
+      <span className="wallet-guide-label-closed">View wallet preview</span>
+      <span className="wallet-guide-label-open">Hide wallet preview</span>
       <span className="wallet-guide-disclosure-icon" aria-hidden="true">+</span>
     </summary>
     <div className="wallet-guide-content">{children}</div>

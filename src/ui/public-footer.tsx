@@ -5,8 +5,8 @@ import { hostedServices } from "@/shared/hosted-services";
 
 const footerGroups = [
   { title: "Services", links: [
-    { href: "/payment-services", label: "Payments" },
-    { href: "/card-services", label: "Cards" },
+    { href: "/payment-services", label: "Payment acceptance" },
+    { href: "/card-services", label: "Credit cards" },
   ] },
   { title: "Support", links: [
     { href: "/help", label: "Help center" },

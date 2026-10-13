@@ -1,5 +1,4 @@
 /* Payments has one editorial sequence; shared company chrome remains unchanged. */
-.consumer-payments .consumer-hero { background: var(--public-paper); }
 .consumer-page.consumer-payments .consumer-hero-grid { grid-template-columns: minmax(0,1fr); gap: 40px; padding-block: 56px 64px; }
 .consumer-payments .consumer-hero-copy { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); gap: 0 80px; align-items: start; padding: 0; }
 .consumer-payments .consumer-product-eyebrow { grid-column: 1/-1; margin-bottom: 22px; }

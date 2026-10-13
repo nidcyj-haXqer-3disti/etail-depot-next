@@ -1,3 +1,51 @@
+> **D199 push and deployment — 14 October 2026:** The user explicitly authorizes pushing and publishing the verified D198 security remediation through PR #35. Require successful exact-source checks and publish the complete static/Edge package to the bound site. Preserve resource, privacy, indexing and access boundaries. Record actual outcomes in current status.
+
+> **D198 local security remediation — 14 October 2026:** The user accepts removal/replacement of affected tooling. Preserve all public pages, design, offers and behavior. Verify the static export, native public Edge boundary and scoped lint patch without suppressing audits or weakening rules. Fresh full audit: zero known vulnerabilities; all local release gates pass. Current status records actual evidence and remaining CI/hosted checks. No push or deployment accompanies this local work.
+
+> **D197 deployment hold — 14 October 2026:** The user explicitly chooses to hold deployment until the two security issues are resolved. No one-time exception is approved. PR #35 remains a draft; preserve the live site, audit gate and repository protections.
+
+> **D196 authorized push — 14 October 2026:** Push the prepared D195 public-site candidate to a review branch in the bound GitHub repository. This supersedes earlier local-only restrictions for the feature-branch push only. Preserve the failing security gate; no merge or deployment.
+
+> **D195 cleanup and preparation — 14 October 2026:** Remove unused code without changing the approved pages, correct stale current release wording, and verify/package the exact local candidate. Preserve the full failing security gate. No push or publication is requested.
+
+> **D194 homepage action — 14 October 2026:** Use Explore payment acceptance for the homepage hero button, retaining its local Payments destination and current styling.
+
+> **D193 dispute fee — 14 October 2026:** The user sets the fee for each dispute received to $35, superseding the earlier $15 benchmark for that line only. The separate manual-response fee and all other offers remain unchanged. Website update only; no provider billing change or deployment.
+
+> **D192 dependency investigation — 14 October 2026:** Verify the two unresolved advisories using current upstream/registry and package evidence. No patched releases are published; preserve the full audit failure. A production-only audit does not cover all prebundled adapter code. No dependency bypass, application change, push or deployment. See current status for evidence and limits.
+
+> **D191 final quality pass — 14 October 2026:** Preserve the preferred design. Clarify the user-confirmed merchant-entered 0.5% fee and fix square website icons while verifying all pages. Keep approved offers, original assets, canonical/indexing controls and public-only scope. No push or deployment. Unresolved development-tool advisories remain explicit.
+
+> **D190 legal contacts — 14 October 2026:** Add the confirmed US and International addresses/phones to both Contact us sections, preserve existing email routes and update contact-revision dates. Local display change only; no change to obligations, offers or contact-service operations.
+
+> **D189 Help simplification — 14 October 2026:** Remove the duplicate bottom legal/contact block; give Sign-in help one route, group access guidance together and prioritize servicing questions. Preserve the other privacy paths, all commercial facts and the current design. Local review only.
+
+> **D188 card wording — 14 October 2026:** Use Coming soon for card availability; remove repeated forthcoming/upcoming adjectives from customer-facing descriptions. Preserve application-closed and launch-dependent qualifications, all terms and the existing design. Local update only.
+
+> **D187 accepted live Home restoration — 14 October 2026:** Restore the published homepage’s photograph, concise copy, proportions and flow. Retain D184 Payments checkout and useful technical/accessibility/accuracy fixes. This supersedes the duplicate Home online-payment artwork; other pages remain intact. Local preview only, no push or deployment. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D185 Home art and wording review — 14 October 2026:** Keep the existing online-payment scene, align its finish to D184 Payments and apply only justified wording corrections. Preserve the other pages’ resolved copy and all offers/notices. Local preview only. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D184 accepted Payments refinement — 13 October 2026:** Restore the live page’s design and Two Step → Clarity → pricing flow, add illustrative card entry in the existing customer outcome, and retain small copy/technical/accessibility improvements. Other pages, shared navigation and offers remain intact. Local preview only. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D182 artwork palette correction — 13 October 2026:** The user prefers the earlier warm sage/cream/forest artwork palette that matches the existing site. Restore color relationships without undoing typography, spacing, wording, assets or behavior. This supersedes the cooler D180 artwork palette. Local preview only. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D181 coordinated copy/artwork refinement — 13 October 2026:** Refine language and existing artwork together across the six public pages. Preserve commercial meaning, approved offers, original scenes/assets and interactions; flag operational unknowns separately. Matched local review only, no push or deployment. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D180 existing-artwork refinement — 13 October 2026:** Preserve the approved scenes, layout, assets/logos, copy, offers and interactions. Refine execution only; compare identical viewport sizes and 200% details. Local review preview only, no push or deployment. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D179 accepted search/trust proposal — 13 October 2026:** Implement D178's proposed metadata, headings, decision FAQs and internal links locally, preserving design, product facts, notices, destinations, canonicals and indexing controls. Correct accessibility semantics and apply verified compatible security patches with exact pins. Record unresolved upstream patches and operational evidence honestly. No push or deployment. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D177 layout refinement — 13 October 2026:** Remove the duplicate price/audience block from the Payments opening, retain full pricing below and refine page/artwork alignment in the existing design. Preserve approved copy, offers, notices and public-only boundaries. Local work only; no deployment. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D176 accepted copy — 13 October 2026:** Apply the accepted commercial wording locally and show only the changes. Preserve D175's design and scope, approved terms, fixed service destinations and complete legal notices. No push or deployment. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D175 focused refinement — 13 October 2026:** The user authorizes local implementation of D172–D174: preserve the current style, add the approved online-payment artwork, improve pricing order and customer support/notice orientation, and refine navigation to Payment acceptance / Credit cards / Help. This supersedes the proposal-only hold. No push, merge or deployment is authorized. [Current context](CURRENT_WORK_CONTEXT.md).
+
+> **D170 focused working context — 23 September 2026:** The user requests removal of unrelated project context to prevent confusion. This repository and conversation now follow only [the current customer-facing website context](CURRENT_WORK_CONTEXT.md). Local application source matches D163 / PR #34. Historical discussion and exploratory material are not an active plan. No runtime change or deployment accompanies this documentation cleanup.
+
+> **D169 restored baseline — 23 September 2026:** The user requested the last deployed website. The exact D163 / PR #34 application source was restored locally and its preview verified. Netlify confirmed that release remains current.
+
 > **D162 release preparation — 22 September 2026:** Freeze and prepare the verified D153–D161 public-site candidate for reviewed release. Confirm exact-source CI, clean packaging and approved resource identities. Preserve live production, data, access and provider settings. Preparation authorizes the feature PR, not merge or publication.
 
 > **D161 three-page craft review — 22 September 2026:** Polish Home, Payments, Cards, Help and notices as one distinctive, credible product experience. Preserve D160 artwork and D159 pricing. Correct concrete language, layout and technical inconsistencies; verify the public-only runtime and preserved archive without reconnecting hosted resources. “A new player” is a positioning goal, not proof of a new category or market leadership. [Positioning](PRODUCT_POSITIONING.md) records the approach. Local review and release checks only; no deployment requested.
