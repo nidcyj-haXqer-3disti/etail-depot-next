@@ -6,6 +6,7 @@ import path from "node:path";
 import { crc32, inflateRawSync } from "node:zlib";
 import ts from "typescript";
 import { forbiddenArtifact } from "./public-artifact-policy.ts";
+import { type Environment, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
 
 export const platformEmailApproval = Object.freeze({
   package: "@netlify/plugin-emails",
@@ -220,14 +221,47 @@ export function verifyBundledPlatformEmail(root: string, contents: string) {
   for (const required of ["netlify-integration-emails.netlify.app", "netlify-emails-secret", "NETLIFY_EMAILS_PROVIDER", "getEmailFromPath"]) assert(contents.includes(required), "Bundled official email implementation is incomplete.");
 }
 
-/** Inspect the actual platform bundle after all onBuild hooks and Functions bundling. */
-export function verifyPlatformEmailBundle(root: string, functionsDist: string) {
+/** Bind platform scratch output to the trusted build identity, never a caller-selected directory. */
+export function platformEmailBundleDirectory(root: string, functionsDist: string, environment: Environment = process.env) {
   const directory = path.resolve(functionsDist);
-  assert.equal(directory, path.resolve(root, ".netlify/functions"), "The hosted verifier must inspect the platform's actual Functions distribution directory.");
+  const localDirectory = path.resolve(root, ".netlify/functions");
+  if (directory === localDirectory) return { directory, hosted: false };
+  assert(environment.NETLIFY === "true" && environment.SITE_ID === PUBLIC_INDEXING_APPROVAL.siteId &&
+    /^(?:production|deploy-preview|branch-deploy)$/.test(environment.CONTEXT ?? "") &&
+    /^[a-f0-9]{24}$/.test(environment.DEPLOY_ID ?? ""), "The hosted verifier must inspect the platform's actual Functions distribution directory with a trusted build identity.");
+  assert.equal(functionsDist, `/tmp/zisi-${environment.DEPLOY_ID}`, "The hosted Functions distribution must belong to this exact deployment.");
+  // A separate local output must not be hidden by selecting the platform scratch directory.
+  const staleLocal = checkedPath(root, ".netlify/functions");
+  assert(!existsSync(staleLocal), "Unexpected additional local Functions distribution during the hosted build.");
+  return { directory, hosted: true };
+}
+
+function checkedBundleFile(directory: string, name?: string) {
+  const absolute = name ? path.join(directory, name) : directory;
+  let current = path.parse(absolute).root;
+  for (const component of absolute.slice(current.length).split(path.sep)) {
+    current = path.join(current, component);
+    assert(!lstatSync(current).isSymbolicLink(), "Platform Functions output cannot contain symlinked paths.");
+  }
+  assert(name ? lstatSync(absolute).isFile() : lstatSync(absolute).isDirectory(), "Unexpected platform Functions artifact type.");
+  return absolute;
+}
+
+/** Inspect the actual platform bundle after all onBuild hooks and Functions bundling. */
+export function verifyPlatformEmailBundle(root: string, functionsDist: string, environment: Environment = process.env) {
+  const { directory, hosted } = platformEmailBundleDirectory(root, functionsDist, environment);
   verifyPlatformEmail(root, { required: true });
-  checkedPath(root, ".netlify/functions", "directory");
+  checkedBundleFile(directory);
   assert.deepEqual(readdirSync(directory).sort(), ["emails.zip", "manifest.json"], "Only the reviewed platform Emails function may be published.");
-  const manifest = JSON.parse(readFileSync(checkedPath(root, ".netlify/functions/manifest.json", "file"), "utf8"));
+  const manifest = JSON.parse(readFileSync(checkedBundleFile(directory, "manifest.json"), "utf8"));
+  if (hosted) console.log("Platform Emails manifest:", JSON.stringify({
+    version: typeof manifest.version === "number" ? manifest.version : "unrecognized",
+    functionCount: Array.isArray(manifest.functions) ? manifest.functions.length : "unrecognized",
+    functions: Array.isArray(manifest.functions) ? manifest.functions.slice(0, 8).map((item: Record<string, unknown>) => ({
+      name: item.name === "emails" ? "emails" : "unrecognized", runtime: item.runtime === "js" ? "js" : "unrecognized",
+      bundler: ["nft", "esbuild", "none", "zisi"].includes(String(item.bundler)) ? item.bundler : "unrecognized",
+    })) : [],
+  }));
   assert.equal(manifest.version, 1, "Review the changed platform Functions manifest format.");
   assert(Array.isArray(manifest.functions) && manifest.functions.length === 1, "Exactly one platform email function is allowed.");
   const entry = manifest.functions[0];
@@ -240,10 +274,14 @@ export function verifyPlatformEmailBundle(root: string, functionsDist: string) {
   for (const key of ["routes", "excludedRoutes"]) assert(entry[key] === undefined || (Array.isArray(entry[key]) && entry[key].length === 0), "Custom Emails routes are not approved.");
   assert.equal(path.resolve(entry.path), path.join(directory, "emails.zip"));
   assert.equal(path.resolve(entry.mainFile), path.resolve(root, generatedDirectory, "index.mjs"));
-  const archive = readFileSync(checkedPath(root, ".netlify/functions/emails.zip", "file"));
+  const archive = readFileSync(checkedBundleFile(directory, "emails.zip"));
   const entries = readBundleEntries(archive);
   const required = ["___netlify-bootstrap.mjs", "___netlify-entry-point.mjs", "___netlify-metadata.json", "index.mjs"];
   const allowed = new Set([...required, "___netlify-telemetry.mjs"]);
+  if (hosted) console.log("Platform Emails archive:", JSON.stringify({
+    sha256: digest(archive), entryCount: entries.size,
+    entries: [...entries].map(([name, bytes]) => ({ name: allowed.has(name) ? name : "unrecognized", size: bytes.length })),
+  }));
   for (const name of required) assert(entries.has(name), "The platform email bundle is incomplete.");
   for (const [name, bytes] of entries) {
     assert(allowed.has(name) && !forbiddenArtifact(name), "Unapproved file in the platform Emails bundle.");
