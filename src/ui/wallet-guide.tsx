@@ -7,8 +7,14 @@ import type { ReactNode } from "react";
 export function WalletGuide({ children }: { children: ReactNode }) {
   const disclosure = useRef<HTMLDetailsElement>(null);
   const userChoseVisibility = useRef(false);
+  const initialVisibilityChecked = useRef(false);
 
   useEffect(() => {
+    // A visitor can open the native disclosure before React attaches its click handler.
+    if (!initialVisibilityChecked.current) {
+      if (disclosure.current?.open) userChoseVisibility.current = true;
+      initialVisibilityChecked.current = true;
+    }
     const desktop = window.matchMedia("(min-width: 851px)");
     const matchViewport = () => {
       if (disclosure.current && !userChoseVisibility.current) disclosure.current.open = desktop.matches;

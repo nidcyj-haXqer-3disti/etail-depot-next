@@ -1,8 +1,8 @@
 # Public website architecture
 
-D108 public-only scope · D198 tooling candidate, 14 October 2026
+D108 public-only scope · D201 published architecture, 14 October 2026
 
-The user selected **public website and vendor links only**, with existing database records preserved. D163 / PR #34 is the recorded published baseline. D198 changes local build and hosting tools while preserving the approved Home photograph, D184 Payments presentation, Cards, six public routes, copy, offers and client interactions. It is not a published release. See [current status](../planning/STATUS.md).
+The user selected **public website and vendor links only**, with existing database records preserved. D201 / PR #36 is published as Netlify deploy `6ace79cf055aae884c3cab1a`, source `9c453b8ae43a6562ef90cb2db95678b3f318b3dc`, confirmed ready and current on 14 October 2026 at 03:35 JST. The static website and native Edge boundary preserve the approved Home photograph, D184 Payments presentation, Cards, six public routes, copy, offers and client interactions. The Netlify Emails extension remains enabled with unchanged saved settings and the reviewed authenticated POST handler described below. Exact-source CI has passed; hosted browser and HTTP acceptance is still in progress. See [current status](../planning/STATUS.md) for final results and limitations.
 
 ## Pages and client interactions
 
@@ -40,6 +40,6 @@ Package verification checks current source/build identity, six pages and metadat
 
 The previous application remains in Git at `111b703d9793c53d414f6c1ab0ec8985a5e54095`. Its 24 ordered migrations, 15 snapshots and 32 schema/configuration files remain in `archive/database`, outside compilation, packaging and migration discovery. The archive is schema history, not a customer-data backup. Do not edit it, reconnect databases or restore Identity while maintaining this website. Earlier catalog checks are not a current hosted-data audit.
 
-D192/D197 recorded unresolved node-forge and braces advisories in the former toolchain, including adapter-bundled build helpers. D198 removes those dependency paths and the adapter deployment package rather than suppressing findings. The complete local verification sequence passes, including the full dependency audit with zero findings. Hosted verification and publication have not occurred. Follow [current status](../planning/STATUS.md) for actual passes, failures and package evidence. Operational privacy/product confirmations and Search Console measurement remain separately unverified.
+D192/D197 recorded unresolved node-forge and braces advisories in the former toolchain, including adapter-bundled build helpers. D198 removes those dependency paths and the adapter deployment package rather than suppressing findings. The complete local verification sequence passes, including the full dependency audit with zero findings. D201 publishes this architecture; hosted browser and HTTP acceptance is still in progress. Follow [current status](../planning/STATUS.md) for final acceptance, actual passes, failures and package evidence. Operational privacy/product confirmations and Search Console measurement remain separately unverified.
 
 Automatic publication remains held. Manual publication requires the reviewed candidate, the exact repository/site in [project targets](../project-targets.json) and the applicable user authorization. Local checks do not change DNS, visitor access, provider operations or financial activation. See [the deployment runbook](NETLIFY_DEPLOYMENT.md).

@@ -1,10 +1,10 @@
 # Local and CI setup for the public website
 
-D201 keep-enabled email compatibility · 14 October 2026
+D201 published public website and email compatibility · 14 October 2026
 
 The application already exists. D108 limits it to public pages and fixed vendor links. Read [AGENTS.md](../AGENTS.md), [project targets](../project-targets.json), [source precedence](SOURCE_PRECEDENCE.md) and [current status](../planning/STATUS.md) first. Do not scaffold a replacement repository, reconnect PostgreSQL or Identity, or restore the retired account application.
 
-D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. The static/Edge security remediation is merged but its first hosted build failed before publication. D201 repairs compatibility while retaining the enabled Emails extension and its configuration. Check current status for the new candidate’s actual verification; older successful checks do not certify changed source. Follow current status for actual checks and remaining limitations. Local checks do not authorize publication.
+D201 / PR #36 is published as Netlify deploy `6ace79cf055aae884c3cab1a`, confirmed ready and current on 14 October 2026 at 03:35 JST. Its source is `9c453b8ae43a6562ef90cb2db95678b3f318b3dc`. The static website and native Edge boundary retain the enabled Netlify Emails extension with its reviewed authenticated POST handler; saved settings are unchanged. Publication and exact-source CI are confirmed; hosted browser and HTTP acceptance is still in progress. Follow [current status](../planning/STATUS.md) for final results, earlier failures and remaining limitations. Local checks do not authorize a later publication or certify changed source.
 
 ## Pinned workspace
 

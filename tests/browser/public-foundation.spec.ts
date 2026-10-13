@@ -617,6 +617,70 @@ test("the wallet setup guide explains both platforms without opening wallets or 
   expect(errors).toEqual([]);
 });
 
+test("a wallet preview opened before hydration keeps the visitor's choice", async ({ page, baseURL }) => {
+  test.skip(page.viewportSize()!.width >= 851, "The mobile disclosure begins closed.");
+  const origin = new URL(baseURL!).origin;
+  const externalRequests: string[] = [];
+  const mutations: string[] = [];
+  let releaseScripts!: () => void;
+  let scriptRequested!: () => void;
+  const heldScripts = new Promise<void>(resolve => { releaseScripts = resolve; });
+  const requestedScript = new Promise<void>(resolve => { scriptRequested = resolve; });
+  await page.route("**/*", async route => {
+    const request = route.request();
+    if (new URL(request.url()).origin !== origin) {
+      externalRequests.push(request.url());
+      await route.abort("blockedbyclient");
+      return;
+    }
+    if (!["GET", "HEAD", "OPTIONS"].includes(request.method())) {
+      mutations.push(`${request.method()} ${request.url()}`);
+      await route.abort("blockedbyclient");
+      return;
+    }
+    if (request.resourceType() === "script") {
+      scriptRequested();
+      await heldScripts;
+    }
+    await route.continue();
+  });
+  try {
+    // Commit avoids waiting for deferred scripts: only native HTML behavior is available here.
+    await page.goto("/card-services", { waitUntil: "commit" });
+    await requestedScript;
+    const disclosure = page.locator(".wallet-guide-disclosure");
+    const summary = disclosure.locator("summary");
+    const guide = page.locator(".wallet-card-art");
+    await expect(guide).toBeHidden();
+    await summary.focus();
+    await page.keyboard.press("Enter");
+    await expect(disclosure).toHaveAttribute("open", "");
+    await expect(guide).toBeVisible();
+
+    releaseScripts();
+    await page.waitForLoadState("load");
+    const google = guide.getByRole("tab", { name: "Google Wallet", exact: true });
+    await google.click({ timeout: 5_000 });
+    await expect(google).toHaveAttribute("aria-selected", "true");
+    await expect(disclosure).toHaveAttribute("open", "");
+    await expect(summary).toHaveAccessibleName("Hide wallet preview");
+    // Hydration and viewport changes must preserve that explicit native choice.
+    await page.setViewportSize({ width: 1000, height: 844 });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(guide).toBeVisible();
+    await summary.click();
+    await expect(guide).toBeHidden();
+    await summary.click();
+    await expect(guide).toBeVisible();
+    await expect(google).toHaveAttribute("aria-selected", "true");
+    expect(externalRequests).toEqual([]);
+    expect(mutations).toEqual([]);
+  } finally {
+    releaseScripts();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+});
+
 test("switching wallets never shows the previous payment mark while the new logo loads", async ({page}) => {
   for (const path of ["/card-services"]) {
     let releaseLogo!: () => void;

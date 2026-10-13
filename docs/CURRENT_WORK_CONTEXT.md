@@ -5,11 +5,11 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 ## Current baseline
 
 - Public pages: Home, Payments, Cards, Help, Privacy and Terms.
-- Published release: D163 / PR #34, 22 September 2026, 04:39 UTC.
-- Netlify deploy: `6ab20642fc4fee270b08924d`, confirmed current and ready during the latest restoration.
-- Local source baseline: `bb5f267e3a4164aabf0886b7851db38dac7e5c2a`, matching published tree `2bf8a6d4964a656fbb55f6006c684be85e3b919d`.
-- Working branch: `codex/hosted-build-cleanup-d199`, based on merged PR #35 at `dbd37d5ee3e09216b9c546f345d5b1cbc7dfdc5d`. The merged source is not yet published.
-- Preview: http://127.0.0.1:3100/.
+- Published release: D201 / PR #36, 14 October 2026, 03:35 JST (13 October, 18:35 UTC), including the reviewed PR #35 website updates.
+- Netlify deploy: `6ace79cf055aae884c3cab1a`, confirmed current and ready. Netlify Emails remains enabled with its saved settings preserved.
+- Published source: `9c453b8ae43a6562ef90cb2db95678b3f318b3dc`, tree `6db99e5eed3e293ce9773e5502c88204af30bc26`, identical to verified candidate `5b1cc820abdc4bdbfb4c1138f127093c1ac8d0bb`.
+- Working branch: `codex/wallet-preview-hydration-d201`, based on the PR #36 merge. A narrow wallet-preview fix follows the live slow-load test; current status records its pending verification. The email repair is already published and remains enabled.
+- Website: https://etail-depot-next.netlify.app/. Local preview is stopped; start it only when needed.
 - Homepage: **Get paid. Keep going.**
 - Homepage hero action: **Explore payment acceptance**, linking to `/payment-services` (D194).
 
