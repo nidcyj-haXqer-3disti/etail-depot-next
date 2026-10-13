@@ -1,3 +1,5 @@
+> **D198 local tooling candidate — 14 October 2026:** Both affected dependency paths have been removed. Full local verification now passes, including the full advisory audit (zero findings), 118 unit cases, 48 browser journeys, 24 accessibility cases, production/preview search checks and static/Edge package inspection. This candidate is not pushed or deployed; PR #35 still contains the earlier failed revision. Follow [current status](../planning/STATUS.md) for source/package identity, visual review, actual diagnostics and remaining hosted checks. D197's deployment hold was not bypassed.
+
 > **Release preparation, D195 / 14 October 2026:** D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. The working branch contains unpublished refinements. Two unresolved high-severity dependency advisories keep the full security gate failing. Follow [current status](../planning/STATUS.md) and [working context](CURRENT_WORK_CONTEXT.md) for the current candidate; earlier entries below are historical. Packaging does not publish or clear this blocker.
 
 ## D195 — local cleanup and package review

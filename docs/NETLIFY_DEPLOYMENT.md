@@ -1,8 +1,8 @@
-> **Release preparation, D195 / 14 October 2026:** D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. The working branch contains unpublished refinements. Two unresolved high-severity dependency advisories keep the full security gate failing; successful packaging alone does not clear release. Follow [current status](../planning/STATUS.md) and [working context](CURRENT_WORK_CONTEXT.md). No publication is authorized by preparation.
+> **Local security remediation, D198 / 14 October 2026:** D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` remains the published baseline. The local candidate removes the tooling behind both dependency findings; a fresh full audit reports zero known vulnerabilities. Follow [current status](../planning/STATUS.md) for the complete verification outcome. PR #35 still contains the earlier failing candidate until an authorized update. Local preparation does not publish this replacement.
 
 # Public website Netlify deployment runbook
 
-D139 maintainer refresh · 21 September 2026
+D198 static publication candidate · 14 October 2026
 
 D108 public-only scope governs this runbook. The repository and site already exist; there is no provisioning, database migration, Identity setup, account acceptance or financial activation step. Read [source precedence](SOURCE_PRECEDENCE.md), [current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) before preparing a release.
 
@@ -27,7 +27,7 @@ Trolleys links remain exactly `https://trolleys.ai`, without forwarded input or 
 
 ## Local build and review gates
 
-Use Node **24.19.0**, pnpm **11.19.0**, the existing lockfile and `@netlify/plugin-nextjs` **5.15.13**. The configured build command is `pnpm build`, publish directory `.next`, and the adapter generates the application server and retirement proxy. Do not add custom functions, archived APIs or `netlify/database` paths.
+Use Node **24.19.0**, pnpm **11.19.0**, the existing lockfile and `@netlify/edge-bundler` **16.0.4**. Next.js uses `output: 'export'`. The configured build command is `pnpm build && node tools/package-public-site.mjs`; publish files are in `.netlify/static`, with the required native request boundary in `.netlify/edge-functions-dist`. The old CLI and Next server adapter are removed. Do not reinstall them or add server functions, archived APIs or `netlify/database` paths.
 
 With ports 3100 and 3101 free, run:
 
@@ -39,15 +39,17 @@ pnpm package:netlify
 pnpm verify:package
 ```
 
-`pnpm verify` runs the four verification/package commands in order. `package:netlify` binds `NETLIFY_SITE_ID` to the recorded site and invokes the local offline production-context build. It does not deploy. Never substitute old `.next` or `.netlify` output for the source under review.
+`pnpm verify` runs the four verification/package commands in order. They share generated output and must not run concurrently. `package:netlify` builds for the exact approved production site, copies the export and bundles the Edge handler locally. The first use can download official Deno/Edge tooling; it does not require site credentials or deploy. A source fingerprint and build-context record prevent stale or differently configured output from being packaged.
 
-Package inspection requires the reviewed public routes, one generated Next.js server handler and the 17 retirement-proxy route families. It checks server ZIP entry names, traces, static files and edge manifests for private or archived inputs. Confirm the exact source/commit/tree and record checks, failures, reruns and remaining limitations. Database records and archived migrations are not build inputs and must not be touched.
+Package inspection requires the six reviewed public pages, metadata/404, byte-identical export files and one native Edge handler covering every path. The handler preserves all 17 retirement families, security headers and runtime preview protection. Inspection rejects old server/adapter output, vulnerable-package paths and private/archive inputs; the Edge archive hash must match its manifest. Confirm the exact source/commit/tree and record checks, failures, reruns and remaining limitations. Database records and archived migrations are not build inputs and must not be touched.
 
 ## Production search configuration
 
 D122 authorizes indexing only `/`, `/payment-services`, `/card-services` and `/help` at the bound production origin. Legal pages, 404, retired routes and local/preview environments remain noindex. Actual search indexing and ranking are not established by a successful build or deployment.
 
-The existing guard requires the recorded approval, exact site/origin, `NODE_ENV=production`, `APP_ENV=production`, `ETAIL_SEARCH_CONTEXT=production`, matching `SITE_ID` and `ETAIL_PUBLIC_ORIGIN`. Any supplied Netlify `CONTEXT` must be `production`; it is absent in Functions. The custom production markers must therefore apply to both builds and functions. `netlify.toml` configures build values; it does not supply function-runtime environment settings. Inspect only necessary nonsecret release settings during an authorized release review and preserve the preview guard. Do not copy production markers into local environment files or expose server secrets through client variables.
+The build guard requires the recorded approval, exact site/origin, `NODE_ENV=production`, `APP_ENV=production`, `ETAIL_SEARCH_CONTEXT=production`, matching `SITE_ID` and `ETAIL_PUBLIC_ORIGIN`; any supplied `CONTEXT` must be production. The native Edge handler then checks trusted `context.site.id` and `context.deploy.context` with the same scoped custom markers. A preview or unapproved site remains noindex even if given production HTML; robots/sitemap are restricted at runtime. Legal HTML aliases, raw navigation payloads and 404 responses also remain noindex.
+
+The custom production markers must apply to both builds and the Functions scope, which also supplies native Edge environment variables. D122 records that setup, but current remote scope/value verification remains a predeployment check. `netlify.toml` supplies build values only. Inspect only those necessary nonsecret settings; do not copy production markers into local files or expose secrets through client variables.
 
 ## Reviewed manual publication
 
@@ -56,10 +58,16 @@ Automatic publication remains held by the existing `build.ignore` setting. Build
 1. Complete the local candidate and review its exact diff, test results and package boundaries on a feature branch. Prepare a reviewable result before any permission request.
 2. Confirm the user's recorded authorization covers this candidate's publication. Use authorization already granted; the runbook and passing checks do not themselves grant it. If authorization is absent, finish preparation and request it before the remote publication step.
 3. Follow the repository PR/check/review workflow, bind passing CI to the exact candidate and merge only within the applicable approval. Do not force-push, bypass protections or silently merge feature work into main.
-4. Manually publish a fresh source-only extraction of the reviewed commit to the existing bound Netlify site using the authorized release mechanism. Keep the build-validation directory separate: the current upload helper does not ignore `.next`, so a previously built source directory is not suitable for upload. Verify every archived source hash and exclude generated files, dependency directories and environment files before starting the helper. Verify the repository/site identities immediately before mutation and preserve source identity between the reviewed, CI-tested and published revisions. Preserve visitor access and environment scope; do not add database or provider operations.
+4. Build and verify a fresh extraction of the reviewed commit. Publish the complete static-plus-Edge package to the existing bound site using a reviewed mechanism that preserves the contract below. Do not use a static-only upload or the removed CLI/adapter. Verify repository/site identities immediately before mutation and preserve source identity between review, CI and publication. Preserve visitor access and environment scope; do not add database or provider operations.
 5. Record the deployment ID, source identity, build outcome and read-back status. Verify public pages, search metadata, links, security headers, responsive interactions and retired-route responses. Public acceptance checks must not create accounts, transmit payment details, send messages or submit vendor actions. Link success does not prove a hosted financial workflow.
 
 Stop if identity, source, checks or authorization do not match. A failed release is not permission to use an excluded site, create replacement resources, change access/DNS or restore the retired backend. Any rollback must follow the authorized site-release workflow and preserve database/provider resources; no database restoration is part of a public-site rollback.
+
+### Static plus Edge upload contract
+
+The local packager produces verified publication artifacts, not an authenticated upload. A future API uploader must send ordinary SHA1 file digests for `.netlify/static/*`, and map every `.netlify/edge-functions-dist/*` entry (including `manifest.json`) to `.netlify/internal/edge-functions/*`. The deploy request must declare `edge_functions: { eszip2: SHA256(bundleBytes) }`, upload any requested Edge bundle to `/deploys/{deploy_id}/edge_functions/{code_sha}`, and include the resolved header configuration. Uploading only the visible HTML/assets loses the retirement and search protections and is prohibited.
+
+This contract follows Netlify's [official file mapping](https://github.com/netlify/cli/blob/main/src/utils/deploy/process-files.ts) and [Edge upload implementation](https://github.com/netlify/cli/blob/main/src/utils/deploy/upload-files.ts). Runtime environment scopes follow [official Edge guidance](https://docs.netlify.com/build/edge-functions/environment-variables/). No live upload or hosted compatibility claim accompanies D198's local checks; validate the exact remote configuration and post-deployment behavior during an authorized release.
 
 ## Historical deployment archive
 

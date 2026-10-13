@@ -8,7 +8,7 @@ import { execFileSync } from "node:child_process";
 import ts from "typescript";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const skipped = new Set(["node_modules", ".git", ".local", ".next", ".netlify", "coverage", "test-results", "playwright-report", "__pycache__"]);
+const skipped = new Set(["node_modules", ".git", ".local", ".next", ".netlify", "out", "coverage", "test-results", "playwright-report", "__pycache__"]);
 const errors = [];
 const relative = (filename) => path.relative(root, filename).split(path.sep).join("/");
 const publicSecretName = /\bNEXT_PUBLIC_[A-Z0-9_]*(?:SECRET|TOKEN|PASSWORD|DATABASE|CONNECTION|DSN|ENCRYPT|PRIVATE|CREDENTIAL|API_KEY|AUTH_KEY)[A-Z0-9_]*\b/g;
@@ -53,7 +53,7 @@ function sourceFindings(filename, text) {
 
   if (/\.(?:tsx?|[cm]?js|jsx)$/.test(filename)) {
     const tree = ts.createSourceFile(filename, text, ts.ScriptTarget.Latest, true, filename.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
-    const applicationSource = relative(filename).startsWith("src/");
+    const applicationSource = (relative(filename).startsWith("src/") || relative(filename).startsWith("netlify/edge-functions/"));
     function visit(node) {
       if (applicationSource && ts.isCallExpression(node)) {
         const callee = node.expression.getText(tree);
@@ -94,7 +94,7 @@ function selfTest() {
 
 selfTest();
 if (!process.argv.includes("--self-test")) {
-  const filenames = (await Promise.all(["src", "tools", "tests", ".github", "public"].map((name) => walk(path.join(root, name))))).flat();
+  const filenames = (await Promise.all(["src", "tools", "tests", ".github", "public", "netlify/edge-functions"].map((name) => walk(path.join(root, name))))).flat();
   for (const name of [".env.example", "next.config.ts", "next.config.mjs", "netlify.toml", "package.json"]) {
     try { await fs.access(path.join(root, name)); filenames.push(path.join(root, name)); } catch { /* Optional configuration file. */ }
   }

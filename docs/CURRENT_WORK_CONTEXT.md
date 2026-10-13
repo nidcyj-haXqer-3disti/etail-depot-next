@@ -8,7 +8,7 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 - Published release: D163 / PR #34, 22 September 2026, 04:39 UTC.
 - Netlify deploy: `6ab20642fc4fee270b08924d`, confirmed current and ready during the latest restoration.
 - Local source baseline: `bb5f267e3a4164aabf0886b7851db38dac7e5c2a`, matching published tree `2bf8a6d4964a656fbb55f6006c684be85e3b919d`.
-- Working branch: `codex/public-site-review-d196`.
+- Working branch: `codex/remove-vulnerable-tooling-d198`, based on the PR #35 candidate `9cb8ef5431b17070e8237bbbee125ce7f96ccf1c`. The remote review branch remains `codex/public-site-review-d196`.
 - Preview: http://127.0.0.1:3100/.
 - Homepage: **Get paid. Keep going.**
 - Homepage hero action: **Explore payment acceptance**, linking to `/payment-services` (D194).
@@ -22,6 +22,18 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 ## Working boundary
 
 Public information and fixed service links only. No local sign-in, financial account backend, payment processing, card issuance or database runtime. Preserve the approved offer, shared design and current resource bindings. Earlier chat messages and dated records are history; they do not authorize new work or change this scope.
+
+## D199 — push and deploy authorized
+
+14 October 2026. The user requests pushing and deploying the repaired D198 candidate. Update PR #35, require successful exact-source CI, follow the reviewed merge/publication workflow and verify the live result. Preserve approved design/content, public-only boundaries, runtime indexing guards and all existing resources/access settings. Current status records actual outcomes; authorization is not deployment evidence.
+
+## D198 — remove vulnerable tooling locally
+
+14 October 2026. The user accepts investigating/removing the tooling that brings in node-forge and braces. Preserve the six-page website, approved content and all interactions. Keep Next.js but use its static export, original local image assets and one native Netlify Edge boundary for retirement responses, security headers and preview search protection. Replace the CLI/server adapter with the exact official Edge bundler; use a scoped, regression-tested Next lint plugin patch that replaces its directory-glob dependency with the pinned Node runtime. No rule or advisory is suppressed. A fresh full dependency audit reports zero known vulnerabilities. The complete local verification sequence passes, including 118 unit, 48 browser and 24 accessibility cases, production/preview SEO and artifact inspection. Rendered comparison preserves content/layouts across 36 states; see current status for image-resampling details and remaining hosted checks. This candidate is local only, with no new push, merge, deployment or remote configuration changes.
+
+## D197 — deployment on hold
+
+14 October 2026. The user requests deployment, then explicitly chooses to hold it until the two security issues are resolved. PR #35 is a draft for exact candidate `9cb8ef5431b17070e8237bbbee125ce7f96ccf1c`; CI run 38431877425 fails at the full dependency audit after application checks pass. Fresh official checks still find no published compatible patches. No security exception, merge or deployment occurs. Preserve the live site and audit gate; do not publish until remediation and required verification succeed.
 
 ## D196 — authorized feature-branch push
 

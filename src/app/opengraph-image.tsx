@@ -5,8 +5,8 @@ import { cardProduct } from "@/shared/card-product";
 export const alt = publicSocialImage.alt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-// Evaluate the same release guard as robots/sitemap at runtime, not once during a local package build.
-export const dynamic = "force-dynamic";
+// Static image generation preserves the artwork; the hosted boundary controls indexing.
+export const dynamic = "force-static";
 
 /** One generic brand image; no request parameters, external assets or customer information. */
 export default function OpenGraphImage() {

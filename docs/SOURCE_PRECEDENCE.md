@@ -1,3 +1,9 @@
+> **D199 push and deployment — 14 October 2026:** The user explicitly authorizes pushing and publishing the verified D198 security remediation through PR #35. Require successful exact-source checks and publish the complete static/Edge package to the bound site. Preserve resource, privacy, indexing and access boundaries. Record actual outcomes in current status.
+
+> **D198 local security remediation — 14 October 2026:** The user accepts removal/replacement of affected tooling. Preserve all public pages, design, offers and behavior. Verify the static export, native public Edge boundary and scoped lint patch without suppressing audits or weakening rules. Fresh full audit: zero known vulnerabilities; all local release gates pass. Current status records actual evidence and remaining CI/hosted checks. No push or deployment accompanies this local work.
+
+> **D197 deployment hold — 14 October 2026:** The user explicitly chooses to hold deployment until the two security issues are resolved. No one-time exception is approved. PR #35 remains a draft; preserve the live site, audit gate and repository protections.
+
 > **D196 authorized push — 14 October 2026:** Push the prepared D195 public-site candidate to a review branch in the bound GitHub repository. This supersedes earlier local-only restrictions for the feature-branch push only. Preserve the failing security gate; no merge or deployment.
 
 > **D195 cleanup and preparation — 14 October 2026:** Remove unused code without changing the approved pages, correct stale current release wording, and verify/package the exact local candidate. Preserve the full failing security gate. No push or publication is requested.

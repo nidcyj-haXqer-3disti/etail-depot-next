@@ -2,7 +2,8 @@ import type { Metadata, MetadataRoute } from "next";
 import { productFacts } from "@/shared/product-facts";
 import { cardProduct } from "@/shared/card-product";
 import { legalIdentity } from "@/shared/legal-identity";
-import targets from "../../../project-targets.json" with { type: "json" };
+import { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
+export { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
 
 const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts.cards.monthlyFeeDollars
   ? `$${productFacts.cards.annualFeeDollars} annual and monthly fees`
@@ -16,38 +17,6 @@ export const PUBLIC_PAGES = {
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
-function boundCanonicalOrigin(): string {
-  const raw = targets.netlify.canonical_origin;
-  const parsed = new URL(raw);
-  if (targets.project_key !== "ETAIL_DEPOT_NEXT_GREENFIELD_2026" || !targets.netlify.site_id ||
-      parsed.protocol !== "https:" || parsed.origin !== raw || parsed.username || parsed.password ||
-      targets.denied.netlify_site_ids.includes(targets.netlify.site_id) || targets.denied.domains.includes(parsed.hostname)) {
-    throw new Error("Public metadata requires the recorded, isolated canonical site binding.");
-  }
-  return parsed.origin;
-}
-export const canonicalOrigin = boundCanonicalOrigin();
-
-interface SearchReleaseApproval {
-  siteId: string;
-  canonicalOrigin: string;
-  reviewReference: string;
-}
-/** D122 explicitly authorizes indexing this recorded site; previews and local builds remain excluded. */
-export const PUBLIC_INDEXING_APPROVAL: SearchReleaseApproval = {
-  siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
-  canonicalOrigin: "https://etail-depot-next.netlify.app",
-  reviewReference: "D122 — user authorization to index and deploy, 2026-09-21",
-};
-type Environment = Readonly<Record<string, string | undefined>>;
-
-/** Pure guard for release review/tests; request URLs, forwarded hosts and search parameters are never inputs. */
-export function isApprovedSearchRelease(approval: SearchReleaseApproval | null, env: Environment): boolean {
-  return Boolean(approval && approval.siteId === targets.netlify.site_id && approval.canonicalOrigin === canonicalOrigin &&
-    approval.reviewReference.trim() && env.NODE_ENV === "production" && env.APP_ENV === "production" &&
-    env.ETAIL_SEARCH_CONTEXT === "production" && (!env.CONTEXT || env.CONTEXT === "production") &&
-    env.SITE_ID === targets.netlify.site_id && env.ETAIL_PUBLIC_ORIGIN === canonicalOrigin);
-}
 export function publicIndexingEnabled(): boolean {
   return isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, process.env);
 }

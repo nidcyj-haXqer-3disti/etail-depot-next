@@ -14,7 +14,7 @@ export default defineConfig({
     { name: "accessibility", testMatch: /public-accessibility\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: {
-    command: "node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3100",
+    command: "node tools/preview-public-site.mjs --port 3100",
     url: "http://127.0.0.1:3100/",
     reuseExistingServer: false,
     timeout: 60_000,

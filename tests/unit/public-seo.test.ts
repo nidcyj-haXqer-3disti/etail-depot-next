@@ -186,7 +186,7 @@ describe("social image release boundary", () => {
     ["another site", { SITE_ID: "another-site" }, "noindex, nofollow"],
   ] as const)("renders a bounded PNG with the correct indexing header for %s", async (_label, changes, expectedHeader) => {
     stubEnvironment({ CONTEXT: undefined, ...changes });
-    expect(socialImageMode).toBe("force-dynamic");
+    expect(socialImageMode).toBe("force-static");
     const response = socialImage();
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("image/png");

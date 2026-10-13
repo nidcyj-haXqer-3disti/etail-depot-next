@@ -9,10 +9,11 @@
   },
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",
-    "build": "next build",
-    "start": "next start --hostname 127.0.0.1",
-    "preview": "next start --hostname 127.0.0.1 --port 3100",
+    "build": "node tools/build-public-site.mjs",
+    "start": "node tools/preview-public-site.mjs",
+    "preview": "node tools/preview-public-site.mjs --port 3100",
     "lint": "eslint .",
+    "test:lint-tooling": "node tools/verify-lint-glob.mjs",
     "typecheck": "next typegen && tsc --noEmit",
     "test:unit": "vitest run tests/unit",
     "test:architecture": "node tools/verify-architecture.mjs",
@@ -20,8 +21,8 @@
     "test:a11y": "playwright test --project=accessibility",
     "test:security": "node tools/verify-security.mjs && pnpm audit --audit-level=high",
     "test:seo:production": "node tools/verify-production-seo.mjs",
-    "verify:public": "pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:architecture && pnpm build && pnpm test:e2e && pnpm test:a11y && pnpm test:security",
-    "package:netlify": "NETLIFY_SITE_ID=cbbb6c24-9dbc-43a2-9234-e4357b5b5280 netlify build --offline --context production",
+    "verify:public": "pnpm lint && pnpm test:lint-tooling && pnpm typecheck && pnpm test:unit && pnpm test:architecture && pnpm build && pnpm test:e2e && pnpm test:a11y && pnpm test:security",
+    "package:netlify": "node tools/package-public-site.mjs --production-review",
     "verify:package": "node tools/verify-architecture.mjs --artifacts",
     "verify": "pnpm verify:public && pnpm test:seo:production && pnpm package:netlify && pnpm verify:package"
   },
@@ -32,15 +33,13 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
-    "@netlify/plugin-nextjs": "5.15.13",
-    "@opentelemetry/api": "1.9.1",
+    "@netlify/edge-bundler": "16.0.4",
     "@playwright/test": "1.63.0",
     "@types/node": "24.13.3",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.8",
-    "netlify-cli": "27.5.0",
     "typescript": "6.0.3",
     "vitest": "5.0.0"
   }

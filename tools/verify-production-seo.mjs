@@ -21,21 +21,22 @@ const canonicalOrigin = targets.netlify.canonical_origin;
 const publicPaths = ["/", "/card-services", "/payment-services", "/help"];
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
-const nextCli = path.join(root, "node_modules/next/dist/bin/next");
+const buildScript = path.join(root, "tools/build-public-site.mjs");
+const previewScript = path.join(root, "tools/preview-public-site.mjs");
 const buildEnv = {
   ...process.env,
   NODE_ENV: "production", APP_ENV: "production", CONTEXT: "production",
   ETAIL_SEARCH_CONTEXT: "production", SITE_ID: targets.netlify.site_id,
   ETAIL_PUBLIC_ORIGIN: canonicalOrigin, NEXT_TELEMETRY_DISABLED: "1",
 };
-// Netlify Functions receive SITE_ID and the production-scoped custom marker, but not CONTEXT.
-const runtimeEnv = { ...buildEnv };
+// The local harness models trusted Edge deployment context independently of build variables.
+const runtimeEnv = { ...buildEnv, ETAIL_PREVIEW_DEPLOY_CONTEXT: "production" };
 delete runtimeEnv.CONTEXT;
 const children = new Set();
 let interrupted = false;
 
 function startNext(args, env) {
-  const child = spawn(process.execPath, [nextCli, ...args], { cwd: root, env, stdio: "inherit", detached: process.platform !== "win32" });
+  const child = spawn(process.execPath, args, { cwd: root, env, stdio: "inherit", detached: process.platform !== "win32" });
   const job = { child, finished: false, result: null, done: null };
   job.done = new Promise(resolve => {
     const finish = result => { job.finished = true; job.result = result; children.delete(job); resolve(result); };
@@ -212,6 +213,12 @@ async function verifyResponses() {
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
     assert.ok(values.some(forbidsIndexing), `${route}: must remain noindex.`);
   }
+  for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-services.txt"]) {
+    const response = await localFetch(route);
+    assert.equal(response.status, 200);
+    assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: raw payloads and legal aliases must remain noindex.`);
+    await response.arrayBuffer();
+  }
   const redirectFamilies = ["cardholder-services", "cards", "merchant-services", "merchants", "login", "profile", "security", "shared-access", "invitations", "operations", "money-accounts", "accounts", "services"];
   for (const family of [...redirectFamilies, "api", "checkout", "pay", "payments"]) {
     const response = await localFetch(`/${family}/seo-test?token=synthetic-test`);
@@ -231,14 +238,32 @@ async function verifyResponses() {
 try {
   await requireFreePort();
   console.log("Building the exact approved site in production mode for rendered SEO verification.");
-  const build = startNext(["build"], buildEnv);
+  const build = startNext([buildScript], buildEnv);
   const result = await build.done;
   assert.equal(interrupted, false, "Production SEO verification was interrupted.");
   if (result.error) throw result.error;
   assert.equal(result.code, 0, `Production SEO build failed (${result.signal ?? result.code}).`);
-  const server = startNext(["start", "--hostname", "127.0.0.1", "--port", String(port)], runtimeEnv);
+  const server = startNext([previewScript, "--port", String(port)], runtimeEnv);
   await waitForServer(server);
   await verifyResponses();
+  await stopJob(server);
+  // Even production HTML must not become indexable on a preview or an unapproved site.
+  for (const environment of [
+    { ...runtimeEnv, ETAIL_PREVIEW_DEPLOY_CONTEXT: "deploy-preview" },
+    { ...runtimeEnv, SITE_ID: "unapproved-local-test-site" },
+  ]) {
+    const privateServer = startNext([previewScript, "--port", String(port)], environment);
+    await waitForServer(privateServer);
+    for (const route of [...publicPaths, "/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/opengraph-image", "/production-seo-missing-page"]) {
+      const response = await localFetch(route);
+      assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: preview/wrong-site response must remain noindex.`);
+      if (route === "/sitemap.xml") assert.doesNotMatch(await response.text(), /<loc>/);
+      else if (route === "/robots.txt") assert.doesNotMatch(await response.text(), /^Sitemap:/im);
+      else await response.arrayBuffer();
+    }
+    await stopJob(privateServer);
+  }
+  console.log("Host-context protection passed: production HTML remains noindex on preview and unapproved-site contexts, with no public sitemap entries.");
 } catch (error) {
   console.error(error);
   process.exitCode = 1;

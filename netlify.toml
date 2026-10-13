@@ -1,26 +1,31 @@
 [build]
-  # Public-only website. Keep automatic publication off pending reviewed release.
-  # Netlify build hooks bypass ignore; do not configure unattended release hooks.
+  # Publication stays manual and reviewed; build hooks must not bypass this hold.
   ignore = "exit 0"
-command = "pnpm build"
-publish = ".next"
+  command = "pnpm build && node tools/package-public-site.mjs"
+  publish = ".netlify/static"
 
 [build.environment]
 NODE_VERSION = "24.19.0"
 PNPM_VERSION = "11.19.0"
+# Static export does not require the Next server adapter.
+NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
-# D122: search launch for this exact production site. Preview contexts stay excluded.
-# Matching production-only Functions values are configured through the Netlify API;
-# netlify.toml environment settings apply to builds, not function runtime.
+# D122: only this approved production site's discovery pages may be indexed.
+# The edge boundary checks trusted site/deploy context and scoped runtime markers again.
 [context.production.environment]
 APP_ENV = "production"
 ETAIL_SEARCH_CONTEXT = "production"
 ETAIL_PUBLIC_ORIGIN = "https://etail-depot-next.netlify.app"
 
-[functions]
-node_bundler = "esbuild"
+[[headers]]
+for = "/*"
+[headers.values]
+X-Content-Type-Options = "nosniff"
+X-Frame-Options = "DENY"
+Referrer-Policy = "no-referrer"
+Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
-# Modern OpenNext adapter, resolved and pinned in the application lockfile.
-# This also makes local packaging independent of Netlify's plugin auto-installer.
-[[plugins]]
-package = "@netlify/plugin-nextjs"
+[[headers]]
+for = "/_next/static/*"
+[headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
