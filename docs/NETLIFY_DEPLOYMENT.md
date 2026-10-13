@@ -1,4 +1,4 @@
-> **Local security remediation, D198 / 14 October 2026:** D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` remains the published baseline. The local candidate removes the tooling behind both dependency findings; a fresh full audit reports zero known vulnerabilities. Follow [current status](../planning/STATUS.md) for the complete verification outcome. PR #35 still contains the earlier failing candidate until an authorized update. Local preparation does not publish this replacement.
+> **Deployment held, D200 / 14 October 2026:** PR #35's security remediation passed CI and merged, but Netlify's Emails build extension prevented publication. The user chooses to keep the extension enabled and hold deployment. Do not disable it, retry or publish by another route. D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` remains live. Follow [current status](../planning/STATUS.md) for the packaging repair, actual checks and the remaining release conflict.
 
 # Public website Netlify deployment runbook
 
@@ -53,7 +53,7 @@ The custom production markers must apply to both builds and the Functions scope,
 
 ## Reviewed manual publication
 
-Automatic publication remains held by the existing `build.ignore` setting. Build hooks can bypass that setting; do not add unattended hooks or a deployment step to the read-only CI workflow.
+Automatic Git builds remain held by the existing `build.ignore` setting. D199 confirmed that the dashboard's manual Trigger deploy action can still start a build; do not treat the ignore command as protection against manual publication. Build hooks can also bypass it. Do not add unattended hooks or a deployment step to the read-only CI workflow. D200 currently prohibits publication regardless of the available mechanism.
 
 1. Complete the local candidate and review its exact diff, test results and package boundaries on a feature branch. Prepare a reviewable result before any permission request.
 2. Confirm the user's recorded authorization covers this candidate's publication. Use authorization already granted; the runbook and passing checks do not themselves grant it. If authorization is absent, finish preparation and request it before the remote publication step.

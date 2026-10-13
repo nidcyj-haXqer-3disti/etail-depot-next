@@ -1,5 +1,9 @@
 # Decision register
 
+## D200 — preserve the email extension and hold deployment
+
+14 October 2026. After PR #35 passes CI and merges, the hosted build fails before publication because packaging removed Netlify's plugin directory while the enabled Emails extension still needed it. Correct local cleanup to remove only the packager's owned static, Edge bundle and build-record outputs; preserve platform configuration and unexpected runtime evidence. The Emails extension separately adds a server function incompatible with this public-only release. Netlify warns that disabling the extension discards its configuration. Automatic approval review rejects that change, and the user explicitly chooses **Keep it enabled and hold deployment**. Preserve the extension and all saved configuration; do not retry, merge a further release or publish through an alternative path. The packaging repair may be tested and pushed for review under the existing push authorization. The previous live deploy remains unchanged. This hold supersedes D199's publication authorization until the user approves a compatible release path.
+
 ## D199 — authorized push and publication of the repaired candidate
 
 14 October 2026. The user explicitly requests “push and deploy” after D198 resolves both dependency findings and all local gates pass. Update the existing PR #35 review branch with this exact repaired candidate, retain the full audit and CI rules, and verify passing checks before merging through the normal PR workflow. Publish the complete static-plus-Edge package to the existing bound Netlify site only after source/resource identity and runtime release markers match. This authorization supersedes D198’s local-only boundary and D197’s security hold for the successfully remediated candidate; it does not waive any failed gate or authorize other resource, database, provider, DNS or access changes. Record actual CI, merge, deployment and hosted acceptance results in current status.

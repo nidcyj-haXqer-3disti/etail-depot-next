@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { bundle, validateManifest } from "@netlify/edge-bundler";
 import { canonicalOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
 import { publicSecurityHeaders } from "../netlify/edge-functions/public-boundary.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
+import { clearPublicPackageOutputs } from "./public-package-cleanup.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
@@ -53,10 +54,8 @@ for (const file of ["index.html", "card-services.html", "payment-services.html",
   assert(existsSync(path.join(exportDirectory, file)), `The static export is missing ${file}.`);
 }
 
-// Remove only reproducible local package output. Site state and remote resources are untouched.
-for (const entry of ["static", "edge-functions-dist", "edge-functions", "functions", "functions-internal", "dist", "plugins", "deploy", "netlify.toml", "edge-functions-import-map.json", "public-build.json"]) {
-  rmSync(path.join(netlifyDirectory, entry), { recursive: true, force: true });
-}
+// Preserve platform plugins/state; unexpected legacy runtimes must fail verification.
+clearPublicPackageOutputs(netlifyDirectory);
 mkdirSync(netlifyDirectory, { recursive: true });
 cpSync(exportDirectory, publishDirectory, { recursive: true, errorOnExist: true, force: false });
 mkdirSync(edgeDirectory, { recursive: true });

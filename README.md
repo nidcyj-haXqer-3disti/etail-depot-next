@@ -2,7 +2,7 @@
 
 The public website for Etail Depot US, Inc., introducing **Trolleys payments** and forthcoming **Ledgix Visa secured credit cards**. Payment account setup, sign-in and dashboards are hosted at the vendor service. This application contains product information, help, legal pages and fixed service links only.
 
-**Release status:** D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. D198 is an unpublished tooling candidate that exports the existing Next.js pages and client interactions as static files, with one native Edge request boundary. The complete local verification sequence passes, including the full dependency audit with zero findings. Hosted verification and publication have not occurred. Local packaging is not publication approval. Read [current work context](docs/CURRENT_WORK_CONTEXT.md) and [status](planning/STATUS.md) for current evidence and limits.
+**Release status:** D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` remains live. PR #35's static-site and native Edge security remediation passed CI and merged with zero dependency advisories. Its first hosted build failed before publication. D200 explicitly holds deployment while preserving the existing Netlify Emails extension; a narrow packaging cleanup repair is under review. Read [current work context](docs/CURRENT_WORK_CONTEXT.md) and [status](planning/STATUS.md) for current evidence and limits.
 
 ## Run locally
 
