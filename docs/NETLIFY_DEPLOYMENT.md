@@ -1,10 +1,12 @@
+> **Release preparation, D195 / 14 October 2026:** D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. The working branch contains unpublished refinements. Two unresolved high-severity dependency advisories keep the full security gate failing; successful packaging alone does not clear release. Follow [current status](../planning/STATUS.md) and [working context](CURRENT_WORK_CONTEXT.md). No publication is authorized by preparation.
+
 # Public website Netlify deployment runbook
 
 D139 maintainer refresh · 21 September 2026
 
 D108 public-only scope governs this runbook. The repository and site already exist; there is no provisioning, database migration, Identity setup, account acceptance or financial activation step. Read [source precedence](SOURCE_PRECEDENCE.md), [current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) before preparing a release.
 
-**Recorded release state:** D152 / PR #33 is published, Netlify deploy `6ab146f61a7d282bab60350e`. Exact-source CI, clean packaging and hosted desktop/mobile/SEO checks passed; ready/current status was re-read after acceptance. See current status for the release evidence and limitations.
+**Release evidence:** use current status for the source under review, actual check results and remaining blockers. Older dated release records do not establish acceptance of this working branch.
 
 ## Existing target and preserved boundaries
 

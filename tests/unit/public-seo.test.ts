@@ -89,11 +89,12 @@ describe("reviewed public metadata", () => {
     for (const path of publicPaths) {
       const metadata = publicPageMetadata(path);
       expect(JSON.stringify(metadata)).not.toMatch(/prepaid|Each service has its own sign-in/i);
+      expect(metadata.title).toEqual({ absolute: `${PUBLIC_PAGES[path].title} | Etail Depot` });
       if (path === "/" || path === "/card-services") {
-        expect(metadata.title).toContain("Digital Wallet Card");
         expect(metadata.description).toContain("virtual Visa secured credit card");
-        expect(metadata.description).toMatch(/upcoming|coming soon/i);
+        expect(metadata.description).toMatch(/upcoming|coming soon|forthcoming/i);
       }
+      if (path === "/card-services") expect(metadata.description).toContain("Applications are not open");
       expect(metadata.alternates).toEqual({ canonical: new URL(path, canonicalOrigin).href });
       expect(metadata.openGraph).toMatchObject({ url: publicPageUrl(path), siteName: "Etail Depot", type: "website", images: [publicSocialImage] });
       expect(metadata.twitter).toMatchObject({ card: "summary_large_image", images: [publicSocialImage] });
@@ -148,7 +149,7 @@ describe("public structured data", () => {
   });
 
   it("provides two-level breadcrumbs for inner pages and no artificial home breadcrumb", () => {
-    const labels = { "/card-services": "Cards", "/payment-services": "Payments", "/help": "Help" } as const;
+    const labels = { "/card-services": "Credit cards", "/payment-services": "Payment acceptance", "/help": "Help" } as const;
     for (const path of Object.keys(labels) as (keyof typeof labels)[]) {
       const graph = JSON.parse(publicPageJsonLd(path))["@graph"];
       const breadcrumb = graph[3];

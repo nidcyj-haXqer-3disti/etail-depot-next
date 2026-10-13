@@ -8,7 +8,7 @@ const exampleAmount = formatUsdCents(6400);
 const purchaseSteps = [
   { title: "Use your card", description: "Pay with your digital wallet card.", kind: "purchase" },
   { title: "Review your statement", description: "See the purchases you need to repay.", kind: "statement" },
-  { title: "Pay in full", description: "Repay your statement balance each month. Earlier or daily payments are optional.", kind: "repayment" },
+  { title: "Pay in full", description: "Repay your full statement balance each month. Earlier or daily payments are optional.", kind: "repayment" },
 ] as const;
 
 function PurchaseIllustration({kind}: {kind: (typeof purchaseSteps)[number]["kind"]}) {
@@ -17,7 +17,7 @@ function PurchaseIllustration({kind}: {kind: (typeof purchaseSteps)[number]["kin
       <div className="secured-mini-phone"><i /><span>Wallet</span><div className="secured-mini-card"><LedgixCardFace /></div><div className="secured-mini-phone-lines"><b /><b /></div><em /></div>
       <div className="secured-purchase-tag"><Icon name="card" /><span>Purchase<strong>{exampleAmount}</strong></span></div>
     </> : kind === "statement" ? <div className="secured-statement-paper"><span>Card statement</span><strong>{exampleAmount}</strong><small>Purchase balance</small><div className="secured-paper-lines"><i /><i /></div><div className="secured-paper-total"><span>Pay in full</span><Icon name="document" /></div></div>
-      : <div className="secured-repayment-paper"><span className="secured-payment-check"><Icon name="check" /></span><span>Payment received</span><strong>{exampleAmount}</strong><div><span>Purchase balance</span><b>{formatUsdCents(0)}</b></div></div>}
+      : <div className="secured-repayment-paper"><span className="secured-payment-check"><Icon name="check" /></span><span>Repaid in full</span><strong>{exampleAmount}</strong><div><span>Purchase balance</span><b>{formatUsdCents(0)}</b></div></div>}
   </div>;
 }
 

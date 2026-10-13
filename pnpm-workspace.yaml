@@ -6,7 +6,11 @@ overrides:
   # CLI permits ^1.8.0; its build/telemetry peers require ~1.8.0.
   netlify-cli@27.5.0>@opentelemetry/api: 1.8.0
   # Security fixes; verified against the Netlify consumers' used APIs.
-  ipx@3.1.1>sharp: 0.35.4
+  ipx@3.1.1>sharp: 0.35.5
+  # Keep security maintenance within the current compatible release lines.
+  fast-uri@4.1.4: 4.1.5
+  netlify-cli@27.5.0>fastify: 5.12.5
+  minimatch@10.2.6>brace-expansion: 5.0.12
   netlify-cli@27.5.0>toml: 4.2.0
   '@netlify/zip-it-and-ship-it@15.5.0>toml': 4.2.0
 packageExtensions:

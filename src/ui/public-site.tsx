@@ -1,11 +1,11 @@
 const commonQuestions = [
   {
     question: "Can I get started with payments now?",
-    answer: "Yes. You can apply with Trolleys now. Once your account is approved and set up, you can accept payments.",
+    answer: "You can apply with Trolleys now and accept payments once your account is approved and set up.",
   },
   {
     question: "When can I apply for a Ledgix card?",
-    answer: "Card applications are not open yet. Explore the Cards page for the product and wallet experience.",
+    answer: "Card applications are not open yet. Visit the Credit cards page for details and a preview of the wallet experience.",
   },
   {
     question: "Where will I manage my services?",

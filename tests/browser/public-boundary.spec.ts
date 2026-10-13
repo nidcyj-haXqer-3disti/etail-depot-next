@@ -20,7 +20,7 @@ test("public pages and every internal link resolve without account APIs or cooki
     } else await expect(page.locator("input")).toHaveCount(0);
     const links = await page.locator("a[href]").evaluateAll(nodes => nodes.map(node => new URL(node.getAttribute("href")!, location.href)).filter(url => url.origin === location.origin).map(url => url.pathname + url.search + url.hash));
     for (const link of links) destinations.add(link);
-    for (const image of await page.getByRole("img").all()) {
+    for (const image of await page.locator("img:visible").all()) {
       await image.scrollIntoViewIfNeeded();
       await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0)).toBe(true);
     }

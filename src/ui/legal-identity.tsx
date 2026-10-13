@@ -10,7 +10,16 @@ export function LegalBrands() {
 
 export function LegalContacts() {
   return <>
-    <p><strong>{legalIdentity.company}</strong><br />{legalIdentity.location}</p>
+    <p><strong>{legalIdentity.company}</strong></p>
+    <div className="legal-office-grid">
+      {legalIdentity.offices.map(office => <div className="legal-office" key={office.label}>
+        <h3>{office.label}</h3>
+        <address>
+          {office.address.map(line => <span key={line}>{line}</span>)}
+          <a href={office.phoneHref}>{office.phone}</a>
+        </address>
+      </div>)}
+    </div>
     <dl className="legal-contact-list">
       {legalIdentity.brands.map(brand => <div key={brand.name}>
         <dt>{brand.name} · {brand.service}</dt><dd><a href={`mailto:${brand.email}`}>{brand.email}</a></dd>

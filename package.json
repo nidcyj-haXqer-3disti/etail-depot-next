@@ -26,7 +26,7 @@
     "verify": "pnpm verify:public && pnpm test:seo:production && pnpm package:netlify && pnpm verify:package"
   },
   "dependencies": {
-    "next": "16.3.4",
+    "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
@@ -39,7 +39,7 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.3.4",
+    "eslint-config-next": "16.3.8",
     "netlify-cli": "27.5.0",
     "typescript": "6.0.3",
     "vitest": "5.0.0"

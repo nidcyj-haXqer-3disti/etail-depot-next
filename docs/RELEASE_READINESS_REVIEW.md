@@ -1,3 +1,11 @@
+> **Release preparation, D195 / 14 October 2026:** D163 / PR #34 / deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. The working branch contains unpublished refinements. Two unresolved high-severity dependency advisories keep the full security gate failing. Follow [current status](../planning/STATUS.md) and [working context](CURRENT_WORK_CONTEXT.md) for the current candidate; earlier entries below are historical. Packaging does not publish or clear this blocker.
+
+## D195 — local cleanup and package review
+
+14 October 2026. Conservative cleanup preserves the existing product pages, artwork, wording, $35 dispute fee and service links. Frozen install, lint/types, 86 unit cases, 48 browser journeys, 24 accessibility cases, source security, production SEO, fresh offline packaging and artifact boundaries pass. All 26 matched screenshots and 36 rendered states are unchanged; all 43 internal links resolve. The full public verification fails at the two known dependency advisories. No audit bypass, publication or hosted operation occurred.
+
+The exact local source fingerprint, package hash, actual failures and supporting logs are recorded in [current status](../planning/STATUS.md). The package is prepared for review; release clearance remains blocked. The D192 analysis distinguishes manifest audit results from bundled adapter code.
+
 ## D161 — public-site craft and package checks complete
 
 22 September 2026. Home, Payments and Cards now share more precise positioning, consistent examples, balanced artwork frames, commercial terminology and FAQ hierarchy. Help and Terms match the actual public-site and separate product-account boundaries; Privacy was reviewed without changing its text. The approved 2.9% + 30¢ Two Step offer and separately optional +0.4% Clarity remain unchanged.

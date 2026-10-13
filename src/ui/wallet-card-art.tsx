@@ -18,12 +18,12 @@ const guides = {
   "Apple Wallet": [
     { title: "Start in Apple Wallet.", description: "Tap +, choose Debit or Credit Card, then Continue. Enter your Ledgix card details manually.", screen: "Add Card", option: "Debit or Credit Card", action: "Enter Card Details Manually" },
     { title: "Confirm it’s your card.", description: "Follow the wallet prompts and any verification requested by your card issuer.", screen: "Verify your card", option: "Card verification", action: "Follow the verification steps" },
-    { title: "Your card. Now in Wallet.", description: "Once setup is complete, use Apple Pay at participating stores, in apps and online.", screen: "Wallet", option: "Apple Pay", action: "Ready for Apple Pay" },
+    { title: "Pay with Apple Pay.", description: "Once setup is complete, use Apple Pay at participating stores, in apps and online.", screen: "Wallet", option: "Apple Pay", action: "Ready for Apple Pay" },
   ],
   "Google Wallet": [
     { title: "Start in Google Wallet.", description: "Tap Add to Wallet, choose Payment card, then New credit or debit card. Enter your Ledgix card details manually.", screen: "Add to Wallet", option: "Payment card", action: "New credit or debit card" },
     { title: "Confirm it’s your card.", description: "Save your details, review the issuer terms and complete any verification requested by your card issuer.", screen: "Verify your card", option: "Card verification", action: "Follow the verification steps" },
-    { title: "Your card. Ready to use.", description: "Once setup is complete, tap to pay with your phone or use Google Pay at participating online checkouts.", screen: "Google Wallet", option: "Google Pay", action: "Tap to pay" },
+    { title: "Pay with Google Pay.", description: "Once setup is complete, tap to pay with your phone or use Google Pay at participating online checkouts.", screen: "Google Wallet", option: "Google Pay", action: "Tap to pay" },
   ],
 } as const;
 
@@ -37,7 +37,7 @@ export function LedgixCardFace() {
 }
 
 function WalletProductPreview({ compact }: { compact: boolean }) {
-  return <figure className={`wallet-product-art${compact ? " wallet-product-art-compact" : ""}`} aria-label="Ledgix Digital Wallet Card for Apple Wallet and Google Wallet">
+  return <figure className={`wallet-product-art${compact ? " wallet-product-art-compact" : ""}`} aria-label="Preview of the Ledgix Digital Wallet Card for Apple Wallet and Google Wallet">
     <div className="wallet-product-device" aria-hidden="true">
       <div className="wallet-product-screen">
         <span className="wallet-product-camera" />
@@ -74,7 +74,7 @@ function WalletSetupGuide({ compact }: { compact: boolean }) {
     tabs?.[next]?.focus();
   }
   return <div className={`wallet-card-art${compact ? " wallet-card-art-compact" : ""}`}>
-    <div className="wallet-setup-tabs" role="tablist" aria-label="Wallet setup options">
+    <div className="wallet-setup-tabs" role="tablist" aria-label="Wallet preview options">
       {wallets.map((name, index) => <button type="button" role="tab" key={name} id={`${id}-wallet-${index}`} aria-selected={wallet === name} aria-controls={`${id}-panel`} tabIndex={wallet === name ? 0 : -1} onClick={() => selectWallet(name)} onKeyDown={event => handleKeys(event, index)}>{name}</button>)}
     </div>
     <div className="wallet-setup-panel" id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-wallet-${wallets.indexOf(wallet)}`} tabIndex={0}>

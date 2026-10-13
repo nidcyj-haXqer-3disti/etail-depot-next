@@ -1,0 +1,104 @@
+.public-help-intro { padding-bottom: 24px; }
+.public-help-body > .help-guide:first-child { padding-top: 20px; }
+
+.help-support-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 36px;
+  text-align: left;
+}
+
+.help-support-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--public-line);
+  border-radius: 9px;
+  background: #fff;
+}
+
+.help-support-card h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -.025em;
+}
+
+.help-support-card p {
+  flex: 1;
+  margin-top: 14px;
+  color: var(--public-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.help-support-card a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: 12px;
+  color: #245a4d;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: #afc4b8;
+  text-underline-offset: 5px;
+  overflow-wrap: anywhere;
+}
+
+.help-support-card a:hover { text-decoration-color: currentColor; }
+.help-support-card .icon { width: 18px; flex-shrink: 0; }
+
+.help-support-notes {
+  margin-top: 24px;
+  color: var(--public-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.help-support-notes p + p { margin-top: 8px; }
+.help-support-notes a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #245a4d;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+}
+
+.public-help-intro .help-topic-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin-top: 24px;
+}
+
+.public-help-intro .help-topic-links a {
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 14px;
+}
+
+.public-help-intro .help-topic-links a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (max-width: 900px) {
+  .help-support-card { padding: 20px; }
+}
+
+@media (max-width: 740px) {
+  .help-support-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 28px; }
+  .public-help-intro .help-topic-links { justify-content: flex-start; gap: 8px 24px; }
+}

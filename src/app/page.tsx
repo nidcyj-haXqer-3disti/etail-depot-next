@@ -17,9 +17,9 @@ export default function HomePage() {
   return <Shell>
     <PublicPageStructuredData path="/" />
     <div className="consumer-page consumer-home">
-      <ConsumerHero service="payments" title={<>Get paid.<br /><span>Keep going.</span></>}
+      <ConsumerHero service="payments" productLabel="Trolleys · Payments" title={<>Get paid.<br /><span>Keep going.</span></>}
         description="Turn a booking, project or sale into a payment request with Trolleys Two Step. Share a link or QR code so customers can pay by card."
-        actions={<Link href="/payment-services" className="button primary">Explore payments<Icon name="arrow" /></Link>}
+        actions={<Link href="/payment-services" className="button primary">Explore payment acceptance<Icon name="arrow" /></Link>}
         visual={<PaymentArtwork />}
         footer={<ConsumerNetworks />}
       />
@@ -35,9 +35,9 @@ export default function HomePage() {
           <div className="consumer-card-copy">
             <div className="consumer-product-eyebrow"><p className="eyebrow">Ledgix · Cards</p><ServiceStatus service="cards" /></div>
             <h2 id="ledgix-title">Secured credit.<br /><span>Made for your wallet.</span></h2>
-            <p>Meet Ledgix Digital Wallet Card. A virtual Visa secured credit card for Apple Wallet and Google Wallet.</p>
-            <p className="consumer-card-terms">From a ${productFacts.cards.minimumDepositDollars} security deposit. No annual or monthly fee. {productFacts.cards.repayment}.</p>
-            <Link href="/card-services" className="consumer-text-link">Explore cards<Icon name="arrow" /></Link>
+            <p>A virtual Visa secured credit card for Apple Wallet and Google Wallet.</p>
+            <p className="consumer-card-terms">A ${productFacts.cards.minimumDepositDollars} minimum security deposit backs your account. No annual or monthly fee. Repay your full statement balance each month.</p>
+            <Link href="/card-services" className="consumer-text-link">Explore the Ledgix card<Icon name="arrow" /></Link>
           </div>
         </div>
       </section>

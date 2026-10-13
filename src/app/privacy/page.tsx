@@ -11,8 +11,10 @@ const sections: LegalSection[] = [
     id: "scope", title: "Our company and services", content: <>
       <p>Etail Depot US, Inc. (“Etail Depot”, “we” or “us”) operates Ledgix for cards and Trolleys for payments. Ledgix and Trolleys are trade names of the same company, not separate legal entities.</p>
       <LegalBrands />
+      <h3>This website</h3>
       <p>This policy explains how we handle information when you browse this website or contact us. This website provides product information and links; it does not offer account registration, card management or payment processing.</p>
-      <p>Trolleys payments and the forthcoming Ledgix card service have separate product websites. For account records, cookies and information handling by Etail Depot and its service partners, review the privacy notices presented within that product when it is available. This website policy does not replace those notices or change our responsibilities for information we handle.</p>
+      <h3>Product privacy notices</h3>
+      <p>Trolleys payments and the Ledgix card service have separate product websites. For account records, cookies and information handling by Etail Depot and its service partners, review the privacy notices presented within that product when it is available. This website policy does not replace those notices or change our responsibilities for information we handle.</p>
       <p>Following a product link does not combine accounts or sign you in. Review the notices at your destination before providing personal or financial information.</p>
     </>,
   },
@@ -44,13 +46,15 @@ const sections: LegalSection[] = [
       <p><strong>Website services.</strong> Companies that help us host, deliver and protect this website may handle the technical information described above. This website does not provide customer accounts or sign-in. Ledgix and Trolleys product notices describe the service partners involved and how information is shared within each product.</p>
       <p><strong>Support.</strong> Authorized staff can review records within their assigned support responsibilities. Include only the information needed to explain your inquiry.</p>
       <p><strong>Information you share.</strong> Email links open your email application. The message and information you send are handled by your email service and the recipient. Product links open the relevant service website; they do not include your earlier account details or website query parameters.</p>
-      <p><strong>{saleRecordsOffer.brandName}.</strong> Trolleys’ optional service uses its live Order Insight integration to share supported merchant, transaction and order details with participating banks for purchase recognition and prevention of eligible fraud disputes. Review the Trolleys product notices and service terms for the information involved, access, sharing and applicable permissions. This public website does not collect sale records or send example information to Order Insight or banks.</p>
+      <p><strong>{saleRecordsOffer.brandName}.</strong> Trolleys’ optional service uses its live Order Insight integration to share supported merchant, transaction and order details with participating banks for purchase recognition and prevention of eligible Visa online fraud disputes. Review the Trolleys product notices and service terms for the information involved, access, sharing and applicable permissions. This public website does not collect sale records or send example information to Order Insight or banks.</p>
       <p><strong>Legal and security matters.</strong> Information may need to be disclosed to comply with applicable law or valid legal process, or to investigate fraud, unauthorized access or threats to the service. Requests about these disclosures should be directed to our compliance contact.</p>
     </>,
   },
   {
     id: "cookies", title: "Cookies and website activity", content: <>
-      <p>This website does not set sign-in or payment cookies. Its payment and {saleRecordsOffer.name} examples, fee calculator and wallet setup guide do not collect card details or store customer information. Example selections and calculator amounts stay in your browser and are not sent to us or saved by this website. The examples use fixed illustrative information; they do not track fulfillment or purchase access, record customer acceptance, send documents or enroll you in a service. The companies supporting this website may process technical information for delivery, security and traffic measurement.</p>
+      <p>This website does not set sign-in or payment cookies. Its payment and {saleRecordsOffer.name} examples, fee calculator and wallet preview do not collect card details or store customer information. Example selections and calculator amounts stay in your browser and are not sent to us or saved by this website.</p>
+      <p>The examples use fixed illustrative information; they do not track fulfillment or purchase access, record customer acceptance, send documents or enroll you in a service.</p>
+      <p>The companies supporting this website may process technical information for delivery, security and traffic measurement.</p>
       <p>Cookies from earlier website account features may remain in your browser until they expire or you clear them. The current website does not use or renew those account cookies. Clearing cookies does not delete retained records.</p>
       <p>The Ledgix and Trolleys product websites have their own cookie practices and controls.</p>
     </>,
@@ -84,5 +88,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function PrivacyPage() {
-  return <LegalDocument title="Privacy Policy" description="Information and choices on the Etail Depot website and links to our product services." updated="September 21, 2026" currentPage="privacy" sections={sections} />;
+  return <LegalDocument title="Privacy Policy" description="How we handle information when you browse this website or contact us." updated="October 14, 2026" currentPage="privacy" sections={sections} />;
 }

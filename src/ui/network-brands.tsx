@@ -11,9 +11,9 @@ const networks = {
 type Network = keyof typeof networks;
 
 /** Original network artwork, served locally without redrawing or color filters. */
-export function NetworkMark({ network, inverse = false, decorative = false }: { network: Network; inverse?: boolean; decorative?: boolean }) {
+export function NetworkMark({ network, decorative = false }: { network: Network; decorative?: boolean }) {
   const mark = networks[network];
-  return <Image unoptimized className={`network-mark network-mark-${network}`} src={network === "visa" && inverse ? "/brand/networks/visa-white.svg" : mark.src} alt={decorative ? "" : mark.name} width={mark.width} height={mark.height} />;
+  return <Image unoptimized className={`network-mark network-mark-${network}`} src={mark.src} alt={decorative ? "" : mark.name} width={mark.width} height={mark.height} />;
 }
 
 export function NetworkBrands({ variant = "compact", label = "Card networks" }: { variant?: "compact" | "accepted"; label?: string }) {

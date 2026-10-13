@@ -10,7 +10,7 @@ import "./payment-channel-preview.css";
 
 type ExampleDetails = (typeof paymentExamples)[PaymentExamplePurpose] & { amount: string };
 
-export type PaymentChannelPreviewProps = {
+type PaymentChannelPreviewProps = {
   purpose: PaymentExamplePurpose;
 };
 

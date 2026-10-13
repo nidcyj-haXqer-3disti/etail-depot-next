@@ -167,6 +167,9 @@ async function verifyResponses() {
     assertIndexable(response, metadata, route);
     assert.equal(metadata.titles.length, 1, `${route}: expected one title.`);
     assert.ok(metadata.titles[0].trim(), `${route}: empty title.`);
+    assert.equal(metadata.titles[0].match(/Etail Depot/g)?.length, 1, `${route}: title must identify Etail Depot exactly once, including Home.`);
+    assert.deepEqual(metadata.metaValues("property", "og:title"), metadata.titles, `${route}: social and document titles must agree.`);
+    assert.deepEqual(metadata.metaValues("name", "twitter:title"), metadata.titles, `${route}: social and document titles must agree.`);
     const description = metadata.metaValues("name", "description");
     assert.equal(description.length, 1, `${route}: expected one description.`);
     assert.ok(description[0].trim(), `${route}: empty description.`);

@@ -1,6 +1,5 @@
 :root {
   --ink: #183d35;
-  --text: #294c4d;
   --muted: #586960;
   --teal: #527254;
   --paper: #f7f6f2;
@@ -36,8 +35,6 @@ svg { flex-shrink: 0; }
 .button .icon { width: 18px; height: 18px; }
 .button.primary { background: var(--ink); color: white; }
 .button.primary:hover { background: #285c49; }
-.button.secondary { color: var(--ink); background: white; border-color: #bacdc6; }
-.button.secondary:hover { background: var(--tint); }
 .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: 10px; line-height: 1.6; font-weight: 600; color: var(--teal); }
 .large-icon { height: 60px; width: 60px; background: var(--tint); color: var(--teal); border: 1px solid var(--line); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 24px; }
 .large-icon .icon { width: 26px; height: 26px; }

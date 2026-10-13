@@ -2,7 +2,7 @@
 
 The public website for Etail Depot US, Inc., introducing **Trolleys payments** and forthcoming **Ledgix Visa secured credit cards**. Payment account setup, sign-in and dashboards are hosted at the vendor service. This application contains product information, help, legal pages and fixed service links only.
 
-**Release status:** D145 / PR #32 is published and verified. Netlify deploy `6ab1259130acf81c435375b6` contains the refined payment artwork and consistent public product pages. Follow [current status](planning/STATUS.md) for actual verification and publication evidence.
+**Release status:** D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` is the recorded published baseline. The working branch contains unpublished website refinements and release-preparation cleanup. Two unresolved high-severity dependency advisories keep the security gate failing; local packaging is not publication approval. Read [current work context](docs/CURRENT_WORK_CONTEXT.md) and [status](planning/STATUS.md) for current evidence and limits.
 
 ## Run locally
 
@@ -46,7 +46,7 @@ The checks cover types, lint, public-only boundaries, unit/browser/accessibility
 
 ## Release boundaries
 
-The only approved repository and site are recorded in [project-targets.json](project-targets.json). D122 authorized search indexing for Home, Payments, Cards and Help at `https://etail-depot-next.netlify.app` in the bound production environment; previews, legal pages, 404 and retired routes remain noindex. Netlify automatic publication remains held. Manual publication follows the reviewed release workflow and the user's authorization for that candidate. D145 published the reviewed D141–D143 candidate through PR #32. Local checks do not publish the website or establish Google indexing.
+The only approved repository and site are recorded in [project-targets.json](project-targets.json). D122 authorized search indexing for Home, Payments, Cards and Help at `https://etail-depot-next.netlify.app` in the bound production environment; previews, legal pages, 404 and retired routes remain noindex. Netlify automatic publication remains held. Manual publication follows the reviewed release workflow and the user's authorization for that candidate. Local checks do not publish the website or establish Google indexing.
 
 Search release requires the recorded approval, exact site/origin and production environment checks. Production-scoped `APP_ENV`, `ETAIL_SEARCH_CONTEXT` and `ETAIL_PUBLIC_ORIGIN` are configured for both Netlify builds and functions. Any supplied Netlify `CONTEXT` must also be production; functions do not receive that variable. See [release evidence and remaining checks](docs/RELEASE_READINESS_REVIEW.md), including the unverified Search Console/indexing status.
 

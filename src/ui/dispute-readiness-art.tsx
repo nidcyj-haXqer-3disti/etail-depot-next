@@ -51,10 +51,10 @@ export function DisputeReadinessArt({purpose}: {purpose: PaymentExamplePurpose})
         <div className="recognition-source-brand"><span><Icon name="business" /></span><div><strong>Trolleys</strong><small>Your sale record</small></div><span className="recognition-paid">Paid</span></div>
         <div className="recognition-source-purchase"><span className="recognition-purchase-symbol"><Icon name={purchaseIcons[purpose]} /></span><p>{sale.description}</p><strong>{amount}</strong></div>
         <div className="recognition-source-reference"><span>Reference</span><strong>{sale.orderReference}</strong></div>
-        <div className="recognition-data-labels" aria-label="Connected purchase information"><span>Business</span><span>Payment</span><span>Purchase</span></div>
+        <div className="recognition-data-labels" role="group" aria-label="Connected purchase information"><span>Business</span><span>Payment</span><span>Purchase</span></div>
       </div>
 
-      <div className="recognition-bridge" aria-label="Purchase information connected through Order Insight to a participating bank">
+      <div className="recognition-bridge" role="group" aria-label="Purchase information connected through Order Insight to a participating bank">
         <span className="recognition-bridge-symbol"><Icon name="layers" /></span>
         <strong>Order Insight</strong>
         <small>Purchase details</small>
