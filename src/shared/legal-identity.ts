@@ -24,3 +24,5 @@ export const legalIdentity = {
     { name: "Trolleys", service: serviceLabels.payments, operator: "Etail Depot US, Inc. DBA Trolleys", website: "https://trolleys.ai", domain: "trolleys.ai", email: "trolleys@etaildepot.com" },
   ],
 } as const;
+
+export const publicCompanyDescription = `Trolleys and Ledgix are trade names of ${legalIdentity.company}, which operates both services.`;

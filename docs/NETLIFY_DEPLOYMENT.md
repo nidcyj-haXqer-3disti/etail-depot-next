@@ -1,4 +1,4 @@
-> **D215 domain migration — 14 October 2026:** The user explicitly authorizes transferring etaildepot.com/www website assignments from source site `e1f23aa8-d7d1-41cd-9f76-8bcbdf05a658` to the existing destination site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`. This overrides older excluded-domain/source-site restrictions below only for the recorded migration scope. Keep Cloudflare nameservers, mail records, old project code/data/Identity and all unrelated settings. Prepare and verify canonical/redirect source before DNS cutover; do not publish a default-host redirect while the custom domain still serves the older site. Use current status for actual readiness and publication.
+> **D215 domain migration completed — 14 October 2026:** The reviewed public website is published at https://etaildepot.com; www and approved default-Netlify public requests redirect to it. The narrow source-project/domain exception and separately approved inactive-zone cleanup are complete. Preserve active Cloudflare DNS, mail, old-project resources and all unrelated settings. Future releases use the bindings below and the normal review/check gates. See current status for exact release evidence and limitations.
 
 > **Published keep-enabled repair, D201 / 14 October 2026:** PR #36 resolves compatibility and PR #37 completes live wallet acceptance; the current release retains Netlify Emails and its settings. D201 permits only that pinned platform handler behind its reviewed POST-only authentication wrapper. Keep the normal PR/check/package gates for future releases; never disable the extension or bypass failed checks. Follow [current status](../planning/STATUS.md) for exact source, hosted acceptance and remaining limitations.
 
@@ -21,9 +21,10 @@ D108 public-only scope governs this runbook. The repository and site already exi
 | Netlify site | `etail-depot-next` |
 | Site ID | `cbbb6c24-9dbc-43a2-9234-e4357b5b5280` |
 | Team ID | `685ae8f4e6ce519ecf6b267d` |
-| Public origin | `https://etail-depot-next.netlify.app` |
+| Public origin | `https://etaildepot.com` |
+| Netlify default address | `https://etail-depot-next.netlify.app` (approved public GET/HEAD paths redirect to the canonical origin) |
 
-Never provision replacements or modify the excluded repositories/sites/domains, including the older Etail projects and `etaildepot.com` / `www.etaildepot.com`. Preserve existing databases, Identity records, visitor access, DNS and provider configuration. Do not change plans, purchase services, expose credentials or remove the denied-resource list.
+Never provision replacements or modify excluded repositories/sites/domains. D215 is the recorded exception for transferring only the apex/www website assignments and required web records to the current site; the separate explicit approval allowed removal of only the inactive two-record Netlify DNS zone. That migration is complete. Preserve all remaining old-project resources, databases, Identity records, visitor access, active Cloudflare DNS and provider configuration. Do not change plans, purchase services, expose credentials or remove the denied-resource list.
 
 Trolleys links remain exactly `https://trolleys.ai`, without forwarded input or referrers. Ledgix cards remain coming soon with inquiries at `ledgix@etaildepot.com`. The optional Order Insight marketing demonstration does not create a vendor connection or authorize enrollment/testing against a vendor account.
 

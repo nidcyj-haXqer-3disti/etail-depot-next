@@ -1,3 +1,5 @@
+import { publicCompanyDescription } from "@/shared/legal-identity";
+
 const commonQuestions = [
   {
     question: "Can I start accepting payments now?",
@@ -10,6 +12,10 @@ const commonQuestions = [
   {
     question: "Where will I manage my services?",
     answer: "Manage your payment acceptance account through Trolleys. Credit card account access will be available through Ledgix when the service launches, with a separate sign-in.",
+  },
+  {
+    question: "Who operates Trolleys and Ledgix?",
+    answer: publicCompanyDescription,
   },
 ];
 

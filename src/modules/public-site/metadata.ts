@@ -2,7 +2,7 @@ import type { Metadata, MetadataRoute } from "next";
 import { serviceLabels } from "@/shared/service-language";
 import { productFacts } from "@/shared/product-facts";
 import { cardProduct } from "@/shared/card-product";
-import { legalIdentity } from "@/shared/legal-identity";
+import { legalIdentity, publicCompanyDescription } from "@/shared/legal-identity";
 import { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
 export { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
 
@@ -77,6 +77,7 @@ export function publicPageJsonLd(path: PublicPath): string {
     "@context": "https://schema.org", "@graph": [
       {
         "@type": "Organization", "@id": organizationId, name: "Etail Depot", legalName: legalIdentity.company,
+        description: publicCompanyDescription,
         url: `${canonicalOrigin}/`, logo: `${canonicalOrigin}/brand/logo.png`, email: legalIdentity.complianceEmail,
         brand: legalIdentity.brands.map(brand => ({ "@type": "Brand", name: brand.name })),
         contactPoint: legalIdentity.brands.map(brand => ({

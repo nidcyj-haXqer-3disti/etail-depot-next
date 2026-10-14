@@ -1,0 +1,95 @@
+{
+  "decision": "D216",
+  "updated_on": "2026-10-14",
+  "scope": "Accepted search-growth recommendation: public baseline, company trust and focused local content refinements. User separately approved creating/verifying the etaildepot.com Search Console Domain property with one Cloudflare TXT record. No website publication or unrelated settings changes.",
+  "canonical_origin": "https://etaildepot.com",
+  "live_baseline": "D215 / d8632ae1d0114989fd66149b003954a4d8ba2d3d",
+  "workstreams": [
+    {
+      "id": "measurement",
+      "priority": "P0",
+      "status": "Google sitemap accepted and three live-tested URLs submitted once; aggregate reports processing",
+      "result": "Sitemap Success: four discovered pages. Payment acceptance, Credit card and Help live tests pass with self canonicals and one accepted indexing request each. Home was indexed at baseline. Aggregate reports still processing.",
+      "next": "Observe subsequent crawl/indexing and canonical results; collect actual impressions and clicks when available. Do not repeat requests to try to increase priority.",
+      "acceptance": "Record actual results or explicit unavailability for the four discovery URLs; keep fetch eligibility distinct from indexing, rankings and AI citations.",
+      "evidence": [
+        "artifacts/search-growth/baseline-2026-10-14.json",
+        "artifacts/search-growth/search-console-setup.json",
+        "artifacts/search-growth/dns-verification-readback.json",
+        "artifacts/d217-release/google-submissions.json"
+      ]
+    },
+    {
+      "id": "trust",
+      "priority": "P1",
+      "status": "Implemented locally for review",
+      "result": "One concise operator answer in the existing Home FAQ, reused as the existing Organization description. No new route, credential or company-role assertion.",
+      "next": "Obtain product-specific operational evidence before expanding responsibility, timing or performance claims.",
+      "acceptance": "Visible identity and structured data use the same approved corporate/trade-name statement; existing notices and indexing controls remain intact.",
+      "evidence": "artifacts/search-growth/trust-review.json"
+    },
+    {
+      "id": "trolleys",
+      "priority": "P1",
+      "status": "Implemented locally for review",
+      "result": "Existing FAQ sections explain goods/services/information, link sharing and booking deposits. All answers are present in initial HTML. Existing pricing and calculator examples remain unchanged.",
+      "next": "Review these additions in the preserved layout before considering longer guides or new pages.",
+      "acceptance": "Supported uses are clear without interacting with artwork; no calendar feature, guaranteed payout, universal eligibility or dispute outcome is implied.",
+      "evidence": "artifacts/search-growth/trolleys-content-plan.json"
+    },
+    {
+      "id": "ledgix",
+      "priority": "P1",
+      "status": "Implemented locally for review",
+      "result": "The existing wallet FAQ now explains both Apple and Google setup paths in initial HTML. The existing deposit/purchase/repayment explanation is retained without duplication.",
+      "next": "Keep applications closed and defer expanded acquisition content until issuer/program terms and launch status are confirmed.",
+      "acceptance": "Current prices, coming-soon qualifications and wallet preview remain; no live provisioning, waitlist, approval or credit-building claim is added.",
+      "evidence": "artifacts/search-growth/ledgix-implementation.json"
+    }
+  ],
+  "dependencies": [
+    {
+      "item": "Google Search Console",
+      "state": "Verified Google Domain property, successful four-page sitemap and three accepted indexing requests; actual indexing/traffic growth remains pending.",
+      "needed_for": "Actual indexing, canonical decisions, search performance and migration bookkeeping"
+    },
+    {
+      "item": "Bing Webmaster Tools",
+      "state": "Robots/sitemap allow Bing; authenticated Bing account/property not yet inspected.",
+      "needed_for": "Bing-specific indexing and performance baseline"
+    },
+    {
+      "item": "Verified crawler request evidence",
+      "state": "Robots policy allows OAI-SearchBot/Bingbot; identity-verified server logs not inspected. No crawler block established.",
+      "needed_for": "Confirm real OAI-SearchBot/Googlebot access rather than relying on robots rules or a spoofed user agent"
+    },
+    {
+      "item": "Field Core Web Vitals",
+      "state": "Data sufficiency unknown",
+      "needed_for": "Assess actual visitor performance; lab results cannot establish a field pass"
+    },
+    {
+      "item": "Product evidence",
+      "state": "Approved website claims preserved; new operational facts require confirmation",
+      "needed_for": "Expanded payout, eligibility, issuer, deposit-return, coverage and case-study content"
+    },
+    {
+      "item": "Legacy references",
+      "state": "Ownership and legal applicability of trolleys.app/etailpitchdeck.com unverified",
+      "needed_for": "Any external identity correction; no modification authorized in this slice"
+    }
+  ],
+  "measurement_rules": [
+    "Separate Google, Bing, AI citations/referrals, website handoff clicks and provider-confirmed onboarding.",
+    "Set growth targets only after a dated baseline; do not invent search volumes or promise rankings.",
+    "Do not add analytics, forward visitor identifiers or weaken no-referrer service handoffs.",
+    "Preserve the four intended indexable routes and legal/preview/retired exclusions."
+  ],
+  "deferred": [
+    "New About/guide routes and mass keyword pages",
+    "External profile edits or outreach",
+    "New analytics or provider attribution integrations",
+    "New account ownership/OAuth grants, site-move submissions and changes to indexing controls"
+  ],
+  "current_execution": "D217 user-authorized sitemap/live inspections/indexing requests and reviewed D216 release; results pending gates."
+}
