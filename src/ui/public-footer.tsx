@@ -1,12 +1,14 @@
-import Image from "next/image";
+import { BrandImage } from "./brand-image";
+import "./brand-images-etail.css";
 import Link from "next/link";
+import { serviceLabels } from "@/shared/service-language";
 import { legalIdentity } from "@/shared/legal-identity";
 import { hostedServices } from "@/shared/hosted-services";
 
 const footerGroups = [
   { title: "Services", links: [
-    { href: "/payment-acceptance-service", label: "Payment acceptance" },
-    { href: "/credit-card-services", label: "Credit cards" },
+    { href: "/payment-acceptance-service", label: serviceLabels.payments },
+    { href: "/credit-card-services", label: serviceLabels.cards },
   ] },
   { title: "Support", links: [
     { href: "/help", label: "Help center" },
@@ -24,7 +26,7 @@ export function PublicFooter() {
       <div className="public-footer-grid">
         <div className="public-footer-brand">
           <Link href="/" className="brand-link" aria-label="Etail Depot home">
-            <Image src="/brand/logo.png" alt="Etail Depot" width={800} height={150} sizes="(max-width: 360px) 133px, (max-width: 760px) 155px, (max-width: 1000px) 166px, 182px" className="brand-logo" />
+            <BrandImage brand="etail" alt="Etail Depot" width={800} height={150} className="brand-logo" />
           </Link>
         </div>
         <div className="public-footer-navigation">

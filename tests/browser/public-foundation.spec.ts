@@ -1,12 +1,13 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expectDecodedBrandMark } from "./brand-marks";
 import { openMainNavigation } from "./public-header";
+
 
 async function expectLoadedNetworkMarks(group: Locator) {
   await expect(group.getByRole("img")).toHaveCount(4);
   for (const network of ["Visa", "Mastercard", "American Express", "Discover"]) {
     const mark = group.getByRole("img", {name:network, exact:true});
-    await expect(mark).toBeVisible();
-    await expect.poll(() => mark.evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0 && image.naturalHeight > 0)).toBe(true);
+    await expectDecodedBrandMark(mark);
   }
 }
 
@@ -53,7 +54,7 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.getByRole("link")).toHaveText(["Payment acceptance", "Credit cards", "Help"]);
+    await expect(navigation.getByRole("link")).toHaveText(["Payment acceptance", "Credit card", "Help"]);
     for (const [index, destination] of ["/payment-acceptance-service", "/credit-card-services", "/help"].entries()) {
       await expect(navigation.getByRole("link").nth(index)).toHaveAttribute("href", destination);
     }
@@ -173,7 +174,7 @@ test("legal documents are reachable without sign-in and retain their search visi
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etail-depot-next.netlify.app${path}`);
     await expect(page.locator('form, script[type="application/ld+json"]')).toHaveCount(0);
     expect(await page.locator("main").innerText()).not.toMatch(/\b(draft|demo|sandbox|simulated|fictional)\b|not yet taken effect/i);
-    await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("Ledgix credit card service");
+    await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("Ledgix for its credit card service and Trolleys for payment acceptance");
     if (path === "/privacy") {
       await expect(page.getByRole("region",{name:"Your choices and privacy requests",exact:true})).toContainText("this website, Ledgix or Trolleys");
     } else {
@@ -223,11 +224,11 @@ test("a new visitor can compare available payments and upcoming cards without a 
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Get paid\.\s*Keep going\.$/);
   await expectLoadedNetworkMarks(page.getByLabel("Accepted card networks", {exact:true}));
   const mainNavigation = await openMainNavigation(page);
-  await mainNavigation.getByRole("link", {name:"Credit cards",exact:true}).click();
+  await mainNavigation.getByRole("link", {name:"Credit card",exact:true}).click();
   await expect(page).toHaveURL(/\/credit-card-services$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Secured credit\.\s*Made for your wallet\.$/);
   await openMainNavigation(page);
-  await expect(mainNavigation.getByRole("link",{name:"Credit cards",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(mainNavigation.getByRole("link",{name:"Credit card",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator("main")).toContainText("Coming soon");
   await expect(page.locator("main")).toContainText("Applications are not open yet.");
   for (const contact of await page.locator("main").getByRole("link",{name:"Contact Ledgix",exact:true}).all()) {
@@ -259,17 +260,17 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
   await expect(signInCard.getByRole("link")).toHaveCount(1);
   await signInCard.getByRole("link",{name:"Get sign-in help",exact:true}).click();
   await expect(page).toHaveURL(/\/help#access$/);
-  await expect(page.locator("#access summary").filter({hasText:"Where do I sign in and manage payments?"})).toBeVisible();
+  await expect(page.locator("#access summary").filter({hasText:"Where do I sign in to Trolleys?"})).toBeVisible();
   await expect(page.locator(".help-support-notes").getByRole("link",{name:"compliance@etaildepot.com",exact:true})).toHaveAttribute("href","mailto:compliance@etaildepot.com");
   expect(await support.evaluate(element=>(element.compareDocumentPosition(document.querySelector(".public-questions")!)&Node.DOCUMENT_POSITION_FOLLOWING)!==0)).toBe(true);
   await expect(page.locator("details[open]")).toHaveCount(0);
-  await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Ledgix secured credit card"}).click();
+  await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Ledgix credit card"}).click();
   await expect(page).toHaveURL(/\/help#cards$/);
-  const question=page.locator("summary").filter({hasText:"Can I apply for a card now?"});
+  const question=page.locator("summary").filter({hasText:"Can I apply for a credit card now?"});
   await question.focus();await page.keyboard.press("Enter");
   await expect(question.locator("..")).toHaveAttribute("open","");
-  await expect(question.locator("..")).toContainText("Digital Wallet Card is a virtual Visa secured credit card");
-  await expect(question.locator("..")).toContainText("Applications are not open yet. You’ll manage your card account through Ledgix when it launches.");
+  await expect(question.locator("..")).toContainText("Ledgix credit card is a virtual Visa secured credit card");
+  await expect(question.locator("..")).toContainText("Applications are not open yet. You’ll manage your credit card account through Ledgix when it launches.");
   await page.keyboard.press("Enter");
   await expect(question.locator("..")).not.toHaveAttribute("open","");
   await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Sign-in help"}).click();
@@ -546,9 +547,8 @@ test("the wallet setup guide explains both platforms without opening wallets or 
     const apple = tablist.getByRole("tab", {name:"Apple Wallet", exact:true});
     const google = tablist.getByRole("tab", {name:"Google Wallet", exact:true});
     await expect(tablist.getByRole("tab")).toHaveCount(2);
-    const logo = guide.locator('img[src="/brand/ledgix-logo.png"]').first();
-    await expect(logo).toBeVisible();
-    await expect.poll(() => logo.evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0)).toBe(true);
+    const logo = guide.locator('.ledgix-wallet-card-logo').first();
+    await expectDecodedBrandMark(logo);
 
     const steps = ["Show step 1: Add card", "Show step 2: Verify", "Show step 3: Use wallet"];
     async function expectStep(platform: "Apple Wallet" | "Google Wallet", step: number) {

@@ -1,3 +1,5 @@
+import { serviceLabels } from "./service-language";
+
 // Public, user-confirmed display information. No domain, account or provider configuration.
 export const legalIdentity = {
   company: "Etail Depot US, Inc.",
@@ -18,7 +20,7 @@ export const legalIdentity = {
     },
   ],
   brands: [
-    { name: "Ledgix", service: "Secured credit card", operator: "Etail Depot US, Inc. DBA Ledgix", website: "https://ledgix.com", domain: "ledgix.com", email: "ledgix@etaildepot.com" },
-    { name: "Trolleys", service: "Payment acceptance", operator: "Etail Depot US, Inc. DBA Trolleys", website: "https://trolleys.ai", domain: "trolleys.ai", email: "trolleys@etaildepot.com" },
+    { name: "Ledgix", service: serviceLabels.cards, operator: "Etail Depot US, Inc. DBA Ledgix", website: "https://ledgix.com", domain: "ledgix.com", email: "ledgix@etaildepot.com" },
+    { name: "Trolleys", service: serviceLabels.payments, operator: "Etail Depot US, Inc. DBA Trolleys", website: "https://trolleys.ai", domain: "trolleys.ai", email: "trolleys@etaildepot.com" },
   ],
 } as const;

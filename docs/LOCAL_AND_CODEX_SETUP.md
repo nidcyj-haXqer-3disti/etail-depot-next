@@ -1,10 +1,10 @@
 # Local and CI setup for the public website
 
-D201 published public website and email compatibility · 14 October 2026
+D208 published public website and retained email compatibility · 14 October 2026
 
 The application already exists. D108 limits it to public pages and fixed vendor links. Read [AGENTS.md](../AGENTS.md), [project targets](../project-targets.json), [source precedence](SOURCE_PRECEDENCE.md) and [current status](../planning/STATUS.md) first. Do not scaffold a replacement repository, reconnect PostgreSQL or Identity, or restore the retired account application.
 
-D201 / PR #37 is published as Netlify deploy `6ace7e8a72d9f38a3f6d464a`, confirmed ready and current on 14 October 2026 at 03:55 JST. Its source is `a8f5ec25f29bf281868043a574aa2315a2d33efb`. The static website and native Edge boundary retain the enabled Netlify Emails extension with its reviewed authenticated POST handler; saved settings are unchanged. Publication, exact-source CI and hosted acceptance are complete; current status preserves the original failures and successful targeted reruns. Follow [current status](../planning/STATUS.md) for final results, earlier failures and remaining limitations. Local checks do not authorize a later publication or certify changed source.
+D208 / PR #38 is published as Netlify deploy `6acef0b08517b5679df9f98f`, confirmed ready and current on 14 October 2026 at 12:02 JST. Its source is `5140da42853f21a0b65ca727be866aa182b5c51c`. The static website and native Edge boundary retain the enabled Netlify Emails extension with its reviewed authenticated POST handler; saved settings are unchanged. Publication, exact-source CI and isolated packaging are complete; D208 live acceptance passes 110 HTTP checks and 73 browser cases (including 24 accessibility checks), with one intentional desktop skip. Follow [current status](../planning/STATUS.md) for final results, earlier failures and remaining limitations. Local checks do not authorize a later publication or certify changed source.
 
 ## Pinned workspace
 

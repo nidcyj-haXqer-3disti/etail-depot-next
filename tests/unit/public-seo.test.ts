@@ -149,7 +149,7 @@ describe("public structured data", () => {
   });
 
   it("provides two-level breadcrumbs for inner pages and no artificial home breadcrumb", () => {
-    const labels = { "/credit-card-services": "Credit cards", "/payment-acceptance-service": "Payment acceptance", "/help": "Help" } as const;
+    const labels = { "/credit-card-services": "Credit card", "/payment-acceptance-service": "Payment acceptance", "/help": "Help" } as const;
     for (const path of Object.keys(labels) as (keyof typeof labels)[]) {
       const graph = JSON.parse(publicPageJsonLd(path))["@graph"];
       const breadcrumb = graph[3];

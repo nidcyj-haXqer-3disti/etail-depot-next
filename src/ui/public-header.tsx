@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { BrandImage } from "./brand-image";
+import "./brand-images-etail.css";
 import Link from "next/link";
 import { PublicNavigation } from "./public-navigation";
 import { PaymentPortalLink } from "./service-entry";
@@ -70,7 +71,7 @@ export function PublicHeader() {
   }}>
     <div className="header-inner">
       <Link href="/" className="brand-link" aria-label="Etail Depot home" onClick={() => setOpen(false)}>
-        <Image src="/brand/logo.png" alt="Etail Depot" width={800} height={150} sizes="(max-width: 959px) 155px, 166px" priority className="brand-logo" />
+        <BrandImage brand="etail" alt="Etail Depot" width={800} height={150} className="brand-logo" />
       </Link>
       <button className="header-menu-toggle" type="button" ref={toggle} aria-expanded={open} aria-controls="public-header-menu" onClick={() => setOpen(!open)}>
         Menu<Icon name={open ? "close" : "menu"} />

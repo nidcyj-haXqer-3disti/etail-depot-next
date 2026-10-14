@@ -1,31 +1,65 @@
 import {expect,test} from "@playwright/test";
+import { expectDecodedBrandMarks } from "./brand-marks";
 import {openMainNavigation} from "./public-header";
 
-test("home network logos load without waiting for styles and scripts on a cold refresh",async({page})=>{
-  const expected=["/brand/networks/visa-blue.svg","/brand/networks/mastercard.svg","/brand/networks/american-express.svg","/brand/networks/discover.jpg"].sort();
-  let releaseResources=()=>{};
-  let resourcesReady=Promise.resolve();
-  let requested=new Set<string>();
-  await page.route("**/*",async route=>{
-    const request=route.request(),path=new URL(request.url()).pathname;
-    if(expected.includes(path))requested.add(path);
-    if(["stylesheet","script"].includes(request.resourceType()))await resourcesReady;
+
+for (const path of ["/", "/payment-acceptance-service", "/credit-card-services", "/help", "/privacy", "/terms"]) {
+  test(`small brand marks render without separate downloads on ${path}`, async ({ page }) => {
+    let releaseResources = () => {};
+    let resourcesReady = Promise.resolve();
+    await page.route("**/*", async route => {
+      const request = route.request();
+      // Simulate slow asset delivery and hydration. CSS can render the surrounding page normally.
+      if (new URL(request.url()).pathname.startsWith("/brand/") || request.resourceType() === "script") await resourcesReady;
+      await route.continue();
+    });
+    // Routing disables the HTTP cache, including on the second navigation.
+    for (const refresh of [false, true]) {
+      resourcesReady = new Promise<void>(resolve => { releaseResources = resolve; });
+      try {
+        if (refresh) await page.reload({ waitUntil: "commit" });
+        else await page.goto(path, { waitUntil: "commit" });
+        await expect(page.locator(".brand-logo")).toHaveCount(2);
+        const marks = page.locator(".brand-logo, .network-mark:not(.network-mark-discover), .ledgix-wallet-card-logo");
+        await expectDecodedBrandMarks(marks);
+        const headerLogo = page.getByRole("banner").getByRole("img", { name: "Etail Depot", exact: true });
+        await expect(headerLogo).toBeVisible();
+        const headerBox = await headerLogo.boundingBox();
+        expect(headerBox?.width).toBeGreaterThan(100);
+        expect(headerBox?.height).toBeGreaterThan(20);
+      } finally { releaseResources(); }
+      await page.waitForLoadState("load");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
+    }
+  });
+}
+
+test("home network logos load with page styles and eager Discover delivery on a cold refresh", async ({ page }) => {
+  let releaseResources = () => {};
+  let resourcesReady = Promise.resolve();
+  let discoverRequested = false;
+  await page.route("**/*", async route => {
+    const request = route.request();
+    if (new URL(request.url()).pathname === "/brand/networks/discover.jpg") discoverRequested = true;
+    if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
     await route.continue();
   });
-  // Routing disables the HTTP cache; each pass must discover the original assets anew.
-  for(const refresh of [false,true]){
-    requested=new Set<string>();
-    resourcesReady=new Promise<void>(resolve=>{releaseResources=resolve;});
-    try{
-      if(refresh)await page.reload({waitUntil:"commit"});
-      else await page.goto("/",{waitUntil:"commit"});
-      await expect.poll(()=>[...requested].sort(),{message:"All four homepage marks must be discovered without waiting for layout or hydration"}).toEqual(expected);
-    }finally{releaseResources();}
+  for (const refresh of [false, true]) {
+    discoverRequested = false;
+    resourcesReady = new Promise<void>(resolve => { releaseResources = resolve; });
+    try {
+      if (refresh) await page.reload({ waitUntil: "commit" });
+      else await page.goto("/", { waitUntil: "commit" });
+      await expect.poll(() => discoverRequested, { message: "The larger original Discover artwork must load without waiting for layout or hydration" }).toBe(true);
+    } finally { releaseResources(); }
     await page.waitForLoadState("load");
-    const logos=page.locator(".consumer-networks img");
+    const logos = page.locator(".consumer-networks .network-mark");
     await expect(logos).toHaveCount(4);
-    await expect.poll(()=>logos.evaluateAll(images=>images.every(image=>image instanceof HTMLImageElement&&image.complete&&image.naturalWidth>0))).toBe(true);
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
+    await expectDecodedBrandMarks(logos);
+    for (const network of ["Visa", "Mastercard", "American Express", "Discover"]) {
+      await expect(page.locator(".consumer-networks").getByRole("img", { name: network, exact: true })).toBeVisible();
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
   }
 });
 
@@ -111,7 +145,7 @@ test("public service discovery shows availability and support without local acco
     const footer=page.getByRole("contentinfo");
     const productPage=path==="/credit-card-services"||path==="/payment-acceptance-service";
     await expect(footer.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Payment acceptance",exact:true})).toHaveAttribute("href","/payment-acceptance-service");
-    await expect(footer.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Credit cards",exact:true})).toHaveAttribute("href","/credit-card-services");
+    await expect(footer.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Credit card",exact:true})).toHaveAttribute("href","/credit-card-services");
     await expect(footer.getByRole("navigation",{name:"Footer support"}).getByRole("link",{name:"Sign-in help",exact:true})).toHaveAttribute("href","/help#access");
     const contacts=footer.getByRole("navigation",{name:"Footer contact"});
     await expect(contacts.getByRole("link",{name:"Payment acceptance support",exact:true})).toHaveAttribute("href","mailto:trolleys@etaildepot.com");
@@ -146,7 +180,7 @@ test("public service discovery shows availability and support without local acco
       const signInQuestion=page.locator("summary").filter({hasText:"Where will I manage my services?"});
       await signInQuestion.click();
       await expect(signInQuestion.locator("..")).toHaveAttribute("open","");
-      await expect(signInQuestion.locator("..")).toContainText("Manage payments through Trolleys. Card account access will be available through Ledgix when the service launches. Each service has its own sign-in.");
+      await expect(signInQuestion.locator("..")).toContainText("Manage your payment acceptance account through Trolleys. Credit card account access will be available through Ledgix when the service launches, with a separate sign-in.");
     }else if(path==="/credit-card-services"){
       await expect(page.getByRole("banner").getByRole("link",{name:"Open Trolleys",exact:true})).toHaveAttribute("href","https://trolleys.ai");
       await expect(page.locator("main")).toContainText("Coming soon");
@@ -171,10 +205,10 @@ test("public service discovery shows availability and support without local acco
   const navigation=await openMainNavigation(page);
   await expect(navigation.getByRole("link",{name:"Payment acceptance",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator(".consumer-hero")).toContainText("Available now");
-  await navigation.getByRole("link",{name:"Credit cards",exact:true}).click();
+  await navigation.getByRole("link",{name:"Credit card",exact:true}).click();
   await expect(page).toHaveURL(/\/credit-card-services$/);
   await openMainNavigation(page);
-  await expect(page.getByRole("navigation",{name:"Main navigation"}).getByRole("link",{name:"Credit cards",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.getByRole("navigation",{name:"Main navigation"}).getByRole("link",{name:"Credit card",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator(".consumer-hero")).toContainText("Coming soon");
   await expect(page.locator(".consumer-product-note")).toHaveText("Applications are not open yet.");
   expect(changes).toEqual([]);expect(privateReads).toEqual([]);expect(errors).toEqual([]);

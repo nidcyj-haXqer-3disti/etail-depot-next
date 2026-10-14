@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
+import { serviceLabels } from "@/shared/service-language";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/payment-acceptance-service", label: "Payment acceptance" },
-  { href: "/credit-card-services", label: "Credit cards" },
+  { href: "/payment-acceptance-service", label: serviceLabels.payments },
+  { href: "/credit-card-services", label: serviceLabels.cards },
   { href: "/help", label: "Help" },
 ];
 
