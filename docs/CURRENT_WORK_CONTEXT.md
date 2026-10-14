@@ -5,31 +5,39 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 ## Current baseline
 
 - Public pages: Home, Payment acceptance, Credit card, Help, Privacy and Terms.
-- Published release: D208 / PR #38, 14 October 2026, 12:02 JST (03:02 UTC), including D202–D207 refinements.
-- Netlify deploy: `6acef0b08517b5679df9f98f`, confirmed current and ready. Netlify Emails remains enabled with unchanged saved settings and protected handler bytes.
-- Published source: `5140da42853f21a0b65ca727be866aa182b5c51c`, tree `6dba3385fe941552f452bc8c48f53ac3fdc10511`, identical to verified candidate `7090f4e23590cdf17292208766254a2f8260a6c2`.
-- Working branch: `codex/logo-rendering-d209`, based on the exact D208 GitHub merge; D209 logo-delivery and D210 terminology refinements are local and unpublished. D202 labels, D203 product URLs, D204 consistency edits, D205 artwork/copy refinements, D206 homepage-logo loading and D207 service wording are published.
+- Published release: D212 / PR #39, 14 October 2026, 13:32 JST (04:32 UTC), including D209 logo delivery and D210 service terminology.
+- Netlify deploy: `6acf05abfff229a0f4d81c85`, confirmed current and ready. Netlify Emails remains enabled with unchanged saved settings and protected handler bytes.
+- Published source: `f3f7ff9e237d5d3cd87dbe82ce16266df9067ea6`, tree `abeae200157127a45ac3a68a96c5b11fbac383ef`, identical to reviewed PR #39 candidate `10e3bf39ec903b8f7f49f03d739d74d51c2d8815`.
+- Working branch: `codex/alignment-refinement-d213`, based on the exact D212 GitHub merge. D202–D210 are published; D213 contact/company-panel alignment refinements remain local. Earlier feature/release branches and release-closeout documentation are preserved.
 - Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently. Payment acceptance help / Credit card help and the related support labels are consistent across pages. Original design, assets, offers and legal substance remain intact.
-- Verification: full local checks, both exact-source GitHub CI runs, isolated frozen-lockfile packaging and final hosted artifact/security checks pass. Live acceptance passes all 110 HTTP checks and 73 browser cases, including 24 accessibility cases, with one intentional desktop skip. Current status records actual results and diagnostics.
+- Verification: full local checks, both exact-source candidate CI runs, merged-main CI, isolated frozen-lockfile packaging and final hosted artifact/security checks pass. D212 live acceptance passes 105 HTTP requests and 85 browser cases, including 24 accessibility cases, with one intentional desktop skip. Eighteen responsive captures pass. Current status records actual results and diagnostics.
 - Website: https://etail-depot-next.netlify.app/. Local preview: http://127.0.0.1:3100/.
 - Homepage: **Get paid. Keep going.**
 - Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service` (D194 label; D203 URL).
 
-## D212 — authorized release in progress
+## D214 — authorized release in progress
 
-The user requests syncing and deploying the prepared candidate, with post-deployment fixes if needed. Remote main is identical to the local D208 base; no incoming conflicts exist. D211 checks and independent diff review pass for the unchanged application fingerprint. Follow current status for actual PR, CI, merge, deployment and hosted verification results. Preserve the enabled Emails extension and resource boundaries.
+The user requests pushing and deploying D213. The existing GitHub main and published Netlify source match the D212 base. Fresh full verification, reviewed exact-source release and post-deployment checks are in progress. Preserve Emails and resource boundaries; follow current status for actual outcomes.
+
+## D213 — local micro-level alignment refinement
+
+Help contact cards now align their headings, descriptions, emails and arrows and stack before tablet widths can split an address. Privacy/Terms company panels share aligned status/domain rows. All six pages are reviewed; Home and product artwork are unchanged. Local build, alignment, accessibility and focused navigation checks pass. No push or deployment; D212 remains live.
+
+## D212 — published and verified
+
+The authorized release is published through reviewed PR #39 and a successful manual Netlify Git build. Its merged tree matches the isolated candidate exactly; the local workspace is aligned to that merge. Emails remains enabled with unchanged settings and protected handler bytes. Live HTTP/browser acceptance and rendered review pass; no application defect or second publication was required. Follow current status for actual diagnostics and limits.
 
 ## D211 — prepared local candidate
 
-All six routes, 43 internal destinations, legal consistency and original artwork/logo delivery have been rechecked. Fresh full verification and packaging pass; see current status for evidence and the exact fingerprint. D209/D210 remain local and unpublished. The next release requires the reviewed GitHub/source and hosted acceptance workflow; no push or deployment occurred during preparation.
+All six routes, 43 internal destinations, legal consistency and original artwork/logo delivery have been rechecked. Fresh full verification and packaging pass; see current status for evidence and the exact fingerprint. D209/D210 were local during preparation and are now published in D212. No push or deployment occurred during D211 preparation itself.
 
 ## D210 — service terminology
 
-Use **Payment acceptance** and **Credit card** as the primary service labels across navigation, page labels, artwork, Help, legal notices and metadata. Refer to the product as **Ledgix credit card**; “virtual Visa secured credit card” describes its type, and digital-wallet wording describes compatibility. D210 supersedes the earlier Digital Wallet Card primary name without changing the offer, status, disclosures, logos or service URLs. Keep natural generic terms for actual payments, card networks, credit/debit cards, repayment and third-party wallet controls. All changes are local and unpublished.
+Use **Payment acceptance** and **Credit card** as the primary service labels across navigation, page labels, artwork, Help, legal notices and metadata. Refer to the product as **Ledgix credit card**; “virtual Visa secured credit card” describes its type, and digital-wallet wording describes compatibility. D210 supersedes the earlier Digital Wallet Card primary name without changing the offer, status, disclosures, logos or service URLs. Keep natural generic terms for actual payments, card networks, credit/debit cards, repayment and third-party wallet controls. These changes were verified locally and are now published in D212.
 
 ## D209 — local logo fix
 
-Check the repeated Home Visa/header-logo delay across all six pages. Small original brand marks now travel with cached foreground CSS rather than separate image requests; offers, layout and original asset files remain unchanged. Verification and prototype findings are recorded in current status. The live site remains D208 until a separate publication request.
+Check the repeated Home Visa/header-logo delay across all six pages. Small original brand marks now travel with cached foreground CSS rather than separate image requests; offers, layout and original asset files remain unchanged. Verification and prototype findings are recorded in current status. D212 publishes this fix after the subsequent explicit deployment request.
 
 ## Products
 

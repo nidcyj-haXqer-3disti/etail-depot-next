@@ -10,8 +10,10 @@
 }
 
 .help-support-card {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 3;
+  row-gap: 0;
   min-width: 0;
   padding: 24px;
   border: 1px solid var(--public-line);
@@ -28,7 +30,6 @@
 }
 
 .help-support-card p {
-  flex: 1;
   margin-top: 14px;
   color: var(--public-muted);
   font-size: 14px;
@@ -37,10 +38,11 @@
 
 .help-support-card a {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   min-height: 44px;
+  padding-block: 11px;
   margin-top: 12px;
   color: #245a4d;
   font-size: 14px;
@@ -52,7 +54,8 @@
 }
 
 .help-support-card a:hover { text-decoration-color: currentColor; }
-.help-support-card .icon { width: 18px; flex-shrink: 0; }
+.help-support-card a > span { flex: 1; min-width: 0; }
+.help-support-card .icon { width: 18px; height: 18px; margin-top: 1.5px; flex-shrink: 0; }
 
 .help-support-notes {
   margin-top: 24px;
@@ -98,7 +101,11 @@
   .help-support-card { padding: 20px; }
 }
 
-@media (max-width: 740px) {
+@media (max-width: 840px) {
   .help-support-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 28px; }
+  .help-support-card { grid-template-rows: auto auto auto; grid-row: auto; }
+}
+
+@media (max-width: 740px) {
   .public-help-intro .help-topic-links { justify-content: flex-start; gap: 8px 24px; }
 }
