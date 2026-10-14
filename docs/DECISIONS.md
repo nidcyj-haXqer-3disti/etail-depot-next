@@ -1,8 +1,18 @@
 # Decision register
 
+## D214 — publish the reviewed alignment refinement
+
+14 October 2026. The user explicitly requests push and deployment of D213. Follow the established feature-branch/review/check/merge and manual Netlify Git-build process on the bound repository/site. This supersedes D213 local-only scope for this candidate’s publication; preserve the current design, words, offers, original assets and enabled Emails integration. No unrelated remote resources or financial functions are authorized. Current status records actual checks, source/deploy identities and live acceptance.
+
+## D213 — refine existing contact and company-card alignment
+
+14 October 2026. The user identifies uneven Help email alignment and requests a micro-level check across all pages. Preserve the approved design, copy, product positioning, offers, original artwork and functional behavior. Correct demonstrable responsive alignment issues in Help and the shared legal company panels; leave well-resolved Home/product compositions intact. Verify rendered geometry, mobile readability, accessibility and navigation locally. No new push or deployment is requested. Current status records observations, narrow changes and actual checks.
+
 ## D212 — sync and deploy the verified website
 
 14 October 2026. The user authorizes synchronizing with GitHub, deploying the prepared D209–D211 website and fixing errors found in post-deployment verification. Use the existing feature-branch/review/check/merge and manual Netlify Git-build workflow. Preserve current offers, six routes, original artwork, the enabled protected Emails integration, indexing controls and all data/Identity/access/DNS/provider settings. This is publication authorization for the reviewed candidate, not permission to change unrelated resources or bypass failed checks. Record actual source, CI, deploy identity and live acceptance in current status.
+
+**Publication:** PR #39 passed both exact-source CI runs and independent review, then merged as `f3f7ff9e237d5d3cd87dbe82ce16266df9067ea6`. Manual Netlify deploy `6acf05abfff229a0f4d81c85` published at 13:32 JST on 14 October 2026 with Emails enabled and unchanged. Merged-main CI, 105 live HTTP checks and 85 browser cases pass, with one intentional skip. No application defect or second deployment was required; current status records actual diagnostics and limits.
 
 ## D211 — final local release preparation
 

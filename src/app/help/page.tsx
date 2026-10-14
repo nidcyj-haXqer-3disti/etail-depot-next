@@ -59,17 +59,17 @@ export default function HelpPage() {
         <article className="help-support-card">
           <h2>Payment acceptance support</h2>
           <p>For Trolleys account, payment, refund and dispute questions.</p>
-          <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}<Icon name="arrow" /></a>
+          <a href={hostedServices.payments.contactHref}><span>{hostedServices.payments.email}</span><Icon name="arrow" /></a>
         </article>
         <article className="help-support-card">
           <h2>Credit card inquiries</h2>
           <p>Ask about the {cardProduct.name}. Applications are not open yet.</p>
-          <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}<Icon name="arrow" /></a>
+          <a href={hostedServices.cards.contactHref}><span>{hostedServices.cards.email}</span><Icon name="arrow" /></a>
         </article>
         <article className="help-support-card">
           <h2>Sign-in help</h2>
           <p>Find sign-in and recovery guidance for your Trolleys account.</p>
-          <a href="#access">Get sign-in help<Icon name="arrow" /></a>
+          <a href="#access"><span>Get sign-in help</span><Icon name="arrow" /></a>
         </article>
       </section>
       <div className="help-support-notes">
