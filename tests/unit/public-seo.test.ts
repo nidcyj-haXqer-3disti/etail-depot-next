@@ -12,7 +12,7 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production", CONTEXT: "production",
   SITE_ID: targets.netlify.site_id, ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
-const publicPaths = ["/", "/card-services", "/payment-services", "/help"] as const;
+const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help"] as const;
 const rejectedEnvironments = [
   ["local development", { NODE_ENV: "development", APP_ENV: "local" }],
   ["local production build", { APP_ENV: "local" }],
@@ -90,11 +90,11 @@ describe("reviewed public metadata", () => {
       const metadata = publicPageMetadata(path);
       expect(JSON.stringify(metadata)).not.toMatch(/prepaid|Each service has its own sign-in/i);
       expect(metadata.title).toEqual({ absolute: `${PUBLIC_PAGES[path].title} | Etail Depot` });
-      if (path === "/" || path === "/card-services") {
+      if (path === "/" || path === "/credit-card-services") {
         expect(metadata.description).toContain("virtual Visa secured credit card");
         expect(metadata.description).toMatch(/upcoming|coming soon|forthcoming/i);
       }
-      if (path === "/card-services") expect(metadata.description).toContain("Applications are not open");
+      if (path === "/credit-card-services") expect(metadata.description).toContain("Applications are not open");
       expect(metadata.alternates).toEqual({ canonical: new URL(path, canonicalOrigin).href });
       expect(metadata.openGraph).toMatchObject({ url: publicPageUrl(path), siteName: "Etail Depot", type: "website", images: [publicSocialImage] });
       expect(metadata.twitter).toMatchObject({ card: "summary_large_image", images: [publicSocialImage] });
@@ -104,7 +104,7 @@ describe("reviewed public metadata", () => {
     expect(publicSocialImage).toMatchObject({ url: `${canonicalOrigin}/opengraph-image`, width: 1200, height: 630 });
   });
 
-  it.each(["/privacy", "/terms", "/login", "/services", "/security", "/operations", "/cardholder-services", "/merchants/person-id", "/pay/channel-id", "/api/v1/cardholder-services", "/help?case=private", "//another-site.test/", "/help/", "__proto__"])("refuses private or unreviewed path %s rather than creating search metadata", path => {
+  it.each(["/privacy", "/terms", "/login", "/services", "/security", "/operations", "/cardholder-services", "/card-services", "/payment-services", "/payment-acceptance", "/merchants/person-id", "/pay/channel-id", "/api/v1/cardholder-services", "/help?case=private", "//another-site.test/", "/help/", "__proto__"])("refuses private or unreviewed path %s rather than creating search metadata", path => {
     expect(() => publicPageUrl(path as PublicPath)).toThrow("Only reviewed public");
     expect(() => publicPageMetadata(path as PublicPath)).toThrow("Only reviewed public");
     expect(() => publicPageJsonLd(path as PublicPath)).toThrow("Only reviewed public");
@@ -149,7 +149,7 @@ describe("public structured data", () => {
   });
 
   it("provides two-level breadcrumbs for inner pages and no artificial home breadcrumb", () => {
-    const labels = { "/card-services": "Credit cards", "/payment-services": "Payment acceptance", "/help": "Help" } as const;
+    const labels = { "/credit-card-services": "Credit cards", "/payment-acceptance-service": "Payment acceptance", "/help": "Help" } as const;
     for (const path of Object.keys(labels) as (keyof typeof labels)[]) {
       const graph = JSON.parse(publicPageJsonLd(path))["@graph"];
       const breadcrumb = graph[3];

@@ -11,9 +11,9 @@ const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts
 
 export const PUBLIC_PAGES = {
   "/": { title: "Online Payment Acceptance & Credit Cards", description: `Explore Trolleys for online payment acceptance and Ledgix, a virtual ${cardProduct.creditType} coming soon. Find product details, pricing and support.` },
-  "/card-services": { title: "Ledgix Virtual Secured Credit Card — Coming Soon", description: `Meet Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
-  "/payment-services": { title: "Trolleys Payment Links & QR Codes", description: "Accept online card payments with Trolleys payment links and QR codes. See domestic payment pricing, optional Clarity and how to get started." },
-  "/help": { title: "Trolleys Support & Ledgix Card Inquiries", description: "Find Trolleys payment support, Ledgix card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
+  "/credit-card-services": { title: "Ledgix Virtual Secured Credit Card — Coming Soon", description: `Meet Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
+  "/payment-acceptance-service": { title: "Trolleys Payment Links & QR Codes", description: "Accept online card payments with Trolleys payment links and QR codes. See domestic payment pricing, optional Clarity and how to get started." },
+  "/help": { title: "Payment Acceptance & Credit Card Help", description: "Find Trolleys payment acceptance support, Ledgix credit card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
@@ -71,7 +71,7 @@ export function publicPageJsonLd(path: PublicPath): string {
   const organizationId = `${canonicalOrigin}/#organization`;
   const websiteId = `${canonicalOrigin}/#website`;
   const breadcrumbId = `${url}#breadcrumb`;
-  const breadcrumbLabels = { "/card-services": "Credit cards", "/payment-services": "Payment acceptance", "/help": "Help" } as const;
+  const breadcrumbLabels = { "/credit-card-services": "Credit cards", "/payment-acceptance-service": "Payment acceptance", "/help": "Help" } as const;
   const data = {
     "@context": "https://schema.org", "@graph": [
       {
@@ -79,7 +79,7 @@ export function publicPageJsonLd(path: PublicPath): string {
         url: `${canonicalOrigin}/`, logo: `${canonicalOrigin}/brand/logo.png`, email: legalIdentity.complianceEmail,
         brand: legalIdentity.brands.map(brand => ({ "@type": "Brand", name: brand.name })),
         contactPoint: legalIdentity.brands.map(brand => ({
-          "@type": "ContactPoint", name: brand.name, contactType: brand.service === "Cards" ? "Card inquiries" : "Payment support", email: brand.email,
+          "@type": "ContactPoint", name: brand.name, contactType: brand.name === "Ledgix" ? "Credit card inquiries" : "Payment acceptance support", email: brand.email,
         })),
       },
       {

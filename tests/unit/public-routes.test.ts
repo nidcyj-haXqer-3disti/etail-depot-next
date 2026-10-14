@@ -11,12 +11,78 @@ function context(response = new Response("public page"), changes: Partial<Public
   return { site: { id: PUBLIC_INDEXING_APPROVAL.siteId }, deploy: { context: "production" }, next: vi.fn(async () => response), ...changes };
 }
 const retiredDestinations = [
-  ["/login", "/help#access"], ["/cardholder-services/cards/old-id", "/card-services#main-content"],
-  ["/cards/old-id", "/card-services#main-content"], ["/merchant-services/terminals/old-id", "/payment-services#main-content"],
-  ["/merchants/old-id", "/payment-services#main-content"], ["/profile", "/help#access"], ["/security", "/help#access"],
+  ["/login", "/help#access"], ["/cardholder-services/cards/old-id", "/credit-card-services#main-content"],
+  ["/cards/old-id", "/credit-card-services#main-content"], ["/merchant-services/terminals/old-id", "/payment-acceptance-service#main-content"],
+  ["/merchants/old-id", "/payment-acceptance-service#main-content"], ["/profile", "/help#access"], ["/security", "/help#access"],
   ["/shared-access/old-id", "/help#access"], ["/invitations/old-id", "/help#access"], ["/money-accounts/old-id", "/#main-content"],
   ["/accounts/old-id", "/#main-content"], ["/services", "/#main-content"], ["/operations", "/help#main-content"],
 ] as const;
+
+const movedPublicPages = [
+  ["/card-services", "/credit-card-services"],
+  ["/payment-services", "/payment-acceptance-service"],
+] as const;
+const publicAliases = movedPublicPages.flatMap(([oldPath, destination]) =>
+  [oldPath, `${oldPath}/`, `${oldPath}.html`, `${oldPath}/index.html`].map(path => [path, destination] as const),
+);
+
+describe("renamed public product pages", () => {
+  it.each(publicAliases)("permanently redirects GET and HEAD %s to its exact new path", async (path, destination) => {
+    for (const method of ["GET", "HEAD"]) {
+      const next = context();
+      const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}?next=https://other.invalid&token=synthetic-test#fees`, { method }), next, production);
+      expect(response.status).toBe(308);
+      expect(response.headers.get("location")).toBe(`${canonicalOrigin}${destination}`);
+      // No replacement fragment: the browser can retain an existing public section bookmark.
+      expect(new URL(response.headers.get("location")!).hash).toBe("");
+      expect(response.headers.has("x-robots-tag")).toBe(false);
+      expect(response.headers.has("set-cookie")).toBe(false);
+      expect(await response.text()).toBe("");
+      expect(next.next).not.toHaveBeenCalled();
+      for (const [key, value] of Object.entries(publicSecurityHeaders)) expect(response.headers.get(key)).toBe(value);
+    }
+  });
+
+  it.each(publicAliases)("keeps %s redirects on the preview origin and out of search", async (path, destination) => {
+    const previewOrigin = "https://deploy-preview-203--etail-depot-next.netlify.app";
+    for (const method of ["GET", "HEAD"]) {
+      const next = context(undefined, { deploy: { context: "deploy-preview" } });
+      const response = await handlePublicRequest(new Request(`${previewOrigin}${path}?next=${canonicalOrigin}`, { method }), next, production);
+      expect(response.status).toBe(308);
+      expect(response.headers.get("location")).toBe(`${previewOrigin}${destination}`);
+      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(next.next).not.toHaveBeenCalled();
+    }
+  });
+
+  it.each(["POST", "PUT", "PATCH", "DELETE", "OPTIONS"])("rejects %s on every public alias without redirecting or reading the body", async method => {
+    for (const [path] of publicAliases) {
+      const next = context();
+      const request = new Request(`${canonicalOrigin}${path}?next=https://other.invalid`, { method, body: "synthetic-private-input" });
+      const response = await handlePublicRequest(request, next, production);
+      expect(response.status).toBe(405);
+      expect(response.headers.get("allow")).toBe("GET, HEAD");
+      expect(response.headers.has("location")).toBe(false);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+      expect(response.headers.has("set-cookie")).toBe(false);
+      expect(request.bodyUsed).toBe(false);
+      expect(next.next).not.toHaveBeenCalled();
+      for (const [key, value] of Object.entries(publicSecurityHeaders)) expect(response.headers.get(key)).toBe(value);
+    }
+  });
+
+  it.each(movedPublicPages)("does not redirect children or lookalikes of %s", async oldPath => {
+    for (const path of [`${oldPath}/missing`, `${oldPath}/index.html/extra`, `${oldPath}//`, `${oldPath}.txt`, `${oldPath}.html/`, `${oldPath}-other`, `${oldPath}%2Findex.html`, oldPath.replace("services", "%73ervices")]) {
+      const next = context(new Response("Not found", { status: 404 }));
+      const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), next, production);
+      expect(response.status).toBe(404);
+      expect(response.headers.has("location")).toBe(false);
+      expect(next.next).toHaveBeenCalledTimes(1);
+    }
+  });
+});
 
 describe("retired application boundary", () => {
   it.each(retiredDestinations)("redirects GET and HEAD %s without forwarding input", async (path, destination) => {
@@ -57,7 +123,7 @@ describe("retired application boundary", () => {
       expect(request.bodyUsed).toBe(false);
     }
   });
-  it.each(["/", "/card-services", "/payment-services", "/help", "/privacy", "/terms", "/apiary", "/constructor", "/__proto__"])("does not capture public or unrelated route %s", path => {
+  it.each(["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/apiary", "/constructor", "/__proto__"])("does not capture public or unrelated route %s", path => {
     expect(retiredRoute(path)).toBeNull();
   });
 });
@@ -68,7 +134,7 @@ describe("public Edge search and security policy", () => {
   });
   it("keeps the public response and security headers on the approved production site", async () => {
     const next = context(new Response("unchanged public HTML", { headers: { "Content-Type": "text/html", ETag: '"public"' } }));
-    const response = await handlePublicRequest(new Request(`${canonicalOrigin}/payment-services`), next, production);
+    const response = await handlePublicRequest(new Request(`${canonicalOrigin}/payment-acceptance-service`), next, production);
     expect(await response.text()).toBe("unchanged public HTML");
     expect(next.next).toHaveBeenCalledTimes(1);
     expect(response.headers.get("etag")).toBe('"public"');
@@ -95,7 +161,7 @@ describe("public Edge search and security policy", () => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });
-  it.each(["/privacy.txt", "/terms.txt", "/index.txt", "/payment-services.txt"])("does not index the raw navigation payload %s", async path => {
+  it.each(["/privacy.txt", "/terms.txt", "/index.txt", "/payment-acceptance-service.txt"])("does not index the raw navigation payload %s", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });

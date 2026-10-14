@@ -60,7 +60,7 @@ async function expectMatchingRecognition(art: Locator, example: (typeof examples
 test("sharing and purchase recognition preserve one purchase without enrollment", async ({ page }) => {
   test.setTimeout(60_000);
   const observed = await blockAccountActions(page);
-  await page.goto("/payment-services");
+  await page.goto("/payment-acceptance-service");
   const initialStorage = await browserStorage(page);
   const experience = page.locator(".payment-experience");
   const types = page.getByRole("tablist", { name: "What you sell", exact: true });
@@ -140,7 +140,7 @@ test("sharing and purchase recognition preserve one purchase without enrollment"
 
 test("optional fee selection changes only the estimate and never enrolls a payment", async ({ page }) => {
   const observed = await blockAccountActions(page);
-  await page.goto("/payment-services");
+  await page.goto("/payment-acceptance-service");
   const initialStorage = await browserStorage(page);
   const experience = page.locator(".payment-experience");
   const types = page.getByRole("tablist", { name: "What you sell", exact: true });
@@ -186,7 +186,7 @@ test("optional fee selection changes only the estimate and never enrolls a payme
 test("mobile sharing stays visible and its selected channel and recognition views fit a 320px screen", async ({ page }) => {
   const observed = await blockAccountActions(page);
   await page.setViewportSize({ width: 320, height: 900 });
-  await page.goto("/payment-services");
+  await page.goto("/payment-acceptance-service");
   const experience = page.locator(".payment-experience");
   const types = page.getByRole("tablist", { name: "What you sell", exact: true });
   const showcase = page.locator(".channel-showcase");
@@ -233,7 +233,7 @@ test("mobile sharing stays visible and its selected channel and recognition view
 
 test("sale, delivery and purchase details support keyboard navigation without account effects", async ({ page }) => {
   const observed = await blockAccountActions(page);
-  await page.goto("/payment-services");
+  await page.goto("/payment-acceptance-service");
   const initialStorage = await browserStorage(page);
   const experience = page.locator(".payment-experience");
   const types = page.getByRole("tablist", { name: "What you sell", exact: true });
@@ -309,7 +309,7 @@ test("both payment steps stay readable when descriptions wrap or text spacing gr
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of [320, 390, 640, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto("/payment-services");
+    await page.goto("/payment-acceptance-service");
     const hero = page.getByRole("figure", { name: "Illustrated payment journey", exact: true });
     for (const spaced of [false, true]) {
       if (spaced) await page.addStyleTag({ content: "body *{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}body p{margin-bottom:2em!important}" });

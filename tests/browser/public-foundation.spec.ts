@@ -42,7 +42,7 @@ async function openWalletSetup(page: Page) {
 test("the shared company header stays consistent and its compact menu works with keyboard, pointer and resizing", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
-  const routes = ["/", "/payment-services", "/card-services", "/help", "/privacy", "/terms", "/missing-header-review-page"];
+  const routes = ["/", "/payment-acceptance-service", "/credit-card-services", "/help", "/privacy", "/terms", "/missing-header-review-page"];
   for (const route of routes) {
     await page.goto(route);
     const header = page.getByRole("banner");
@@ -54,11 +54,11 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
     await expect(navigation.getByRole("link")).toHaveText(["Payment acceptance", "Credit cards", "Help"]);
-    for (const [index, destination] of ["/payment-services", "/card-services", "/help"].entries()) {
+    for (const [index, destination] of ["/payment-acceptance-service", "/credit-card-services", "/help"].entries()) {
       await expect(navigation.getByRole("link").nth(index)).toHaveAttribute("href", destination);
     }
     const current = navigation.locator('[aria-current="page"]');
-    if (["/payment-services", "/card-services", "/help"].includes(route)) await expect(current).toHaveAttribute("href", route);
+    if (["/payment-acceptance-service", "/credit-card-services", "/help"].includes(route)) await expect(current).toHaveAttribute("href", route);
     else await expect(current).toHaveCount(0);
     const action = header.getByRole("link", { name: "Open Trolleys", exact: true });
     await expect(action).toBeVisible();
@@ -108,7 +108,7 @@ test("the shared company header stays consistent and its compact menu works with
 
   await menu.click();
   await navigation.getByRole("link", { name: "Payment acceptance", exact: true }).click();
-  await expect(page).toHaveURL(/\/payment-services$/);
+  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   await expect(menu).toHaveAttribute("aria-expanded", "false");
   await expect(navigation).toBeHidden();
   await expect(header.getByRole("link", { name: "Etail Depot home", exact: true }).getByRole("img", { name: "Etail Depot", exact: true })).toBeVisible();
@@ -173,11 +173,11 @@ test("legal documents are reachable without sign-in and retain their search visi
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etail-depot-next.netlify.app${path}`);
     await expect(page.locator('form, script[type="application/ld+json"]')).toHaveCount(0);
     expect(await page.locator("main").innerText()).not.toMatch(/\b(draft|demo|sandbox|simulated|fictional)\b|not yet taken effect/i);
-    await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("Ledgix card service");
+    await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("Ledgix credit card service");
     if (path === "/privacy") {
       await expect(page.getByRole("region",{name:"Your choices and privacy requests",exact:true})).toContainText("this website, Ledgix or Trolleys");
     } else {
-      await expect(page.getByRole("region",{name:"Trolleys · Payments",exact:true})).toContainText("do not create a payment request or record a transaction");
+      await expect(page.getByRole("region",{name:"Trolleys · Payment acceptance",exact:true})).toContainText("do not create a payment request or record a transaction");
     }
     const cards = page.locator(".legal-brand").filter({ hasText: "Etail Depot US, Inc. DBA Ledgix" });
     await expect(cards).toContainText("ledgix.com · Coming soon");
@@ -224,7 +224,7 @@ test("a new visitor can compare available payments and upcoming cards without a 
   await expectLoadedNetworkMarks(page.getByLabel("Accepted card networks", {exact:true}));
   const mainNavigation = await openMainNavigation(page);
   await mainNavigation.getByRole("link", {name:"Credit cards",exact:true}).click();
-  await expect(page).toHaveURL(/\/card-services$/);
+  await expect(page).toHaveURL(/\/credit-card-services$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Secured credit\.\s*Made for your wallet\.$/);
   await openMainNavigation(page);
   await expect(mainNavigation.getByRole("link",{name:"Credit cards",exact:true})).toHaveAttribute("aria-current","page");
@@ -234,7 +234,7 @@ test("a new visitor can compare available payments and upcoming cards without a 
     await expect(contact).toHaveAttribute("href", "mailto:ledgix@etaildepot.com");
   }
   await mainNavigation.getByRole("link",{name:"Payment acceptance",exact:true}).click();
-  await expect(page).toHaveURL(/\/payment-services$/);
+  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Create\. Share\.\s*Get paid\.$/);
   await openMainNavigation(page);
   await expect(mainNavigation.getByRole("link",{name:"Payment acceptance",exact:true})).toHaveAttribute("aria-current","page");
@@ -249,8 +249,8 @@ test("a new visitor can compare available payments and upcoming cards without a 
 test("help topics and answers work with a keyboard without sign-in", async ({page}) => {
   await page.goto("/help");
   const support=page.getByRole("region",{name:"Support contacts",exact:true});
-  await expect(support.getByRole("heading",{level:2})).toHaveText(["Payment support","Card inquiries","Sign-in help"]);
-  for (const [heading,email] of [["Payment support","trolleys@etaildepot.com"],["Card inquiries","ledgix@etaildepot.com"]]) {
+  await expect(support.getByRole("heading",{level:2})).toHaveText(["Payment acceptance support","Credit card inquiries","Sign-in help"]);
+  for (const [heading,email] of [["Payment acceptance support","trolleys@etaildepot.com"],["Credit card inquiries","ledgix@etaildepot.com"]]) {
     const contact=support.getByRole("article").filter({has:page.getByRole("heading",{name:heading,exact:true})});
     await expect(contact.getByRole("link",{name:email,exact:true})).toBeVisible();
     await expect(contact.getByRole("link",{name:email,exact:true})).toHaveAttribute("href",`mailto:${email}`);
@@ -263,7 +263,7 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
   await expect(page.locator(".help-support-notes").getByRole("link",{name:"compliance@etaildepot.com",exact:true})).toHaveAttribute("href","mailto:compliance@etaildepot.com");
   expect(await support.evaluate(element=>(element.compareDocumentPosition(document.querySelector(".public-questions")!)&Node.DOCUMENT_POSITION_FOLLOWING)!==0)).toBe(true);
   await expect(page.locator("details[open]")).toHaveCount(0);
-  await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Ledgix cards"}).click();
+  await page.getByRole("navigation",{name:"Help topics"}).getByRole("link",{name:"Ledgix secured credit card"}).click();
   await expect(page).toHaveURL(/\/help#cards$/);
   const question=page.locator("summary").filter({hasText:"Can I apply for a card now?"});
   await question.focus();await page.keyboard.press("Enter");
@@ -284,7 +284,7 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
 
 test("public pages have unique canonical metadata and no private data", async ({page,request}) => {
   const titles=new Set<string>();
-  for (const route of ["/","/card-services","/payment-services","/help"]) {
+  for (const route of ["/","/credit-card-services","/payment-acceptance-service","/help"]) {
     await page.goto(route);
     titles.add(await page.title());
     const canonical = page.locator('link[rel="canonical"]');
@@ -298,7 +298,7 @@ test("public pages have unique canonical metadata and no private data", async ({
     const editorialText = (await page.locator("main").textContent()) ?? "";
     // Marketing describes the hosted services, never the local prototype's balances or controls.
     expect(editorialText).not.toMatch(/Visa prepaid card|prepaid Visa card/i);
-    if (route === "/" || route === "/card-services" || route === "/help") {
+    if (route === "/" || route === "/credit-card-services" || route === "/help") {
       expect(editorialText).toContain("Visa secured credit card");
     }
     expect(editorialText).not.toMatch(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice|fixture/i);
@@ -345,7 +345,7 @@ test("all six payment channels share one request and work by keyboard without pr
       await route.continue();
     }
   });
-  await page.goto("/payment-services?handoff_probe=public-channel-check");
+  await page.goto("/payment-acceptance-service?handoff_probe=public-channel-check");
   const figure = page.getByRole("figure", {name:"Illustrated payment journey", exact:true});
   const showcase = figure.locator(".channel-showcase");
   const tablist = showcase.getByRole("tablist", {name:"Ways to share a payment request", exact:true});
@@ -435,7 +435,7 @@ test("all six payment channels share one request and work by keyboard without pr
 test("payment channels keep their content and touch targets inside a 320px screen", async ({page}) => {
   await page.setViewportSize({width:320,height:900});
   const mutations = await preventMutationRequests(page);
-  await page.goto("/payment-services");
+  await page.goto("/payment-acceptance-service");
   const figure = page.getByRole("figure", {name:"Illustrated payment journey", exact:true});
   const showcase = figure.locator(".channel-showcase");
   await expect(showcase.locator(".marketing-channel-journey")).toBeVisible();
@@ -475,7 +475,7 @@ test("payment examples connect each business request to the same checkout amount
   await page.setViewportSize({width:320,height:900});
   await page.goto("/");
   await page.locator(".consumer-hero-actions").getByRole("link",{name:"Explore payment acceptance",exact:true}).click();
-  await expect(page).toHaveURL(/\/payment-services$/);
+  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   const art = page.getByRole("figure",{name:"Illustrated payment journey",exact:true});
   const tablist = art.getByRole("tablist",{name:"What you sell",exact:true});
   await expect(tablist).toHaveCount(1);
@@ -514,7 +514,7 @@ test("payment examples connect each business request to the same checkout amount
   await tablist.getByRole("tab",{name:"Services",exact:true}).click(); await expectExample(1);
   await page.keyboard.press("Tab");
   await expect(art.getByRole("tabpanel",{name:"Services",exact:true})).toBeFocused();
-  await expect(page).toHaveURL(/\/payment-services$/);
+  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   expect(mutations).toEqual([]);
   expect(privateReads).toEqual([]);
 });
@@ -537,7 +537,7 @@ test("the wallet setup guide explains both platforms without opening wallets or 
     } else await route.continue();
   });
 
-  for (const path of ["/card-services"]) {
+  for (const path of ["/credit-card-services"]) {
     await page.goto(path);
     await openWalletSetup(page);
     const guide = page.locator(".wallet-card-art");
@@ -646,7 +646,7 @@ test("a wallet preview opened before hydration keeps the visitor's choice", asyn
   });
   try {
     // Commit avoids waiting for deferred scripts: only native HTML behavior is available here.
-    await page.goto("/card-services", { waitUntil: "commit" });
+    await page.goto("/credit-card-services", { waitUntil: "commit" });
     await requestedScript;
     const disclosure = page.locator(".wallet-guide-disclosure");
     const summary = disclosure.locator("summary");
@@ -682,7 +682,7 @@ test("a wallet preview opened before hydration keeps the visitor's choice", asyn
 });
 
 test("switching wallets never shows the previous payment mark while the new logo loads", async ({page}) => {
-  for (const path of ["/card-services"]) {
+  for (const path of ["/credit-card-services"]) {
     let releaseLogo!: () => void;
     let requestedLogo!: () => void;
     const heldLogo = new Promise<void>(resolve => { releaseLogo = resolve; });

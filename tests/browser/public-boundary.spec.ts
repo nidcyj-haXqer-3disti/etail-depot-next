@@ -1,7 +1,43 @@
 import { expect, test } from "@playwright/test";
 
+test("renamed product bookmarks retain their section and reject submitted data", async ({ page, request, baseURL }) => {
+  const origin = new URL(baseURL!).origin;
+  const destinations = [
+    ["/card-services", "/credit-card-services", "#wallets"],
+    ["/payment-services", "/payment-acceptance-service", "#fees"],
+  ];
+  for (const [oldPath, destination, section] of destinations) {
+    for (const suffix of ["", "/", ".html", "/index.html"]) {
+      for (const method of ["GET", "HEAD"]) {
+        const response = await request.fetch(`${oldPath}${suffix}?next=https://other.invalid&token=synthetic-test`, { method, maxRedirects: 0 });
+        expect(response.status()).toBe(308);
+        expect(response.headers().location).toBe(`${origin}${destination}`);
+        expect(response.headers()["set-cookie"]).toBeUndefined();
+      }
+    }
+    for (const method of ["POST", "PUT", "PATCH", "DELETE", "OPTIONS"]) {
+      const response = await request.fetch(`${oldPath}?next=https://other.invalid`, { method, data: "synthetic-private-input", maxRedirects: 0 });
+      expect(response.status()).toBe(405);
+      expect(response.headers().allow).toBe("GET, HEAD");
+      expect(response.headers().location).toBeUndefined();
+      expect(response.headers()["cache-control"]).toBe("no-store");
+      expect(response.headers()["x-robots-tag"]).toBe("noindex, nofollow");
+    }
+    const unrelated = await request.get(`${oldPath}/unrelated`, { maxRedirects: 0 });
+    expect(unrelated.status()).toBe(404);
+    expect(unrelated.headers().location).toBeUndefined();
+
+    const pageResponse = await page.goto(`${oldPath}?next=https://other.invalid&token=synthetic-test${section}`);
+    expect(pageResponse!.status()).toBe(200);
+    await expect(page).toHaveURL(`${origin}${destination}${section}`);
+    await expect(page.locator(section)).toBeVisible();
+    expect(await page.evaluate(() => location.search)).toBe("");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etail-depot-next.netlify.app${destination}`);
+  }
+});
+
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
-  const pages = ["/", "/card-services", "/payment-services", "/help", "/privacy", "/terms"];
+  const pages = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms"];
   const privateRequests: string[] = [], errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });
@@ -11,7 +47,7 @@ test("public pages and every internal link resolve without account APIs or cooki
     expect(response!.status()).toBe(200);
     expect(response!.headers()["set-cookie"]).toBeUndefined();
     await expect(page.locator("form,iframe")).toHaveCount(0);
-    if (path === "/payment-services") {
+    if (path === "/payment-acceptance-service") {
       // Local estimate controls never submit, enroll in Dispute readiness or create an account.
       await expect(page.locator("input")).toHaveCount(2);
       await expect(page.locator('.fee-estimate input#payment-amount[type="text"]')).toHaveCount(1);
@@ -41,7 +77,7 @@ test("public pages and every internal link resolve without account APIs or cooki
 });
 
 test("old account bookmarks are local redirects and old financial endpoints are gone", async ({ request, page }) => {
-  for (const [path, destination] of [["/login", "/help#access"], ["/services", "/"], ["/cardholder-services/cards/example", "/card-services"], ["/merchant-services/terminals/example", "/payment-services"]]) {
+  for (const [path, destination] of [["/login", "/help#access"], ["/services", "/"], ["/cardholder-services/cards/example", "/credit-card-services"], ["/merchant-services/terminals/example", "/payment-acceptance-service"]]) {
     const response = await request.get(`${path}?next=https://other.invalid&token=synthetic-test`, { maxRedirects: 0 });
     expect(response.status()).toBe(307);
     const location = new URL(response.headers().location, "http://127.0.0.1:3100");
@@ -57,7 +93,7 @@ test("old account bookmarks are local redirects and old financial endpoints are 
     }
   }
   await page.goto("/cardholder-services?next=private#synthetic-token");
-  await expect(page).toHaveURL(/\/card-services#main-content$/);
+  await expect(page).toHaveURL(/\/credit-card-services#main-content$/);
   expect(await page.evaluate(() => location.hash)).toBe("#main-content");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   expect((await page.goto("/this-page-does-not-exist"))!.status()).toBe(404);

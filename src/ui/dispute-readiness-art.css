@@ -58,6 +58,7 @@
 .recognition-phone-amount i { display: block; width: 5px; height: 5px; border-radius: 50%; background: #567451; }
 .recognition-transaction { display: grid; gap: 10px; margin: 0; padding: 14px 0; border-top: 1px solid #e3e9e3; color: #2d453a; }
 .recognition-transaction > div, .recognition-details > div { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); align-items: baseline; gap: 12px; }
+.recognition-transaction > div { grid-template-columns: max-content minmax(0,1fr); }
 .recognition-transaction dt, .recognition-details dt { color: #66736b; font-size: 11px; line-height: 1.6; }
 .recognition-transaction dd, .recognition-details dd { margin: 0; font-size: 11px; line-height: 1.6; text-align: right; overflow-wrap: anywhere; }
 .recognition-receipt { margin-top: 10px; border: 1px solid #d9e2d6; border-radius: 9px; background: #f6f8f2; }
@@ -167,7 +168,7 @@
   .recognition-transaction > div, .recognition-details > div { gap: 8px; }
   .recognition-bank-chrome { padding: 12px 14px; }
   .recognition-bank article { padding: 16px 14px; }
-  .recognition-bank-payment { flex-wrap: wrap; }
+  .recognition-bank-payment { display: grid; grid-template-columns: minmax(0,1fr) auto; }
   .recognition-bank-payment .dispute-charge { margin-left: auto; }
   .recognition-response { padding: 12px; }
   .recognition-inquiry { padding: 11px 10px; gap: 8px; }

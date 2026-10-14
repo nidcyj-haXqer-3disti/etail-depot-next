@@ -3,17 +3,17 @@ import {expect,test} from "@playwright/test";
 import {openMainNavigation} from "./public-header";
 
 for (const width of [1440,390,320]) {
-  for(const route of ["/","/card-services","/payment-services","/help","/privacy","/terms"]) {
+  for(const route of ["/","/credit-card-services","/payment-acceptance-service","/help","/privacy","/terms"]) {
     test(`consumer ${route} is readable and accessible at ${width}px`,async({page})=>{
       await page.setViewportSize({width,height:900});
       await page.goto(route);await page.evaluate(()=>document.fonts.ready);
       const question=page.locator("summary:visible:not(.wallet-guide-disclosure > summary):not(.recognition-receipt > summary)").first();
       if(await question.count())await question.click();
-      if(route==="/card-services"){
+      if(route==="/credit-card-services"){
         if(width<851)await page.locator(".wallet-guide-disclosure summary").click();
         await expect(page.locator(".wallet-card-art")).toBeVisible();
       }
-      if(route==="/payment-services"){
+      if(route==="/payment-acceptance-service"){
         await expect(page.locator(".marketing-channel-journey")).toBeVisible();
       }
       const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
@@ -40,7 +40,7 @@ for(const width of [1440,320]){
   ]){
     test(`${saleType} sharing and purchase recognition remain accessible at ${width}px`,async({page})=>{
       await page.setViewportSize({width,height:900});
-      await page.goto("/payment-services");
+      await page.goto("/payment-acceptance-service");
       await page.evaluate(()=>document.fonts.ready);
       const type=page.getByRole("tablist",{name:"What you sell",exact:true}).getByRole("tab",{name:saleType,exact:true});
       await type.click();

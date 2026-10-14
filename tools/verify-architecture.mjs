@@ -14,7 +14,7 @@ import { verifyPlatformEmail, verifyPlatformEmailBundle } from "./netlify-email-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relative = filename => path.relative(root, filename).split(path.sep).join("/");
 const failures = [];
-const publicPages = ["page.tsx", "card-services/page.tsx", "payment-services/page.tsx", "help/page.tsx", "privacy/page.tsx", "terms/page.tsx"];
+const publicPages = ["page.tsx", "credit-card-services/page.tsx", "payment-acceptance-service/page.tsx", "help/page.tsx", "privacy/page.tsx", "terms/page.tsx"];
 const infrastructure = new Set(["layout.tsx", "not-found.tsx", "error.tsx", "global-error.tsx", "robots.ts", "sitemap.ts", "opengraph-image.tsx"]);
 const publicPackages = new Set(["next", "react", "react-dom"]);
 function fail(filename, code) { failures.push(`${filename}: ${code}`); }
@@ -114,7 +114,7 @@ if (process.argv.includes("--artifacts")) {
   const appManifest = path.join(nextRoot, "server/app-paths-manifest.json");
   if (!existsSync(appManifest)) throw new Error("Build the public static website before checking deployment artifacts.");
   const routes = Object.keys(JSON.parse(readFileSync(appManifest, "utf8")));
-  const expected = new Set(["/page", "/card-services/page", "/payment-services/page", "/help/page", "/privacy/page", "/terms/page", "/robots.txt/route", "/sitemap.xml/route", "/opengraph-image/route", "/_not-found/page", "/_global-error/page"]);
+  const expected = new Set(["/page", "/credit-card-services/page", "/payment-acceptance-service/page", "/help/page", "/privacy/page", "/terms/page", "/robots.txt/route", "/sitemap.xml/route", "/opengraph-image/route", "/_not-found/page", "/_global-error/page"]);
   for (const route of routes) if (!expected.has(route)) fail(".next/server/app-paths-manifest.json", `UNEXPECTED_BUILT_ROUTE ${route}`);
   for (const page of publicPages) {
     const route = `/${page.replace(/\.tsx$/, "")}`;
@@ -144,7 +144,7 @@ if (process.argv.includes("--artifacts")) {
     const base = path.join(root, directory);
     for (const filename of files(base)) if (forbiddenStatic(path.relative(base, filename))) fail(relative(filename), "PRIVATE_OR_ARCHIVED_STATIC_FILE");
   }
-  const publicHtml = ["index.html", "card-services.html", "payment-services.html", "help.html", "privacy.html", "terms.html"];
+  const publicHtml = ["index.html", "credit-card-services.html", "payment-acceptance-service.html", "help.html", "privacy.html", "terms.html"];
   const allowedHtml = new Set([...publicHtml, "404.html", "_not-found.html", "_global-error.html"]);
   for (const name of staticNames.filter(filename => filename.endsWith(".html"))) if (!allowedHtml.has(name)) fail(name, "UNEXPECTED_STATIC_PAGE");
   for (const name of [...publicHtml, "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {

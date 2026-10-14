@@ -12,9 +12,9 @@ import { productFacts } from "@/shared/product-facts";
 import "@/ui/public-site.css";
 import "@/ui/payment-page.css";
 
-export const metadata = publicPageMetadata("/payment-services");
+export const metadata = publicPageMetadata("/payment-acceptance-service");
 export default function PaymentServicesPage() {
-  return <Shell><PublicPageStructuredData path="/payment-services" /><div className="consumer-page consumer-product consumer-payments">
+  return <Shell><PublicPageStructuredData path="/payment-acceptance-service" /><div className="consumer-page consumer-product consumer-payments">
     <PaymentExampleProvider>
     <ConsumerHero product service="payments" title={<>Create. Share.<br /><span>Get paid.</span></>}
       description="Sell goods, services or information. Create a payment request, then share it wherever your customers are."
@@ -25,7 +25,7 @@ export default function PaymentServicesPage() {
     <PaymentExperience />
     </PaymentExampleProvider>
     <section className="public-section page-container public-faq-section" aria-labelledby="payment-questions-title">
-      <div><p className="eyebrow">Before you start</p><h2 id="payment-questions-title">Good to know.</h2><Link href="/help#payments" className="consumer-text-link">Payment help<Icon name="arrow" /></Link></div>
+      <div><p className="eyebrow">Before you start</p><h2 id="payment-questions-title">Good to know.</h2><Link href="/help#payments" className="consumer-text-link">Payment acceptance help<Icon name="arrow" /></Link></div>
       <div className="public-questions">
         <details><summary>How do I get started?<span aria-hidden="true">+</span></summary><p>Apply with Trolleys. Once approved and set up, create payment requests and manage payments from your account.</p></details>
         <details id="payouts"><summary>When will I receive my money?<span aria-hidden="true">+</span></summary><p>Payment confirmation, available funds and bank arrival are separate steps. Your account’s payout schedule applies; fees, refunds, disputes and holds affect the amount available. First payouts, reviews, reserves and bank holidays can affect timing.</p></details>

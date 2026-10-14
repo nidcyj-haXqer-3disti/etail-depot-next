@@ -13,10 +13,10 @@ import { ConsumerHero } from "@/ui/consumer-layout";
 import "@/ui/public-site.css";
 import "@/ui/card-services.css";
 
-export const metadata = publicPageMetadata("/card-services");
+export const metadata = publicPageMetadata("/credit-card-services");
 export default function CardServicesPage() {
-  return <Shell><PublicPageStructuredData path="/card-services" /><div className="consumer-page consumer-product consumer-cards">
-    <ConsumerHero product service="cards" productLabel={`Ledgix · ${cardProduct.name}`} title={<>Secured credit. <br /><span>Made for your wallet.</span></>}
+  return <Shell><PublicPageStructuredData path="/credit-card-services" /><div className="consumer-page consumer-product consumer-cards">
+    <ConsumerHero product service="cards" productLabel="Ledgix · Secured credit card" title={<>Secured credit. <br /><span>Made for your wallet.</span></>}
       description={<>A virtual {cardProduct.creditType} for Apple&nbsp;Wallet and Google&nbsp;Wallet. Keep your card on your phone and pay in stores, in apps and online where supported.</>}
       actions={<><CardContactLink /><a href="#card-details" className="consumer-text-link">View card details<Icon name="arrow" /></a></>}
       note={<div className="consumer-product-note">Applications are not open yet.</div>}
@@ -40,7 +40,7 @@ export default function CardServicesPage() {
       <WalletGuide><WalletCardArt /></WalletGuide>
     </div></section>
     <section className="page-container public-section public-faq-section" aria-labelledby="card-questions-title">
-      <div><p className="eyebrow">Before launch</p><h2 id="card-questions-title">Card questions.</h2><Link href="/help#cards" className="consumer-text-link">Card help<Icon name="arrow" /></Link></div>
+      <div><p className="eyebrow">Before launch</p><h2 id="card-questions-title">Credit card questions.</h2><Link href="/help#cards" className="consumer-text-link">Credit card help<Icon name="arrow" /></Link></div>
       <div className="public-questions">
         <details><summary>Can I apply for the Ledgix Digital Wallet Card now?<span aria-hidden="true">+</span></summary><p>Applications are not open yet. Contact Ledgix with questions about the card. An inquiry does not submit an application or subscribe you to launch updates.</p></details>
         <details><summary>How does the security deposit work?<span aria-hidden="true">+</span></summary><p>The minimum security deposit is ${productFacts.cards.minimumDepositDollars}. It backs your credit account; it does not pay for purchases. The card agreement will explain credit limits and when and under what conditions your deposit can be returned. These terms will be provided before applications open.</p></details>

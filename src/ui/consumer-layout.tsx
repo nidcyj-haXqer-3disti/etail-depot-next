@@ -10,7 +10,7 @@ export function ConsumerHero({service,title,description,actions,visual,note,foot
   return <section className={`consumer-hero${product ? " consumer-product-hero" : ""}`} aria-labelledby="welcome-title">
     <div className="page-container consumer-hero-grid">
       <div className="consumer-hero-copy">
-        <div className="consumer-product-eyebrow"><p className="eyebrow">{productLabel ?? (service === "cards" ? "Ledgix · Digital Wallet Card" : "Trolleys · Payment acceptance")}</p><ServiceStatus service={service}/></div>
+        <div className="consumer-product-eyebrow"><p className="eyebrow">{productLabel ?? (service === "cards" ? "Ledgix · Secured credit card" : "Trolleys · Payment acceptance")}</p><ServiceStatus service={service}/></div>
         <h1 id="welcome-title">{title}</h1>
         <p>{description}</p>
         {actions && <div className="consumer-hero-actions">{actions}</div>}
@@ -25,6 +25,6 @@ export function ConsumerHero({service,title,description,actions,visual,note,foot
 export function ConsumerNetworks() {
   return <div className="consumer-networks">
     <p>Accept major credit and debit cards.</p>
-    <NetworkBrands variant="accepted" label="Accepted card networks" />
+    <NetworkBrands variant="accepted" label="Accepted card networks" loading="eager" />
   </div>;
 }

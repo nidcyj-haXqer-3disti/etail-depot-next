@@ -18,7 +18,7 @@ assert.equal(targets.netlify.canonical_origin, "https://etail-depot-next.netlify
 assert.equal(targets.release.real_money_allowed, false);
 
 const canonicalOrigin = targets.netlify.canonical_origin;
-const publicPaths = ["/", "/card-services", "/payment-services", "/help"];
+const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help"];
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -72,9 +72,10 @@ async function requireFreePort() {
     probe.listen(port, "127.0.0.1", () => probe.close(error => error ? reject(error) : resolve()));
   });
 }
-async function localFetch(route) {
+async function localFetch(route, { method = "GET" } = {}) {
   assert.ok(route.startsWith("/") && !route.startsWith("//"), "Only local paths may be requested.");
-  return fetch(`${localOrigin}${route}`, { redirect: "manual", signal: AbortSignal.timeout(15000) });
+  assert.ok(["GET", "HEAD"].includes(method), "SEO verification only reads local responses.");
+  return fetch(`${localOrigin}${route}`, { method, redirect: "manual", signal: AbortSignal.timeout(15000) });
 }
 async function waitForServer(job) {
   for (let attempt = 0; attempt < 180; attempt++) {
@@ -185,6 +186,23 @@ async function verifyResponses() {
   assert.equal(titles.size, publicPaths.length, "Public titles must be distinct.");
   assert.equal(descriptions.size, publicPaths.length, "Public descriptions must be distinct.");
 
+  for (const [oldPath, destination] of [["/card-services", "/credit-card-services"], ["/payment-services", "/payment-acceptance-service"]]) {
+    for (const suffix of ["", "/", ".html", "/index.html"]) {
+      for (const method of ["GET", "HEAD"]) {
+        const response = await localFetch(`${oldPath}${suffix}?token=synthetic-test`, { method });
+        assert.equal(response.status, 308, "Former product URLs must redirect permanently.");
+        assert.equal(response.headers.get("location"), `${localOrigin}${destination}`);
+        assert.equal(response.headers.get("cache-control"), "no-store");
+        assert.equal(response.headers.has("x-robots-tag"), false, "Production migration redirects must remain crawlable.");
+        assert.equal(await response.text(), "");
+      }
+    }
+    const payload = await localFetch(`${oldPath}.txt`);
+    assert.equal(payload.status, 404, "An old navigation payload must never redirect to HTML.");
+    assert.ok(forbidsIndexing(payload.headers.get("x-robots-tag") ?? ""));
+    await payload.arrayBuffer();
+  }
+
   const sitemapResponse = await localFetch("/sitemap.xml");
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
@@ -213,7 +231,7 @@ async function verifyResponses() {
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
     assert.ok(values.some(forbidsIndexing), `${route}: must remain noindex.`);
   }
-  for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-services.txt"]) {
+  for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-acceptance-service.txt"]) {
     const response = await localFetch(route);
     assert.equal(response.status, 200);
     assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: raw payloads and legal aliases must remain noindex.`);
@@ -254,7 +272,7 @@ try {
   ]) {
     const privateServer = startNext([previewScript, "--port", String(port)], environment);
     await waitForServer(privateServer);
-    for (const route of [...publicPaths, "/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/opengraph-image", "/production-seo-missing-page"]) {
+    for (const route of [...publicPaths, "/card-services", "/payment-services", "/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/opengraph-image", "/production-seo-missing-page"]) {
       const response = await localFetch(route);
       assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: preview/wrong-site response must remain noindex.`);
       if (route === "/sitemap.xml") assert.doesNotMatch(await response.text(), /<loc>/);

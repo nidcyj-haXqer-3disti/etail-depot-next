@@ -4,7 +4,7 @@ export function LegalBrands() {
   return <div className="legal-brand-grid">{legalIdentity.brands.map(brand => <div className="legal-brand" key={brand.name}>
     <h3>{brand.name}<span>{brand.service}</span></h3>
     <p>{brand.operator}</p>
-    {brand.service === "Cards" ? <p>{brand.domain} · Coming soon</p> : <a href={brand.website} referrerPolicy="no-referrer" rel="external noreferrer">{brand.domain}</a>}
+    {brand.name === "Ledgix" ? <p>{brand.domain} · Coming soon</p> : <a href={brand.website} referrerPolicy="no-referrer" rel="external noreferrer">{brand.domain}</a>}
   </div>)}</div>;
 }
 

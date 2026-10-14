@@ -1,4 +1,4 @@
-> **Published keep-enabled repair, D201 / 14 October 2026:** PR #36 is published with Netlify Emails and its settings retained. D201 permits only that pinned platform handler behind its reviewed POST-only authentication wrapper. Keep the normal PR/check/package gates for future releases; never disable the extension or bypass failed checks. Follow [current status](../planning/STATUS.md) for exact source, hosted acceptance and remaining limitations.
+> **Published keep-enabled repair, D201 / 14 October 2026:** PR #36 resolves compatibility and PR #37 completes live wallet acceptance; the current release retains Netlify Emails and its settings. D201 permits only that pinned platform handler behind its reviewed POST-only authentication wrapper. Keep the normal PR/check/package gates for future releases; never disable the extension or bypass failed checks. Follow [current status](../planning/STATUS.md) for exact source, hosted acceptance and remaining limitations.
 
 # Public website Netlify deployment runbook
 
@@ -45,7 +45,7 @@ Package inspection requires the six reviewed public pages, metadata/404, byte-id
 
 ## Production search configuration
 
-D122 authorizes indexing only `/`, `/payment-services`, `/card-services` and `/help` at the bound production origin. Legal pages, 404, retired routes and local/preview environments remain noindex. Actual search indexing and ranking are not established by a successful build or deployment.
+D122 authorizes four discovery pages; D203 renames their product paths to `/payment-acceptance-service` and `/credit-card-services`, alongside `/` and `/help` at the bound production origin. Legal pages, 404, retired routes and local/preview environments remain noindex. Actual search indexing and ranking are not established by a successful build or deployment.
 
 The build guard requires the recorded approval, exact site/origin, `NODE_ENV=production`, `APP_ENV=production`, `ETAIL_SEARCH_CONTEXT=production`, matching `SITE_ID` and `ETAIL_PUBLIC_ORIGIN`; any supplied `CONTEXT` must be production. The native Edge handler then checks trusted `context.site.id` and `context.deploy.context` with the same scoped custom markers. A preview or unapproved site remains noindex even if given production HTML; robots/sitemap are restricted at runtime. Legal HTML aliases, raw navigation payloads and 404 responses also remain noindex.
 

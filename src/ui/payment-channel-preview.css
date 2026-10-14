@@ -61,7 +61,7 @@
 .marketing-line-item b { font-size: 12px; font-weight: 550; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .marketing-social-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 15px 17px; font-size: 12px; }
 .marketing-social-heading > span:first-child { display: flex; align-items: center; gap: 8px; font-weight: 550; }
-.marketing-social-heading > span:last-child { color: #6c7c6b; letter-spacing: .1em; }
+.marketing-social-heading > span:last-child { flex-shrink: 0; white-space: nowrap; color: #6c7c6b; letter-spacing: .1em; }
 .marketing-social-poster { position: relative; display: grid; gap: 17px; padding: 26px 24px; overflow: hidden; background: #e6eadb; color: #27472f; }
 .marketing-social-poster .marketing-document-kicker { color: #35513b; }
 .marketing-social-poster > :not(.marketing-poster-orbit) { position: relative; z-index: 1; }

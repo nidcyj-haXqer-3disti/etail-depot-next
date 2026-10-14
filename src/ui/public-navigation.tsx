@@ -3,8 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/payment-services", label: "Payment acceptance" },
-  { href: "/card-services", label: "Credit cards" },
+  { href: "/payment-acceptance-service", label: "Payment acceptance" },
+  { href: "/credit-card-services", label: "Credit cards" },
   { href: "/help", label: "Help" },
 ];
 
