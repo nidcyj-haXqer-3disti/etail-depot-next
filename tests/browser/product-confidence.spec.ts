@@ -24,8 +24,8 @@ test("payments explain Two Step, optional Clarity and pricing with a safe hero s
   await expect(page).toHaveURL(/\/payment-acceptance-service#fees$/);
   await expect(fees.getByRole("heading",{name:"Know your fees.",exact:true})).toBeInViewport();
   const questions=page.locator(".public-faq-section summary");
-  await expect(questions).toHaveCount(4);
-  await expect(questions).toContainText(["How do I get started?","When will I receive my money?","How do refunds and disputes work?","Does Clarity prevent every dispute?"]);
+  await expect(questions).toHaveCount(6);
+  await expect(questions).toContainText(["How do I get started?","What can I request payment for?","How can I share a payment request?","When will I receive my money?","How do refunds and disputes work?","Does Clarity prevent every dispute?"]);
 });
 
 test("optional dispute readiness keeps price and Order Insight coverage limits visible", async ({page}) => {

@@ -1,14 +1,14 @@
 # Consumer search and public release
 
-D179 · D191 verification, 14 October 2026
+D215 published baseline · D216 content · D217 authorized search submission/release, 14 October 2026
 
 ## Current scope and search controls
 
-The active application contains six public information pages. Home, Payment acceptance, Credit cards and Help are eligible for indexing on the approved live site; Privacy and Terms retain `noindex, nofollow`. The website has no account, authentication, checkout or database runtime. Retired routes remain governed by the read-only retirement proxy. Search directives are not access controls.
+The active application contains six public information pages. Home, Payment acceptance, Credit card and Help are eligible for indexing on the approved live site; Privacy and Terms retain `noindex, nofollow`. The website has no account, authentication, checkout or database runtime. Retired routes remain governed by the read-only public boundary. Search directives are not access controls.
 
-All six canonicals use `https://etail-depot-next.netlify.app` and their fixed public path. Visitor queries, account identifiers and request headers never choose the canonical origin. D122 records indexing approval for site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`. The source guard requires that exact approval and the matching production environment/site/origin. Local, test, branch and deploy-preview environments stay non-indexable. D179 does not change those controls.
+All six canonicals use `https://etaildepot.com` and their fixed public path. D215 completed the approved domain migration; the old Netlify public hostname and www redirect to the apex. Visitor queries, account identifiers and request headers never choose the canonical origin. D122 records indexing approval for site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`, with D215 binding it to the apex origin. The source guard requires that exact approval and the matching production environment/site/origin. Local, test, branch and deploy-preview environments stay non-indexable. D216 does not change those controls.
 
-The D203 candidate sitemap contains only `/`, `/credit-card-services`, `/payment-acceptance-service` and `/help`, with no invented last-modified dates. `robots.txt` permits HTML crawling so Google can observe indexing directives, excludes `/api/` and advertises the sitemap only in the approved environment. Live D178 checks confirmed these settings. They do not establish actual Google indexing. [Google indexing directives](https://developers.google.com/search/docs/crawling-indexing/block-indexing)
+The published sitemap contains only `/`, `/credit-card-services`, `/payment-acceptance-service` and `/help`, with no invented last-modified dates. `robots.txt` permits HTML crawling so Google can observe indexing directives, excludes `/api/` and advertises the sitemap only in the approved environment. D215 hosted verification confirmed the current domain and route settings. HTTP eligibility does not establish actual Google indexing. [Google indexing directives](https://developers.google.com/search/docs/crawling-indexing/block-indexing)
 
 ## Audience and metadata
 
@@ -26,17 +26,29 @@ The earlier nonsquare symbol used as a favicon is replaced by a square 192×192 
 
 Page-specific social-preview imagery could be considered separately using approved existing art. The current shared company image is preserved; it is not an indexing failure or authorization for another visual redesign. [Google image guidance](https://developers.google.com/search/docs/appearance/google-images)
 
+## D217 Google submissions and broader search access
+
+On 14 October 2026, Google accepted the existing sitemap with Success and four discovered pages. Payment acceptance, Credit card and Help each passed a live smartphone inspection: successful fetch, crawling/indexing allowed, the exact self canonical and one valid breadcrumb item. One indexing request per page was accepted into the priority crawl queue. The earlier baseline below remains a dated observation, not the current submission status. Actual Google-selected canonicals after indexing, impressions, rankings and traffic require subsequent reports; no repeated request is warranted.
+
+Read-only review confirms that the existing wildcard robots policy permits Bingbot and OAI-SearchBot. This is crawl eligibility, not proof of genuine crawler visits, WAF access or AI citations. No robots edit is needed. Bing account/property access remains to be established; importing Google properties would grant ongoing Search Console access/synchronization and is not silently authorized by a search-access check. GPTBot training controls are distinct from ChatGPT search controls. Sources and limitations are recorded in `artifacts/d217-release/search-access-review.json`.
+
 ## Measurement still required
 
-Search Console access and field performance were not available in D178–D179. No search-volume, ranking, indexing, conversion or Core Web Vitals outcome is established. An authorized property owner should:
+Search Console access and field performance were not available in D178–D179. On 14 October 2026, D216 verified the Domain property through the explicitly approved single Cloudflare TXT addition. Google reports Home as indexed; Payment acceptance, Credit card and Help are unknown to Google. No sitemap is listed as submitted, and manual-action/security reports show no issues. Performance and indexing aggregate reports are still processing. Home’s stored crawl reports no declared canonical, whereas the current live HTML has the correct self canonical; retain this discrepancy until a later crawl can be checked. No search-volume, ranking, conversion or field Core Web Vitals outcome is established. The next measurement steps are:
 
-1. Inspect the four discovery URLs and record Google's indexing status and selected canonical. Confirm legal-page exclusions remain intentional.
-2. Review the existing sitemap report and any security/manual-action reports. Property verification, sitemap submission or indexing requests remain separate authorized actions.
+1. Retain the dated four-URL baseline in `artifacts/search-growth/search-console-setup.json` and compare subsequent crawl/indexing results. Legal-page exclusions remain intentional.
+2. Follow the accepted D217 sitemap and indexing requests in subsequent reports. These are complete submissions, not guarantees of indexing or ranking.
 3. Record US query/page/device impressions, clicks and click-through rate for each product separately. Distinguish branded queries from payment-link and secured-card queries, and retain comparable dated periods.
 4. Review field Core Web Vitals if sufficient data exists. Record unavailable field data as unknown, not as a passing score; use browser/lab tests only as diagnostic evidence.
 5. Compare a later approved release with that baseline. Do not promise search placement or infer market fit from technical checks.
 
 [Google Search Console guidance](https://developers.google.com/search/docs/monitor-debug/search-console-start), [title guidance](https://developers.google.com/search/docs/appearance/title-link), [description guidance](https://developers.google.com/search/docs/appearance/snippet)
+
+## D216 local content and trust refinement
+
+The accepted first slice uses existing FAQ sections: a concise operator identity answer on Home, sale/use-case and sharing explanations on Payment acceptance, a booking-deposit answer on Help, and Apple/Google setup summaries on Credit card. These answers are present in initial HTML, including when their native disclosures are closed. Existing artwork, interaction states, pricing, deposit/repayment explanations, service availability and notices remain the foundation. The Organization description reuses the visible identity sentence; it introduces no new credential or entity.
+
+The coordinated backlog is `planning/search-growth.json`; dated public observations and specialist drafts are under `artifacts/search-growth/`. Longer guides and new routes are deferred. The separately approved Google ownership verification is complete. Sitemap submissions, new tracking, external identity edits and publication remain separate from this local content work. Keep crawler access, search impressions, AI citations, website clicks and provider-confirmed onboarding as different measures; unavailable data is not zero.
 
 ## Verification and release
 

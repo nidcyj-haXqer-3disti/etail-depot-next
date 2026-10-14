@@ -1,8 +1,10 @@
 # Public website architecture
 
-D108 public-only scope · D214 published architecture, 14 October 2026
+D108 public-only scope · D215 published architecture, 14 October 2026
 
-The user selected **public website and vendor links only**, with existing database records preserved. D214 / PR #40 is published as Netlify deploy `6acf12b74fe02b69c92bcc60`, source `03585117285172fc1238bf1e3e72187c91a4856e`, confirmed ready and current on 14 October 2026 at 14:27 JST. Help/contact and legal-company alignment is refined; the architecture is unchanged. The static website and native Edge boundary preserve the approved Home photograph, D184 Payments presentation, Cards, six public routes, copy, offers and client interactions. The Netlify Emails extension remains enabled with unchanged saved settings and the reviewed authenticated POST handler described below. Exact-source CI, isolated packaging and final hosted build checks pass; D214 live acceptance passes 105 HTTP checks and 48 browser cases (including 24 accessibility checks), with one intentional desktop skip. See [current status](../planning/STATUS.md) for final results and limitations.
+The six-page public website is published at **https://etaildepot.com** through PR #41, Netlify deploy `6acf885a922b0f7283693c75`, source `d8632ae1d0114989fd66149b003954a4d8ba2d3d` (13:49:56 UTC). The design, copy, offers, original assets and client interactions are unchanged from D214. Cloudflare remains authoritative, www redirects to the apex, and both hostnames have trusted HTTPS. The Netlify Emails extension remains enabled with its unchanged saved settings and protected handler. See [current status](../planning/STATUS.md) for release verification and limits.
+
+D215 adds exact-host canonical redirection for approved public GET/HEAD requests from `etail-depot-next.netlify.app` to `etaildepot.com`. Pathnames are retained and query input is dropped; normal browser fragment preservation remains. Public legacy product aliases point directly to their current canonical paths. Retired-route handling runs first; writes, retired financial/API paths and `/.netlify` platform endpoints are not forwarded by this canonical rule. Production build and Functions origin settings agree; wrong-site and preview guards remain in place. No database, account or financial runtime is introduced.
 
 ## Original brand artwork delivery (D209, published in D212)
 

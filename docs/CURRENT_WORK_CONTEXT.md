@@ -2,20 +2,32 @@
 
 This workspace and conversation concern the existing customer-facing Etail Depot website. Start from the deployed version and the user's next explicit request.
 
-## D215 — domain migration in progress
+## D217 — search submission and authorized release in progress
 
-The user requests https://etaildepot.com for this existing public website. After explicit approval of the domain-only exception, apex/www Netlify assignments have moved from etail-depot-webapp to etail-depot-next; the old project and its deploy remain intact. Active Cloudflare DNS still points to the previous website, so traffic and HTTPS cutover await authenticated DNS access. Do not change nameservers or mail records. Canonical/redirect changes are verified locally on `codex/custom-domain-d215`; D214 remains published. Do not publish the default-host redirect before the custom domain serves the current site over HTTPS. Follow current status for actual progress.
+The user accepts the next-step recommendation: submit the existing four-page sitemap, test/request indexing for the three undiscovered pages, release the reviewed D216 content through normal gates, and continue Bing/ChatGPT access checks. This supersedes D216’s local-only publication hold for that reviewed content. Google has accepted the sitemap with Success and four discovered pages. All three discovery-page live tests pass and their one-time indexing requests are accepted. All local release gates and packaging pass. Exact-source CI, isolated packaging and hosted acceptance remain; authorization alone is not evidence of publication. Preserve site design/offers, approved provider links, all DNS/email settings and stored resources. D215 remains live until a verified D217 release completes.
+
+## D216 — local search refinements and verified Google ownership
+
+The user accepted the search-growth recommendation. Local changes on `codex/search-growth-d216` add concise Home company identity, payment-use/sharing answers, Help booking guidance and both wallet setup summaries, preserving the six-page design, offers, artwork and product limitations. The existing Organization description shares the visible identity sentence. Public-site checks and the production SEO matrix pass; the local preview at http://127.0.0.1:3100/ remains nonindexable. No new commit, push or deployment; D215 remains live. Package/release gates have not been rerun for D216.
+
+The user separately approved Google Search Console Domain-property verification for `sc-domain:etaildepot.com` using one Cloudflare TXT record. Google confirms ownership; all 54 original DNS records remain unchanged, with only that record added (55 total). Manual actions and Security issues show no issues; performance/indexing overview data is processing. No sitemap submission, indexing request, analytics installation or other DNS change occurred. URL-inspection evidence and remaining measurement work are recorded in `artifacts/search-growth/search-console-setup.json`; processing data is not evidence of zero traffic or a ranking result.
+
+## D215 — custom domain published and verified
+
+The reviewed website is now published at **https://etaildepot.com**. Cloudflare apex A is `75.2.60.5`; www CNAME is `etail-depot-next.netlify.app`, preserving TTL 300, DNS-only mode, all other 52 records and nameservers. Separately approved deletion of the inactive two-record Netlify zone resolved HTTPS provisioning. Apex and www have a trusted Let's Encrypt certificate. The old project and its deployment remain intact.
+
+PR #41 is merged as `d8632ae1d0114989fd66149b003954a4d8ba2d3d`; exact-source CI and hosted package/security checks pass. Netlify deploy `6acf885a922b0f7283693c75` is ready/current. Final hosted acceptance passes 177 HTTP checks and 49 unique browser cases, including all 24 accessibility checks, with one intentional skip. The original cross-domain managed-connection challenge and successful single retry are recorded. All 18 matched screenshots are pixel-identical to D214; 21 alignment states pass. No scheduled DNS work is configured.
 
 ## Current baseline
 
 - Public pages: Home, Payment acceptance, Credit card, Help, Privacy and Terms.
-- Published release: D214 / PR #40, 14 October 2026, 14:27 JST (05:27 UTC), including D213 Help/legal alignment and the existing D209 logo delivery/D210 service terminology.
-- Netlify deploy: `6acf12b74fe02b69c92bcc60`, confirmed current and ready. Netlify Emails remains enabled with unchanged saved settings and protected handler bytes.
-- Published source: `03585117285172fc1238bf1e3e72187c91a4856e`, tree `73847264d1ed3b518e9573162e20f650f0dbecfd`, identical to reviewed PR #40 candidate `9959c022d5ebf25946158f510746b336c11d822a`.
-- Working branch: `codex/released-d214`, aligned to the exact D214 GitHub merge. D213 alignment refinements are published; the original feature branch is preserved. Release-closeout documentation is local follow-up only.
+- Published release: D215 / PR #41, 14 October 2026, 22:49 JST (13:49 UTC), moving the D214 public website to etaildepot.com without design, offer or financial-runtime changes.
+- Netlify deploy: `6acf885a922b0f7283693c75`, confirmed current and ready. Netlify Emails remains enabled with unchanged saved settings and protected handler bytes.
+- Published source: `d8632ae1d0114989fd66149b003954a4d8ba2d3d`, tree `f16e45c52163f20e9ba787f995bd94ce9ae70459`, identical to reviewed PR #41 candidate `6e22d715307771613578c32de8d1d3721d0ce579`.
+- Published baseline: `codex/released-d215`, aligned to the exact GitHub merge. Current local work is on `codex/search-growth-d216`; prior branches and D215 closeout edits remain preserved. D216 content and documentation are not published.
 - Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently. Payment acceptance help / Credit card help and the related support labels are consistent across pages. Original design, assets, offers and legal substance remain intact.
-- Verification: full local checks, both exact-source candidate CI runs, merged-main CI, isolated frozen-lockfile packaging and final hosted artifact/security checks pass. D214 live acceptance passes 105 HTTP requests and 48 browser cases, including 24 accessibility cases, with one intentional desktop skip. Eighteen full-page captures and 21 contact/legal alignment states pass. Current status records actual results and diagnostics.
-- Website: https://etail-depot-next.netlify.app/. Local preview: http://127.0.0.1:3100/.
+- Verification: full local checks, exact-source candidate/main CI, isolated packaging and hosted artifact/security checks pass. D215 hosted acceptance passes 177 HTTP checks, 49 unique browser cases and all 24 accessibility cases, with one intentional skip. Eighteen matching screenshots are pixel-identical to D214; 21 alignment states pass. Current status retains the managed-connection retry and hosted-preview limitation.
+- Website: https://etaildepot.com/. The old Netlify public address redirects to it. Local preview: http://127.0.0.1:3100/.
 - Homepage: **Get paid. Keep going.**
 - Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service` (D194 label; D203 URL).
 
