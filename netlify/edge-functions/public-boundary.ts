@@ -1,5 +1,5 @@
 import { publicPageRedirect, retiredRoute } from "../../src/shared/public-routes.ts";
-import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release.ts";
+import { canonicalOrigin, defaultOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release.ts";
 
 type Environment = Readonly<Record<string, string | undefined>>;
 
@@ -57,6 +57,7 @@ export async function handlePublicRequest(
     SITE_ID: context.site?.id,
     CONTEXT: context.deploy.context,
   });
+  const moveToCanonical = approved && url.origin === defaultOrigin;
   const publicDestination = publicPageRedirect(url.pathname);
   if (publicDestination) {
     if (!["GET", "HEAD"].includes(request.method)) {
@@ -65,12 +66,24 @@ export async function handlePublicRequest(
         headers: { Allow: "GET, HEAD", "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" },
       }), true);
     }
-    // Fixed same-origin destination: no queries or submitted data are forwarded.
+    // Fixed page destination: only the approved production subdomain changes origin.
+    // No queries or submitted data are forwarded.
     // Omit a fragment so browsers retain public section bookmarks such as #wallets.
     return withSecurityHeaders(new Response(null, {
       status: 308,
-      headers: { Location: new URL(publicDestination, url.origin).href, "Cache-Control": "no-store" },
+      headers: { Location: new URL(publicDestination, moveToCanonical ? canonicalOrigin : url.origin).href, "Cache-Control": "no-store" },
     }), !approved);
+  }
+  if (moveToCanonical && ["GET", "HEAD"].includes(request.method) && !/^\/\.netlify(?:\/|$)/.test(url.pathname)) {
+    // Retirement checks run first. Preserve only the path; never carry queries or
+    // change a platform-function endpoint. Assigning pathname prevents // paths
+    // from turning a visitor-controlled value into an external redirect host.
+    const destination = new URL(canonicalOrigin);
+    destination.pathname = url.pathname;
+    return withSecurityHeaders(new Response(null, {
+      status: 308,
+      headers: { Location: destination.href, "Cache-Control": "no-store" },
+    }), false);
   }
   if (!approved && ["GET", "HEAD"].includes(request.method)) {
     const metadataPath = url.pathname.replace(/\/$/, "");

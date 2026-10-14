@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { retiredRoute } from "../../src/shared/public-routes";
-import { canonicalOrigin, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release";
+import { canonicalOrigin, defaultOrigin, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release";
 import { config, handlePublicRequest, publicSecurityHeaders, type PublicBoundaryContext } from "../../netlify/edge-functions/public-boundary";
 
 const production = {
@@ -25,6 +25,132 @@ const movedPublicPages = [
 const publicAliases = movedPublicPages.flatMap(([oldPath, destination]) =>
   [oldPath, `${oldPath}/`, `${oldPath}.html`, `${oldPath}/index.html`].map(path => [path, destination] as const),
 );
+
+describe("production domain migration", () => {
+  it.each(["GET", "HEAD"])("redirects %s from the exact production subdomain without carrying query inputs", async method => {
+    for (const path of ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/brand/logo.png", "/missing"]) {
+      const next = context();
+      const response = await handlePublicRequest(new Request(`${defaultOrigin}${path}?token=private&next=https://other.invalid#fees`, { method }), next, production);
+      expect(response.status).toBe(308);
+      expect(response.headers.get("location")).toBe(`${canonicalOrigin}${path}`);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(response.headers.has("x-robots-tag")).toBe(false);
+      expect(response.headers.has("set-cookie")).toBe(false);
+      expect(await response.text()).toBe("");
+      expect(next.next).not.toHaveBeenCalled();
+      for (const [key, value] of Object.entries(publicSecurityHeaders)) expect(response.headers.get(key)).toBe(value);
+    }
+  });
+
+  it("combines an old public page and production-domain move in one redirect", async () => {
+    for (const [path, destination] of publicAliases) {
+      const response = await handlePublicRequest(new Request(`${defaultOrigin}${path}?token=private#wallets`), context(), production);
+      expect(response.status).toBe(308);
+      expect(response.headers.get("location")).toBe(`${canonicalOrigin}${destination}`);
+      // Leaving the fragment unset preserves an existing public section bookmark in browsers.
+      expect(new URL(response.headers.get("location")!).hash).toBe("");
+    }
+  });
+
+  it.each(["POST", "PUT", "PATCH", "DELETE", "OPTIONS"])("does not redirect or read %s bodies during a domain move", async method => {
+    const request = new Request(`${defaultOrigin}/?token=private`, { method, body: "synthetic-private-input" });
+    const next = context(new Response("Method not allowed", { status: 405 }));
+    const response = await handlePublicRequest(request, next, production);
+    expect(response.status).toBe(405);
+    expect(response.headers.has("location")).toBe(false);
+    expect(request.bodyUsed).toBe(false);
+    expect(next.next).toHaveBeenCalledTimes(1);
+
+    for (const [path] of publicAliases) {
+      const aliasRequest = new Request(`${defaultOrigin}${path}`, { method, body: "synthetic-private-input" });
+      const aliasNext = context();
+      const aliasResponse = await handlePublicRequest(aliasRequest, aliasNext, production);
+      expect(aliasResponse.status).toBe(405);
+      expect(aliasResponse.headers.has("location")).toBe(false);
+      expect(aliasRequest.bodyUsed).toBe(false);
+      expect(aliasNext.next).not.toHaveBeenCalled();
+    }
+  });
+
+  it("keeps retired account bookmarks on their fixed local recovery route before moving domains", async () => {
+    for (const [path, destination] of retiredDestinations) {
+      const next = context();
+      const response = await handlePublicRequest(new Request(`${defaultOrigin}${path}?token=private#private`), next, production);
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe(`${defaultOrigin}${destination}`);
+      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+      expect(next.next).not.toHaveBeenCalled();
+    }
+  });
+
+  it.each(["GET", "HEAD", "POST"])("preserves retired financial responses for %s instead of moving their input", async method => {
+    for (const path of ["/api/v1/sessions", "/checkout/old-payment", "/pay/old-link", "/payments/old-receipt", ...(method === "POST" ? ["/login", "/accounts/old-id"] : [])]) {
+      const request = new Request(`${defaultOrigin}${path}?token=private`, { method, ...(method === "POST" ? { body: "synthetic-private-input" } : {}) });
+      const next = context();
+      const response = await handlePublicRequest(request, next, production);
+      expect(response.status).toBe(410);
+      expect(response.headers.has("location")).toBe(false);
+      expect(request.bodyUsed).toBe(false);
+      expect(next.next).not.toHaveBeenCalled();
+    }
+  });
+
+  it.each(["GET", "HEAD", "POST"])("leaves %s platform endpoints on their original host", async method => {
+    for (const path of ["/.netlify", "/.netlify/functions/emails", "/.netlify/functions/emails/template", "/.netlify/identity/token"]) {
+      const request = new Request(`${defaultOrigin}${path}?token=private`, { method, ...(method === "POST" ? { body: "synthetic-private-input" } : {}) });
+      const next = context(new Response(null, { status: 404 }));
+      const response = await handlePublicRequest(request, next, production);
+      expect(response.status).toBe(404);
+      expect(response.headers.has("location")).toBe(false);
+      expect(request.bodyUsed).toBe(false);
+      expect(next.next).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it.each(["deploy-preview", "branch-deploy", "dev", undefined])("does not move the default host in trusted %s context", async deployContext => {
+    const next = context(undefined, { deploy: { context: deployContext } });
+    const response = await handlePublicRequest(new Request(`${defaultOrigin}/?CONTEXT=production`), next, production);
+    expect(response.status).toBe(200);
+    expect(response.headers.has("location")).toBe(false);
+    expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    expect(next.next).toHaveBeenCalledTimes(1);
+  });
+
+  it("requires the exact site identity and release environment before moving a host", async () => {
+    for (const changes of [{ site: { id: "another-site" } }, { site: undefined }]) {
+      const next = context(undefined, changes);
+      const response = await handlePublicRequest(new Request(`${defaultOrigin}/`), next, production);
+      expect(response.headers.has("location")).toBe(false);
+      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    }
+    for (const key of Object.keys(production)) {
+      const response = await handlePublicRequest(new Request(`${defaultOrigin}/`), context(), { ...production, [key]: undefined });
+      expect(response.headers.has("location")).toBe(false);
+      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    }
+  });
+
+  it("does not match custom, local, preview, permalink or lookalike origins", async () => {
+    for (const origin of [canonicalOrigin, "https://www.etaildepot.com", "http://127.0.0.1:3100", "http://etail-depot-next.netlify.app", "https://deploy-preview-215--etail-depot-next.netlify.app", "https://branch--etail-depot-next.netlify.app", "https://6acf12b74fe02b69c92bcc60--etail-depot-next.netlify.app", "https://etail-depot-next.netlify.app.other.invalid", "https://other.netlify.app"]) {
+      const next = context();
+      const response = await handlePublicRequest(new Request(`${origin}/`), next, production);
+      expect(response.status).toBe(200);
+      expect(response.headers.has("location")).toBe(false);
+      expect(next.next).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it("ignores forwarded hosts and cannot turn a path into a redirect authority", async () => {
+    const response = await handlePublicRequest(new Request(`${canonicalOrigin}/`, { headers: { host: new URL(defaultOrigin).host, "x-forwarded-host": new URL(defaultOrigin).host } }), context(), production);
+    expect(response.headers.has("location")).toBe(false);
+    for (const path of ["//other.invalid/help", "/%2F%2Fother.invalid/help"]) {
+      const redirected = await handlePublicRequest(new Request(`${defaultOrigin}${path}`, { headers: { "x-forwarded-host": "other.invalid" } }), context(), production);
+      expect(redirected.status).toBe(308);
+      expect(new URL(redirected.headers.get("location")!).origin).toBe(canonicalOrigin);
+      expect(new URL(redirected.headers.get("location")!).pathname).toBe(path);
+    }
+  });
+});
 
 describe("renamed public product pages", () => {
   it.each(publicAliases)("permanently redirects GET and HEAD %s to its exact new path", async (path, destination) => {

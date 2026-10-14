@@ -14,7 +14,7 @@ const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"
 assert.equal(process.version, `v${manifest.engines.node}`, "Use the pinned project Node.js runtime.");
 assert.equal(targets.project_key, "ETAIL_DEPOT_NEXT_GREENFIELD_2026");
 assert.equal(targets.netlify.site_id, "cbbb6c24-9dbc-43a2-9234-e4357b5b5280");
-assert.equal(targets.netlify.canonical_origin, "https://etail-depot-next.netlify.app");
+assert.equal(targets.netlify.canonical_origin, "https://etaildepot.com");
 assert.equal(targets.release.real_money_allowed, false);
 
 const canonicalOrigin = targets.netlify.canonical_origin;

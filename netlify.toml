@@ -21,12 +21,12 @@ package = "./netlify/plugins/public-release"
 [functions.emails]
 node_bundler = "esbuild"
 
-# D122: only this approved production site's discovery pages may be indexed.
+# D122/D215: only this approved production site and its new canonical domain may be indexed.
 # The edge boundary checks trusted site/deploy context and scoped runtime markers again.
 [context.production.environment]
 APP_ENV = "production"
 ETAIL_SEARCH_CONTEXT = "production"
-ETAIL_PUBLIC_ORIGIN = "https://etail-depot-next.netlify.app"
+ETAIL_PUBLIC_ORIGIN = "https://etaildepot.com"
 
 [[headers]]
 for = "/*"

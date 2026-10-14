@@ -32,7 +32,7 @@ test("renamed product bookmarks retain their section and reject submitted data",
     await expect(page).toHaveURL(`${origin}${destination}${section}`);
     await expect(page.locator(section)).toBeVisible();
     expect(await page.evaluate(() => location.search)).toBe("");
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etail-depot-next.netlify.app${destination}`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etaildepot.com${destination}`);
   }
 });
 

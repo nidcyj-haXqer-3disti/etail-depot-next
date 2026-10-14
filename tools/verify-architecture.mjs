@@ -82,7 +82,7 @@ const targets = JSON.parse(readFileSync(path.join(root, "project-targets.json"),
 assert.equal(targets.project_key, "ETAIL_DEPOT_NEXT_GREENFIELD_2026");
 assert.equal(targets.github.repository_id, 1361184741);
 assert.equal(targets.netlify.site_id, "cbbb6c24-9dbc-43a2-9234-e4357b5b5280");
-assert.equal(targets.netlify.canonical_origin, "https://etail-depot-next.netlify.app");
+assert.equal(targets.netlify.canonical_origin, "https://etaildepot.com");
 assert.equal(targets.release.real_money_allowed, false);
 assert.equal(targets.denied.netlify_site_ids.includes(targets.netlify.site_id), false);
 const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));

@@ -13,7 +13,7 @@ Read `project-targets.json`, `docs/CURRENT_WORK_CONTEXT.md`, `docs/SOURCE_PRECED
 
 ## Boundaries
 
-- Use only the exact repository/site IDs in `project-targets.json`. Never modify excluded projects or domains, provision replacements, change DNS, purchase plans or expose secrets.
+- Use only the exact repository/site IDs in `project-targets.json`. D215 explicitly permits the recorded apex/www domain migration from etail-depot-webapp and required web DNS changes; preserve nameservers, email records and all old project code/data/settings. All other excluded-project/domain changes, provisioning, purchases and secret exposure remain prohibited.
 - Existing databases and Identity records remain preserved. `archive/database` is inactive schema history, not a data backup. Do not edit archived migrations or reconnect old resources.
 - Keep the retirement proxy read-only. Old account bookmarks may redirect to fixed local information pages; retired APIs and financial links return Gone. Never forward submitted bodies to a vendor.
 - Real-money processing remains absent. No public indexing, deployment or remote resource change is implied by local verification.

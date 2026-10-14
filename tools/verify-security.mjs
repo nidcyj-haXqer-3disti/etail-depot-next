@@ -107,7 +107,7 @@ if (!process.argv.includes("--self-test")) {
   const targets = JSON.parse(readFileSync(path.join(root, "project-targets.json"), "utf8"));
   assert.equal(targets.project_key, "ETAIL_DEPOT_NEXT_GREENFIELD_2026");
   assert.equal(targets.netlify.site_id, "cbbb6c24-9dbc-43a2-9234-e4357b5b5280");
-  assert.equal(targets.netlify.canonical_origin, "https://etail-depot-next.netlify.app");
+  assert.equal(targets.netlify.canonical_origin, "https://etaildepot.com");
   assert.equal(targets.release.real_money_allowed, false);
   const tracked = execFileSync("git", ["ls-files", "-z"], { cwd: root, encoding: "utf8" }).split("\0").filter(Boolean);
   for (const name of tracked) {

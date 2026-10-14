@@ -1,8 +1,20 @@
 # Decision register
 
+## D215 — associate the current website with etaildepot.com
+
+14 October 2026. The user explicitly asks to move etaildepot.com from Netlify project etail-depot-webapp to the current etail-depot-next public website. This overrides the previous domain/source-site prohibition only for transferring the apex/www website assignments and required web DNS records. The verified source site is `e1f23aa8-d7d1-41cd-9f76-8bcbdf05a658`; destination remains `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`, same team. Preserve old project code/deployments, databases, Identity, enabled Emails, mail DNS and unrelated settings. Do not change nameservers or DNS-provider ownership.
+
+Use https://etaildepot.com as the intended canonical origin; www redirects to it. Prepare exact-host read-only redirection from the default Netlify address and update central metadata, sitemap, environment bindings, safeguards and tests through the normal reviewed source/deployment workflow. No approved wording, offer, artwork or financial runtime changes. Publication and DNS cutover depend on readiness, not this authorization alone. Current status records actual results.
+
+Read-only inspection finds authoritative Cloudflare DNS, an apex A record pointing to `34.111.179.208` and www CNAME pointing to `sites.framer.app`; the older Netlify zone is not authoritative. Netlify association alone will not switch the active website. Preserve current MX/TXT records; Cloudflare authentication is requested through the website, with no credentials in chat.
+
+After automatic approval review blocked the initial removal under the old exclusion, the user explicitly approved the exact domain-only exception. The same UI action then transferred apex/www to the destination; old project and deployment remain preserved. Actual DNS/HTTPS cutover and reviewed source publication remain pending. This limited exception does not authorize unrelated old-project changes.
+
 ## D214 — publish the reviewed alignment refinement
 
 14 October 2026. The user explicitly requests push and deployment of D213. Follow the established feature-branch/review/check/merge and manual Netlify Git-build process on the bound repository/site. This supersedes D213 local-only scope for this candidate’s publication; preserve the current design, words, offers, original assets and enabled Emails integration. No unrelated remote resources or financial functions are authorized. Current status records actual checks, source/deploy identities and live acceptance.
+
+**Publication:** Reviewed PR #40 merged as `03585117285172fc1238bf1e3e72187c91a4856e`; Netlify deploy `6acf12b74fe02b69c92bcc60` published at 14:27 JST on 14 October 2026. Both candidate CI runs, merged-main CI, isolated packaging and hosted checks pass. Live acceptance passes 105 HTTP checks and 48 browser cases, including all 24 accessibility cases, with one intentional skip. No application fix or second publication was required. Emails and all resource settings are preserved.
 
 ## D213 — refine existing contact and company-card alignment
 
