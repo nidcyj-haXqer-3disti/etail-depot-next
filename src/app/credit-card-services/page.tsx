@@ -16,7 +16,7 @@ import "@/ui/card-services.css";
 export const metadata = publicPageMetadata("/credit-card-services");
 export default function CardServicesPage() {
   return <Shell><PublicPageStructuredData path="/credit-card-services" /><div className="consumer-page consumer-product consumer-cards">
-    <ConsumerHero product service="cards" productLabel="Ledgix · Secured credit card" title={<>Secured credit. <br /><span>Made for your wallet.</span></>}
+    <ConsumerHero product service="cards" title={<>Secured credit. <br /><span>Made for your wallet.</span></>}
       description={<>A virtual {cardProduct.creditType} for Apple&nbsp;Wallet and Google&nbsp;Wallet. Keep your card on your phone and pay in stores, in apps and online where supported.</>}
       actions={<><CardContactLink /><a href="#card-details" className="consumer-text-link">View card details<Icon name="arrow" /></a></>}
       note={<div className="consumer-product-note">Applications are not open yet.</div>}
@@ -42,12 +42,12 @@ export default function CardServicesPage() {
     <section className="page-container public-section public-faq-section" aria-labelledby="card-questions-title">
       <div><p className="eyebrow">Before launch</p><h2 id="card-questions-title">Credit card questions.</h2><Link href="/help#cards" className="consumer-text-link">Credit card help<Icon name="arrow" /></Link></div>
       <div className="public-questions">
-        <details><summary>Can I apply for the Ledgix Digital Wallet Card now?<span aria-hidden="true">+</span></summary><p>Applications are not open yet. Contact Ledgix with questions about the card. An inquiry does not submit an application or subscribe you to launch updates.</p></details>
+        <details><summary>Can I apply for the Ledgix credit card now?<span aria-hidden="true">+</span></summary><p>Applications are not open yet. Contact Ledgix with questions about the card. An inquiry does not submit an application or subscribe you to launch updates.</p></details>
         <details><summary>How does the security deposit work?<span aria-hidden="true">+</span></summary><p>The minimum security deposit is ${productFacts.cards.minimumDepositDollars}. It backs your credit account; it does not pay for purchases. The card agreement will explain credit limits and when and under what conditions your deposit can be returned. These terms will be provided before applications open.</p></details>
         <details><summary>What fees and repayments apply?<span aria-hidden="true">+</span></summary><p>The annual fee is ${productFacts.cards.annualFeeDollars}, and the monthly fee is ${productFacts.cards.monthlyFeeDollars}. Repay your full statement balance each month. Earlier or daily payments are optional. Your security deposit does not replace your monthly payment. Other charges and final terms will be provided before applications open.</p></details>
-        <details><summary>Can I use Ledgix with Apple Wallet or Google Wallet?<span aria-hidden="true">+</span></summary><p>When the card service launches, eligible cards can be added to Apple Wallet or Google Wallet for purchases at participating stores, in apps and online. Availability depends on your card, device and region; wallet and merchant acceptance requirements apply. <a href="#wallets">Preview the wallet experience</a>.</p></details>
+        <details><summary>Can I use Ledgix with Apple Wallet or Google Wallet?<span aria-hidden="true">+</span></summary><p>When the credit card service launches, eligible cards can be added to Apple Wallet or Google Wallet for purchases at participating stores, in apps and online. Availability depends on your card, device and region; wallet and merchant acceptance requirements apply. <a href="#wallets">Preview the wallet experience</a>.</p></details>
         <details><summary>What if I lose my phone?<span aria-hidden="true">+</span></summary><p>Use Apple Find My or Google Find Hub to secure your device. Contact Ledgix promptly about your card and any unrecognized purchases.</p></details>
-        <details><summary>Where will I manage my card account?<span aria-hidden="true">+</span></summary><p>You’ll manage your card account and get support through Ledgix when the service launches.</p></details>
+        <details><summary>Where will I manage my credit card account?<span aria-hidden="true">+</span></summary><p>You’ll manage your credit card account and get support through Ledgix when the service launches.</p></details>
       </div>
     </section>
   </div></Shell>;

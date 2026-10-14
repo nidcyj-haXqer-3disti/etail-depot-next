@@ -6,7 +6,7 @@ import "./secured-credit-art.css";
 
 const exampleAmount = formatUsdCents(6400);
 const purchaseSteps = [
-  { title: "Use your card", description: "Pay with your digital wallet card.", kind: "purchase" },
+  { title: "Use your card", description: "Pay with your credit card through your digital wallet.", kind: "purchase" },
   { title: "Review your statement", description: "See the purchases you need to repay.", kind: "statement" },
   { title: "Pay in full", description: "Repay your full statement balance each month. Earlier or daily payments are optional.", kind: "repayment" },
 ] as const;

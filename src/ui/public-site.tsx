@@ -5,11 +5,11 @@ const commonQuestions = [
   },
   {
     question: "When can I apply for a Ledgix credit card?",
-    answer: "Credit card applications are not open yet. Visit the Credit cards page for details and a preview of the wallet experience.",
+    answer: "Credit card applications are not open yet. Visit the Credit card page for details and a preview of the wallet experience.",
   },
   {
     question: "Where will I manage my services?",
-    answer: "Manage payments through Trolleys. Card account access will be available through Ledgix when the service launches. Each service has its own sign-in.",
+    answer: "Manage your payment acceptance account through Trolleys. Credit card account access will be available through Ledgix when the service launches, with a separate sign-in.",
   },
 ];
 

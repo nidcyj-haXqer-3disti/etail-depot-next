@@ -1,6 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { serviceLabels } from "@/shared/service-language";
+import { BrandImage } from "./brand-image";
+import "./brand-images-ledgix.css";
 import { useId, useState } from "react";
 import type { KeyboardEvent } from "react";
 import { Icon } from "./icon";
@@ -30,14 +33,14 @@ const guides = {
 export function LedgixCardFace() {
   return <div className="ledgix-wallet-card">
     <div className="ledgix-wallet-card-accent" />
-    <Image className="ledgix-wallet-card-logo" src="/brand/ledgix-logo.png" alt="" width={512} height={182} unoptimized />
-    <span className="ledgix-wallet-card-name">Digital Wallet Card</span>
+    <BrandImage brand="ledgix" className="ledgix-wallet-card-logo" alt="" width={512} height={182} />
+    <span className="ledgix-wallet-card-name">{serviceLabels.cards}</span>
     <div className="ledgix-wallet-card-network"><NetworkMark network="visa" decorative /></div>
   </div>;
 }
 
 function WalletProductPreview({ compact }: { compact: boolean }) {
-  return <figure className={`wallet-product-art${compact ? " wallet-product-art-compact" : ""}`} aria-label="Preview of the Ledgix Digital Wallet Card for Apple Wallet and Google Wallet">
+  return <figure className={`wallet-product-art${compact ? " wallet-product-art-compact" : ""}`} aria-label="Preview of the Ledgix credit card for Apple Wallet and Google Wallet">
     <div className="wallet-product-device" aria-hidden="true">
       <div className="wallet-product-screen">
         <span className="wallet-product-camera" />

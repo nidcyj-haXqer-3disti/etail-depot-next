@@ -1,4 +1,5 @@
 import type { Metadata, MetadataRoute } from "next";
+import { serviceLabels } from "@/shared/service-language";
 import { productFacts } from "@/shared/product-facts";
 import { cardProduct } from "@/shared/card-product";
 import { legalIdentity } from "@/shared/legal-identity";
@@ -10,9 +11,9 @@ const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts
   : `$${productFacts.cards.annualFeeDollars} annual fee and $${productFacts.cards.monthlyFeeDollars} monthly fee`;
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Online Payment Acceptance & Credit Cards", description: `Explore Trolleys for online payment acceptance and Ledgix, a virtual ${cardProduct.creditType} coming soon. Find product details, pricing and support.` },
-  "/credit-card-services": { title: "Ledgix Virtual Secured Credit Card — Coming Soon", description: `Meet Ledgix ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
-  "/payment-acceptance-service": { title: "Trolleys Payment Links & QR Codes", description: "Accept online card payments with Trolleys payment links and QR codes. See domestic payment pricing, optional Clarity and how to get started." },
+  "/": { title: "Payment Acceptance & Credit Card", description: `Explore Trolleys for online payment acceptance and the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. Find product details, pricing and support.` },
+  "/credit-card-services": { title: "Ledgix Credit Card — Coming Soon", description: `Meet the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
+  "/payment-acceptance-service": { title: "Trolleys Payment Acceptance — Links & QR Codes", description: "Accept online card payments with Trolleys payment links and QR codes. See domestic payment pricing, optional Clarity and how to get started." },
   "/help": { title: "Payment Acceptance & Credit Card Help", description: "Find Trolleys payment acceptance support, Ledgix credit card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
@@ -26,17 +27,17 @@ export const publicSocialImage = {
   url: `${canonicalOrigin}/opengraph-image`,
   width: 1200,
   height: 630,
-  alt: `Etail Depot — Trolleys payment acceptance available now; Ledgix ${cardProduct.pluralName} coming soon`,
+  alt: `Etail Depot — Trolleys payment acceptance available now; ${cardProduct.name} coming soon`,
 };
 export const rootMetadata: Metadata = {
   metadataBase: new URL(canonicalOrigin),
-  title: { default: "Etail Depot — Payment acceptance and credit cards", template: "%s | Etail Depot" },
+  title: { default: "Etail Depot — Payment acceptance and credit card", template: "%s | Etail Depot" },
   description: PUBLIC_PAGES["/"].description,
   applicationName: "Etail Depot",
   robots: privateRobots,
   icons: { icon: { url: "/brand/favicon-192.png", type: "image/png", sizes: "192x192" }, apple: { url: "/brand/apple-touch-icon.png", type: "image/png", sizes: "180x180" } },
-  openGraph: { type: "website", siteName: "Etail Depot", locale: "en_US", title: "Etail Depot — Payment acceptance and credit cards", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
-  twitter: { card: "summary_large_image", title: "Etail Depot — Payment acceptance and credit cards", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
+  openGraph: { type: "website", siteName: "Etail Depot", locale: "en_US", title: "Etail Depot — Payment acceptance and credit card", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
+  twitter: { card: "summary_large_image", title: "Etail Depot — Payment acceptance and credit card", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
 };
 
 export function publicPageUrl(path: PublicPath): string {
@@ -71,7 +72,7 @@ export function publicPageJsonLd(path: PublicPath): string {
   const organizationId = `${canonicalOrigin}/#organization`;
   const websiteId = `${canonicalOrigin}/#website`;
   const breadcrumbId = `${url}#breadcrumb`;
-  const breadcrumbLabels = { "/credit-card-services": "Credit cards", "/payment-acceptance-service": "Payment acceptance", "/help": "Help" } as const;
+  const breadcrumbLabels = { "/credit-card-services": serviceLabels.cards, "/payment-acceptance-service": serviceLabels.payments, "/help": "Help" } as const;
   const data = {
     "@context": "https://schema.org", "@graph": [
       {

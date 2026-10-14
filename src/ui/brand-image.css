@@ -1,0 +1,5 @@
+.inline-brand-image {
+  display: block;
+  content: var(--brand-image);
+  object-fit: contain;
+}

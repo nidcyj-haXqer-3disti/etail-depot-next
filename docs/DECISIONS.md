@@ -1,9 +1,27 @@
 # Decision register
 
+## D212 — sync and deploy the verified website
+
+14 October 2026. The user authorizes synchronizing with GitHub, deploying the prepared D209–D211 website and fixing errors found in post-deployment verification. Use the existing feature-branch/review/check/merge and manual Netlify Git-build workflow. Preserve current offers, six routes, original artwork, the enabled protected Emails integration, indexing controls and all data/Identity/access/DNS/provider settings. This is publication authorization for the reviewed candidate, not permission to change unrelated resources or bypass failed checks. Record actual source, CI, deploy identity and live acceptance in current status.
+
+## D211 — final local release preparation
+
+14 October 2026. Recheck exact public paths, all internal destinations, legal language/contacts and original artwork/logo delivery. Preserve D209/D210, the approved service URLs and all offers, disclosures, indexing guards and resource boundaries. Run the full local gates and package the verified candidate. Preparation does not push, merge or deploy; no new financial functionality or remote setting change is in scope. Record exact results in current status.
+
+## D210 — consistent service names and descriptive product language
+
+14 October 2026. The user requests Payment acceptance and Credit card as the main service language across all six pages, artwork, navigation, Help, Privacy and Terms. Use the singular Credit card for the one Ledgix product; replace the former competing Digital Wallet Card primary name with Ledgix credit card. Keep virtual, Visa secured credit card and supported digital wallets as accurate product descriptors. Preserve natural transaction nouns, plural credit/debit cards accepted, security-deposit and repayment distinctions, existing offers/status/disclosures, contacts, legal rights and original third-party wallet labels. Shared service labels prevent navigation/hero/legal drift. Keep exact current URL paths and anchors, canonical/indexing controls, original assets and the D209 logo fix. Legal edits are nomenclature only, with no change to duties or revision dates. Local implementation and verification only; no push or deployment.
+
+## D209 — keep small brand marks visible when the page appears
+
+14 October 2026. The user reports delayed Home Visa and shared-header Etail logos after the D208 release and asks to check every page. D206 already discovered the external logo requests early; separate delivery and asynchronous decoding still allowed empty spaces. Preserve the exact original assets, names, colors, proportions, page layout and commercial wording. Deliver the five small Etail, Ledgix, Visa, Mastercard and American Express marks as foreground image content in cached component stylesheets, avoiding repeated HTML/JavaScript data. Keep the larger Discover JPEG separate and eager, and preserve the Apple/Google wallet switching behavior. Original public asset URLs remain available for metadata and direct access. Verify original bytes, asset-response delays, cold load/reload, accessible names, mobile layout and printing. Work is local only; no new push, deployment, indexing or resource change is authorized by this check request. Current status records results and discarded prototype limitations.
+
 ## D208 — deploy the reviewed public website refinements
 
 14 October 2026. The user requests deployment of the current D202–D207 candidate. Use the existing reviewed PR/check/merge and manual Netlify Git-build workflow, preserving the enabled Emails extension and all resource boundaries. This authorizes publication of the reviewed public-site changes; it does not authorize DNS, access, database, Identity or provider changes. Record exact CI/source/deployment identity and hosted acceptance in current status.
 
+
+**Publication:** PR #38 was reviewed, passed both exact-source CI runs and merged as `5140da42853f21a0b65ca727be866aa182b5c51c`. Manual Netlify deploy `6acef0b08517b5679df9f98f` published at 12:02 JST on 14 October 2026 with Emails enabled and unchanged. Current status records live acceptance and diagnostics.
 
 ## D207 — use explicit service names in help and contact labels
 

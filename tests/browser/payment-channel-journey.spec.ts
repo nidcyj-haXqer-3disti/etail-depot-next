@@ -1,3 +1,4 @@
+import { expectDecodedBrandMark } from "./brand-marks";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const channels = ["Copy link", "Text", "Email", "Social", "QR code", "Website"] as const;
@@ -130,8 +131,7 @@ test("sharing and purchase recognition preserve one purchase without enrollment"
   await expect(art.locator("article a, article button, article input, form, iframe")).toHaveCount(0);
   for (const name of ["Visa", "Mastercard", "American Express", "Discover"]) {
     const image = outcome.getByRole("img", { name, exact: true });
-    await expect(image).toBeVisible();
-    await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth > 0)).toBe(true);
+    await expectDecodedBrandMark(image);
   }
   expect(await browserStorage(page)).toEqual(initialStorage);
   expect(observed.unexpected).toEqual([]);

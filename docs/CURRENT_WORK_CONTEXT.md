@@ -4,24 +4,38 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 
 ## Current baseline
 
-- Public pages: Home, Payments, Cards, Help, Privacy and Terms.
-- Published release: D201 / PR #37, 14 October 2026, 03:55 JST (13 October, 18:55 UTC), including PR #35 website updates, PR #36 email compatibility and the wallet-loading follow-up.
-- Netlify deploy: `6ace7e8a72d9f38a3f6d464a`, confirmed current and ready. Netlify Emails remains enabled with its saved settings preserved.
-- Published source: `a8f5ec25f29bf281868043a574aa2315a2d33efb`, tree `89e59b750fb1dec708266b2b4182de9e83f0a3d6`, identical to verified candidate `be45810a3c1e3312157775e353b54c1e5c0743ad`.
-- Working branch: `codex/product-labels-d202`, based on the PR #37 merge. D202 labels, D203 product URLs, D204 consistency edits, D205 artwork/copy refinements, D206 homepage-logo loading, D207 service wording and the prior release-closeout documentation are local; the published release above is unchanged.
-- D207 local wording: Payment acceptance help / Credit card help on product pages; Payment acceptance support / Credit card inquiries in Help, footer and structured contacts. Service introductions and Help metadata are aligned; formal product names, offers and legal substance remain intact. Complete verification and six-page responsive/link review pass; current status preserves the initial test diagnostics and final evidence.
-- D206 local fix: homepage card-network logos load eagerly from the initial HTML, instead of waiting for lazy-image layout. Original assets/design and lazy loading elsewhere remain intact. Cold navigation/refresh regressions, focused discovery/accessibility checks and packaging pass; see current status for the exact fresh verification scope.
-- D205 local review: six-page desktop/mobile and magnified artwork checks complete. Small payment-art wrapping/alignment and secured-credit illustration spacing fixes; clearer merchant-entered fee exclusion and payout FAQ. Existing design, warm palette, original assets, offers and legal substance remain intact. Complete `pnpm verify` passes, including the zero-finding dependency audit. See current status for evidence and limitations.
-- Acceptance: full local/CI gates and isolated packaging pass; the final production passes 88 HTTP checks and five affected wallet cases (one intentional desktop skip). The full dependency audit reports zero known vulnerabilities. Earlier hosted diagnostics and successful reruns are preserved in current status.
+- Public pages: Home, Payment acceptance, Credit card, Help, Privacy and Terms.
+- Published release: D208 / PR #38, 14 October 2026, 12:02 JST (03:02 UTC), including D202–D207 refinements.
+- Netlify deploy: `6acef0b08517b5679df9f98f`, confirmed current and ready. Netlify Emails remains enabled with unchanged saved settings and protected handler bytes.
+- Published source: `5140da42853f21a0b65ca727be866aa182b5c51c`, tree `6dba3385fe941552f452bc8c48f53ac3fdc10511`, identical to verified candidate `7090f4e23590cdf17292208766254a2f8260a6c2`.
+- Working branch: `codex/logo-rendering-d209`, based on the exact D208 GitHub merge; D209 logo-delivery and D210 terminology refinements are local and unpublished. D202 labels, D203 product URLs, D204 consistency edits, D205 artwork/copy refinements, D206 homepage-logo loading and D207 service wording are published.
+- Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently. Payment acceptance help / Credit card help and the related support labels are consistent across pages. Original design, assets, offers and legal substance remain intact.
+- Verification: full local checks, both exact-source GitHub CI runs, isolated frozen-lockfile packaging and final hosted artifact/security checks pass. Live acceptance passes all 110 HTTP checks and 73 browser cases, including 24 accessibility cases, with one intentional desktop skip. Current status records actual results and diagnostics.
 - Website: https://etail-depot-next.netlify.app/. Local preview: http://127.0.0.1:3100/.
 - Homepage: **Get paid. Keep going.**
 - Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service` (D194 label; D203 URL).
+
+## D212 — authorized release in progress
+
+The user requests syncing and deploying the prepared candidate, with post-deployment fixes if needed. Remote main is identical to the local D208 base; no incoming conflicts exist. D211 checks and independent diff review pass for the unchanged application fingerprint. Follow current status for actual PR, CI, merge, deployment and hosted verification results. Preserve the enabled Emails extension and resource boundaries.
+
+## D211 — prepared local candidate
+
+All six routes, 43 internal destinations, legal consistency and original artwork/logo delivery have been rechecked. Fresh full verification and packaging pass; see current status for evidence and the exact fingerprint. D209/D210 remain local and unpublished. The next release requires the reviewed GitHub/source and hosted acceptance workflow; no push or deployment occurred during preparation.
+
+## D210 — service terminology
+
+Use **Payment acceptance** and **Credit card** as the primary service labels across navigation, page labels, artwork, Help, legal notices and metadata. Refer to the product as **Ledgix credit card**; “virtual Visa secured credit card” describes its type, and digital-wallet wording describes compatibility. D210 supersedes the earlier Digital Wallet Card primary name without changing the offer, status, disclosures, logos or service URLs. Keep natural generic terms for actual payments, card networks, credit/debit cards, repayment and third-party wallet controls. All changes are local and unpublished.
+
+## D209 — local logo fix
+
+Check the repeated Home Visa/header-logo delay across all six pages. Small original brand marks now travel with cached foreground CSS rather than separate image requests; offers, layout and original asset files remain unchanged. Verification and prototype findings are recorded in current status. The live site remains D208 until a separate publication request.
 
 ## Products
 
 **Trolleys:** Two Step payments, 2.9% + 30 cents per successful domestic online card payment, no monthly fee. Optional Clarity retains its 0.4% fee basis, eligibility and coverage qualifications. Account access remains at the approved fixed service destination.
 
-**Ledgix:** Digital Wallet Card, a virtual Visa secured credit card for supported Apple/Google wallets, marked Coming soon. Approved terms remain a $200 minimum security deposit, $0 annual/monthly fees and full monthly repayment, with optional early repayment. Applications are not open yet.
+**Ledgix:** Ledgix credit card, a virtual Visa secured credit card for supported Apple/Google wallets, marked Coming soon. Approved terms remain a $200 minimum security deposit, $0 annual/monthly fees and full monthly repayment, with optional early repayment. Applications are not open yet.
 
 ## Working boundary
 

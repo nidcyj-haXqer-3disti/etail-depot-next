@@ -7,6 +7,7 @@ import { PublicQuestions } from "@/ui/public-site";
 import { PaymentArtwork, ServiceStatus } from "@/ui/service-entry";
 import { WalletCardArt } from "@/ui/wallet-card-art";
 import { PaymentHighlights } from "@/ui/payment-highlights";
+import { serviceLabels } from "@/shared/service-language";
 import { productFacts } from "@/shared/product-facts";
 import "@/ui/public-site.css";
 import { ConsumerHero, ConsumerNetworks } from "@/ui/consumer-layout";
@@ -17,7 +18,7 @@ export default function HomePage() {
   return <Shell>
     <PublicPageStructuredData path="/" />
     <div className="consumer-page consumer-home">
-      <ConsumerHero service="payments" productLabel="Trolleys · Payment acceptance" title={<>Get paid.<br /><span>Keep going.</span></>}
+      <ConsumerHero service="payments" title={<>Get paid.<br /><span>Keep going.</span></>}
         description="Turn a booking, project or sale into a payment request with Trolleys Two Step. Share a link or QR code so customers can pay by card."
         actions={<Link href="/payment-acceptance-service" className="button primary">Explore payment acceptance<Icon name="arrow" /></Link>}
         visual={<PaymentArtwork />}
@@ -25,7 +26,7 @@ export default function HomePage() {
       />
 
       <section className="consumer-channels page-container" id="payment-channels" aria-labelledby="channels-title">
-        <div className="consumer-section-heading"><h2 id="channels-title">Payments for everyday business.</h2></div>
+        <div className="consumer-section-heading"><h2 id="channels-title">Payment acceptance for your business.</h2></div>
         <PaymentHighlights />
       </section>
 
@@ -33,7 +34,7 @@ export default function HomePage() {
         <div className="page-container consumer-card-grid">
           <div className="consumer-card-visual"><WalletCardArt compact variant="preview" /></div>
           <div className="consumer-card-copy">
-            <div className="consumer-product-eyebrow"><p className="eyebrow">Ledgix · Secured credit card</p><ServiceStatus service="cards" /></div>
+            <div className="consumer-product-eyebrow"><p className="eyebrow">Ledgix · {serviceLabels.cards}</p><ServiceStatus service="cards" /></div>
             <h2 id="ledgix-title">Secured credit.<br /><span>Made for your wallet.</span></h2>
             <p>A virtual Visa secured credit card for Apple Wallet and Google Wallet.</p>
             <p className="consumer-card-terms">A ${productFacts.cards.minimumDepositDollars} minimum security deposit backs your account. No annual or monthly fee. Repay your full statement balance each month.</p>
