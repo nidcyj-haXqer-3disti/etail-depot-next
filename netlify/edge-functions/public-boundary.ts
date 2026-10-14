@@ -1,4 +1,4 @@
-import { retiredRoute } from "../../src/shared/public-routes.ts";
+import { publicPageRedirect, retiredRoute } from "../../src/shared/public-routes.ts";
 import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release.ts";
 
 type Environment = Readonly<Record<string, string | undefined>>;
@@ -57,6 +57,21 @@ export async function handlePublicRequest(
     SITE_ID: context.site?.id,
     CONTEXT: context.deploy.context,
   });
+  const publicDestination = publicPageRedirect(url.pathname);
+  if (publicDestination) {
+    if (!["GET", "HEAD"].includes(request.method)) {
+      return withSecurityHeaders(new Response("Method not allowed", {
+        status: 405,
+        headers: { Allow: "GET, HEAD", "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" },
+      }), true);
+    }
+    // Fixed same-origin destination: no queries or submitted data are forwarded.
+    // Omit a fragment so browsers retain public section bookmarks such as #wallets.
+    return withSecurityHeaders(new Response(null, {
+      status: 308,
+      headers: { Location: new URL(publicDestination, url.origin).href, "Cache-Control": "no-store" },
+    }), !approved);
+  }
   if (!approved && ["GET", "HEAD"].includes(request.method)) {
     const metadataPath = url.pathname.replace(/\/$/, "");
     const body = metadataPath === "/robots.txt" ? previewRobots : metadataPath === "/sitemap.xml" ? emptySitemap : null;

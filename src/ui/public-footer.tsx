@@ -5,16 +5,16 @@ import { hostedServices } from "@/shared/hosted-services";
 
 const footerGroups = [
   { title: "Services", links: [
-    { href: "/payment-services", label: "Payment acceptance" },
-    { href: "/card-services", label: "Credit cards" },
+    { href: "/payment-acceptance-service", label: "Payment acceptance" },
+    { href: "/credit-card-services", label: "Credit cards" },
   ] },
   { title: "Support", links: [
     { href: "/help", label: "Help center" },
     { href: "/help#access", label: "Sign-in help" },
   ] },
   { title: "Contact", links: [
-    { href: hostedServices.payments.contactHref, label: "Payment support" },
-    { href: hostedServices.cards.contactHref, label: "Card inquiries" },
+    { href: hostedServices.payments.contactHref, label: "Payment acceptance support" },
+    { href: hostedServices.cards.contactHref, label: "Credit card inquiries" },
   ] },
 ] as const;
 

@@ -22,6 +22,6 @@ export function PaymentFeeEstimate({saleRecords, onSaleRecordsChange}: {saleReco
         <div className="fee-net"><dt>Amount after displayed fees</dt><dd>{formatUsdCents(estimate.subtotalCents)}</dd></div>
       </dl> : <p className="fee-error" id="fee-estimate-error">Enter an amount from $1 to $100,000, with up to two decimal places.</p>}
     </div>
-    <p className="fee-estimate-note" id="fee-estimate-note">Estimate excludes international cards, currency conversion, manual card entry and other applicable charges. This is not a guaranteed payout. Using this calculator does not enroll you in Clarity or charge a fee.</p>
+    <p className="fee-estimate-note" id="fee-estimate-note">Estimate excludes international cards, currency conversion, merchant-entered card payments and other applicable charges. This is not a guaranteed payout. Using this calculator does not enroll you in Clarity or charge a fee.</p>
   </section>;
 }

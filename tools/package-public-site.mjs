@@ -51,7 +51,7 @@ function rejectSymlinks(directory) {
   }
 }
 rejectSymlinks(exportDirectory);
-for (const file of ["index.html", "card-services.html", "payment-services.html", "help.html", "privacy.html", "terms.html", "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
+for (const file of ["index.html", "credit-card-services.html", "payment-acceptance-service.html", "help.html", "privacy.html", "terms.html", "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
   assert(existsSync(path.join(exportDirectory, file)), `The static export is missing ${file}.`);
 }
 

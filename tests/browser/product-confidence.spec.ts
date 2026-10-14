@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("payments explain Two Step, optional Clarity and pricing with a safe hero service entry", async ({page}) => {
-  await page.goto("/payment-services");
+  await page.goto("/payment-acceptance-service");
   const fees=page.locator("#fees");
   const continuation=page.locator(".consumer-hero-actions").getByRole("link",{name:"Continue to Trolleys",exact:true});
   await expect(continuation).toHaveAttribute("href","https://trolleys.ai");
@@ -21,7 +21,7 @@ test("payments explain Two Step, optional Clarity and pricing with a safe hero s
   await expect(fees).toContainText("Original processing and currency conversion fees are not returned");
   await expect(fees).toContainText("eligible, successful payments enrolled in the service");
   await page.locator(".consumer-hero-actions").getByRole("link",{name:"View pricing",exact:true}).click();
-  await expect(page).toHaveURL(/\/payment-services#fees$/);
+  await expect(page).toHaveURL(/\/payment-acceptance-service#fees$/);
   await expect(fees.getByRole("heading",{name:"Know your fees.",exact:true})).toBeInViewport();
   const questions=page.locator(".public-faq-section summary");
   await expect(questions).toHaveCount(4);
@@ -29,7 +29,7 @@ test("payments explain Two Step, optional Clarity and pricing with a safe hero s
 });
 
 test("optional dispute readiness keeps price and Order Insight coverage limits visible", async ({page}) => {
-  await page.goto("/payment-services");
+  await page.goto("/payment-acceptance-service");
   const network=page.locator("#dispute-readiness");
   await expect(network.locator(".dispute-price")).toContainText("Optional service");
   await expect(network.locator(".dispute-price")).toContainText("+0.4%");
@@ -55,7 +55,7 @@ test("optional dispute readiness keeps price and Order Insight coverage limits v
 test("fees show Two Step and optional Clarity and recover invalid input", async ({page}) => {
   const mutations:string[]=[];
   page.on("request",request=>{if(!["GET","HEAD","OPTIONS"].includes(request.method()))mutations.push(request.url());});
-  await page.goto("/payment-services");
+  await page.goto("/payment-acceptance-service");
   const offer=page.locator(".payment-price-card");
   await expect(offer.getByRole("heading",{name:"Trolleys Two Step",exact:true})).toBeVisible();
   await expect(offer.locator(".payment-base-rate")).toHaveText("2.9% + 30¢");
@@ -95,7 +95,7 @@ test("fees show Two Step and optional Clarity and recover invalid input", async 
 });
 
 test("cards separate the deposit from debt and keep material terms outside disclosures", async ({page}) => {
-  await page.goto("/card-services");
+  await page.goto("/credit-card-services");
   const facts = page.locator("#card-details");
   await expect(facts).toContainText("$200");
   await expect(facts).toContainText("$0");

@@ -23,7 +23,7 @@ describe("static public deployment boundary", () => {
       for (const suffix of ["", ".html", ".txt", "/index.html", "/record.json"]) expect(forbiddenStatic(`${family}${suffix}`)).toBe(true);
     }
     for (const path of ["records.db", "backup.SQL", "src/app/page.tsx", "node_modules/next/package.json", ".next/server/page.js", "functions/server.js", "server.zip", "edge.eszip"]) expect(forbiddenStatic(path), path).toBe(true);
-    for (const path of ["index.html", "card-services.html", "payment-services.txt", "404.html", "robots.txt", "sitemap.xml", "opengraph-image", "brand/networks/visa-blue.svg", "_next/static/chunks/app.js"]) expect(forbiddenStatic(path), path).toBe(false);
+    for (const path of ["index.html", "credit-card-services.html", "payment-acceptance-service.txt", "404.html", "robots.txt", "sitemap.xml", "opengraph-image", "brand/networks/visa-blue.svg", "_next/static/chunks/app.js"]) expect(forbiddenStatic(path), path).toBe(false);
   });
 
   it("requires one all-path edge boundary before cache, without method or path exclusions", () => {

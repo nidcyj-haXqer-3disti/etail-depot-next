@@ -18,7 +18,7 @@ export const legalIdentity = {
     },
   ],
   brands: [
-    { name: "Ledgix", service: "Cards", operator: "Etail Depot US, Inc. DBA Ledgix", website: "https://ledgix.com", domain: "ledgix.com", email: "ledgix@etaildepot.com" },
-    { name: "Trolleys", service: "Payments", operator: "Etail Depot US, Inc. DBA Trolleys", website: "https://trolleys.ai", domain: "trolleys.ai", email: "trolleys@etaildepot.com" },
+    { name: "Ledgix", service: "Secured credit card", operator: "Etail Depot US, Inc. DBA Ledgix", website: "https://ledgix.com", domain: "ledgix.com", email: "ledgix@etaildepot.com" },
+    { name: "Trolleys", service: "Payment acceptance", operator: "Etail Depot US, Inc. DBA Trolleys", website: "https://trolleys.ai", domain: "trolleys.ai", email: "trolleys@etaildepot.com" },
   ],
 } as const;

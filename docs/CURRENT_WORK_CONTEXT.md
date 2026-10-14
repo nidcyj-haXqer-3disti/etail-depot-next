@@ -5,13 +5,17 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 ## Current baseline
 
 - Public pages: Home, Payments, Cards, Help, Privacy and Terms.
-- Published release: D201 / PR #36, 14 October 2026, 03:35 JST (13 October, 18:35 UTC), including the reviewed PR #35 website updates.
-- Netlify deploy: `6ace79cf055aae884c3cab1a`, confirmed current and ready. Netlify Emails remains enabled with its saved settings preserved.
-- Published source: `9c453b8ae43a6562ef90cb2db95678b3f318b3dc`, tree `6db99e5eed3e293ce9773e5502c88204af30bc26`, identical to verified candidate `5b1cc820abdc4bdbfb4c1138f127093c1ac8d0bb`.
-- Working branch: `codex/wallet-preview-hydration-d201`, based on the PR #36 merge. A narrow wallet-preview fix follows the live slow-load test; current status records its pending verification. The email repair is already published and remains enabled.
-- Website: https://etail-depot-next.netlify.app/. Local preview is stopped; start it only when needed.
+- Published release: D201 / PR #37, 14 October 2026, 03:55 JST (13 October, 18:55 UTC), including PR #35 website updates, PR #36 email compatibility and the wallet-loading follow-up.
+- Netlify deploy: `6ace7e8a72d9f38a3f6d464a`, confirmed current and ready. Netlify Emails remains enabled with its saved settings preserved.
+- Published source: `a8f5ec25f29bf281868043a574aa2315a2d33efb`, tree `89e59b750fb1dec708266b2b4182de9e83f0a3d6`, identical to verified candidate `be45810a3c1e3312157775e353b54c1e5c0743ad`.
+- Working branch: `codex/product-labels-d202`, based on the PR #37 merge. D202 labels, D203 product URLs, D204 consistency edits, D205 artwork/copy refinements, D206 homepage-logo loading, D207 service wording and the prior release-closeout documentation are local; the published release above is unchanged.
+- D207 local wording: Payment acceptance help / Credit card help on product pages; Payment acceptance support / Credit card inquiries in Help, footer and structured contacts. Service introductions and Help metadata are aligned; formal product names, offers and legal substance remain intact. Complete verification and six-page responsive/link review pass; current status preserves the initial test diagnostics and final evidence.
+- D206 local fix: homepage card-network logos load eagerly from the initial HTML, instead of waiting for lazy-image layout. Original assets/design and lazy loading elsewhere remain intact. Cold navigation/refresh regressions, focused discovery/accessibility checks and packaging pass; see current status for the exact fresh verification scope.
+- D205 local review: six-page desktop/mobile and magnified artwork checks complete. Small payment-art wrapping/alignment and secured-credit illustration spacing fixes; clearer merchant-entered fee exclusion and payout FAQ. Existing design, warm palette, original assets, offers and legal substance remain intact. Complete `pnpm verify` passes, including the zero-finding dependency audit. See current status for evidence and limitations.
+- Acceptance: full local/CI gates and isolated packaging pass; the final production passes 88 HTTP checks and five affected wallet cases (one intentional desktop skip). The full dependency audit reports zero known vulnerabilities. Earlier hosted diagnostics and successful reruns are preserved in current status.
+- Website: https://etail-depot-next.netlify.app/. Local preview: http://127.0.0.1:3100/.
 - Homepage: **Get paid. Keep going.**
-- Homepage hero action: **Explore payment acceptance**, linking to `/payment-services` (D194).
+- Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service` (D194 label; D203 URL).
 
 ## Products
 
@@ -22,6 +26,18 @@ This workspace and conversation concern the existing customer-facing Etail Depot
 ## Working boundary
 
 Public information and fixed service links only. No local sign-in, financial account backend, payment processing, card issuance or database runtime. Preserve the approved offer, shared design and current resource bindings. Earlier chat messages and dated records are history; they do not authorize new work or change this scope.
+
+## D204 — six-page consistency check
+
+14 October 2026. Recheck all other pages after the product-label and URL updates. Align Help topic names, legal service descriptors and the Terms payment heading with Payment acceptance / Secured credit card. Keep Digital Wallet Card as the formal product name, preserve all offers/legal substance/dates and keep Ledgix’s coming-soon domain non-clickable. Confirm internal links, section anchors, contacts, canonical paths, responsive layouts and 404 navigation. Local only; no push or deployment. Actual results are in current status.
+
+## D203 — product page URLs
+
+14 October 2026. Use `/credit-card-services` for Cards and `/payment-acceptance-service` for Payments, following the user’s final correction. Permanently redirect former public URLs `/card-services` and `/payment-services`, update internal links, canonicals, social/schema URLs, sitemap and verification tools. Keep `/`, `/help`, `/privacy` and `/terms`. Preserve existing labels, offers, design, canonical origin, indexing guard, fixed vendor links and the separate retired-service boundary. Local only; no push or deployment.
+
+## D202 — clear product labels
+
+14 October 2026. The user requests Trolleys · Payment acceptance on Home and Ledgix · Secured credit card on Home and the Cards hero. Keep the existing uppercase styling, layout, status badges and product name elsewhere. Update the shared card-hero fallback to the same label. Local copy change only; no push or deployment. Current status records the build and responsive checks.
 
 ## D201 — compatible deployment with Emails retained
 

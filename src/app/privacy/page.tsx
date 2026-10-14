@@ -9,12 +9,12 @@ export const metadata = legalPageMetadata("/privacy");
 const sections: LegalSection[] = [
   {
     id: "scope", title: "Our company and services", content: <>
-      <p>Etail Depot US, Inc. (“Etail Depot”, “we” or “us”) operates Ledgix for cards and Trolleys for payments. Ledgix and Trolleys are trade names of the same company, not separate legal entities.</p>
+      <p>Etail Depot US, Inc. (“Etail Depot”, “we” or “us”) operates Ledgix for secured credit cards and Trolleys for payment acceptance. Ledgix and Trolleys are trade names of the same company, not separate legal entities.</p>
       <LegalBrands />
       <h3>This website</h3>
       <p>This policy explains how we handle information when you browse this website or contact us. This website provides product information and links; it does not offer account registration, card management or payment processing.</p>
       <h3>Product privacy notices</h3>
-      <p>Trolleys payments and the Ledgix card service have separate product websites. For account records, cookies and information handling by Etail Depot and its service partners, review the privacy notices presented within that product when it is available. This website policy does not replace those notices or change our responsibilities for information we handle.</p>
+      <p>Trolleys payment acceptance and the Ledgix credit card service have separate product websites. For account records, cookies and information handling by Etail Depot and its service partners, review the privacy notices presented within that product when it is available. This website policy does not replace those notices or change our responsibilities for information we handle.</p>
       <p>Following a product link does not combine accounts or sign you in. Review the notices at your destination before providing personal or financial information.</p>
     </>,
   },

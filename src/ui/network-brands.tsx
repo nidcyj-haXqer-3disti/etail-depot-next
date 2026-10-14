@@ -11,13 +11,13 @@ const networks = {
 type Network = keyof typeof networks;
 
 /** Original network artwork, served locally without redrawing or color filters. */
-export function NetworkMark({ network, decorative = false }: { network: Network; decorative?: boolean }) {
+export function NetworkMark({ network, decorative = false, loading = "lazy" }: { network: Network; decorative?: boolean; loading?: "eager" | "lazy" }) {
   const mark = networks[network];
-  return <Image unoptimized className={`network-mark network-mark-${network}`} src={mark.src} alt={decorative ? "" : mark.name} width={mark.width} height={mark.height} />;
+  return <Image unoptimized loading={loading} className={`network-mark network-mark-${network}`} src={mark.src} alt={decorative ? "" : mark.name} width={mark.width} height={mark.height} />;
 }
 
-export function NetworkBrands({ variant = "compact", label = "Card networks" }: { variant?: "compact" | "accepted"; label?: string }) {
+export function NetworkBrands({ variant = "compact", label = "Card networks", loading = "lazy" }: { variant?: "compact" | "accepted"; label?: string; loading?: "eager" | "lazy" }) {
   return <div className={`network-brands network-brands-${variant}`} role="group" aria-label={label}>
-    {(Object.keys(networks) as Network[]).map(network => <span className="network-brand-slot" key={network}><NetworkMark network={network} /></span>)}
+    {(Object.keys(networks) as Network[]).map(network => <span className="network-brand-slot" key={network}><NetworkMark network={network} loading={loading} /></span>)}
   </div>;
 }

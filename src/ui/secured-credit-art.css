@@ -18,8 +18,8 @@
 .secured-cycle-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px 20px; padding: 6px 0 22px; }
 .secured-cycle-heading > span { font-size: 14px; font-weight: 550; line-height: 1.5; }
 .secured-cycle-heading > small { color: #66755e; font-size: 11px; line-height: 1.5; }
-.secured-credit-purchase-flow { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin: 0; padding: 0; list-style: none; }
-.secured-credit-purchase-flow > li { min-width: 0; }
+.secured-credit-purchase-flow { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); column-gap: 18px; row-gap: 0; margin: 0; padding: 0; list-style: none; }
+.secured-credit-purchase-flow > li { display: grid; grid-template-rows: subgrid; grid-row: span 2; min-width: 0; }
 .secured-step-art { position: relative; display: grid; place-items: center; min-height: 212px; min-width: 0; padding: 22px 10px; border: 1px solid #e0e6d9; border-radius: 8px; overflow: hidden; background: #e9efea; }
 .secured-step-art-statement { background: #eeeede; }
 .secured-step-art-repayment { background: #e4ece0; }
@@ -81,7 +81,7 @@
  .secured-deposit-copy > span { margin-top: 10px; font-size: 11px; }
  .secured-cycle-heading { padding-bottom: 16px; }
  .secured-credit-purchase-flow { grid-template-columns: minmax(0,1fr); gap: 16px; }
- .secured-credit-purchase-flow > li { display: grid; grid-template-columns: 154px minmax(0,1fr); gap: 18px; align-items: center; }
+ .secured-credit-purchase-flow > li { grid-template-columns: 154px minmax(0,1fr); grid-template-rows: auto; grid-row: auto; gap: 18px; align-items: center; }
  .secured-step-art { min-height: 212px; padding: 22px 10px; }
  .secured-credit-step { padding: 0; flex-direction: column; gap: 8px; }
  .secured-credit-step h3 { font-size: 15px; }
@@ -108,7 +108,7 @@
  .secured-purchase-tag .icon { width: 12px; height: 12px; }
  .secured-purchase-tag strong { font-size: 12px; }
  .secured-purchase-tag > span { font-size: 10px; }
- .secured-statement-paper { width: 100px; padding: 12px 8px 10px; transform: rotate(4deg); }
+ .secured-statement-paper { width: 96px; padding: 12px 8px 10px; transform: rotate(4deg); }
  .secured-statement-paper > strong { font-size: 19px; }
  .secured-statement-paper > span, .secured-statement-paper > small { font-size: 10px; }
  .secured-paper-total { margin-top: 11px; font-size: 10px; }

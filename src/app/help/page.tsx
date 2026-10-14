@@ -14,14 +14,14 @@ export const metadata = publicPageMetadata("/help");
 
 const topics = [
   {
-    id: "payments", label: "Trolleys payments", link: hostedServices.payments.portalUrl, action: "Open Trolleys",
+    id: "payments", label: "Trolleys payment acceptance", link: hostedServices.payments.portalUrl, action: "Open Trolleys",
     questions: [
-      { q: "What does it cost to accept payments?", a: <>For US businesses, {productFacts.payments.offerName} costs {productFacts.payments.cardRateLabel} per successful domestic online card payment in USD. No setup or monthly fee. Payment request creation, sharing and basic receipts are included. See <Link href="/payment-services#fees">payment pricing</Link> for optional services and other applicable charges.</> },
-      { q: "When does a payment reach my bank?", a: <>A successful payment and a bank payout are different steps. Check payment and payout status in your Trolleys account for timing and any review requirements. Learn more about <Link href="/payment-services#payouts">payouts</Link>.</> },
-      { q: "How do I handle a refund or dispute?", a: <>Follow the instructions in your Trolleys account to request a refund or respond to a dispute. Review the applicable fees, required information and deadlines there. See <Link href="/payment-services#refunds-and-disputes">refund and dispute details</Link>, or contact the payments team if you need help.</> },
-      { q: "Who can help with my payment account?", a: <>Use the support options in your Trolleys account or email <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a>. Do not include passwords or full card details.</> },
-      { q: "What is Trolleys Clarity?", a: <>Trolleys’ optional {saleRecordsOffer.name} service uses Order Insight to share purchase details with participating banks and help customers recognize charges. Eligible Visa online fraud disputes may be prevented when the required transaction history and data qualify. Basic payment receipts remain included without this service. <Link href="/payment-services#dispute-readiness">See how it works</Link>.</> },
-      { q: "What does Clarity cost?", a: <>The Trolleys service fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Payment processing is separate. Applicable charges and service terms are disclosed before enrollment. See <Link href="/payment-services#fees">fees and estimates</Link>. Selecting the website example does not enroll you or create a charge.</> },
+      { q: "What does it cost to accept payments?", a: <>For US businesses, {productFacts.payments.offerName} costs {productFacts.payments.cardRateLabel} per successful domestic online card payment in USD. No setup or monthly fee. Payment request creation, sharing and basic receipts are included. See <Link href="/payment-acceptance-service#fees">payment pricing</Link> for optional services and other applicable charges.</> },
+      { q: "When will a payout reach my bank?", a: <>A successful payment and a bank payout are different steps. Check payment and payout status in your Trolleys account for timing and any review requirements. Learn more about <Link href="/payment-acceptance-service#payouts">payouts</Link>.</> },
+      { q: "How do I handle a refund or dispute?", a: <>Follow the instructions in your Trolleys account to request a refund or respond to a dispute. Review the applicable fees, required information and deadlines there. See <Link href="/payment-acceptance-service#refunds-and-disputes">refund and dispute details</Link>, or contact the payments team if you need help.</> },
+      { q: "Who can help with my Trolleys account?", a: <>Use the support options in your Trolleys account or email <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a>. Do not include passwords or full card details.</> },
+      { q: "What is Trolleys Clarity?", a: <>Trolleys’ optional {saleRecordsOffer.name} service uses Order Insight to share purchase details with participating banks and help customers recognize charges. Eligible Visa online fraud disputes may be prevented when the required transaction history and data qualify. Basic payment receipts remain included without this service. <Link href="/payment-acceptance-service#dispute-readiness">See how it works</Link>.</> },
+      { q: "What does Clarity cost?", a: <>The Trolleys service fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Payment processing is separate. Applicable charges and service terms are disclosed before enrollment. See <Link href="/payment-acceptance-service#fees">fees and estimates</Link>. Selecting the website example does not enroll you or create a charge.</> },
       { q: "How does Order Insight help with a payment inquiry?", a: "Supported business, payment and purchase details help participating banks answer questions about a charge. Coverage depends on merchant enrollment, the payment and available records. The examples on this website do not share actual customer or purchase information." },
       { q: "Does Clarity prevent every dispute?", a: "No. Purchase recognition and prevention of eligible Visa online fraud disputes do not cover every bank, payment or dispute reason. A dispute can still proceed, and no outcome is guaranteed. Refund programs and managed responses to existing chargebacks are separate services. Follow your account’s instructions and deadlines if a dispute occurs." },
       { q: "What happens when I explore the payment examples?", a: "The examples illustrate payments for goods, services and information using fixed sample details. Your selections stay in this browser. They do not send payment requests, collect customer information, create sale records or enroll you in a service." },
@@ -29,13 +29,13 @@ const topics = [
     ],
   },
   {
-    id: "cards", label: "Ledgix cards", link: hostedServices.cards.contactHref, action: "Contact Ledgix",
+    id: "cards", label: "Ledgix secured credit card", link: hostedServices.cards.contactHref, action: "Contact Ledgix",
     questions: [
       { q: "Can I apply for a card now?", a: `Ledgix ${cardProduct.name} is a virtual ${cardProduct.creditType} for compatible digital wallets. Applications are not open yet. You’ll manage your card account through Ledgix when it launches.` },
-      { q: "Which digital wallets are supported?", a: <>When the card service is available, eligible cards can be added to Apple Wallet or Google Wallet. Support depends on the card, device and region. <Link href="/card-services#wallets">Preview the wallet experience</Link>.</> },
-      { q: "How does the security deposit work?", a: <>The minimum security deposit is ${productFacts.cards.minimumDepositDollars}. It backs the credit account; it does not pay for purchases. Purchases create a balance that you repay separately. See <Link href="/card-services#card-details">card details</Link> and review the card agreement for credit limits and deposit-return conditions.</> },
-      { q: "What are the card fees and repayment terms?", a: <>The annual fee is ${productFacts.cards.annualFeeDollars}, and the monthly fee is ${productFacts.cards.monthlyFeeDollars}. {productFacts.cards.repayment}. You can also make payments earlier or daily. See <Link href="/card-services#card-details">card details</Link> and review the full charges and conditions in the card agreement when the service launches.</> },
-      { q: "How do I contact Ledgix?", a: <>Email <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}</a> for card inquiries. An inquiry does not submit a card application, guarantee approval or subscribe you to launch updates.</> },
+      { q: "Which digital wallets are supported?", a: <>When the card service is available, eligible cards can be added to Apple Wallet or Google Wallet. Support depends on the card, device and region. <Link href="/credit-card-services#wallets">Preview the wallet experience</Link>.</> },
+      { q: "How does the security deposit work?", a: <>The minimum security deposit is ${productFacts.cards.minimumDepositDollars}. It backs the credit account; it does not pay for purchases. Purchases create a balance that you repay separately. See <Link href="/credit-card-services#card-details">card details</Link> and review the card agreement for credit limits and deposit-return conditions.</> },
+      { q: "What are the card fees and repayment terms?", a: <>The annual fee is ${productFacts.cards.annualFeeDollars}, and the monthly fee is ${productFacts.cards.monthlyFeeDollars}. {productFacts.cards.repayment}. You can also make payments earlier or daily. See <Link href="/credit-card-services#card-details">card details</Link> and review the full charges and conditions in the card agreement when the service launches.</> },
+      { q: "How do I contact Ledgix?", a: <>Email <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}</a> for credit card inquiries. An inquiry does not submit a card application, guarantee approval or subscribe you to launch updates.</> },
     ],
   },
   {
@@ -54,15 +54,15 @@ export default function HelpPage() {
     <PublicPageStructuredData path="/help" />
     <section className="page-container public-help-intro">
       <h1>Help center</h1>
-      <p>Get help with Trolleys payments or ask about the Ledgix card.</p>
+      <p>Get help with Trolleys payment acceptance or ask about the Ledgix credit card.</p>
       <section className="help-support-grid" aria-label="Support contacts">
         <article className="help-support-card">
-          <h2>Payment support</h2>
+          <h2>Payment acceptance support</h2>
           <p>For Trolleys account, payment, refund and dispute questions.</p>
           <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}<Icon name="arrow" /></a>
         </article>
         <article className="help-support-card">
-          <h2>Card inquiries</h2>
+          <h2>Credit card inquiries</h2>
           <p>Ask about the Ledgix {cardProduct.name}. Applications are not open yet.</p>
           <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}<Icon name="arrow" /></a>
         </article>

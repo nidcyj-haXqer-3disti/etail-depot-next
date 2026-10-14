@@ -8,7 +8,7 @@ The active application contains six public information pages. Home, Payment acce
 
 All six canonicals use `https://etail-depot-next.netlify.app` and their fixed public path. Visitor queries, account identifiers and request headers never choose the canonical origin. D122 records indexing approval for site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`. The source guard requires that exact approval and the matching production environment/site/origin. Local, test, branch and deploy-preview environments stay non-indexable. D179 does not change those controls.
 
-The production sitemap contains only `/`, `/card-services`, `/payment-services` and `/help`, with no invented last-modified dates. `robots.txt` permits HTML crawling so Google can observe indexing directives, excludes `/api/` and advertises the sitemap only in the approved environment. Live D178 checks confirmed these settings. They do not establish actual Google indexing. [Google indexing directives](https://developers.google.com/search/docs/crawling-indexing/block-indexing)
+The D203 candidate sitemap contains only `/`, `/credit-card-services`, `/payment-acceptance-service` and `/help`, with no invented last-modified dates. `robots.txt` permits HTML crawling so Google can observe indexing directives, excludes `/api/` and advertises the sitemap only in the approved environment. Live D178 checks confirmed these settings. They do not establish actual Google indexing. [Google indexing directives](https://developers.google.com/search/docs/crawling-indexing/block-indexing)
 
 ## Audience and metadata
 

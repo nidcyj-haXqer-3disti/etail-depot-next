@@ -1,6 +1,39 @@
 # Decision register
 
+## D208 — deploy the reviewed public website refinements
+
+14 October 2026. The user requests deployment of the current D202–D207 candidate. Use the existing reviewed PR/check/merge and manual Netlify Git-build workflow, preserving the enabled Emails extension and all resource boundaries. This authorizes publication of the reviewed public-site changes; it does not authorize DNS, access, database, Identity or provider changes. Record exact CI/source/deployment identity and hosted acceptance in current status.
+
+
+## D207 — use explicit service names in help and contact labels
+
+14 October 2026. The user requests Payment acceptance help and Credit card help and a full wording recheck. Apply these to product-page help links; align Help, footer contact labels, metadata/structured data and service introductions with Payment acceptance / Credit card terminology. Preserve actual help-section/contact destinations, the formal Digital Wallet Card product name, natural transactional wording, approved terms, availability and design. The legal edits clarify existing service names only and do not alter duties or revision dates. Local implementation and verification; no push or deployment. Current status records final checks and corrected test expectations.
+
+## D206 — load homepage network marks without waiting for layout
+
+14 October 2026. Correct the reported refresh delay by requesting eager loading only for the four original network marks in Home's accepted-networks strip. Preserve original assets/styles and the shared lazy default elsewhere. Verify early browser discovery on initial navigation and refresh independently of stylesheet layout or hydration, followed by decoded/rendered image checks. Keep hero scheduling unchanged; no extra preload or image processing service. Local repair only, no push or deployment. Current status records reproduction and final checks.
+
+## D205 — micro-refine existing artwork and wording
+
+14 October 2026. The user requests a microlevel words/artwork fit pass across all pages. Preserve the approved live-style foundation, warm palette, compositions, original assets, page structure, product positioning, financial terms, availability and interactions. Correct only observed details: the Social specimen's wrapping ellipsis, Clarity's narrow transaction labels and bank amount placement, uneven desktop secured-credit artwork rows and a near-touching mobile statement edge. Clarify the calculator's merchant-entered fee exclusion and the Help payout question. Home, shared chrome and legal pages need no further visual or substantive change after review.
+
+Use matching six-page 1440/390/320 renders, double-resolution details and explicitly labeled 200% CSS zoom captures. A full local verification and package check is appropriate; it does not authorize publication or remote changes. Evidence and limitations are recorded in current status. No push or deployment.
+
+## D204 — consistent labels across support and legal pages
+
+14 October 2026. The user requests checking all other pages after D203. Align Help topic labels, shared legal brand/contact descriptors and the Terms payment heading with the approved product categories. Preserve the formal Digital Wallet Card name, legal substance/revision dates, pricing and availability. Select Ledgix’s coming-soon display and structured contact type by stable brand identity rather than mutable display wording, so editing its descriptor cannot introduce a launch link. Verify all six routes, internal anchors, contact destinations, metadata and narrow-screen layouts. No push, deployment or hosted-service configuration change.
+
+## D203 — descriptive product page addresses
+
+14 October 2026. The user requests `/credit-card-services`, agrees to rename the Payments URL, then explicitly corrects that choice to `/payment-acceptance-service`. Migrate both existing pages without changing their approved content/design or canonical domain. Update active navigation, cross-links, search metadata, sitemap, artifact expectations and tests. GET/HEAD requests for exact old public HTML addresses receive a 308 to the new same-origin path, with no query forwarding; browser section bookmarks retain their fragment. Other methods return 405 without consuming or forwarding data. Retired financial paths retain 410 and account bookmarks retain their fixed 307 behavior, now pointing directly to the new pages. No additional discovery pages or runtime services. Local change only, no push or deployment.
+
+## D202 — product eyebrow labels
+
+14 October 2026. Use **Trolleys · Payment acceptance** on the homepage and **Ledgix · Secured credit card** on the homepage and Cards hero, retaining the existing uppercase presentation. Align the shared card-hero fallback. Preserve Digital Wallet Card as the product name elsewhere, availability, all offers and the current layout. Local only; no new publication authorization.
+
 ## D201 — resolve deployment conflicts while keeping Emails enabled
+
+**Completed:** PR #37 publishes the wallet follow-up and completes D201 as deploy `6ace7e8a72d9f38a3f6d464a`, source `a8f5ec25f29bf281868043a574aa2315a2d33efb`, after exact-source CI, isolated packaging and preview acceptance. Final production passes 88 HTTP checks and five affected wallet cases with one intentional desktop skip. Emails remains enabled; its handler archive is unchanged from PR #36 and all saved settings are preserved. No message was sent or email delivery claimed. Current status records the complete checks, earlier failures and reruns; the following paragraphs retain their chronological context.
 
 **Publication and follow-up:** PR #36 published as deploy `6ace79cf055aae884c3cab1a` from merged source `9c453b8ae43a6562ef90cb2db95678b3f318b3dc`, after successful exact-candidate CI and preview verification. Emails remains enabled with saved settings unchanged. Live HTTP/security/metadata checks pass. The final browser run also identified a mobile wallet disclosure that can close after an early native click while hydration is pending. Preserve that visitor choice through a minimal regression-tested follow-up; do not delay the test to hide the behavior or alter the existing artwork, wording, offers or email settings. Current status retains the initial challenge/timing failures and actual rerun outcomes.
 
