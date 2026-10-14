@@ -2,26 +2,30 @@
 
 This workspace and conversation concern the existing customer-facing Etail Depot website. Start from the deployed version and the user's next explicit request.
 
+## D215 — domain migration in progress
+
+The user requests https://etaildepot.com for this existing public website. After explicit approval of the domain-only exception, apex/www Netlify assignments have moved from etail-depot-webapp to etail-depot-next; the old project and its deploy remain intact. Active Cloudflare DNS still points to the previous website, so traffic and HTTPS cutover await authenticated DNS access. Do not change nameservers or mail records. Canonical/redirect changes are verified locally on `codex/custom-domain-d215`; D214 remains published. Do not publish the default-host redirect before the custom domain serves the current site over HTTPS. Follow current status for actual progress.
+
 ## Current baseline
 
 - Public pages: Home, Payment acceptance, Credit card, Help, Privacy and Terms.
-- Published release: D212 / PR #39, 14 October 2026, 13:32 JST (04:32 UTC), including D209 logo delivery and D210 service terminology.
-- Netlify deploy: `6acf05abfff229a0f4d81c85`, confirmed current and ready. Netlify Emails remains enabled with unchanged saved settings and protected handler bytes.
-- Published source: `f3f7ff9e237d5d3cd87dbe82ce16266df9067ea6`, tree `abeae200157127a45ac3a68a96c5b11fbac383ef`, identical to reviewed PR #39 candidate `10e3bf39ec903b8f7f49f03d739d74d51c2d8815`.
-- Working branch: `codex/alignment-refinement-d213`, based on the exact D212 GitHub merge. D202–D210 are published; D213 contact/company-panel alignment refinements remain local. Earlier feature/release branches and release-closeout documentation are preserved.
+- Published release: D214 / PR #40, 14 October 2026, 14:27 JST (05:27 UTC), including D213 Help/legal alignment and the existing D209 logo delivery/D210 service terminology.
+- Netlify deploy: `6acf12b74fe02b69c92bcc60`, confirmed current and ready. Netlify Emails remains enabled with unchanged saved settings and protected handler bytes.
+- Published source: `03585117285172fc1238bf1e3e72187c91a4856e`, tree `73847264d1ed3b518e9573162e20f650f0dbecfd`, identical to reviewed PR #40 candidate `9959c022d5ebf25946158f510746b336c11d822a`.
+- Working branch: `codex/released-d214`, aligned to the exact D214 GitHub merge. D213 alignment refinements are published; the original feature branch is preserved. Release-closeout documentation is local follow-up only.
 - Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently. Payment acceptance help / Credit card help and the related support labels are consistent across pages. Original design, assets, offers and legal substance remain intact.
-- Verification: full local checks, both exact-source candidate CI runs, merged-main CI, isolated frozen-lockfile packaging and final hosted artifact/security checks pass. D212 live acceptance passes 105 HTTP requests and 85 browser cases, including 24 accessibility cases, with one intentional desktop skip. Eighteen responsive captures pass. Current status records actual results and diagnostics.
+- Verification: full local checks, both exact-source candidate CI runs, merged-main CI, isolated frozen-lockfile packaging and final hosted artifact/security checks pass. D214 live acceptance passes 105 HTTP requests and 48 browser cases, including 24 accessibility cases, with one intentional desktop skip. Eighteen full-page captures and 21 contact/legal alignment states pass. Current status records actual results and diagnostics.
 - Website: https://etail-depot-next.netlify.app/. Local preview: http://127.0.0.1:3100/.
 - Homepage: **Get paid. Keep going.**
 - Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service` (D194 label; D203 URL).
 
-## D214 — authorized release in progress
+## D214 — published and verified
 
-The user requests pushing and deploying D213. The existing GitHub main and published Netlify source match the D212 base. Fresh full verification, reviewed exact-source release and post-deployment checks are in progress. Preserve Emails and resource boundaries; follow current status for actual outcomes.
+Reviewed PR #40 and the successful manual Netlify Git build publish D213. Exact-source CI, isolated packaging, hosted build and live acceptance pass. Help contacts and legal company details align across desktop/tablet/mobile; Home/product artwork, wording and offers remain unchanged. Emails stays enabled. Follow current status for exact evidence and limits.
 
-## D213 — local micro-level alignment refinement
+## D213 — alignment refinement, published in D214
 
-Help contact cards now align their headings, descriptions, emails and arrows and stack before tablet widths can split an address. Privacy/Terms company panels share aligned status/domain rows. All six pages are reviewed; Home and product artwork are unchanged. Local build, alignment, accessibility and focused navigation checks pass. No push or deployment; D212 remains live.
+Help contact cards now align their headings, descriptions, emails and arrows and stack before tablet widths can split an address. Privacy/Terms company panels share aligned status/domain rows. All six pages are reviewed; Home and product artwork are unchanged. Local build, alignment, accessibility and focused navigation checks passed during D213. D214 subsequently authorizes and completes publication.
 
 ## D212 — published and verified
 

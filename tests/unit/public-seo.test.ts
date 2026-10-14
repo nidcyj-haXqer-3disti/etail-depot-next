@@ -24,7 +24,7 @@ const rejectedEnvironments = [
   ["another site", { SITE_ID: "another-site" }],
   ["retired site", { SITE_ID: targets.denied.netlify_site_ids[0] }],
   ["local origin", { ETAIL_PUBLIC_ORIGIN: "http://127.0.0.1:3100" }],
-  ["different origin", { ETAIL_PUBLIC_ORIGIN: "https://etaildepot.com" }],
+  ["previous origin", { ETAIL_PUBLIC_ORIGIN: "https://etail-depot-next.netlify.app" }],
   ["nonexact origin", { ETAIL_PUBLIC_ORIGIN: `${canonicalOrigin}/` }],
 ] as const;
 
@@ -34,17 +34,17 @@ function stubEnvironment(changes: Readonly<Record<string, string | undefined>> =
 afterEach(() => vi.unstubAllEnvs());
 
 describe("public search release boundary", () => {
-  it("records D122 approval for only the exact reviewed site", () => {
+  it("records D215 domain migration for only the exact reviewed site", () => {
     expect(PUBLIC_INDEXING_APPROVAL).toMatchObject({
-      siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etail-depot-next.netlify.app",
+      siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D122.*2026-09-21/);
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D215.*2026-10-14.*D122/);
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
       expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, { ...production, [key]: undefined })).toBe(false);
     }
-    for (const changed of [{ siteId: "another-site" }, { canonicalOrigin: "https://etaildepot.com" }, { reviewReference: " " }]) {
+    for (const changed of [{ siteId: "another-site" }, { canonicalOrigin: "https://etail-depot-next.netlify.app" }, { reviewReference: " " }]) {
       expect(isApprovedSearchRelease({ ...PUBLIC_INDEXING_APPROVAL, ...changed }, production)).toBe(false);
     }
   });

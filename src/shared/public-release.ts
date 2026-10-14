@@ -11,17 +11,22 @@ function boundCanonicalOrigin(): string {
   return parsed.origin;
 }
 export const canonicalOrigin = boundCanonicalOrigin();
+/** Only the recorded production subdomain redirects; preview/deploy URLs stay independent. */
+export const defaultOrigin = targets.netlify.default_origin;
+if (defaultOrigin !== `https://${targets.netlify.site_name}.netlify.app` || defaultOrigin === canonicalOrigin) {
+  throw new Error("The public domain redirect requires the recorded production subdomain.");
+}
 
 export interface SearchReleaseApproval {
   siteId: string;
   canonicalOrigin: string;
   reviewReference: string;
 }
-/** D122 explicitly authorizes indexing this recorded site; previews and local builds remain excluded. */
+/** D215 moves the existing D122 search release to the approved custom domain. */
 export const PUBLIC_INDEXING_APPROVAL: SearchReleaseApproval = {
   siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
-  canonicalOrigin: "https://etail-depot-next.netlify.app",
-  reviewReference: "D122 — user authorization to index and deploy, 2026-09-21",
+  canonicalOrigin: "https://etaildepot.com",
+  reviewReference: "D215 — user authorization to move the public website to etaildepot.com, 2026-10-14; preserves D122 indexing scope",
 };
 export type Environment = Readonly<Record<string, string | undefined>>;
 

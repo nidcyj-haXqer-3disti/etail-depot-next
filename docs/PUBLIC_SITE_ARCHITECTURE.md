@@ -1,8 +1,8 @@
 # Public website architecture
 
-D108 public-only scope · D212 published architecture, 14 October 2026
+D108 public-only scope · D214 published architecture, 14 October 2026
 
-The user selected **public website and vendor links only**, with existing database records preserved. D212 / PR #39 is published as Netlify deploy `6acf05abfff229a0f4d81c85`, source `f3f7ff9e237d5d3cd87dbe82ce16266df9067ea6`, confirmed ready and current on 14 October 2026 at 13:32 JST. The static website and native Edge boundary preserve the approved Home photograph, D184 Payments presentation, Cards, six public routes, copy, offers and client interactions. The Netlify Emails extension remains enabled with unchanged saved settings and the reviewed authenticated POST handler described below. Exact-source CI, isolated packaging and final hosted build checks pass; D212 live acceptance passes 105 HTTP checks and 85 browser cases (including 24 accessibility checks), with one intentional desktop skip. See [current status](../planning/STATUS.md) for final results and limitations.
+The user selected **public website and vendor links only**, with existing database records preserved. D214 / PR #40 is published as Netlify deploy `6acf12b74fe02b69c92bcc60`, source `03585117285172fc1238bf1e3e72187c91a4856e`, confirmed ready and current on 14 October 2026 at 14:27 JST. Help/contact and legal-company alignment is refined; the architecture is unchanged. The static website and native Edge boundary preserve the approved Home photograph, D184 Payments presentation, Cards, six public routes, copy, offers and client interactions. The Netlify Emails extension remains enabled with unchanged saved settings and the reviewed authenticated POST handler described below. Exact-source CI, isolated packaging and final hosted build checks pass; D214 live acceptance passes 105 HTTP checks and 48 browser cases (including 24 accessibility checks), with one intentional desktop skip. See [current status](../planning/STATUS.md) for final results and limitations.
 
 ## Original brand artwork delivery (D209, published in D212)
 

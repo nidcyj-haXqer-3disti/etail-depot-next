@@ -171,7 +171,7 @@ test("legal documents are reachable without sign-in and retain their search visi
       await expect(page.locator(selector)).toHaveAttribute("content", searchTitle);
     }
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etail-depot-next.netlify.app${path}`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etaildepot.com${path}`);
     await expect(page.locator('form, script[type="application/ld+json"]')).toHaveCount(0);
     expect(await page.locator("main").innerText()).not.toMatch(/\b(draft|demo|sandbox|simulated|fictional)\b|not yet taken effect/i);
     await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("Ledgix for its credit card service and Trolleys for payment acceptance");
@@ -290,12 +290,12 @@ test("public pages have unique canonical metadata and no private data", async ({
     titles.add(await page.title());
     const canonical = page.locator('link[rel="canonical"]');
     await expect(canonical).toHaveCount(1);
-    expect(new URL((await canonical.getAttribute("href"))!).href).toBe(`https://etail-depot-next.netlify.app${route}`);
+    expect(new URL((await canonical.getAttribute("href"))!).href).toBe(`https://etaildepot.com${route}`);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute("content",/.{50,}/);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content",/noindex/);
     await expect(page.getByRole("heading",{level:1})).toHaveCount(1);
     const data=JSON.parse(await page.locator('script[type="application/ld+json"]').innerText());
-    expect(data["@graph"].find((node: { "@type": string }) => node["@type"] === "WebPage").url).toBe(`https://etail-depot-next.netlify.app${route}`);
+    expect(data["@graph"].find((node: { "@type": string }) => node["@type"] === "WebPage").url).toBe(`https://etaildepot.com${route}`);
     const editorialText = (await page.locator("main").textContent()) ?? "";
     // Marketing describes the hosted services, never the local prototype's balances or controls.
     expect(editorialText).not.toMatch(/Visa prepaid card|prepaid Visa card/i);
@@ -317,7 +317,7 @@ test("public pages have unique canonical metadata and no private data", async ({
   await expect(page.locator(".sandbox-badge")).toHaveCount(0);
   await expect(page.getByRole("banner")).not.toContainText(/\bsandbox\b/i);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content",/noindex/);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etail-depot-next.netlify.app/help");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/help");
   const image=await request.get("/opengraph-image");expect(image.ok()).toBe(true);
   expect(image.headers()["content-type"]).toBe("image/png");
 });

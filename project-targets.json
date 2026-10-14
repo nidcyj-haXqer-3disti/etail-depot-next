@@ -12,7 +12,11 @@
     "site_name": "etail-depot-next",
     "site_id": "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
     "team_id": "685ae8f4e6ce519ecf6b267d",
-    "canonical_origin": "https://etail-depot-next.netlify.app"
+    "canonical_origin": "https://etaildepot.com",
+    "default_origin": "https://etail-depot-next.netlify.app",
+    "domain_aliases": [
+      "www.etaildepot.com"
+    ]
   },
   "isolation": {
     "new_database_required": false,
@@ -41,11 +45,21 @@
       "7e49e5cf-5938-4e90-8c0e-026432311e0b"
     ],
     "domains": [
-      "etaildepot.com",
-      "www.etaildepot.com",
       "etail-depot-member-commerce.netlify.app",
       "etail-depot-webapp.netlify.app"
     ]
   },
-  "binding_instructions": "Resources already exist. Use the recorded repository and site IDs; verify identity before mutations. This public website must not connect to existing database or Identity resources; preserve those resources and their records. Any future credentials must be project-specific. Do not reuse legacy resources or remove denied targets. Local checks are not remote authorization."
+  "binding_instructions": "Use the recorded repository and destination site IDs. D215 explicitly authorizes the domain_migration scope on its recorded source site, overriding its denied name only for these domain assignments. All other denied-project changes remain prohibited. Preserve all existing database and Identity records, email and unrelated DNS settings. No legacy runtime or resource reconnection.",
+  "domain_migration": {
+    "decision": "D215 \u2014 explicit user request, 2026-10-14",
+    "source_site_name": "etail-depot-webapp",
+    "source_site_id": "e1f23aa8-d7d1-41cd-9f76-8bcbdf05a658",
+    "destination_site_id": "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
+    "domains": [
+      "etaildepot.com",
+      "www.etaildepot.com"
+    ],
+    "authorized_scope": "Move only these website domain assignments and their required web DNS records; update current public-site canonical metadata and routing. Preserve source project/code/data/Identity, all email/MX/TXT records, unrelated domains and settings.",
+    "dns_provider": "Cloudflare"
+  }
 }
