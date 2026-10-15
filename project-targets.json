@@ -6,7 +6,7 @@
     "owner": "nidcyj-haXqer-3disti",
     "repository_name": "etail-depot-next",
     "repository_id": 1361184741,
-    "private": true
+    "private": false
   },
   "netlify": {
     "site_name": "etail-depot-next",
