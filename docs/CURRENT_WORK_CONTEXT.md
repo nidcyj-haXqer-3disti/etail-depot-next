@@ -2,9 +2,23 @@
 
 This workspace and conversation concern the existing customer-facing Etail Depot website. Start from the deployed version and the user's next explicit request.
 
-## D217 — search submission and authorized release in progress
+## D220 — documentation release authorized
 
-The user accepts the next-step recommendation: submit the existing four-page sitemap, test/request indexing for the three undiscovered pages, release the reviewed D216 content through normal gates, and continue Bing/ChatGPT access checks. This supersedes D216’s local-only publication hold for that reviewed content. Google has accepted the sitemap with Success and four discovered pages. All three discovery-page live tests pass and their one-time indexing requests are accepted. All local release gates and packaging pass. Exact-source CI, isolated packaging and hosted acceptance remain; authorization alone is not evidence of publication. Preserve site design/offers, approved provider links, all DNS/email settings and stored resources. D215 remains live until a verified D217 release completes.
+The user requests deployment of the prepared public README/contribution guide and accompanying accurate project records. Follow the reviewed PR/check/manual Netlify Git-build workflow, preserving application behavior and all existing resources. D217 remains the published baseline until fresh release readback confirms otherwise; current status records actual checks and publication.
+
+## D219 — public contributor documentation, local
+
+README.md now describes the current product website, exact setup/checks, contribution process, support and license status without obsolete deployment narration. CONTRIBUTING.md explains forks, upstream pull requests, UI/check evidence and the separate release boundary. Documentation links, commands and pins pass focused validation and independent review. Branch `codex/public-contributor-docs-d219`; no push, merge or deployment. D217 remains live and the D218 repository remains public.
+
+## D218 — public GitHub contributions
+
+The user authorized making `nidcyj-haXqer-3disti/etail-depot-next` public. GitHub settings/API confirm public visibility on 15 October 2026 after user reauthentication. The bounded history review found no concrete exposure blocker; coverage and limitations are in current status. Anyone may fork and submit a pull request; no new direct-write permission, license or branch rule was added. Main and the D217 website release remain unchanged. Local visibility/closeout records are not a new code push or deployment.
+
+## D217 — search refinement published and verified
+
+The reviewed D216 content is published at https://etaildepot.com through PR #42. Signed merge `9dbfbd2e73a7c55f20e3c5621c081494c755209e`, tree `35fbf0646ed7c51614768c46ed243ca036e241b6`, exactly matches the reviewed and independently packaged candidate. Candidate/main CI and the hosted artifact/security gates pass. Deploy `6acf9c330c039995f744c0a2` is ready/current. Hosted acceptance passes 135 HTTP requests and 68 unique browser cases, including all 24 accessibility cases, with one intentional skip. One managed-connection challenge passed a single slower isolated retry; original diagnostics remain in current status. Existing design, offers, six routes and protected Emails are preserved.
+
+Google accepted the four-page sitemap and one indexing request for each of the three successfully live-tested discovery pages. Bing separately confirms DNS-verified administrator access after explicit approval of one CNAME; all 55 previous DNS records are unchanged. Its sitemap is Success with four discovered URLs; search reports request 48 hours for preparation. No Google OAuth import, analytics or scheduled monitoring was added. Actual indexing, rankings, field performance and ChatGPT citations remain unproven.
 
 ## D216 — local search refinements and verified Google ownership
 
@@ -21,15 +35,15 @@ PR #41 is merged as `d8632ae1d0114989fd66149b003954a4d8ba2d3d`; exact-source CI 
 ## Current baseline
 
 - Public pages: Home, Payment acceptance, Credit card, Help, Privacy and Terms.
-- Published release: D215 / PR #41, 14 October 2026, 22:49 JST (13:49 UTC), moving the D214 public website to etaildepot.com without design, offer or financial-runtime changes.
-- Netlify deploy: `6acf885a922b0f7283693c75`, confirmed current and ready. Netlify Emails remains enabled with unchanged saved settings and protected handler bytes.
-- Published source: `d8632ae1d0114989fd66149b003954a4d8ba2d3d`, tree `f16e45c52163f20e9ba787f995bd94ce9ae70459`, identical to reviewed PR #41 candidate `6e22d715307771613578c32de8d1d3721d0ce579`.
-- Published baseline: `codex/released-d215`, aligned to the exact GitHub merge. Current local work is on `codex/search-growth-d216`; prior branches and D215 closeout edits remain preserved. D216 content and documentation are not published.
-- Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently. Payment acceptance help / Credit card help and the related support labels are consistent across pages. Original design, assets, offers and legal substance remain intact.
-- Verification: full local checks, exact-source candidate/main CI, isolated packaging and hosted artifact/security checks pass. D215 hosted acceptance passes 177 HTTP checks, 49 unique browser cases and all 24 accessibility cases, with one intentional skip. Eighteen matching screenshots are pixel-identical to D214; 21 alignment states pass. Current status retains the managed-connection retry and hosted-preview limitation.
-- Website: https://etaildepot.com/. The old Netlify public address redirects to it. Local preview: http://127.0.0.1:3100/.
+- Published release: D217 / PR #42, 15 October 2026, 00:14 JST (14 October 15:14 UTC), adding focused payment/wallet/company FAQs while preserving design, offers and financial-runtime boundaries.
+- Netlify deploy: `6acf9c330c039995f744c0a2`, confirmed current and ready. Emails remains enabled with unchanged saved settings and protected handler bytes.
+- Published source: `9dbfbd2e73a7c55f20e3c5621c081494c755209e`, tree `35fbf0646ed7c51614768c46ed243ca036e241b6`, identical to reviewed PR #42 candidate `eccc32c2034e306fbd6664c6dd65cbf0e54d2a41`.
+- Local baseline: `codex/released-d217`, aligned to the exact signed merge. The original feature branch is preserved. Release-closeout documentation remains local follow-up and does not change the deployed application.
+- Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently. Original design, assets, offers and legal substance remain intact.
+- Verification: full local checks, exact-source candidate/main CI, isolated packaging and hosted artifact/security checks pass. Hosted acceptance passes 135 HTTP requests and 68 unique browser cases, including all 24 accessibility cases, with one intentional skip. Follow current status for the preserved challenge retry and visual/measurement limitations.
+- Website: https://etaildepot.com/. The old Netlify public address redirects to it. Local preview: http://127.0.0.1:3100/, with noindex, blocked crawling and empty sitemap.
 - Homepage: **Get paid. Keep going.**
-- Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service` (D194 label; D203 URL).
+- Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service`.
 
 ## D214 — published and verified
 

@@ -1,6 +1,6 @@
 # Consumer search and public release
 
-D215 published baseline · D216 content · D217 authorized search submission/release, 14 October 2026
+D217 published search refinement · Google and Bing verification/submissions, 15 October 2026 JST
 
 ## Current scope and search controls
 
@@ -30,7 +30,7 @@ Page-specific social-preview imagery could be considered separately using approv
 
 On 14 October 2026, Google accepted the existing sitemap with Success and four discovered pages. Payment acceptance, Credit card and Help each passed a live smartphone inspection: successful fetch, crawling/indexing allowed, the exact self canonical and one valid breadcrumb item. One indexing request per page was accepted into the priority crawl queue. The earlier baseline below remains a dated observation, not the current submission status. Actual Google-selected canonicals after indexing, impressions, rankings and traffic require subsequent reports; no repeated request is warranted.
 
-Read-only review confirms that the existing wildcard robots policy permits Bingbot and OAI-SearchBot. This is crawl eligibility, not proof of genuine crawler visits, WAF access or AI citations. No robots edit is needed. Bing account/property access remains to be established; importing Google properties would grant ongoing Search Console access/synchronization and is not silently authorized by a search-access check. GPTBot training controls are distinct from ChatGPT search controls. Sources and limitations are recorded in `artifacts/d217-release/search-access-review.json`.
+Read-only review confirms that the existing wildcard robots policy permits Bingbot and OAI-SearchBot. This is crawl eligibility, not proof of genuine crawler visits, WAF access or AI citations. No robots edit is needed. On 15 October 2026 JST, the user separately approved manual Bing site verification through one Cloudflare CNAME. Bing confirms verified administrator access by DNS, and its first sitemap submission is Success with four discovered URLs. All 55 previous DNS records are unchanged (56 total); no Google Search Console import or ongoing OAuth grant was made. GPTBot training controls are distinct from ChatGPT search controls. Sources, DNS readback and limitations are recorded in `artifacts/d217-release/search-access-review.json`, `bing-verification.json` and `bing-dns-readback.json`.
 
 ## Measurement still required
 

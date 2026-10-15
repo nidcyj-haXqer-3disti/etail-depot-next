@@ -1,55 +1,92 @@
 # Etail Depot
 
-The public website for Etail Depot US, Inc., introducing **Trolleys payments** and forthcoming **Ledgix Visa secured credit cards**. Payment account setup, sign-in and dashboards are hosted at the vendor service. This application contains product information, help, legal pages and fixed service links only.
+The customer-facing website for **Etail Depot US, Inc.**, introducing **Trolleys payment acceptance** and the **Ledgix credit card**.
 
-**Release status:** D163 / PR #34 / Netlify deploy `6ab20642fc4fee270b08924d` remains live. PR #35's static-site and native Edge security remediation passed CI and merged with zero dependency advisories. Its first hosted build failed before publication. D201 directs a compatible repair that keeps the existing Netlify Emails extension enabled and preserves its settings. The reviewed release now allows only its pinned, authenticated POST handler alongside the public site; full local/CI and hosted checks must pass before publication. Read [current work context](docs/CURRENT_WORK_CONTEXT.md) and [status](planning/STATUS.md) for current evidence and limits.
+[Website](https://etaildepot.com) · [Payment acceptance](https://etaildepot.com/payment-acceptance-service) · [Credit card](https://etaildepot.com/credit-card-services) · [Help](https://etaildepot.com/help)
 
-## Run locally
+## About the project
 
-Use Node **24.19.0** and pnpm **11.19.0**:
+Trolleys helps US businesses accept online payments. Ledgix is a virtual Visa secured credit card, **coming soon**; applications are not open. The website explains both products, their pricing and limitations, and where to get help.
+
+This repository contains the public website: product pages, interactive illustrations, help, legal notices and fixed links to the services. It does not run customer accounts, card issuance or payment processing. Trolleys account access is handled separately at [trolleys.ai](https://trolleys.ai); Ledgix inquiries go to [ledgix@etaildepot.com](mailto:ledgix@etaildepot.com).
+
+Built with **Next.js, React and TypeScript**, exported as static pages and served on Netlify with a shared Edge request boundary. See the [architecture](docs/PUBLIC_SITE_ARCHITECTURE.md) for implementation details and [current status](planning/STATUS.md) for verified release information.
+
+## Quick start
+
+Install **Node.js 24.19.0**, **pnpm 11.19.0** and Git. Dependency versions are pinned in [package.json](package.json) and [pnpm-lock.yaml](pnpm-lock.yaml).
 
 ```sh
+git clone https://github.com/nidcyj-haXqer-3disti/etail-depot-next.git
+cd etail-depot-next
 pnpm install --frozen-lockfile
 pnpm build
 pnpm preview
 ```
 
-Open `http://127.0.0.1:3100`. No database, authentication tenant, payment credentials or environment secrets are needed. For UI development, use `pnpm dev --port 3100`; use the built preview to exercise static hosting, retirement responses and search headers.
+Open [http://127.0.0.1:3100](http://127.0.0.1:3100). Local setup needs no production credentials, database, service account or environment file.
 
-## Project map
-
-| Folder | Purpose |
-| --- | --- |
-| `src/app` | Six public pages, metadata routes, global styles and 404 |
-| `src/ui` | Public layout, brand artwork, channel illustrations and legal/help components |
-| `src/shared` | Confirmed product/contact details, public channel types, retired bookmark destinations and the search-release guard |
-| `src/modules/public-site` | Search/social metadata, illustrative purchase examples and local fee calculations |
-| `netlify/edge-functions/public-boundary.ts` | Read-only retirement responses, security headers and deployment-context search protection |
-| `netlify/email-compat`, `netlify/plugins/public-release` | Protect the existing platform email handler and verify its final hosted package; no website email form |
-| `public` | Local brand assets, official network marks and marketing photography |
-| `tests` | Public journeys, links, accessibility, metadata and retired-route checks |
-| `tools` | Static build/preview, local Edge packaging and source/dependency/artifact verification |
-| `patches` | Scoped Next lint root-resolver patch, tested without disabling lint rules |
-| `archive/database` | Inactive migration/schema history and preservation evidence; never used at runtime |
-| `docs`, `planning`, `sources`, `contracts` | Current decisions plus dated requirements and review history |
-
-The previous account backend is retained in Git at `111b703d9793c53d414f6c1ab0ec8985a5e54095`. Existing database records were not deleted or imported into the public website. The database archive is schema history, not a customer-data backup.
-
-## Verify and package
+For UI development with automatic reloads:
 
 ```sh
-pnpm verify:public
-pnpm test:seo:production
-pnpm package:netlify
-pnpm verify:package
+pnpm dev --port 3100
 ```
 
-The checks cover types, lint and `test:lint-tooling`, public-only boundaries, unit/browser/accessibility tests, dependencies, the static production build, search guard and local Netlify packaging. The supported `output: "export"` keeps the existing pages and interactions; original images are served directly without an image server. The pinned `@netlify/edge-bundler` 16.0.4 replaces the Next adapter and Netlify CLI. A scoped patch uses pinned Node 24’s stable filesystem glob API for Next lint root resolution; unsupported patterns fail closed and rule coverage is tested. Run them with ports 3100 and 3101 free. `pnpm verify` runs the complete sequence. `package:netlify` rebuilds a local production-review export and packages static files, the single Edge boundary and the strictly verified platform email source; it does not upload or publish them.
+Stop the preview before starting the development server on the same port. The built preview exercises hosting, redirects and search headers; development mode is for UI work. Local previews remain excluded from search indexing.
 
-## Release boundaries
+## Contributing
 
-The only approved repository and site are recorded in [project-targets.json](project-targets.json). D122 authorized search indexing for Home, Payments, Cards and Help at `https://etail-depot-next.netlify.app` in the bound production environment; previews, legal pages, 404 and retired routes remain noindex. Netlify automatic publication remains held. Manual publication follows the reviewed release workflow and the user's authorization for that candidate. Local checks do not publish the website or establish Google indexing.
+Contributions are welcome through pull requests. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the fork and branch workflow, checks and review expectations. Start with an issue for a substantial product or architecture change so its scope can be agreed before implementation.
 
-Search release requires the recorded approval, exact site/origin and production environment checks. Static build metadata and runtime Edge protection use the same pure guard. The Edge boundary takes site identity and deploy context from Netlify’s trusted context, not visitor headers; nonproduction responses remain noindex. Search environment and remote release configuration must be verified for the candidate before publication. See [release evidence and remaining checks](docs/RELEASE_READINESS_REVIEW.md), including the unverified Search Console/indexing status.
+Public access allows anyone to fork the repository and propose changes. Merging requires repository write access; changes should go through review. A merge or a passing local check does not authorize a production deployment.
 
-Read [the public architecture](docs/PUBLIC_SITE_ARCHITECTURE.md), [current source precedence](docs/SOURCE_PRECEDENCE.md) and [implementation status](planning/STATUS.md) before changing scope. Older documents describe retired account features; they do not authorize restoring those features or reconnecting stored account data.
+## Checks
+
+Stop your local development or preview server and keep ports **3100 and 3101** free. Install the test browser, then run the complete verification sequence:
+
+```sh
+pnpm exec playwright install chromium
+pnpm verify
+```
+
+On Linux, Playwright may also require system libraries; use `pnpm exec playwright install --with-deps chromium` when needed. Dependency auditing and first-time bundling require network access.
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm verify:public` | Lint, types, unit tests, architecture, build, browser journeys, accessibility and security checks |
+| `pnpm test:seo:production` | Check production metadata and indexing safeguards using a local server |
+| `pnpm package:netlify` | Build and package a local production-review candidate |
+| `pnpm verify:package` | Verify package contents, source identity and hosting boundaries |
+
+`pnpm verify` runs all four commands in order. None uploads or deploys the website. The [GitHub workflow](.github/workflows/foundation.yml) runs these checks for pull requests against this repository's `main` branch.
+
+## Repository guide
+
+| Path | Purpose |
+| --- | --- |
+| `src/app` | Home, Payment acceptance, Credit card, Help, Privacy, Terms, metadata and 404 |
+| `src/ui` | Shared layout, navigation, artwork and interface components |
+| `src/shared`, `src/modules/public-site` | Product details, safe service links, metadata and illustrative calculations |
+| `public`, `assets/brand` | Original brand, card-network, wallet and other visual assets |
+| `netlify` | Edge request boundary, protected platform email compatibility and release checks |
+| `tests`, `tools`, `patches` | Automated checks, build/preview tooling and a documented dependency patch |
+| `docs`, `planning` | Architecture, decisions, current work and release evidence |
+| `archive/database`, `sources`, `contracts` | Preserved schema, requirements and research history; not active application services |
+
+## Scope and releases
+
+The active application is a public information website. Historical account code and database schemas are retained for reference; they are not setup instructions, customer-data backups or permission to reconnect retired services. The existing protected Netlify Emails handler is a platform compatibility exception; website pages do not call it.
+
+Preserve approved product wording, pricing, availability, authentic logos and the shared design. Service links use fixed destinations and must not forward customer identifiers, query strings, fragments or referrers. Production indexing is limited to Home, Payment acceptance, Credit card and Help; legal, preview, error and retired pages retain their indexing restrictions.
+
+Release targets are bound in [project-targets.json](project-targets.json). Deployment is a separate maintainer operation under the [deployment runbook](docs/NETLIFY_DEPLOYMENT.md). Use the [current work context](docs/CURRENT_WORK_CONTEXT.md) and [source precedence](docs/SOURCE_PRECEDENCE.md) before acting on older documents. Coding agents must also follow [AGENTS.md](AGENTS.md).
+
+## Support and security
+
+- **Website bugs:** [open an issue](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/issues) with the affected page, reproduction steps and browser/viewport details. Remove personal information from screenshots.
+- **Product or account questions:** use the [Help center](https://etaildepot.com/help), rather than a public GitHub issue.
+- **Potential security vulnerabilities:** contact [compliance@etaildepot.com](mailto:compliance@etaildepot.com) privately. Do not post credentials, customer information or sensitive exploit details in public issues or pull requests.
+
+## License and assets
+
+No repository-wide open-source license has been selected. Public visibility is not a license announcement. For licensing or reuse questions, contact [compliance@etaildepot.com](mailto:compliance@etaildepot.com). Preserve the existing notices and attribution for dependencies and third-party brand assets.
