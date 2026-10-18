@@ -12,7 +12,7 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production", CONTEXT: "production",
   SITE_ID: targets.netlify.site_id, ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
-const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help"] as const;
+const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback"] as const;
 const rejectedEnvironments = [
   ["local development", { NODE_ENV: "development", APP_ENV: "local" }],
   ["local production build", { APP_ENV: "local" }],
@@ -39,6 +39,7 @@ describe("public search release boundary", () => {
       siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
     expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D215.*2026-10-14.*D122/);
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D228.*2026-10-19/);
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
@@ -80,12 +81,12 @@ describe("public search release boundary", () => {
 });
 
 describe("reviewed public metadata", () => {
-  it("uses distinct truthful descriptions and fixed canonical URLs for exactly four public pages", () => {
+  it("uses distinct truthful descriptions and fixed canonical URLs for exactly seven public pages", () => {
     expect(Object.keys(PUBLIC_PAGES)).toEqual(publicPaths);
     expect(canonicalOrigin).toBe(targets.netlify.canonical_origin);
     expect(new URL(String(rootMetadata.metadataBase)).origin).toBe(canonicalOrigin);
-    expect(new Set(Object.values(PUBLIC_PAGES).map(page => page.title)).size).toBe(4);
-    expect(new Set(Object.values(PUBLIC_PAGES).map(page => page.description)).size).toBe(4);
+    expect(new Set(Object.values(PUBLIC_PAGES).map(page => page.title)).size).toBe(publicPaths.length);
+    expect(new Set(Object.values(PUBLIC_PAGES).map(page => page.description)).size).toBe(publicPaths.length);
     for (const path of publicPaths) {
       const metadata = publicPageMetadata(path);
       expect(JSON.stringify(metadata)).not.toMatch(/prepaid|Each service has its own sign-in/i);
@@ -104,7 +105,7 @@ describe("reviewed public metadata", () => {
     expect(publicSocialImage).toMatchObject({ url: `${canonicalOrigin}/opengraph-image`, width: 1200, height: 630 });
   });
 
-  it.each(["/privacy", "/terms", "/login", "/services", "/security", "/operations", "/cardholder-services", "/card-services", "/payment-services", "/payment-acceptance", "/merchants/person-id", "/pay/channel-id", "/api/v1/cardholder-services", "/help?case=private", "//another-site.test/", "/help/", "__proto__"])("refuses private or unreviewed path %s rather than creating search metadata", path => {
+  it.each(["/privacy", "/terms", "/login", "/services", "/security", "/operations", "/cardholder-services", "/card-services", "/payment-services", "/payment-acceptance", "/guides", "/guides/unapproved-guide", "/guides/stripe-alternatives?account=private", "/merchants/person-id", "/pay/channel-id", "/api/v1/cardholder-services", "/help?case=private", "//another-site.test/", "/help/", "__proto__"])("refuses private or unreviewed path %s rather than creating search metadata", path => {
     expect(() => publicPageUrl(path as PublicPath)).toThrow("Only reviewed public");
     expect(() => publicPageMetadata(path as PublicPath)).toThrow("Only reviewed public");
     expect(() => publicPageJsonLd(path as PublicPath)).toThrow("Only reviewed public");
@@ -160,6 +161,19 @@ describe("public structured data", () => {
       ]);
     }
     expect(JSON.parse(publicPageJsonLd("/"))["@graph"][2]).not.toHaveProperty("breadcrumb");
+  });
+
+  it("connects each guide to Payment acceptance without inventing a guide index", () => {
+    const labels = { "/guides/stripe-alternatives": "Stripe alternatives", "/guides/payment-processing-systems": "Payment processing systems", "/guides/what-is-a-chargeback": "What is a chargeback?" } as const;
+    for (const path of Object.keys(labels) as (keyof typeof labels)[]) {
+      const graph = JSON.parse(publicPageJsonLd(path))["@graph"];
+      expect(graph[2].breadcrumb).toEqual({ "@id": graph[3]["@id"] });
+      expect(graph[3].itemListElement).toEqual([
+        { "@type": "ListItem", position: 1, name: "Etail Depot", item: publicPageUrl("/") },
+        { "@type": "ListItem", position: 2, name: "Payment acceptance", item: publicPageUrl("/payment-acceptance-service") },
+        { "@type": "ListItem", position: 3, name: labels[path], item: publicPageUrl(path) },
+      ]);
+    }
   });
 
   it("escapes script-closing characters while preserving valid JSON and its original text", () => {

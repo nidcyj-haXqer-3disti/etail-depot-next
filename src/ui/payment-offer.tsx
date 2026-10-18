@@ -7,7 +7,7 @@ import "./product-confidence.css";
 export function PaymentOffer({saleRecords,onSaleRecordsChange}: {saleRecords: boolean; onSaleRecordsChange: (enabled: boolean) => void}) {
   const fees = productFacts.payments;
   return <section className="page-container payment-offer-section" id="fees" aria-labelledby="payment-fees-title">
-    <div className="consumer-section-heading"><div><h2 id="payment-fees-title">Know your fees.</h2></div><p>For US businesses accepting online payments in USD. Eligibility and account approval apply.</p></div>
+    <div className="consumer-section-heading"><div><h2 id="payment-fees-title">Credit card processing fees.</h2></div><p>For US businesses accepting online payments in USD. Eligibility and account approval apply.</p></div>
     <div className="payment-offer-grid">
       <div className="payment-price-card">
         <h3>{fees.offerName}</h3><p className="payment-base-rate">{fees.cardRateLabel}</p><p>per successful domestic online card payment</p>

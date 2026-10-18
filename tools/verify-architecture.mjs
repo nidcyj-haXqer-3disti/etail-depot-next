@@ -6,7 +6,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
-import { boundarySource, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, publicSourcePath, retiredFamilies } from "./public-artifact-policy.ts";
+import { boundarySource, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "./public-artifact-policy.ts";
 import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { verifyPlatformEmail, verifyPlatformEmailBundle } from "./netlify-email-compat.ts";
@@ -14,8 +14,6 @@ import { verifyPlatformEmail, verifyPlatformEmailBundle } from "./netlify-email-
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relative = filename => path.relative(root, filename).split(path.sep).join("/");
 const failures = [];
-const publicPages = ["page.tsx", "credit-card-services/page.tsx", "payment-acceptance-service/page.tsx", "help/page.tsx", "privacy/page.tsx", "terms/page.tsx"];
-const infrastructure = new Set(["layout.tsx", "not-found.tsx", "error.tsx", "global-error.tsx", "robots.ts", "sitemap.ts", "opengraph-image.tsx"]);
 const publicPackages = new Set(["next", "react", "react-dom"]);
 function fail(filename, code) { failures.push(`${filename}: ${code}`); }
 function files(directory) {
@@ -90,7 +88,7 @@ assert.deepEqual(Object.keys(manifest.dependencies).sort(), [...publicPackages].
 for (const entry of ["src/platform", "src/app/api", "netlify/database", "netlify/functions", "src/proxy.ts", "drizzle.config.ts", "playwright.email.config.ts"]) {
   if (existsSync(path.join(root, entry))) fail(entry, "RETIRED_RUNTIME_PATH");
 }
-for (const page of publicPages) if (!existsSync(path.join(root, "src/app", page))) fail(`src/app/${page}`, "MISSING_PUBLIC_PAGE");
+for (const page of publicPageSources) if (!existsSync(path.join(root, "src/app", page))) fail(`src/app/${page}`, "MISSING_PUBLIC_PAGE");
 const sources = [...files(path.join(root, "src")), ...files(path.join(root, "netlify/edge-functions"))];
 if (!existsSync(path.join(root, boundarySource))) fail(boundarySource, "MISSING_PUBLIC_BOUNDARY");
 for (const filename of sources) {
@@ -98,7 +96,7 @@ for (const filename of sources) {
   if (!publicSourcePath(name)) fail(name, "NON_PUBLIC_SOURCE_PATH");
   if (name.startsWith("src/app/") && /\.[cm]?[jt]sx?$/.test(name)) {
     const appPath = name.slice("src/app/".length);
-    if (!publicPages.includes(appPath) && !infrastructure.has(appPath)) fail(name, "UNREVIEWED_ROUTE_OR_APP_MODULE");
+    if (!reviewedPublicAppModule(appPath)) fail(name, "UNREVIEWED_ROUTE_OR_APP_MODULE");
   }
   if (/\.[cm]?[jt]sx?$/.test(name)) sourceChecks(name, readFileSync(filename, "utf8"));
 }
@@ -114,9 +112,9 @@ if (process.argv.includes("--artifacts")) {
   const appManifest = path.join(nextRoot, "server/app-paths-manifest.json");
   if (!existsSync(appManifest)) throw new Error("Build the public static website before checking deployment artifacts.");
   const routes = Object.keys(JSON.parse(readFileSync(appManifest, "utf8")));
-  const expected = new Set(["/page", "/credit-card-services/page", "/payment-acceptance-service/page", "/help/page", "/privacy/page", "/terms/page", "/robots.txt/route", "/sitemap.xml/route", "/opengraph-image/route", "/_not-found/page", "/_global-error/page"]);
+  const expected = new Set([...publicPageSources.map(page => `/${page.replace(/\.tsx$/, "")}`), "/robots.txt/route", "/sitemap.xml/route", "/opengraph-image/route", "/_not-found/page", "/_global-error/page"]);
   for (const route of routes) if (!expected.has(route)) fail(".next/server/app-paths-manifest.json", `UNEXPECTED_BUILT_ROUTE ${route}`);
-  for (const page of publicPages) {
+  for (const page of publicPageSources) {
     const route = `/${page.replace(/\.tsx$/, "")}`;
     if (!routes.includes(route)) fail(".next/server/app-paths-manifest.json", `MISSING_BUILT_ROUTE ${route}`);
   }
@@ -144,10 +142,9 @@ if (process.argv.includes("--artifacts")) {
     const base = path.join(root, directory);
     for (const filename of files(base)) if (forbiddenStatic(path.relative(base, filename))) fail(relative(filename), "PRIVATE_OR_ARCHIVED_STATIC_FILE");
   }
-  const publicHtml = ["index.html", "credit-card-services.html", "payment-acceptance-service.html", "help.html", "privacy.html", "terms.html"];
-  const allowedHtml = new Set([...publicHtml, "404.html", "_not-found.html", "_global-error.html"]);
+  const allowedHtml = new Set([...publicHtmlFiles, "404.html", "_not-found.html", "_global-error.html"]);
   for (const name of staticNames.filter(filename => filename.endsWith(".html"))) if (!allowedHtml.has(name)) fail(name, "UNEXPECTED_STATIC_PAGE");
-  for (const name of [...publicHtml, "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
+  for (const name of [...publicHtmlFiles, "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
     const filename = path.join(staticRoot, name);
     assert.ok(existsSync(filename) && statSync(filename).isFile() && statSync(filename).size > 0, `Missing required public export: ${name}`);
   }
@@ -190,10 +187,10 @@ if (process.argv.includes("--artifacts")) {
   for (const signature of ["___netlify-server-handler", "___netlify-edge-handler-node-middleware", "@netlify/plugin-nextjs"]) {
     if (bundleText.includes(signature)) fail(relative(bundlePath), "RETIRED_ADAPTER_IN_EDGE_BUNDLE");
   }
-  console.log(`Artifact boundary checked ${routes.length} compiler routes, ${publicHtml.length} static pages, ${staticNames.length} static files, one public edge boundary covering ${retiredFamilies.length} retired families, and only the protected platform email handler.`);
+  console.log(`Artifact boundary checked ${routes.length} compiler routes, ${publicHtmlFiles.length} static pages, ${staticNames.length} static files, one public edge boundary covering ${retiredFamilies.length} retired families, and only the protected platform email handler.`);
 }
 
 if (failures.length) {
   for (const failure of [...new Set(failures)]) console.error(failure);
   process.exitCode = 1;
-} else console.log(`Public architecture checks passed: ${sources.length} application source files; six public pages; no local account, payment or database runtime.`);
+} else console.log(`Public architecture checks passed: ${sources.length} application source files; ${publicPageSources.length} public pages; no local account, payment or database runtime.`);

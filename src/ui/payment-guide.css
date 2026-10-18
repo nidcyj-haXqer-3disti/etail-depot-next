@@ -1,0 +1,83 @@
+.payment-guide-header { background: var(--public-paper); border-bottom: 1px solid var(--public-line); padding: 28px 0 58px; }
+.payment-guide-breadcrumb ol { display: flex; flex-wrap: wrap; gap: 8px 12px; margin: 0 0 48px; padding: 0; list-style: none; color: var(--public-muted); font-size: 12px; line-height: 1.7; }
+.payment-guide-breadcrumb li + li::before { content: "/"; margin-right: 12px; color: var(--public-accent); }
+.payment-guide-breadcrumb a { color: var(--public-ink); text-decoration: underline; text-underline-offset: 3px; }
+.payment-guide-heading { max-width: 830px; }
+.payment-guide-heading h1 { margin-top: 15px; font-size: clamp(2.1rem, 4.5vw, 3.65rem); line-height: 1.12; letter-spacing: -.045em; text-wrap: balance; }
+.payment-guide-intro { margin-top: 24px; max-width: 760px; color: var(--public-muted); font-size: 18px; line-height: 1.75; }
+.payment-guide-byline { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 25px; color: var(--public-muted); font-size: 12px; line-height: 1.8; }
+.payment-guide-disclosure { max-width: 760px; margin-top: 15px; color: var(--public-muted); font-size: 13px; line-height: 1.75; }
+.payment-guide-body { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 64px; padding-block: 60px 72px; }
+.payment-guide-contents { align-self: start; position: sticky; top: 28px; font-size: 13px; line-height: 1.65; }
+.payment-guide-contents h2 { margin-bottom: 16px; font-size: 14px; font-weight: 600; letter-spacing: 0; }
+.payment-guide-contents ol { display: grid; gap: 12px; padding-left: 18px; margin: 0 0 18px; }
+.payment-guide-contents a { text-decoration: underline; text-decoration-color: var(--public-line); text-underline-offset: 4px; }
+.payment-guide-contents a:hover { text-decoration-color: currentColor; }
+.payment-guide-article { max-width: 820px; min-width: 0; }
+.payment-guide-section + .payment-guide-section { margin-top: 42px; padding-top: 36px; border-top: 1px solid var(--public-line); }
+.payment-guide-section h2, .payment-guide-sources h2, .payment-guide-next h2 { font-size: 25px; line-height: 1.3; letter-spacing: -.035em; scroll-margin-top: 28px; }
+.payment-guide-copy { margin-top: 18px; font-size: 16px; line-height: 1.85; color: var(--public-muted); }
+.payment-guide-copy > * + * { margin-top: 18px; }
+.payment-guide-copy strong { color: var(--public-ink); font-weight: 600; }
+.payment-guide-copy ul, .payment-guide-copy ol { padding-left: 24px; }
+.payment-guide-copy li + li { margin-top: 10px; }
+.payment-guide-copy a, .payment-guide-sources a { color: var(--public-ink); text-decoration: underline; text-underline-offset: 3px; }
+.payment-guide-copy a:hover, .payment-guide-sources a:hover { color: var(--public-hover); }
+.payment-guide-callout { background: var(--public-tint); border-left: 3px solid var(--public-accent); padding: 20px 24px; border-radius: 0 var(--public-radius) var(--public-radius) 0; }
+.payment-guide-callout > * + * { margin-top: 12px; }
+.payment-guide-table-hint { display: none; }
+.payment-guide-table-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--public-line); border-radius: var(--public-radius); }
+.payment-guide-table-scroll:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 4px; }
+.payment-guide-table-scroll table { width: 100%; min-width: 580px; border-collapse: collapse; font-size: 14px; line-height: 1.7; text-align: left; }
+.payment-guide-table-scroll caption { padding: 16px 18px; color: var(--public-ink); background: var(--public-paper); font-size: 13px; font-weight: 600; text-align: left; }
+.payment-guide-table-scroll caption span { display: block; max-width: min(100%, calc(100vw - var(--public-gutter) - var(--public-gutter) - 38px)); }
+.payment-guide-table-scroll th, .payment-guide-table-scroll td { padding: 16px 18px; border-top: 1px solid var(--public-line); vertical-align: top; }
+.payment-guide-table-scroll thead th { background: var(--public-tint); color: var(--public-ink); font-weight: 600; }
+.payment-guide-table-scroll tbody th { width: 28%; color: var(--public-ink); font-weight: 500; }
+.payment-guide-table-scroll td { min-width: 170px; }
+.payment-guide-note { font-size: 13px; line-height: 1.8; }
+.payment-guide-sources { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--public-line); color: var(--public-muted); font-size: 13px; line-height: 1.8; }
+.payment-guide-sources h2 { color: var(--public-ink); font-size: 21px; }
+.payment-guide-sources p { margin-top: 15px; }
+.payment-guide-sources ul { padding-left: 20px; margin-block: 15px; }
+.payment-guide-sources li + li { margin-top: 7px; }
+.payment-guide-next { margin-top: 38px; padding: 28px; background: var(--public-paper); border-radius: var(--public-radius); }
+.payment-guide-next p { margin-top: 14px; color: var(--public-muted); font-size: 14px; line-height: 1.8; }
+.payment-guide-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.payment-guide-actions .button.secondary { border: 1px solid var(--public-ink); background: transparent; color: var(--public-ink); }
+.payment-guide-actions .button.secondary:hover { background: var(--public-tint); }
+.payment-guide-top { display: inline-flex; gap: 12px; margin-top: 26px; font-size: 13px; text-decoration: underline; text-underline-offset: 4px; }
+.payment-guides { padding: 54px 0; background: var(--public-paper); border-top: 1px solid var(--public-line); }
+.payment-guides-heading { max-width: 640px; }
+.payment-guides-heading h2 { margin-top: 12px; font-size: 30px; line-height: 1.25; letter-spacing: -.035em; }
+.payment-guides-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 18px; margin-top: 28px; }
+.payment-guides-card { display: flex; flex-direction: column; align-items: flex-start; padding: 24px; border: 1px solid var(--public-line); border-radius: var(--public-radius); background: #fff; }
+.payment-guides-card:hover { border-color: var(--public-accent); }
+.payment-guides-card h3 { font-size: 20px; line-height: 1.35; letter-spacing: -.025em; }
+.payment-guides-card p { margin: 12px 0 20px; color: var(--public-muted); font-size: 14px; line-height: 1.75; }
+.payment-guides-read { display: flex; gap: 10px; margin-top: auto; font-size: 13px; font-weight: 600; }
+.payment-guides-next { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 28px; margin-top: 32px; border-top: 1px solid var(--public-line); }
+.payment-guides-next p { max-width: 600px; color: var(--public-muted); font-size: 14px; line-height: 1.8; }
+.payment-guides-next .button { flex-shrink: 0; }
+@media (max-width: 1000px) {
+  .payment-guide-body { grid-template-columns: 180px minmax(0, 1fr); gap: 32px; }
+}
+@media (max-width: 760px) {
+  .payment-guide-header { padding-block: 24px 38px; }
+  .payment-guide-breadcrumb ol { margin-bottom: 32px; }
+  .payment-guide-intro { font-size: 16px; margin-top: 20px; }
+  .payment-guide-body { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 32px 48px; }
+  .payment-guide-contents { position: static; border-bottom: 1px solid var(--public-line); padding-bottom: 26px; }
+  .payment-guide-contents ol { gap: 10px; }
+  .payment-guide-section h2 { font-size: 23px; }
+  .payment-guide-copy { font-size: 15px; }
+  .payment-guide-table-hint { display: block; margin-bottom: 10px; font-size: 12px; line-height: 1.7; }
+  .payment-guide-callout { padding: 18px; }
+  .payment-guide-next { padding: 22px; }
+  .payment-guide-next h2 { font-size: 22px; }
+  .payment-guide-actions { flex-direction: column; align-items: flex-start; }
+  .payment-guides { padding-block: 38px; }
+  .payment-guides-heading h2 { font-size: 26px; }
+  .payment-guides-card { padding: 22px; }
+  .payment-guides-next { flex-direction: column; align-items: flex-start; gap: 18px; }
+}

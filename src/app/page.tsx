@@ -19,14 +19,14 @@ export default function HomePage() {
     <PublicPageStructuredData path="/" />
     <div className="consumer-page consumer-home">
       <ConsumerHero service="payments" title={<>Get paid.<br /><span>Keep going.</span></>}
-        description="Turn a booking, project or sale into a payment request with Trolleys Two Step. Share a link or QR code so customers can pay by card."
+        description="Accept online card payments with Trolleys Two Step. Create a request for your sale, then share a link or QR code."
         actions={<Link href="/payment-acceptance-service" className="button primary">Explore payment acceptance<Icon name="arrow" /></Link>}
         visual={<PaymentArtwork />}
         footer={<ConsumerNetworks />}
       />
 
       <section className="consumer-channels page-container" id="payment-channels" aria-labelledby="channels-title">
-        <div className="consumer-section-heading"><h2 id="channels-title">Payment acceptance for your business.</h2></div>
+        <div className="consumer-section-heading"><h2 id="channels-title">One payment link. More ways to get paid.</h2></div>
         <PaymentHighlights />
       </section>
 

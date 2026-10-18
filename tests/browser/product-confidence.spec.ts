@@ -12,9 +12,9 @@ test("payments explain Two Step, optional Clarity and pricing with a safe hero s
     const clarity=element.querySelector("#dispute-readiness")!;
     const pricing=element.querySelector("#fees")!;
     const before=(first:Element,second:Element)=>(first.compareDocumentPosition(second)&Node.DOCUMENT_POSITION_FOLLOWING)!==0;
-    return {twoStepBeforeClarity:before(twoStep,clarity),clarityBeforePricing:before(clarity,pricing)};
+    return {twoStepBeforePricing:before(twoStep,pricing),pricingBeforeClarity:before(pricing,clarity)};
   });
-  expect(sequence).toEqual({twoStepBeforeClarity:true,clarityBeforePricing:true});
+  expect(sequence).toEqual({twoStepBeforePricing:true,pricingBeforeClarity:true});
   await expect(fees.getByRole("link",{name:"Continue to Trolleys",exact:true})).toHaveCount(0);
   await fees.locator(".offer-details > summary").click();
   await expect(fees.locator(".fee-exceptions")).toBeVisible();
@@ -22,10 +22,10 @@ test("payments explain Two Step, optional Clarity and pricing with a safe hero s
   await expect(fees).toContainText("eligible, successful payments enrolled in the service");
   await page.locator(".consumer-hero-actions").getByRole("link",{name:"View pricing",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-acceptance-service#fees$/);
-  await expect(fees.getByRole("heading",{name:"Know your fees.",exact:true})).toBeInViewport();
+  await expect(fees.getByRole("heading",{name:"Credit card processing fees.",exact:true})).toBeInViewport();
   const questions=page.locator(".public-faq-section summary");
-  await expect(questions).toHaveCount(7);
-  await expect(questions).toContainText(["How do I get started?","Who operates Trolleys?","What can I request payment for?","How can I share a payment request?","When will I receive my money?","How do refunds and disputes work?","Does Clarity prevent every dispute?"]);
+  await expect(questions).toHaveCount(10);
+  await expect(questions).toContainText(["How do I get started?","Who operates Trolleys?","What can I request payment for?","How can I share a payment request?","Can I accept ACH payments?","What should I compare when choosing a payment processing system?","When will I receive my money?","What is a chargeback?","How do refunds and disputes work?","Does Clarity prevent every chargeback?"]);
 });
 
 test("optional dispute readiness keeps price and Order Insight coverage limits visible", async ({page}) => {
@@ -40,15 +40,15 @@ test("optional dispute readiness keeps price and Order Insight coverage limits v
   await expect(page.locator("#fees")).toContainText("Payment processing is separate");
   const limits=network.locator(".dispute-service-note");
   await expect(limits).toBeVisible();
-  await expect(limits).toContainText("eligible enrolled payments");
-  await expect(limits).toContainText("participating bank and available data");
-  await expect(limits).toContainText("dispute outcomes are not guaranteed");
-  await expect(network.locator(".dispute-benefits")).toContainText("Qualifying Visa online fraud disputes");
-  await expect(network.locator(".dispute-benefits")).toContainText("required transaction history and evidence");
+  await expect(limits).toContainText("eligible payments enrolled in Clarity");
+  await expect(limits).toContainText("whether the bank participates and the information available");
+  await expect(limits).toContainText("No dispute outcome is guaranteed");
+  await expect(network.locator(".dispute-benefits")).toContainText("Eligible Visa online fraud disputes");
+  await expect(network.locator(".dispute-benefits")).toContainText("payment history and evidence meet the requirements");
   await expect(network.getByRole("link",{name:"Explore Order Insight at Visa",exact:true})).toHaveAttribute("href","https://www.visa.com/en-us/products/order-insight");
-  const coverage=page.locator("details").filter({has:page.locator("summary").filter({hasText:"Does Clarity prevent every dispute?"})});
+  const coverage=page.locator("details").filter({has:page.locator("summary").filter({hasText:"Does Clarity prevent every chargeback?"})});
   await coverage.locator("summary").click();
-  await expect(coverage).toContainText("Automatic refund programs and managed chargeback responses are separate services");
+  await expect(coverage).toContainText("Automatic refund programs and services that respond to chargebacks for you are separate services");
   await expect(page.getByRole("checkbox",{name:"Clarity",exact:true})).not.toBeChecked();
 });
 

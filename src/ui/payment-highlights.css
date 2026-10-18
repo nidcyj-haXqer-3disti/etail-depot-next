@@ -9,8 +9,7 @@
 .payment-story-request > .icon { width: 17px; height: 17px; flex: 0 0 auto; }
 .payment-story-request > .icon:last-child { margin-left: auto; }
 .payment-story-request span { font-size: 12px; }
-.payment-story-request strong { display: block; margin-top: 4px; font-size: 18px; line-height: 1.2; font-weight: 500; }
-.payment-story-request small { font-size: 12px; font-weight: 400; margin-left: 8px; color: var(--public-muted); }
+.payment-story-request strong { display: block; margin-top: 4px; font-size: 18px; line-height: 1.2; font-weight: 500; font-variant-numeric: tabular-nums; }
 .payment-highlight-request { background: #edf1e5; padding: 20px 24px; }
 .payment-story-paper { width: 260px; max-width: 100%; background: #fffefa; padding: 20px 22px; box-shadow: 0 4px 18px #48371909; border: 1px solid #e4ddd1; border-radius: 8px; }
 .payment-story-paper > div:first-child { display: flex; align-items: center; gap: 10px; color: var(--public-muted); font-size: 12px; }
@@ -21,10 +20,11 @@
 .payment-story-total > strong { font-weight: 500; font-size: 18px; font-variant-numeric: tabular-nums; }
 .payment-story-pay { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 16px; padding: 8px 12px; color: #fff; background: var(--public-ink); border-radius: 5px; font-size: 12px; }
 .payment-highlight-counter { background: #e8eee7; position: relative; padding: 20px; }
-.payment-story-sign { width: 150px; display: flex; align-items: center; flex-direction: column; background: #fff; border: 1px solid #d8e3dd; border-radius: 6px; padding: 16px 10px; box-shadow: 0 6px 18px #143d2510; transform: rotate(-5deg); }
+.payment-story-sign { width: 150px; display: flex; align-items: center; flex-direction: column; background: #fff; border: 1px solid #d8e3dd; border-radius: 8px; padding: 16px 10px; box-shadow: 0 4px 18px #143d250d; transform: translateY(-16px) rotate(-5deg); }
 .payment-story-sign > span { font-weight: 500; }
 .payment-story-sign > .icon { width: 76px; height: 76px; margin-block: 10px; stroke-width: 1.2; }
-.payment-story-link { position: absolute; bottom: 24px; right: 22px; background: var(--public-ink); color: #fff; border-radius: 24px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 9px; font-size: 12px; }
+.payment-story-sign > small { color: var(--public-muted); font-size: 12px; }
+.payment-story-link { position: absolute; bottom: 18px; right: 22px; background: var(--public-ink); color: #fff; border-radius: 24px; padding: 9px 13px; display: inline-flex; align-items: center; gap: 9px; font-size: 12px; }
 .payment-story-link .icon { width: 14px; height: 14px; }
 .consumer-card-copy > p.consumer-card-terms { font-size: 14px; line-height: 1.7; max-width: 38ch; margin-top: 16px; }
 .consumer-card-copy > .consumer-text-link { margin-top: 20px; }

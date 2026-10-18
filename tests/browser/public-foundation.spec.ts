@@ -164,8 +164,8 @@ test("legal documents are reachable without sign-in and retain their search visi
     await expect(page.getByRole("complementary", { name: "Review status" })).toHaveCount(0);
     await expect(page).toHaveTitle(searchTitle);
     expect(await page.title()).not.toMatch(/draft|review/i);
-    await expect(page.locator(".legal-document-date")).toHaveText("Last updated October 14, 2026");
-    await expect(page.locator("main")).toContainText("live Order Insight integration");
+    await expect(page.locator(".legal-document-date")).toHaveText("Last updated October 19, 2026");
+    await expect(page.locator("main")).toContainText("uses Order Insight to share supported merchant, transaction and order details with participating banks");
     await expect(page.locator("main")).not.toContainText("integration are not confirmed");
     for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
       await expect(page.locator(selector)).toHaveAttribute("content", searchTitle);

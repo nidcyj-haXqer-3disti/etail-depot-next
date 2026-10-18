@@ -37,7 +37,7 @@ test("renamed product bookmarks retain their section and reject submitted data",
 });
 
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
-  const pages = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms"];
+  const pages = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback"];
   const privateRequests: string[] = [], errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });

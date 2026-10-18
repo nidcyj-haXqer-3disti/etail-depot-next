@@ -11,10 +11,13 @@ const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts
   : `$${productFacts.cards.annualFeeDollars} annual fee and $${productFacts.cards.monthlyFeeDollars} monthly fee`;
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Payment Acceptance & Credit Card", description: `Explore Trolleys for online payment acceptance and the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. Find product details, pricing and support.` },
-  "/credit-card-services": { title: "Ledgix Credit Card — Coming Soon", description: `Meet the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
-  "/payment-acceptance-service": { title: "Trolleys Payment Acceptance — Links & QR Codes", description: "Accept online card payments with Trolleys payment links and QR codes. See domestic payment pricing, optional Clarity and how to get started." },
+  "/": { title: "Payment Acceptance & Credit Card Processing", description: `Explore Trolleys for online payment acceptance and the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. Find product details, pricing and support.` },
+  "/credit-card-services": { title: "Ledgix Secured Credit Card — Coming Soon", description: `Meet the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
+  "/payment-acceptance-service": { title: "Trolleys Payment Processing System", description: "Accept online card payments with Trolleys payment links and QR codes. Compare fees and optional Clarity chargeback prevention, including eligibility and limits." },
   "/help": { title: "Payment Acceptance & Credit Card Help", description: "Find Trolleys payment acceptance support, Ledgix credit card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
+  "/guides/stripe-alternatives": { title: "Stripe Alternatives: Stripe vs Trolleys", description: "Compare Stripe and Trolleys for online card payments. Review payment links, processing and dispute fees, account requirements and questions to ask before switching." },
+  "/guides/payment-processing-systems": { title: "Payment Processing Systems: A Merchant Guide", description: "Understand payment gateways, processors and merchant accounts. Compare ways to accept online payments, costs, payout terms and the setup your business needs." },
+  "/guides/what-is-a-chargeback": { title: "What Is a Chargeback? Fees & Prevention", description: "Understand chargebacks vs. refunds, dispute fees and response evidence. Learn about chargeback prevention and what optional Trolleys Clarity covers." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
@@ -29,15 +32,16 @@ export const publicSocialImage = {
   height: 630,
   alt: `Etail Depot — Trolleys payment acceptance available now; ${cardProduct.name} coming soon`,
 };
+const homeTitle = `${PUBLIC_PAGES["/"].title} | Etail Depot`;
 export const rootMetadata: Metadata = {
   metadataBase: new URL(canonicalOrigin),
-  title: { default: "Etail Depot — Payment acceptance and credit card", template: "%s | Etail Depot" },
+  title: { default: homeTitle, template: "%s | Etail Depot" },
   description: PUBLIC_PAGES["/"].description,
   applicationName: "Etail Depot",
   robots: privateRobots,
   icons: { icon: { url: "/brand/favicon-192.png", type: "image/png", sizes: "192x192" }, apple: { url: "/brand/apple-touch-icon.png", type: "image/png", sizes: "180x180" } },
-  openGraph: { type: "website", siteName: "Etail Depot", locale: "en_US", title: "Etail Depot — Payment acceptance and credit card", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
-  twitter: { card: "summary_large_image", title: "Etail Depot — Payment acceptance and credit card", description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
+  openGraph: { type: "website", siteName: "Etail Depot", locale: "en_US", title: homeTitle, description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
+  twitter: { card: "summary_large_image", title: homeTitle, description: PUBLIC_PAGES["/"].description, images: [publicSocialImage] },
 };
 
 export function publicPageUrl(path: PublicPath): string {
@@ -72,7 +76,8 @@ export function publicPageJsonLd(path: PublicPath): string {
   const organizationId = `${canonicalOrigin}/#organization`;
   const websiteId = `${canonicalOrigin}/#website`;
   const breadcrumbId = `${url}#breadcrumb`;
-  const breadcrumbLabels = { "/credit-card-services": serviceLabels.cards, "/payment-acceptance-service": serviceLabels.payments, "/help": "Help" } as const;
+  const breadcrumbLabels = { "/credit-card-services": serviceLabels.cards, "/payment-acceptance-service": serviceLabels.payments, "/help": "Help", "/guides/stripe-alternatives": "Stripe alternatives", "/guides/payment-processing-systems": "Payment processing systems", "/guides/what-is-a-chargeback": "What is a chargeback?" } as const;
+  const isGuide = path.startsWith("/guides/");
   const data = {
     "@context": "https://schema.org", "@graph": [
       {
@@ -98,7 +103,8 @@ export function publicPageJsonLd(path: PublicPath): string {
         "@type": "BreadcrumbList", "@id": breadcrumbId,
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Etail Depot", item: publicPageUrl("/") },
-          { "@type": "ListItem", position: 2, name: breadcrumbLabels[path], item: url },
+          ...(isGuide ? [{ "@type": "ListItem", position: 2, name: serviceLabels.payments, item: publicPageUrl("/payment-acceptance-service") }] : []),
+          { "@type": "ListItem", position: isGuide ? 3 : 2, name: breadcrumbLabels[path], item: url },
         ],
       }] : []),
     ],

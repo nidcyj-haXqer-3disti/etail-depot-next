@@ -3,6 +3,22 @@ export const retiredFamilies = ["api", "checkout", "pay", "payments", "cardholde
 export const boundarySource = "netlify/edge-functions/public-boundary.ts";
 export const edgeHandler = "public-boundary";
 
+/** Exact reviewed pages: adding a guide never opens the rest of its route family. */
+export const publicPageSources = [
+  "page.tsx", "credit-card-services/page.tsx", "payment-acceptance-service/page.tsx", "help/page.tsx",
+  "privacy/page.tsx", "terms/page.tsx", "guides/stripe-alternatives/page.tsx",
+  "guides/payment-processing-systems/page.tsx", "guides/what-is-a-chargeback/page.tsx",
+] as const;
+export const publicHtmlFiles = publicPageSources.map(page => page === "page.tsx" ? "index.html" : page.replace(/\/page\.tsx$/, ".html"));
+const publicAppModules = new Set<string>([
+  ...publicPageSources,
+  "layout.tsx", "not-found.tsx", "error.tsx", "global-error.tsx", "robots.ts", "sitemap.ts", "opengraph-image.tsx",
+]);
+
+export function reviewedPublicAppModule(appPath: string): boolean {
+  return publicAppModules.has(appPath);
+}
+
 export function publicSourcePath(filename: string): boolean {
   return filename === boundarySource || filename.startsWith("src/app/") || filename.startsWith("src/ui/") ||
     filename.startsWith("src/shared/") || filename.startsWith("src/modules/public-site/");

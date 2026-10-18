@@ -16,7 +16,7 @@ export const paymentExamples = {
   },
   information: {
     name: "Information", categoryDescription: "Research, data, insights and advice", context: "Market research briefing", description: "Market research briefing", amountCents: 3500,
-    question: "Can I get the briefing before our planning meeting?", quantity: "1 briefing",
+    question: "Can you send me the payment link for the briefing?", quantity: "1 briefing",
     benefit: "For research, insights and advice your customers value.",
     orderReference: "BRIEF-3012", purchaseDetail: "Market research · 1 briefing",
     fulfillmentLabel: "Supplied", fulfillmentDetail: "Email · 18 Sep",

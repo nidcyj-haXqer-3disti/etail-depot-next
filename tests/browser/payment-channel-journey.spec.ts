@@ -76,8 +76,8 @@ test("sharing and purchase recognition preserve one purchase without enrollment"
   await expect(types).toHaveCount(1);
   await expect(page.getByRole("tablist", { name: "Payment examples", exact: true })).toHaveCount(0);
   await expect(hero.locator(".payment-create-step, .payment-share-step")).toHaveCount(2);
-  await expect(hero.locator(".payment-create-step").getByRole("heading", { name: "Create your request", exact: true })).toBeVisible();
-  await expect(hero.locator(".payment-share-step").getByRole("heading", { name: "Share your way", exact: true })).toBeVisible();
+  await expect(hero.locator(".payment-create-step").getByRole("heading", { name: "Create a payment request", exact: true })).toBeVisible();
+  await expect(hero.locator(".payment-share-step").getByRole("heading", { name: "Share your payment link", exact: true })).toBeVisible();
   await expect(types.getByRole("tab")).toHaveCount(3);
   await expect(delivery.getByRole("tab")).toHaveCount(channels.length);
   await expect(delivery).toHaveAttribute("aria-orientation", "horizontal");

@@ -11,6 +11,11 @@ import "./payment-journey-art.css";
 
 const saleTypes = Object.keys(paymentExamples) as PaymentExamplePurpose[];
 const typeDescriptions = { goods: "Products & orders", services: "Projects & appointments", information: "Research & insights" } as const;
+const requestGuidance = {
+  goods: "Describe the item, quantity, amount due and delivery arrangements. Make the return terms clear before payment.",
+  services: "Describe the work, the amount due now and any remaining balance. Include the delivery date and cancellation terms.",
+  information: "State the subject, format, delivery deadline and access conditions. Explain when the information is current and whether updates are included.",
+} as const;
 
 function SaleThumbnail({ type }: { type: PaymentExamplePurpose }) {
   return <span className="sale-thumbnail" data-sale={type} aria-hidden="true">
@@ -32,7 +37,7 @@ export function PaymentJourneyArt() {
     <div className="two-step-signature"><h2><Icon name="link" />Trolleys Two Step</h2><p>Explore a payment from request to checkout.</p></div>
     <div className="two-step-stages">
       <section className="payment-create-step" aria-labelledby={`${id}-create`}>
-        <div className="two-step-heading"><span aria-hidden="true">01</span><div><h3 id={`${id}-create`}>Create your request</h3><p>Choose what you sell. Add the details and amount.</p></div></div>
+        <div className="two-step-heading"><span aria-hidden="true">01</span><div><h3 id={`${id}-create`}>Create a payment request</h3><p>Choose what you sell. Add the details and amount.</p></div></div>
         <div className="request-workspace">
           <div className="request-workspace-chrome"><span><Icon name="business" />Trolleys</span><span>New payment request</span></div>
           <div className="request-workspace-body">
@@ -54,12 +59,16 @@ export function PaymentJourneyArt() {
               <div className="request-preview-amount"><span>Amount</span><strong>{amount}</strong></div>
               <div className="request-preview-link"><Icon name="check" /><span>Ready to share</span><Icon name="arrow" /></div>
             </div>
+            <div className="request-guidance" id="request-details">
+              <h4>Before you share</h4>
+              {saleTypes.map(type => <p key={type} hidden={purpose !== type}>{requestGuidance[type]}</p>)}
+            </div>
           </div>
           </div>
         </div>
       </section>
       <section className="payment-share-step" aria-labelledby={`${id}-share`}>
-        <div className="two-step-heading"><span aria-hidden="true">02</span><div><h3 id={`${id}-share`}>Share your way</h3><p>Use the same link in more than one place.</p></div></div>
+        <div className="two-step-heading"><span aria-hidden="true">02</span><div><h3 id={`${id}-share`}>Share your payment link</h3><p>Send it by text, email or social media. Share a QR code or add the link to your website.</p></div></div>
         <PaymentChannelPreview purpose={purpose} />
       </section>
     </div>

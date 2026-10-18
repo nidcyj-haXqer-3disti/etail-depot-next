@@ -1,17 +1,17 @@
 {
-  "decision": "D225",
-  "updated_on": "2026-10-18",
-  "scope": "Two approved local Payment copy improvements; preserve search controls, offers and design. No publication, search submission or remote changes.",
+  "decision": "D243",
+  "updated_on": "2026-10-19",
+  "scope": "Traditional SEO and AI discovery for the existing public website. Strengthen accurate answers, genuine product evidence and measured customer acquisition while preserving approved offers, design, exact routes and indexing controls. Per-query leadership is an aspiration, not a universal or guaranteed outcome.",
   "canonical_origin": "https://etaildepot.com",
-  "live_baseline": "D220 / 3948e697272b7b6ee35fd814ae7e31bb72185d7d (D217 customer-facing content preserved)",
+  "live_baseline": "D226 / 9b4dc4b3e3e70c94fe1065637e7dddf2da905224",
   "workstreams": [
     {
       "id": "measurement",
       "priority": "P0",
-      "status": "Payment indexing pending; deeper Google crawl/host/removal review finds no demonstrated blocker",
-      "result": "October 18 stored Payment status remains discovered with last crawl N/A. Crawl Stats (updated October 16) reports 166 requests, 99% HTTP 200 and 1% permanent redirects, average 245 ms and healthy host/robots/DNS/connectivity. Payment has a 200 HTML discovery sample labeled Other agent type; this does not prove a normal indexing crawl. No removal requests appear in any of the three reports. Aggregate Page indexing is still processing. Source and live-page reviews find distinct content and working discovery paths; eligibility/onboarding detail remains a verified-content opportunity, not a proven indexing fix.",
-      "next": "Check only when asked, after a meaningful interval; October 21 and October 28 are practical review checkpoints, not promised Google dates. Preserve existing working URLs/redirects/search controls. If unchanged, correlate available verified crawler evidence with refreshed reports. Improve eligibility/onboarding guidance only when operational facts are confirmed; do not repeat submissions or invent SEO guarantees.",
-      "acceptance": "Record actual results or explicit unavailability for the four discovery URLs; keep fetch eligibility distinct from indexing, rankings and AI citations.",
+      "status": "D243: current Google, Bing and Semrush reports read; separate SEO/AI baselines recorded",
+      "result": "D243 read-only check: Payment still Discovered — currently not indexed, last crawl N/A; D234 request was not repeated. Google Web reports 10 clicks/40 impressions/average position 6.3 for October 13–16, mainly branded/legacy. Google generative AI Beta reports 18 impressions in that period including old URLs. Bing AI reports 0 citations for July 18–October 17; its ordinary search report still requests 48 hours to prepare data. These are distinct measurements, not ChatGPT visibility or qualified merchant acquisition.",
+      "next": "Release prepared content only through reviewed authorization, then measure stored indexing, US nonbrand demand and separate AI citations. Keep checks user-requested and do not repeat indexing submissions for priority.",
+      "acceptance": "Record actual results or explicit unavailability for the four live discovery URLs and, after an approved release, all seven intended discovery URLs. Keep fetch eligibility distinct from indexing, rankings and AI citations.",
       "evidence": [
         "artifacts/search-growth/baseline-2026-10-14.json",
         "artifacts/search-growth/search-console-setup.json",
@@ -23,28 +23,38 @@
         "artifacts/search-growth/search-console-status-2026-10-17.json",
         "artifacts/search-growth/payment-live-test-2026-10-17.json",
         "artifacts/payment-index-readiness-20261017/readiness-summary.json",
-        "artifacts/search-growth/google-indexing-rules-2026-10-18.json"
+        "artifacts/search-growth/google-indexing-rules-2026-10-18.json",
+        "artifacts/d231-search-growth/baseline.json",
+        "artifacts/d234-indexing-action/live-http.json",
+        "artifacts/d234-indexing-action/google-request.json",
+        "artifacts/d235-final-review/semrush-observation.json",
+        "artifacts/d243-search-ai/baseline.json"
       ]
     },
     {
       "id": "trust",
       "priority": "P1",
-      "status": "D217 published; D225 operator FAQ prepared locally",
+      "status": "D217 content and D225 refinement published and verified in D226",
       "result": "One concise operator answer in the existing Home FAQ, reused as the existing Organization description. No new route, credential or company-role assertion.",
       "next": "Obtain product-specific operational evidence before expanding responsibility, timing or performance claims.",
       "acceptance": "Visible identity and structured data use the same approved corporate/trade-name statement; existing notices and indexing controls remain intact.",
       "evidence": "artifacts/search-growth/trust-review.json",
-      "local_change": "Added the approved Trolleys operator and separate account-management explanation to the existing Payment FAQ."
+      "published_change": "Added the approved Trolleys operator and separate account-management explanation to the existing Payment FAQ."
     },
     {
       "id": "trolleys",
       "priority": "P1",
-      "status": "D217 published; D225 introduction prepared locally",
-      "result": "Existing FAQ sections explain goods/services/information, link sharing and booking deposits. All answers are present in initial HTML. Existing pricing and calculator examples remain unchanged.",
-      "next": "Measure product-specific discovery and customer questions before considering longer guides or new pages.",
+      "status": "D226 live; D228-D243 improvements local with focused D243 validation",
+      "result": "Three source-linked guides, current fee examples, contextual Home/Payment links, an explicit payment-link explanation, a feature-fit Stripe/Trolleys comparison and reason-specific chargeback evidence examples. The comparison title matches its scope. Original design, artwork, pricing, provider links and restrictions remain.",
+      "next": "Complete fresh release verification and review before publication; then measure discovery and acquisition. Actual vendor walkthrough/account facts remain the largest content-evidence dependency.",
       "acceptance": "Supported uses are clear without interacting with artwork; no calendar feature, guaranteed payout, universal eligibility or dispute outcome is implied.",
-      "evidence": "artifacts/search-growth/trolleys-content-plan.json",
-      "local_change": "Replaced the Payment hero description with explicit online card payment/link/QR wording, preserving its existing design and offer."
+      "evidence": [
+        "artifacts/search-growth/trolleys-content-plan.json",
+        "artifacts/d228-search-content/",
+        "artifacts/d231-search-growth/",
+        "artifacts/d235-final-review/"
+      ],
+      "published_change": "Replaced the Payment hero description with explicit online card payment/link/QR wording, preserving its existing design and offer."
     },
     {
       "id": "ledgix",
@@ -54,17 +64,48 @@
       "next": "Keep applications closed and defer expanded acquisition content until issuer/program terms and launch status are confirmed.",
       "acceptance": "Current prices, coming-soon qualifications and wallet preview remain; no live provisioning, waitlist, approval or credit-building claim is added.",
       "evidence": "artifacts/search-growth/ledgix-implementation.json"
+    },
+    {
+      "id": "clarity-chargebacks",
+      "priority": "P1",
+      "status": "D236: local copy, guide, metadata, link and rendering checks passed",
+      "result": "Clarity is described as optional chargeback prevention with eligible Visa online fraud-dispute scope. Home and Help link to the Payment section; the chargeback guide separates prevention, refunds, fees and responses, and links back to Clarity. No new route or capability.",
+      "query_map": [
+        {
+          "intent": "Clarity and chargeback prevention",
+          "route": "/payment-acceptance-service#dispute-readiness"
+        },
+        {
+          "intent": "What is a chargeback, chargeback vs refund, chargeback fees",
+          "route": "/guides/what-is-a-chargeback"
+        },
+        {
+          "intent": "How to respond to a chargeback and evidence",
+          "route": "/guides/what-is-a-chargeback#what-happens-next"
+        },
+        {
+          "intent": "Trolleys dispute support",
+          "route": "/help#payments"
+        }
+      ],
+      "next": "Review local copy; after a separately approved publication, measure US query/page impressions and clicks without assuming indexing or a rank gain.",
+      "acceptance": "Optional 0.4% and bank/payment/data eligibility remain visible. No universal coverage, ACH protection, automatic refunds, representment or guaranteed outcome. Preserve design, canonical URLs and indexing controls.",
+      "evidence": [
+        "artifacts/d236-clarity-search/"
+      ],
+      "current_rank": null,
+      "rank_limit": "No new ranking or volume measurement for this change."
     }
   ],
   "dependencies": [
     {
       "item": "Google Search Console",
-      "state": "October 18: Payment still discovered with no stored indexing crawl. Crawl Stats through October 16 shows healthy availability and a successful Payment fetch by Other agent type. No removal requests. Aggregate Page indexing still processing; numerical performance baseline exists from October 17. Prior live-test/sitemap/manual/security results remain dated evidence.",
+      "state": "D243 read-only check: Payment still Discovered — currently not indexed, last crawl N/A; D234 request was not repeated. Google Web reports 10 clicks/40 impressions/average position 6.3 for October 13–16, mainly branded/legacy. Google generative AI Beta reports 18 impressions in that period including old URLs.",
       "needed_for": "Actual indexing, canonical decisions, search performance and migration bookkeeping"
     },
     {
       "item": "Bing Webmaster Tools",
-      "state": "Verified administrator by DNS; one sitemap submitted with Success and four discovered URLs. Search reports request 48 hours for preparation; actual indexing/performance results remain pending.",
+      "state": "D243 read-only AI report: zero citations and zero cited pages for July 18–October 17. Search Performance still requests 48 hours for preparation; search counts unavailable, not zero. Existing verified access/settings preserved.",
       "needed_for": "Bing-specific indexing and performance baseline"
     },
     {
@@ -79,7 +120,7 @@
     },
     {
       "item": "Product evidence",
-      "state": "Approved website claims preserved; new operational facts require confirmation",
+      "state": "D233: operator confirms ACH is currently available through Trolleys. Approved website facts remain; ACH-specific fees, timing, checkout configuration and Clarity applicability are not supplied or inferred. Other new operational facts still require confirmation.",
       "needed_for": "Expanded payout, eligibility, issuer, deposit-return, coverage and case-study content"
     },
     {
@@ -98,14 +139,158 @@
     "Separate Google, Bing, AI citations/referrals, website handoff clicks and provider-confirmed onboarding.",
     "Set growth targets only after a dated baseline; do not invent search volumes or promise rankings.",
     "Do not add analytics, forward visitor identifiers or weaken no-referrer service handoffs.",
-    "Preserve the four intended indexable routes and legal/preview/retired exclusions.",
-    "User preference D221: check only when asked; do not create a recurring monitor or notification schedule."
+    "D226 has four intended indexable routes. D228 locally prepares seven exact discovery routes for a separately approved release; preserve legal/preview/retired exclusions.",
+    "User preference D221: check only when asked; do not create a recurring monitor or notification schedule.",
+    "AI benchmarks separate nonbrand discovery from brand-seeded accuracy per engine. Rate denominators are completed eligible prompt-runs, including repeats as distinct observations; failed/unavailable runs are recorded separately. Instructed brand mentions never establish discovery."
   ],
   "deferred": [
-    "New About/guide routes and mass keyword pages",
+    "New About or guide routes beyond the three accepted D228 guides, and mass keyword pages",
     "External profile edits or outreach",
     "New analytics or provider attribution integrations",
     "Further account ownership/OAuth grants, site-move submissions and changes to indexing controls"
   ],
-  "current_execution": "D225 local candidate on codex/payment-clarity-d225: two approved Payment copy changes, corresponding existing FAQ-count/order expectation, successful build/lint, five focused browser/accessibility cases and desktop/mobile visual review. D220 remains deployed. Indexing status is unchanged by this local work; no submission, publication or remote change."
+  "current_execution": "D247: remove persistent Read the guide action underlines across four routes. Build and 12 responsive rendered checks pass; keyboard focus retained. D246 artwork/copy changes remain. Prior full release/security/production-SEO/package evidence must be refreshed before publication. D226 remains live.",
+  "ranking_objective": {
+    "aspiration": "Earn top-two organic positions for selected relevant US merchant searches; Stripe is a comparator, not assumed number one for every query.",
+    "measurement": "Fixed Google US English mobile target to match the existing campaign; desktop is a separate comparison. Record date, query, device, ranking URL and competitor URL. GSC average position is a diagnostic, not proof of a specific rank.",
+    "target_map": "artifacts/d231-search-growth/query-targets.json",
+    "sequence": [
+      "Live publication of reviewed useful content",
+      "Indexing of all seven intended discovery pages",
+      "Relevant nonbrand impressions and clicks",
+      "Top 100, then top 20 and top 10 for selected merchant queries",
+      "Top three and top two, measured repeatedly under the same target"
+    ],
+    "limits": "Milestones are evaluation gates, not predicted dates. Search volume estimates are not traffic projections. No ranking gain has yet been measured."
+  },
+  "execution_order": [
+    {
+      "priority": 1,
+      "work": "Review and release the prepared content",
+      "deliverable": "Nine exact pages, including three guides, with seven intended search-eligible URLs under the existing production guard.",
+      "acceptance": "Full public, production SEO, package and independent review pass; separately authorized publication and hosted readback match the candidate.",
+      "state": "D246 refinement locally verified. Refresh full current-source public/security/production-SEO/package gates and independent release review, then ordinary source/CI/authorization and hosted acceptance. D244 package is prior-source evidence."
+    },
+    {
+      "priority": 2,
+      "work": "Measure discovery before changing strategy",
+      "deliverable": "Per-URL indexed status and canonical; US nonbrand query/page report; fixed-device rank observations.",
+      "acceptance": "Actual values or explicit missing-data states; do not infer rank from a live test or total site average.",
+      "state": "Fresh D243 baseline recorded; use the separate SEO and AI protocol. Future checks remain user-requested only."
+    },
+    {
+      "priority": 3,
+      "work": "Add verified first-hand product evidence",
+      "deliverable": "Permissioned real request-to-checkout walkthrough plus confirmed application requirements, payout schedule and dispute-support boundaries.",
+      "acceptance": "Screens are from the actual Trolleys service, free of customer data, and each operational claim has confirmed evidence.",
+      "state": "Requires actual service evidence. Current illustrative artwork stays labeled as examples."
+    },
+    {
+      "priority": 4,
+      "work": "Earn relevant trust and referrals",
+      "deliverable": "A substantiated merchant case study and accurate partner/support references where the respective owners agree.",
+      "acceptance": "Permission for names/screens; documented baseline, period and results; no fabricated testimonials, awards or paid ranking links.",
+      "state": "Evidence and outreach authorization needed. No messages sent or external profiles edited."
+    },
+    {
+      "priority": 5,
+      "work": "Improve using observed customer searches",
+      "deliverable": "Refine titles, answers and guidance where impressions reveal a real unmet question; evaluate 30/60/90 days after release if requested.",
+      "acceptance": "Keep one primary destination per intent, assess qualified clicks and actual customer understanding, and retain truthful coverage/eligibility.",
+      "state": "Review windows are suggested, not a schedule or promised performance deadline."
+    }
+  ],
+  "query_targets": [
+    {
+      "query": "stripe alternatives",
+      "primary_route": "/guides/stripe-alternatives",
+      "merchant_relevance_priority": 1,
+      "intent": "Commercial investigation; fit, fees and account terms before changing providers.",
+      "supporting_queries": [
+        "best stripe alternatives",
+        "stripe alternatives for small business"
+      ],
+      "current_rank": null,
+      "rank_limit": "Not measured for this exact query in the current campaign.",
+      "next_content_action": "Keep an immediate fit answer, dated comparison table, worked cost example and switching checklist. Preserve operator disclosure and distinguish unsupported requirements."
+    },
+    {
+      "query": "payment processing systems",
+      "primary_route": "/guides/payment-processing-systems",
+      "merchant_relevance_priority": 4,
+      "intent": "Informational and commercial investigation; payment roles, options, total costs and payout terms.",
+      "supporting_queries": [
+        "payment processing",
+        "payment processing system",
+        "online payment processing for small business",
+        "payment processing fees"
+      ],
+      "current_rank": null,
+      "rank_limit": "Not measured for this exact query in the current campaign.",
+      "next_content_action": "Use the existing roles, customer-payment choices, cost examples and application questions to answer the selection task; link to the product fee schedule."
+    },
+    {
+      "query": "what is a chargeback",
+      "primary_route": "/guides/what-is-a-chargeback",
+      "merchant_relevance_priority": 6,
+      "intent": "Informational; definition, refund distinction, merchant response and required records.",
+      "supporting_queries": [
+        "chargeback meaning",
+        "credit card chargeback",
+        "what is a chargeback dispute",
+        "chargeback prevention"
+      ],
+      "current_rank": null,
+      "rank_limit": "Not measured for this exact query in the current campaign.",
+      "next_content_action": "Keep the definition and refund comparison first, then a practical merchant evidence/deadline checklist. Preserve all Clarity limits and avoid guaranteed prevention or dispute outcomes."
+    },
+    {
+      "query": "online payments",
+      "primary_route": "/",
+      "merchant_relevance_priority": 5,
+      "intent": "Mixed informational, merchant acceptance, consumer payment and navigation.",
+      "supporting_queries": [
+        "payment links",
+        "accept payments online",
+        "accept online payments",
+        "qr code payments",
+        "how to create payment link"
+      ],
+      "current_rank": null,
+      "rank_limit": "Not measured for this exact query in the current campaign.",
+      "next_content_action": "Keep Home a concise introduction with clear links to payment acceptance. Put commercial detail on Payment and verified task instructions in Help, avoiding duplicate long-form targets."
+    },
+    {
+      "query": "merchant services",
+      "primary_route": "/payment-acceptance-service",
+      "merchant_relevance_priority": 3,
+      "intent": "Commercial investigation; services available to accept and manage customer payments.",
+      "supporting_queries": [
+        "merchant services for small business",
+        "online merchant services",
+        "credit card merchant services",
+        "merchant services provider"
+      ],
+      "current_rank": null,
+      "rank_limit": "Not measured for this exact query in the current campaign.",
+      "next_content_action": "Use the existing product description and FAQ to state what is included and who the offer fits. Keep general roles in the systems guide; do not add a thin competing route."
+    },
+    {
+      "query": "credit card processing",
+      "primary_route": "/payment-acceptance-service",
+      "merchant_relevance_priority": 2,
+      "intent": "Mixed commercial and educational; card acceptance, fees and small-business fit.",
+      "supporting_queries": [
+        "credit card processing fees",
+        "credit card processing for small business",
+        "credit card processing rates",
+        "credit card payment processing"
+      ],
+      "current_rank": null,
+      "rank_limit": "Not measured for this exact query in the current campaign.",
+      "next_content_action": "Retain the clear processing-fee heading, exact shared prices and worked estimates; explain merchant entry, international cards, optional services and dispute costs without expanding product claims."
+    }
+  ],
+  "ai_execution_plan": "planning/search-ai-execution.json",
+  "last_verification": "artifacts/d247-guide-links/summary.json"
 }

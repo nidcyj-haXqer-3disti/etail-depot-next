@@ -18,7 +18,8 @@ assert.equal(targets.netlify.canonical_origin, "https://etaildepot.com");
 assert.equal(targets.release.real_money_allowed, false);
 
 const canonicalOrigin = targets.netlify.canonical_origin;
-const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help"];
+const guidePaths = ["/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback"];
+const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", ...guidePaths];
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -147,13 +148,14 @@ function checkSchema(html, route, description) {
   assert.equal(page.isPartOf?.["@id"], website["@id"]);
   if (route !== "/") {
     const crumbs = node("BreadcrumbList").itemListElement;
-    assert.equal(crumbs.length, 2, `${route}: breadcrumb must reflect Home and this page.`);
+    assert.equal(crumbs.length, guidePaths.includes(route) ? 3 : 2, `${route}: breadcrumb must reflect its actual page hierarchy.`);
     for (const [index, crumb] of crumbs.entries()) {
       assert.equal(crumb["@type"], "ListItem");
       assert.equal(crumb.position, index + 1);
       assert.ok(typeof crumb.name === "string" && crumb.name.trim());
       const item = typeof crumb.item === "string" ? crumb.item : crumb.item?.["@id"];
-      assert.equal(item, new URL(index ? route : "/", canonicalOrigin).href);
+      const expectedPath = index === 0 ? "/" : guidePaths.includes(route) && index === 1 ? "/payment-acceptance-service" : route;
+      assert.equal(item, new URL(expectedPath, canonicalOrigin).href);
     }
   }
   assert.equal(nodes.some(entry => ["Offer", "AggregateRating", "Review", "ApplyAction"].includes(entry["@type"])), false, `${route}: unapproved offer or endorsement markup.`);
@@ -207,7 +209,7 @@ async function verifyResponses() {
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => decode(match[1]));
-  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the four reviewed canonical pages.");
+  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the seven reviewed canonical pages.");
   const robotsResponse = await localFetch("/robots.txt");
   assert.equal(robotsResponse.status, 200);
   const robots = await robotsResponse.text();
@@ -224,14 +226,14 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of ["/privacy", "/terms", "/production-seo-missing-page"]) {
+  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page"]) {
     const response = await localFetch(route);
     assert.equal(response.status, route.includes("missing-page") ? 404 : 200, `${route}: unexpected status.`);
     const metadata = documentMetadata(await response.text(), route);
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
     assert.ok(values.some(forbidsIndexing), `${route}: must remain noindex.`);
   }
-  for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-acceptance-service.txt"]) {
+  for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-acceptance-service.txt", ...guidePaths.map(route => `${route}.txt`)]) {
     const response = await localFetch(route);
     assert.equal(response.status, 200);
     assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: raw payloads and legal aliases must remain noindex.`);
@@ -250,7 +252,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: four indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: seven indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

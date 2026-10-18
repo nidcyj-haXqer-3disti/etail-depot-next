@@ -30,7 +30,7 @@
 .thumbnail-web b:last-child { width: 26px; height: 3px; background: #c4d2ce; box-shadow: 0 6px #e0e8e3; }
 .thumbnail-web em { display: block; height: 6px; width: 31px; margin: 4px auto 0; border-radius: 2px; background: #51756f; }
 
-.channel-marketing .channel-medium { width: 100%; min-width: 0; max-width: none; border: 1px solid #e0e5dd; border-radius: var(--public-radius,10px); background: #fff; color: #254537; box-shadow: 6px 6px 0 #365d49, 7px 7px 0 #6c8976, 0 20px 50px -28px #081d14; font-size: 12px; line-height: 1.7; overflow: hidden; overflow-wrap: anywhere; }
+.channel-marketing .channel-medium { width: 100%; min-width: 0; max-width: none; border: 1px solid #e0e5dd; border-radius: var(--public-radius,10px); background: #fff; color: #254537; box-shadow: 0 8px 24px -14px #081d1440; font-size: 12px; line-height: 1.7; overflow: hidden; overflow-wrap: anywhere; }
 .channel-marketing .channel-medium p { margin: 0; }
 .channel-marketing .channel-medium .icon { flex-shrink: 0; width: 17px; height: 17px; }
 .marketing-medium-title { display: flex; align-items: center; gap: 10px; padding: 20px 18px; border-bottom: 1px solid #eef0eb; }
@@ -64,12 +64,8 @@
 .marketing-social-heading > span:last-child { flex-shrink: 0; white-space: nowrap; color: #6c7c6b; letter-spacing: .1em; }
 .marketing-social-poster { position: relative; display: grid; gap: 17px; padding: 26px 24px; overflow: hidden; background: #e6eadb; color: #27472f; }
 .marketing-social-poster .marketing-document-kicker { color: #35513b; }
-.marketing-social-poster > :not(.marketing-poster-orbit) { position: relative; z-index: 1; }
 .marketing-social-poster strong { font-family: Georgia,serif; font-size: 22px; font-weight: 400; letter-spacing: -.025em; line-height: 1.2; }
 .marketing-social-poster > span:last-child { font-size: 12px; }
-.marketing-poster-orbit { position: absolute; width: 130px; height: 130px; border: 1px solid #b9c6ac; border-radius: 50%; }
-.marketing-poster-orbit-one { right: -55px; top: 45px; }
-.marketing-poster-orbit-two { right: -29px; top: 70px; }
 .marketing-social-caption { padding: 18px 16px; }
 .marketing-social-caption > p { font-size: 12px; color: #5d6e5a; padding-bottom: 14px; }
 .channel-marketing .marketing-counter { max-width: 300px; margin-inline: auto; padding: 28px 22px; border-radius: 6px; text-align: center; background: #fffefa; }
@@ -131,7 +127,7 @@
 .portable-link-address { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-width: 0; padding: 12px; background: #fff; border: 1px solid #ccd8c5; border-radius: 6px; font-size: 12px; line-height: 1.5; }
 .portable-link-address .icon { width: 14px; height: 14px; }
 .portable-link-destinations { display: flex; gap: 20px; padding-top: 2px; color: #607356; }
-.channel-marketing .marketing-message { padding: 10px 8px 9px; border: 3px solid #2b3e36; border-radius: 32px; box-shadow: 0 0 0 2px #a0b2a3, 0 0 0 4px #436353, 0 24px 45px -20px #071e19; }
+.channel-marketing .marketing-message { padding: 10px 8px 9px; border: 3px solid #2b3e36; border-radius: 32px; box-shadow: 0 12px 24px -16px #071e1966; }
 .sharing-phone-status { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 6px 18px 12px; font-size: 10px; line-height: 1.4; font-weight: 600; }
 .sharing-phone-status > i { display: block; height: 16px; width: 62px; border-radius: 12px; background: #273c33; }
 .sharing-phone-battery { width: 18px; height: 8px; border: 1px solid #52675e; border-radius: 2px; background: linear-gradient(to right,#52675e 75%,transparent 75%); }

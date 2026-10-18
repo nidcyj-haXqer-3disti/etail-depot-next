@@ -48,7 +48,7 @@ The workflow in `.github/workflows/foundation.yml` checks the exact repository, 
 
 `archive/database` holds immutable schema/migration history, not a data backup. Existing databases and Identity records remain outside this runtime. Do not open them, run archived tools, apply migrations or change provider settings as part of setup or verification.
 
-Production search permits only Home, Payments, Cards and Help for the exact approved site and environment. Local/preview, legal, 404 and retired pages remain noindex. Keep the guard intact. Manual publication follows the [reviewed deployment runbook](NETLIFY_DEPLOYMENT.md) and authorization already recorded for that candidate; a passing local check is not publication authorization.
+The current candidate prepares Home, Payment acceptance, Credit card, Help and the three exact merchant guides for production search eligibility on the approved site and environment. D226's live sitemap still contains four pages until a separately authorized release. Local/preview, legal, 404 and retired pages remain noindex. Keep the guard intact. Manual publication follows the [reviewed deployment runbook](NETLIFY_DEPLOYMENT.md) and authorization already recorded for that candidate; a passing local check is not publication authorization.
 
 ## Historical setup archive
 

@@ -14,9 +14,9 @@ const purchaseSteps = [
 function PurchaseIllustration({kind}: {kind: (typeof purchaseSteps)[number]["kind"]}) {
   return <div className={`secured-step-art secured-step-art-${kind}`} aria-hidden="true">
     {kind === "purchase" ? <>
-      <div className="secured-mini-phone"><i /><span>Wallet</span><div className="secured-mini-card"><LedgixCardFace /></div><div className="secured-mini-phone-lines"><b /><b /></div><em /></div>
+      <div className="secured-mini-phone"><i /><span>Wallet</span><div className="secured-mini-card"><LedgixCardFace /></div><em /></div>
       <div className="secured-purchase-tag"><Icon name="card" /><span>Purchase<strong>{exampleAmount}</strong></span></div>
-    </> : kind === "statement" ? <div className="secured-statement-paper"><span>Card statement</span><strong>{exampleAmount}</strong><small>Purchase balance</small><div className="secured-paper-lines"><i /><i /></div><div className="secured-paper-total"><span>Pay in full</span><Icon name="document" /></div></div>
+    </> : kind === "statement" ? <div className="secured-statement-paper"><span>Card statement</span><strong>{exampleAmount}</strong><small>Purchase balance</small><div className="secured-paper-total"><span>Pay in full</span><Icon name="document" /></div></div>
       : <div className="secured-repayment-paper"><span className="secured-payment-check"><Icon name="check" /></span><span>Repaid in full</span><strong>{exampleAmount}</strong><div><span>Purchase balance</span><b>{formatUsdCents(0)}</b></div></div>}
   </div>;
 }
@@ -26,7 +26,7 @@ export function SecuredCreditArt() {
   return <figure className="secured-credit-art" aria-label="Security deposit and card repayment explained">
     <div className="secured-credit-scene">
       <div className="secured-credit-deposit">
-        <div className="secured-deposit-art" aria-hidden="true"><div className="secured-deposit-sheet"><span>Security deposit</span><strong>${productFacts.cards.minimumDepositDollars}</strong><small>Minimum deposit</small><i /><i /></div><span className="secured-deposit-lock"><Icon name="lock" /></span></div>
+        <div className="secured-deposit-art" aria-hidden="true"><div className="secured-deposit-sheet"><span>Security deposit<Icon name="lock" /></span><strong>${productFacts.cards.minimumDepositDollars}</strong><small>Minimum deposit</small></div></div>
         <div className="secured-deposit-copy"><p>YOUR SECURITY DEPOSIT</p><h3>Backing for <br />your account.</h3><span>Purchases create a separate balance to repay.</span></div>
       </div>
       <div className="secured-credit-purchases">
@@ -39,6 +39,6 @@ export function SecuredCreditArt() {
         </ol>
       </div>
     </div>
-    <figcaption><Icon name="info" /><span>Example: a {exampleAmount} purchase is repaid separately. Your security deposit does not pay your purchase bill.</span></figcaption>
+    <figcaption><Icon name="info" /><span>Example: a {exampleAmount} purchase adds {exampleAmount} to your purchase balance. Repay that balance in full; your security deposit does not make the payment.</span></figcaption>
   </figure>;
 }
