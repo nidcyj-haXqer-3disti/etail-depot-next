@@ -9,6 +9,7 @@ import { publicSecurityHeaders } from "../netlify/edge-functions/public-boundary
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { clearPublicPackageOutputs } from "./public-package-cleanup.ts";
 import { preparePlatformEmail } from "./netlify-email-compat.ts";
+import { publicHtmlFiles } from "./public-artifact-policy.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
@@ -51,7 +52,7 @@ function rejectSymlinks(directory) {
   }
 }
 rejectSymlinks(exportDirectory);
-for (const file of ["index.html", "credit-card-services.html", "payment-acceptance-service.html", "help.html", "privacy.html", "terms.html", "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
+for (const file of [...publicHtmlFiles, "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
   assert(existsSync(path.join(exportDirectory, file)), `The static export is missing ${file}.`);
 }
 

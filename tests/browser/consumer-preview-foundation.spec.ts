@@ -168,8 +168,9 @@ test("public service discovery shows availability and support without local acco
       await expect(page.getByRole("tablist",{name:"Ways to share a payment request",exact:true})).toHaveCount(0);
       await expect(page.locator(".channel-showcase")).toHaveCount(0);
       const paymentSummary=page.locator(".consumer-payment-summary");
-      await expect(paymentSummary.getByRole("heading",{level:3})).toHaveText(["Booking deposits","Work and expertise","Sales wherever you are"]);
-      await expect(paymentSummary.locator("a, button, input, form")).toHaveCount(0);
+      await expect(paymentSummary.getByRole("heading",{level:3})).toHaveText(["Orders by message","Online checkout","QR code payments"]);
+      await expect(paymentSummary.locator("a")).toHaveCount(0);
+      await expect(paymentSummary.locator("button, input, form, .payment-highlight-art a")).toHaveCount(0);
       await expect(cards).toContainText("Ledgix");
       await expect(cards).toContainText("Coming soon");
       await expect(cards.getByRole("link",{name:"Explore the Ledgix credit card",exact:true})).toHaveAttribute("href","/credit-card-services");

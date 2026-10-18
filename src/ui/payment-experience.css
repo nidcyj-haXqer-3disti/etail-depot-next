@@ -19,6 +19,7 @@
 .dispute-benefits p { margin-top: 8px; max-width: 48ch; font-size: 14px; line-height: 1.7; color: var(--public-muted); }
 .dispute-service-note { display: flex; align-items: flex-start; justify-content: space-between; gap: 40px; padding-top: 16px; margin-top: 20px; }
 .dispute-service-note > p { max-width: 85ch; font-size: 12px; line-height: 1.7; color: var(--public-muted); }
+.dispute-service-note > p a { color: var(--public-ink); text-decoration: underline; text-underline-offset: 3px; }
 .dispute-service-note > a { display: inline-flex; align-items: center; gap: 12px; flex: 0 0 auto; font-size: 12px; min-height: 44px; color: var(--public-ink); }
 .dispute-service-note > a .icon { width: 16px; height: 16px; }
 @media (max-width: 1000px) {

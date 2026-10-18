@@ -2,9 +2,10 @@
 
 ## Current scope
 
-Read `project-targets.json`, `docs/CURRENT_WORK_CONTEXT.md`, `docs/SOURCE_PRECEDENCE.md`, `docs/PUBLIC_SITE_ARCHITECTURE.md` and `planning/STATUS.md`. This workspace and conversation concern only the deployed customer-facing website. Use the current context as the starting point; dated research or requirements are not active instructions. The user explicitly chose **public website and vendor links only** in D108. Historical account/financial requirements do not override this decision.
+Read `project-targets.json`, `docs/CURRENT_WORK_CONTEXT.md`, `docs/SOURCE_PRECEDENCE.md`, `docs/PUBLIC_SITE_ARCHITECTURE.md` and `planning/STATUS.md`. This workspace and conversation concern only the customer-facing website and its explicitly approved local refinements. Use the current context as the starting point; dated research or requirements are not active instructions. The user explicitly chose **public website and vendor links only** in D108. Historical account/financial requirements do not override this decision.
 
-- Public routes: `/`, `/credit-card-services`, `/payment-acceptance-service`, `/help`, `/privacy`, `/terms`, metadata and 404.
+- D228 public page scope: `/`, `/credit-card-services`, `/payment-acceptance-service`, `/help`, `/privacy`, `/terms`, `/guides/stripe-alternatives`, `/guides/payment-processing-systems` and `/guides/what-is-a-chargeback`, plus metadata and 404. Only these three guide routes are approved; no general guide/blog route family is opened.
+- D228 is local preparation only. After an eventual approved release, the seven nonlegal pages may be search-eligible under the exact production site/origin guard; legal, local/preview, error, navigation-payload and retired-route protections remain. No indexing or ranking result is implied.
 - Trolleys payments use the fixed `https://trolleys.ai` entrance. Ledgix Visa secured credit cards are coming soon; inquiries use `ledgix@etaildepot.com`.
 - No Etail login, dashboard, API, database adapter, ledger, checkout, issuance, KYC or money processing belongs in the active application.
 - D201 preserves the enabled Netlify Emails extension and its settings. Its pinned, authenticated, POST-only platform handler is the sole permitted server-function exception; website pages do not call it. Reject other generated functions and do not expose the extension's preview UI or secrets.

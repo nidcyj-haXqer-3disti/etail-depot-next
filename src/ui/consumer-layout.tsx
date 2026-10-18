@@ -25,7 +25,7 @@ export function ConsumerHero({service,title,description,actions,visual,note,foot
 
 export function ConsumerNetworks() {
   return <div className="consumer-networks">
-    <p>Accept major credit and debit cards.</p>
+    <p>Payment processing systems for major credit cards and ACH.</p>
     <NetworkBrands variant="accepted" label="Accepted card networks" />
   </div>;
 }

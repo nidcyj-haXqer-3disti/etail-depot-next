@@ -1,0 +1,265 @@
+{
+  "decision": "D243",
+  "updated_on": "2026-10-19",
+  "scope": "Traditional search and AI discovery for the existing public website. Preserve the approved design, offers, exact nine routes, safe provider links and indexing controls.",
+  "status": "Local preparation; no publication, campaign change or recurring schedule.",
+  "objective": "Earn qualified US merchant discovery and accurate product citations. Win relevant individual searches progressively; no universal rank or citation guarantee.",
+  "ownership": [
+    "Etail Depot US, Inc. is the operator.",
+    "Trolleys is payment acceptance for approved US businesses; card and ACH scope/pricing remain distinct.",
+    "Ledgix is a coming-soon virtual Visa secured credit card; applications remain closed."
+  ],
+  "baseline": "../artifacts/d243-search-ai/baseline.json",
+  "work_order": [
+    {
+      "priority": 1,
+      "action": "Verify and publish the prepared merchant content through the existing reviewed release process",
+      "owner": "Website/release",
+      "state": "D247 guide-link styling and D246 artwork/copy locally verified. Refresh full release gates and package before separately authorized publication. D226 remains live.",
+      "acceptance": "Fresh full public, production SEO, package and independent review, then separately authorized publication. Hosted sitemap lists seven intended discovery pages; notices/previews/retired routes retain exclusions."
+    },
+    {
+      "priority": 2,
+      "action": "Measure indexing and verified search-crawler access",
+      "owner": "Search measurement",
+      "state": "Payment still discovered/not indexed; live robots allows general crawling",
+      "acceptance": "Read stored Google/Bing status and canonical per intended page after release. Verify real crawler requests through identity-validated logs if available. A user-agent spoof or HTTP 200 does not establish crawler identity or indexing."
+    },
+    {
+      "priority": 3,
+      "action": "Supply first-hand Trolleys evidence",
+      "owner": "Product operations",
+      "state": "Actual approved service walkthrough and account facts required",
+      "acceptance": "Permissioned, redacted real create/share/customer-pay/receipt walkthrough; confirmed eligibility, first and subsequent payouts, holds/reserves, refund/dispute tasks and support ownership. Publish in existing Payment/Help/guide sections without inventing controls or promises."
+    },
+    {
+      "priority": 4,
+      "action": "Strengthen corroboration outside our own claims",
+      "owner": "Commercial/editorial",
+      "state": "Evidence and specific outreach authorization required",
+      "acceptance": "Accurate partner references and merchant stories with publication permission, documented period/methods and bounded results. No purchased ranking links, invented awards/reviews, or unsupported partnership logos."
+    },
+    {
+      "priority": 5,
+      "action": "Compare search and AI outcomes using fixed measurements",
+      "owner": "Search measurement",
+      "state": "Protocol prepared; prompt benchmark not run",
+      "acceptance": "Separate indexed URLs, US nonbrand query/page clicks, exact-query positions, direct cited links, brand mentions, accuracy and vendor-confirmed customer outcomes. Evaluate comparable periods only when asked."
+    }
+  ],
+  "intended_query_groups": [
+    {
+      "intent": "Accept payments without building checkout",
+      "queries": [
+        "payment links for small business",
+        "accept online card payments",
+        "qr code payments for small business"
+      ],
+      "primary_route": "/payment-acceptance-service"
+    },
+    {
+      "intent": "Choose an online payment provider",
+      "queries": [
+        "stripe alternatives",
+        "payment processing systems",
+        "merchant services",
+        "credit card processing"
+      ],
+      "primary_routes": [
+        "/guides/stripe-alternatives",
+        "/guides/payment-processing-systems",
+        "/payment-acceptance-service"
+      ]
+    },
+    {
+      "intent": "Understand and reduce chargeback exposure",
+      "queries": [
+        "what is a chargeback",
+        "chargeback vs refund",
+        "chargeback prevention"
+      ],
+      "primary_routes": [
+        "/guides/what-is-a-chargeback",
+        "/payment-acceptance-service#dispute-readiness"
+      ]
+    },
+    {
+      "intent": "Find the correct company and product",
+      "queries": [
+        "etail depot",
+        "trolleys payments",
+        "ledgix credit card"
+      ],
+      "primary_routes": [
+        "/",
+        "/payment-acceptance-service",
+        "/credit-card-services"
+      ]
+    },
+    {
+      "intent": "Understand a virtual secured credit card",
+      "queries": [
+        "virtual secured credit card",
+        "secured credit card security deposit"
+      ],
+      "primary_route": "/credit-card-services",
+      "limits": "Coming soon; do not target approval, instant issuance, credit-building benefits or live applications without confirmed terms."
+    }
+  ],
+  "semrush_proposal": {
+    "state": "Not applied; current ten-keyword campaign preserved",
+    "existing_obsolete_keyword": "booking deposit payment link",
+    "suggested_replacement": "chargeback prevention",
+    "proposed_next_ten_keyword_set": [
+      "etail depot",
+      "trolleys payments",
+      "ledgix credit card",
+      "payment links for small business",
+      "qr code payments for small business",
+      "stripe alternatives",
+      "payment processing systems",
+      "credit card processing for small business",
+      "merchant services for small business",
+      "what is a chargeback"
+    ],
+    "note": "Two alternatives: a one-keyword cleanup or a reviewed ten-slot commercial set. Choose deliberately; do not delete campaign history or buy capacity automatically. Broad themes remain in editorial planning; volume estimates are not traffic or conversion forecasts."
+  },
+  "ai_benchmark": {
+    "status": "Prepared, not executed",
+    "engines": [
+      "ChatGPT Search",
+      "Google AI search",
+      "Microsoft Copilot",
+      "Perplexity"
+    ],
+    "method": "Use fresh sessions without this project history, search enabled where available, consistent US English context, exact prompts, and record product/model/version/date when exposed. Repeat a fixed prompt set across comparable runs; these are observations, not universal ranks. Classify every prompt before a run. Report each engine and prompt class separately; brand-seeded answers are accuracy observations, never unprompted discovery.",
+    "fields": [
+      "observed_at",
+      "engine",
+      "model_if_exposed",
+      "prompt_id",
+      "prompt_class",
+      "run_id",
+      "run_status",
+      "search_enabled",
+      "region_context",
+      "brand_mentioned",
+      "etail_url_cited",
+      "cited_urls",
+      "supported_claims",
+      "incorrect_claims",
+      "answer_artifact",
+      "availability_limit"
+    ],
+    "metrics": {
+      "citation_rate": "For each engine and prompt class: completed eligible prompt-runs with at least one direct Etail URL citation / all completed eligible prompt-runs. Repeats count as distinct runs; record failed/unavailable runs separately. Brand-seeded citation rates are not discovery rates.",
+      "mention_rate": "For each engine and prompt class: completed eligible prompt-runs mentioning Etail/Trolleys/Ledgix / all completed eligible prompt-runs. Report unprompted discovery separately from brand-seeded accuracy; never equate mentions with citations.",
+      "accuracy": "For brand-seeded and nonbrand answers separately, review price, US scope, ACH-specific unknowns, Clarity eligibility and Ledgix availability. An instructed brand mention is not a discovery win.",
+      "conversion": "Vendor-confirmed approved merchants or useful inquiries where agreed evidence exists. Do not treat a handoff click as onboarding."
+    },
+    "prompts": [
+      {
+        "id": "M1",
+        "prompt": "Which services let a US small business accept card payments through a shared link without building a checkout?",
+        "class": "nonbrand_discovery"
+      },
+      {
+        "id": "M2",
+        "prompt": "Compare Stripe alternatives for US merchants who need payment links and QR codes.",
+        "class": "nonbrand_discovery"
+      },
+      {
+        "id": "M3",
+        "prompt": "What should a US small business compare when choosing a payment processing system?",
+        "class": "nonbrand_discovery"
+      },
+      {
+        "id": "M4",
+        "prompt": "How does a QR code payment link work, and how is it different from a card reader?",
+        "class": "nonbrand_discovery"
+      },
+      {
+        "id": "M5",
+        "prompt": "Compare the published fees for a $100 domestic online card payment using Trolleys and Stripe. Separate optional services and dispute costs.",
+        "class": "brand_seeded_accuracy"
+      },
+      {
+        "id": "M6",
+        "prompt": "What is a chargeback, how does it differ from a refund, and what records should a merchant keep?",
+        "class": "nonbrand_discovery"
+      },
+      {
+        "id": "M7",
+        "prompt": "What does Trolleys Clarity cover, what does it cost, and what does it not cover?",
+        "class": "brand_seeded_accuracy"
+      },
+      {
+        "id": "C1",
+        "prompt": "What is the Ledgix credit card, and can I apply for it now?",
+        "class": "brand_seeded_accuracy"
+      },
+      {
+        "id": "C2",
+        "prompt": "For Ledgix, is the security deposit the same as paying the purchase balance?",
+        "class": "brand_seeded_accuracy"
+      }
+    ]
+  },
+  "evidence_needed": [
+    {
+      "asset": "Real product walkthrough",
+      "source": "Approved Trolleys operator/vendor service",
+      "conditions": "Publication permission, no personal/payment data, actual field labels and methods, date/version."
+    },
+    {
+      "asset": "Operational facts sheet",
+      "source": "Account agreements and service owner",
+      "conditions": "US eligibility, required application information, confirmed payout/refund/dispute procedures and support; clearly distinguish unknown ACH fees/timing."
+    },
+    {
+      "asset": "Merchant case example",
+      "source": "Consenting merchant plus records",
+      "conditions": "Observed baseline and period, denominators, attributable results and limitations; no borrowed competitor statistics."
+    },
+    {
+      "asset": "Ledgix launch terms",
+      "source": "Issuer/program approved documents",
+      "conditions": "Issuer, eligibility, deposit custody/return and credit terms confirmed before expanded acquisition claims."
+    }
+  ],
+  "safeguards": [
+    "No keyword stuffing, hidden answers, mass near-duplicate pages or fictional authority.",
+    "No special AI file or schema is assumed to guarantee discovery.",
+    "Keep normal public search access separate from training permissions; do not change crawler policies merely to seek mentions.",
+    "Do not add analytics or forward identifiers/referrers to Trolleys; any new attribution setup requires separate privacy review and approval.",
+    "Checks remain user-requested only. No background monitor or schedule created.",
+    "Existing source-linked content and illustrative artwork stay; real product evidence must remain distinguishable from examples."
+  ],
+  "sources": [
+    {
+      "url": "https://developers.google.com/search/docs/appearance/ai-features",
+      "supports": "Ordinary SEO, indexed/snippet-eligible pages, helpful visible content, internal links and accurate structured data; no special AI file requirement."
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/bots",
+      "supports": "OAI-SearchBot governs search crawling; search/training controls are independent; robots and published-IP access requirements."
+    },
+    {
+      "url": "https://blogs.bing.com/webmaster/2026/10/introducing-topics-portfolio-beta-in-ai-performance/",
+      "supports": "Bing AI measurement and site-specific grounding queries/citations; data sufficiency required."
+    },
+    {
+      "url": "https://stripe.com/pricing",
+      "supports": "Dated US base-price comparison."
+    },
+    {
+      "url": "https://docs.stripe.com/payment-links/share",
+      "supports": "Specific operational sharing guidance as a competitor evidence example."
+    },
+    {
+      "url": "https://developer.paypal.com/payment-links-buttons/share-payment-link/",
+      "supports": "Payment-link sharing and verification documentation as an evidence example."
+    }
+  ],
+  "last_verification": "../artifacts/d247-guide-links/summary.json"
+}

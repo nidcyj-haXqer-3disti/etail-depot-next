@@ -7,6 +7,7 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production",
   ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
+const guidePaths = ["/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback"] as const;
 function context(response = new Response("public page"), changes: Partial<PublicBoundaryContext> = {}) {
   return { site: { id: PUBLIC_INDEXING_APPROVAL.siteId }, deploy: { context: "production" }, next: vi.fn(async () => response), ...changes };
 }
@@ -28,7 +29,7 @@ const publicAliases = movedPublicPages.flatMap(([oldPath, destination]) =>
 
 describe("production domain migration", () => {
   it.each(["GET", "HEAD"])("redirects %s from the exact production subdomain without carrying query inputs", async method => {
-    for (const path of ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/brand/logo.png", "/missing"]) {
+    for (const path of ["/", "/credit-card-services", "/payment-acceptance-service", "/help", ...guidePaths, "/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/brand/logo.png", "/missing"]) {
       const next = context();
       const response = await handlePublicRequest(new Request(`${defaultOrigin}${path}?token=private&next=https://other.invalid#fees`, { method }), next, production);
       expect(response.status).toBe(308);
@@ -249,7 +250,7 @@ describe("retired application boundary", () => {
       expect(request.bodyUsed).toBe(false);
     }
   });
-  it.each(["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/apiary", "/constructor", "/__proto__"])("does not capture public or unrelated route %s", path => {
+  it.each(["/", "/credit-card-services", "/payment-acceptance-service", "/help", ...guidePaths, "/privacy", "/terms", "/apiary", "/constructor", "/__proto__"])("does not capture public or unrelated route %s", path => {
     expect(retiredRoute(path)).toBeNull();
   });
 });
@@ -258,9 +259,9 @@ describe("public Edge search and security policy", () => {
   it("matches all routes and methods and fails closed rather than bypassing policy", () => {
     expect(config).toEqual({ pattern: "^/.*$", onError: "fail" });
   });
-  it("keeps the public response and security headers on the approved production site", async () => {
+  it.each(["/payment-acceptance-service", ...guidePaths])("keeps the %s response and security headers on the approved production site", async path => {
     const next = context(new Response("unchanged public HTML", { headers: { "Content-Type": "text/html", ETag: '"public"' } }));
-    const response = await handlePublicRequest(new Request(`${canonicalOrigin}/payment-acceptance-service`), next, production);
+    const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), next, production);
     expect(await response.text()).toBe("unchanged public HTML");
     expect(next.next).toHaveBeenCalledTimes(1);
     expect(response.headers.get("etag")).toBe('"public"');
@@ -268,31 +269,35 @@ describe("public Edge search and security policy", () => {
     for (const [key, value] of Object.entries(publicSecurityHeaders)) expect(response.headers.get(key)).toBe(value);
   });
   it.each(["deploy-preview", "branch-deploy", "dev", undefined])("denies indexing in trusted %s context even with production environment claims", async deployContext => {
-    const next = context(new Response("<meta name=robots content=index,follow>"), { deploy: { context: deployContext } });
-    const response = await handlePublicRequest(new Request(`${canonicalOrigin}/?CONTEXT=production`, { headers: { "x-forwarded-host": new URL(canonicalOrigin).host } }), next, { ...production, CONTEXT: "production", SITE_ID: PUBLIC_INDEXING_APPROVAL.siteId });
-    expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
-    expect(await response.text()).toBe("<meta name=robots content=index,follow>");
+    for (const path of ["/", ...guidePaths]) {
+      const next = context(new Response("<meta name=robots content=index,follow>"), { deploy: { context: deployContext } });
+      const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}?CONTEXT=production`, { headers: { "x-forwarded-host": new URL(canonicalOrigin).host } }), next, { ...production, CONTEXT: "production", SITE_ID: PUBLIC_INDEXING_APPROVAL.siteId });
+      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+      expect(await response.text()).toBe("<meta name=robots content=index,follow>");
+    }
   });
   it("requires the platform site identity and all reviewed environment flags", async () => {
-    for (const id of [undefined, "another-site"]) {
-      const response = await handlePublicRequest(new Request(`${canonicalOrigin}/`), context(undefined, { site: { id } }), { ...production, SITE_ID: PUBLIC_INDEXING_APPROVAL.siteId });
-      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
-    }
-    for (const key of Object.keys(production)) {
-      const response = await handlePublicRequest(new Request(`${canonicalOrigin}/`), context(), { ...production, [key]: undefined });
-      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    for (const path of ["/", ...guidePaths]) {
+      for (const id of [undefined, "another-site"]) {
+        const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(undefined, { site: { id } }), { ...production, SITE_ID: PUBLIC_INDEXING_APPROVAL.siteId });
+        expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+      }
+      for (const key of Object.keys(production)) {
+        const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), { ...production, [key]: undefined });
+        expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+      }
     }
   });
   it.each(["/privacy", "/privacy/", "/privacy.html", "/terms", "/terms/index.html"])("keeps the legal page %s private in production", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });
-  it.each(["/privacy.txt", "/terms.txt", "/index.txt", "/payment-acceptance-service.txt"])("does not index the raw navigation payload %s", async path => {
+  it.each(["/privacy.txt", "/terms.txt", "/index.txt", "/payment-acceptance-service.txt", ...guidePaths.map(path => `${path}.txt`)])("does not index the raw navigation payload %s", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });
-  it("keeps missing pages private and preserves their 404 status", async () => {
-    const response = await handlePublicRequest(new Request(`${canonicalOrigin}/missing`), context(new Response("Not found", { status: 404 })), production);
+  it.each(["/missing", "/guides/unreviewed"])("keeps missing page %s private and preserves its 404 status", async path => {
+    const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(new Response("Not found", { status: 404 })), production);
     expect(response.status).toBe(404);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });

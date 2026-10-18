@@ -18,7 +18,7 @@
 .wallet-setup-description { grid-column: 1; grid-row: 1; }
 .wallet-setup-description h3 { font-size: 24px; line-height: 1.25; letter-spacing: -.035em; font-weight: 500; text-wrap: balance; }
 .wallet-setup-description p { margin-top: 14px; color: #51665b; font-size: 14px; line-height: 1.65; }
-.wallet-setup-phone { position: relative; grid-column: 2; grid-row: 1; width: 100%; max-width: 214px; aspect-ratio: .56; justify-self: center; border: 1px solid #728078; border-radius: 29px; background: #233a30; box-shadow: inset 0 0 0 2px #b6c0b4, 0 16px 24px -16px #173b3240, 0 2px 4px #173b3212; }
+.wallet-setup-phone { position: relative; grid-column: 2; grid-row: 1; width: 100%; max-width: 214px; aspect-ratio: .56; justify-self: center; border: 1px solid #728078; border-radius: 29px; background: #233a30; box-shadow: 0 12px 24px -16px #173b3240; }
 .wallet-setup-screen { position: absolute; inset: 5px; overflow: hidden; border: 1px solid #2f4435; border-radius: 23px; background: #fff; }
 .wallet-setup-camera { position: absolute; top: 8px; left: 37%; width: 26%; height: 8px; border-radius: 8px; background: #203129; }
 .wallet-setup-phone-google .wallet-setup-camera { width: 7px; height: 7px; left: calc(50% - 3.5px); }
@@ -61,7 +61,7 @@
 
 /* Quiet product art for discovery; the single interactive guide lives further down the Cards page. */
 .wallet-product-art { position: relative; container-type: inline-size; isolation: isolate; display: grid; place-items: center; width: 100%; min-width: 0; height: var(--consumer-art-height, 480px); margin: 0; padding: 24px; overflow: hidden; border: 1px solid #dfe6e0; border-radius: 12px; background: linear-gradient(145deg, #f4f6ef, #e7eee8); }
-.wallet-product-device { position: relative; width: clamp(194px, 40cqw, 216px); aspect-ratio: .56; border: 1px solid #778b82; border-radius: 33px; background: #243d33; box-shadow: inset 0 0 0 2px #bec8bc, 0 22px 32px -20px #173b3240, 0 2px 4px #173b3212; }
+.wallet-product-device { position: relative; width: clamp(194px, 40cqw, 216px); aspect-ratio: .56; border: 1px solid #778b82; border-radius: 33px; background: #243d33; box-shadow: 0 12px 24px -16px #173b3240; }
 .wallet-product-screen { position: absolute; inset: 5px; overflow: hidden; border: 1px solid #354a3b; border-radius: 27px; background: linear-gradient(180deg, #fff 40%, #f6f8f6); }
 .wallet-product-camera { position: absolute; top: 11px; left: 37%; width: 26%; height: 8px; border-radius: 8px; background: #203129; }
 .wallet-product-card { position: relative; margin: 62px 12px 0; aspect-ratio: 1.586; }

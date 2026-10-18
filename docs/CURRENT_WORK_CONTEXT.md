@@ -2,9 +2,109 @@
 
 This workspace and conversation concern the existing customer-facing Etail Depot website. Start from the deployed version and the user's next explicit request.
 
-## D226 — authorized release in progress, 18 October 2026
+## D248 — push and deploy authorized
 
-The user authorizes pushing and deploying the reviewed D225 Payment introduction/operator FAQ. Prepare a fresh isolated candidate, run all release gates, publish a reviewed PR and use the existing manual Netlify Git build. D220 remains live until publication is verified. Preserve the design, offers, public-only scope and enabled protected Emails. See current status for actual outcomes.
+The user authorizes publication of the accumulated D227–D247 public-site candidate through the reviewed feature-branch, exact-source CI/package and manual Netlify Git-build process. Fresh full local gates and two independent source reviews pass. Preserve the nine-page public-only scope, seven production discovery routes, approved offers and enabled protected Emails. D226 remains live until verified publication; current status records the release and actual limitations.
+
+## D247 — guide-card link styling
+
+19 October 2026. The user dislikes the underline on “Read the guide.” Remove the persistent text decoration from the shared guide-card action; this applies to all nine actions across Payment and the three guides. Keep the wording, arrow, clickable card, hover border and keyboard focus. Prose/legal links and other navigation are unchanged. Static build and 12 rendered route/viewport checks at 1440/390/320px pass, with no underlined guide actions or horizontal overflow and a visible 3px focus outline. Review actual desktop/phone screenshots. Evidence: `artifacts/d247-guide-links/`. This is a local CSS refinement; no push/deployment. Prior full release checks/package must still be refreshed before publication; D226 remains live.
+
+## D246 — artwork and asset authenticity review, 19 October 2026
+
+Refine existing payment/card artwork rather than replacing scenes: quieter shadows/phone frames, upright category objects and secured-credit panels, no placeholder text strokes or social-poster rings, larger readable checkout logos, and an inline deposit lock. Fix the Information SMS/Help example and remove a duplicated guide conclusion. Preserve approved colors, layout, offers, original marks and interactions. The homepage photo is documented AI-generated (`docs/artwork/d117-assets.json`); preserve the approved image, while identifying licensed real photography as the remaining authenticity improvement. Do not describe the photo as a real customer or infer authorship from appearance.
+
+Lint/build, 69 browser cases (one pre-existing intentional desktop skip), 33 accessibility cases, architecture and nine-page 1440/390/320px rendered checks pass. Additional enlarged detail/404 review passes; this is 2x pixel capture, not native zoom. No page errors, broken images or overflow. Final mobile deposit-label overlap is corrected. Evidence: `artifacts/d246-art-review/`. D244 full security/production-SEO/package checks predate these edits; refresh before release. Local preview only, D226 remains published.
+
+## D245 — natural wording, existing visuals
+
+19 October 2026. Keep the approved artwork and main headlines after independent rendered review. Refine only eight vague, repetitive or stiff phrases in payment-channel captions and guides; preserve facts, qualifications, fees, core SEO terms and legal text. Focused lint/build, 18 existing browser/accessibility cases and 12 rendered views pass. Exact edits are in `artifacts/d245-natural-copy/changes.json`. Local only; D226 remains live. D244's earlier release package predates these copy edits and must be refreshed before publication.
+
+## D244 — final candidate verification
+
+19 October 2026. The current D227–D243 candidate passes full local public, security, production SEO and Netlify package checks, plus nine-page desktop/phone rendered review. No application change is needed; correct only stale page/search counts in the deployment runbook. The reviewed candidate contains nine exact pages and seven production discovery pages, with all existing exclusions and protected Emails preserved. Use current status and `artifacts/d244-final-check/summary.json` for exact source identity, checks, the sandbox retry and limits. Local preview remains nonindexable; no push/deployment or remote change. D226 remains live. Any release still requires the ordinary reviewed source/CI/authorization and hosted acceptance steps.
+
+## D243 — traditional search and AI discovery
+
+19 October 2026. Pursue qualified US merchant discovery and accurate product citations through the existing public website. Retain approved design, offers, exact nine routes and all indexing/handoff controls. Four narrow copy refinements clarify the US audience, ACH scope, Stripe comparison and publisher identity. Three independent reviews and fresh authenticated Google/Bing/Semrush observations inform `planning/search-ai-execution.json`; use its evidence-led release and measurement sequence. Distinguish nonbrand AI discovery from brand-seeded accuracy; no universal rank guarantee. Actual Trolleys walkthrough/account facts and permissioned merchant evidence remain dependencies. Checks are user-requested only. No publication, campaign/tracking/crawler setting change or outreach; D226 remains live. Current status records the baseline, passing focused checks and remaining full release gates.
+
+## D242 — approved homepage heading
+
+19 October 2026. Home's payment-highlights heading is now “One payment link. More ways to get paid.” The user accepts this wording above Orders by message, Online checkout and QR code payments. Keep the existing design and offers. Local preview only; build and responsive review pass as recorded in current status. D226 remains live.
+
+## D241 — homepage checkout wording
+
+19 October 2026. Home's middle payment highlight now reads “Online checkout” and “Let customers review the amount and pay by card on your payment page.” This aligns the explanation with the existing artwork and the adjacent message/QR examples. Preserve the artwork, other copy, layout, offers and service scope. Local only; current status records passing focused validation. D240's read-only ratio investigation found no reason to alter the design or remove necessary framework code; its live warnings remain visible. D226 remains deployed.
+
+## D239 — QR-payment wording
+
+19 October 2026. User requests QR-code-generation search wording for the Home sharing example. Its heading becomes “QR code payments” and paragraph “Generate a QR code for your payment link so customers can scan and pay by card.” Preserve the artwork, actual hosted service scope, pricing, routes and indexing controls. This adds no local generator or free-tool claim. Local only; validation is in current status.
+
+## D238 — remove booking-deposit promotion and unused code
+
+19 October 2026. The user requests removing the booking-deposit related add-on throughout the website. This supersedes D232's narrower removal of only a homepage guidance link and the booking-specific parts of D227. Remove the Home booking copy/artwork labels, Help FAQ/fragment behavior and guide references. Reuse the existing Home message artwork for a regular Homeware set order at the existing $64 sample amount. Remove the unused Help answer helper, its styles, module allowance and booking-specific test block. Retain general payment-request guidance and Ledgix's separate security-deposit explanations. No booking-deposit promotion remains in active source or exported pages. No fees, card terms, routes, provider capabilities, design system or indexing controls change. Local only; D226 remains live. Current status records checks and release limits.
+
+## D237 — requested page titles, existing URLs preserved
+
+19 October 2026. The user explicitly confirms page titles only, keeping existing addresses. Set Home to “Payment Acceptance & Credit Card Processing | Etail Depot” and Payment to “Trolleys Payment Processing System | Etail Depot.” Use the Home registry title for root fallback/social metadata; the same registry supplies page titles, Open Graph/Twitter titles and WebPage structured names. Keep navigation labels, headings, descriptions, routes, canonicals, offers, artwork and indexing controls. Local only; no publication or search submission. Validation is recorded in current status.
+
+## D236 — Clarity chargeback search language and linked guidance
+
+19 October 2026. The user asks to improve Clarity's chargeback-related SEO. Make its existing optional prevention purpose explicit in the Payment heading, introductory copy, metadata and Help questions; add one qualified homepage FAQ linking directly to Clarity. Strengthen the existing chargeback guide's refund, response, prevention and Clarity sections with descriptive two-way links and an official Order Insight source. Qualify the other two guides' existing Clarity descriptions as eligible Visa online fraud disputes. Keep the approved artwork, page structure, prices and exact nine routes; only the new inline guide link needs the existing design's underline treatment.
+
+Official Visa Order Insight and Google Search Central guidance support useful purchase-recognition/prevention explanations and natural descriptive headings/links. Do not treat Clarity as universal chargeback protection, an ACH service, automatic refunds or managed chargeback responses; no guaranteed outcome or ranking. Terms and Privacy already preserve the correct scope and need no SEO insertion. Local preview only: no push, deployment, search submission, campaign change or new indexing permission. D226 remains live. Actual validation and limitations are recorded in current status and `artifacts/d236-clarity-search/`.
+
+## D235 — final local quality and search review
+
+19 October 2026. The user requests a final artwork, wording, internal-language, Terms/Privacy and SEO review, and clarifies: meet Semrush SEO checks while keeping Etail typography. Preserve the approved artwork, colors, original logos and page structure. The narrow corrections explain confirmed ACH availability separately from card pricing on Payment, make Terms sign-in guidance match Help, specify that the fee calculator excludes ACH, and standardize the guide footer's payment-acceptance label. Record ACH provenance without inventing fees, timing, checkout configuration or Clarity coverage. Update the legal pages' revision dates to October 19 for this reviewed candidate; rights and approved offers remain unchanged.
+
+The existing live Semrush audit shows 99% Site Health, zero errors, three low text/HTML-ratio warnings and an optional llms.txt notice. Its sole “broken” URL is the absent `/llms.txt`, not a customer page. Do not add filler, change fonts, hide findings or add files solely for a score. Current Google guidance requires useful crawlable content and does not guarantee indexing or require special AI text files. Search and operational privacy limitations stay explicit. D226 remains published; the local candidate is not deployed or submitted. Validation, actual diagnostics and evidence: `planning/STATUS.md`, `artifacts/d235-final-review/`.
+
+## D234 — live Payment indexing requested
+
+19 October 2026 (18 October 16:50 UTC). The user asks to change Google's discovered status for the live service. Five ordinary HTTPS checks find no technical indexing defect. Search Console still shows Payment “Discovered — currently not indexed,” last crawl N/A; its existing live test permits indexing. One Request indexing action is accepted: Google confirms addition to its priority crawl queue. This is queue acceptance, not an indexed result or ranking. Evidence: `artifacts/d234-indexing-action/`. No source, deployment, DNS or indexing-control changes. D226 remains live; D227–D233 remain local. Keep checks user-requested only and do not repeat submissions to try to increase priority.
+
+## D233 — homepage payment-processing heading and confirmed ACH availability
+
+19 October 2026. The user requests “Payment processing systems for major credit card and ACH” and explicitly confirms “Yes, ACH is available” through Trolleys. Update the homepage network-strip heading to “Payment processing systems for major credit cards and ACH.” Use the plural for grammatical agreement. This operator confirmation supersedes the prior absence of ACH availability evidence; it does not establish ACH pricing, settlement timing, checkout-specific configuration or Clarity coverage. Existing prices and calculations remain explicitly card-specific.
+
+Keep the current layout and authentic card-network marks. Focused lint/build, two desktop/mobile logo-loading checks and three homepage accessibility checks pass. Actual 1440/390/320px captures show clean wrapping, no overflow or page errors. No new test, processing function, fee, route or remote change. Preview only; D226 remains live, and D231 packaging covers earlier source.
+
+## D232 — remove the extra homepage booking-guidance link
+
+19 October 2026. The user rejects the “Booking deposit guidance” link beneath the homepage booking illustration. Remove that anchor, both now-unused `.payment-highlight-guide` CSS rules and the obsolete positive test expectation. Keep the illustration and independently reachable Help/chargeback guidance. This supersedes only D227's extra homepage link. Focused lint, static build and both existing desktop/mobile service-discovery cases pass; the rendered Home export and source no longer contain the link or style class. No new tests, offers, routes, remote changes or deployment. The D231 package covers prior source; fresh packaging is required before a release.
+
+## D231 — merchant search-growth candidate verified locally, 19 October 2026
+
+The user wants Etail Depot to compete with Stripe in search. Keep that as a measured per-query aspiration, not an achieved or guaranteed industry rank. Authenticated Google inspection still shows Payment discovered without a stored crawl. Property-wide Web performance displays 10 clicks, 40 impressions and average position 6.3 for October 13–16; the queries are mainly branded/legacy, not a US merchant-ranking baseline. The existing Semrush US/mobile report remains dated October 18. Evidence, the six accepted target themes and the release/measurement/product-evidence sequence are in `planning/search-growth.json` and `artifacts/d231-search-growth`.
+
+Local work adds contextual Home/Payment guide links, clarifies payment links, narrows the Stripe comparison title to its actual scope, adds a sourced feature-fit comparison and illustrates relevant evidence for three dispute reasons. D227–D230, the original design, offers, nine exact routes, provider links, privacy practices and indexing safeguards remain. Full public verification passes (256 units, 69 browser journeys plus one pre-existing intentional skip, 33 accessibility cases, security/audit), as do production SEO and local package verification. Rendered review at 1440/390/320px passes after correcting a screenshot-helper selector; independent content review finds no material issue. The nonindexable local preview is restored. D226 remains deployed; no push, deployment, indexing submission, tracking change, outreach or recurring monitoring. No ranking improvement is claimed.
+
+## D230 — plain-language cleanup ready for local review, 19 October 2026
+
+The user asks to recheck all nine pages and remove internal language. On `codex/search-content-d228`, guide wording drops review/capability/workflow/application-entrance jargon while preserving pricing facts, qualified comparisons, sources and dates. Help clarifies example labels and earlier account records. Privacy/Terms names Order Insight directly and explains link privacy/history in ordinary language, preserving rights, data practices, legal dates and fees. Payment explains that eligible Visa online fraud disputes may be stopped before they become chargebacks, with the required payment history/evidence, makes coverage qualifications readable, describes services that respond to chargebacks for the merchant, and labels the illustration “Example bank screens.” Home/Cards retain D229 unchanged.
+
+This is a wording cleanup: the earlier proposed Clarity rebranding/headline was not accepted or applied, and coverage is not expanded. D227–D229, routes, assets, style, functionality, public-only scope and indexing guards remain. Full lint, static build and architecture pass; the existing browser/accessibility selection passes 72 cases with one pre-existing intentional skip and no failures. All 27 rendered views at 1440/390/320px have no HTTP/page errors, horizontal overflow or targeted internal-language matches. Independent review confirms unchanged commercial/legal meaning. The local preview is ready; evidence and coverage are in current status and `artifacts/d230-language-review`. Release packaging was not repeated; the D228 package belongs to prior source. D226 remains deployed, with no push, deployment, indexing submission or remote-resource change.
+
+## D229 — Home copy and artwork refinement ready for local review, 19 October 2026
+
+The local Home hero now reads “Accept online card payments with Trolleys Two Step. Create a request for a booking, project or sale, then share a link or QR code.” The use-case heading is “A payment link for the way you sell.” The original hero photograph stays, with a Home-only mobile 4:3 crop replacing the tall 360px treatment. The existing QR artwork adds “Pay by card” and “Same payment link,” with refined geometry, shadows and number alignment. No new scene, section, offer, route or behavior is added; D228's full search-content and guide work remains.
+
+Pinned-runtime focused lint/build, 13 browser/accessibility cases, two full internal-link cases and the public architecture check pass. Before/after views at 1440/768/390/320px show no page errors or horizontal overflow; independent art review confirms the crop and QR alignment improvements. The local preview is ready; evidence is under `artifacts/d229-home-refinement`. This is focused verification, not a full release check: the D228 package belongs to prior source and this changed candidate has not been release-packaged. D226 remains deployed. No push, merge, deployment, indexing submission or remote change is included.
+
+## D228 — accepted search-content proposal ready for local review, 19 October 2026
+
+On `codex/search-content-d228`, the user accepts the full proposal: clarify Home's online-payment introduction/highlights and merchant-services answer; refine Payment's Create/Share labels, place processing pricing before optional Clarity, add processing-system/chargeback answers and guide links, and use one final fixed Trolleys action. Update the Home/Payment search titles and prepare three static editorial guides: `/guides/stripe-alternatives`, `/guides/payment-processing-systems` and `/guides/what-is-a-chargeback`. Preserve D227 guidance, approved offers, original design/assets, fixed service entrances and provider-claim limits. No new collection, tracking or account/backend function is introduced.
+
+The exact page scope expands to nine. The seven nonlegal pages are prepared for search eligibility only under the unchanged production site/origin guard after an eventual approved release; legal remains noindex and local/preview responses retain noindex and empty sitemaps. Public checks, production SEO, local package verification and 1440/390/320px rendered review pass; actual failures, focused reruns and limits are recorded in current status. D226 remains deployed. No push, merge, deployment, search submission, monitoring or remote-resource change is included; no traffic, indexing or ranking improvement is claimed.
+
+## D227 — merchant guidance ready for local review, 18 October 2026
+
+On `codex/merchant-guidance-d227`, the accepted proposal adds purpose-specific “Before you share” guidance to the existing Two Step artwork, expands the Help booking-deposit example and links it from Home, clarifies the existing Ledgix purchase/deposit example, and names secured credit in the card search title. A small Help fragment helper keeps the linked answer open after refresh. Build, focused lint, relevant desktop/mobile browser and accessibility checks pass; actual 1440/390/320px views were reviewed. Existing design, offers, six routes, privacy practices and service destinations are preserved. D226 remains deployed; this is a local preview only. The user confirms Cybersource is the gateway, but the actual checkout integration, application requirements and service walkthrough still need confirmed vendor evidence. Do not infer capabilities from gateway documentation. See current status for verification and limitations.
+
+## D226 — Payment clarity published, 18 October 2026
+
+PR #44 publishes the approved online-card-payment/link/QR introduction and Trolleys operator FAQ. Signed merge `9b4dc4b3e3e70c94fe1065637e7dddf2da905224`, tree `5e570b583169738e6ead3c77e704179d66757b8a`, matches the independently reviewed and isolated candidate. Candidate/main CI, full local gates and manual Netlify Git build pass. Deploy `6ad44f2ceaffeae11e613f79` is ready/current at https://etaildepot.com; all 73 hosted HTTP requests and eight desktop/mobile cases pass first attempt. Offers, design, links, indexing controls and enabled protected Emails are unchanged. Follow current status for actual diagnostics and limitations. No new indexing request or ranking result.
 
 ## D225 — local Payment clarity update, 18 October 2026
 
@@ -56,18 +156,17 @@ The reviewed website is now published at **https://etaildepot.com**. Cloudflare 
 
 PR #41 is merged as `d8632ae1d0114989fd66149b003954a4d8ba2d3d`; exact-source CI and hosted package/security checks pass. Netlify deploy `6acf885a922b0f7283693c75` is ready/current. Final hosted acceptance passes 177 HTTP checks and 49 unique browser cases, including all 24 accessibility checks, with one intentional skip. The original cross-domain managed-connection challenge and successful single retry are recorded. All 18 matched screenshots are pixel-identical to D214; 21 alignment states pass. No scheduled DNS work is configured.
 
-## Current baseline
+## Published baseline and local scope
 
-- Public pages: Home, Payment acceptance, Credit card, Help, Privacy and Terms.
-- Published release: D220 / PR #43, 15 October 2026, 11:46 JST (02:46 UTC), publishing contributor documentation with the D217 customer experience unchanged.
-- Netlify deploy: `6ad03e7f1b5603bc0c899171`, confirmed current and ready. Emails remains enabled with unchanged saved settings and protected handler bytes.
-- Published source: `3948e697272b7b6ee35fd814ae7e31bb72185d7d`, tree `ed4f22dc27b716dca2ae81b3493884bc5750e055`, identical to reviewed PR #43 candidate `19c4e7d8d1837255e6eb7180174291d7881667e7`.
-- Released base: D220 signed merge `3948e697272b7b6ee35fd814ae7e31bb72185d7d`. Current work is on `codex/payment-clarity-d225` with the two approved Payment copy changes, the existing FAQ expectation and preserved release/research records. D226 authorizes their publication through the release gates.
-- Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently. Original design, assets, offers and legal substance remain intact.
-- Verification: full fresh isolated checks, exact-source candidate/main CI, packaging and hosted artifact/security checks pass. All 73 hosted HTTP requests and six desktop/mobile browser cases pass; the broader D217 visual review remains applicable to the unchanged design. Six visible page bodies, all 14 stylesheets and all 15 original assets match D217; generated payload/build identifiers can differ.
-- Website: https://etaildepot.com/. The old Netlify public address redirects to it. Local preview: http://127.0.0.1:3100/, with noindex, blocked crawling and empty sitemap.
-- Homepage: **Get paid. Keep going.**
-- Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service`.
+- Published pages: Home, Payment acceptance, Credit card, Help, Privacy and Terms. D228 prepares the three exact guide routes above locally, for a nine-page candidate.
+- Published release: D226 / PR #44, 18 October 2026, 13:47 JST (04:47 UTC).
+- Netlify deploy: `6ad44f2ceaffeae11e613f79`, confirmed current and ready; enabled Emails and its protected handler are preserved.
+- Published source: `9b4dc4b3e3e70c94fe1065637e7dddf2da905224`, tree `5e570b583169738e6ead3c77e704179d66757b8a`, identical to reviewed candidate `4e6df27ef50cc31f68cd2c2e312814d24d2350a7`.
+- Published release branch: `codex/released-d226`, aligned to the signed merge. Active local work is on `codex/search-content-d228`; D227/D228 changes are not deployed.
+- Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently.
+- Full isolated checks, exact-source candidate/main CI, hosting/package/security checks and live acceptance pass. All 73 HTTP requests and eight focused desktop/mobile browser cases pass first attempt.
+- Website: https://etaildepot.com/. The prior Netlify public address redirects to it. Local preview: http://127.0.0.1:3100/, with noindex, blocked crawling and empty sitemap.
+- Homepage: **Get paid. Keep going.** Homepage hero action: **Explore payment acceptance**.
 
 ## D214 — published and verified
 

@@ -3,7 +3,7 @@ import {expect,test} from "@playwright/test";
 import {openMainNavigation} from "./public-header";
 
 for (const width of [1440,390,320]) {
-  for(const route of ["/","/credit-card-services","/payment-acceptance-service","/help","/privacy","/terms"]) {
+  for(const route of ["/","/credit-card-services","/payment-acceptance-service","/help","/privacy","/terms","/guides/stripe-alternatives","/guides/payment-processing-systems","/guides/what-is-a-chargeback"]) {
     test(`consumer ${route} is readable and accessible at ${width}px`,async({page})=>{
       await page.setViewportSize({width,height:900});
       await page.goto(route);await page.evaluate(()=>document.fonts.ready);
@@ -88,7 +88,7 @@ for(const width of [1440,320]){
         const record=example.locator(".dispute-purchase-details");
         await expect(record.getByRole("term")).toHaveText(["Purchase","Reference",...fulfillment.map(([label])=>label)]);
         await expect(record.getByRole("definition")).toHaveText([purchase,reference,...fulfillment.map(([,value])=>value)]);
-        await expect(artwork.locator("figcaption")).toContainText("Illustrative banking experience");
+        await expect(artwork.locator("figcaption")).toContainText("Example bank screens");
         await expect(selection).toBeChecked();
         const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
         expect(result.violations.map(({id,nodes})=>({id,nodes:nodes.map(node=>node.target)}))).toEqual([]);

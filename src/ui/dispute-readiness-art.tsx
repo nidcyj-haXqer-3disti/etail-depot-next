@@ -91,6 +91,6 @@ export function DisputeReadinessArt({purpose}: {purpose: PaymentExamplePurpose})
         </div>}
       </div>
     </div>
-    <figcaption>Illustrative banking experience. Available details and screen layouts vary by bank.</figcaption>
+    <figcaption>Example bank screens. The details shown and screen layouts vary by bank.</figcaption>
   </figure>;
 }

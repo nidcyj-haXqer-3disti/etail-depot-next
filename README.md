@@ -8,7 +8,7 @@ The customer-facing website for **Etail Depot US, Inc.**, introducing **Trolleys
 
 Trolleys helps US businesses accept online payments. Ledgix is a virtual Visa secured credit card, **coming soon**; applications are not open. The website explains both products, their pricing and limitations, and where to get help.
 
-This repository contains the public website: product pages, interactive illustrations, help, legal notices and fixed links to the services. It does not run customer accounts, card issuance or payment processing. Trolleys account access is handled separately at [trolleys.ai](https://trolleys.ai); Ledgix inquiries go to [ledgix@etaildepot.com](mailto:ledgix@etaildepot.com).
+This repository contains the public website: product pages, interactive illustrations, help, merchant guides, legal notices and fixed links to the services. It does not run customer accounts, card issuance or payment processing. Trolleys account access is handled separately at [trolleys.ai](https://trolleys.ai); Ledgix inquiries go to [ledgix@etaildepot.com](mailto:ledgix@etaildepot.com).
 
 Built with **Next.js, React and TypeScript**, exported as static pages and served on Netlify with a shared Edge request boundary. See the [architecture](docs/PUBLIC_SITE_ARCHITECTURE.md) for implementation details and [current status](planning/STATUS.md) for verified release information.
 
@@ -64,7 +64,7 @@ On Linux, Playwright may also require system libraries; use `pnpm exec playwrigh
 
 | Path | Purpose |
 | --- | --- |
-| `src/app` | Home, Payment acceptance, Credit card, Help, Privacy, Terms, metadata and 404 |
+| `src/app` | Nine approved page routes: Home, Payment acceptance, Credit card, Help, three merchant guides, Privacy and Terms; plus metadata and 404 |
 | `src/ui` | Shared layout, navigation, artwork and interface components |
 | `src/shared`, `src/modules/public-site` | Product details, safe service links, metadata and illustrative calculations |
 | `public`, `assets/brand` | Original brand, card-network, wallet and other visual assets |
@@ -77,7 +77,9 @@ On Linux, Playwright may also require system libraries; use `pnpm exec playwrigh
 
 The active application is a public information website. Historical account code and database schemas are retained for reference; they are not setup instructions, customer-data backups or permission to reconnect retired services. The existing protected Netlify Emails handler is a platform compatibility exception; website pages do not call it.
 
-Preserve approved product wording, pricing, availability, authentic logos and the shared design. Service links use fixed destinations and must not forward customer identifiers, query strings, fragments or referrers. Production indexing is limited to Home, Payment acceptance, Credit card and Help; legal, preview, error and retired pages retain their indexing restrictions.
+Preserve approved product wording, pricing, availability, authentic logos and the shared design. Service links use fixed destinations and must not forward customer identifiers, query strings, fragments or referrers. D228 locally prepares three exact guide routes: `/guides/stripe-alternatives`, `/guides/payment-processing-systems` and `/guides/what-is-a-chargeback`. The deployed website remains D226 until a separately approved release.
+
+After that release, production search eligibility is limited to Home, Payment acceptance, Credit card, Help and those three guides under the recorded site/origin guard. Legal pages, local/preview builds, navigation payloads, errors and retired routes retain their indexing restrictions. Eligibility does not establish actual indexing or rankings.
 
 Release targets are bound in [project-targets.json](project-targets.json). Deployment is a separate maintainer operation under the [deployment runbook](docs/NETLIFY_DEPLOYMENT.md). Use the [current work context](docs/CURRENT_WORK_CONTEXT.md) and [source precedence](docs/SOURCE_PRECEDENCE.md) before acting on older documents. Coding agents must also follow [AGENTS.md](AGENTS.md).
 
