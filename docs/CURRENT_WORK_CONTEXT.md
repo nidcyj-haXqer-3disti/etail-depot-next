@@ -2,9 +2,33 @@
 
 This workspace and conversation concern the existing customer-facing Etail Depot website. Start from the deployed version and the user's next explicit request.
 
-## D220 — documentation release authorized
+## D226 — authorized release in progress, 18 October 2026
 
-The user requests deployment of the prepared public README/contribution guide and accompanying accurate project records. Follow the reviewed PR/check/manual Netlify Git-build workflow, preserving application behavior and all existing resources. D217 remains the published baseline until fresh release readback confirms otherwise; current status records actual checks and publication.
+The user authorizes pushing and deploying the reviewed D225 Payment introduction/operator FAQ. Prepare a fresh isolated candidate, run all release gates, publish a reviewed PR and use the existing manual Netlify Git build. D220 remains live until publication is verified. Preserve the design, offers, public-only scope and enabled protected Emails. See current status for actual outcomes.
+
+## D225 — local Payment clarity update, 18 October 2026
+
+On `codex/payment-clarity-d225`, the Payment introduction now explicitly describes online card payments, payment links and QR codes. The existing FAQ includes “Who operates Trolleys?” immediately after getting-started guidance, using the confirmed company and service-handoff facts. Only those approved copy changes and the existing FAQ-count/order test are changed in application/test source. Build, focused lint, five existing browser/accessibility cases and desktop/mobile visual review pass. The local preview is ready; D220 remains deployed. No new product claim, indexing request, push or deployment. See current status for diagnostics and release limits.
+
+## D224 — deeper Google review, 18 October 2026
+
+Payment remains discovered with no stored indexing crawl. Google Crawl Stats, updated October 16, shows healthy host/robots/DNS/connectivity, 166 requests and 99% HTTP 200. A Payment discovery sample returned 200 but is labeled **Other agent type**; it does not establish a normal Search indexing crawl or identify the specific fetcher. All three removal histories are empty; aggregate Page indexing still processes data. Current source/live content review finds no indexing defect. Verified eligibility/application guidance and an actual service walkthrough are content opportunities, not established indexing remedies. Preserve current controls; no code, submission, remote change or deployment. Details and limitations are in current status and the search backlog.
+
+## D223 — Payment indexing diagnosis, 17 October 2026
+
+Payment acceptance is still discovered, currently not indexed, with no stored crawl. Google's fresh live test passes HTTP fetch, crawl/index permission, exact canonical, all resources and breadcrumb checks; five ordinary public GETs agree. Sitemap is Success, last read October 16, with four pages. Google reports no manual actions or security issues. No technical correction is justified by these checks. First limited search-performance data is now available; legacy URLs/subdomains and branded searches constrain interpretation. Home/Card/Help were last individually confirmed indexed October 15. Keep checking only when asked; no repeated submission, application change or deployment. D220 remains live. Follow planning/search-growth.json and current status for dated evidence.
+
+## D222 — current Trolleys service remains live; vendor update pending
+
+The user confirms **the current service is live; only an update is being tested**. Preserve Trolleys “Available now” and the approved application entrance. The public-site commercial audit finds no actionable internal inconsistency in pricing, Clarity qualifications, card availability/deposit/repayment or support/handoff wording. Prepare acceptance of the vendor update separately; no provider access, product change, publication or claim of completed end-to-end verification. Local audit/checklist: `artifacts/commercial-readiness/2026-10-15-audit.json`.
+
+## D221 — search measurement, on request only
+
+Search Console now confirms Home, Credit card and Help indexed. Payment acceptance is discovered, currently not indexed; its fresh Google live test passes fetch, crawl/index permission, self canonical and breadcrumb checks. Sitemap is Success with four pages, and performance reports are still processing. Five ordinary hosted GETs also find no technical indexing blocker. The user explicitly chooses **check only when asked**; no automation, repeated submission, website change or deployment. D220 remains live. See current status and planning/search-growth.json for dated evidence and next measurements.
+
+## D220 — contributor documentation published
+
+PR #43 publishes the public README/contribution guide, accurate repository visibility and prior release records. Signed merge `3948e697272b7b6ee35fd814ae7e31bb72185d7d`, tree `ed4f22dc27b716dca2ae81b3493884bc5750e055`, matches the independently reviewed and packaged candidate. Both candidate CI runs, merged-main CI and the manual Netlify Git build pass. Deploy `6ad03e7f1b5603bc0c899171` is ready/current at https://etaildepot.com. Hosted acceptance passes all 73 HTTP requests and six desktop/mobile browser cases on their first live attempt. Application code, design, offers, assets and the protected Emails handler remain unchanged. Follow current status for evidence and actual limitations.
 
 ## D219 — public contributor documentation, local
 
@@ -35,12 +59,12 @@ PR #41 is merged as `d8632ae1d0114989fd66149b003954a4d8ba2d3d`; exact-source CI 
 ## Current baseline
 
 - Public pages: Home, Payment acceptance, Credit card, Help, Privacy and Terms.
-- Published release: D217 / PR #42, 15 October 2026, 00:14 JST (14 October 15:14 UTC), adding focused payment/wallet/company FAQs while preserving design, offers and financial-runtime boundaries.
-- Netlify deploy: `6acf9c330c039995f744c0a2`, confirmed current and ready. Emails remains enabled with unchanged saved settings and protected handler bytes.
-- Published source: `9dbfbd2e73a7c55f20e3c5621c081494c755209e`, tree `35fbf0646ed7c51614768c46ed243ca036e241b6`, identical to reviewed PR #42 candidate `eccc32c2034e306fbd6664c6dd65cbf0e54d2a41`.
-- Local baseline: `codex/released-d217`, aligned to the exact signed merge. The original feature branch is preserved. Release-closeout documentation remains local follow-up and does not change the deployed application.
+- Published release: D220 / PR #43, 15 October 2026, 11:46 JST (02:46 UTC), publishing contributor documentation with the D217 customer experience unchanged.
+- Netlify deploy: `6ad03e7f1b5603bc0c899171`, confirmed current and ready. Emails remains enabled with unchanged saved settings and protected handler bytes.
+- Published source: `3948e697272b7b6ee35fd814ae7e31bb72185d7d`, tree `ed4f22dc27b716dca2ae81b3493884bc5750e055`, identical to reviewed PR #43 candidate `19c4e7d8d1837255e6eb7180174291d7881667e7`.
+- Released base: D220 signed merge `3948e697272b7b6ee35fd814ae7e31bb72185d7d`. Current work is on `codex/payment-clarity-d225` with the two approved Payment copy changes, the existing FAQ expectation and preserved release/research records. D226 authorizes their publication through the release gates.
 - Public product URLs: `/payment-acceptance-service` and `/credit-card-services`; old public product addresses redirect permanently. Original design, assets, offers and legal substance remain intact.
-- Verification: full local checks, exact-source candidate/main CI, isolated packaging and hosted artifact/security checks pass. Hosted acceptance passes 135 HTTP requests and 68 unique browser cases, including all 24 accessibility cases, with one intentional skip. Follow current status for the preserved challenge retry and visual/measurement limitations.
+- Verification: full fresh isolated checks, exact-source candidate/main CI, packaging and hosted artifact/security checks pass. All 73 hosted HTTP requests and six desktop/mobile browser cases pass; the broader D217 visual review remains applicable to the unchanged design. Six visible page bodies, all 14 stylesheets and all 15 original assets match D217; generated payload/build identifiers can differ.
 - Website: https://etaildepot.com/. The old Netlify public address redirects to it. Local preview: http://127.0.0.1:3100/, with noindex, blocked crawling and empty sitemap.
 - Homepage: **Get paid. Keep going.**
 - Homepage hero action: **Explore payment acceptance**, linking locally to `/payment-acceptance-service`.

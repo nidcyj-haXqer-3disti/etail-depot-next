@@ -1,8 +1,8 @@
 # Public website architecture
 
-D108 public-only scope · D217 published content, 15 October 2026 JST
+D108 public-only scope · D220 documentation release, 15 October 2026 JST
 
-The six-page public website is published at **https://etaildepot.com** through PR #42, Netlify deploy `6acf9c330c039995f744c0a2`, source `9dbfbd2e73a7c55f20e3c5621c081494c755209e` (14 October 15:14:38 UTC). Focused FAQ/company additions preserve the design, offers, original assets, client interactions and public-only architecture. Cloudflare remains authoritative, www redirects to the apex, and both hostnames have trusted HTTPS. The Netlify Emails extension remains enabled with its unchanged saved settings and protected handler. See [current status](../planning/STATUS.md) for release verification and limits.
+The six-page public website is published at **https://etaildepot.com** through PR #43, Netlify deploy `6ad03e7f1b5603bc0c899171`, source `3948e697272b7b6ee35fd814ae7e31bb72185d7d` (15 October 02:46:57 UTC). This documentation release preserves the D217 design, wording, offers, original assets, client interactions and public-only architecture. Cloudflare remains authoritative, www redirects to the apex, and both hostnames have trusted HTTPS. The Netlify Emails extension remains enabled with its unchanged saved settings and protected handler. See [current status](../planning/STATUS.md) for release verification and limits.
 
 D215 adds exact-host canonical redirection for approved public GET/HEAD requests from `etail-depot-next.netlify.app` to `etaildepot.com`. Pathnames are retained and query input is dropped; normal browser fragment preservation remains. Public legacy product aliases point directly to their current canonical paths. Retired-route handling runs first; writes, retired financial/API paths and `/.netlify` platform endpoints are not forwarded by this canonical rule. Production build and Functions origin settings agree; wrong-site and preview guards remain in place. No database, account or financial runtime is introduced.
 
