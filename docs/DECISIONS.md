@@ -1,8 +1,34 @@
 # Decision register
 
+## D226 — publish the reviewed Payment clarity update
+
+18 October 2026. The user explicitly requests “push and deploy” after reviewing D225. Publish the two approved Payment copy changes and their existing FAQ expectation through the bound repository’s feature-branch, review, exact-source checks and manual Netlify Git deployment. Include the preserved D220–D225 release/research records. Keep pricing, design, URLs, indexing controls, enabled protected Emails, DNS, provider settings and all stored resources unchanged. No new indexing submission or financial/provider action is included. Current status records actual preparation, publication and acceptance outcomes.
+
+## D225 — clarify Payment acceptance and its operator locally
+
+18 October 2026. The user accepts proposal items 1 and 2 only: replace the Payment introduction with the approved online-card-payment/link/QR explanation and add the approved Trolleys operator/account-management FAQ. Preserve the existing hero, artwork, offers, qualifications, links, styles and public-only architecture. Keep further eligibility, commercial verification and actual-service walkthrough work separate. Prepare a local preview and focused checks; no push, deployment, indexing submission or remote change is authorized. Current status records actual results.
+
+## D224 — study Google indexing rules and actual crawl history
+
+18 October 2026. The user asks for a deeper Google-rules investigation because Payment remains unindexed. Review current official guidance, stored inspection, Crawl Stats/host availability, removal history and the existing public content. Keep live-test eligibility distinct from actual indexing and identify hypotheses explicitly. No source defect is demonstrated; preserve URLs, offers, design, indexing controls and hosting protections. Content opportunities require confirmed operational facts. This is read-only research with local tracking, not authorization for a new submission, remote change, publication or monitoring. Current status records evidence and remaining uncertainty.
+
+## D223 — diagnose the remaining Payment indexing gap
+
+17 October 2026 JST. After reviewing the first numerical search baseline, the user accepts priority 1: diagnose Payment acceptance indexing. Inspect the current stored status, run one live Google test, and check sitemap, manual actions, security and ordinary public crawl readiness. This authorizes the bounded diagnosis and local evidence, not the other proposed content improvements, repeated submissions, monitoring, remote settings or deployment. No technical blocker is observed; actual indexing remains pending. D221's check-only-when-asked preference and D220's published source remain unchanged. Current status records the results and limits.
+
+## D222 — separate vendor update testing from live-service availability
+
+15 October 2026. The user agrees to the commercial/customer-journey audit and notes vendor-hosted final testing. The explicit clarification is “The current service is live; only an update is being tested.” Keep existing approved Trolleys availability/application wording and fixed entrance. Audit the public pages and prepare a concise vendor-update acceptance checklist; current live service and pending update are distinct. Do not access or operate provider accounts, change product claims, send outreach or declare the updated journey accepted without evidence. D220 remains the published source; current status records the local audit.
+
+## D221 — check search progress when requested
+
+15 October 2026. The user accepts confirming Payment acceptance indexing and using actual search data for subsequent improvements, then explicitly selects “Check only when I ask.” Perform the bounded current inspection/live test and technical readiness check; retain a dated baseline. Do not create scheduled monitoring, repeat the accepted indexing request, change search controls or invent performance results. Current status records the observed results; D220 website/source publication remains unchanged.
+
 ## D220 — publish the public contributor documentation
 
 15 October 2026. The user requests deployment of the prepared D219 documentation. Publish the reviewed README/contribution guide, accurate public-repository binding and accumulated D217–D219 closeout notes through the existing PR, exact-source checks and manual Netlify Git-build workflow. Preserve the six-page website, offers, original assets, existing database/Identity records, enabled protected Emails, DNS and visitor access. Run the required local/isolated, CI, package and hosted checks; record actual outcomes in current status. This authorization includes the reviewed source merge and deployment, not unrelated remote settings or product changes.
+
+**Publication:** PR #43 is merged as `3948e697272b7b6ee35fd814ae7e31bb72185d7d`, with the exact reviewed tree and passing candidate/main CI. Manual Netlify Git deploy `6ad03e7f1b5603bc0c899171` is ready/current at 15 October 02:46:57 UTC. Hosted package/security checks pass and the enabled protected Emails handler is unchanged. All 73 hosted HTTP requests and six desktop/mobile browser cases pass first attempt. Current status records evidence and limitations; follow-up release notes remain local.
 
 ## D219 — public contributor documentation
 
