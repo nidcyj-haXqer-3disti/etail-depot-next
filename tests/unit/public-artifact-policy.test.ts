@@ -2,18 +2,20 @@ import { describe, expect, it } from "vitest";
 import { boundarySource, edgeEntryFindings, forbiddenArtifact, forbiddenStatic, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "../../tools/public-artifact-policy";
 
 describe("static public deployment boundary", () => {
-  it("allows the nine reviewed pages and exact helpers without opening arbitrary guide routes", () => {
+  it("allows the ten reviewed pages and exact helpers without opening arbitrary guide routes", () => {
     expect(publicPageSources).toEqual([
       "page.tsx", "credit-card-services/page.tsx", "payment-acceptance-service/page.tsx", "help/page.tsx",
       "privacy/page.tsx", "terms/page.tsx", "guides/stripe-alternatives/page.tsx",
       "guides/payment-processing-systems/page.tsx", "guides/what-is-a-chargeback/page.tsx",
+      "guides/how-to-create-a-payment-link/page.tsx",
     ]);
     expect(publicHtmlFiles).toEqual([
       "index.html", "credit-card-services.html", "payment-acceptance-service.html", "help.html", "privacy.html", "terms.html",
       "guides/stripe-alternatives.html", "guides/payment-processing-systems.html", "guides/what-is-a-chargeback.html",
+      "guides/how-to-create-a-payment-link.html",
     ]);
     for (const path of [...publicPageSources, "layout.tsx", "robots.ts", "sitemap.ts"]) expect(reviewedPublicAppModule(path), path).toBe(true);
-    for (const path of ["guides/page.tsx", "guides/unreviewed/page.tsx", "guides/[slug]/page.tsx", "guides/stripe-alternatives/route.ts", "guides/stripe-alternatives/extra.tsx", "guides/stripe-alternatives/checkout/page.tsx", "help/unreviewed.tsx", "api/route.ts", "login/page.tsx"]) {
+    for (const path of ["guides/page.tsx", "guides/unreviewed/page.tsx", "guides/[slug]/page.tsx", "guides/stripe-alternatives/route.ts", "guides/stripe-alternatives/extra.tsx", "guides/stripe-alternatives/checkout/page.tsx", "guides/how-to-create-a-payment-link/route.ts", "guides/how-to-create-a-payment-link/extra.tsx", "guides/how-to-create-a-payment-link/checkout/page.tsx", "help/unreviewed.tsx", "api/route.ts", "login/page.tsx"]) {
       expect(reviewedPublicAppModule(path), path).toBe(false);
     }
   });
@@ -39,7 +41,7 @@ describe("static public deployment boundary", () => {
       for (const suffix of ["", ".html", ".txt", "/index.html", "/record.json"]) expect(forbiddenStatic(`${family}${suffix}`)).toBe(true);
     }
     for (const path of ["records.db", "backup.SQL", "src/app/page.tsx", "node_modules/next/package.json", ".next/server/page.js", "functions/server.js", "server.zip", "edge.eszip"]) expect(forbiddenStatic(path), path).toBe(true);
-    for (const path of [...publicHtmlFiles, "payment-acceptance-service.txt", "guides/stripe-alternatives.txt", "guides/payment-processing-systems.txt", "guides/what-is-a-chargeback.txt", "404.html", "robots.txt", "sitemap.xml", "opengraph-image", "brand/networks/visa-blue.svg", "_next/static/chunks/app.js"]) expect(forbiddenStatic(path), path).toBe(false);
+    for (const path of [...publicHtmlFiles, "payment-acceptance-service.txt", "guides/stripe-alternatives.txt", "guides/payment-processing-systems.txt", "guides/what-is-a-chargeback.txt", "guides/how-to-create-a-payment-link.txt", "404.html", "robots.txt", "sitemap.xml", "opengraph-image", "brand/networks/visa-blue.svg", "_next/static/chunks/app.js"]) expect(forbiddenStatic(path), path).toBe(false);
   });
 
   it("requires one all-path edge boundary before cache, without method or path exclusions", () => {

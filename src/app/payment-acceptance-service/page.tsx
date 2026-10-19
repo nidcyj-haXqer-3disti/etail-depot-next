@@ -21,7 +21,7 @@ export default function PaymentServicesPage() {
       description="US businesses can accept credit and debit card payments online with Trolleys. Create a request for goods, services or information, then share a payment link or QR code with your customer."
       actions={<><PaymentPortalLink>Continue to Trolleys</PaymentPortalLink><a className="consumer-text-link" href="#fees">View pricing<Icon name="arrow" /></a></>}
       note={<p className="payment-hero-price"><strong>{productFacts.payments.cardRateLabel}</strong> per successful domestic online card payment.<br />No monthly fee. Create and share included.</p>}
-      visual={<PaymentJourneyArt />}
+      visual={<div className="payment-workflow"><PaymentJourneyArt /><p className="payment-workflow-guide"><Link className="consumer-text-link" href="/guides/how-to-create-a-payment-link">How to create and share a payment link<Icon name="arrow" /></Link></p></div>}
     />
     <PaymentExperience />
     </PaymentExampleProvider>

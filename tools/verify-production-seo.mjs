@@ -18,7 +18,7 @@ assert.equal(targets.netlify.canonical_origin, "https://etaildepot.com");
 assert.equal(targets.release.real_money_allowed, false);
 
 const canonicalOrigin = targets.netlify.canonical_origin;
-const guidePaths = ["/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback"];
+const guidePaths = ["/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link"];
 const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", ...guidePaths];
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
@@ -209,7 +209,7 @@ async function verifyResponses() {
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => decode(match[1]));
-  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the seven reviewed canonical pages.");
+  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the eight reviewed canonical pages.");
   const robotsResponse = await localFetch("/robots.txt");
   assert.equal(robotsResponse.status, 200);
   const robots = await robotsResponse.text();
@@ -226,7 +226,7 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page"]) {
+  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/how-to-create-a-payment-link/unreviewed-missing-page"]) {
     const response = await localFetch(route);
     assert.equal(response.status, route.includes("missing-page") ? 404 : 200, `${route}: unexpected status.`);
     const metadata = documentMetadata(await response.text(), route);
@@ -252,7 +252,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: seven indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: eight indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

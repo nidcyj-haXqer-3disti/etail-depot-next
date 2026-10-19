@@ -7,6 +7,9 @@
 .consumer-payments .consumer-hero-actions { grid-column: 2; margin-top: 22px; }
 .consumer-payments .consumer-hero-copy > .payment-hero-price { margin-top: 22px; font-size: 12px; line-height: 1.8; }
 .payment-hero-price strong { color: var(--public-ink); font-weight: 600; }
+.payment-workflow { min-width: 0; }
+.payment-workflow-guide { margin-top: 18px; }
+.payment-workflow-guide .consumer-text-link { font-size: 14px; line-height: 1.6; }
 .consumer-payments .payment-offer-section { border-top: 1px solid var(--public-line); }
 .consumer-payments .payment-offer-grid { gap: 0; border: 1px solid #cad7c4; border-radius: 16px; background: #f4f6ee; }
 .consumer-payments .payment-price-card, .consumer-payments .fee-estimate { border: 0; border-radius: 0; padding: 36px; }

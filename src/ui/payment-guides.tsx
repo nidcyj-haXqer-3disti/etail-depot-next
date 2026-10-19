@@ -4,6 +4,11 @@ import "./payment-guide.css";
 
 const guides = [
   {
+    path: "/guides/how-to-create-a-payment-link",
+    title: "Create a payment link",
+    description: "Prepare your request, share a link or QR code and check your customer’s payment.",
+  },
+  {
     path: "/guides/stripe-alternatives",
     title: "Stripe alternatives",
     description: "Compare Stripe and Trolleys on payment links, features and costs before switching.",
@@ -25,7 +30,7 @@ export function PaymentGuides({ showCta = false, excludePath }: { showCta?: bool
     <div className="page-container">
       <div className="payment-guides-heading">
         <p className="eyebrow">Merchant guides</p>
-        <h2 id="payment-guides-title">Payment providers, fees and chargebacks.</h2>
+        <h2 id="payment-guides-title">Payment links, providers and chargebacks.</h2>
       </div>
       <div className="payment-guides-grid">
         {guides.filter(guide => guide.path !== excludePath).map(guide => <Link className="payment-guides-card" href={guide.path} key={guide.path}>

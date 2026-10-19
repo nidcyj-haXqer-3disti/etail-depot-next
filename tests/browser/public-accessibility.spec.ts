@@ -3,7 +3,7 @@ import {expect,test} from "@playwright/test";
 import {openMainNavigation} from "./public-header";
 
 for (const width of [1440,390,320]) {
-  for(const route of ["/","/credit-card-services","/payment-acceptance-service","/help","/privacy","/terms","/guides/stripe-alternatives","/guides/payment-processing-systems","/guides/what-is-a-chargeback"]) {
+  for(const route of ["/","/credit-card-services","/payment-acceptance-service","/help","/privacy","/terms","/guides/stripe-alternatives","/guides/payment-processing-systems","/guides/what-is-a-chargeback","/guides/how-to-create-a-payment-link"]) {
     test(`consumer ${route} is readable and accessible at ${width}px`,async({page})=>{
       await page.setViewportSize({width,height:900});
       await page.goto(route);await page.evaluate(()=>document.fonts.ready);
