@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import targets from "../../project-targets.json";
 import { legalIdentity } from "../../src/shared/legal-identity";
 import { legalPageMetadata } from "../../src/modules/public-site/legal-metadata";
-import { canonicalOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL, PUBLIC_PAGES, privateRobots, publicIndexingEnabled, publicPageJsonLd, publicPageMetadata, publicPageUrl, publicRobots, publicSitemap, publicSocialImage, rootMetadata, type PublicPath } from "../../src/modules/public-site/metadata";
+import { canonicalOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL, PUBLIC_PAGES, PUBLIC_PAGE_MODIFIED, privateRobots, publicIndexingEnabled, publicPageJsonLd, publicPageMetadata, publicPageUrl, publicRobots, publicSitemap, publicSocialImage, rootMetadata, type PublicPath } from "../../src/modules/public-site/metadata";
 import robots from "../../src/app/robots";
 import sitemap from "../../src/app/sitemap";
 import socialImage, { dynamic as socialImageMode } from "../../src/app/opengraph-image";
@@ -31,7 +31,7 @@ const rejectedEnvironments = [
 function stubEnvironment(changes: Readonly<Record<string, string | undefined>> = {}) {
   for (const [key, value] of Object.entries({ ...production, ...changes })) vi.stubEnv(key, value);
 }
-afterEach(() => vi.unstubAllEnvs());
+afterEach(() => { vi.unstubAllEnvs(); vi.useRealTimers(); });
 
 describe("public search release boundary", () => {
   it("records D215 domain migration for only the exact reviewed site", () => {
@@ -56,7 +56,7 @@ describe("public search release boundary", () => {
     for (const path of publicPaths) {
       expect(publicPageMetadata(path).robots).toEqual({ index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } });
     }
-    expect(sitemap()).toEqual(publicPaths.map(path => ({ url: publicPageUrl(path) })));
+    expect(sitemap()).toEqual(publicPaths.map(path => ({ url: publicPageUrl(path), lastModified: PUBLIC_PAGE_MODIFIED[path] })));
     expect(robots()).toMatchObject({ sitemap: `${canonicalOrigin}/sitemap.xml` });
   });
 
@@ -115,11 +115,27 @@ describe("reviewed public metadata", () => {
     stubEnvironment();
     vi.stubEnv("URL", "https://another-site.test/?access_token=secret");
     vi.stubEnv("DEPLOY_PRIME_URL", "https://preview--another-site.test");
-    expect(publicSitemap()).toEqual(publicPaths.map(path => ({ url: `${canonicalOrigin}${path}` })));
+    expect(publicSitemap()).toEqual(publicPaths.map(path => ({ url: `${canonicalOrigin}${path}`, lastModified: PUBLIC_PAGE_MODIFIED[path] })));
     expect(sitemap()).toEqual(publicSitemap());
     expect(JSON.stringify(sitemap())).not.toMatch(/privacy|terms|login|api|access_token|another-site|preview|\?/);
     expect(publicRobots().rules).toEqual({ userAgent: "*", allow: "/", disallow: "/api/" });
     expect(publicRobots().sitemap).toBe(`${canonicalOrigin}/sitemap.xml`);
+  });
+
+  it("keeps reviewed page revision dates stable as the build clock advances", () => {
+    stubEnvironment();
+    expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
+    for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {
+      expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10)).toBe(date);
+    }
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2027-01-01T00:00:00Z"));
+    const firstBuild = publicSitemap();
+    vi.setSystemTime(new Date("2030-12-31T23:59:59Z"));
+    expect(publicSitemap()).toEqual(firstBuild);
+    expect(firstBuild).toHaveLength(publicPaths.length);
+    for (const page of firstBuild) expect(Object.keys(page)).toEqual(["url", "lastModified"]);
   });
 });
 

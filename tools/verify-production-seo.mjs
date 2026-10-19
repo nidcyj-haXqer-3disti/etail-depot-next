@@ -210,6 +210,16 @@ async function verifyResponses() {
   const sitemap = await sitemapResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => decode(match[1]));
   assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the eight reviewed canonical pages.");
+  const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)];
+  assert.equal(sitemapEntries.length, publicPaths.length);
+  for (const [, entry] of sitemapEntries) {
+    const dates = [...entry.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map(match => match[1]);
+    assert.equal(dates.length, 1, "Each canonical page must have one maintained revision date.");
+    assert.match(dates[0], /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(new Date(`${dates[0]}T00:00:00Z`).toISOString().slice(0, 10), dates[0]);
+    assert.ok(dates[0] <= new Date().toISOString().slice(0, 10), "Sitemap revision dates must not be in the future.");
+  }
+  assert.doesNotMatch(sitemap, /<(?:priority|changefreq)>/);
   const robotsResponse = await localFetch("/robots.txt");
   assert.equal(robotsResponse.status, 200);
   const robots = await robotsResponse.text();

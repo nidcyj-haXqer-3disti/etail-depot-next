@@ -22,6 +22,21 @@ export const PUBLIC_PAGES = {
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
+// UTC dates of the last published, significant page update. Maintain per page when
+// its content, relevant shared content, metadata or links materially change.
+// Do not advance for deployments, cosmetic edits or copyright-year changes alone.
+// Baseline: Home PR #48; Cards PR #45; remaining pages PR #47.
+export const PUBLIC_PAGE_MODIFIED = {
+  "/": "2026-10-19",
+  "/credit-card-services": "2026-10-18",
+  "/payment-acceptance-service": "2026-10-19",
+  "/help": "2026-10-19",
+  "/guides/stripe-alternatives": "2026-10-19",
+  "/guides/payment-processing-systems": "2026-10-19",
+  "/guides/what-is-a-chargeback": "2026-10-19",
+  "/guides/how-to-create-a-payment-link": "2026-10-19",
+} as const satisfies Record<PublicPath, string>;
+
 export function publicIndexingEnabled(): boolean {
   return isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, process.env);
 }
@@ -63,7 +78,9 @@ export function publicPageMetadata(path: PublicPath): Metadata {
 }
 export function publicSitemap(): MetadataRoute.Sitemap {
   // Never read identities, services, cards, channels, support cases or database rows here.
-  return publicIndexingEnabled() ? (Object.keys(PUBLIC_PAGES) as PublicPath[]).map(path => ({ url: publicPageUrl(path) })) : [];
+  return publicIndexingEnabled() ? (Object.keys(PUBLIC_PAGES) as PublicPath[]).map(path => ({
+    url: publicPageUrl(path), lastModified: PUBLIC_PAGE_MODIFIED[path],
+  })) : [];
 }
 export function publicRobots(): MetadataRoute.Robots {
   return {
