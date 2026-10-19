@@ -7,7 +7,7 @@ const guidePaths = [
   "/guides/how-to-create-a-payment-link",
 ] as const;
 
-test("merchants can discover each guide, read its sources and return to payment acceptance", async ({ page, request }) => {
+test("merchants can discover each guide, read its references and return to payment acceptance", async ({ page, request }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   for (const path of guidePaths) {
@@ -42,8 +42,10 @@ test("merchants can discover each guide, read its sources and return to payment 
       await page.keyboard.press("ArrowRight");
       await expect.poll(() => comparison.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
     }
-    await contents.getByRole("link", { name: "Sources", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Sources", exact: true })).toBeInViewport();
+    await expect(contents.locator('a[href="#sources"]')).toHaveCount(0);
+    const references = page.getByRole("heading", { name: "References", exact: true });
+    await references.scrollIntoViewIfNeeded();
+    await expect(references).toBeInViewport();
     const sources = page.locator('.payment-guide-sources a[rel~="external"]');
     expect(await sources.count()).toBeGreaterThanOrEqual(2);
     for (const source of await sources.all()) {

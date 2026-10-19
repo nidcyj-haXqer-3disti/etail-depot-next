@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
-import { GuideSourceLink, GuideTable, PaymentGuide } from "@/ui/payment-guide";
+import { GuideTable, PaymentGuide } from "@/ui/payment-guide";
 
 export const metadata = publicPageMetadata("/guides/payment-processing-systems");
 
-const rolesSource = "https://stripe.com/resources/more/payment-processor-vs-gateway-vs-merchant-account";
-const merchantSource = "https://stripe.com/resources/more/merchant-account-vs-payment-gateway";
-const processingSource = "https://stripe.com/resources/more/credit-card-processing-101";
-const captureSource = "https://docs.stripe.com/payments/place-a-hold-on-a-payment-method";
-const payoutsSource = "https://docs.stripe.com/payouts";
+const gatewaySource = "https://www.cybersource.com/en-us/solutions/payment-acceptance/payment-gateway.html";
+const rolesSource = "https://www.cybersource.com/content/dam/documents/en/ultimate-payments-industry-guide.pdf";
+const authorizationSource = "https://developer.cybersource.com/docs/cybs/en-us/payments/developer/vital/sa/payments/payments-intro/payments-services-intro/payments-intro-processing-auth/payments-intro-processing-auth-workflow.html";
+const captureSource = "https://developer.cybersource.com/docs/cybs/en-us/payments/developer/vital/sa/payments/payments-intro/payments-services-intro/payments-intro-processing-capture/payments-intro-processing-capture-workflow.html";
 const fees = productFacts.payments;
 const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const feeExamples = [2_000, 10_000].map(amount => {
@@ -21,13 +20,13 @@ export default function PaymentProcessingSystemsPage() {
   return <PaymentGuide
     path="/guides/payment-processing-systems"
     title="Payment processing systems: a practical guide for US businesses"
-    intro="A payment system connects the customer’s payment step with authorization, settlement and your business’s records. Choose it around the way you sell and the work you need to do after a payment."
+    intro="A payment system connects the customer’s payment step with authorization, settlement and your business’s records. Choose a system that fits how you sell and how you manage each sale afterward."
     sections={[
       {
         id: "parts-of-a-system",
         title: "Understand the parts of a payment system",
         content: <>
-          <p>A payment processor, payment gateway and merchant account serve different roles. One service may package several roles together, so you may not need a separate contract for every part. <GuideSourceLink href={rolesSource}>Stripe’s overview of payment-system roles</GuideSourceLink> explains that distinction.</p>
+          <p>A payment system does three jobs for your business: lets the customer pay, moves the transaction through the financial system and gives you records to manage the sale. A gateway, processor and merchant account each have a role; one service may bring several of them together.</p>
           <GuideTable caption="Payment-system roles and useful questions" headings={["Part", "What it does", "What to ask"]} rows={[
             ["Customer payment page", "Presents the amount and collects the customer’s payment choice.", "Can customers use it from the channels where I sell?"],
             ["Payment gateway", "Passes payment information securely between the checkout and processing service.", "Is it included, and does my checkout work with it?"],
@@ -35,7 +34,7 @@ export default function PaymentProcessingSystemsPage() {
             ["Merchant account arrangement", "Supports receiving card-payment funds before payout to the business bank account.", "How is my account set up, and which settlement, reserve and payout terms apply?"],
           ]} />
           <p>“Merchant services” is a wider label for services that help a business accept and manage payments. It can include processing, payment software and support. Ask which services are actually included instead of treating the label as a feature list.</p>
-          <p>A merchant account arrangement is also different from the everyday business bank account where payouts arrive. Some services bundle merchant-account functionality; a separate account is not always something the merchant opens independently. See <GuideSourceLink href={merchantSource}>Stripe’s explanation of merchant accounts and gateways</GuideSourceLink>.</p>
+          <p>Your merchant account arrangement supports card acceptance. Your business bank account receives payouts. Confirm how both are connected, who provides each service and which terms apply. Buying a gateway alone does not tell you the full cost or when your bank will receive the money.</p>
         </>,
       },
       {
@@ -57,17 +56,29 @@ export default function PaymentProcessingSystemsPage() {
         id: "payment-to-payout",
         title: "How a credit card processing system works",
         content: <>
-          <p>Follow an illustrative $100 online card purchase. The <strong>issuer</strong> provides the customer’s card, the <strong>acquirer</strong> handles the merchant side, and the <strong>card network</strong> connects them. These are general processing stages, not Trolleys screen names or promised timings.</p>
-          <ol>
-            <li><strong>Checkout.</strong> The customer reviews the $100 purchase and submits their card details on the payment page. Opening a link alone does not make a payment.</li>
-            <li><strong>Authorization.</strong> The gateway and processing service route the request through the card network to the issuer. The issuer checks the account and approves or declines the request. Approval can place a hold on the customer’s available credit; it is not a deposit into the merchant’s bank account.</li>
-            <li><strong>Capture.</strong> The approved amount is submitted for collection. Capture may follow authorization automatically or happen separately, depending on the service and setup. An authorization can expire if it is not captured; do not assume an approval alone completes collection.</li>
-            <li><strong>Settlement.</strong> Transaction records are exchanged and funds move between the issuing and acquiring sides under the network’s arrangements. Fees and account adjustments affect what becomes available to the business.</li>
-            <li><strong>Payout.</strong> Available funds are sent to the business bank account under its payout schedule. One payout can combine multiple payments and adjustments, so it may not match this $100 sale.</li>
-          </ol>
-          <p>For background, see Stripe’s explanations of <GuideSourceLink href={processingSource}>credit card processing</GuideSourceLink>, <GuideSourceLink href={captureSource}>authorization and capture</GuideSourceLink>, and <GuideSourceLink href={payoutsSource}>payout scheduling</GuideSourceLink>. Trolleys’ account terms determine its processing and payout arrangements; first payouts, reviews, reserves and bank holidays can affect timing.</p>
-          <div className="payment-guide-callout"><p><strong>Ask two separate questions:</strong> “How will I confirm this customer paid?” and “When will the funds be available and arrive in my bank?” Use the actual payment record for the first and the account’s payout information for the second.</p></div>
-          <p>Match the $100 order to its payment reference, then check the fees and adjustments in the relevant payout record. Keep delivery and refund records with the order. A customer’s screenshot or an email alone should not replace checking the payment in your account. See <Link href="/payment-acceptance-service#payouts">Trolleys payout guidance</Link>.</p>
+          <p>The <strong>issuer</strong> provides the customer’s card, the <strong>acquirer</strong> handles the merchant side, and the <strong>card network</strong> connects them. Follow the five stages of a sample online card purchase below.</p>
+          <figure className="payment-guide-flow" aria-labelledby="payment-flow-caption">
+            <figcaption id="payment-flow-caption"><span>From checkout to payout</span><span className="payment-guide-flow-amount">$100.00 <span>sample purchase</span></span></figcaption>
+            <ol>
+              {[
+                ["Checkout", "The customer reviews the $100 purchase and submits their card details on the payment page. Opening the link alone does not make a payment."],
+                ["Authorization", "The request reaches the issuer through the gateway, processing service and card network. The issuer approves or declines it. Approval can reserve available credit; the money has not reached your bank."],
+                ["Capture", "The approved amount is submitted for collection. This can follow authorization automatically or happen separately, depending on the setup."],
+                ["Settlement", "Transaction records are exchanged and funds move between the issuing and acquiring sides. Fees and account adjustments affect the funds available to your business."],
+                ["Payout", "Available funds are sent to your business bank account under your payout schedule. A payout may combine several sales, refunds and other adjustments."],
+              ].map(([title, description], index) => <li key={title}>
+                <span className="payment-guide-flow-number" aria-hidden="true">{index + 1}</span>
+                <div><h3>{title}</h3><p>{description}</p></div>
+              </li>)}
+            </ol>
+            <p className="payment-guide-flow-note">Illustrative stages. Your account determines the available controls and timing.</p>
+          </figure>
+          <p>An approval alone does not complete collection: an authorization can expire before capture. Check the actual payment status before treating an order as paid. Trolleys’ account terms determine processing and payouts; first payouts, reviews, reserves and bank holidays can affect timing.</p>
+          <div className="payment-guide-records">
+            <div><h3>Check the payment</h3><p>Match the order reference, $100 amount and payment result. Keep the delivery and any refund records with that order.</p></div>
+            <div><h3>Check the payout</h3><p>Match the payout reference to the bank deposit. Review the included payments, fees, refunds and adjustments to explain the total.</p></div>
+          </div>
+          <p>A customer’s screenshot or message does not replace checking the payment in your account. For the difference between a payment and its bank deposit, see <Link href="/payment-acceptance-service#payouts">Trolleys payout guidance</Link>.</p>
         </>,
       },
       {
@@ -94,11 +105,10 @@ export default function PaymentProcessingSystemsPage() {
       },
     ]}
     sources={[
-      { title: "Stripe — Payment processor, gateway and merchant account", href: rolesSource },
-      { title: "Stripe — Merchant account versus payment gateway", href: merchantSource },
-      { title: "Stripe — Credit card processing 101", href: processingSource },
-      { title: "Stripe — Authorization and capture", href: captureSource },
-      { title: "Stripe — Receive payouts", href: payoutsSource },
+      { title: "Cybersource — How a payment gateway works", href: gatewaySource },
+      { title: "Authorize.net — Payments industry roles (PDF, page 5)", href: rolesSource },
+      { title: "Cybersource — Authorization workflow", href: authorizationSource },
+      { title: "Cybersource — Capture and reconciliation", href: captureSource },
     ]}
   />;
 }

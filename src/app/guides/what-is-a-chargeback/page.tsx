@@ -6,9 +6,8 @@ import { GuideSourceLink, GuideTable, PaymentGuide } from "@/ui/payment-guide";
 export const metadata = publicPageMetadata("/guides/what-is-a-chargeback");
 
 const visaSource = "https://www.visa.com/en-us/support/business/dispute-resolution";
-const disputeSource = "https://docs.stripe.com/disputes/how-disputes-work";
-const evidenceSource = "https://docs.stripe.com/disputes/responding";
-const evidenceCategoriesSource = "https://docs.stripe.com/disputes/categories";
+const evidenceSource = "https://usa.visa.com/content/dam/VCOM/global/support-legal/documents/merchants-dispute-management-guidelines.pdf";
+const caseRecordsSource = "https://developer.cybersource.com/docs/cybs/en-us/reporting/developer/all/rest/reporting/reporting_fields/chargeback.html";
 const orderInsightSource = "https://www.visa.com/en-us/products/order-insight";
 const fees = productFacts.payments;
 
@@ -22,7 +21,7 @@ export default function ChargebackGuidePage() {
         id: "chargeback-vs-refund",
         title: "Chargeback vs. refund: what is the difference?",
         content: <>
-          <p>A customer may dispute an unrecognized payment, a purchase they say was not delivered or another problem with a transaction. The card issuer’s dispute process can reverse the payment amount. <GuideSourceLink href={visaSource}>Visa’s merchant dispute guidance</GuideSourceLink> describes a dispute as a full or partial reversal through the issuer and acquiring side of the payment system.</p>
+          <p>A customer may dispute an unrecognized payment, a purchase they say was not delivered or another problem with a transaction. The issuer is the bank that issued the customer’s card. The card network carries the dispute to your merchant bank or processor, which may ask for records to respond. This process can reverse all or part of the payment.</p>
           <GuideTable caption="Refunds and card-payment disputes" headings={["Question", "Refund", "Chargeback"]} rows={[
             ["How does it start?", "The business initiates a return of funds through its payment service.", "The cardholder raises a dispute with the card issuer."],
             ["Who handles the decision?", "The business handles the refund under the applicable policy and obligations.", "The issuer reviews the dispute through card-network procedures."],
@@ -37,9 +36,14 @@ export default function ChargebackGuidePage() {
         title: "How to respond to a chargeback",
         content: <>
           <p>The notice identifies the disputed payment, the reason and the steps available to you. Depending on the case, you may accept the dispute or submit a response with evidence. Funds and fees can be deducted while the case is reviewed; submitting evidence does not itself return the money.</p>
+          <ol>
+            <li><strong>Match the notice to the sale.</strong> Find the original payment and order. Check the disputed amount and currency; the case may concern only part of a payment. Read the reason and any customer statement before gathering documents.</li>
+            <li><strong>Decide whether the records support a response.</strong> Check what was sold, delivered, canceled or refunded. If you cannot answer the stated reason, ask your payment service about the available next steps, including accepting the dispute.</li>
+            <li><strong>Follow the response instructions in the notice.</strong> Explain the relevant facts, attach the requested records and meet the response deadline. For a Trolleys payment, follow the instructions for that case in your Trolleys account.</li>
+            <li><strong>Keep the submission and follow the case.</strong> Save what you sent and any submission confirmation. Check for further requests and the final outcome, then reconcile the disputed amount and fees with your payment records.</li>
+          </ol>
           <p>Read the deadline shown for your actual case. A customer’s time to raise a dispute is different from a merchant’s time to respond. Deadlines and evidence requirements vary; do not substitute a general number of days for the date in the notice.</p>
-          <p><GuideSourceLink href={disputeSource}>Stripe explains what happens when a dispute arrives</GuideSourceLink>, how to respond and how the issuer decides. Its account instructions are specific to Stripe. For a Trolleys payment, manage the original payment in Trolleys and follow the instructions for that account.</p>
-          <div className="payment-guide-callout"><p><strong>First action:</strong> note the response deadline, confirm which payment is involved and read the stated reason. Then decide which records answer that reason. Contact your payment service promptly if the notice or next step is unclear.</p></div>
+          <div className="payment-guide-callout"><p><strong>Keep one case record:</strong> the case reference, original payment and order references, disputed amount and currency, reason or reason code, response deadline, submission date and final outcome. Keep fees and fund adjustments as separate entries so you can see what changed.</p></div>
         </>,
       },
       {
@@ -55,11 +59,12 @@ export default function ChargebackGuidePage() {
           </ul>
           <p>Use these illustrative examples to organize records, then follow the evidence requirements and response deadline in your own notice.</p>
           <GuideTable caption="Illustrative evidence by dispute reason" headings={["Dispute reason", "Records to review", "What those records address"]} rows={[
-            ["Goods not received", "The agreed delivery date, tracking and delivery confirmation tied to the order, and relevant customer messages.", "Whether the goods reached the customer or were not yet due for delivery."],
-            ["Duplicate charge", "Separate itemized receipts and payment records for each purchase, or a record of any duplicate payment already refunded.", "Whether the charges were for separate purchases or a duplicate was already refunded."],
+            ["Goods not received", "The agreed delivery date and address, tracking and delivery confirmation tied to the order, and relevant customer messages.", "Whether the goods reached the agreed destination and how the delivery record answers the customer’s claim."],
+            ["Duplicate charge", "The receipts, order references and payment records for both charges, or a record of any duplicate payment already refunded.", "Whether the charges were for separate purchases or a duplicate was already refunded."],
             ["Canceled or refunded purchase", "The cancellation or return request, policy shown before purchase, related messages and any processed refund record with its date and amount.", "What was requested, which terms were communicated and whether a refund was processed."],
           ]} />
-          <p>Use the case’s requested format and submit through the payment service’s designated process. An authorization or a successful payment record does not, on its own, answer whether goods or services were delivered. See <GuideSourceLink href={evidenceSource}>Stripe’s response guidance</GuideSourceLink> and <GuideSourceLink href={evidenceCategoriesSource}>evidence examples by dispute reason</GuideSourceLink>. Evidence can support a response; it cannot guarantee the issuer’s decision.</p>
+          <p>For example, if a customer disputes a delivered order, connect the order reference, agreed address and delivery record in your explanation. A payment receipt alone shows a charge; it does not establish delivery. If a refund was already processed, identify its date, amount and payment reference so it can be matched to the disputed sale.</p>
+          <p>Keep the explanation concise and the documents readable. Use the case’s requested format and include only records that help answer the reason. Evidence can support a response; it cannot guarantee the issuer’s decision.</p>
         </>,
       },
       {
@@ -78,8 +83,8 @@ export default function ChargebackGuidePage() {
         id: "reduce-avoidable-disputes",
         title: "Chargeback prevention: reduce avoidable disputes",
         content: <>
-          <p>Give the customer a clear description, the amount due, the delivery or service arrangement and the applicable refund or cancellation policy. See <Link href="/payment-acceptance-service#request-details">what to include in a payment request</Link>.</p>
-          <p>Keep customers informed if fulfillment changes and make it easy for them to identify and ask about a purchase. Check for duplicate payments before processing the same order again. These steps align with <GuideSourceLink href={visaSource}>Visa’s guidance on clear policies, transaction records and customer communication</GuideSourceLink>.</p>
+          <p>Give the customer a clear description, the amount due, the delivery or service arrangement and the applicable refund or cancellation policy. The <Link href="/guides/how-to-create-a-payment-link#prepare-the-request">payment-link preparation checklist</Link> helps you collect these details before sharing a request.</p>
+          <p>Keep customers informed if fulfillment changes and make it easy for them to identify and ask about a purchase. Check the original payment status before retrying a charge or sending another request for the same order. Retain the terms and messages from the time of purchase so you can reconstruct what was agreed.</p>
         </>,
       },
       {
@@ -94,9 +99,8 @@ export default function ChargebackGuidePage() {
     ]}
     sources={[
       { title: "Visa — Merchant dispute resolution", href: visaSource },
-      { title: "Stripe — How disputes work", href: disputeSource },
-      { title: "Stripe — Respond to disputes", href: evidenceSource },
-      { title: "Stripe — Dispute reason code categories", href: evidenceCategoriesSource },
+      { title: "Visa — Dispute management guide: response and evidence (October 2026)", href: evidenceSource },
+      { title: "Cybersource — Chargeback and retrieval fields: case records and response dates", href: caseRecordsSource },
       { title: "Visa — Order Insight", href: orderInsightSource },
     ]}
   />;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef } from "react";
+import Image from "next/image";
 import { paymentExamples, type PaymentExamplePurpose } from "@/modules/public-site/payment-examples";
 import { formatUsdCents } from "@/modules/public-site/fee-estimate";
 import { usePaymentExample } from "./payment-example-context";
@@ -72,21 +73,44 @@ export function PaymentJourneyArt() {
         <PaymentChannelPreview purpose={purpose} />
       </section>
     </div>
-    <section className="two-step-outcome" aria-label="Illustrative customer checkout">
-      <div className="checkout-purchase">
-        <div className="two-step-customer"><span><Icon name="card" /></span><div><strong>Your customer opens the link and pays by card.</strong><p>Payment receipt included.</p></div></div>
-        <div className="marketing-payment-summary"><span>Your business</span><span className="checkout-purchase-name">{example.description}</span><strong>{amount}</strong></div>
-        <NetworkBrands label="Card networks" />
-      </div>
-      <div className="checkout-card-preview" role="img" aria-label={`Card-entry illustration for ${example.description}, ${amount}. Card number ending 4242, expiration and security code fields, and Pay ${amount}. No payment is made.`}>
-        <div className="checkout-preview-heading"><span>Pay by card</span><span>Checkout example</span></div>
-        <div className="checkout-field-group"><span>Card number</span><div className="checkout-field checkout-card-number"><span>•••• •••• •••• 4242</span><Icon name="card" /></div></div>
-        <div className="checkout-field-row">
-          <div className="checkout-field-group"><span>Expiration</span><div className="checkout-field">MM / YY</div></div>
-          <div className="checkout-field-group"><span>Security code</span><div className="checkout-field">•••</div></div>
+    <section className="two-step-outcome" id="customer-checkout" aria-label="Illustrative customer checkout">
+      <div className="checkout-preview-heading"><div><Icon name="business" /><span>Your business</span></div><span>Checkout example</span></div>
+      <div className="checkout-preview-layout">
+        <div className="checkout-purchase">
+          <div className="marketing-payment-summary"><span>Order summary</span><span className="checkout-purchase-name">{example.description}</span><span className="checkout-purchase-quantity">{example.quantity}</span><div className="checkout-order-reference"><span>Reference</span><span>{example.orderReference}</span></div><div className="checkout-order-total"><span>Total</span><strong>{amount}<small>USD</small></strong></div></div>
+          <div className="checkout-accepted-cards"><span>Accepted cards</span><NetworkBrands label="Card networks" /></div>
+          <div className="two-step-customer"><span><Icon name="card" /></span><div><strong>Your customer opens the link and pays by card.</strong><p>Payment receipt included.</p></div></div>
         </div>
-        <span className="checkout-pay-example">Pay {amount}<Icon name="lock" /></span>
+        <div className="checkout-card-preview" role="img" aria-label={`Checkout illustration for ${example.description}, ${amount}. Apple Pay and Google Pay wallet options, followed by contact details, card number ending 4242, expiration, security code, cardholder name and billing fields, and Pay ${amount}. Wallet availability varies by device and merchant account. No payment is made.`}>
+          <div className="checkout-wallet-preview">
+            <h4>Pay with a wallet</h4>
+            <div className="checkout-wallet-options">
+              <div className="checkout-wallet-option"><Image src="/brand/wallets/apple-pay.svg" width={165.52107} height={105.9651} alt="Apple Pay" className="checkout-wallet-apple" loading="eager" unoptimized /></div>
+              <div className="checkout-wallet-option"><Image src="/brand/wallets/google-pay.svg" width={1094} height={742} alt="Google Pay" className="checkout-wallet-google" loading="eager" unoptimized /></div>
+            </div>
+          </div>
+          <div className="checkout-method-divider"><span>or pay by card</span></div>
+          <div className="checkout-contact-preview"><span>Contact details</span><strong>customer@example.com</strong></div>
+          <div className="checkout-payment-details">
+            <h4>Payment details</h4>
+            <div className="checkout-field-group"><span>Card number</span><div className="checkout-field checkout-card-number"><span>•••• •••• •••• 4242</span><Icon name="card" /></div></div>
+            <div className="checkout-field-row">
+              <div className="checkout-field-group"><span>Expiry</span><div className="checkout-field">MM / YY</div></div>
+              <div className="checkout-field-group"><span>Security code</span><div className="checkout-field">•••</div></div>
+            </div>
+            <div className="checkout-field-row">
+              <div className="checkout-field-group"><span>First name</span><div className="checkout-field">Alex</div></div>
+              <div className="checkout-field-group"><span>Last name</span><div className="checkout-field">Morgan</div></div>
+            </div>
+          </div>
+          <div className="checkout-billing-preview"><h4>Billing address</h4><div className="checkout-field-row">
+            <div className="checkout-field-group"><span>Country</span><div className="checkout-field">United States</div></div>
+            <div className="checkout-field-group"><span>ZIP code</span><div className="checkout-field">10001</div></div>
+          </div></div>
+          <span className="checkout-pay-example"><Icon name="lock" />Pay {amount}</span>
+        </div>
       </div>
+      <p className="checkout-preview-note">Wallet availability varies by device and merchant account. Checkout fields may vary.</p>
     </section>
     <figcaption>Payment example. Create and share requests from your Trolleys account after approval and setup.</figcaption>
   </figure>;

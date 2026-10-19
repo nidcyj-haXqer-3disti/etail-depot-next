@@ -60,7 +60,7 @@ export function PaymentGuide({ path, title, intro, sections, sources, disclosure
             <p className="eyebrow">Merchant guides</p>
             <h1 id="payment-guide-title">{title}</h1>
             <p className="payment-guide-intro">{intro}</p>
-            <p className="payment-guide-byline">Published by {legalIdentity.company}, operator of Trolleys<span aria-hidden="true"> · </span><span>Reviewed <time dateTime="2026-10-19">October 19, 2026</time></span></p>
+            <p className="payment-guide-byline">Published by {legalIdentity.company}, operator of Trolleys</p>
             {disclosure && <p className="payment-guide-disclosure">{disclosure}</p>}
           </div>
         </div>
@@ -69,7 +69,6 @@ export function PaymentGuide({ path, title, intro, sections, sources, disclosure
         <nav className="payment-guide-contents" aria-labelledby="payment-guide-contents-title">
           <h2 id="payment-guide-contents-title">On this page</h2>
           <ContentsList>{sections.map(section => <li key={section.id}><a href={`#${section.id}`}>{section.title}</a></li>)}</ContentsList>
-          <a href="#sources">Sources</a>
         </nav>
         <article className="payment-guide-article" aria-labelledby="payment-guide-title">
           {sections.map(section => <section className="payment-guide-section" key={section.id} aria-labelledby={section.id}>
@@ -77,14 +76,14 @@ export function PaymentGuide({ path, title, intro, sections, sources, disclosure
             <div className="payment-guide-copy">{section.content}</div>
           </section>)}
           <section className="payment-guide-sources" aria-labelledby="sources">
-            <h2 id="sources" tabIndex={-1}>Sources</h2>
-            <p>Official sources reviewed on October 19, 2026. Published prices and product terms can change; check the terms for your account before making a decision.</p>
+            <h2 id="sources" tabIndex={-1}>References</h2>
+            <p>Published prices and product terms can change. Check the terms for your account before making a decision.</p>
             <ul>{sources.map(source => <li key={source.href}><GuideSourceLink href={source.href}>{source.title}</GuideSourceLink></li>)}</ul>
             <p>See <Link href="/payment-acceptance-service">Trolleys’ payment acceptance service and fees</Link>. Trolleys is a trade name of {legalIdentity.company}</p>
           </section>
           <div className="payment-guide-next">
             <h2>Explore Trolleys payment acceptance.</h2>
-            <p>Review the service and fees, then continue to Trolleys to apply. Eligibility and approval apply.</p>
+            <p>Review the service and fees before applying at Trolleys. Business eligibility and account approval are required.</p>
             <div className="payment-guide-actions">
               <Link className="button secondary" href="/payment-acceptance-service">See payment acceptance</Link>
               <PaymentPortalLink>Continue to Trolleys</PaymentPortalLink>

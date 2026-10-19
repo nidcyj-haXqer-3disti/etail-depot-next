@@ -5,7 +5,7 @@
 .payment-guide-heading { max-width: 830px; }
 .payment-guide-heading h1 { margin-top: 15px; font-size: clamp(2.1rem, 4.5vw, 3.65rem); line-height: 1.12; letter-spacing: -.045em; text-wrap: balance; }
 .payment-guide-intro { margin-top: 24px; max-width: 760px; color: var(--public-muted); font-size: 18px; line-height: 1.75; }
-.payment-guide-byline { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 25px; color: var(--public-muted); font-size: 12px; line-height: 1.8; }
+.payment-guide-byline { margin-top: 25px; color: var(--public-muted); font-size: 12px; line-height: 1.8; }
 .payment-guide-disclosure { max-width: 760px; margin-top: 15px; color: var(--public-muted); font-size: 13px; line-height: 1.75; }
 .payment-guide-body { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 64px; padding-block: 60px 72px; }
 .payment-guide-contents { align-self: start; position: sticky; top: 28px; font-size: 13px; line-height: 1.65; }
@@ -37,6 +37,20 @@
 .payment-guide-example-total dd span { font-size: 12px; font-weight: 400; letter-spacing: 0; }
 .payment-guide-message blockquote { margin: 0; color: var(--public-ink); font-size: 15px; line-height: 1.8; }
 .payment-guide-link-placeholder { display: block; margin-top: 12px; font-size: 13px; color: var(--public-muted); }
+.payment-guide-flow { margin-inline: 0; border: 1px solid var(--public-line); border-radius: var(--public-radius); background: #fff; overflow: hidden; }
+.payment-guide-flow figcaption { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 24px; background: var(--public-paper); color: var(--public-ink); font-size: 14px; font-weight: 600; line-height: 1.5; }
+.payment-guide-flow-amount { flex-shrink: 0; text-align: right; font-size: 24px; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+.payment-guide-flow-amount > span { display: block; margin-top: 2px; color: var(--public-muted); font-size: 12px; font-weight: 400; letter-spacing: 0; }
+.payment-guide-copy .payment-guide-flow ol { list-style: none; padding: 0 24px; margin: 0; }
+.payment-guide-copy .payment-guide-flow li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 16px; align-items: start; margin: 0; padding: 20px 0; }
+.payment-guide-flow li + li { border-top: 1px solid var(--public-line); }
+.payment-guide-flow-number { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--public-line); border-radius: 50%; background: var(--public-tint); color: var(--public-ink); font-size: 12px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.payment-guide-flow h3, .payment-guide-records h3 { color: var(--public-ink); font-size: 16px; font-weight: 600; line-height: 1.6; letter-spacing: -.01em; }
+.payment-guide-flow li p { margin-top: 7px; font-size: 14px; line-height: 1.8; }
+.payment-guide-flow-note { padding: 16px 24px; border-top: 1px solid var(--public-line); font-size: 12px; line-height: 1.7; }
+.payment-guide-records { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; padding: 22px 24px; border: 1px solid var(--public-line); border-radius: var(--public-radius); }
+.payment-guide-records > div + div { padding-left: 24px; border-left: 1px solid var(--public-line); }
+.payment-guide-records p { margin-top: 8px; font-size: 14px; line-height: 1.8; }
 .payment-guide-table-hint { display: none; }
 .payment-guide-table-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--public-line); border-radius: var(--public-radius); }
 .payment-guide-table-scroll:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 4px; }
@@ -87,6 +101,14 @@
   .payment-guide-callout { padding: 18px; }
   .payment-guide-example { padding: 18px; }
   .payment-guide-example dl > div { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 12px; }
+  .payment-guide-flow figcaption { gap: 16px; padding: 18px; }
+  .payment-guide-flow-amount { font-size: 22px; }
+  .payment-guide-copy .payment-guide-flow ol { padding-inline: 18px; }
+  .payment-guide-copy .payment-guide-flow li { grid-template-columns: 26px minmax(0, 1fr); gap: 12px; padding-block: 18px; }
+  .payment-guide-flow-number { width: 26px; height: 26px; }
+  .payment-guide-flow-note { padding: 16px 18px; }
+  .payment-guide-records { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 18px; }
+  .payment-guide-records > div + div { padding-left: 0; padding-top: 18px; border-left: 0; border-top: 1px solid var(--public-line); }
   .payment-guide-next { padding: 22px; }
   .payment-guide-next h2 { font-size: 22px; }
   .payment-guide-actions { flex-direction: column; align-items: flex-start; }
