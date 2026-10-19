@@ -23,7 +23,7 @@ export function PaymentExperience() {
         </div>
         <DisputeReadinessArt purpose={purpose} />
         <ul className="dispute-benefits">
-          <li><span><Icon name="business" /></span><div><h3>Help customers recognize charges.</h3><p>Help customers recognize your business and their purchase when reviewing a charge at a participating bank.</p></div></li>
+          <li><span><Icon name="business" /></span><div><h3>Help customers recognize charges.</h3><p>Purchase details can help customers identify your business and what they bought when reviewing a charge with a participating bank.</p></div></li>
           <li><span><Icon name="bank" /></span><div><h3>Give banks purchase details.</h3><p>Make merchant, transaction and purchase details available through Order Insight to help answer payment inquiries.</p></div></li>
           <li><span><Icon name="shield" /></span><div><h3>Help prevent eligible fraud disputes.</h3><p>Eligible Visa online fraud disputes may be stopped before they become chargebacks, provided the payment history and evidence meet the requirements.</p></div></li>
         </ul>

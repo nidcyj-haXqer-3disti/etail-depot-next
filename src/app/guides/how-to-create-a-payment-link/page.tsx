@@ -3,7 +3,7 @@ import { formatUsdCents } from "@/modules/public-site/fee-estimate";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { paymentExamples } from "@/modules/public-site/payment-examples";
 import { productFacts } from "@/shared/product-facts";
-import { GuideSourceLink, GuideTable, PaymentGuide } from "@/ui/payment-guide";
+import { GuideTable, PaymentGuide } from "@/ui/payment-guide";
 
 export const metadata = publicPageMetadata("/guides/how-to-create-a-payment-link");
 
@@ -32,7 +32,7 @@ export default function CreatePaymentLinkPage() {
             <li><strong>Information:</strong> explain what the customer will receive, how you will supply it and any access conditions.</li>
           </ul>
           <p>You need an approved Trolleys account and completed setup to create and share requests. Review <Link href="/payment-acceptance-service">the payment acceptance service</Link> before applying.</p>
-          <p>This walkthrough follows one sample order. Field names and available options may differ in your account.</p>
+          <p>This walkthrough uses a sample order. Field names and options may differ in your account; follow the instructions shown there.</p>
         </>,
       },
       {
@@ -44,7 +44,7 @@ export default function CreatePaymentLinkPage() {
             <figcaption>Example request</figcaption>
             <dl><div><dt>Payment for</dt><dd>{example.description}</dd></div><div><dt>Quantity</dt><dd>{example.quantity}</dd></div><div><dt>Order reference</dt><dd>{example.orderReference}</dd></div><div className="payment-guide-example-total"><dt>Total</dt><dd>{exampleAmount} <span>USD</span></dd></div></dl>
           </figure>
-          <p>Keep the same reference in your order records and customer message. In this example, it is {example.orderReference}. Cybersource’s <GuideSourceLink href={createSource}>fixed-price payment-link documentation</GuideSourceLink> describes the underlying pattern: purchase details, an amount and currency, a reference and a link to a hosted payment page.</p>
+          <p>Keep the same reference in your order records and customer message. In this example, it is {example.orderReference}. The reference connects the request, your message and the eventual payment to one purchase.</p>
           <GuideTable caption="Illustrative payment requests in USD" headings={["What you sell", "Example request", "Details to agree with the customer"]} rows={[
             ["Goods", `${paymentExamples.goods.description} · ${formatUsdCents(paymentExamples.goods.amountCents)}`, "What is included in the set and how the customer will receive it."],
             ["Services", `${paymentExamples.services.description} · ${formatUsdCents(paymentExamples.services.amountCents)}`, "Which design work the payment covers and the completion arrangements."],
@@ -57,7 +57,8 @@ export default function CreatePaymentLinkPage() {
         id: "check-before-sending",
         title: "Check the payment page before sharing",
         content: <>
-          <p>Open the exact link you plan to send. Check that the description and amount match both the order and your message. If you add a website button, follow that button to check its destination. For printed QR codes, scan the finished print with a phone and check the page it opens.</p>
+          <p>Open the exact link you plan to send. Check that the description, currency and amount match both the order and your message. Correct any mismatch before sharing, then reopen the link to check the result.</p>
+          <p>If you add a website button, follow that button to check its destination. For printed QR codes, scan the finished print with a phone and check the page it opens.</p>
           <p>A shared link lets the customer enter their card details on the payment page. You do not need to ask them to send card details in a message. Sharing a link by text does not include a messaging subscription.</p>
         </>,
       },
@@ -71,7 +72,7 @@ export default function CreatePaymentLinkPage() {
             <figcaption>Example customer message</figcaption>
             <blockquote>Here is the payment link for your homeware set, order {example.orderReference}. The total is {exampleAmount} USD. Please review the details before paying.<span className="payment-guide-link-placeholder">[Your payment link]</span></blockquote>
           </figure>
-          <p>Add the agreed delivery or collection details. The customer opens the link, reviews the purchase and enters their payment details on the payment page. Cybersource’s <GuideSourceLink href={overviewSource}>Pay by Link overview</GuideSourceLink> describes this hosted-payment approach. Use your Trolleys account’s instructions for its specific controls.</p>
+          <p>Add the agreed delivery or collection details and keep a copy of the message with the order. The customer opens the link, reviews the purchase and enters their payment details on the payment page.</p>
         </>,
       },
       {
@@ -93,7 +94,7 @@ export default function CreatePaymentLinkPage() {
             <li><strong>Check the payment result:</strong> confirm that the payment completed. A link being active or a payment awaiting completion does not mean the order is paid.</li>
             <li><strong>Keep the reference:</strong> save the payment reference with the order and any later refund or delivery record.</li>
           </ul>
-          <p>Cybersource documents <GuideSourceLink href={notificationSource}>payment-completion notifications</GuideSourceLink> separately from link creation. The notification setup depends on the service; check the account record rather than relying only on a customer’s screenshot or message.</p>
+          <p>If a customer says they paid but you cannot find a matching completed payment, check the account record before marking the order as paid or asking them to pay again. A screenshot or message alone does not confirm the payment result.</p>
           <p>A successful payment and money arriving in your bank are separate steps. Your account’s payout schedule applies, and fees, refunds, disputes, holds or reserves can affect available funds. See <Link href="/payment-acceptance-service#payouts">payout guidance</Link>, or use <Link href="/help#payments">payment acceptance help</Link> for an account question.</p>
         </>,
       },

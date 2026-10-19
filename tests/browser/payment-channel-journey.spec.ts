@@ -40,10 +40,11 @@ async function expectMatchingExample(page: Page, example: (typeof examples)[numb
     }
   }
   await expect(figure.locator(".payment-request-preview")).toContainText(example.reference);
-  const checkout = figure.getByRole("img", { name: `Card-entry illustration for ${example.description}, ${example.amount}. Card number ending 4242, expiration and security code fields, and Pay ${example.amount}. No payment is made.`, exact: true });
+  const checkout = figure.getByRole("img", { name: `Checkout illustration for ${example.description}, ${example.amount}. Apple Pay and Google Pay wallet options, followed by contact details, card number ending 4242, expiration, security code, cardholder name and billing fields, and Pay ${example.amount}. Wallet availability varies by device and merchant account. No payment is made.`, exact: true });
   await expect(checkout).toBeVisible();
   await expect(checkout.locator(".checkout-pay-example")).toHaveText(`Pay ${example.amount}`);
   await expect(checkout.locator("input, button, form, a, [tabindex]")).toHaveCount(0);
+  for (const wallet of ["Apple Pay", "Google Pay"]) await expectDecodedBrandMark(checkout.locator(`img[alt="${wallet}"]`));
 }
 
 async function expectMatchingRecognition(art: Locator, example: (typeof examples)[number]) {
