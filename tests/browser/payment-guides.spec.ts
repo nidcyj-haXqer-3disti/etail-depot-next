@@ -4,6 +4,7 @@ const guidePaths = [
   "/guides/stripe-alternatives",
   "/guides/payment-processing-systems",
   "/guides/what-is-a-chargeback",
+  "/guides/how-to-create-a-payment-link",
 ] as const;
 
 test("merchants can discover each guide, read its sources and return to payment acceptance", async ({ page, request }) => {
@@ -11,7 +12,7 @@ test("merchants can discover each guide, read its sources and return to payment 
   page.on("pageerror", error => errors.push(error.message));
   for (const path of guidePaths) {
     await page.goto("/payment-acceptance-service");
-    const discovery = page.getByRole("region", { name: "Payment providers, fees and chargebacks.", exact: true });
+    const discovery = page.getByRole("region", { name: "Payment links, providers and chargebacks.", exact: true });
     await discovery.locator(`a[href="${path}"]`).click();
     await expect(page).toHaveURL(new RegExp(`${path}$`));
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
@@ -50,7 +51,7 @@ test("merchants can discover each guide, read its sources and return to payment 
       expect(url.protocol).toBe("https:");
       await expect(source).toHaveAttribute("referrerpolicy", "no-referrer");
     }
-    await expect(page.locator(".payment-guides-card")).toHaveCount(2);
+    await expect(page.locator(".payment-guides-card")).toHaveCount(guidePaths.length - 1);
     await expect(page.locator(`.payment-guides-card[href="${path}"]`)).toHaveCount(0);
     await expect(page.locator("form, input, iframe")).toHaveCount(0);
     expect((await request.get(`${path}/not-a-page`)).status()).toBe(404);

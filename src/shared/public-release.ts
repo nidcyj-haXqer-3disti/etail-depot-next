@@ -22,11 +22,11 @@ export interface SearchReleaseApproval {
   canonicalOrigin: string;
   reviewReference: string;
 }
-/** D215 binds the D122 search release; D228 prepares three additional guides locally. */
+/** D215 binds the D122 search release; D228/D250 prepare the exact approved merchant guide routes. */
 export const PUBLIC_INDEXING_APPROVAL: SearchReleaseApproval = {
   siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
   canonicalOrigin: "https://etaildepot.com",
-  reviewReference: "D215 — user authorization to move the public website to etaildepot.com, 2026-10-14; preserves D122 safeguards. D228 — user-approved local preparation of Stripe alternatives, payment processing systems and chargeback guides, 2026-10-19; publication and search submissions remain separate",
+  reviewReference: "D215 — user authorization to move the public website to etaildepot.com, 2026-10-14; preserves D122 safeguards. D228 — user-approved local preparation of Stripe alternatives, payment processing systems and chargeback guides, 2026-10-19; D250 adds the approved payment-link guide locally; publication and search submissions remain separate",
 };
 export type Environment = Readonly<Record<string, string | undefined>>;
 

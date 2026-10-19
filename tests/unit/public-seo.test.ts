@@ -12,7 +12,7 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production", CONTEXT: "production",
   SITE_ID: targets.netlify.site_id, ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
-const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback"] as const;
+const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link"] as const;
 const rejectedEnvironments = [
   ["local development", { NODE_ENV: "development", APP_ENV: "local" }],
   ["local production build", { APP_ENV: "local" }],
@@ -81,7 +81,7 @@ describe("public search release boundary", () => {
 });
 
 describe("reviewed public metadata", () => {
-  it("uses distinct truthful descriptions and fixed canonical URLs for exactly seven public pages", () => {
+  it("uses distinct truthful descriptions and fixed canonical URLs for exactly eight public pages", () => {
     expect(Object.keys(PUBLIC_PAGES)).toEqual(publicPaths);
     expect(canonicalOrigin).toBe(targets.netlify.canonical_origin);
     expect(new URL(String(rootMetadata.metadataBase)).origin).toBe(canonicalOrigin);
@@ -105,7 +105,7 @@ describe("reviewed public metadata", () => {
     expect(publicSocialImage).toMatchObject({ url: `${canonicalOrigin}/opengraph-image`, width: 1200, height: 630 });
   });
 
-  it.each(["/privacy", "/terms", "/login", "/services", "/security", "/operations", "/cardholder-services", "/card-services", "/payment-services", "/payment-acceptance", "/guides", "/guides/unapproved-guide", "/guides/stripe-alternatives?account=private", "/merchants/person-id", "/pay/channel-id", "/api/v1/cardholder-services", "/help?case=private", "//another-site.test/", "/help/", "__proto__"])("refuses private or unreviewed path %s rather than creating search metadata", path => {
+  it.each(["/privacy", "/terms", "/login", "/services", "/security", "/operations", "/cardholder-services", "/card-services", "/payment-services", "/payment-acceptance", "/guides", "/guides/unapproved-guide", "/guides/stripe-alternatives?account=private", "/guides/how-to-create-a-payment-link?account=private", "/guides/how-to-create-a-payment-link/checkout", "/merchants/person-id", "/pay/channel-id", "/api/v1/cardholder-services", "/help?case=private", "//another-site.test/", "/help/", "__proto__"])("refuses private or unreviewed path %s rather than creating search metadata", path => {
     expect(() => publicPageUrl(path as PublicPath)).toThrow("Only reviewed public");
     expect(() => publicPageMetadata(path as PublicPath)).toThrow("Only reviewed public");
     expect(() => publicPageJsonLd(path as PublicPath)).toThrow("Only reviewed public");
@@ -164,7 +164,7 @@ describe("public structured data", () => {
   });
 
   it("connects each guide to Payment acceptance without inventing a guide index", () => {
-    const labels = { "/guides/stripe-alternatives": "Stripe alternatives", "/guides/payment-processing-systems": "Payment processing systems", "/guides/what-is-a-chargeback": "What is a chargeback?" } as const;
+    const labels = { "/guides/stripe-alternatives": "Stripe alternatives", "/guides/payment-processing-systems": "Payment processing systems", "/guides/what-is-a-chargeback": "What is a chargeback?", "/guides/how-to-create-a-payment-link": "Create a payment link" } as const;
     for (const path of Object.keys(labels) as (keyof typeof labels)[]) {
       const graph = JSON.parse(publicPageJsonLd(path))["@graph"];
       expect(graph[2].breadcrumb).toEqual({ "@id": graph[3]["@id"] });

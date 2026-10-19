@@ -34,14 +34,16 @@ export function GuideTable({ caption, headings, rows }: {
   </div>;
 }
 
-export function PaymentGuide({ path, title, intro, sections, sources, disclosure }: {
+export function PaymentGuide({ path, title, intro, sections, sources, disclosure, numberedContents = true }: {
   path: PublicPath;
   title: string;
   intro: string;
   sections: GuideSection[];
   sources: GuideSource[];
   disclosure?: ReactNode;
+  numberedContents?: boolean;
 }) {
+  const ContentsList = numberedContents ? "ol" : "ul";
   return <Shell>
     <PublicPageStructuredData path={path} />
     <div className="payment-guide">
@@ -66,7 +68,7 @@ export function PaymentGuide({ path, title, intro, sections, sources, disclosure
       <div className="page-container payment-guide-body">
         <nav className="payment-guide-contents" aria-labelledby="payment-guide-contents-title">
           <h2 id="payment-guide-contents-title">On this page</h2>
-          <ol>{sections.map(section => <li key={section.id}><a href={`#${section.id}`}>{section.title}</a></li>)}</ol>
+          <ContentsList>{sections.map(section => <li key={section.id}><a href={`#${section.id}`}>{section.title}</a></li>)}</ContentsList>
           <a href="#sources">Sources</a>
         </nav>
         <article className="payment-guide-article" aria-labelledby="payment-guide-title">

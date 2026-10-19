@@ -7,6 +7,8 @@ export const metadata = publicPageMetadata("/guides/payment-processing-systems")
 
 const rolesSource = "https://stripe.com/resources/more/payment-processor-vs-gateway-vs-merchant-account";
 const merchantSource = "https://stripe.com/resources/more/merchant-account-vs-payment-gateway";
+const processingSource = "https://stripe.com/resources/more/credit-card-processing-101";
+const captureSource = "https://docs.stripe.com/payments/place-a-hold-on-a-payment-method";
 const payoutsSource = "https://docs.stripe.com/payouts";
 const fees = productFacts.payments;
 const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
@@ -48,16 +50,24 @@ export default function PaymentProcessingSystemsPage() {
             ["Regular automatic charges", "A recurring-billing product", "Customer consent, schedule changes, failed-payment handling, cancellation and extra fees."],
           ]} />
           <p>Trolleys lets approved businesses create online card-payment requests and share them by link or QR code for goods, services or information. If you need a store integration, recurring billing or a card terminal, ask Trolleys whether it supports those requirements before choosing.</p>
+          <p>For a request you can share directly with a customer, see <Link href="/guides/how-to-create-a-payment-link">how to create and share a payment link</Link>.</p>
         </>,
       },
       {
         id: "payment-to-payout",
-        title: "Separate payment confirmation from payout",
+        title: "How a credit card processing system works",
         content: <>
-          <p>Authorization is the card issuer’s decision on a payment request. Capture and settlement handle later processing steps. Funds then become available under the account’s terms, and a payout moves available money toward the business bank account. A service may handle several of these steps automatically, but they are still different events.</p>
-          <p>For example, a merchant may see a successful payment while bank arrival is still pending. <GuideSourceLink href={payoutsSource}>Stripe’s payout documentation</GuideSourceLink> separates funds availability, payout scheduling and bank timing. For Trolleys, the account’s schedule applies; first payouts, reviews, reserves and bank holidays can affect timing.</p>
+          <p>Follow an illustrative $100 online card purchase. The <strong>issuer</strong> provides the customer’s card, the <strong>acquirer</strong> handles the merchant side, and the <strong>card network</strong> connects them. These are general processing stages, not Trolleys screen names or promised timings.</p>
+          <ol>
+            <li><strong>Checkout.</strong> The customer reviews the $100 purchase and submits their card details on the payment page. Opening a link alone does not make a payment.</li>
+            <li><strong>Authorization.</strong> The gateway and processing service route the request through the card network to the issuer. The issuer checks the account and approves or declines the request. Approval can place a hold on the customer’s available credit; it is not a deposit into the merchant’s bank account.</li>
+            <li><strong>Capture.</strong> The approved amount is submitted for collection. Capture may follow authorization automatically or happen separately, depending on the service and setup. An authorization can expire if it is not captured; do not assume an approval alone completes collection.</li>
+            <li><strong>Settlement.</strong> Transaction records are exchanged and funds move between the issuing and acquiring sides under the network’s arrangements. Fees and account adjustments affect what becomes available to the business.</li>
+            <li><strong>Payout.</strong> Available funds are sent to the business bank account under its payout schedule. One payout can combine multiple payments and adjustments, so it may not match this $100 sale.</li>
+          </ol>
+          <p>For background, see Stripe’s explanations of <GuideSourceLink href={processingSource}>credit card processing</GuideSourceLink>, <GuideSourceLink href={captureSource}>authorization and capture</GuideSourceLink>, and <GuideSourceLink href={payoutsSource}>payout scheduling</GuideSourceLink>. Trolleys’ account terms determine its processing and payout arrangements; first payouts, reviews, reserves and bank holidays can affect timing.</p>
           <div className="payment-guide-callout"><p><strong>Ask two separate questions:</strong> “How will I confirm this customer paid?” and “When will the funds be available and arrive in my bank?” Use the actual payment record for the first and the account’s payout information for the second.</p></div>
-          <p>Keep a record connecting the order, payment, fulfillment and any later refund. That makes a payment easier to reconcile and gives you useful context if the customer asks a question or disputes it.</p>
+          <p>Match the $100 order to its payment reference, then check the fees and adjustments in the relevant payout record. Keep delivery and refund records with the order. A customer’s screenshot or an email alone should not replace checking the payment in your account. See <Link href="/payment-acceptance-service#payouts">Trolleys payout guidance</Link>.</p>
         </>,
       },
       {
@@ -86,6 +96,8 @@ export default function PaymentProcessingSystemsPage() {
     sources={[
       { title: "Stripe — Payment processor, gateway and merchant account", href: rolesSource },
       { title: "Stripe — Merchant account versus payment gateway", href: merchantSource },
+      { title: "Stripe — Credit card processing 101", href: processingSource },
+      { title: "Stripe — Authorization and capture", href: captureSource },
       { title: "Stripe — Receive payouts", href: payoutsSource },
     ]}
   />;

@@ -18,6 +18,7 @@ export const PUBLIC_PAGES = {
   "/guides/stripe-alternatives": { title: "Stripe Alternatives: Stripe vs Trolleys", description: "Compare Stripe and Trolleys for online card payments. Review payment links, processing and dispute fees, account requirements and questions to ask before switching." },
   "/guides/payment-processing-systems": { title: "Payment Processing Systems: A Merchant Guide", description: "Understand payment gateways, processors and merchant accounts. Compare ways to accept online payments, costs, payout terms and the setup your business needs." },
   "/guides/what-is-a-chargeback": { title: "What Is a Chargeback? Fees & Prevention", description: "Understand chargebacks vs. refunds, dispute fees and response evidence. Learn about chargeback prevention and what optional Trolleys Clarity covers." },
+  "/guides/how-to-create-a-payment-link": { title: "How to Create and Share a Payment Link", description: "Prepare a Trolleys payment request, share a link or QR code and check payment status. Learn what to include, what customers see and how fees apply." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
@@ -76,7 +77,7 @@ export function publicPageJsonLd(path: PublicPath): string {
   const organizationId = `${canonicalOrigin}/#organization`;
   const websiteId = `${canonicalOrigin}/#website`;
   const breadcrumbId = `${url}#breadcrumb`;
-  const breadcrumbLabels = { "/credit-card-services": serviceLabels.cards, "/payment-acceptance-service": serviceLabels.payments, "/help": "Help", "/guides/stripe-alternatives": "Stripe alternatives", "/guides/payment-processing-systems": "Payment processing systems", "/guides/what-is-a-chargeback": "What is a chargeback?" } as const;
+  const breadcrumbLabels = { "/credit-card-services": serviceLabels.cards, "/payment-acceptance-service": serviceLabels.payments, "/help": "Help", "/guides/stripe-alternatives": "Stripe alternatives", "/guides/payment-processing-systems": "Payment processing systems", "/guides/what-is-a-chargeback": "What is a chargeback?", "/guides/how-to-create-a-payment-link": "Create a payment link" } as const;
   const isGuide = path.startsWith("/guides/");
   const data = {
     "@context": "https://schema.org", "@graph": [
