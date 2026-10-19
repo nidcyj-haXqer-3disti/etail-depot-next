@@ -91,11 +91,11 @@ describe("reviewed public metadata", () => {
       const metadata = publicPageMetadata(path);
       expect(JSON.stringify(metadata)).not.toMatch(/prepaid|Each service has its own sign-in/i);
       expect(metadata.title).toEqual({ absolute: `${PUBLIC_PAGES[path].title} | Etail Depot` });
-      if (path === "/" || path === "/credit-card-services") {
+      if (path === "/credit-card-services") {
         expect(metadata.description).toContain("virtual Visa secured credit card");
         expect(metadata.description).toMatch(/upcoming|coming soon|forthcoming/i);
+        expect(metadata.description).toContain("Applications are not open");
       }
-      if (path === "/credit-card-services") expect(metadata.description).toContain("Applications are not open");
       expect(metadata.alternates).toEqual({ canonical: new URL(path, canonicalOrigin).href });
       expect(metadata.openGraph).toMatchObject({ url: publicPageUrl(path), siteName: "Etail Depot", type: "website", images: [publicSocialImage] });
       expect(metadata.twitter).toMatchObject({ card: "summary_large_image", images: [publicSocialImage] });

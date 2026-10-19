@@ -11,7 +11,7 @@ const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts
   : `$${productFacts.cards.annualFeeDollars} annual fee and $${productFacts.cards.monthlyFeeDollars} monthly fee`;
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Payment Acceptance & Credit Card Processing", description: `Explore Trolleys for online payment acceptance and the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. Find product details, pricing and support.` },
+  "/": { title: "Payment Acceptance & Credit Card Processing", description: "Accept online payments with Trolleys’ credit card processing system. Explore payment options, compare fees and learn what a chargeback is." },
   "/credit-card-services": { title: "Ledgix Secured Credit Card — Coming Soon", description: `Meet the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
   "/payment-acceptance-service": { title: "Trolleys Payment Processing System", description: "Accept online card payments with Trolleys payment links and QR codes. Compare fees and optional Clarity chargeback prevention, including eligibility and limits." },
   "/help": { title: "Payment Acceptance & Credit Card Help", description: "Find Trolleys payment acceptance support, Ledgix credit card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
