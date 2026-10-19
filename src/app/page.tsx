@@ -36,8 +36,8 @@ export default function HomePage() {
           <div className="consumer-card-copy">
             <div className="consumer-product-eyebrow"><p className="eyebrow">Ledgix · {serviceLabels.cards}</p><ServiceStatus service="cards" /></div>
             <h2 id="ledgix-title">Secured credit.<br /><span>Made for your wallet.</span></h2>
-            <p>A virtual Visa secured credit card for Apple Wallet and Google Wallet.</p>
-            <p className="consumer-card-terms">A ${productFacts.cards.minimumDepositDollars} minimum security deposit backs your account. No annual or monthly fee. Repay your full statement balance each month.</p>
+            <p><span data-nosnippet="">A virtual Visa secured credit card for Apple Wallet and Google Wallet.</span></p>
+            <p className="consumer-card-terms"><span data-nosnippet="">A ${productFacts.cards.minimumDepositDollars} minimum security deposit backs your account. No annual or monthly fee. Repay your full statement balance each month.</span></p>
             <Link href="/credit-card-services" className="consumer-text-link">Explore the Ledgix credit card<Icon name="arrow" /></Link>
           </div>
         </div>
