@@ -27,7 +27,7 @@ export function PublicHeader() {
       const menu = root.querySelector<HTMLElement>("#public-header-menu");
       const destination = desktop.matches
         ? focused === toggle.current
-          ? root.querySelector<HTMLElement>('.public-navigation [aria-current="page"]') ?? root.querySelector<HTMLElement>(".public-navigation a") ?? root.querySelector<HTMLElement>(".brand-link")
+          ? root.querySelector<HTMLElement>(".public-navigation [aria-current]") ?? root.querySelector<HTMLElement>(".public-navigation a") ?? root.querySelector<HTMLElement>(".brand-link")
           : null
         : focused && menu?.contains(focused) ? toggle.current : null;
       setOpen(false);

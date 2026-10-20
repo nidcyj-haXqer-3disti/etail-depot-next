@@ -4,11 +4,11 @@
 
 # Public website Netlify deployment runbook
 
-D201 static website and retained platform Emails · 14 October 2026
+D302 eleven-page release candidate; retained protected platform Emails · 20 October 2026
 
 D108 public-only scope governs this runbook. The repository and site already exist; there is no provisioning, database migration, Identity setup, account acceptance or financial activation step. Read [source precedence](SOURCE_PRECEDENCE.md), [current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) before preparing a release.
 
-**Release evidence:** use current status for the source under review, actual check results and remaining blockers. Older dated release records do not establish acceptance of this working branch.
+**Release evidence:** D302 authorizes push and deployment of the eleven-page/nine-discovery-URL candidate. Independent preflight source/scope review found no blocking issue. Exact-source release verification, packaging, GitHub CI/review and hosted acceptance are pending. D275 remains live until verified replacement. Use current status for actual results. Older checks and local output do not certify this release commit.
 
 ## Existing target and preserved boundaries
 
@@ -42,13 +42,13 @@ pnpm package:netlify
 pnpm verify:package
 ```
 
-`pnpm verify` runs the four verification/package commands in order. They share generated output and must not run concurrently. `package:netlify` builds for the exact approved production site, copies the export and bundles the Edge handler locally. The first use can download official Deno/Edge tooling; it does not require site credentials or deploy. A source fingerprint and build-context record prevent stale or differently configured output from being packaged.
+`pnpm verify` runs the four verification/package commands in order. They share generated output and must not run concurrently. `package:netlify` builds for the exact approved production site, copies the export and bundles the Edge handler locally. The first use can download official Deno/Edge tooling; it does not require site credentials or deploy. A source fingerprint and build-context record prevent stale or differently configured output from being packaged. Verify and package the exact release checkout: private editorial tools are excluded, and their presence in another working tree changes its fingerprint. Do not reuse that tree’s generated artifacts.
 
-Package inspection requires the nine exact public pages accepted in D228, metadata/404, byte-identical export files and one native Edge handler covering every path. The three guide routes are `/guides/stripe-alternatives`, `/guides/payment-processing-systems` and `/guides/what-is-a-chargeback`; no other editorial route is implicitly allowed. The handler preserves all 17 retirement families, security headers and runtime preview protection. Inspection rejects old server/adapter output, vulnerable-package paths and private/archive inputs; the Edge archive hash must match its manifest. Confirm the exact source/commit/tree and record checks, failures, reruns and remaining limitations. Database records and archived migrations are not build inputs and must not be touched.
+Package inspection requires the eleven exact public pages, metadata/404, byte-identical export files and one native Edge handler covering every path. The `/guides` hub lists four article routes: `/guides/stripe-alternatives`, `/guides/payment-processing-systems`, `/guides/what-is-a-chargeback` and `/guides/how-to-create-a-payment-link`; no other editorial route is implicitly allowed. The handler preserves all 17 retirement families, security headers and runtime preview protection. Inspection rejects old server/adapter output, vulnerable-package paths and private/archive inputs; the Edge archive hash must match its manifest. Confirm the exact source/commit/tree and record checks, failures, reruns and remaining limitations. Database records and archived migrations are not build inputs and must not be touched.
 
 ## Production search configuration
 
-D226 remains the published four-discovery-page baseline: `/`, `/payment-acceptance-service`, `/credit-card-services` and `/help`. The D228 local candidate adds only the three exact guides listed above, preparing seven discovery pages for an eventual reviewed, authorized release at the same bound production origin. Legal pages, 404, retired routes and local/preview environments remain noindex. Local verification does not publish these guides; actual search indexing and ranking are not established by a successful build or deployment.
+The D302 candidate has nine discovery URLs: `/`, `/payment-acceptance-service`, `/credit-card-services`, `/help`, `/guides` and the four exact articles listed above. D275 remains live with eight discovery URLs until verified replacement. Legal pages, 404, retired routes, navigation payloads and local/preview environments remain noindex. Publication does not establish actual indexing or ranking and does not authorize a search submission.
 
 The build guard requires the recorded approval, exact site/origin, `NODE_ENV=production`, `APP_ENV=production`, `ETAIL_SEARCH_CONTEXT=production`, matching `SITE_ID` and `ETAIL_PUBLIC_ORIGIN`; any supplied `CONTEXT` must be production. The native Edge handler then checks trusted `context.site.id` and `context.deploy.context` with the same scoped custom markers. A preview or unapproved site remains noindex even if given production HTML; robots/sitemap are restricted at runtime. Legal HTML aliases, raw navigation payloads and 404 responses also remain noindex.
 

@@ -1,10 +1,10 @@
 # Local and CI setup for the public website
 
-D208 published public website and retained email compatibility · 14 October 2026
+D302 public release candidate and retained email compatibility · 20 October 2026
 
 The application already exists. D108 limits it to public pages and fixed vendor links. Read [AGENTS.md](../AGENTS.md), [project targets](../project-targets.json), [source precedence](SOURCE_PRECEDENCE.md) and [current status](../planning/STATUS.md) first. Do not scaffold a replacement repository, reconnect PostgreSQL or Identity, or restore the retired account application.
 
-D208 / PR #38 is published as Netlify deploy `6acef0b08517b5679df9f98f`, confirmed ready and current on 14 October 2026 at 12:02 JST. Its source is `5140da42853f21a0b65ca727be866aa182b5c51c`. The static website and native Edge boundary retain the enabled Netlify Emails extension with its reviewed authenticated POST handler; saved settings are unchanged. Publication, exact-source CI and isolated packaging are complete; D208 live acceptance passes 110 HTTP checks and 73 browser cases (including 24 accessibility checks), with one intentional desktop skip. Follow [current status](../planning/STATUS.md) for final results, earlier failures and remaining limitations. Local checks do not authorize a later publication or certify changed source.
+D302 authorizes push and deployment of eleven exact public pages and nine production-gated discovery URLs. The only added route is `/guides`, a hub for four existing articles with eight main topics and local search/sort. Main navigation uses Guides; Help remains in the footer. Product FAQs stay focused on their services; Payment acceptance omits the separate Merchant guides promotion. Independent preflight source/scope review found no blocking issue. Exact-source release verification, packaging, GitHub CI/review and hosted acceptance are pending. D275 remains live until verified replacement. The enabled Netlify Emails extension and its reviewed authenticated POST handler retain their settings. Follow [current status](../planning/STATUS.md) for actual results. Local checks do not certify changed source or perform publication.
 
 ## Pinned workspace
 
@@ -48,7 +48,7 @@ The workflow in `.github/workflows/foundation.yml` checks the exact repository, 
 
 `archive/database` holds immutable schema/migration history, not a data backup. Existing databases and Identity records remain outside this runtime. Do not open them, run archived tools, apply migrations or change provider settings as part of setup or verification.
 
-The current candidate prepares Home, Payment acceptance, Credit card, Help and the three exact merchant guides for production search eligibility on the approved site and environment. D226's live sitemap still contains four pages until a separately authorized release. Local/preview, legal, 404 and retired pages remain noindex. Keep the guard intact. Manual publication follows the [reviewed deployment runbook](NETLIFY_DEPLOYMENT.md) and authorization already recorded for that candidate; a passing local check is not publication authorization.
+The current candidate prepares nine discovery URLs: Home, Payment acceptance, Credit card, Help, Guides and four exact articles. They are eligible only on the approved production site and environment. Local/preview, legal, 404, navigation-payload and retired responses remain noindex. D302 authorizes the reviewed publication process; exact-source checks and hosted acceptance are still required. Follow the [deployment runbook](NETLIFY_DEPLOYMENT.md) and current status for the actual outcome.
 
 ## Historical setup archive
 

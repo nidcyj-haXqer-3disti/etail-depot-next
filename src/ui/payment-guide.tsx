@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import type { PublicPath } from "@/modules/public-site/metadata";
+import { PUBLISHED_GUIDES } from "@/modules/public-site/guide-catalog";
 import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
 import { legalIdentity } from "@/shared/legal-identity";
 import { Shell } from "./shell";
@@ -44,6 +45,7 @@ export function PaymentGuide({ path, title, intro, sections, sources, disclosure
   numberedContents?: boolean;
 }) {
   const ContentsList = numberedContents ? "ol" : "ul";
+  const breadcrumbTitle = PUBLISHED_GUIDES.find(guide => guide.path === path)?.title ?? title;
   return <Shell>
     <PublicPageStructuredData path={path} />
     <div className="payment-guide">
@@ -52,8 +54,8 @@ export function PaymentGuide({ path, title, intro, sections, sources, disclosure
           <nav className="payment-guide-breadcrumb" aria-label="Breadcrumb">
             <ol>
               <li><Link href="/">Home</Link></li>
-              <li><Link href="/payment-acceptance-service">Payment acceptance</Link></li>
-              <li aria-current="page">Merchant guide</li>
+              <li><Link href="/guides">Guides</Link></li>
+              <li aria-current="page">{breadcrumbTitle}</li>
             </ol>
           </nav>
           <div className="payment-guide-heading">

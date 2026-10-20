@@ -116,6 +116,6 @@ export default function publicBoundary(request: Request, context: PublicBoundary
   });
 }
 
-// Unknown URLs need the same preview/404 protection as the six public routes.
+// Unknown URLs need the same preview/404 protection as the reviewed public routes.
 // Do not cache the policy decision or bypass the boundary if it fails.
 export const config = { pattern: "^/.*$", onError: "fail" };

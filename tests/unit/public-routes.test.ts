@@ -7,7 +7,7 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production",
   ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
-const guidePaths = ["/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link"] as const;
+const guidePaths = ["/guides", "/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link"] as const;
 function context(response = new Response("public page"), changes: Partial<PublicBoundaryContext> = {}) {
   return { site: { id: PUBLIC_INDEXING_APPROVAL.siteId }, deploy: { context: "production" }, next: vi.fn(async () => response), ...changes };
 }
@@ -296,7 +296,7 @@ describe("public Edge search and security policy", () => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });
-  it.each(["/missing", "/guides/unreviewed", "/guides/how-to-create-a-payment-link/unreviewed"])("keeps missing page %s private and preserves its 404 status", async path => {
+  it.each(["/missing", "/guides/unreviewed", "/guides/payment-processing-fees", "/guides/how-to-create-a-payment-link/unreviewed"])("keeps missing page %s private and preserves its 404 status", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(new Response("Not found", { status: 404 })), production);
     expect(response.status).toBe(404);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");

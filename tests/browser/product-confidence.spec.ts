@@ -24,8 +24,8 @@ test("payments explain Two Step, optional Clarity and pricing with a safe hero s
   await expect(page).toHaveURL(/\/payment-acceptance-service#fees$/);
   await expect(fees.getByRole("heading",{name:"Credit card processing fees.",exact:true})).toBeInViewport();
   const questions=page.locator(".public-faq-section summary");
-  await expect(questions).toHaveCount(10);
-  await expect(questions).toContainText(["How do I get started?","Who operates Trolleys?","What can I request payment for?","How can I share a payment request?","Can I accept ACH payments?","What should I compare when choosing a payment processing system?","When will I receive my money?","What is a chargeback?","How do refunds and disputes work?","Does Clarity prevent every chargeback?"]);
+  await expect(questions).toHaveCount(8);
+  await expect(questions).toContainText(["How do I get started?","Who operates Trolleys?","What can I request payment for?","How can I share a payment request?","Can I accept ACH payments?","When will I receive my money?","How do refunds and disputes work?","Does Clarity prevent every chargeback?"]);
 });
 
 test("optional dispute readiness keeps price and Order Insight coverage limits visible", async ({page}) => {

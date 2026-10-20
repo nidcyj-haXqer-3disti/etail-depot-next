@@ -1,5 +1,14 @@
 # Decision register
 
+## D302 — publish the current public website
+
+20 October 2026. The user explicitly requests push and deployment through the existing feature-branch, exact-source verification, reviewed PR and manual Netlify Git-build process. D302 authorizes push and deployment of eleven exact public pages and nine production-gated discovery URLs. The only added route is `/guides`, a hub for four existing articles with eight main topics and local search/sort. Main navigation uses Guides; Help remains in the footer. Product FAQs stay focused on their services; Payment acceptance omits the separate Merchant guides promotion. Include matching article breadcrumbs, the corrected chargeback reference label and maintained page revision dates.
+
+Approved offers, legal notices, original assets, fixed provider entrances, public-only runtime and enabled protected Emails remain unchanged. Legal, local/preview, error, navigation-payload and retired-route protections remain. Private drafts, planning inventories, research outputs and editorial tooling are excluded from the release. Independent preflight source/scope review found no blocking issue. Exact-source release verification, packaging, GitHub CI/review and hosted acceptance are pending. D275 remains live until verified replacement. No search submission, provider operation, database/Identity change or unrelated remote setting change is included.
+
+
+Fresh isolated release gates passed: Node 24.19.0/pnpm 11.19.0 frozen install; 26 lint-tooling cases, 281 unit cases, 75 browser cases (one intentional desktop skip), 39 accessibility cases, source security and dependency audit with no known vulnerabilities, production SEO and package inspection. The package contains eleven public pages, nine discovery URLs, 111 static files, one Edge boundary and only the protected Emails handler. Active-source fingerprint: `b082dc8cfa903c672a110209016b1c1780315553ae48de4ab1973745bdb0b490`. Nonblocking diagnostics are color-environment warnings and Next ignoring the parent workspace file outside this isolated repository. GitHub exact-commit CI/review, fresh committed-source verification and hosted acceptance remain pending.
+
 ## D248 — publish the approved website refinements
 
 19 October 2026. The user explicitly requests “push and deploy.” Publish D227–D247, including the three approved guides and final guide-action styling, through the existing reviewed feature-branch/check/merge/manual Netlify Git-build gates. Preserve all offers, source/resource boundaries, fixed vendor entrances and enabled protected Emails. Perform hosted acceptance and record actual outcomes; no unrelated settings, search submissions, financial actions or provider operations.
