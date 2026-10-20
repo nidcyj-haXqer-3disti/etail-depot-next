@@ -32,7 +32,7 @@ export const PUBLIC_PAGE_MODIFIED = {
   "/credit-card-services": "2026-10-19",
   "/payment-acceptance-service": "2026-10-19",
   "/help": "2026-10-19",
-  "/guides": "2026-10-19",
+  "/guides": "2026-10-20",
   "/guides/stripe-alternatives": "2026-10-19",
   "/guides/payment-processing-systems": "2026-10-19",
   "/guides/what-is-a-chargeback": "2026-10-19",
