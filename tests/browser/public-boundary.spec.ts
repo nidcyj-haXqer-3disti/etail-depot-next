@@ -1,3 +1,4 @@
+import { PUBLISHED_GUIDES } from "../../src/modules/public-site/guide-catalog";
 import { expect, test } from "@playwright/test";
 
 test("renamed product bookmarks retain their section and reject submitted data", async ({ page, request, baseURL }) => {
@@ -37,7 +38,7 @@ test("renamed product bookmarks retain their section and reject submitted data",
 });
 
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
-  const pages = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides","/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback","/guides/how-to-create-a-payment-link"];
+  const pages = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides", ...PUBLISHED_GUIDES.map(guide => guide.path)];
   const privateRequests: string[] = [], errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });
@@ -54,8 +55,8 @@ test("public pages and every internal link resolve without account APIs or cooki
       await expect(page.locator('.fee-estimate input#addon-sale-records[type="checkbox"]')).toHaveCount(1);
       await expect(page.locator("select, textarea, [contenteditable=true]")).toHaveCount(0);
     } else if (path === "/guides") {
-      await expect(page.locator("input")).toHaveCount(1);
-      await expect(page.locator('input#guide-search[type="search"]')).toHaveCount(1);
+      await expect(page.locator("input")).toHaveCount(0);
+      await expect(page.locator(".guide-library-topic-select")).toHaveCount(1);
     } else await expect(page.locator("input")).toHaveCount(0);
     const links = await page.locator("a[href]").evaluateAll(nodes => nodes.map(node => new URL(node.getAttribute("href")!, location.href)).filter(url => url.origin === location.origin).map(url => url.pathname + url.search + url.hash));
     for (const link of links) destinations.add(link);

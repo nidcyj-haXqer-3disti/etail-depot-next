@@ -1,5 +1,14 @@
 # Decision register
 
+## D333 — release the approved 20-guide website
+
+21 October 2026 JST. The user authorizes deployment of the accepted D331 website. Integrate its 20 articles and ten-section, browse-only library into the existing static application. The 27 exact pages consist of seven core pages and 20 guide articles; 25 nonlegal pages are eligible only under the unchanged production guard. No further batch, dynamic guide routes, search engine, vendor integration, financial runtime or database change is included.
+
+The inactive D332 review bundle is replaced by active production source; its reproducible snapshot remains in PR #52 history. Original artwork, all product offers, fixed provider destinations and the protected enabled Emails extension remain unchanged. Approved article text and visible layout are preserved. Production metadata/schema, sitemap and explicit package/test allowlists are updated together. Guide/hub significant-change dates use actual UTC 2026-10-20. Local/preview, legal, payload, error and retired protections remain.
+
+Local release gates pass: 362 unit tests, 115 browser passes with one existing intentional skip, 87 accessibility cases, zero known dependency vulnerabilities, production SEO and exact 27-page package verification. Setup/test corrections and reruns are recorded in current status. All 27 rendered page bodies and 16 images match the accepted preview. GitHub exact-head CI and hosted acceptance remain required. PR #52 is the release vehicle; main is not changed directly. The currently verified deployment remains `6ad7328696e3c17590534f57` until a successful replacement. Current status and release receipts record actual results; older checks cannot certify this source.
+
+
 ## D302 — publish the current public website
 
 20 October 2026. The user explicitly requests push and deployment through the existing feature-branch, exact-source verification, reviewed PR and manual Netlify Git-build process. D302 authorizes push and deployment of eleven exact public pages and nine production-gated discovery URLs. The only added route is `/guides`, a hub for four existing articles with eight main topics and local search/sort. Main navigation uses Guides; Help remains in the footer. Product FAQs stay focused on their services; Payment acceptance omits the separate Merchant guides promotion. Include matching article breadcrumbs, the corrected chargeback reference label and maintained page revision dates.

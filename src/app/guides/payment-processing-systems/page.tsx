@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
-import { GuideTable, PaymentGuide } from "@/ui/payment-guide";
+import { GuideTable } from "@/ui/payment-guide";
+
+import { ReadingGuide } from "@/ui/reading-guide";
 
 export const metadata = publicPageMetadata("/guides/payment-processing-systems");
 
@@ -13,25 +15,27 @@ const fees = productFacts.payments;
 const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const feeExamples = [2_000, 10_000].map(amount => {
   const fee = Math.round(amount * fees.cardRateBasisPoints / 10_000) + fees.cardFixedFeeCents;
-  return [dollars(amount), dollars(fee), dollars(amount - fee)];
+  return [dollars(amount), `${dollars(fee)} base fee; ${dollars(amount - fee)} remaining after that fee.`];
 });
 
 export default function PaymentProcessingSystemsPage() {
-  return <PaymentGuide
+  return <ReadingGuide
     path="/guides/payment-processing-systems"
     title="Payment processing systems: a practical guide for US businesses"
-    intro="A payment system connects the customer’s payment step with authorization, settlement and your business’s records. Choose a system that fits how you sell and how you manage each sale afterward."
+    intro="A payment processing system lets a customer pay and helps you track what happens to the money afterward. Start with how customers buy from you, then check the fees, order records and payout terms before choosing a service."
+    showPaymentAcceptanceLink
+    relatedPaths={["/guides/how-to-create-a-payment-link", "/guides/stripe-alternatives"]}
     sections={[
       {
         id: "parts-of-a-system",
-        title: "Understand the parts of a payment system",
+        title: "What each part does",
         content: <>
-          <p>A payment system does three jobs for your business: lets the customer pay, moves the transaction through the financial system and gives you records to manage the sale. A gateway, processor and merchant account each have a role; one service may bring several of them together.</p>
-          <GuideTable caption="Payment-system roles and useful questions" headings={["Part", "What it does", "What to ask"]} rows={[
-            ["Customer payment page", "Presents the amount and collects the customer’s payment choice.", "Can customers use it from the channels where I sell?"],
-            ["Payment gateway", "Passes payment information securely between the checkout and processing service.", "Is it included, and does my checkout work with it?"],
-            ["Payment processor", "Coordinates transaction messages and processing with financial institutions and card networks.", "Which payment methods and transactions are supported?"],
-            ["Merchant account arrangement", "Supports receiving card-payment funds before payout to the business bank account.", "How is my account set up, and which settlement, reserve and payout terms apply?"],
+          <p>The payment page is the part your customer sees. Behind it, a gateway, processor and merchant account arrangement handle different parts of the transaction. One provider may bring several of these together.</p>
+          <GuideTable caption="The main parts of a payment system" headings={["Part", "Its role in the sale"]} rows={[
+            ["Customer payment page", "Shows the amount and collects the customer’s payment choice."],
+            ["Payment gateway", "Passes payment information securely between checkout and the processing service."],
+            ["Payment processor", "Coordinates transaction messages with financial institutions and card networks."],
+            ["Merchant account arrangement", "Supports receiving card-payment funds before payout to your business bank account. Settlement, reserve and payout terms depend on the arrangement."],
           ]} />
           <p>“Merchant services” is a wider label for services that help a business accept and manage payments. It can include processing, payment software and support. Ask which services are actually included instead of treating the label as a feature list.</p>
           <p>Your merchant account arrangement supports card acceptance. Your business bank account receives payouts. Confirm how both are connected, who provides each service and which terms apply. Buying a gateway alone does not tell you the full cost or when your bank will receive the money.</p>
@@ -42,12 +46,8 @@ export default function PaymentProcessingSystemsPage() {
         title: "Start with how customers will pay",
         content: <>
           <p>Write down where the customer agrees to buy and what should happen next. A business taking occasional orders may need a different setup from a store managing stock or a service charging recurring subscriptions.</p>
-          <GuideTable caption="Match the way customers pay to the sale" headings={["Your situation", "An option to consider", "Check before choosing"]} rows={[
-            ["Orders agreed by email, text or conversation", "A payment request shared as a link", "Clear description, amount, delivery terms and a way to match the payment to the order."],
-            ["A sign, printed material or an in-person conversation", "A QR code opening an online payment page", "The customer can open the page and confirm the intended payment. A QR code alone is not a card terminal."],
-            ["A website with a shopping cart", "An integrated or hosted checkout", "Compatibility with the store, order updates, inventory and how you handle refunds."],
-            ["Regular automatic charges", "A recurring-billing product", "Customer consent, schedule changes, failed-payment handling, cancellation and extra fees."],
-          ]} />
+          <p>For an order agreed by email or text, a payment link may be enough. It needs a recognizable description, the agreed amount and a reference you can match to the order. A QR code can open that same page from printed material; it does not turn the payment into a card-terminal transaction.</p>
+          <p>A website with a shopping cart needs checkout to work with order updates, inventory and refunds. Regular automatic charges need recurring billing, including consent, schedule changes, failed-payment handling and cancellation. Check those requirements and their fees before choosing.</p>
           <p>Trolleys lets approved businesses create online card-payment requests and share them by link or QR code for goods, services or information. If you need a store integration, recurring billing or a card terminal, ask Trolleys whether it supports those requirements before choosing.</p>
           <p>For a request you can share directly with a customer, see <Link href="/guides/how-to-create-a-payment-link">how to create and share a payment link</Link>.</p>
         </>,
@@ -86,7 +86,7 @@ export default function PaymentProcessingSystemsPage() {
         title: "Compare costs using your usual order amounts",
         content: <>
           <p>A percentage plus a fixed fee affects small and large orders differently. The examples below show the base fee for successful domestic online card payments at Trolleys’ published {fees.cardRateLabel} rate.</p>
-          <GuideTable caption="Illustrative Trolleys base processing fees in USD" headings={["Payment", "Base processing fee", "Amount after base fee"]} rows={feeExamples} />
+          <GuideTable caption="Illustrative Trolleys base processing fees in USD" headings={["Payment", "Base fee and remaining amount"]} rows={feeExamples} />
           <p>The formula is payment amount × 2.9%, plus 30¢. A $20 payment therefore has a higher fee as a share of the sale than a $100 payment. Use your typical amounts and card mix when comparing offers, rather than only comparing the headline percentage.</p>
           <p>These figures exclude optional Clarity, international-card, currency-conversion, merchant-entry, dispute and other applicable charges. They do not predict the bank payout after refunds, reserves or other adjustments. Review <Link href="/payment-acceptance-service#fees">all published Trolleys fees</Link>.</p>
           <p>Optional Clarity adds {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. It uses Order Insight to help customers recognize purchases and prevent eligible Visa online fraud disputes. Coverage depends on the payment, participating bank and available data; it does not prevent every dispute or guarantee an outcome. Automatic refunds and services that respond to chargebacks for you are separate services.</p>
@@ -94,7 +94,7 @@ export default function PaymentProcessingSystemsPage() {
       },
       {
         id: "questions-before-applying",
-        title: "Prepare five questions before applying",
+        title: "What to confirm before applying",
         content: <ol>
           <li><strong>Does the service accept my business?</strong> Describe what you sell, who buys it and when you deliver. Confirm eligibility and any restrictions before relying on approval.</li>
           <li><strong>Can customers pay the way I need?</strong> List the channels, payment methods and integrations you need, including work after the sale.</li>

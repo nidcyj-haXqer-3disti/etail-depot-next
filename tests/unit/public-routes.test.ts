@@ -7,7 +7,29 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production",
   ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
-const guidePaths = ["/guides", "/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link"] as const;
+const guidePaths = [
+  "/guides",
+  "/guides/stripe-alternatives",
+  "/guides/payment-processing-systems",
+  "/guides/what-is-a-chargeback",
+  "/guides/how-to-create-a-payment-link",
+  "/guides/optimize-your-mobile-checkout-experience",
+  "/guides/cart-abandonment-vs-checkout-abandonment",
+  "/guides/consuming-webhooks",
+  "/guides/designing-robust-and-predictable-apis-with-idempotency",
+  "/guides/how-3d-secure-works",
+  "/guides/account-takeover-fraud",
+  "/guides/important-invoice-management-tips",
+  "/guides/types-of-invoice-discrepancies",
+  "/guides/b2b-payment-methods",
+  "/guides/ach-debit",
+  "/guides/edi-payment-how-does-it-differ-from-ach-and-eft",
+  "/guides/pick-the-right-payment-methods-in-a-new-country",
+  "/guides/important-information-about-bic-and-swift-codes",
+  "/guides/profit-and-loss-statement",
+  "/guides/read-a-balance-sheet",
+  "/guides/credit-card-interest",
+] as const;
 function context(response = new Response("public page"), changes: Partial<PublicBoundaryContext> = {}) {
   return { site: { id: PUBLIC_INDEXING_APPROVAL.siteId }, deploy: { context: "production" }, next: vi.fn(async () => response), ...changes };
 }
@@ -296,7 +318,7 @@ describe("public Edge search and security policy", () => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });
-  it.each(["/missing", "/guides/unreviewed", "/guides/payment-processing-fees", "/guides/how-to-create-a-payment-link/unreviewed"])("keeps missing page %s private and preserves its 404 status", async path => {
+  it.each(["/missing", "/guides/unreviewed", "/guides/payment-processing-fees", "/guides/how-to-create-a-payment-link/unreviewed", "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal", "/guides/use-a-cash-register", "/guides/charge-cards", "/guides/sections/payment-processing-checkout", "/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"])("keeps missing page %s private and preserves its 404 status", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(new Response("Not found", { status: 404 })), production);
     expect(response.status).toBe(404);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");

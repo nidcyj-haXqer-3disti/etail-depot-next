@@ -2,13 +2,15 @@
 
 The customer-facing website for **Etail Depot US, Inc.**, introducing **Trolleys payment acceptance** and the **Ledgix credit card**.
 
-[Website](https://etaildepot.com) · [Payment acceptance](https://etaildepot.com/payment-acceptance-service) · [Credit card](https://etaildepot.com/credit-card-services) · [Help](https://etaildepot.com/help)
+[Website](https://etaildepot.com) · [Payment acceptance](https://etaildepot.com/payment-acceptance-service) · [Credit card](https://etaildepot.com/credit-card-services) · [Guides](https://etaildepot.com/guides) · [Help](https://etaildepot.com/help)
 
 ## About the project
 
 Trolleys helps US businesses accept online payments. Ledgix is a virtual Visa secured credit card, **coming soon**; applications are not open. The website explains both products, their pricing and limitations, and where to get help.
 
 This repository contains the public website: product pages, interactive illustrations, help, merchant guides, legal notices and fixed links to the services. It does not run customer accounts, card issuance or payment processing. Trolleys account access is handled separately at [trolleys.ai](https://trolleys.ai); Ledgix inquiries go to [ledgix@etaildepot.com](mailto:ledgix@etaildepot.com).
+
+The Guides library contains 20 reviewed articles in ten sections. Browse topics or follow article links; unpublished research and future content batches are outside the application.
 
 Built with **Next.js, React and TypeScript**, exported as static pages and served on Netlify with a shared Edge request boundary. See the [architecture](docs/PUBLIC_SITE_ARCHITECTURE.md) for implementation details and [current status](planning/STATUS.md) for verified release information.
 

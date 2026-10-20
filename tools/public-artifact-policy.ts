@@ -5,10 +5,33 @@ export const edgeHandler = "public-boundary";
 
 /** Exact reviewed pages: adding a guide never opens the rest of its route family. */
 export const publicPageSources = [
-  "page.tsx", "credit-card-services/page.tsx", "payment-acceptance-service/page.tsx", "help/page.tsx",
-  "privacy/page.tsx", "terms/page.tsx", "guides/page.tsx", "guides/stripe-alternatives/page.tsx",
-  "guides/payment-processing-systems/page.tsx", "guides/what-is-a-chargeback/page.tsx",
+  "page.tsx",
+  "credit-card-services/page.tsx",
+  "payment-acceptance-service/page.tsx",
+  "help/page.tsx",
+  "privacy/page.tsx",
+  "terms/page.tsx",
+  "guides/page.tsx",
+  "guides/stripe-alternatives/page.tsx",
+  "guides/payment-processing-systems/page.tsx",
+  "guides/what-is-a-chargeback/page.tsx",
   "guides/how-to-create-a-payment-link/page.tsx",
+  "guides/optimize-your-mobile-checkout-experience/page.tsx",
+  "guides/cart-abandonment-vs-checkout-abandonment/page.tsx",
+  "guides/consuming-webhooks/page.tsx",
+  "guides/designing-robust-and-predictable-apis-with-idempotency/page.tsx",
+  "guides/how-3d-secure-works/page.tsx",
+  "guides/account-takeover-fraud/page.tsx",
+  "guides/important-invoice-management-tips/page.tsx",
+  "guides/types-of-invoice-discrepancies/page.tsx",
+  "guides/b2b-payment-methods/page.tsx",
+  "guides/ach-debit/page.tsx",
+  "guides/edi-payment-how-does-it-differ-from-ach-and-eft/page.tsx",
+  "guides/pick-the-right-payment-methods-in-a-new-country/page.tsx",
+  "guides/important-information-about-bic-and-swift-codes/page.tsx",
+  "guides/profit-and-loss-statement/page.tsx",
+  "guides/read-a-balance-sheet/page.tsx",
+  "guides/credit-card-interest/page.tsx",
 ] as const;
 export const publicHtmlFiles = publicPageSources.map(page => page === "page.tsx" ? "index.html" : page.replace(/\/page\.tsx$/, ".html"));
 const publicAppModules = new Set<string>([
@@ -37,7 +60,7 @@ export function forbiddenArtifact(filename: string): boolean {
 
 export function forbiddenStatic(filename: string): boolean {
   const normalized = filename.replaceAll("\\", "/");
-  return forbiddenArtifact(normalized) || /(?:^|\/)(?:src|node_modules|\.next|functions|functions-internal)(?:\/|$)/.test(normalized) ||
+  return forbiddenArtifact(normalized) || /(?:^|\/)(?:src|review|artifacts|content|outputs|tools|node_modules|\.next|functions|functions-internal)(?:\/|$)/.test(normalized) ||
     /\.(?:sql|sqlite|sqlite3|db|dump|zip|eszip)$/i.test(normalized) ||
     retiredFamilies.some(family => normalized === family || normalized.startsWith(`${family}/`) || normalized === `${family}.html` || normalized === `${family}.txt`);
 }
