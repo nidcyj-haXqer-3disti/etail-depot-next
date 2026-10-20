@@ -38,16 +38,17 @@ describe("published guide catalog", () => {
     expect(PUBLISHED_GUIDES.some(guide => String(guide.path) === "/guides/payment-processing-fees")).toBe(false);
   });
 
-  it("has eight unique stable topic groups while leaving empty groups without invented entries", () => {
+  it("has the ten approved topic groups while leaving empty groups without invented entries", () => {
     expect(GUIDE_TOPICS.map(topic => topic.id)).toEqual([
-      "taking-payments", "fees-and-providers", "invoicing-and-billing", "disputes-and-fraud",
-      "business-finances", "running-a-business", "cards-and-credit", "payment-technology",
+      "payment-processing-checkout", "ach-bank-transfers", "payments-by-business", "business-finance-accounting",
+      "credit-cards-issuing", "in-person-payments-pos", "invoicing-recurring-payments", "gateways-apis-integrations",
+      "chargebacks-refunds-fraud", "cross-border-merchant-infrastructure",
     ]);
-    expect(new Set(GUIDE_TOPICS.map(topic => topic.label)).size).toBe(8);
-    expect(searchGuides(PUBLISHED_GUIDES, { topic: "invoicing-and-billing" })).toEqual([]);
-    expect(searchGuides(PUBLISHED_GUIDES, { topic: "cards-and-credit" })).toEqual([]);
-    expect(searchGuides(PUBLISHED_GUIDES, { topic: "payment-technology" })).toEqual([]);
-    expect(new Set(PUBLISHED_GUIDES.map(guide => guide.topic)).size).toBe(3);
+    expect(new Set(GUIDE_TOPICS.map(topic => topic.label)).size).toBe(10);
+    expect(searchGuides(PUBLISHED_GUIDES, { topic: "invoicing-recurring-payments" })).toEqual([]);
+    expect(searchGuides(PUBLISHED_GUIDES, { topic: "credit-cards-issuing" })).toEqual([]);
+    expect(searchGuides(PUBLISHED_GUIDES, { topic: "gateways-apis-integrations" })).toEqual([]);
+    expect(new Set(PUBLISHED_GUIDES.map(guide => guide.topic)).size).toBe(2);
   });
 });
 
@@ -57,17 +58,17 @@ describe("guide metadata search", () => {
     expect(searchGuides(PUBLISHED_GUIDES, { query: "  QR\tREQUEST  " }).map(guide => guide.path)).toEqual([approvedArticlePaths[0]]);
     expect(searchGuides(PUBLISHED_GUIDES, { query: "CHARGE BACK" }).map(guide => guide.path)).toEqual([approvedArticlePaths[3]]);
     expect(searchGuides(PUBLISHED_GUIDES, { query: "technology gateway" }).map(guide => guide.path)).toEqual([approvedArticlePaths[2]]);
-    expect(searchGuides(PUBLISHED_GUIDES, { query: "credit card processing", topic: "taking-payments", format: "Explainer" }).map(guide => guide.path)).toEqual([approvedArticlePaths[2]]);
+    expect(searchGuides(PUBLISHED_GUIDES, { query: "credit card processing", topic: "payment-processing-checkout", format: "Explainer" }).map(guide => guide.path)).toEqual([approvedArticlePaths[2]]);
     expect(searchGuides(PUBLISHED_GUIDES, { query: "qr chargeback" })).toEqual([]);
   });
 
   it("combines topic, format and query filters and returns no results for regex-like input", () => {
-    expect(searchGuides(PUBLISHED_GUIDES, { query: "fees", topic: "fees-and-providers", format: "Comparison" }).map(guide => guide.path)).toEqual([approvedArticlePaths[1]]);
-    expect(searchGuides(PUBLISHED_GUIDES, { query: "fees", topic: "taking-payments", format: "Comparison" })).toEqual([]);
+    expect(searchGuides(PUBLISHED_GUIDES, { query: "fees", topic: "payment-processing-checkout", format: "Comparison" }).map(guide => guide.path)).toEqual([approvedArticlePaths[1]]);
+    expect(searchGuides(PUBLISHED_GUIDES, { query: "fees", topic: "chargebacks-refunds-fraud", format: "Comparison" })).toEqual([]);
     expect(searchGuides(PUBLISHED_GUIDES, { topic: "unapproved-topic" })).toEqual([]);
     expect(searchGuides(PUBLISHED_GUIDES, { subtopic: "unapproved-subtopic" })).toEqual([]);
-    expect(searchGuides(PUBLISHED_GUIDES, { topic: "taking-payments", subtopic: "Payment processing", query: "credit card" }).map(guide => guide.path)).toEqual([approvedArticlePaths[2]]);
-    expect(searchGuides(PUBLISHED_GUIDES, { topic: "taking-payments", subtopic: "Payment links and QR codes", query: "credit card" })).toEqual([]);
+    expect(searchGuides(PUBLISHED_GUIDES, { topic: "payment-processing-checkout", subtopic: "Payment processing", query: "credit card" }).map(guide => guide.path)).toEqual([approvedArticlePaths[2]]);
+    expect(searchGuides(PUBLISHED_GUIDES, { topic: "payment-processing-checkout", subtopic: "Payment links and QR codes", query: "credit card" })).toEqual([]);
     expect(searchGuides(PUBLISHED_GUIDES, { format: "unapproved-format" })).toEqual([]);
     expect(searchGuides(PUBLISHED_GUIDES, { query: `QR${" ".repeat(158)}ignored-over-limit-token` }).map(guide => guide.path)).toEqual([approvedArticlePaths[0]]);
     for (const query of [".*", "[", "(?=payment)", "<script>"]) expect(searchGuides(PUBLISHED_GUIDES, { query })).toEqual([]);
@@ -90,9 +91,9 @@ describe("guide metadata search", () => {
     expect(matches.every(entry => entry.keywords.includes("segment-7"))).toBe(true);
     expect(searchGuides(entries, { query: "CAFE checkout" })).toHaveLength(2000);
     expect(searchGuides(entries, { query: "cafe missing-term" })).toEqual([]);
-    const combined = searchGuides(entries, { query: "cafe", topic: "taking-payments", format: "Explainer" });
+    const combined = searchGuides(entries, { query: "cafe", topic: "payment-processing-checkout", format: "Explainer" });
     expect(combined.length).toBeGreaterThan(0);
-    expect(combined.every(entry => entry.topic === "taking-payments" && entry.format === "Explainer")).toBe(true);
+    expect(combined.every(entry => entry.topic === "payment-processing-checkout" && entry.format === "Explainer")).toBe(true);
     const reverseEntries = Object.freeze([...entries].reverse());
     expect(searchGuides(reverseEntries, { sort: "title" })).toEqual(entries);
     expect(JSON.stringify(entries)).toBe(before);
