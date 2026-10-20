@@ -15,6 +15,7 @@ export const PUBLIC_PAGES = {
   "/credit-card-services": { title: "Ledgix Secured Credit Card — Coming Soon", description: `Meet the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
   "/payment-acceptance-service": { title: "Trolleys Payment Processing System", description: "Accept online card payments with Trolleys payment links and QR codes. Compare fees and optional Clarity chargeback prevention, including eligibility and limits." },
   "/help": { title: "Payment Acceptance & Credit Card Help", description: "Find Trolleys payment acceptance support, Ledgix credit card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
+  "/guides": { title: "Payment Acceptance Guides", description: "Browse practical guides to payment links, payment processing systems, Stripe alternatives and chargebacks for your business." },
   "/guides/stripe-alternatives": { title: "Stripe Alternatives: Stripe vs Trolleys", description: "Compare Stripe and Trolleys for online card payments. Review payment links, processing and dispute fees, account requirements and questions to ask before switching." },
   "/guides/payment-processing-systems": { title: "Payment Processing Systems: A Merchant Guide", description: "Understand payment gateways, processors and merchant accounts. Compare ways to accept online payments, costs, payout terms and the setup your business needs." },
   "/guides/what-is-a-chargeback": { title: "What Is a Chargeback? Fees & Prevention", description: "Understand chargebacks vs. refunds, dispute fees and response evidence. Learn about chargeback prevention and what optional Trolleys Clarity covers." },
@@ -22,15 +23,16 @@ export const PUBLIC_PAGES = {
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
-// UTC dates of the last published, significant page update. Maintain per page when
+// UTC dates of each candidate page's last significant content update. Maintain when
 // its content, relevant shared content, metadata or links materially change.
 // Do not advance for deployments, cosmetic edits or copyright-year changes alone.
-// Baseline: Home PR #48; Cards PR #45; remaining pages PR #47.
+// Local revisions become public only in the next approved release.
 export const PUBLIC_PAGE_MODIFIED = {
   "/": "2026-10-19",
-  "/credit-card-services": "2026-10-18",
+  "/credit-card-services": "2026-10-19",
   "/payment-acceptance-service": "2026-10-19",
   "/help": "2026-10-19",
+  "/guides": "2026-10-19",
   "/guides/stripe-alternatives": "2026-10-19",
   "/guides/payment-processing-systems": "2026-10-19",
   "/guides/what-is-a-chargeback": "2026-10-19",
@@ -94,7 +96,7 @@ export function publicPageJsonLd(path: PublicPath): string {
   const organizationId = `${canonicalOrigin}/#organization`;
   const websiteId = `${canonicalOrigin}/#website`;
   const breadcrumbId = `${url}#breadcrumb`;
-  const breadcrumbLabels = { "/credit-card-services": serviceLabels.cards, "/payment-acceptance-service": serviceLabels.payments, "/help": "Help", "/guides/stripe-alternatives": "Stripe alternatives", "/guides/payment-processing-systems": "Payment processing systems", "/guides/what-is-a-chargeback": "What is a chargeback?", "/guides/how-to-create-a-payment-link": "Create a payment link" } as const;
+  const breadcrumbLabels = { "/credit-card-services": serviceLabels.cards, "/payment-acceptance-service": serviceLabels.payments, "/help": "Help", "/guides": "Guides", "/guides/stripe-alternatives": "Stripe alternatives", "/guides/payment-processing-systems": "Payment processing systems", "/guides/what-is-a-chargeback": "What is a chargeback?", "/guides/how-to-create-a-payment-link": "Create a payment link" } as const;
   const isGuide = path.startsWith("/guides/");
   const data = {
     "@context": "https://schema.org", "@graph": [
@@ -121,7 +123,7 @@ export function publicPageJsonLd(path: PublicPath): string {
         "@type": "BreadcrumbList", "@id": breadcrumbId,
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Etail Depot", item: publicPageUrl("/") },
-          ...(isGuide ? [{ "@type": "ListItem", position: 2, name: serviceLabels.payments, item: publicPageUrl("/payment-acceptance-service") }] : []),
+          ...(isGuide ? [{ "@type": "ListItem", position: 2, name: "Guides", item: publicPageUrl("/guides") }] : []),
           { "@type": "ListItem", position: isGuide ? 3 : 2, name: breadcrumbLabels[path], item: url },
         ],
       }] : []),

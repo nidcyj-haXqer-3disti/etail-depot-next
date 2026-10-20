@@ -5,7 +5,6 @@ const commonQuestions = [
   {
     question: "What merchant services does Trolleys offer?",
     answer: "Trolleys offers online card payments through payment requests shared by link or QR code. ACH payments are also available; contact Trolleys for ACH fees, timing and account options. Approved businesses manage payments in their Trolleys account.",
-    guide: { href: "/guides/payment-processing-systems", label: "Compare payment processing systems" },
   },
   {
     question: "Can I start accepting payments now?",
@@ -14,7 +13,7 @@ const commonQuestions = [
   {
     question: "Can Trolleys help prevent chargebacks?",
     answer: "Optional Clarity shares purchase details with participating banks and helps prevent eligible Visa online fraud disputes. Coverage depends on the payment, participating bank and available records; it does not cover every chargeback.",
-    guide: { href: "/payment-acceptance-service#dispute-readiness", label: "Explore Clarity chargeback prevention and fees" },
+    link: { href: "/payment-acceptance-service#dispute-readiness", label: "Explore Clarity chargeback prevention and fees" },
   },
   {
     question: "When can I apply for a Ledgix credit card?",
@@ -31,5 +30,5 @@ const commonQuestions = [
 ];
 
 export function PublicQuestions() {
-  return <div className="public-questions">{commonQuestions.map(item => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}{item.guide && <> <Link href={item.guide.href}>{item.guide.label}</Link>.</>}</p></details>)}</div>;
+  return <div className="public-questions">{commonQuestions.map(item => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}{item.link && <> <Link href={item.link.href}>{item.link.label}</Link>.</>}</p></details>)}</div>;
 }

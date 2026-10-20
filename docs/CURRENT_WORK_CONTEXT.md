@@ -1,5 +1,13 @@
 # Etail Depot website — current work context
 
+## D302 — push and deployment authorized
+
+20 October 2026. The user explicitly requests push and deployment of the current public website. D302 authorizes push and deployment of eleven exact public pages and nine production-gated discovery URLs. The only added route is `/guides`, a hub for four existing articles with eight main topics and local search/sort. Main navigation uses Guides; Help remains in the footer. Product FAQs stay focused on their services; Payment acceptance omits the separate Merchant guides promotion. Matching article breadcrumbs, the corrected chargeback reference label and maintained page revision dates are included.
+
+Approved offers, legal notices, original assets, fixed provider entrances, public-only runtime and enabled protected Emails remain unchanged. Legal, local/preview, error, navigation-payload and retired-route protections remain. Private drafts, planning inventories, research outputs and editorial tooling are excluded from the release.
+
+Independent preflight source/scope review found no blocking issue. Exact-source release verification, packaging, GitHub CI/review and hosted acceptance are pending. D275 remains live until verified replacement. Follow the reviewed feature-branch and manual Netlify Git-build process; record actual outcomes in [current status](../planning/STATUS.md). No search submission, provider operation or unrelated resource change is included. Earlier entries below are dated history; their counts and local-only states do not replace D302.
+
 This workspace and conversation concern the existing customer-facing Etail Depot website. Start from the deployed version and the user's next explicit request.
 
 ## D248 — push and deploy authorized

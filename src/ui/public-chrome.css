@@ -49,7 +49,7 @@
   text-decoration: none;
 }
 .public-navigation a:hover { color: var(--public-ink); }
-.public-navigation a[aria-current=page] { color: var(--public-ink); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 8px; }
+.public-navigation a[aria-current] { color: var(--public-ink); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 8px; }
 .public-header .header-actions { grid-column: 3; grid-row: 1; justify-self: end; gap: 0; margin-left: 0; }
 .public-header .header-sign-in {
   display: inline-flex;

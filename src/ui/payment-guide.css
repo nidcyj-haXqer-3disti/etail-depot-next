@@ -82,9 +82,6 @@
 .payment-guides-card h3 { font-size: 20px; line-height: 1.35; letter-spacing: -.025em; }
 .payment-guides-card p { margin: 12px 0 20px; color: var(--public-muted); font-size: 14px; line-height: 1.75; }
 .payment-guides-read { display: flex; gap: 10px; margin-top: auto; font-size: 13px; font-weight: 600; }
-.payment-guides-next { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 28px; margin-top: 32px; border-top: 1px solid var(--public-line); }
-.payment-guides-next p { max-width: 600px; color: var(--public-muted); font-size: 14px; line-height: 1.8; }
-.payment-guides-next .button { flex-shrink: 0; }
 @media (max-width: 1000px) {
   .payment-guide-body { grid-template-columns: 180px minmax(0, 1fr); gap: 32px; }
 }
@@ -115,5 +112,4 @@
   .payment-guides { padding-block: 38px; }
   .payment-guides-heading h2 { font-size: 26px; }
   .payment-guides-card { padding: 22px; }
-  .payment-guides-next { flex-direction: column; align-items: flex-start; gap: 18px; }
 }

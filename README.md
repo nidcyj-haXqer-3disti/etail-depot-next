@@ -64,7 +64,7 @@ On Linux, Playwright may also require system libraries; use `pnpm exec playwrigh
 
 | Path | Purpose |
 | --- | --- |
-| `src/app` | Nine approved page routes: Home, Payment acceptance, Credit card, Help, three merchant guides, Privacy and Terms; plus metadata and 404 |
+| `src/app` | Eleven approved page routes: Home, Payment acceptance, Credit card, Help, Guides, four guide articles, Privacy and Terms; plus metadata and 404 |
 | `src/ui` | Shared layout, navigation, artwork and interface components |
 | `src/shared`, `src/modules/public-site` | Product details, safe service links, metadata and illustrative calculations |
 | `public`, `assets/brand` | Original brand, card-network, wallet and other visual assets |
@@ -77,9 +77,9 @@ On Linux, Playwright may also require system libraries; use `pnpm exec playwrigh
 
 The active application is a public information website. Historical account code and database schemas are retained for reference; they are not setup instructions, customer-data backups or permission to reconnect retired services. The existing protected Netlify Emails handler is a platform compatibility exception; website pages do not call it.
 
-Preserve approved product wording, pricing, availability, authentic logos and the shared design. Service links use fixed destinations and must not forward customer identifiers, query strings, fragments or referrers. D248 publishes the three exact guide routes `/guides/stripe-alternatives`, `/guides/payment-processing-systems` and `/guides/what-is-a-chargeback`. D250 adds `/guides/how-to-create-a-payment-link` for local review; publication remains separate.
+Preserve approved product wording, pricing, availability, authentic logos and the shared design. Service links use fixed destinations and must not forward customer identifiers, query strings, fragments or referrers. The `/guides` hub links four existing articles: `/guides/stripe-alternatives`, `/guides/payment-processing-systems`, `/guides/what-is-a-chargeback` and `/guides/how-to-create-a-payment-link`. No other editorial route or private draft is included. Product FAQs stay focused on their services; Guides is in the main navigation and Help remains in the footer.
 
-The current local candidate prepares eight search-eligible routes: Home, Payment acceptance, Credit card, Help and the four exact guides under the recorded site/origin guard. The live D248 sitemap contains seven URLs until a separately approved release. Legal pages, local/preview builds, navigation payloads, errors and retired routes retain their indexing restrictions. Eligibility does not establish actual indexing or rankings.
+D302 authorizes push and deployment of this eleven-page candidate through the reviewed release process. Nine nonlegal URLs are eligible for discovery under the recorded production site/origin guard: Home, Payment acceptance, Credit card, Help, Guides and four articles. Legal pages, local/preview builds, navigation payloads, errors and retired routes retain their indexing restrictions. Independent preflight source/scope review found no blocking issue. Exact-source release verification, packaging, GitHub CI/review and hosted acceptance are pending. D275 remains live until verified replacement. See current status for actual outcomes; eligibility does not establish indexing or rankings.
 
 Release targets are bound in [project-targets.json](project-targets.json). Deployment is a separate maintainer operation under the [deployment runbook](docs/NETLIFY_DEPLOYMENT.md). Use the [current work context](docs/CURRENT_WORK_CONTEXT.md) and [source precedence](docs/SOURCE_PRECEDENCE.md) before acting on older documents. Coding agents must also follow [AGENTS.md](AGENTS.md).
 

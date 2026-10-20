@@ -43,7 +43,7 @@ async function openWalletSetup(page: Page) {
 test("the shared company header stays consistent and its compact menu works with keyboard, pointer and resizing", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
-  const routes = ["/", "/payment-acceptance-service", "/credit-card-services", "/help", "/privacy", "/terms", "/missing-header-review-page"];
+  const routes = ["/", "/payment-acceptance-service", "/credit-card-services", "/help", "/guides", "/guides/what-is-a-chargeback", "/privacy", "/terms", "/missing-header-review-page"];
   for (const route of routes) {
     await page.goto(route);
     const header = page.getByRole("banner");
@@ -54,13 +54,16 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.getByRole("link")).toHaveText(["Payment acceptance", "Credit card", "Help"]);
-    for (const [index, destination] of ["/payment-acceptance-service", "/credit-card-services", "/help"].entries()) {
+    await expect(navigation.getByRole("link")).toHaveText(["Payment acceptance", "Credit card", "Guides"]);
+    for (const [index, destination] of ["/payment-acceptance-service", "/credit-card-services", "/guides"].entries()) {
       await expect(navigation.getByRole("link").nth(index)).toHaveAttribute("href", destination);
     }
-    const current = navigation.locator('[aria-current="page"]');
-    if (["/payment-acceptance-service", "/credit-card-services", "/help"].includes(route)) await expect(current).toHaveAttribute("href", route);
-    else await expect(current).toHaveCount(0);
+    const current = navigation.locator("[aria-current]");
+    if (["/payment-acceptance-service", "/credit-card-services", "/guides"].includes(route)) await expect(current).toHaveAttribute("href", route);
+    else if (route.startsWith("/guides/")) {
+      await expect(current).toHaveAttribute("href", "/guides");
+      await expect(current).toHaveAttribute("aria-current", "location");
+    } else await expect(current).toHaveCount(0);
     const action = header.getByRole("link", { name: "Open Trolleys", exact: true });
     await expect(action).toBeVisible();
     await expect(action).toHaveAttribute("href", "https://trolleys.ai");
@@ -126,11 +129,11 @@ test("the shared company header stays consistent and its compact menu works with
   await expect(menu).toBeFocused();
 
   await page.keyboard.press("Enter");
-  const help = navigation.getByRole("link", { name: "Help", exact: true });
-  await help.focus();
+  const guides = navigation.getByRole("link", { name: "Guides", exact: true });
+  await guides.focus();
   await page.setViewportSize({ width: 960, height: 900 });
   await expect(navigation).toBeVisible();
-  await expect(help).toBeFocused();
+  await expect(guides).toBeFocused();
   await page.setViewportSize({ width: 959, height: 900 });
   await expect(menu).toHaveAttribute("aria-expanded", "false");
   await expect(navigation).toBeHidden();

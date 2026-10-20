@@ -19,7 +19,7 @@ assert.equal(targets.release.real_money_allowed, false);
 
 const canonicalOrigin = targets.netlify.canonical_origin;
 const guidePaths = ["/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link"];
-const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", ...guidePaths];
+const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides", ...guidePaths];
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -154,7 +154,7 @@ function checkSchema(html, route, description) {
       assert.equal(crumb.position, index + 1);
       assert.ok(typeof crumb.name === "string" && crumb.name.trim());
       const item = typeof crumb.item === "string" ? crumb.item : crumb.item?.["@id"];
-      const expectedPath = index === 0 ? "/" : guidePaths.includes(route) && index === 1 ? "/payment-acceptance-service" : route;
+      const expectedPath = index === 0 ? "/" : guidePaths.includes(route) && index === 1 ? "/guides" : route;
       assert.equal(item, new URL(expectedPath, canonicalOrigin).href);
     }
   }
@@ -209,7 +209,7 @@ async function verifyResponses() {
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => decode(match[1]));
-  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the eight reviewed canonical pages.");
+  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the nine reviewed canonical pages.");
   const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)];
   assert.equal(sitemapEntries.length, publicPaths.length);
   for (const [, entry] of sitemapEntries) {
@@ -236,14 +236,14 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/how-to-create-a-payment-link/unreviewed-missing-page"]) {
+  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/payment-processing-fees", "/guides/how-to-create-a-payment-link/unreviewed-missing-page"]) {
     const response = await localFetch(route);
-    assert.equal(response.status, route.includes("missing-page") ? 404 : 200, `${route}: unexpected status.`);
+    assert.equal(response.status, ["/privacy", "/terms"].includes(route) ? 200 : 404, `${route}: unexpected status.`);
     const metadata = documentMetadata(await response.text(), route);
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
     assert.ok(values.some(forbidsIndexing), `${route}: must remain noindex.`);
   }
-  for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-acceptance-service.txt", ...guidePaths.map(route => `${route}.txt`)]) {
+  for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-acceptance-service.txt", "/guides.txt", ...guidePaths.map(route => `${route}.txt`)]) {
     const response = await localFetch(route);
     assert.equal(response.status, 200);
     assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: raw payloads and legal aliases must remain noindex.`);
@@ -262,7 +262,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: eight indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: nine indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

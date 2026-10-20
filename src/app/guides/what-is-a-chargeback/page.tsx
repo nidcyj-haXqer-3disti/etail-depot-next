@@ -99,7 +99,7 @@ export default function ChargebackGuidePage() {
     ]}
     sources={[
       { title: "Visa — Merchant dispute resolution", href: visaSource },
-      { title: "Visa — Dispute management guide: response and evidence (October 2026)", href: evidenceSource },
+      { title: "Visa — Dispute management guide: response and evidence", href: evidenceSource },
       { title: "Cybersource — Chargeback and retrieval fields: case records and response dates", href: caseRecordsSource },
       { title: "Visa — Order Insight", href: orderInsightSource },
     ]}
