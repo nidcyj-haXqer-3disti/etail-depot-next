@@ -3,7 +3,9 @@ import { formatUsdCents } from "@/modules/public-site/fee-estimate";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { paymentExamples } from "@/modules/public-site/payment-examples";
 import { productFacts } from "@/shared/product-facts";
-import { GuideTable, PaymentGuide } from "@/ui/payment-guide";
+import { GuideTable } from "@/ui/payment-guide";
+
+import { ReadingGuide } from "@/ui/reading-guide";
 
 export const metadata = publicPageMetadata("/guides/how-to-create-a-payment-link");
 
@@ -15,22 +17,18 @@ const example = paymentExamples.goods;
 const exampleAmount = formatUsdCents(example.amountCents);
 
 export default function CreatePaymentLinkPage() {
-  return <PaymentGuide
+  return <ReadingGuide
     path="/guides/how-to-create-a-payment-link"
     title="How to create and share a payment link"
-    numberedContents={false}
-    intro="Create a payment request with a description and amount, then share its link with your customer. In Trolleys, approved businesses can request online card payments for goods, services or information and share the same payment page by link or QR code."
+    intro="Agree on the purchase and amount, create a payment request, then send your customer its link. With an approved Trolleys account, you can share an online card-payment page by link or QR code and check the payment in your account afterward."
+    showPaymentAcceptanceLink
+    relatedPaths={["/guides/payment-processing-systems", "/guides/what-is-a-chargeback"]}
     sections={[
       {
         id: "prepare-the-request",
         title: "Before you begin",
         content: <>
-          <p>Before creating the request, agree on the purchase, total amount and delivery or completion arrangements. A clear description helps the customer recognize the payment and helps you connect it to the right order later.</p>
-          <ul>
-            <li><strong>Goods:</strong> identify the item, quantity and delivery or collection arrangement.</li>
-            <li><strong>Services:</strong> describe the work covered by this payment and when you will complete it.</li>
-            <li><strong>Information:</strong> explain what the customer will receive, how you will supply it and any access conditions.</li>
-          </ul>
+          <p>Agree on what the customer is buying, the total amount and when they will receive it. For goods, record the item, quantity and delivery arrangement. For services, describe the work and completion date. For information, explain what will be supplied, how the customer will receive it and any access conditions.</p>
           <p>You need an approved Trolleys account and completed setup to create and share requests. Review <Link href="/payment-acceptance-service">the payment acceptance service</Link> before applying.</p>
           <p>This walkthrough uses a sample order. Field names and options may differ in your account; follow the instructions shown there.</p>
         </>,
@@ -45,10 +43,10 @@ export default function CreatePaymentLinkPage() {
             <dl><div><dt>Payment for</dt><dd>{example.description}</dd></div><div><dt>Quantity</dt><dd>{example.quantity}</dd></div><div><dt>Order reference</dt><dd>{example.orderReference}</dd></div><div className="payment-guide-example-total"><dt>Total</dt><dd>{exampleAmount} <span>USD</span></dd></div></dl>
           </figure>
           <p>Keep the same reference in your order records and customer message. In this example, it is {example.orderReference}. The reference connects the request, your message and the eventual payment to one purchase.</p>
-          <GuideTable caption="Illustrative payment requests in USD" headings={["What you sell", "Example request", "Details to agree with the customer"]} rows={[
-            ["Goods", `${paymentExamples.goods.description} · ${formatUsdCents(paymentExamples.goods.amountCents)}`, "What is included in the set and how the customer will receive it."],
-            ["Services", `${paymentExamples.services.description} · ${formatUsdCents(paymentExamples.services.amountCents)}`, "Which design work the payment covers and the completion arrangements."],
-            ["Information", `${paymentExamples.information.description} · ${formatUsdCents(paymentExamples.information.amountCents)}`, "What the briefing covers and when it will be supplied by email."],
+          <GuideTable caption="Illustrative payment requests in USD" headings={["Example purchase", "Details to agree before payment"]} rows={[
+            [`${paymentExamples.goods.description}: ${formatUsdCents(paymentExamples.goods.amountCents)}`, "What is included in the set and how the customer will receive it."],
+            [`${paymentExamples.services.description}: ${formatUsdCents(paymentExamples.services.amountCents)}`, "Which design work the payment covers and the completion arrangements."],
+            [`${paymentExamples.information.description}: ${formatUsdCents(paymentExamples.information.amountCents)}`, "What the briefing covers and when it will be supplied by email."],
           ]} />
           <p>These are sample purchases, not suggested prices or real payment requests. Use your own agreed details and keep a record connecting the request to the order.</p>
         </>,
@@ -87,13 +85,8 @@ export default function CreatePaymentLinkPage() {
         id: "confirm-the-payment",
         title: "After your customer pays",
         content: <>
-          <p>Check the payment status in your Trolleys account and match the amount and purchase to your order. Opening a link or scanning a QR code does not establish that the customer paid. Keep the payment record together with the agreed purchase details and delivery or completion records.</p>
-          <ul>
-            <li><strong>Match the order:</strong> connect the payment to {example.orderReference} and the homeware set.</li>
-            <li><strong>Match the amount:</strong> check for {exampleAmount} USD, not just a matching customer name.</li>
-            <li><strong>Check the payment result:</strong> confirm that the payment completed. A link being active or a payment awaiting completion does not mean the order is paid.</li>
-            <li><strong>Keep the reference:</strong> save the payment reference with the order and any later refund or delivery record.</li>
-          </ul>
+          <p>Open the payment record in your Trolleys account. For this example, check that it matches order {example.orderReference}, the homeware set and {exampleAmount} USD. A matching customer name is not enough; check that the payment completed.</p>
+          <p>Opening a link or scanning its QR code does not mean the order is paid. Keep the completed payment reference with the purchase details and any delivery, completion or refund records so you can find them together later.</p>
           <p>If a customer says they paid but you cannot find a matching completed payment, check the account record before marking the order as paid or asking them to pay again. A screenshot or message alone does not confirm the payment result.</p>
           <p>A successful payment and money arriving in your bank are separate steps. Your account’s payout schedule applies, and fees, refunds, disputes, holds or reserves can affect available funds. See <Link href="/payment-acceptance-service#payouts">payout guidance</Link>, or use <Link href="/help#payments">payment acceptance help</Link> for an account question.</p>
         </>,

@@ -1,12 +1,22 @@
 import AxeBuilder from "@axe-core/playwright";
 import {expect,test} from "@playwright/test";
 import {openMainNavigation} from "./public-header";
+import {PUBLISHED_GUIDES} from "../../src/modules/public-site/guide-catalog";
+
+const publicRoutes = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides", ...PUBLISHED_GUIDES.map(guide => guide.path)];
 
 for (const width of [1440,390,320]) {
-  for(const route of ["/","/credit-card-services","/payment-acceptance-service","/help","/privacy","/terms","/guides","/guides/stripe-alternatives","/guides/payment-processing-systems","/guides/what-is-a-chargeback","/guides/how-to-create-a-payment-link"]) {
+  for(const route of publicRoutes) {
     test(`consumer ${route} is readable and accessible at ${width}px`,async({page})=>{
       await page.setViewportSize({width,height:900});
-      await page.goto(route);await page.evaluate(()=>document.fonts.ready);
+      const errors: string[] = [];
+      page.on("pageerror",error=>errors.push(error.message));
+      const response = await page.goto(route);
+      expect(response?.status()).toBe(200);
+      await page.evaluate(()=>document.fonts.ready);
+      await expect(page.getByRole("heading",{level:1})).toHaveCount(1);
+      const brokenImages = await page.locator("img").evaluateAll(images=>images.flatMap(image=>image instanceof HTMLImageElement && (!image.complete || image.naturalWidth===0) ? [image.currentSrc || image.src] : []));
+      expect(brokenImages).toEqual([]);
       const question=page.locator("summary:visible:not(.wallet-guide-disclosure > summary):not(.recognition-receipt > summary)").first();
       if(await question.count())await question.click();
       if(route==="/credit-card-services"){
@@ -19,6 +29,7 @@ for (const width of [1440,390,320]) {
       const result=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
       expect(result.violations.map(({id,nodes})=>({id,nodes:nodes.map(node=>node.target)}))).toEqual([]);
       expect(await page.evaluate(()=>Math.max(document.body.scrollWidth,document.documentElement.scrollWidth)-innerWidth)).toBeLessThanOrEqual(1);
+      expect(errors).toEqual([]);
       const nav=await openMainNavigation(page);
       if(width<960){
         const expandedResult=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();

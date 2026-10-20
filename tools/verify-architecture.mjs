@@ -54,11 +54,15 @@ function sourceChecks(filename, source) {
   inspect(tree);
 }
 
+assert.equal(publicPageSources.length, 27, "Only the twenty approved guides and seven core pages may be built.");
+assert.equal(new Set(publicPageSources).size, publicPageSources.length, "Reviewed page paths must be unique.");
+assert.equal(publicHtmlFiles.length, 27);
 assert.equal(publicSourcePath(boundarySource), true);
 assert.equal(publicSourcePath("src/proxy.ts"), false);
 assert.equal(publicSourcePath("src/modules/identity/service.ts"), false);
 for (const unsafe of [".env", "server/.env.production", ".local/keys.json", "archive/database/migration.sql", "src/modules/identity/session.ts", "netlify/database/migrations/a.sql", "node_modules/pg/lib/index.js", "node_modules/drizzle-orm/index.js", "node_modules/@netlify/database/index.js", "node_modules/.pnpm/@netlify+identity@1.0.0/index.js", "node_modules/braces/lib/parse.js", "node_modules/node-forge/lib/rsa.js", "node_modules/@netlify/plugin-nextjs/dist/run.js"]) assert.equal(forbiddenArtifact(unsafe), true);
 assert.equal(forbiddenStatic("archive/database/migration.sql"), true);
+for (const privateFile of ["review/guides/manifest.json", "artifacts/guides-review/site/index.html", "content/drafts/guide.json", "outputs/topic-map.csv", "tools/guide-review/build.mjs"]) assert.equal(forbiddenStatic(privateFile), true);
 assert.equal(forbiddenStatic("cardholder-services/index.html"), true);
 assert.equal(forbiddenStatic("brand/networks/visa.svg"), false);
 const validEdges = [{ function: edgeHandler, pattern: "^/.*$", excluded_patterns: [] }];

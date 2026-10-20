@@ -18,8 +18,31 @@ assert.equal(targets.netlify.canonical_origin, "https://etaildepot.com");
 assert.equal(targets.release.real_money_allowed, false);
 
 const canonicalOrigin = targets.netlify.canonical_origin;
-const guidePaths = ["/guides/stripe-alternatives", "/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link"];
+const guidePaths = [
+  "/guides/stripe-alternatives",
+  "/guides/payment-processing-systems",
+  "/guides/what-is-a-chargeback",
+  "/guides/how-to-create-a-payment-link",
+  "/guides/optimize-your-mobile-checkout-experience",
+  "/guides/cart-abandonment-vs-checkout-abandonment",
+  "/guides/consuming-webhooks",
+  "/guides/designing-robust-and-predictable-apis-with-idempotency",
+  "/guides/how-3d-secure-works",
+  "/guides/account-takeover-fraud",
+  "/guides/important-invoice-management-tips",
+  "/guides/types-of-invoice-discrepancies",
+  "/guides/b2b-payment-methods",
+  "/guides/ach-debit",
+  "/guides/edi-payment-how-does-it-differ-from-ach-and-eft",
+  "/guides/pick-the-right-payment-methods-in-a-new-country",
+  "/guides/important-information-about-bic-and-swift-codes",
+  "/guides/profit-and-loss-statement",
+  "/guides/read-a-balance-sheet",
+  "/guides/credit-card-interest",
+];
 const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides", ...guidePaths];
+assert.equal(guidePaths.length, 20);
+assert.equal(new Set(publicPaths).size, 25, "Only twenty guides and five core pages are eligible for search.");
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -209,7 +232,7 @@ async function verifyResponses() {
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => decode(match[1]));
-  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the nine reviewed canonical pages.");
+  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the twenty-five reviewed canonical pages.");
   const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)];
   assert.equal(sitemapEntries.length, publicPaths.length);
   for (const [, entry] of sitemapEntries) {
@@ -236,7 +259,7 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/payment-processing-fees", "/guides/how-to-create-a-payment-link/unreviewed-missing-page"]) {
+  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/payment-processing-fees", "/guides/how-to-create-a-payment-link/unreviewed-missing-page", "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal", "/guides/use-a-cash-register", "/guides/charge-cards", "/guides/sections/payment-processing-checkout", "/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
     const response = await localFetch(route);
     assert.equal(response.status, ["/privacy", "/terms"].includes(route) ? 200 : 404, `${route}: unexpected status.`);
     const metadata = documentMetadata(await response.text(), route);
@@ -262,7 +285,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: nine indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: twenty-five indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

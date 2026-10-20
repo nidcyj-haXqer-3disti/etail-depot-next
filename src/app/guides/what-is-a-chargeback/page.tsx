@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
-import { GuideSourceLink, GuideTable, PaymentGuide } from "@/ui/payment-guide";
+import { GuideSourceLink, GuideTable } from "@/ui/payment-guide";
+
+import { ReadingGuide } from "@/ui/reading-guide";
 
 export const metadata = publicPageMetadata("/guides/what-is-a-chargeback");
 
@@ -12,22 +14,20 @@ const orderInsightSource = "https://www.visa.com/en-us/products/order-insight";
 const fees = productFacts.payments;
 
 export default function ChargebackGuidePage() {
-  return <PaymentGuide
+  return <ReadingGuide
     path="/guides/what-is-a-chargeback"
     title="What is a chargeback? A merchant guide"
     intro="A chargeback reverses all or part of a card payment through the card issuer’s dispute process. If you receive one, check the reason and response deadline, then gather the relevant records."
+    showPaymentAcceptanceLink
+    relatedPaths={["/guides/how-to-create-a-payment-link", "/guides/payment-processing-systems"]}
     sections={[
       {
         id: "chargeback-vs-refund",
         title: "Chargeback vs. refund: what is the difference?",
         content: <>
           <p>A customer may dispute an unrecognized payment, a purchase they say was not delivered or another problem with a transaction. The issuer is the bank that issued the customer’s card. The card network carries the dispute to your merchant bank or processor, which may ask for records to respond. This process can reverse all or part of the payment.</p>
-          <GuideTable caption="Refunds and card-payment disputes" headings={["Question", "Refund", "Chargeback"]} rows={[
-            ["How does it start?", "The business initiates a return of funds through its payment service.", "The cardholder raises a dispute with the card issuer."],
-            ["Who handles the decision?", "The business handles the refund under the applicable policy and obligations.", "The issuer reviews the dispute through card-network procedures."],
-            ["What does the merchant need?", "The original payment and the refund amount and reason.", "The dispute notice, response deadline and relevant transaction records."],
-            ["Can there be costs?", "Original processing fees may not be returned; check the service terms.", "The disputed amount and dispute-related fees can affect the account."],
-          ]} />
+          <p>With a refund, your business returns money through its payment service under the applicable policy and obligations. You need the original payment, refund amount and reason. Original processing fees may not be returned.</p>
+          <p>A chargeback follows the card issuer’s dispute process. You need the notice, response deadline and records that answer the stated reason. The disputed amount and dispute fees can affect your account while the case is being reviewed.</p>
           <p>A customer contacting you about a purchase is not automatically a formal chargeback. Check the original payment and any account notice before deciding how to respond. If a formal dispute is already open, follow that process and ask your payment service how to handle any proposed refund without duplicating the return of funds.</p>
         </>,
       },
@@ -48,20 +48,15 @@ export default function ChargebackGuidePage() {
       },
       {
         id: "relevant-evidence",
-        title: "Collect evidence that answers the reason",
+        title: "Choose records that answer the dispute",
         content: <>
           <p>A useful response explains the transaction in a short, consistent sequence. Keep original records and select material relevant to the allegation. For example, a delivery complaint calls for different evidence from an alleged duplicate charge.</p>
-          <ul>
-            <li><strong>The purchase:</strong> the order description, amount, transaction date and the terms presented when the customer agreed to buy.</li>
-            <li><strong>Delivery or performance:</strong> relevant shipping and delivery records, service completion records or agreed digital-access details.</li>
-            <li><strong>Customer communication:</strong> messages that clarify what was ordered, changes, delivery issues or the resolution offered.</li>
-            <li><strong>Refunds or cancellations:</strong> the request, the policy communicated at purchase and records of any refund already processed.</li>
-          </ul>
+          <p>Start with the order description, amount, date and terms presented at purchase. Add the relevant delivery, service-completion or access records, customer messages, and any cancellation or refund record. You do not need to submit every document merely because you have it.</p>
           <p>Use these illustrative examples to organize records, then follow the evidence requirements and response deadline in your own notice.</p>
-          <GuideTable caption="Illustrative evidence by dispute reason" headings={["Dispute reason", "Records to review", "What those records address"]} rows={[
-            ["Goods not received", "The agreed delivery date and address, tracking and delivery confirmation tied to the order, and relevant customer messages.", "Whether the goods reached the agreed destination and how the delivery record answers the customer’s claim."],
-            ["Duplicate charge", "The receipts, order references and payment records for both charges, or a record of any duplicate payment already refunded.", "Whether the charges were for separate purchases or a duplicate was already refunded."],
-            ["Canceled or refunded purchase", "The cancellation or return request, policy shown before purchase, related messages and any processed refund record with its date and amount.", "What was requested, which terms were communicated and whether a refund was processed."],
+          <GuideTable caption="Illustrative records for different dispute reasons" headings={["Dispute reason", "Records that may answer it"]} rows={[
+            ["Goods not received", "Connect the agreed delivery date and address to tracking, delivery confirmation and relevant customer messages. Explain how those records address the claimed missing delivery."],
+            ["Duplicate charge", "Match both charges to their orders and receipts. Explain whether they concern separate purchases, or identify a duplicate payment already refunded."],
+            ["Canceled or refunded purchase", "Use the cancellation or return request, policy shown before purchase, related messages and any refund date, amount and reference. Explain what was requested and what happened."],
           ]} />
           <p>For example, if a customer disputes a delivered order, connect the order reference, agreed address and delivery record in your explanation. A payment receipt alone shows a charge; it does not establish delivery. If a refund was already processed, identify its date, amount and payment reference so it can be matched to the disputed sale.</p>
           <p>Keep the explanation concise and the documents readable. Use the case’s requested format and include only records that help answer the reason. Evidence can support a response; it cannot guarantee the issuer’s decision.</p>
@@ -69,7 +64,7 @@ export default function ChargebackGuidePage() {
       },
       {
         id: "dispute-costs",
-        title: "Understand the payment amount and fees separately",
+        title: "The disputed amount and fees are separate",
         content: <>
           <p>For Trolleys, the published fee is ${fees.disputeFeeDollars} for each dispute received. A manual dispute response has a separate ${fees.disputeResponseFeeDollars} fee, returned if you win. These fees are separate from the disputed payment amount.</p>
           <div className="payment-guide-callout">
