@@ -92,3 +92,7 @@ Release targets are bound in [project-targets.json](project-targets.json). Deplo
 ## License and assets
 
 No repository-wide open-source license has been selected. Public visibility is not a license announcement. For licensing or reuse questions, contact [compliance@etaildepot.com](mailto:compliance@etaildepot.com). Preserve the existing notices and attribution for dependencies and third-party brand assets.
+
+## Guides review
+
+The accepted twenty-guide local preview is available as [reproducible review source](review/guides/README.md). It is separate from the deployed application.

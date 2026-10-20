@@ -63,6 +63,11 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: Verify the public website
         run: pnpm verify:public
+      - name: Verify and build the isolated Guides review
+        run: |
+          node --test tools/guide-review/preview-assets.test.mjs
+          node tools/guide-review/build.mjs --check
+          node tools/guide-review/build.mjs
       - name: Verify the approved production search release
         run: pnpm test:seo:production
       - name: Package for the bound Netlify site without publishing
