@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("payments explain Two Step, optional Clarity and pricing with a safe hero service entry", async ({page}) => {
+test("payments explain Two Step, optional Clarity and pricing with safe service entries", async ({page}) => {
   await page.goto("/payment-acceptance-service");
   const fees=page.locator("#fees");
   const continuation=page.locator(".consumer-hero-actions").getByRole("link",{name:"Continue to Trolleys",exact:true});
@@ -15,7 +15,12 @@ test("payments explain Two Step, optional Clarity and pricing with a safe hero s
     return {twoStepBeforePricing:before(twoStep,pricing),pricingBeforeClarity:before(pricing,clarity)};
   });
   expect(sequence).toEqual({twoStepBeforePricing:true,pricingBeforeClarity:true});
-  await expect(fees.getByRole("link",{name:"Continue to Trolleys",exact:true})).toHaveCount(0);
+  const pricingContinuation=fees.getByRole("link",{name:"Continue to Trolleys",exact:true});
+  await expect(pricingContinuation).toBeVisible();
+  await expect(pricingContinuation).toHaveAttribute("href","https://trolleys.ai");
+  await expect(pricingContinuation).toHaveAttribute("referrerpolicy","no-referrer");
+  await expect(pricingContinuation).toHaveAttribute("rel",/\bnoreferrer\b/);
+  await expect(fees.getByRole("link",{name:"Ask about fees",exact:true})).toBeVisible();
   await fees.locator(".offer-details > summary").click();
   await expect(fees.locator(".fee-exceptions")).toBeVisible();
   await expect(fees).toContainText("Original processing and currency conversion fees are not returned");

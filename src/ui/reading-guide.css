@@ -38,6 +38,24 @@
 .reading-guide .payment-guide-table-scroll tbody th { width: auto; }
 .reading-guide .payment-guide-table-scroll caption { padding: 14px 12px; font-size: 14px; }
 .reading-guide-table-note { font-size: 15px; }
+.reading-guide-checks { margin-inline: 0; border-block: 1px solid var(--public-line); }
+.reading-guide-checks > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr); gap: 24px; padding-block: 20px; }
+.reading-guide-checks > div + div { border-top: 1px solid var(--public-line); }
+.reading-guide-checks dt { color: var(--public-ink); font-weight: 600; }
+.reading-guide-checks dd { margin: 0; }
+.reading-guide-checklist { margin-inline: 0; }
+.reading-guide-checklist figcaption { color: var(--public-ink); font-size: 15px; font-weight: 600; }
+.reading-guide-checklist .reading-guide-checks { margin-bottom: 0; }
+.reading-guide-reconciliation { margin-inline: 0; border: 1px solid var(--public-line); border-radius: var(--public-radius); overflow: hidden; }
+.reading-guide-reconciliation table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.5; text-align: left; }
+.reading-guide-reconciliation caption { padding: 16px 20px; background: var(--public-paper); color: var(--public-ink); font-weight: 600; text-align: left; }
+.reading-guide-reconciliation th, .reading-guide-reconciliation td { padding: 14px 20px; border-top: 1px solid var(--public-line); }
+.reading-guide-reconciliation thead { color: var(--public-ink); font-size: 13px; }
+.reading-guide-reconciliation tbody th { font-weight: 500; color: var(--public-ink); }
+.reading-guide-reconciliation tbody th span { display: block; margin-top: 4px; color: var(--public-muted); font-size: 13px; font-weight: 400; }
+.reading-guide-reconciliation tr > :last-child { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.reading-guide-reconciliation tfoot { background: var(--public-tint); color: var(--public-ink); font-weight: 600; }
+.reading-guide-reconciliation tfoot td { font-size: 20px; }
 .reading-guide-sources { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--public-line); font-size: 14px; line-height: 1.7; color: var(--public-muted); }
 .reading-guide-sources h2, .reading-guide-related h2 { margin-bottom: 12px; color: var(--public-ink); font-size: 20px; line-height: 1.4; letter-spacing: -.02em; scroll-margin-top: 24px; }
 .reading-guide-sources ul, .reading-guide-related ul { display: grid; gap: 10px; padding-left: 20px; margin: 0; }
@@ -66,6 +84,10 @@
   .reading-guide .payment-guide-table-scroll th, .reading-guide .payment-guide-table-scroll td { padding: 12px 8px; }
   .reading-guide .payment-guide-table-scroll caption { padding: 12px; }
   .reading-guide-table-note { font-size: 14px; }
+  .reading-guide-checks > div { grid-template-columns: minmax(0, 1fr); gap: 8px; padding-block: 18px; }
+  .reading-guide-reconciliation table { font-size: 14px; }
+  .reading-guide-reconciliation caption, .reading-guide-reconciliation th, .reading-guide-reconciliation td { padding: 14px 12px; }
+  .reading-guide-reconciliation tfoot td { font-size: 18px; }
 }
 
 /* Keep the existing provider-comparison disclosure beside the opening answer. */

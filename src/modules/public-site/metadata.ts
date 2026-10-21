@@ -14,11 +14,11 @@ const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts
 type GuidePath = (typeof PUBLISHED_GUIDES)[number]["path"];
 type PageDescription = { title: string; description: string };
 
-// Retain the reviewed search titles and descriptions of the four existing articles.
+// Reviewed search titles and descriptions for the original four articles.
 const existingGuideMetadata = {
   "/guides/stripe-alternatives": { title: "Stripe Alternatives: Stripe vs Trolleys", description: "Compare Stripe and Trolleys for online card payments. Review payment links, processing and dispute fees, account requirements and questions to ask before switching." },
-  "/guides/payment-processing-systems": { title: "Payment Processing Systems: A Merchant Guide", description: "Understand payment gateways, processors and merchant accounts. Compare ways to accept online payments, costs, payout terms and the setup your business needs." },
-  "/guides/what-is-a-chargeback": { title: "What Is a Chargeback? Fees & Prevention", description: "Understand chargebacks vs. refunds, dispute fees and response evidence. Learn about chargeback prevention and what optional Trolleys Clarity covers." },
+  "/guides/payment-processing-systems": { title: "Credit Card Processing Systems: How They Work", description: "Follow an online card payment from checkout to bank payout. Understand gateways, processors and merchant accounts, then compare fees and setup requirements." },
+  "/guides/what-is-a-chargeback": { title: "What Is a Chargeback? A Merchant Response Guide", description: "Understand chargebacks vs. refunds, fees and response evidence. Use a chargeback worksheet to organize the notice, deadline, records and submission." },
   "/guides/how-to-create-a-payment-link": { title: "How to Create and Share a Payment Link", description: "Prepare a Trolleys payment request, share a link or QR code and check payment status. Learn what to include, what customers see and how fees apply." },
 } as const satisfies Partial<Record<GuidePath, PageDescription>>;
 
@@ -34,9 +34,9 @@ const guideMetadata = Object.fromEntries(PUBLISHED_GUIDES.map(guide => [
 export const PUBLIC_PAGES = {
   "/": { title: "Payment Acceptance & Credit Card Processing", description: "Accept online payments with Trolleys’ credit card processing system. Explore payment options, compare fees and learn what a chargeback is." },
   "/credit-card-services": { title: "Ledgix Secured Credit Card — Coming Soon", description: `Meet the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
-  "/payment-acceptance-service": { title: "Trolleys Payment Processing System", description: "Accept online card payments with Trolleys payment links and QR codes. Compare fees and optional Clarity chargeback prevention, including eligibility and limits." },
+  "/payment-acceptance-service": { title: "Online Credit Card Processing with Trolleys", description: "Accept online credit and debit card payments with Trolleys. Create and share payment links or QR codes. Compare processing fees and optional Clarity coverage." },
   "/help": { title: "Payment Acceptance & Credit Card Help", description: "Find Trolleys payment acceptance support, Ledgix credit card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
-  "/guides": { title: "Payment Acceptance Guides", description: "Browse practical guides to payment links, payment processing systems, Stripe alternatives and chargebacks for your business." },
+  "/guides": { title: "Payment Acceptance Guides", description: "Practical guides for online merchants: payment links, checkout, fees, chargebacks, bank payments, invoicing and business finance." },
   ...guideMetadata,
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
@@ -48,10 +48,18 @@ export type PublicPath = keyof typeof PUBLIC_PAGES;
 export const PUBLIC_PAGE_MODIFIED = {
   "/": "2026-10-19",
   "/credit-card-services": "2026-10-19",
-  "/payment-acceptance-service": "2026-10-19",
-  "/help": "2026-10-19",
-  "/guides": "2026-10-20",
+  "/payment-acceptance-service": "2026-10-21",
+  "/help": "2026-10-21",
+  "/guides": "2026-10-21",
   ...Object.fromEntries(PUBLISHED_GUIDES.map(guide => [guide.path, "2026-10-20"])) as Record<GuidePath, string>,
+  "/guides/payment-processing-systems": "2026-10-21",
+  "/guides/what-is-a-chargeback": "2026-10-21",
+  "/guides/how-to-create-a-payment-link": "2026-10-21",
+  "/guides/how-3d-secure-works": "2026-10-21",
+  "/guides/stripe-alternatives": "2026-10-21",
+  "/guides/profit-and-loss-statement": "2026-10-21",
+  "/guides/important-invoice-management-tips": "2026-10-21",
+  "/guides/designing-robust-and-predictable-apis-with-idempotency": "2026-10-21",
 } as const satisfies Record<PublicPath, string>;
 
 export function publicIndexingEnabled(): boolean {

@@ -16,6 +16,15 @@ const exampleAmountCents = 10_000;
 const exampleFeeCents = Math.round(exampleAmountCents * fees.cardRateBasisPoints / 10_000) + fees.cardFixedFeeCents;
 const clarityFeeCents = Math.round(exampleAmountCents * saleRecordsOffer.rateBasisPoints / 10_000);
 const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+const salesMixExamples = [
+  { count: 10, amountCents: 10_000 },
+  { count: 100, amountCents: 1_000 },
+].map(({ count, amountCents }) => {
+  const feePerPaymentCents = Math.round(amountCents * fees.cardRateBasisPoints / 10_000) + fees.cardFixedFeeCents;
+  return { count, amountCents, feePerPaymentCents, totalFeeCents: count * feePerPaymentCents };
+});
+const extraPayments = salesMixExamples[1].count - salesMixExamples[0].count;
+const fixedFeeDifferenceCents = extraPayments * fees.cardFixedFeeCents;
 
 export default function StripeAlternativesPage() {
   return <ReadingGuide
@@ -58,14 +67,19 @@ export default function StripeAlternativesPage() {
       },
       {
         id: "payment-example",
-        title: "Work through a $100 payment",
+        title: "Compare fees across your sales",
         content: <>
           <div className="payment-guide-callout">
             <p><strong>Illustrative domestic online card payment:</strong> at the published base rate, a $100 payment costs {dollars(exampleFeeCents)}, leaving {dollars(exampleAmountCents - exampleFeeCents)} after that fee. The same base-rate calculation applies to Stripe standard pricing.</p>
             <p>For an eligible Trolleys payment enrolled in Clarity, the additional fee is {dollars(clarityFeeCents)}. Processing and Clarity together cost {dollars(exampleFeeCents + clarityFeeCents)}, leaving {dollars(exampleAmountCents - exampleFeeCents - clarityFeeCents)} before any other applicable charges or adjustments.</p>
           </div>
-          <p>Matching base rates do not necessarily mean matching total costs. Repeat the calculation with your usual order amounts and number of payments, then add the services and extra charges that apply to your business. Include the fixed per-payment fee each time; the same monthly sales total can cost more when it comes from many small payments.</p>
-          <p>This calculation is not a promised payout amount: refunds, disputes, holds, reserves and other account adjustments can affect available funds.</p>
+          <p>Suppose two businesses each collect $1,000 in successful domestic online card payments in USD at {fees.cardRateLabel}. One receives ten $100 payments; the other receives one hundred $10 payments. Calculate each payment’s fee, rounded to the nearest cent, before adding the fees together.</p>
+          <GuideTable caption="Illustrative base fees for the same $1,000 in sales" headings={["Payments received", "Total base processing fees"]} rows={salesMixExamples.map(item => [
+            `${item.count} payments of ${dollars(item.amountCents)}`,
+            `${dollars(item.totalFeeCents)} (${item.count} × ${dollars(item.feePerPaymentCents)})`,
+          ])} />
+          <p>The percentage component is {dollars(Math.round(100_000 * fees.cardRateBasisPoints / 10_000))} in either example. The second business pays the fixed {fees.cardFixedFeeCents}¢ fee {extraPayments} more times, adding {dollars(fixedFeeDifferenceCents)}. Compare your usual number and size of payments, then add any optional services, international-card or conversion charges, and <Link href="/guides/what-is-a-chargeback#dispute-costs">chargeback costs</Link> that apply.</p>
+          <p>The two sales examples show base processing fees only. These calculations are not promised payout amounts: refunds, disputes, holds, reserves and other account adjustments can affect available funds.</p>
         </>,
       },
       {

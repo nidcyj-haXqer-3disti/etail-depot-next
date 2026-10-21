@@ -39,7 +39,7 @@ const GUIDE_ENTRIES = [
   {
     path: "/guides/stripe-alternatives",
     title: "Stripe alternatives",
-    description: "Compare Stripe and Trolleys on payment links, features and costs before switching.",
+    description: "Compare Stripe and Trolleys, work through processing fees and check what matters before switching.",
     topic: "payment-processing-checkout",
     subtopic: "Provider comparisons",
     format: "Comparison",
@@ -48,7 +48,7 @@ const GUIDE_ENTRIES = [
   {
     path: "/guides/payment-processing-systems",
     title: "Payment processing systems",
-    description: "Understand the parts of a payment system and choose how customers will pay.",
+    description: "Follow a credit card payment from checkout to payout, then match sales, fees and a refund to a bank deposit.",
     topic: "payment-processing-checkout",
     subtopic: "Payment processing",
     format: "Explainer",
@@ -57,7 +57,7 @@ const GUIDE_ENTRIES = [
   {
     path: "/guides/what-is-a-chargeback",
     title: "What is a chargeback?",
-    description: "Understand refunds, dispute fees, prevention and the records that help you respond.",
+    description: "Understand the dispute, check the fees and use a worksheet to prepare your response.",
     topic: "chargebacks-refunds-fraud",
     subtopic: "Chargebacks and disputes",
     format: "Explainer",

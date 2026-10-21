@@ -12,6 +12,9 @@ export const metadata = publicPageMetadata("/guides/how-to-create-a-payment-link
 const createSource = "https://developer.cybersource.com/docs/cybs/en-us/paybylink/developer/all/rest/paybylink/paybylink-services/paybylink-create-intro.html";
 const overviewSource = "https://developer.cybersource.com/docs/cybs/en-us/paybylink/developer/all/rest/paybylink/paybylink-intro.html";
 const notificationSource = "https://developer.cybersource.com/docs/cybs/en-us/paybylink/developer/all/rest/paybylink/paybylink-webhooks-intro.html";
+const authorizationSource = "https://developer.cybersource.com/docs/cybs/en-us/payments/developer/vital/sa/payments/payments-intro/payments-services-intro/payments-intro-processing-auth/payments-intro-processing-auth-workflow.html";
+const timeoutSource = "https://developer.cybersource.com/docs/cybs/en-us/payments/developer/fdiglobal/rest/payments/payments-intro/timeouts-intro.html";
+const declineSource = "https://developer.cybersource.com/docs/cybs/en-us/payments/developer/ctv/rest/payments/payments-processing-basic-intro/payments-processing-basic-auth-intro/payments-intro-processing-auth-decline.html";
 const fees = productFacts.payments;
 const example = paymentExamples.goods;
 const exampleAmount = formatUsdCents(example.amountCents);
@@ -25,11 +28,19 @@ export default function CreatePaymentLinkPage() {
     relatedPaths={["/guides/payment-processing-systems", "/guides/what-is-a-chargeback"]}
     sections={[
       {
+        id: "without-a-website",
+        title: "Do I need a website to share a payment link?",
+        content: <>
+          <p>You can send a hosted payment link by text or email without building your own checkout. It fits an order whose description and amount you have already agreed with the customer.</p>
+          <p>The link alone does not manage a shopping cart, stock or a subscription schedule. If your business needs those features, confirm the required integration and recurring-payment support with Trolleys before relying on them.</p>
+          <p>You need an approved Trolleys account and completed setup to create and share requests. Confirm what business information, including any website details, your application requires. Review <Link href="/payment-acceptance-service">the payment acceptance service</Link> before applying.</p>
+        </>,
+      },
+      {
         id: "prepare-the-request",
         title: "Before you begin",
         content: <>
           <p>Agree on what the customer is buying, the total amount and when they will receive it. For goods, record the item, quantity and delivery arrangement. For services, describe the work and completion date. For information, explain what will be supplied, how the customer will receive it and any access conditions.</p>
-          <p>You need an approved Trolleys account and completed setup to create and share requests. Review <Link href="/payment-acceptance-service">the payment acceptance service</Link> before applying.</p>
           <p>This walkthrough uses a sample order. Field names and options may differ in your account; follow the instructions shown there.</p>
         </>,
       },
@@ -87,8 +98,21 @@ export default function CreatePaymentLinkPage() {
         content: <>
           <p>Open the payment record in your Trolleys account. For this example, check that it matches order {example.orderReference}, the homeware set and {exampleAmount} USD. A matching customer name is not enough; check that the payment completed.</p>
           <p>Opening a link or scanning its QR code does not mean the order is paid. Keep the completed payment reference with the purchase details and any delivery, completion or refund records so you can find them together later.</p>
-          <p>If a customer says they paid but you cannot find a matching completed payment, check the account record before marking the order as paid or asking them to pay again. A screenshot or message alone does not confirm the payment result.</p>
-          <p>A successful payment and money arriving in your bank are separate steps. Your account’s payout schedule applies, and fees, refunds, disputes, holds or reserves can affect available funds. See <Link href="/payment-acceptance-service#payouts">payout guidance</Link>, or use <Link href="/help#payments">payment acceptance help</Link> for an account question.</p>
+          <p>A successful payment and money arriving in your bank are <Link href="/guides/payment-processing-systems#payment-to-payout">separate steps</Link>. Your account’s payout schedule applies, and fees, refunds, disputes, holds or reserves can affect available funds. See <Link href="/payment-acceptance-service#payouts">payout guidance</Link>, or use <Link href="/help#payments">payment acceptance help</Link> for an account question.</p>
+        </>,
+      },
+      {
+        id: "payment-result-unclear",
+        title: "What if the payment result is unclear?",
+        content: <>
+          <p>A timeout, bank notification or customer screenshot does not establish the final payment result. Check the payment record before marking the order as paid or asking the customer to pay again.</p>
+          <dl className="reading-guide-checks">
+            <div><dt>A pending entry in the customer’s banking app</dt><dd>It may be an authorization hold rather than a completed payment. Match it to the payment record in your account. Ask support about an unresolved result; the cardholder’s bank can explain its pending entry.</dd></div>
+            <div><dt>Checkout shows success, but no matching payment appears</dt><dd>Check the order reference, amount, currency and time. A missing record immediately after checkout does not prove failure. Ask support to trace it before requesting payment again.</dd></div>
+            <div><dt>The attempt is confirmed as declined</dt><dd>Make sure the result belongs to this attempt and follow the instructions for that decline. Some attempts must not be retried.</dd></div>
+            <div><dt>The customer reports two charges for one order</dt><dd>Match the references and status of both attempts. A hold and a completed charge are not necessarily two completed payments. If a duplicate is confirmed, check the appropriate correction with support.</dd></div>
+          </dl>
+          <p>For an unresolved result, contact <Link href="/help#payments">payment acceptance help</Link> with the order reference, any payment reference, amount, currency and approximate time. Keep a record of the confirmed outcome with the order.</p>
         </>,
       },
     ]}
@@ -96,6 +120,9 @@ export default function CreatePaymentLinkPage() {
       { title: "Cybersource — Create a fixed-price link", href: createSource },
       { title: "Cybersource — Introduction to Pay by Link", href: overviewSource },
       { title: "Cybersource — Payment-link notifications", href: notificationSource },
+      { title: "Cybersource — Authorization workflow", href: authorizationSource },
+      { title: "Cybersource — Transaction timeouts and status checks", href: timeoutSource },
+      { title: "Cybersource — Declined authorizations", href: declineSource },
     ]}
   />;
 }

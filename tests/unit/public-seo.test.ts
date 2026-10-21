@@ -66,8 +66,8 @@ describe("public search release boundary", () => {
       siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
     expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D215.*2026-10-14.*D122/);
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D228.*2026-10-19/);
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D288.*exact \/guides browse hub locally.*2026-10-19/);
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D333.*27 exact pages, 25 nonlegal search-eligible URLs/);
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D345.*push and deployment.*D340–D344.*No new URL or search submission/);
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
@@ -163,9 +163,12 @@ describe("reviewed public metadata", () => {
   it("keeps reviewed page revision dates stable as the build clock advances", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
-    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-20");
-    for (const path of guidePaths) expect(PUBLIC_PAGE_MODIFIED[path]).toBe("2026-10-20");
-    for (const path of ["/", "/credit-card-services", "/payment-acceptance-service", "/help"] as const) {
+    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-21");
+    const refinedGuides: readonly string[] = ["/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link", "/guides/how-3d-secure-works", "/guides/stripe-alternatives", "/guides/profit-and-loss-statement", "/guides/important-invoice-management-tips", "/guides/designing-robust-and-predictable-apis-with-idempotency"];
+    for (const path of guidePaths) expect(PUBLIC_PAGE_MODIFIED[path]).toBe(refinedGuides.includes(path) ? "2026-10-21" : "2026-10-20");
+    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-10-21");
+    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-21");
+    for (const path of ["/", "/credit-card-services"] as const) {
       expect(PUBLIC_PAGE_MODIFIED[path]).toBe("2026-10-19");
     }
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
 import { GuideSourceLink, GuideTable } from "@/ui/payment-guide";
+import { ChargebackWorksheet } from "@/ui/chargeback-worksheet";
 
 import { ReadingGuide } from "@/ui/reading-guide";
 
@@ -43,7 +44,6 @@ export default function ChargebackGuidePage() {
             <li><strong>Keep the submission and follow the case.</strong> Save what you sent and any submission confirmation. Check for further requests and the final outcome, then reconcile the disputed amount and fees with your payment records.</li>
           </ol>
           <p>Read the deadline shown for your actual case. A customer’s time to raise a dispute is different from a merchant’s time to respond. Deadlines and evidence requirements vary; do not substitute a general number of days for the date in the notice.</p>
-          <div className="payment-guide-callout"><p><strong>Keep one case record:</strong> the case reference, original payment and order references, disputed amount and currency, reason or reason code, response deadline, submission date and final outcome. Keep fees and fund adjustments as separate entries so you can see what changed.</p></div>
         </>,
       },
       {
@@ -54,12 +54,25 @@ export default function ChargebackGuidePage() {
           <p>Start with the order description, amount, date and terms presented at purchase. Add the relevant delivery, service-completion or access records, customer messages, and any cancellation or refund record. You do not need to submit every document merely because you have it.</p>
           <p>Use these illustrative examples to organize records, then follow the evidence requirements and response deadline in your own notice.</p>
           <GuideTable caption="Illustrative records for different dispute reasons" headings={["Dispute reason", "Records that may answer it"]} rows={[
+            ["Unrecognized or allegedly unauthorized payment", "Identify existing records that connect the cardholder to this purchase, such as relevant communications, authentication or usage records. A payment receipt alone does not establish authorization."],
             ["Goods not received", "Connect the agreed delivery date and address to tracking, delivery confirmation and relevant customer messages. Explain how those records address the claimed missing delivery."],
+            ["Service not provided", "Match the agreed work and service date to completion or attendance records and relevant customer messages. An order confirmation shows what was arranged, not that the service took place."],
+            ["Information not received", "Match the promised report, briefing or access period to the version supplied, recipient and dated delivery or usage records. Access alone does not establish payment authorization or accuracy."],
             ["Duplicate charge", "Match both charges to their orders and receipts. Explain whether they concern separate purchases, or identify a duplicate payment already refunded."],
             ["Canceled or refunded purchase", "Use the cancellation or return request, policy shown before purchase, related messages and any refund date, amount and reference. Explain what was requested and what happened."],
           ]} />
-          <p>For example, if a customer disputes a delivered order, connect the order reference, agreed address and delivery record in your explanation. A payment receipt alone shows a charge; it does not establish delivery. If a refund was already processed, identify its date, amount and payment reference so it can be matched to the disputed sale.</p>
+          <p>For example, a report promised by a particular deadline needs a record of the version, recipient and delivery time. If the complaint concerns the report’s contents rather than receipt, address the agreed scope and the material supplied. A delivery log alone does not answer that complaint.</p>
+          <p>If a refund was already processed, identify its date, amount and payment reference so it can be matched to the disputed sale.</p>
           <p>Keep the explanation concise and the documents readable. Use the case’s requested format and include only records that help answer the reason. Evidence can support a response; it cannot guarantee the issuer’s decision.</p>
+        </>,
+      },
+      {
+        id: "response-worksheet",
+        title: "Prepare your response with a worksheet",
+        content: <>
+          <p>Use one copy for each dispute. Copy the details from your notice, then organize the records that answer the stated reason. If the response time or time zone is unclear, confirm it with your payment provider.</p>
+          <ChargebackWorksheet />
+          <p>This is a blank template to use in your own document. Use references to securely held records, not full card numbers, CVV, passwords or login details. Review your explanation and attachments, then submit through your payment provider. Keep the confirmation and check for further requests.</p>
         </>,
       },
       {
