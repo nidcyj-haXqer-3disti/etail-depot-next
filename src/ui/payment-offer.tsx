@@ -2,6 +2,7 @@ import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
 import { PaymentFeeEstimate } from "./payment-fee-estimate";
 import { hostedServices } from "@/shared/hosted-services";
 import { Icon } from "./icon";
+import { PaymentPortalLink } from "./service-entry";
 import "./product-confidence.css";
 
 export function PaymentOffer({saleRecords,onSaleRecordsChange}: {saleRecords: boolean; onSaleRecordsChange: (enabled: boolean) => void}) {
@@ -21,7 +22,10 @@ export function PaymentOffer({saleRecords,onSaleRecordsChange}: {saleRecords: bo
       <dl className="fee-exceptions"><div><dt>International cards</dt><dd>+{fees.internationalRateLabel}</dd></div><div><dt>Currency conversion, when required</dt><dd>+{fees.conversionRateLabel}</dd></div><div><dt>Merchant-entered card payments</dt><dd>+{fees.manualEntryRateLabel}</dd></div><div><dt>Disputes received</dt><dd>${fees.disputeFeeDollars} each</dd></div><div><dt>Manual dispute response</dt><dd>${fees.disputeResponseFeeDollars}; returned if you win</dd></div></dl>
       <p>Original processing and currency conversion fees are not returned when a payment is refunded. Network charges and optional services may add costs; review the applicable terms. Sharing a link by text does not include a messaging subscription.</p>
       <p>The {saleRecordsOffer.name} fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Review eligibility, applicable charges and service refund terms before enrollment.</p>
-      <a className="consumer-text-link" href={hostedServices.payments.contactHref}>Ask about fees<Icon name="arrow" /></a>
     </div></details>
+    <div className="payment-offer-actions">
+      <PaymentPortalLink>Continue to Trolleys</PaymentPortalLink>
+      <a className="consumer-text-link" href={hostedServices.payments.contactHref}>Ask about fees<Icon name="arrow" /></a>
+    </div>
   </section>;
 }

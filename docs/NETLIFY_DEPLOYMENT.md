@@ -4,6 +4,10 @@
 
 # Public website Netlify deployment runbook
 
+## D334/D336 production-check correction, retained for D345
+
+Run broad browser, responsive, asset, method-rejection, missing-page and retired-route checks against the exact reviewed package on loopback or an approved nonproduction deployment. Do not point the historical bulk production scripts at the live website. Production smoke uses a small fixed set of ordinary public URLs, serial GETs at least five seconds apart, an identifiable release-check user agent, no credentials, redirects or retries, and saved response status/request IDs. Stop on an unexpected response or connection-verification screen. A challenge makes that check inconclusive; do not switch identities, proxies or URLs to evade it or weaken site security. Local success does not establish crawler access or ranking. Follow current status for the selected bounded smoke and any normal-browser spot check.
+
 D333 twenty-seven-page release candidate; retained protected platform Emails · 21 October 2026
 
 D108 public-only scope governs this runbook. The repository and site already exist; there is no provisioning, database migration, Identity setup, account acceptance or financial activation step. Read [source precedence](SOURCE_PRECEDENCE.md), [current status](../planning/STATUS.md) and [release evidence](RELEASE_READINESS_REVIEW.md) before preparing a release.

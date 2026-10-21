@@ -1,13 +1,18 @@
 import { Fragment } from "react";
+import Link from "next/link";
 import type { PublicPath } from "@/modules/public-site/metadata";
 import { GuideTable } from "./payment-guide";
 import { ReadingGuide } from "./reading-guide";
 
+type GuidePath = Extract<PublicPath, `/guides/${string}`>;
+type LinkedText = { text: string; inlineLink?: { text: string; href: GuidePath | `${GuidePath}#${string}` } };
+
 type Block =
-  | { type: "paragraph"; text: string }
+  | ({ type: "paragraph" } & LinkedText)
   | { type: "list"; items: string[] }
   | { type: "table"; caption: string; headings: string[]; rows: string[][]; note?: string }
-  | { type: "steps"; items: string[] }
+  | { type: "checks"; caption: string; items: { term: string; description: string }[]; note?: string }
+  | { type: "steps"; items: (string | LinkedText)[] }
   | { type: "example"; title: string; paragraphs: string[] };
 
 type GuideContentData = {
@@ -29,14 +34,21 @@ const MERCHANT_READING_PATHS: readonly string[] = [
   "/guides/types-of-invoice-discrepancies",
 ];
 
+function InlineText({ text, inlineLink }: LinkedText) {
+  const start = inlineLink?.text ? text.indexOf(inlineLink.text) : -1;
+  return inlineLink && start >= 0
+    ? <>{text.slice(0, start)}<Link href={inlineLink.href}>{inlineLink.text}</Link>{text.slice(start + inlineLink.text.length)}</>
+    : <>{text}</>;
+}
+
 function ContentBlock({ block }: { block: Block }) {
   switch (block.type) {
     case "paragraph":
-      return <p>{block.text}</p>;
+      return <p><InlineText {...block} /></p>;
     case "list":
       return <ul>{block.items.map((item, index) => <li key={index}>{item}</li>)}</ul>;
     case "steps":
-      return <ol className="reading-guide-steps">{block.items.map((item, index) => <li key={index}>{item}</li>)}</ol>;
+      return <ol className="reading-guide-steps">{block.items.map((item, index) => <li key={index}>{typeof item === "string" ? item : <InlineText {...item} />}</li>)}</ol>;
     case "example":
       return <figure className="reading-guide-example">
         <figcaption>{block.title}</figcaption>
@@ -45,6 +57,16 @@ function ContentBlock({ block }: { block: Block }) {
     case "table":
       return <>
         <GuideTable caption={block.caption} headings={block.headings} rows={block.rows} />
+        {block.note && <p className="reading-guide-table-note">{block.note}</p>}
+      </>;
+    case "checks":
+      return <>
+        <figure className="reading-guide-checklist">
+          <figcaption>{block.caption}</figcaption>
+          <dl className="reading-guide-checks">{block.items.map(item => <div key={item.term}>
+            <dt>{item.term}</dt><dd>{item.description}</dd>
+          </div>)}</dl>
+        </figure>
         {block.note && <p className="reading-guide-table-note">{block.note}</p>}
       </>;
   }

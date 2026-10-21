@@ -11,18 +11,25 @@ const gatewaySource = "https://www.cybersource.com/en-us/solutions/payment-accep
 const rolesSource = "https://www.cybersource.com/content/dam/documents/en/ultimate-payments-industry-guide.pdf";
 const authorizationSource = "https://developer.cybersource.com/docs/cybs/en-us/payments/developer/vital/sa/payments/payments-intro/payments-services-intro/payments-intro-processing-auth/payments-intro-processing-auth-workflow.html";
 const captureSource = "https://developer.cybersource.com/docs/cybs/en-us/payments/developer/vital/sa/payments/payments-intro/payments-services-intro/payments-intro-processing-capture/payments-intro-processing-capture-workflow.html";
+const reconciliationSource = "https://developer.cybersource.com/docs/cybs/en-us/reporting/user/all/ebc/reporting-ug/c_Financial_and_Reconciliation_Reports.html";
 const fees = productFacts.payments;
 const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const feeExamples = [2_000, 10_000].map(amount => {
   const fee = Math.round(amount * fees.cardRateBasisPoints / 10_000) + fees.cardFixedFeeCents;
   return [dollars(amount), `${dollars(fee)} base fee; ${dollars(amount - fee)} remaining after that fee.`];
 });
+const payoutPayments = [10_000, 6_000];
+const payoutFees = payoutPayments.map(amount => Math.round(amount * fees.cardRateBasisPoints / 10_000) + fees.cardFixedFeeCents);
+const payoutGross = payoutPayments.reduce((sum, amount) => sum + amount, 0);
+const payoutProcessingFees = payoutFees.reduce((sum, fee) => sum + fee, 0);
+const payoutRefund = 2_000;
+const examplePayout = payoutGross - payoutProcessingFees - payoutRefund;
 
 export default function PaymentProcessingSystemsPage() {
   return <ReadingGuide
     path="/guides/payment-processing-systems"
-    title="Payment processing systems: a practical guide for US businesses"
-    intro="A payment processing system lets a customer pay and helps you track what happens to the money afterward. Start with how customers buy from you, then check the fees, order records and payout terms before choosing a service."
+    title="Credit card processing systems: how they work"
+    intro="A credit card processing system connects your customer’s checkout to the services that authorize, collect and settle a card payment. It also provides the records you need to match payments to orders and bank payouts. For an online business, the right setup depends on how customers buy, the fees and the account’s payout terms."
     showPaymentAcceptanceLink
     relatedPaths={["/guides/how-to-create-a-payment-link", "/guides/stripe-alternatives"]}
     sections={[
@@ -74,11 +81,30 @@ export default function PaymentProcessingSystemsPage() {
             <p className="payment-guide-flow-note">Illustrative stages. Your account determines the available controls and timing.</p>
           </figure>
           <p>An approval alone does not complete collection: an authorization can expire before capture. Check the actual payment status before treating an order as paid. Trolleys’ account terms determine processing and payouts; first payouts, reviews, reserves and bank holidays can affect timing.</p>
-          <div className="payment-guide-records">
-            <div><h3>Check the payment</h3><p>Match the order reference, $100 amount and payment result. Keep the delivery and any refund records with that order.</p></div>
-            <div><h3>Check the payout</h3><p>Match the payout reference to the bank deposit. Review the included payments, fees, refunds and adjustments to explain the total.</p></div>
-          </div>
           <p>A customer’s screenshot or message does not replace checking the payment in your account. For the difference between a payment and its bank deposit, see <Link href="/payment-acceptance-service#payouts">Trolleys payout guidance</Link>.</p>
+        </>,
+      },
+      {
+        id: "reconcile-a-payout",
+        title: "Match sales to a bank payout",
+        content: <>
+          <p>Two customers pay {dollars(payoutPayments[0])} and {dollars(payoutPayments[1])}. You then refund {dollars(payoutRefund)} of the first order. Here is how those records could explain one bank deposit.</p>
+          <figure className="reading-guide-reconciliation">
+            <table>
+              <caption>Worked payout example in USD</caption>
+              <thead><tr><th scope="col">Record</th><th scope="col">Amount</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">First payment</th><td>+{dollars(payoutPayments[0])}</td></tr>
+                <tr><th scope="row">Second payment</th><td>+{dollars(payoutPayments[1])}</td></tr>
+                <tr><th scope="row">Processing fees<span>{dollars(payoutFees[0])} + {dollars(payoutFees[1])}</span></th><td>−{dollars(payoutProcessingFees)}</td></tr>
+                <tr><th scope="row">Partial refund<span>For the first order</span></th><td>−{dollars(payoutRefund)}</td></tr>
+              </tbody>
+              <tfoot><tr><th scope="row">Payout in this example</th><td>{dollars(examplePayout)}</td></tr></tfoot>
+            </table>
+          </figure>
+          <p className="reading-guide-table-note">This example uses the {fees.cardRateLabel} domestic online card rate. Both payments, their fees and the refund are included in the same payout. Original processing fees are retained. It excludes Clarity, other charges, reserves and holds; your account may deduct fees separately or include the refund in a later payout.</p>
+          <p>Start with the transactions listed against the payout, rather than adding every sale from the same calendar day. Match each payment to its order and each refund to the original payment. Then use the payout reference to match the total to your bank deposit.</p>
+          <p>If the figures differ, check the reporting period and look for refunds, dispute adjustments or reserves. Do not deduct a separately billed fee a second time from the payout. If the total matches but the bank deposit has not arrived, check its status and expected arrival with your provider. A missing bank deposit does not mean the customer should pay again.</p>
         </>,
       },
       {
@@ -109,6 +135,7 @@ export default function PaymentProcessingSystemsPage() {
       { title: "Authorize.net — Payments industry roles (PDF, page 5)", href: rolesSource },
       { title: "Cybersource — Authorization workflow", href: authorizationSource },
       { title: "Cybersource — Capture and reconciliation", href: captureSource },
+      { title: "Cybersource — Financial and reconciliation reports", href: reconciliationSource },
     ]}
   />;
 }

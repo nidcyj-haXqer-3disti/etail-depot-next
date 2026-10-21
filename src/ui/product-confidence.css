@@ -50,3 +50,4 @@
 
 .fee-service-option > .fee-estimate-note { color: var(--public-muted); font-size: 12px; line-height: 1.7; margin-block: 6px 18px; }
 @media (max-width: 400px) { .fee-result .fee-net { font-size: 16px; } }
+.payment-offer-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin-top: 24px; }

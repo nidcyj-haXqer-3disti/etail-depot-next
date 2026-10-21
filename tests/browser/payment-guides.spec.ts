@@ -25,6 +25,49 @@ const guidePaths = [
 ] as const;
 const internalLanguage = /(?:editorial draft|private preview|human review pending|publication approval|source-led|archiveInputsUsed|D3\d{2}|G\d{4})/i;
 
+test("chargeback worksheet copies a blank template without submitting data", async ({ page, context, baseURL }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: baseURL });
+  const submissions: string[] = [];
+  page.on("request", request => { if (request.method() === "POST") submissions.push(request.url()); });
+  await page.goto("/guides/what-is-a-chargeback#response-worksheet");
+  await page.getByRole("button", { name: "Copy worksheet", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Copied. Paste the worksheet into a document you keep securely.");
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toContain("Response due (date, time and time zone):");
+  expect(copied).toContain("Any possible overlap in returned funds:");
+  expect(copied).toContain("Submission confirmation or reference:");
+  expect(copied).toContain("Submit your response through your payment provider.");
+  expect(submissions).toEqual([]);
+  await page.locator("#chargeback-worksheet-template summary").click();
+  await expect(page.getByRole("textbox", { name: "Blank response worksheet" })).toHaveValue(copied);
+  await expect(page.getByRole("textbox", { name: "Blank response worksheet" })).toHaveAttribute("readonly", "");
+});
+
+test("chargeback worksheet remains usable when clipboard access is denied", async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: () => Promise.reject(new DOMException("Denied", "NotAllowedError")) } }));
+  await page.goto("/guides/what-is-a-chargeback#response-worksheet");
+  await page.getByRole("button", { name: "Copy worksheet", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Automatic copying is unavailable");
+  const template = page.getByRole("textbox", { name: "Blank response worksheet" });
+  await expect(template).toBeVisible();
+  await page.getByRole("button", { name: "Select template", exact: true }).click();
+  await expect(template).toBeFocused();
+  expect(await template.evaluate(element => { const field = element as HTMLTextAreaElement; return field.selectionEnd - field.selectionStart === field.value.length; })).toBe(true);
+  await page.locator("#chargeback-worksheet-template summary").click();
+  await expect(template).toBeHidden();
+});
+
+test("chargeback worksheet can be read without JavaScript", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, reducedMotion: "reduce", baseURL });
+  const page = await context.newPage();
+  try {
+    await page.goto("/guides/what-is-a-chargeback#response-worksheet");
+    await page.locator("#chargeback-worksheet-template summary").click();
+    await expect(page.getByRole("textbox", { name: "Blank response worksheet" })).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Blank response worksheet" })).toHaveValue(/CASE DETAILS[\s\S]+SUBMISSION AND FOLLOW-UP/);
+  } finally { await context.close(); }
+});
+
 async function chooseTopic(page: Page, value: string, label: string) {
   const select = page.getByRole("combobox", { name: "Browse by topic", exact: true });
   if (await select.isVisible()) {
