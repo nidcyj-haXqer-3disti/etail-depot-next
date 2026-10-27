@@ -1,0 +1,154 @@
+/* A single transaction record with a separate net calculation. */
+.payment-lifecycle-art {
+  container: payment-lifecycle / inline-size;
+  width: 100%;
+  max-width: 600px;
+  min-width: 0;
+  margin: 0;
+  color: var(--public-ink, #183d35);
+  font-family: var(--public-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+  --pla-gutter: 28px;
+}
+.payment-lifecycle-art,
+.payment-lifecycle-art *,
+.payment-lifecycle-art *::before,
+.payment-lifecycle-art *::after { box-sizing: border-box; }
+.payment-lifecycle-art p,
+.payment-lifecycle-art dl,
+.payment-lifecycle-art dd { margin: 0; }
+.payment-lifecycle-art .pla-sheet {
+  overflow: hidden;
+  border: 1px solid var(--public-frame-line, #d2ddd5);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 32px -16px #0239411a, 0 2px 5px #02394104;
+}
+.payment-lifecycle-art .pla-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  min-height: 66px;
+  padding: 18px var(--pla-gutter);
+  border-bottom: 1px solid var(--public-line, #dce3dc);
+  background: var(--public-paper, #f7f6f2);
+}
+.payment-lifecycle-art .pla-title { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.payment-lifecycle-art .pla-title .icon { flex: none; width: 17px; height: 17px; color: var(--public-muted, #586960); }
+.payment-lifecycle-art .pla-business { color: var(--public-muted, #586960); font-size: 12px; }
+.payment-lifecycle-art .pla-body { padding: 28px var(--pla-gutter) var(--pla-gutter); }
+.payment-lifecycle-art .pla-amount-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.payment-lifecycle-art .pla-amount { display: flex; align-items: baseline; gap: 9px; font-size: 44px; line-height: 1.1; font-weight: 500; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.payment-lifecycle-art .pla-amount > span { color: var(--public-muted, #586960); font-size: 12px; font-weight: 400; letter-spacing: .015em; }
+.payment-lifecycle-art .pla-status { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border: 1px solid #d2e2d7; border-radius: 5px; background: #edf5ef; color: #27553e; font-size: 12px; font-weight: 500; line-height: 1.5; }
+.payment-lifecycle-art .pla-status .icon { flex: none; width: 13px; height: 13px; }
+.payment-lifecycle-art .pla-description { font-size: 15px; line-height: 1.5; font-weight: 500; }
+.payment-lifecycle-art .pla-product { display: flex; align-items: center; gap: 16px; margin-top: 26px; }
+.payment-lifecycle-art .pla-product-detail { margin-top: 5px; font-size: 12px; color: var(--public-muted); }
+.payment-lifecycle-art .pla-details { padding-block: 24px; margin-top: 24px; border-top: 1px solid var(--public-line, #dce3dc); }
+.payment-lifecycle-art .pla-details > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 36px; }
+.payment-lifecycle-art .pla-details > div + div { margin-top: 9px; }
+.payment-lifecycle-art .pla-details dt { font-size: 13px; color: var(--public-muted, #586960); }
+.payment-lifecycle-art .pla-details dd { font-size: 14px; font-variant-numeric: tabular-nums; }
+.payment-lifecycle-art .pla-card { display: flex; align-items: center; gap: 9px; white-space: nowrap; }
+.payment-lifecycle-art .pla-card-prefix { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.payment-lifecycle-art .pla-card-brand { display: grid; place-items: center; width: 43px; height: 28px; border: 1px solid var(--public-line, #dce3dc); border-radius: 4px; background: #fff; }
+.payment-lifecycle-art .pla-card-brand .network-mark-visa { display: block; width: 40px; height: auto; }
+.payment-lifecycle-art .pla-totals { border: 1px solid var(--public-frame-line, #d2ddd5); border-radius: 7px; background: #fff; overflow: hidden; }
+.payment-lifecycle-art .pla-totals > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; }
+.payment-lifecycle-art .pla-totals dt { font-size: 14px; }
+.payment-lifecycle-art .pla-totals dd { flex: none; font-size: 16px; font-variant-numeric: tabular-nums; }
+.payment-lifecycle-art .pla-fee dt > span { display: block; margin-top: 3px; color: var(--public-muted, #586960); font-size: 12px; }
+.payment-lifecycle-art .pla-net { border-top: 1px solid var(--public-frame-line, #d2ddd5); background: var(--public-frame-surface, #f0f5f1); }
+.payment-lifecycle-art .pla-net dt { font-weight: 500; }
+.payment-lifecycle-art .pla-net dd { font-size: 30px; font-weight: 500; line-height: 1.2; letter-spacing: -.035em; }
+.payment-lifecycle-art figcaption { padding-inline: 4px; margin-top: 14px; color: var(--public-muted, #586960); font-size: 13px; line-height: 1.65; }
+@container payment-lifecycle (max-width: 440px) {
+  .payment-lifecycle-art .pla-sheet { --pla-gutter: 22px; }
+  .payment-lifecycle-art .pla-amount { font-size: 38px; }
+  .payment-lifecycle-art .pla-body { padding-top: 24px; }
+  .payment-lifecycle-art .pla-details { padding-block: 20px; margin-top: 20px; }
+  .payment-lifecycle-art .pla-totals > div { padding: 17px 18px; }
+}
+@container payment-lifecycle (max-width: 320px) {
+  .payment-lifecycle-art .pla-sheet { --pla-gutter: 18px; }
+  .payment-lifecycle-art .pla-toolbar { gap: 5px 12px; padding-block: 16px; }
+  .payment-lifecycle-art .pla-title { font-size: 13px; gap: 7px; }
+  .payment-lifecycle-art .pla-title .icon { width: 15px; height: 15px; }
+  .payment-lifecycle-art .pla-business { font-size: 11px; }
+  .payment-lifecycle-art .pla-amount-row { gap: 12px 8px; }
+  .payment-lifecycle-art .pla-amount { font-size: 36px; gap: 7px; }
+  .payment-lifecycle-art .pla-status { padding: 4px 7px; font-size: 11px; }
+  .payment-lifecycle-art .pla-description { font-size: 14px; }
+  .payment-lifecycle-art .pla-details > div { gap: 10px; }
+  .payment-lifecycle-art .pla-details dt { font-size: 12px; }
+  .payment-lifecycle-art .pla-details dd { font-size: 13px; }
+  .payment-lifecycle-art .pla-card { gap: 7px; }
+  .payment-lifecycle-art .pla-totals > div { padding: 16px; }
+  .payment-lifecycle-art .pla-totals dt { font-size: 13px; }
+  .payment-lifecycle-art .pla-net dd { font-size: 27px; }
+}
+
+@container payment-lifecycle (max-width: 320px) {
+ .payment-lifecycle-art .pla-product { gap: 12px; margin-top: 22px; }
+ .payment-lifecycle-art .commerce-product-thumbnail { width: 72px; height: 56px; }
+}
+
+/* Merchant operations: a transaction record and its separate funding stages. */
+.payment-lifecycle-art--merchant .pla-sheet { border-radius: 12px; box-shadow: 0 16px 36px -24px #02394129, 0 2px 6px -3px #02394114; }
+.payment-lifecycle-art--merchant .pla-toolbar { min-height: 68px; padding: 18px 24px; background: #fff; }
+.payment-lifecycle-art--merchant .pla-title { font-weight: 500; }
+.pla-record-body { padding: 28px 24px; }
+.payment-lifecycle-art .pla-record-summary { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1fr) auto; align-items: start; gap: 14px; }
+.pla-record-summary dt { font-size: 12px; color: var(--public-muted); line-height: 1.5; }
+.payment-lifecycle-art .pla-record-summary dd { margin-top: 9px; font-size: 18px; line-height: 1.5; font-weight: 500; font-variant-numeric: tabular-nums; }
+.pla-record-summary dd > span:not(.pla-status) { display: block; margin-top: 3px; color: var(--public-muted); font-size: 11px; font-weight: 400; letter-spacing: .02em; }
+.pla-record-summary > div:last-child { text-align: right; }
+.payment-lifecycle-art .pla-record-summary > div:last-child dd { margin-top: 7px; }
+.pla-record-purchase { display: flex; align-items: center; gap: 18px; margin-top: 28px; padding-top: 26px; border-top: 1px solid var(--public-line); }
+.pla-record-purchase > div { min-width: 0; }
+.payment-lifecycle-art .pla-record-purchase p { font-size: 14px; font-weight: 500; line-height: 1.5; }
+.pla-record-purchase > div > span { display: block; margin-top: 5px; color: var(--public-muted); font-size: 12px; line-height: 1.5; }
+.pla-record-purchase .commerce-product-thumbnail { width: 88px; height: 66px; }
+.pla-record-method { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 21px; font-size: 12px; line-height: 1.5; }
+.pla-record-method > span:first-child { color: var(--public-muted); }
+.pla-processing { margin-top: 24px; padding: 20px 18px; border: 1px solid #d9e5dd; border-radius: 8px; background: #f4f8f5; }
+.payment-lifecycle-art .pla-processing > p { color: #526a60; font-size: 12px; line-height: 1.5; }
+.pla-processing ol { list-style: none; margin: 17px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; }
+.pla-processing li { position: relative; min-width: 0; }
+.pla-processing li:not(:last-child)::after { content: ""; position: absolute; left: 33px; right: -4px; top: 13px; height: 1px; background: #d1dfd7; }
+.pla-processing li > span { display: grid; place-items: center; width: 27px; height: 27px; border: 1px solid #cbdcd2; border-radius: 50%; background: #fff; color: #526a60; font-size: 11px; }
+.pla-processing .pla-processing-current > span { color: #023941; border-color: #a6dccc; background: #dff8ef; }
+.pla-processing strong { display: block; margin-top: 9px; font-size: 12px; font-weight: 500; line-height: 1.5; color: #526a60; }
+.pla-processing-current strong { color: #023941; }
+.payment-lifecycle-art .pla-record-totals { margin-top: 24px; }
+.pla-record-totals > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; }
+.pla-record-totals dt { font-size: 13px; line-height: 1.5; }
+.pla-record-totals dt > span { display: block; color: var(--public-muted); font-size: 12px; margin-top: 3px; }
+.pla-record-totals dd { flex: none; font-variant-numeric: tabular-nums; font-size: 15px; }
+.pla-record-totals .pla-record-net { margin-top: 12px; padding-top: 20px; border-top: 1px solid var(--public-line); }
+.pla-record-net dt { font-weight: 500; }
+.pla-record-net dd { font-size: 32px; line-height: 1.3; letter-spacing: -.03em; font-weight: 500; }
+@container payment-lifecycle (max-width: 360px) {
+ .payment-lifecycle-art--merchant .pla-toolbar { padding: 16px 18px; }
+ .pla-record-body { padding: 20px 18px; }
+ .payment-lifecycle-art .pla-record-summary { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 15px; }
+ .pla-record-summary > div:last-child { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; text-align: left; }
+ .payment-lifecycle-art .pla-record-summary > div:last-child dd { margin: 0; }
+ .pla-record-purchase { gap: 12px; margin-top: 20px; padding-top: 20px; }
+ .pla-record-purchase .commerce-product-thumbnail { width: 68px; height: 54px; }
+ .pla-processing { padding: 16px 12px; }
+ .pla-record-totals .pla-record-net { flex-wrap: wrap; gap: 8px; }
+}
+
+.payment-lifecycle-art .pla-processing > .pla-processing-note { margin-top: 16px; padding-top: 13px; border-top: 1px solid #d9e5dd; font-size: 11px; line-height: 1.6; }
+@container payment-lifecycle (max-width: 420px) {
+ .pla-processing ol { grid-template-columns: 1fr; gap: 16px; }
+ .pla-processing li { display: grid; grid-template-columns: 27px minmax(0,1fr); align-items: center; column-gap: 12px; }
+ .pla-processing li:not(:last-child)::after { left: 13px; right: auto; top: 33px; bottom: -10px; width: 1px; height: auto; }
+ .pla-processing strong { margin: 0; font-size: 12px; }
+}

@@ -1,0 +1,129 @@
+.partner-page .platform-journey { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:32px; margin:0; padding:0; list-style:none; }
+.partner-page .platform-journey > li { min-width:0; }
+.partner-page .platform-journey-heading { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.partner-page .platform-step { color:#416259; font-size:13px; font-variant-numeric:tabular-nums; letter-spacing:.04em; }
+.partner-page .platform-journey-heading h3 { font-size:21px; font-weight:500; }
+.partner-page .platform-stage-art { display:flex; align-items:center; min-width:0; padding:24px; min-height:350px; border:1px solid #dce5dc; border-radius:12px; background:linear-gradient(145deg,#f3f5ef,#e9f0e9); }
+.partner-page .platform-art-sheet { display:flex; flex-direction:column; min-height:300px; width:100%; min-width:0; border:1px solid #cedad3; border-radius:9px; background:#fff; box-shadow:0 12px 24px -20px #02394155; overflow:hidden; }
+.partner-page .platform-art-heading { display:flex; align-items:center; gap:9px; padding:15px 18px; border-bottom:1px solid #e0e7e1; color:#31534a; font-size:13px; line-height:1.5; }
+.partner-page .platform-art-heading .icon { width:17px; height:17px; }
+.partner-page .platform-business-profile { display:flex; align-items:center; gap:12px; padding:18px 18px 10px; }
+.partner-page .platform-business-monogram { display:grid; place-items:center; width:40px; height:40px; border:1px solid #d4e0d7; border-radius:8px; background:#eff4ed; }
+.partner-page .platform-business-monogram .icon { width:23px; height:23px; }
+.partner-page :is(.platform-business-profile,.platform-checkout-purchase) strong { display:block; font-size:15px; font-weight:500; line-height:1.4; }
+.partner-page :is(.platform-business-profile,.platform-checkout-purchase) div > span { display:block; margin-top:4px; color:var(--public-muted); font-size:12px; line-height:1.5; }
+.partner-page .platform-application-items { list-style:none; margin:0; padding:0 18px 12px; }
+.partner-page .platform-application-items li { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-block:9px; color:#456259; font-size:13px; line-height:1.5; }
+.partner-page .platform-application-items .icon { width:16px; height:16px; color:#627c70; }
+.partner-page .platform-art-footnote { margin-top:auto; display:flex; align-items:center; justify-content:center; gap:10px; min-height:43px; padding:11px 12px; border-top:1px solid #dce6de; background:#f3f6f1; font-size:12px; line-height:1.6; color:#47665b; }
+.partner-page .platform-art-footnote .icon { width:15px; height:15px; }
+.partner-page .platform-checkout-purchase { display:flex; align-items:center; gap:12px; padding:20px 18px 16px; }
+.partner-page .platform-checkout-purchase > div { min-width:0; }
+.partner-page .platform-product-image { flex:0 0 64px; width:64px; height:54px; display:grid; place-items:center; border-radius:7px; border:1px solid #e0e6df; background:#f7f8f4; }
+.partner-page .platform-product-image img { display:block; width:62px; height:auto; }
+.partner-page .platform-checkout-total { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:8px; margin:0 18px; padding-block:12px; border-top:1px solid #e1e8e1; font-size:13px; color:var(--public-muted); }
+.partner-page .platform-checkout-total strong { display:flex; align-items:baseline; gap:5px; color:#023941; font-size:24px; font-weight:500; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }
+.partner-page .platform-checkout-total small { font-size:10px; font-weight:400; letter-spacing:0; }
+.partner-page .platform-checkout-method { display:flex; align-items:center; gap:8px; padding:4px 18px 20px; color:#506a60; font-size:12px; line-height:1.5; }
+.partner-page .platform-checkout-method .network-mark { width:46px; height:26px; }
+.partner-page .platform-payout-lines { padding:10px 18px 4px; }
+.partner-page .platform-payout-lines > div { display:flex; justify-content:space-between; align-items:center; gap:12px; padding-block:14px; font-size:13px; line-height:1.5; color:#49665b; }
+.partner-page .platform-payout-lines .icon { width:17px; height:17px; }
+.partner-page .platform-payout-lines .platform-payout-total { border-top:1px solid #dce5dd; margin-top:2px; color:#023941; }
+.partner-page .platform-payout-total strong { font-weight:500; font-size:16px; }
+.partner-page .platform-deposit { margin-top:auto; display:flex; align-items:center; gap:12px; padding:17px 18px; background:#023941; color:#fff; }
+.partner-page .platform-deposit > .icon { width:22px; height:22px; color:#0acea9; }
+.partner-page .platform-deposit strong { display:block; font-size:14px; font-weight:500; line-height:1.5; }
+.partner-page .platform-deposit span { display:block; font-size:12px; color:#d2e4df; line-height:1.6; margin-top:3px; }
+.partner-page .platform-integration-art { margin:0; }
+.partner-page .platform-integration-diagram { display:grid; grid-template-columns:minmax(0,1fr) 190px minmax(0,1fr); align-items:center; }
+.partner-page .platform-system { min-width:0; align-self:stretch; border:1px solid #cbd9d0; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 12px 30px -24px #0239414a; }
+.partner-page .platform-system-heading { display:flex; align-items:center; gap:12px; min-height:70px; padding:22px 26px; border-bottom:1px solid #dce5dd; background:#f7f8f4; }
+.partner-page .platform-system-heading .icon { width:22px; height:22px; }
+.partner-page .platform-system-heading h3 { font-size:19px; font-weight:500; }
+.partner-page .platform-system--payments .platform-system-heading { background:#023941; color:#fff; border-color:#023941; }
+.partner-page .platform-system--payments .platform-system-heading .icon { color:#0acea9; }
+.partner-page .platform-system-body { padding:26px; }
+.partner-page .platform-system-function { display:flex; align-items:flex-start; gap:12px; }
+.partner-page .platform-system-function + .platform-system-function { border-top:1px solid #e0e7e0; margin-top:22px; padding-top:22px; }
+.partner-page .platform-system-function > .icon { width:18px; height:18px; margin-top:3px; color:#527367; }
+.partner-page .platform-system-function strong { display:block; font-size:15px; font-weight:500; line-height:1.5; }
+.partner-page .platform-data-paths { display:grid; gap:20px; padding-top:36px; }
+.partner-page .platform-data-path { text-align:center; color:#345b50; font-size:13px; line-height:1.5; }
+.partner-page .platform-data-path small { display:block; font-size:12px; color:var(--public-muted); margin-top:7px; }
+.partner-page .platform-path-line { position:relative; display:block; margin-top:10px; height:16px; }
+.partner-page .platform-path-line::before { position:absolute; content:""; height:1px; left:0; right:12px; top:8px; background:#809e90; }
+.partner-page .platform-path-line .icon { position:absolute; width:24px; height:24px; right:-2px; top:-4px; color:#688e7e; }
+.partner-page .platform-data-path--return .platform-path-line { transform:rotate(180deg); }
+.partner-page .platform-integration-notes { display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr); gap:70px; margin-top:40px; padding-top:34px; border-top:1px solid #cfddd2; }
+.partner-page .platform-integration-notes h3 { max-width:20ch; font-size:24px; line-height:1.35; font-weight:400; }
+.partner-page .platform-integration-notes .partner-function-details { margin:0; }
+.partner-page .platform-integration-notes details:first-child { border-top:0; }
+.partner-page .platform-integration-notes details:first-child summary { padding-top:0; }
+.partner-page .platform-integration-notes .partner-documentation-link { margin-top:22px; }
+@media(max-width:1100px) {
+ .partner-page .platform-journey { gap:22px; }
+ .partner-page .platform-stage-art { padding:16px; }
+ .partner-page .platform-integration-diagram { grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr); }
+ .partner-page .platform-system-body,.partner-page .platform-system-heading { padding:22px; }
+}
+@media(max-width:900px) {
+ .partner-page .platform-journey { grid-template-columns:1fr; gap:32px; }
+ .partner-page .platform-journey > li { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:0 32px; align-items:center; }
+ .partner-page .platform-journey-heading { align-self:end; }
+ .partner-page .platform-stage-art { grid-column:2; grid-row:1 / span 2; }
+ .partner-page .platform-integration-diagram { grid-template-columns:1fr; }
+ .partner-page .platform-data-paths { display:flex; justify-content:space-evenly; padding:20px 10px; gap:20px; }
+ .partner-page .platform-data-path { display:grid; grid-template-columns:22px 1fr; gap:0 8px; align-items:center; text-align:left; }
+ .partner-page .platform-data-path small { grid-column:2; margin-top:3px; }
+ .partner-page .platform-path-line { grid-column:1; grid-row:1 / span 2; margin:0; width:22px; height:42px; }
+ .partner-page .platform-path-line::before { display:none; }
+ .partner-page .platform-path-line .icon { transform:rotate(90deg); top:8px; right:0; }
+ .partner-page .platform-integration-notes { grid-template-columns:1fr; gap:24px; }
+ .partner-page .platform-integration-notes h3 { max-width:none; }
+}
+@media(max-width:600px) {
+ .partner-page .platform-journey > li { display:block; }
+ .partner-page .platform-stage-art { min-height:0; padding:22px; }
+ .partner-page .platform-journey-heading { margin-bottom:14px; }
+ .partner-page .platform-system-body { padding:22px; }
+ .partner-page .platform-system-heading { padding:20px 22px; }
+ .partner-page .platform-integration-notes { margin-top:28px; padding-top:28px; }
+ .partner-page .platform-integration-notes h3 { font-size:22px; }
+}
+@media(max-width:360px) {
+ .partner-page .platform-stage-art { padding:16px; }
+ .partner-page .platform-data-paths { padding-inline:0; gap:8px; }
+ .partner-page .platform-data-path { grid-template-columns:18px 1fr; gap:0 4px; font-size:12px; }
+ .partner-page .platform-data-path small { font-size:11px; }
+}
+
+.partner-page .platform-integration-diagram > .visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+/* The platform is the entry point, with separate merchant-service handoffs. */
+.partner-page .platform-journey-owner { display:flex; align-items:center; gap:12px; padding:20px 24px; border:1px solid #cbd9d0; border-radius:12px 12px 0 0; background:#023941; color:#fff; }
+.partner-page .platform-journey-owner > .icon { width:22px; height:22px; color:#0acea9; }
+.partner-page .platform-journey-owner > span { font-size:17px; line-height:1.5; }
+.partner-page .platform-software-step { min-height:124px; padding:24px; border-bottom:1px solid #cbd9d0; background:#f3f6f1; }
+.partner-page .platform-software-step .platform-journey-heading { margin-bottom:10px; }
+.partner-page .platform-software-step > p { font-size:14px; line-height:1.65; color:#4a665b; }
+.partner-page .platform-mobile-owner { display:none; }
+.partner-page .platform-journey { column-gap:32px; background:linear-gradient(#f3f6f1 124px,transparent 124px); }
+.partner-page .platform-journey-handoff { display:flex; align-items:center; justify-content:center; gap:9px; min-height:70px; color:#567568; font-size:12px; line-height:1.5; }
+.partner-page .platform-journey-handoff .icon { width:20px; height:20px; transform:rotate(90deg); }
+.partner-page .platform-journey-handoff--return .icon { transform:rotate(-90deg); }
+@media(max-width:1100px) {
+ .partner-page .platform-software-step { padding-inline:16px; }
+}
+@media(max-width:900px) {
+ .partner-page .platform-journey-owner { border-radius:12px; }
+ .partner-page .platform-journey { background:none; margin-top:24px; gap:40px; }
+ .partner-page .platform-journey > li { display:block; }
+ .partner-page .platform-software-step { min-height:0; padding:22px; border:1px solid #cbd9d0; border-radius:10px; }
+ .partner-page .platform-mobile-owner { display:block; color:#526d61; font-size:12px; line-height:1.5; margin-bottom:12px; }
+ .partner-page .platform-stage-art { max-width:none; }
+}
+@media(max-width:600px) {
+ .partner-page .platform-journey-owner { padding:18px 20px; }
+ .partner-page .platform-journey-handoff { min-height:58px; }
+}

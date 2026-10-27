@@ -5,6 +5,7 @@ import { cardProduct } from "@/shared/card-product";
 import { hostedServices } from "@/shared/hosted-services";
 import { legalIdentity } from "@/shared/legal-identity";
 import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
+import { serviceLabels } from "@/shared/service-language";
 import { Shell } from "@/ui/shell";
 import { Icon } from "@/ui/icon";
 import "@/ui/public-site.css";
@@ -14,35 +15,44 @@ export const metadata = publicPageMetadata("/help");
 
 const topics = [
   {
-    id: "payments", label: "Trolleys payment acceptance", link: hostedServices.payments.portalUrl, action: "Open Trolleys",
+    id: "payments", label: serviceLabels.payments, link: hostedServices.payments.portalUrl, action: "Open Trolleys",
     questions: [
-      { q: "How do I create and share a payment link?", a: <>In Trolleys, prepare a request with the amount and what the customer is buying, then share it through your chosen channel. Read <Link href="/guides/how-to-create-a-payment-link">how to create and share a payment link</Link> for request details, QR sharing and payment checks.</> },
-      { q: "What does it cost to accept payments?", a: <>For US businesses, {productFacts.payments.offerName} costs {productFacts.payments.cardRateLabel} per successful domestic online card payment in USD. No setup or monthly fee. Payment request creation, sharing and basic receipts are included. See <Link href="/payment-acceptance-service#fees">payment acceptance pricing</Link> for optional services and other applicable charges.</> },
-      { q: "When will a payout reach my bank?", a: <>A successful payment and a bank payout are different steps. Check payment and payout status in your Trolleys account for timing and any review requirements. Learn more about <Link href="/payment-acceptance-service#payouts">payouts</Link>.</> },
-      { q: "How do I handle a refund or dispute?", a: <>Follow the instructions in your Trolleys account to request a refund or respond to a dispute. Review the applicable fees, required information and deadlines there. See <Link href="/payment-acceptance-service#refunds-and-disputes">refund and dispute details</Link> or read <Link href="/guides/what-is-a-chargeback">what a chargeback means for your business</Link>. Contact Trolleys support if you need help with an account.</> },
-      { q: "Who can help with my Trolleys account?", a: <>Use the support options in your Trolleys account or email <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a>. Do not include passwords or full card details.</> },
-      { q: "How does Clarity help prevent chargebacks?", a: <>Trolleys’ optional {saleRecordsOffer.name} service uses Order Insight to share business, payment and purchase details with participating banks and help customers recognize charges. Coverage depends on merchant enrollment, the payment and available records. Eligible Visa online fraud disputes may be prevented when the required transaction history and data qualify. Basic payment receipts remain included without this service. <Link href="/payment-acceptance-service#dispute-readiness">Explore Clarity chargeback prevention</Link>.</> },
-      { q: "What does Clarity cost?", a: <>The Trolleys service fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Payment processing is separate. Applicable charges and service terms are disclosed before enrollment. See <Link href="/payment-acceptance-service#fees">fees and estimates</Link>. Selecting the website example does not enroll you or create a charge.</> },
-      { q: "Does Clarity prevent every chargeback?", a: "No. Purchase recognition and prevention of eligible Visa online fraud disputes do not cover every bank, payment or dispute reason. A dispute can still proceed, and no outcome is guaranteed. Refund programs and services that respond to existing chargebacks for you are separate services. Follow your account’s instructions and deadlines if a dispute occurs." },
+      { q: "How do I check a customer’s payment?", a: <>Use your Trolleys account to check the payment record and match its reference, amount and date to the customer’s order. A customer’s screenshot or confirmation message does not replace the account record. Contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> if the status is unclear.</> },
+      { q: "I’m not sure a payment went through. What should I do?", a: <>Check the original payment before asking the customer to pay again. A timeout or missing confirmation does not mean the payment failed. If you cannot confirm the result in your account, contact Trolleys support with the payment reference.</> },
+      { q: "What will I pay to accept card payments?", a: <>For US businesses, the card processing fee for {productFacts.payments.offerName} is {productFacts.payments.cardRateLabel} per successful domestic online card payment in USD. No setup or monthly fee. Payment request creation, sharing and basic receipts are included. See <Link href="/payment-acceptance-service#fees">card processing fees</Link> for optional services and other applicable charges.</> },
+      { q: "When will the money reach my bank?", a: <>A completed payment does not mean the money has reached your bank. Check the payout status, expected timing and any review requirements in your Trolleys account. If a payout has not arrived, contact support with its reference. Do not ask the customer to pay again to resolve a missing payout. See <Link href="/payment-acceptance-service#payouts">payout information</Link>.</> },
+      { q: "How do I refund a customer?", a: <>Find the original payment and follow the refund instructions in your Trolleys account. Check whether a refund or dispute already exists before returning money again. You can track progress in the refund record. Processing the refund and posting it to the customer’s bank account are separate steps. See <Link href="/payment-acceptance-service#refunds-and-disputes">refund details and fees</Link>.</> },
+      { q: "A customer disputed a payment. What should I do?", a: <>Open the dispute notice and check the reason, response deadline and requested evidence. Follow the instructions in your Trolleys account or contact support if you need help. If you have already refunded the payment, include that record. A refund does not automatically close a dispute, and closing a dispute does not confirm a refund.</> },
+      { q: "Can you help prevent disputes?", a: <>Trolleys’ optional {saleRecordsOffer.name} service uses Order Insight to share business, payment and purchase details with participating banks and help customers recognize charges. Coverage depends on merchant enrollment, the payment and available records. Eligible Visa online fraud disputes may be prevented when the required transaction history and data qualify. Basic payment receipts remain included without this service. <Link href="/terms#dispute-prevention">Service terms</Link>.</> },
+      { q: "Is there an extra fee for dispute prevention?", a: <>The Trolleys service fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Payment processing is separate. Applicable charges and service terms are disclosed before enrollment. See <Link href="/terms#dispute-prevention">Dispute prevention terms</Link>.</> },
+      { q: "Will dispute prevention stop every chargeback?", a: "No. Purchase recognition and prevention of eligible Visa online fraud disputes do not cover every bank, payment or dispute reason. A dispute can still proceed, and no outcome is guaranteed. Refund programs and services that respond to existing chargebacks for you are separate services. Follow your account’s instructions and deadlines if a dispute occurs." },
     ],
   },
   {
-    id: "cards", label: "Ledgix credit card", link: hostedServices.cards.contactHref, action: "Contact Ledgix",
+    id: "partners", label: "Software platforms", link: hostedServices.payments.contactHref, action: "Contact the payments team",
     questions: [
-      { q: "Can I apply for a credit card now?", a: `The ${cardProduct.name} is a virtual ${cardProduct.creditType} for compatible digital wallets. Applications are not open yet. You’ll manage your credit card account through Ledgix when it launches.` },
-      { q: "Which digital wallets are supported?", a: <>When the credit card service is available, eligible cards can be added to Apple Wallet or Google Wallet. Support depends on the card, device and region. <Link href="/credit-card-services#wallets">Preview the wallet experience</Link>.</> },
-      { q: "How does the security deposit work?", a: <>The minimum security deposit is ${productFacts.cards.minimumDepositDollars}. It backs the credit account; it does not pay for purchases. Purchases create a balance that you repay separately. See <Link href="/credit-card-services#card-details">card details</Link> and review the card agreement for credit limits and deposit-return conditions.</> },
-      { q: "What are the card fees and repayment terms?", a: <>The annual fee is ${productFacts.cards.annualFeeDollars}, and the monthly fee is ${productFacts.cards.monthlyFeeDollars}. Repay your full statement balance each month. Earlier or daily payments are optional. See <Link href="/credit-card-services#card-details">card details</Link> and review the full charges and conditions in the card agreement when the service launches.</> },
-      { q: "How do I contact Ledgix?", a: <>Email <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}</a> for credit card inquiries. An inquiry does not submit a card application, guarantee approval or subscribe you to launch updates.</> },
+      { q: "Who can I talk to about payments for my software?", a: <>Email <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> with your company name, the software you provide and the merchants you serve. Tell us how customers pay today and what you want the payment connection to support. See <Link href="/software-partners">payments for software platforms</Link> for the service overview.</> },
+      { q: "How would payments fit into my software?", a: "Describe your checkout, the payment methods you need and how your software handles orders, refunds and reporting. The payments team can discuss the available connection, merchant requirements and responsibilities with you before implementation." },
+      { q: "Does each business need its own approval?", a: "Yes. Each business needs its own eligibility checks and account approval. We’ll discuss the application process, supported business activities and support responsibilities with you." },
     ],
   },
   {
-    id: "access", label: "Sign-in help",
+    id: "cards", label: serviceLabels.cards, link: hostedServices.cards.contactHref, action: "Contact Ledgix",
     questions: [
-      { q: "Where do I sign in to Trolleys?", a: "Follow the sign-in instructions provided with your Trolleys account. If you are new to the service, visit Trolleys to apply." },
-      { q: "What if I cannot sign in to Trolleys?", a: <>Follow the recovery instructions supplied with your Trolleys account, or contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> for help. Do not send us your password or verification codes.</> },
-      { q: "Does one service account give me access to the other?", a: "No. A Trolleys account does not create a Ledgix account. Ledgix registration and sign-in will be separate when the credit card service launches." },
-      { q: "How do I ask about records from an earlier Etail Depot account?", a: <>Earlier Etail Depot accounts are no longer accessible on this website. For access, correction or deletion requests about those records, email <a href={`mailto:${legalIdentity.complianceEmail}`}>{legalIdentity.complianceEmail}</a>. You do not need to sign in. Records are not automatically deleted when account access ends; applicable rights and retention requirements still apply. See <Link href="/privacy#choices">your privacy request choices</Link>.</> },
+      { q: "Can I apply for a credit card yet?", a: `Applications are not open yet. The ${cardProduct.name} is a virtual ${cardProduct.creditType} for compatible digital wallets. You’ll manage your credit card account through Ledgix when it launches.` },
+      { q: "Can I add the card to my phone’s wallet?", a: <>When the credit card service is available, eligible cards can be added to Apple Wallet or Google Wallet. Support depends on the card, device and region. <Link href="/credit-card-services#wallets">How to add a card to your wallet</Link>.</> },
+      { q: "Does my deposit pay for my purchases?", a: <>No. Your deposit backs the credit account; you repay purchases separately. The minimum deposit is ${productFacts.cards.minimumDepositDollars}. See <Link href="/credit-card-services#card-details">card details</Link> and review the card agreement for credit limits and conditions for returning your deposit.</> },
+      { q: "What will I pay, and when is my balance due?", a: <>The annual fee is ${productFacts.cards.annualFeeDollars}, and the monthly fee is ${productFacts.cards.monthlyFeeDollars}. Repay your full statement balance each month. Earlier or daily payments are optional. See <Link href="/credit-card-services#card-details">card details</Link> and review the full charges and conditions in the card agreement when the service launches.</> },
+      { q: "Who can I contact about the card?", a: <>Email <a href={hostedServices.cards.contactHref}>{hostedServices.cards.email}</a> for credit card inquiries. An inquiry does not submit a card application, guarantee approval or subscribe you to launch updates.</> },
+    ],
+  },
+  {
+    id: "access", label: "Help signing in",
+    questions: [
+      { q: "Where do I sign in to my merchant account?", a: "Follow the instructions for signing in provided with your Trolleys account. If you are new to the service, visit Trolleys to apply." },
+      { q: "I can’t sign in. What should I do?", a: <>Follow the recovery instructions supplied with your Trolleys account, or contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> for help.</> },
+      { q: "Does my merchant account include a credit card account?", a: "No. A Trolleys account does not create a Ledgix account. Ledgix registration and account access will be separate when the credit card service launches." },
+      { q: "How can I access records from my old Etail Depot account?", a: <>Earlier Etail Depot accounts are no longer accessible on this website. For access, correction or deletion requests about those records, email <a href={`mailto:${legalIdentity.complianceEmail}`}>{legalIdentity.complianceEmail}</a>. You do not need to sign in. Records are not automatically deleted when account access ends; applicable rights and retention requirements still apply. See <Link href="/privacy#choices">your privacy request choices</Link>.</> },
     ],
   },
 ];
@@ -51,23 +61,24 @@ export default function HelpPage() {
   return <Shell>
     <PublicPageStructuredData path="/help" />
     <section className="page-container public-help-intro">
+      <p className="eyebrow">Support</p>
       <h1>Help center</h1>
-      <p>Get help with Trolleys payment acceptance or ask about the Ledgix credit card.</p>
+      <p>Support for merchant services, card inquiries and software partnerships.</p>
       <section className="help-support-grid" aria-label="Support contacts">
         <article className="help-support-card">
-          <h2>Payment acceptance support</h2>
-          <p>For Trolleys account, payment, refund and dispute questions.</p>
+          <h2>Merchant support</h2>
+          <p>For Trolleys account, payment, payout, refund and dispute questions.</p>
           <a href={hostedServices.payments.contactHref}><span>{hostedServices.payments.email}</span><Icon name="arrow" /></a>
         </article>
         <article className="help-support-card">
-          <h2>Credit card inquiries</h2>
+          <h2>Card inquiries</h2>
           <p>Ask about the {cardProduct.name}. Applications are not open yet.</p>
           <a href={hostedServices.cards.contactHref}><span>{hostedServices.cards.email}</span><Icon name="arrow" /></a>
         </article>
         <article className="help-support-card">
-          <h2>Sign-in help</h2>
-          <p>Find sign-in and recovery guidance for your Trolleys account.</p>
-          <a href="#access"><span>Get sign-in help</span><Icon name="arrow" /></a>
+          <h2>Help signing in</h2>
+          <p>Find help signing in or recovering access for your Trolleys account.</p>
+          <a href="#access"><span>Get help signing in</span><Icon name="arrow" /></a>
         </article>
       </section>
       <div className="help-support-notes">
@@ -80,7 +91,7 @@ export default function HelpPage() {
       {topics.map(topic => <section key={topic.id} id={topic.id} className="help-guide">
         <h2>{topic.label}</h2>
         <div className="public-questions">{topic.questions.map(item => <details key={item.q}><summary>{item.q}<span aria-hidden="true">+</span></summary><p>{item.a}</p></details>)}</div>
-        {topic.link && <a className="welcome-text-link" href={topic.link} referrerPolicy="no-referrer" rel="noreferrer">{topic.action}<Icon name="arrow" /></a>}
+        {topic.id === "payments" && topic.link && <a className="welcome-text-link" href={topic.link} referrerPolicy="no-referrer" rel="noreferrer">{topic.action}<Icon name="arrow" /></a>}
       </section>)}
     </div>
   </Shell>;

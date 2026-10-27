@@ -8,11 +8,22 @@ import { PublicNavigation } from "./public-navigation";
 import { PaymentPortalLink } from "./service-entry";
 import { Icon } from "./icon";
 
-export function PublicHeader() {
+export function PublicHeader({ quietAccess = false }: { quietAccess?: boolean }) {
   const [open, setOpen] = useState(false);
   const header = useRef<HTMLElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
   const focusedControl = useRef<HTMLElement | null>(null);
+  const pointerInteraction = useRef(false);
+  useEffect(() => {
+    const pointer = () => { pointerInteraction.current = true; };
+    const keyboard = () => { pointerInteraction.current = false; };
+    document.addEventListener("pointerdown", pointer, true);
+    document.addEventListener("keydown", keyboard, true);
+    return () => {
+      document.removeEventListener("pointerdown", pointer, true);
+      document.removeEventListener("keydown", keyboard, true);
+    };
+  }, []);
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 960px)");
@@ -27,7 +38,7 @@ export function PublicHeader() {
       const menu = root.querySelector<HTMLElement>("#public-header-menu");
       const destination = desktop.matches
         ? focused === toggle.current
-          ? root.querySelector<HTMLElement>(".public-navigation [aria-current]") ?? root.querySelector<HTMLElement>(".public-navigation a") ?? root.querySelector<HTMLElement>(".brand-link")
+          ? root.querySelector<HTMLElement>(".public-navigation summary.is-current") ?? root.querySelector<HTMLElement>(".public-navigation > a[aria-current]") ?? root.querySelector<HTMLElement>(".public-navigation summary") ?? root.querySelector<HTMLElement>(".brand-link")
           : null
         : focused && menu?.contains(focused) ? toggle.current : null;
       setOpen(false);
@@ -46,29 +57,31 @@ export function PublicHeader() {
       }
     };
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && !event.defaultPrevented) {
         event.preventDefault();
         setOpen(false);
         toggle.current?.focus();
       }
     };
-    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("click", closeOutside);
     document.addEventListener("keydown", closeOnEscape);
     return () => {
-      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("click", closeOutside);
       document.removeEventListener("keydown", closeOnEscape);
     };
   }, [open]);
 
-  return <header className="site-header public-header" ref={header} onFocusCapture={event => {
+  return <header className={`site-header public-header${quietAccess ? " public-header-quiet" : ""}`} ref={header} onFocusCapture={event => {
     if (event.target instanceof HTMLElement) focusedControl.current = event.target;
   }} onBlur={event => {
-    if (event.currentTarget.contains(event.relatedTarget)) return;
+    if (event.currentTarget.contains(event.relatedTarget) || pointerInteraction.current) return;
+    event.currentTarget.querySelectorAll<HTMLDetailsElement>("details[open]").forEach(item => { item.open = false; });
     // Retain the last control only for a layout-driven blur so the breakpoint handler can restore focus.
     if (!event.relatedTarget && event.target instanceof HTMLElement && !event.target.getClientRects().length) return;
     focusedControl.current = null;
     setOpen(false);
   }}>
+    <noscript><span className="public-header-no-script" hidden /></noscript>
     <div className="header-inner">
       <Link href="/" className="brand-link" aria-label="Etail Depot home" onClick={() => setOpen(false)}>
         <BrandImage brand="etail" alt="Etail Depot" width={800} height={150} className="brand-logo" />
@@ -79,7 +92,8 @@ export function PublicHeader() {
       <div id="public-header-menu" className={`public-header-menu${open ? " is-open" : ""}`}>
         <PublicNavigation onNavigate={() => { focusedControl.current = null; setOpen(false); }} />
         <div className="header-actions">
-          <PaymentPortalLink className="header-sign-in">Open Trolleys</PaymentPortalLink>
+          <Link href="/help" className="header-help" onClick={() => setOpen(false)}>Help</Link>
+          <PaymentPortalLink className="header-sign-in">Merchant access</PaymentPortalLink>
         </div>
       </div>
     </div>

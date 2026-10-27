@@ -1,22 +1,20 @@
 import { BrandImage } from "./brand-image";
 import "./brand-images-etail.css";
 import Link from "next/link";
-import { serviceLabels } from "@/shared/service-language";
+import { serviceNavigation, useCaseNavigation } from "@/shared/site-navigation";
 import { legalIdentity } from "@/shared/legal-identity";
-import { hostedServices } from "@/shared/hosted-services";
+
 
 const footerGroups = [
-  { title: "Services", links: [
-    { href: "/payment-acceptance-service", label: serviceLabels.payments },
-    { href: "/credit-card-services", label: serviceLabels.cards },
+  { title: "Services", links: serviceNavigation },
+  { title: "Use cases", links: useCaseNavigation },
+  { title: "Documentation", links: [
+    { href: "/docs#merchant-operations", label: "Merchant operations" },
+    { href: "/docs#developer-integration", label: "Developer integration" },
   ] },
-  { title: "Support", links: [
-    { href: "/help", label: "Help center" },
-    { href: "/help#access", label: "Sign-in help" },
-  ] },
-  { title: "Contact", links: [
-    { href: hostedServices.payments.contactHref, label: "Payment acceptance support" },
-    { href: hostedServices.cards.contactHref, label: "Credit card inquiries" },
+  { title: "Guides", links: [
+    { href: "/guides/iso-20022", label: "ISO 20022" },
+    { href: "/guides/iso-8583", label: "ISO 8583" },
   ] },
 ] as const;
 
@@ -41,7 +39,7 @@ export function PublicFooter() {
           <p>© {new Date().getUTCFullYear()} <span className="public-footer-company-name">{legalIdentity.company}</span> All rights reserved.</p>
         </div>
         <nav className="public-footer-legal" aria-label="Footer legal">
-          <Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link>
+          <Link href="/help">Help center</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link>
         </nav>
       </div>
     </div>

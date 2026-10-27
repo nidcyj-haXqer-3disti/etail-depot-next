@@ -1,43 +1,22 @@
 import type { Metadata, MetadataRoute } from "next";
+import { INDEXABLE_PUBLIC_PATHS, isIndexablePath } from "@/shared/public-page-inventory";
 import { serviceLabels } from "@/shared/service-language";
 import { productFacts } from "@/shared/product-facts";
 import { cardProduct } from "@/shared/card-product";
 import { legalIdentity, publicCompanyDescription } from "@/shared/legal-identity";
 import { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
-import { PUBLISHED_GUIDES } from "./guide-catalog";
 export { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
 
 const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts.cards.monthlyFeeDollars
   ? `$${productFacts.cards.annualFeeDollars} annual and monthly fees`
   : `$${productFacts.cards.annualFeeDollars} annual fee and $${productFacts.cards.monthlyFeeDollars} monthly fee`;
 
-type GuidePath = (typeof PUBLISHED_GUIDES)[number]["path"];
-type PageDescription = { title: string; description: string };
-
-// Reviewed search titles and descriptions for the original four articles.
-const existingGuideMetadata = {
-  "/guides/stripe-alternatives": { title: "Stripe Alternatives: Stripe vs Trolleys", description: "Compare Stripe and Trolleys for online card payments. Review payment links, processing and dispute fees, account requirements and questions to ask before switching." },
-  "/guides/payment-processing-systems": { title: "Credit Card Processing Systems: How They Work", description: "Follow an online card payment from checkout to bank payout. Understand gateways, processors and merchant accounts, then compare fees and setup requirements." },
-  "/guides/what-is-a-chargeback": { title: "What Is a Chargeback? A Merchant Response Guide", description: "Understand chargebacks vs. refunds, fees and response evidence. Use a chargeback worksheet to organize the notice, deadline, records and submission." },
-  "/guides/how-to-create-a-payment-link": { title: "How to Create and Share a Payment Link", description: "Prepare a Trolleys payment request, share a link or QR code and check payment status. Learn what to include, what customers see and how fees apply." },
-} as const satisfies Partial<Record<GuidePath, PageDescription>>;
-
-// Only the explicit publication catalog supplies article metadata. No draft directory,
-// research register, section fragment or unknown /guides path becomes a public page.
-const guideMetadata = Object.fromEntries(PUBLISHED_GUIDES.map(guide => [
-  guide.path,
-  Object.hasOwn(existingGuideMetadata, guide.path)
-    ? existingGuideMetadata[guide.path as keyof typeof existingGuideMetadata]
-    : { title: guide.title, description: guide.description },
-])) as Record<GuidePath, PageDescription>;
-
 export const PUBLIC_PAGES = {
-  "/": { title: "Payment Acceptance & Credit Card Processing", description: "Accept online payments with Trolleys’ credit card processing system. Explore payment options, compare fees and learn what a chargeback is." },
-  "/credit-card-services": { title: "Ledgix Secured Credit Card — Coming Soon", description: `Meet the ${cardProduct.name}, a virtual ${cardProduct.creditType} coming soon. $${productFacts.cards.minimumDepositDollars} minimum deposit; ${cardFeesDescription}. Applications are not open.` },
-  "/payment-acceptance-service": { title: "Online Credit Card Processing with Trolleys", description: "Accept online credit and debit card payments with Trolleys. Create and share payment links or QR codes. Compare processing fees and optional Clarity coverage." },
-  "/help": { title: "Payment Acceptance & Credit Card Help", description: "Find Trolleys payment acceptance support, Ledgix credit card inquiries and sign-in guidance. Contact Etail Depot for website, privacy and legal questions." },
-  "/guides": { title: "Payment Acceptance Guides", description: "Practical guides for online merchants: payment links, checkout, fees, chargebacks, bank payments, invoicing and business finance." },
-  ...guideMetadata,
+  "/": { title: "Merchant Services & Credit Card Processing", description: "Merchant services for US businesses and payment partnerships for software providers. Explore card and ACH acceptance, checkout, transaction records and payouts." },
+  "/credit-card-services": { title: "Card Services: Ledgix Secured Credit Card", description: `${cardProduct.name}: virtual ${cardProduct.creditType}, $${productFacts.cards.minimumDepositDollars} minimum deposit, ${cardFeesDescription}. ${productFacts.cards.repayment}. Applications are not open.` },
+  "/payment-acceptance-service": { title: "Merchant Services & Online Card Processing", description: "Accept online card and ACH payments with Trolleys. Explore checkout, transaction records, payouts, refunds and disputes, plus clear card processing fees." },
+  "/help": { title: "Help Center: Merchant and Card Services", description: "Find Trolleys merchant support, Ledgix secured credit card inquiries and help signing in. Contact Etail Depot for website, privacy and legal questions." },
+  "/guides": { title: "ISO 20022 & ISO 8583 Code Reference", description: "Browse ISO 20022 external code sets and an independent ISO 8583 implementation reference, with message types, field formats, explanations and identified sources." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
@@ -46,20 +25,11 @@ export type PublicPath = keyof typeof PUBLIC_PAGES;
 // Do not advance for deployments, cosmetic edits or copyright-year changes alone.
 // Local revisions become public only in the next approved release.
 export const PUBLIC_PAGE_MODIFIED = {
-  "/": "2026-10-19",
-  "/credit-card-services": "2026-10-19",
-  "/payment-acceptance-service": "2026-10-21",
-  "/help": "2026-10-21",
-  "/guides": "2026-10-21",
-  ...Object.fromEntries(PUBLISHED_GUIDES.map(guide => [guide.path, "2026-10-20"])) as Record<GuidePath, string>,
-  "/guides/payment-processing-systems": "2026-10-21",
-  "/guides/what-is-a-chargeback": "2026-10-21",
-  "/guides/how-to-create-a-payment-link": "2026-10-21",
-  "/guides/how-3d-secure-works": "2026-10-21",
-  "/guides/stripe-alternatives": "2026-10-21",
-  "/guides/profit-and-loss-statement": "2026-10-21",
-  "/guides/important-invoice-management-tips": "2026-10-21",
-  "/guides/designing-robust-and-predictable-apis-with-idempotency": "2026-10-21",
+  "/": "2026-10-27",
+  "/credit-card-services": "2026-10-24",
+  "/payment-acceptance-service": "2026-10-27",
+  "/help": "2026-10-27",
+  "/guides": "2026-10-28",
 } as const satisfies Record<PublicPath, string>;
 
 export function publicIndexingEnabled(): boolean {
@@ -71,7 +41,7 @@ export const publicSocialImage = {
   url: `${canonicalOrigin}/opengraph-image`,
   width: 1200,
   height: 630,
-  alt: `Etail Depot — Trolleys payment acceptance available now; ${cardProduct.name} coming soon`,
+  alt: `Etail Depot: Merchant services and card services. ${cardProduct.name}: applications are not open.`,
 };
 const homeTitle = `${PUBLIC_PAGES["/"].title} | Etail Depot`;
 export const rootMetadata: Metadata = {
@@ -96,15 +66,48 @@ export function publicPageMetadata(path: PublicPath): Metadata {
     // Absolute titles also brand Home, where the root layout's child template does not apply.
     title: { absolute: title }, description: page.description,
     alternates: { canonical: url },
-    robots: publicIndexingEnabled() ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } } : privateRobots,
+    robots: pageRobots(path),
     openGraph: { type: "website", url, title, description: page.description, siteName: "Etail Depot", locale: "en_US", images: [publicSocialImage] },
     twitter: { card: "summary_large_image", title, description: page.description, images: [publicSocialImage] },
   };
 }
+
+// Reviewed service and documentation pages share the same exact production guard.
+export const SERVICE_PAGES = {
+  "/docs/merchant-onboarding": { title: "Merchant Account Setup | Documentation", description: "Prepare a merchant application, complete account review and confirm processing readiness." },
+  "/docs/integration-access": { title: "Integration Access | Documentation", description: "Map merchant accounts, permissions and separate credentials for checkout and reporting." },
+  "/docs/checkout": { title: "Online Checkout | Documentation", description: "Connect an order to checkout, payment completion and a verified transaction result." },
+  "/docs/payment-requests": { title: "Payment Requests | Documentation", description: "Create and share a hosted payment request, then match the transaction to the order." },
+  "/docs/payment-status": { title: "Payment Status | Documentation", description: "Understand authorization, capture, pending results and safe recovery from an interrupted payment." },
+  "/docs/refunds-and-disputes": { title: "Refunds and Disputes | Documentation", description: "Choose the appropriate refund or dispute action and follow the operation through its result." },
+  "/docs/payouts": { title: "Payouts and Reconciliation | Documentation", description: "Reconcile settlements, fees and adjustments with funding records and bank receipt." },
+  "/docs/webhooks": { title: "Events and Webhooks | Documentation", description: "Handle account, payment and funding events with verification, deduplication and recovery." },
+  "/docs/testing-and-launch": { title: "Sandbox and Launch | Documentation", description: "Arrange sandbox access, confirm payment setup and prepare for launch." },
+  "/online-businesses": { title: "Online Payments for Businesses", description: "Explore merchant onboarding, online card and ACH checkout, payment requests and payout records for your US business." },
+  "/docs": { title: "Payment Documentation: Merchant Operations and Developer Integration", description: "Set up merchant accounts, integrate checkout, and manage payments through reconciliation. Documentation for merchant operations and developer integration." },
+  "/software-partners": { title: "Payment Processing for Software Platforms", description: "Explore Trolleys merchant services for the US businesses using your software: card and ACH acceptance, payment records, refunds and disputes." },
+} as const;
+export function servicePageMetadata(path: keyof typeof SERVICE_PAGES): Metadata {
+  if (!Object.hasOwn(SERVICE_PAGES, path)) throw new Error("Only the exact reviewed service page may use service metadata.");
+  const page = SERVICE_PAGES[path], url = new URL(path, canonicalOrigin).href;
+  const title = `${page.title} | Etail Depot`;
+  return {
+    title: { absolute: title }, description: page.description,
+    alternates: { canonical: url }, robots: pageRobots(path),
+    openGraph: { type: "website", url, title, description: page.description, siteName: "Etail Depot", locale: "en_US", images: [publicSocialImage] },
+    twitter: { card: "summary_large_image", title, description: page.description, images: [publicSocialImage] },
+  };
+}
+export function pageRobots(path: string): Metadata["robots"] {
+  return isIndexablePath(path) && publicIndexingEnabled() ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } } : privateRobots;
+}
+export function publicPageModified(path: string): string {
+  return Object.hasOwn(PUBLIC_PAGE_MODIFIED, path) ? PUBLIC_PAGE_MODIFIED[path as PublicPath] : path.startsWith("/guides/iso-8583") ? "2026-10-28" : "2026-10-27";
+}
 export function publicSitemap(): MetadataRoute.Sitemap {
   // Never read identities, services, cards, channels, support cases or database rows here.
-  return publicIndexingEnabled() ? (Object.keys(PUBLIC_PAGES) as PublicPath[]).map(path => ({
-    url: publicPageUrl(path), lastModified: PUBLIC_PAGE_MODIFIED[path],
+  return publicIndexingEnabled() ? INDEXABLE_PUBLIC_PATHS.map(path => ({
+    url: new URL(path, canonicalOrigin).href, lastModified: publicPageModified(path),
   })) : [];
 }
 export function publicRobots(): MetadataRoute.Robots {
@@ -119,7 +122,6 @@ const breadcrumbLabels = {
   "/payment-acceptance-service": serviceLabels.payments,
   "/help": "Help",
   "/guides": "Guides",
-  ...Object.fromEntries(PUBLISHED_GUIDES.map(guide => [guide.path, guide.title])) as Record<GuidePath, string>,
 } satisfies Record<Exclude<PublicPath, "/">, string>;
 
 export function publicPageJsonLd(path: PublicPath): string {
@@ -127,7 +129,6 @@ export function publicPageJsonLd(path: PublicPath): string {
   const organizationId = `${canonicalOrigin}/#organization`;
   const websiteId = `${canonicalOrigin}/#website`;
   const breadcrumbId = `${url}#breadcrumb`;
-  const isGuide = path.startsWith("/guides/");
   const data = {
     "@context": "https://schema.org", "@graph": [
       {
@@ -136,7 +137,7 @@ export function publicPageJsonLd(path: PublicPath): string {
         url: `${canonicalOrigin}/`, logo: `${canonicalOrigin}/brand/logo.png`, email: legalIdentity.complianceEmail,
         brand: legalIdentity.brands.map(brand => ({ "@type": "Brand", name: brand.name })),
         contactPoint: legalIdentity.brands.map(brand => ({
-          "@type": "ContactPoint", name: brand.name, contactType: brand.name === "Ledgix" ? "Credit card inquiries" : "Payment acceptance support", email: brand.email,
+          "@type": "ContactPoint", name: brand.name, contactType: brand.name === "Ledgix" ? "Credit card inquiries" : "Merchant support", email: brand.email,
         })),
       },
       {
@@ -144,18 +145,26 @@ export function publicPageJsonLd(path: PublicPath): string {
         description: PUBLIC_PAGES["/"].description, inLanguage: "en-US", publisher: { "@id": organizationId },
       },
       {
-        "@type": "WebPage", "@id": `${url}#webpage`, url, name: page.title, description: page.description,
+        "@type": path === "/guides" ? "CollectionPage" : "WebPage", "@id": `${url}#webpage`, url, name: page.title, description: page.description,
+        ...(path === "/guides" ? { mainEntity: { "@id": `${url}#reference-collections` } } : {}),
         dateModified: PUBLIC_PAGE_MODIFIED[path],
         inLanguage: "en-US", isPartOf: { "@id": websiteId }, publisher: { "@id": organizationId },
         primaryImageOfPage: { "@type": "ImageObject", url: publicSocialImage.url, width: publicSocialImage.width, height: publicSocialImage.height },
         ...(path !== "/" ? { breadcrumb: { "@id": breadcrumbId } } : {}),
       },
+      ...(path === "/guides" ? [{
+        "@type": "ItemList", "@id": `${url}#reference-collections`, name: "Payment standards",
+        numberOfItems: 2, itemListOrder: "https://schema.org/ItemListUnordered",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "ISO 20022", url: `${url}/iso-20022` },
+          { "@type": "ListItem", position: 2, name: "ISO 8583", url: `${url}/iso-8583` },
+        ],
+      }] : []),
       ...(path !== "/" ? [{
         "@type": "BreadcrumbList", "@id": breadcrumbId,
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Etail Depot", item: publicPageUrl("/") },
-          ...(isGuide ? [{ "@type": "ListItem", position: 2, name: "Guides", item: publicPageUrl("/guides") }] : []),
-          { "@type": "ListItem", position: isGuide ? 3 : 2, name: breadcrumbLabels[path], item: url },
+          { "@type": "ListItem", position: 2, name: breadcrumbLabels[path], item: url },
         ],
       }] : []),
     ],

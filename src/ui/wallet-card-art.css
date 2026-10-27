@@ -1,7 +1,7 @@
 /* The artwork explains wallet setup; only the guide controls are interactive. */
-.wallet-card-art { container-type: inline-size; min-width: 0; width: 100%; padding: 26px; border: 1px solid #dae2e0; border-radius: 12px; background: #f3f6f4; color: var(--public-ink); }
-.wallet-setup-tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; gap: 4px; border: 1px solid #dce3df; border-radius: 12px; background: #e6ece8; }
-.wallet-setup-tabs button { min-width: 0; min-height: 44px; padding: 10px 8px; border: 0; border-radius: 8px; background: transparent; color: #4b6058; font-family: inherit; font-size: 13px; font-weight: 500; line-height: 1.4; cursor: pointer; }
+.wallet-card-art { container-type: inline-size; min-width: 0; width: 100%; padding: 26px; border: 1px solid var(--public-frame-line); border-radius: var(--public-radius); background: var(--public-frame-surface); color: var(--public-ink); }
+.wallet-setup-tabs { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; gap: 4px; border: 1px solid var(--public-frame-line); border-radius: var(--public-radius); background: var(--public-frame-surface); }
+.wallet-setup-tabs button { min-width: 0; min-height: 44px; padding: 10px 8px; border: 0; border-radius: var(--public-control-radius); background: transparent; color: #4b6058; font-family: inherit; font-size: 13px; font-weight: 500; line-height: 1.4; cursor: pointer; }
 .wallet-setup-tabs button[aria-selected="true"] { background: #fff; color: #183d35; box-shadow: 0 1px 3px #15392b12; }
 .wallet-setup-tabs button:hover { color: #183d35; background: #ffffff80; }
 .wallet-setup-tabs button[aria-selected="true"]:hover { background: #fff; }
@@ -9,7 +9,7 @@
 .wallet-setup-panel:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 5px; }
 .wallet-setup-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; list-style: none; margin: 20px 0 24px; padding: 0; }
 .wallet-setup-steps li { min-width: 0; }
-.wallet-setup-steps button { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 44px; padding: 8px 4px; border: 0; border-bottom: 2px solid #dce4df; background: transparent; color: #54655d; font-size: 12px; line-height: 1.4; font-family: inherit; cursor: pointer; }
+.wallet-setup-steps button { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 48px; padding: 8px 4px; border: 0; border-bottom: 2px solid #dce4df; background: transparent; color: #54655d; font-size: 12px; line-height: 1.4; font-family: inherit; cursor: pointer; }
 .wallet-setup-steps button > span { display: grid; place-items: center; flex: 0 0 20px; width: 20px; height: 20px; border-radius: 50%; background: #e3e9e4; font-size: 12px; }
 .wallet-setup-steps button[aria-pressed="true"] { border-color: #2a5c45; color: #214b3d; font-weight: 600; }
 .wallet-setup-steps button[aria-pressed="true"] > span { color: #fff; background: #2a5c45; }
@@ -17,8 +17,8 @@
 .wallet-setup-scene { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 24px; }
 .wallet-setup-description { grid-column: 1; grid-row: 1; }
 .wallet-setup-description h3 { font-size: 24px; line-height: 1.25; letter-spacing: -.035em; font-weight: 500; text-wrap: balance; }
-.wallet-setup-description p { margin-top: 14px; color: #51665b; font-size: 14px; line-height: 1.65; }
-.wallet-setup-phone { position: relative; grid-column: 2; grid-row: 1; width: 100%; max-width: 214px; aspect-ratio: .56; justify-self: center; border: 1px solid #728078; border-radius: 29px; background: #233a30; box-shadow: 0 12px 24px -16px #173b3240; }
+.wallet-setup-description p { margin-top: 14px; color: #51665b; font-size: 14px; line-height: 1.75; }
+.wallet-setup-phone { position: relative; grid-column: 2; grid-row: 1; width: 100%; max-width: 214px; aspect-ratio: .56; justify-self: center; border: 1px solid #728078; border-radius: 29px; background: #233a30; box-shadow: 0 18px 30px -22px #173b3240, 0 2px 5px #173b3210; }
 .wallet-setup-screen { position: absolute; inset: 5px; overflow: hidden; border: 1px solid #2f4435; border-radius: 23px; background: #fff; }
 .wallet-setup-camera { position: absolute; top: 8px; left: 37%; width: 26%; height: 8px; border-radius: 8px; background: #203129; }
 .wallet-setup-phone-google .wallet-setup-camera { width: 7px; height: 7px; left: calc(50% - 3.5px); }
@@ -26,7 +26,7 @@
 .wallet-setup-screen-heading > b { display: grid; place-items: center; flex: 0 0 19px; height: 19px; border-radius: 50%; font-size: 17px; font-weight: 400; background: #edf1f4; }
 .wallet-setup-screen-heading > .icon { width: 16px; height: 16px; flex-shrink: 0; }
 .wallet-setup-card-wrap { position: relative; margin: 18px 11px 0; aspect-ratio: 1.586; }
-.ledgix-wallet-card { position: absolute; inset: 0; container-type: inline-size; isolation: isolate; overflow: hidden; border-radius: 8px; border: 1px solid #dbe6f0; background: linear-gradient(125deg, #fff 20%, #f2f8ff 70%, #e8f3ff); box-shadow: 0 3px 7px #2c4e720d; }
+.ledgix-wallet-card { position: absolute; inset: 0; container-type: inline-size; isolation: isolate; overflow: hidden; border-radius: 8px; border: 1px solid #dbe6f0; background: linear-gradient(125deg, #fff 20%, #f2f8ff 70%, #e8f3ff); box-shadow: 0 4px 10px -5px #2c4e7220; }
 .ledgix-wallet-card-accent { position: absolute; width: 62%; aspect-ratio: 1; top: -36%; right: -38%; transform: rotate(25deg); background: #369bf31a; border: 1px solid #369bf329; box-shadow: 0 0 0 11px #369bf307, 0 0 0 24px #369bf307; }
 .ledgix-wallet-card-logo { position: absolute; top: 12%; left: 8%; width: 56%; height: auto; }
 .ledgix-wallet-card-name { position: absolute; bottom: 14%; left: 8%; font-size: 4cqw; font-weight: 500; letter-spacing: .01em; color: #345d78; }
@@ -61,7 +61,7 @@
 
 /* Quiet product art for discovery; the single interactive guide lives further down the Cards page. */
 .wallet-product-art { position: relative; container-type: inline-size; isolation: isolate; display: grid; place-items: center; width: 100%; min-width: 0; height: var(--consumer-art-height, 480px); margin: 0; padding: 24px; overflow: hidden; border: 1px solid #dfe6e0; border-radius: 12px; background: linear-gradient(145deg, #f4f6ef, #e7eee8); }
-.wallet-product-device { position: relative; width: clamp(194px, 40cqw, 216px); aspect-ratio: .56; border: 1px solid #778b82; border-radius: 33px; background: #243d33; box-shadow: 0 12px 24px -16px #173b3240; }
+.wallet-product-device { position: relative; width: clamp(194px, 40cqw, 216px); aspect-ratio: .56; border: 1px solid #778b82; border-radius: 33px; background: #243d33; box-shadow: 0 18px 30px -22px #173b3240, 0 2px 5px #173b3210; }
 .wallet-product-screen { position: absolute; inset: 5px; overflow: hidden; border: 1px solid #354a3b; border-radius: 27px; background: linear-gradient(180deg, #fff 40%, #f6f8f6); }
 .wallet-product-camera { position: absolute; top: 11px; left: 37%; width: 26%; height: 8px; border-radius: 8px; background: #203129; }
 .wallet-product-card { position: relative; margin: 62px 12px 0; aspect-ratio: 1.586; }

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { retiredRoute } from "../../src/shared/public-routes";
+import { managedContentRoute, retiredRoute } from "../../src/shared/public-routes";
 import { canonicalOrigin, defaultOrigin, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release";
 import { config, handlePublicRequest, publicSecurityHeaders, type PublicBoundaryContext } from "../../netlify/edge-functions/public-boundary";
 
@@ -7,29 +7,7 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production",
   ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
-const guidePaths = [
-  "/guides",
-  "/guides/stripe-alternatives",
-  "/guides/payment-processing-systems",
-  "/guides/what-is-a-chargeback",
-  "/guides/how-to-create-a-payment-link",
-  "/guides/optimize-your-mobile-checkout-experience",
-  "/guides/cart-abandonment-vs-checkout-abandonment",
-  "/guides/consuming-webhooks",
-  "/guides/designing-robust-and-predictable-apis-with-idempotency",
-  "/guides/how-3d-secure-works",
-  "/guides/account-takeover-fraud",
-  "/guides/important-invoice-management-tips",
-  "/guides/types-of-invoice-discrepancies",
-  "/guides/b2b-payment-methods",
-  "/guides/ach-debit",
-  "/guides/edi-payment-how-does-it-differ-from-ach-and-eft",
-  "/guides/pick-the-right-payment-methods-in-a-new-country",
-  "/guides/important-information-about-bic-and-swift-codes",
-  "/guides/profit-and-loss-statement",
-  "/guides/read-a-balance-sheet",
-  "/guides/credit-card-interest",
-] as const;
+const guidePaths = ["/guides"] as const;
 function context(response = new Response("public page"), changes: Partial<PublicBoundaryContext> = {}) {
   return { site: { id: PUBLIC_INDEXING_APPROVAL.siteId }, deploy: { context: "production" }, next: vi.fn(async () => response), ...changes };
 }
@@ -48,6 +26,40 @@ const movedPublicPages = [
 const publicAliases = movedPublicPages.flatMap(([oldPath, destination]) =>
   [oldPath, `${oldPath}/`, `${oldPath}.html`, `${oldPath}/index.html`].map(path => [path, destination] as const),
 );
+
+describe.each(["software-partners", "docs", "online-businesses"])("reviewed %s boundary", root => {
+  it.each(["GET", "HEAD"])("serves approved %s documents and keeps aliases and payloads private", async method => {
+    for (const suffix of ["", "/", ".html", "/index.html", ".txt", "/__next._tree.txt"]) {
+      const path = `/${root}${suffix}`, next = context(new Response(method === "HEAD" ? null : "page"));
+      const response = await handlePublicRequest(new Request(canonicalOrigin + path, { method }), next, production);
+      expect(response.status).toBe(200);
+      expect(response.headers.has("x-robots-tag")).toBe(suffix !== "");
+      expect(next.next).toHaveBeenCalledTimes(1);
+    }
+  });
+  it("preserves noindex and no-store in preview and wrong-site contexts", async () => {
+    for (const changes of [{ deploy: { context: "dev" } }, { deploy: { context: "deploy-preview" } }, { site: { id: "another-site" } }]) {
+      const response = await handlePublicRequest(new Request(canonicalOrigin + "/" + root), context(undefined, changes), production);
+      expect(response.status).toBe(200);
+      expect(response.headers.get("x-robots-tag")).toContain("noindex");
+      expect(response.headers.get("cache-control")).toBe("no-store");
+    }
+  });
+  it("denies unknown paths and encoded variants before downstream access", async () => {
+    for (const path of [`/${root}/private`, `/${root}/record.json`, `/${root}/__next.secret.txt`, `/${root.toUpperCase()}`, `/%${root.charCodeAt(0).toString(16)}${root.slice(1)}`]) {
+      expect(managedContentRoute(path)).toBe(true);
+      const next = context();
+      const response = await handlePublicRequest(new Request(canonicalOrigin + path), next, production);
+      expect(response.status).toBe(404); expect(next.next).not.toHaveBeenCalled();
+      expect(response.headers.get("x-robots-tag")).toContain("noindex");
+    }
+  });
+  it.each(["POST", "PUT", "PATCH", "DELETE", "OPTIONS"])("rejects %s without reading or forwarding a body", async method => {
+    const request = new Request(canonicalOrigin + "/" + root, { method, body: "synthetic" }), next = context();
+    const response = await handlePublicRequest(request, next, production);
+    expect(response.status).toBe(405); expect(request.bodyUsed).toBe(false); expect(next.next).not.toHaveBeenCalled();
+  });
+});
 
 describe("production domain migration", () => {
   it.each(["GET", "HEAD"])("redirects %s from the exact production subdomain without carrying query inputs", async method => {

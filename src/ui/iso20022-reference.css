@@ -1,0 +1,54 @@
+.iso-reference .sr-inner { padding-top:38px; }
+.iso-reference h1 { max-width:850px; overflow-wrap:anywhere; }
+.iso-reference .sr-copy, .iso-reference .iso-sidebar { min-width:0; }
+.iso-reference .iso-alphabet { display:flex;flex-wrap:wrap;gap:4px;margin:0 0 30px;padding:0 0 18px;border-bottom:1px solid var(--line); }
+.iso-reference .iso-alphabet a { display:flex;align-items:center;justify-content:center;min-width:40px;min-height:44px;text-decoration:none;font-size:14px;border-radius:4px; }
+.iso-reference .iso-alphabet a:hover { background:var(--wash); }
+.iso-reference :is(section,tr,details)[id] { scroll-margin-top:110px; }
+.iso-reference .iso-set-group { display:grid;grid-template-columns:36px minmax(0,1fr);gap:16px; }
+.iso-reference .iso-set-group h2 { margin-top:12px;font-size:22px; }
+.iso-reference .iso-set-list { list-style:none;padding:0;margin:0; }
+.iso-reference .iso-set-list li { border-bottom:1px solid var(--line); }
+.iso-reference .iso-set-list a { display:flex;gap:18px;justify-content:space-between;align-items:baseline;min-height:54px;padding:13px 0;text-decoration:none;font-size:15px;line-height:1.6; }
+.iso-reference .iso-count { white-space:nowrap;font-size:12px;color:var(--muted); }
+.iso-reference .iso-count span { margin-left:8px; }
+.iso-reference .iso-reading-note { padding:26px 4px 0;font-size:13px;color:var(--muted); }
+.iso-reference .iso-reading-note h2 { color:var(--ink);font-size:16px;letter-spacing:0; }
+.iso-reference .iso-definition { border-left:2px solid var(--accent);padding-left:22px;margin-bottom:32px; }
+.iso-reference .iso-definition h2 { font-size:13px;letter-spacing:0;color:var(--muted); }
+.iso-reference .iso-definition p { font-size:18px;line-height:1.75;white-space:pre-line;overflow-wrap:anywhere; }
+.iso-reference .iso-code-table strong { font-weight:500;overflow-wrap:anywhere; }
+.iso-reference .iso-code-table { margin-bottom:34px; }
+.iso-reference .iso-code-table td { overflow-wrap:anywhere; }
+.iso-reference .iso-code-table td:first-child { width:104px; }
+.iso-reference .iso-code-table td:first-child a { min-height:44px;padding-block:6px; }
+.iso-reference .iso-code-table caption { overflow-wrap:anywhere; }
+.iso-reference .iso-details { border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px 0; }
+.iso-reference .iso-details summary { cursor:pointer;min-height:52px;align-content:center;font-size:16px;padding:12px 0;line-height:1.5; }
+.iso-reference .iso-details summary span { font-size:12px;color:var(--muted);margin-left:8px; }
+.iso-reference .iso-details[open] { padding-bottom:18px; }
+.iso-reference :is(.iso-message-list,.iso-history,.iso-peer-list) { list-style:none;padding:0;margin:18px 0 0; }
+.iso-reference :is(.iso-message-list,.iso-history) li { display:grid;grid-template-columns:155px minmax(0,1fr);gap:15px;border-top:1px solid var(--line);padding:12px 0;font-size:13px;overflow-wrap:anywhere; }
+.iso-reference .iso-history li { grid-template-columns:60px minmax(0,1fr); }
+.iso-reference .iso-history small { display:block;color:var(--muted);font-size:12px;margin-top:4px; }
+.iso-reference .iso-peer-list a { display:block;padding:12px 0;min-height:44px;border-top:1px solid var(--line);font-size:14px;text-decoration:none; }
+.iso-reference .iso-peer-list span { display:block;color:var(--muted);font-size:13px;margin-top:3px; }
+.iso-reference .sr-copy a:focus-visible,.iso-reference summary:focus-visible { outline:2px solid var(--ink);outline-offset:4px;border-radius:2px; }
+@media(max-width:600px) {
+  .iso-reference h1 { font-size:31px;letter-spacing:-1px; }
+  .iso-reference h1 .sr-code { font-size:46px;letter-spacing:-2px; }
+  .iso-reference .iso-set-group { grid-template-columns:24px minmax(0,1fr);gap:10px; }
+  .iso-reference .iso-set-list a { flex-wrap:wrap;gap:2px 10px;font-size:15px;padding-block:13px; }
+  .iso-reference .iso-count { flex-basis:100%; }
+  .iso-reference .iso-definition { padding-left:16px; }
+  .iso-reference .iso-definition p { font-size:17px; }
+  .iso-reference .iso-code-table td:first-child { width:74px;padding-right:12px; }
+  .iso-reference .iso-message-list li { grid-template-columns:1fr;gap:5px; }
+}
+
+.iso-reference h1 .sr-code.iso-code-long { font-size:clamp(24px,7vw,46px);letter-spacing:-1px;overflow-wrap:normal; }
+
+.iso-reference .iso-source-replacement { border-left:2px solid var(--ink);padding-left:22px; }
+.iso-reference .iso-code-table .iso-source-advisory { color:var(--ink);margin-top:8px; }
+.iso-reference .iso-code-table .iso-source-advisory a { min-height:24px;padding-block:0; }
+@media(max-width:600px) { .iso-reference .iso-source-replacement { padding-left:16px; } }

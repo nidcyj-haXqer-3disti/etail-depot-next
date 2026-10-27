@@ -7,7 +7,7 @@
   --consumer-heading: clamp(2rem, 3.1vw, 2.5rem);
   --consumer-body: 16px;
   --consumer-small: 13px;
-  --consumer-space: 72px;
+  --consumer-space: 80px;
   --consumer-art-height: 440px;
   color: var(--home-ink);
   background: #fff;
@@ -26,19 +26,48 @@
 .consumer-product-eyebrow { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
 .consumer-product-eyebrow .service-availability { padding: 4px 10px; font-size: 12px; }
 
-/* One clear proposition, supported by the homepage's business photograph. */
+/* Product propositions share the company homepage's quiet editorial rhythm. */
 .consumer-hero { background: var(--public-paper); }
-.consumer-hero-grid { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr); align-items: center; gap: 48px; padding-block: 56px 48px; }
+.consumer-hero-grid { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr); align-items: center; gap: 48px; padding-block: 64px; }
 .consumer-hero-copy { padding-block: 16px; min-width: 0; }
 .consumer-hero h1 { font-size: var(--consumer-title); line-height: 1.08; letter-spacing: -.045em; margin-top: 24px; }
-.consumer-hero h1 > span { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; color: var(--public-accent); letter-spacing: -.045em; }
+.consumer-hero h1 > span { font-family: inherit; font-style: normal; font-weight: 400; color: var(--public-ink); letter-spacing: inherit; }
+.consumer-home .consumer-hero h1 { font-size: clamp(2.5rem, 4vw, 3.375rem); }
 .consumer-hero-copy > p { max-width: 42ch; font-size: 17px; line-height: 1.7; color: var(--home-muted); margin-top: 24px; }
 .consumer-hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-top: 28px; }
 .consumer-hero-visual { position: relative; isolation: isolate; overflow: hidden; height: var(--consumer-art-height); margin: 0; border-radius: var(--public-radius); background: var(--public-ink); }
 .consumer-hero-visual > img { object-fit: cover; object-position: center; }
-.consumer-networks { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.5fr); align-items: center; gap: 48px; border-top: 1px solid var(--home-line); padding-block: 28px; }
-.consumer-networks > p { max-width: 24ch; font-size: 24px; font-weight: 500; line-height: 1.35; letter-spacing: -.025em; color: var(--home-ink); text-wrap: balance; }
+.consumer-networks { display: grid; grid-template-columns: minmax(0,1fr); align-items: center; border-top: 1px solid var(--home-line); padding-block: 28px; }
 .consumer-networks .network-brands-accepted { width: 100%; justify-self: end; }
+
+/* Card networks, digital wallets and ACH retain their distinct identities. */
+.consumer-payment-methods { display: grid; grid-template-columns: minmax(0,4fr) minmax(0,3fr); align-items: center; gap: 12px; width: 100%; max-width: 1000px; min-width: 0; justify-self: center; }
+.consumer-payment-methods .network-brands-accepted { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; max-width: none; }
+.consumer-payment-methods .network-brand-slot { min-height: 64px; border: 0; background: transparent; }
+.consumer-payment-methods .network-mark-visa { width: 92px; max-width: 100%; }
+.consumer-payment-methods .network-mark-mastercard { width: 52px; max-width: 80%; }
+.consumer-payment-methods .network-mark-amex { width: 35px; }
+.consumer-payment-methods .network-mark-discover { width: 58px; max-width: 80%; }
+.consumer-bank-wallets { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; width: 100%; margin: 0; }
+.consumer-payment-mark { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 64px; border: 0; background: transparent; }
+.consumer-payment-mark img { display: block; height: auto; max-width: 86%; object-fit: contain; }
+.consumer-payment-mark .consumer-apple-pay { width: 65px; }
+.consumer-payment-mark .consumer-google-pay { width: 82px; }
+.consumer-ach { gap: 7px; color: var(--home-ink); font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+.consumer-ach .icon { flex: none; width: 21px; height: 21px; }
+@media (max-width: 680px) {
+  .consumer-payment-methods { grid-template-columns: minmax(0,1fr); max-width: 560px; gap: 0; }
+  .consumer-bank-wallets { width: calc(75% - 3px); margin: 12px auto 0; }
+}
+@media (max-width: 440px) {
+  .consumer-payment-methods .network-brands-accepted { gap: 8px; }
+  .consumer-bank-wallets { width: calc(75% - 2px); gap: 8px; margin-top: 8px; }
+  .consumer-payment-methods .network-brand-slot, .consumer-payment-mark { min-height: 58px; }
+  .consumer-payment-methods .network-mark-mastercard { width: 46px; }
+  .consumer-payment-methods .network-mark-amex { width: 32px; }
+  .consumer-ach { gap: 5px; font-size: 13px; }
+  .consumer-ach .icon { width: 18px; height: 18px; }
+}
 
 /* Channels explain the product through concrete customer moments. */
 .consumer-channels { padding-block: var(--consumer-space); scroll-margin-top: 28px; }
@@ -46,13 +75,16 @@
 .consumer-section-heading h2 { font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; margin-top: 16px; }
 .consumer-section-heading h2 > span { color: var(--public-accent); }
 .consumer-section-heading > p { max-width: 34ch; color: var(--home-muted); font-size: var(--consumer-body); line-height: 1.7; margin-bottom: 4px; }
+.consumer-home .payment-story-guide { margin-top: 28px; }
+.consumer-home .payment-story-guide .consumer-text-link { line-height: 1.6; }
+.consumer-home .payment-story-guide .icon { flex: 0 0 18px; }
 
 /* Upcoming cards have their own deliberate, quieter product moment. */
 .consumer-card-section { background: var(--public-tint); }
 .consumer-card-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; padding-block: var(--consumer-space); }
 .consumer-card-visual { min-width: 0; }
 .consumer-card-copy h2 { font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; margin-top: 16px; }
-.consumer-card-copy h2 > span { font-family: Georgia, serif; font-style: italic; color: var(--public-accent); }
+.consumer-card-copy h2 > span { font-family: inherit; font-style: normal; font-weight: 400; color: var(--public-ink); }
 .consumer-card-copy > p { font-size: var(--consumer-body); line-height: 1.7; color: var(--home-muted); margin-top: 24px; max-width: 41ch; }
 
 .consumer-page .public-faq-section { padding-block: var(--consumer-space); margin: 0 auto; border-top: 0; grid-template-columns: .85fr 1.15fr; gap: 64px; }
@@ -77,7 +109,6 @@
   .consumer-hero-copy > p { font-size: 16px; }
   .consumer-product-eyebrow { gap: 12px; }
   .consumer-networks { gap: 24px; }
-  .consumer-networks > p { font-size: 22px; }
   .consumer-section-heading { gap: 30px; }
   .consumer-section-heading > p { max-width: 30ch; }
   .consumer-card-grid { gap: 32px; }
@@ -93,7 +124,6 @@
   .consumer-hero-visual > img { object-position: 50% 45%; }
   .consumer-home .consumer-hero-visual { height: auto; aspect-ratio: 4 / 3; }
   .consumer-networks { grid-template-columns: minmax(0,1fr); gap: 20px; padding-block: 26px; }
-  .consumer-networks > p { max-width: none; font-size: 20px; text-wrap: pretty; }
   .consumer-section-heading { display: block; margin-bottom: 28px; }
   .consumer-section-heading > p { max-width: 43ch; margin-top: 20px; }
   .consumer-card-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -103,5 +133,5 @@
   .consumer-page .public-questions summary { min-height: 68px; }
 }
 /* Product pages continue the same editorial system as the homepage. */
-.consumer-product-hero h1 { font-size: min(var(--consumer-title), 64px); }
+.consumer-product-hero h1 { font-size: min(var(--consumer-title), 56px); }
 .consumer-product-note { max-width: 42ch; margin-top: 20px; font-size: var(--consumer-small); line-height: 1.6; color: var(--home-muted); }

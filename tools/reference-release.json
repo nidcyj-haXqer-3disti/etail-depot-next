@@ -1,0 +1,35 @@
+{
+  "reviewed": "2026-10-28",
+  "scope": {
+    "corePages": 19,
+    "iso20022Pages": 3455,
+    "independent8583Pages": 251,
+    "contentPages": 3725,
+    "sitemapPages": 3723
+  },
+  "iso20022": {
+    "basis": "Published Financial Repository policy, retaining source attribution and contributor conditions",
+    "policy": "https://www.iso20022.org/intellectual-property-rights"
+  },
+  "independent8583": {
+    "basis": "Original explanations and identified open source implementation contributions",
+    "pyiso8583": {
+      "revision": "3842ba80c578f557625fc78a5b7ef18d30824e62",
+      "license": "MIT"
+    },
+    "moov": {
+      "revision": "5972bcd0d8af54abe97ba06e77de23fb6d0e499a",
+      "license": "Apache-2.0"
+    },
+    "excluded": "The previous reproduced ISO 8583 tables and edition routes. No ISO republication permission is asserted."
+  },
+  "files": {
+    "src/modules/public-site/iso20022-data.json": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
+    "src/modules/public-site/iso8583-independent-data.json": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
+    "src/shared/standard-reference-paths.ts": "8a9859adb7cf77a4ace61b641a9f8eae9dc77c6aa837069644c643932913a270",
+    "public/licenses/iso20022-reference-NOTICE.txt": "2125d0188bbc870725f39c4240f168e173bc9dc14c77e2cfd6a7df37f1cf3586",
+    "public/licenses/iso8583-reference-NOTICE.txt": "e63e5ebbd1dc6215baefd4ea69b111bb69d6afed418f25e33ea4c6c9bed98971",
+    "public/licenses/pyiso8583-MIT.txt": "804badb01a7e2e71ddd21947faaef6823de4511da46fd97b7e91197570cc9faf",
+    "public/licenses/moov-iso8583-Apache-2.0.txt": "3c96c0da3de9587c2062f25bc7efccba795f81dbf1b08dc71652c856e88b01a8"
+  }
+}

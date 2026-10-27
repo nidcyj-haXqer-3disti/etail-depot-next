@@ -1,0 +1,4949 @@
+{
+  "schemaVersion": 1,
+  "scope": "Independent implementation reference, not a reproduction of ISO code tables",
+  "reviewedOn": "2026-10-28",
+  "sources": [
+    {
+      "id": "pyiso8583",
+      "name": "pyiso8583 starter profiles",
+      "repository": "knovichikhin/pyiso8583",
+      "commit": "3842ba80c578f557625fc78a5b7ef18d30824e62",
+      "path": "iso8583/specs.py",
+      "license": "MIT",
+      "licensePath": "/licenses/pyiso8583-MIT.txt",
+      "url": "https://github.com/knovichikhin/pyiso8583/blob/3842ba80c578f557625fc78a5b7ef18d30824e62/iso8583/specs.py",
+      "sha256": "c4738266d59aaf070c27828734822bd709914ce9cf45bc2068b953d0bb444731"
+    },
+    {
+      "id": "moov",
+      "name": "Moov message type reference",
+      "repository": "moov-io/iso8583",
+      "commit": "5972bcd0d8af54abe97ba06e77de23fb6d0e499a",
+      "path": "docs/mti.md",
+      "license": "Apache-2.0",
+      "licensePath": "/licenses/moov-iso8583-Apache-2.0.txt",
+      "url": "https://github.com/moov-io/iso8583/blob/5972bcd0d8af54abe97ba06e77de23fb6d0e499a/docs/mti.md",
+      "sha256": "5af497fe1e6d07aa08f623ed8e14aa1a03274fecbd391404a8729c970335ad3f"
+    }
+  ],
+  "messages": [
+    {
+      "code": "0100",
+      "title": "Authorization request",
+      "version": "1987",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        86,
+        86
+      ]
+    },
+    {
+      "code": "1100",
+      "title": "Authorization request",
+      "version": "1993",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        86,
+        86
+      ]
+    },
+    {
+      "code": "2100",
+      "title": "Authorization request",
+      "version": "2003",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        86,
+        86
+      ]
+    },
+    {
+      "code": "0110",
+      "title": "Authorization response",
+      "version": "1987",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        87,
+        87
+      ]
+    },
+    {
+      "code": "1110",
+      "title": "Authorization response",
+      "version": "1993",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        87,
+        87
+      ]
+    },
+    {
+      "code": "2110",
+      "title": "Authorization response",
+      "version": "2003",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        87,
+        87
+      ]
+    },
+    {
+      "code": "0120",
+      "title": "Authorization advice",
+      "version": "1987",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        88,
+        88
+      ]
+    },
+    {
+      "code": "1120",
+      "title": "Authorization advice",
+      "version": "1993",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        88,
+        88
+      ]
+    },
+    {
+      "code": "2120",
+      "title": "Authorization advice",
+      "version": "2003",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        88,
+        88
+      ]
+    },
+    {
+      "code": "0121",
+      "title": "Authorization advice repeat",
+      "version": "1987",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        89,
+        89
+      ]
+    },
+    {
+      "code": "1121",
+      "title": "Authorization advice repeat",
+      "version": "1993",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        89,
+        89
+      ]
+    },
+    {
+      "code": "2121",
+      "title": "Authorization advice repeat",
+      "version": "2003",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        89,
+        89
+      ]
+    },
+    {
+      "code": "0130",
+      "title": "Authorization advice response",
+      "version": "1987",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        90,
+        90
+      ]
+    },
+    {
+      "code": "1130",
+      "title": "Authorization advice response",
+      "version": "1993",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        90,
+        90
+      ]
+    },
+    {
+      "code": "2130",
+      "title": "Authorization advice response",
+      "version": "2003",
+      "className": "Authorization",
+      "group": "authorization",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        90,
+        90
+      ]
+    },
+    {
+      "code": "0200",
+      "title": "Financial transaction request",
+      "version": "1987",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        91,
+        91
+      ]
+    },
+    {
+      "code": "1200",
+      "title": "Financial transaction request",
+      "version": "1993",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        91,
+        91
+      ]
+    },
+    {
+      "code": "2200",
+      "title": "Financial transaction request",
+      "version": "2003",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        91,
+        91
+      ]
+    },
+    {
+      "code": "0210",
+      "title": "Financial transaction response",
+      "version": "1987",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        92,
+        92
+      ]
+    },
+    {
+      "code": "1210",
+      "title": "Financial transaction response",
+      "version": "1993",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        92,
+        92
+      ]
+    },
+    {
+      "code": "2210",
+      "title": "Financial transaction response",
+      "version": "2003",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        92,
+        92
+      ]
+    },
+    {
+      "code": "0220",
+      "title": "Financial transaction advice",
+      "version": "1987",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        93,
+        93
+      ]
+    },
+    {
+      "code": "1220",
+      "title": "Financial transaction advice",
+      "version": "1993",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        93,
+        93
+      ]
+    },
+    {
+      "code": "2220",
+      "title": "Financial transaction advice",
+      "version": "2003",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        93,
+        93
+      ]
+    },
+    {
+      "code": "0221",
+      "title": "Financial transaction advice repeat",
+      "version": "1987",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        94,
+        94
+      ]
+    },
+    {
+      "code": "1221",
+      "title": "Financial transaction advice repeat",
+      "version": "1993",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        94,
+        94
+      ]
+    },
+    {
+      "code": "2221",
+      "title": "Financial transaction advice repeat",
+      "version": "2003",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        94,
+        94
+      ]
+    },
+    {
+      "code": "0230",
+      "title": "Financial transaction advice response",
+      "version": "1987",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        95,
+        95
+      ]
+    },
+    {
+      "code": "1230",
+      "title": "Financial transaction advice response",
+      "version": "1993",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        95,
+        95
+      ]
+    },
+    {
+      "code": "2230",
+      "title": "Financial transaction advice response",
+      "version": "2003",
+      "className": "Financial transaction",
+      "group": "financial",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        95,
+        95
+      ]
+    },
+    {
+      "code": "0320",
+      "title": "File action advice",
+      "version": "1987",
+      "className": "File action",
+      "group": "file",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        96,
+        96
+      ]
+    },
+    {
+      "code": "1320",
+      "title": "File action advice",
+      "version": "1993",
+      "className": "File action",
+      "group": "file",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        96,
+        96
+      ]
+    },
+    {
+      "code": "2320",
+      "title": "File action advice",
+      "version": "2003",
+      "className": "File action",
+      "group": "file",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        96,
+        96
+      ]
+    },
+    {
+      "code": "0330",
+      "title": "File action advice response",
+      "version": "1987",
+      "className": "File action",
+      "group": "file",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        97,
+        97
+      ]
+    },
+    {
+      "code": "1330",
+      "title": "File action advice response",
+      "version": "1993",
+      "className": "File action",
+      "group": "file",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        97,
+        97
+      ]
+    },
+    {
+      "code": "2330",
+      "title": "File action advice response",
+      "version": "2003",
+      "className": "File action",
+      "group": "file",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        97,
+        97
+      ]
+    },
+    {
+      "code": "0400",
+      "title": "Reversal request",
+      "version": "1987",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        98,
+        98
+      ]
+    },
+    {
+      "code": "1400",
+      "title": "Reversal request",
+      "version": "1993",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        98,
+        98
+      ]
+    },
+    {
+      "code": "2400",
+      "title": "Reversal request",
+      "version": "2003",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        98,
+        98
+      ]
+    },
+    {
+      "code": "0402",
+      "title": "Reversal request",
+      "version": "1987",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "request",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        99,
+        99
+      ]
+    },
+    {
+      "code": "1402",
+      "title": "Reversal request",
+      "version": "1993",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "request",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        99,
+        99
+      ]
+    },
+    {
+      "code": "2402",
+      "title": "Reversal request",
+      "version": "2003",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "request",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        99,
+        99
+      ]
+    },
+    {
+      "code": "0410",
+      "title": "Reversal response",
+      "version": "1987",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        100,
+        100
+      ]
+    },
+    {
+      "code": "1410",
+      "title": "Reversal response",
+      "version": "1993",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        100,
+        100
+      ]
+    },
+    {
+      "code": "2410",
+      "title": "Reversal response",
+      "version": "2003",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        100,
+        100
+      ]
+    },
+    {
+      "code": "0412",
+      "title": "Reversal response",
+      "version": "1987",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        101,
+        101
+      ]
+    },
+    {
+      "code": "1412",
+      "title": "Reversal response",
+      "version": "1993",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        101,
+        101
+      ]
+    },
+    {
+      "code": "2412",
+      "title": "Reversal response",
+      "version": "2003",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        101,
+        101
+      ]
+    },
+    {
+      "code": "0420",
+      "title": "Reversal advice",
+      "version": "1987",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        102,
+        102
+      ]
+    },
+    {
+      "code": "1420",
+      "title": "Reversal advice",
+      "version": "1993",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        102,
+        102
+      ]
+    },
+    {
+      "code": "2420",
+      "title": "Reversal advice",
+      "version": "2003",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        102,
+        102
+      ]
+    },
+    {
+      "code": "0421",
+      "title": "Reversal advice repeat",
+      "version": "1987",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        103,
+        103
+      ]
+    },
+    {
+      "code": "1421",
+      "title": "Reversal advice repeat",
+      "version": "1993",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        103,
+        103
+      ]
+    },
+    {
+      "code": "2421",
+      "title": "Reversal advice repeat",
+      "version": "2003",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        103,
+        103
+      ]
+    },
+    {
+      "code": "0430",
+      "title": "Reversal advice response",
+      "version": "1987",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        104,
+        104
+      ]
+    },
+    {
+      "code": "1430",
+      "title": "Reversal advice response",
+      "version": "1993",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        104,
+        104
+      ]
+    },
+    {
+      "code": "2430",
+      "title": "Reversal advice response",
+      "version": "2003",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        104,
+        104
+      ]
+    },
+    {
+      "code": "0432",
+      "title": "Reversal advice response",
+      "version": "1987",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        105,
+        105
+      ]
+    },
+    {
+      "code": "1432",
+      "title": "Reversal advice response",
+      "version": "1993",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        105,
+        105
+      ]
+    },
+    {
+      "code": "2432",
+      "title": "Reversal advice response",
+      "version": "2003",
+      "className": "Reversal",
+      "group": "reversal",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        105,
+        105
+      ]
+    },
+    {
+      "code": "0500",
+      "title": "Reconciliation request",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        106,
+        106
+      ]
+    },
+    {
+      "code": "1500",
+      "title": "Reconciliation request",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        106,
+        106
+      ]
+    },
+    {
+      "code": "2500",
+      "title": "Reconciliation request",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        106,
+        106
+      ]
+    },
+    {
+      "code": "0502",
+      "title": "Reconciliation request",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "request",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        107,
+        107
+      ]
+    },
+    {
+      "code": "1502",
+      "title": "Reconciliation request",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "request",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        107,
+        107
+      ]
+    },
+    {
+      "code": "2502",
+      "title": "Reconciliation request",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "request",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        107,
+        107
+      ]
+    },
+    {
+      "code": "0510",
+      "title": "Reconciliation response",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        108,
+        108
+      ]
+    },
+    {
+      "code": "1510",
+      "title": "Reconciliation response",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        108,
+        108
+      ]
+    },
+    {
+      "code": "2510",
+      "title": "Reconciliation response",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        108,
+        108
+      ]
+    },
+    {
+      "code": "0512",
+      "title": "Reconciliation response",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        109,
+        109
+      ]
+    },
+    {
+      "code": "1512",
+      "title": "Reconciliation response",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        109,
+        109
+      ]
+    },
+    {
+      "code": "2512",
+      "title": "Reconciliation response",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        109,
+        109
+      ]
+    },
+    {
+      "code": "0520",
+      "title": "Reconciliation advice",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        110,
+        110
+      ]
+    },
+    {
+      "code": "1520",
+      "title": "Reconciliation advice",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        110,
+        110
+      ]
+    },
+    {
+      "code": "2520",
+      "title": "Reconciliation advice",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        110,
+        110
+      ]
+    },
+    {
+      "code": "0521",
+      "title": "Reconciliation advice repeat",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        111,
+        111
+      ]
+    },
+    {
+      "code": "1521",
+      "title": "Reconciliation advice repeat",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        111,
+        111
+      ]
+    },
+    {
+      "code": "2521",
+      "title": "Reconciliation advice repeat",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        111,
+        111
+      ]
+    },
+    {
+      "code": "0522",
+      "title": "Reconciliation advice",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        112,
+        112
+      ]
+    },
+    {
+      "code": "1522",
+      "title": "Reconciliation advice",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        112,
+        112
+      ]
+    },
+    {
+      "code": "2522",
+      "title": "Reconciliation advice",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        112,
+        112
+      ]
+    },
+    {
+      "code": "0523",
+      "title": "Reconciliation advice repeat",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Issuer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        113,
+        113
+      ]
+    },
+    {
+      "code": "1523",
+      "title": "Reconciliation advice repeat",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Issuer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        113,
+        113
+      ]
+    },
+    {
+      "code": "2523",
+      "title": "Reconciliation advice repeat",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice",
+      "origin": "Issuer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        113,
+        113
+      ]
+    },
+    {
+      "code": "0530",
+      "title": "Reconciliation advice response",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        114,
+        114
+      ]
+    },
+    {
+      "code": "1530",
+      "title": "Reconciliation advice response",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        114,
+        114
+      ]
+    },
+    {
+      "code": "2530",
+      "title": "Reconciliation advice response",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        114,
+        114
+      ]
+    },
+    {
+      "code": "0532",
+      "title": "Reconciliation advice response",
+      "version": "1987",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        115,
+        115
+      ]
+    },
+    {
+      "code": "1532",
+      "title": "Reconciliation advice response",
+      "version": "1993",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        115,
+        115
+      ]
+    },
+    {
+      "code": "2532",
+      "title": "Reconciliation advice response",
+      "version": "2003",
+      "className": "Reconciliation",
+      "group": "reconciliation",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        115,
+        115
+      ]
+    },
+    {
+      "code": "0604",
+      "title": "Administration request",
+      "version": "1987",
+      "className": "Administration",
+      "group": "administration",
+      "function": "request",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        116,
+        116
+      ]
+    },
+    {
+      "code": "1604",
+      "title": "Administration request",
+      "version": "1993",
+      "className": "Administration",
+      "group": "administration",
+      "function": "request",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        116,
+        116
+      ]
+    },
+    {
+      "code": "2604",
+      "title": "Administration request",
+      "version": "2003",
+      "className": "Administration",
+      "group": "administration",
+      "function": "request",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        116,
+        116
+      ]
+    },
+    {
+      "code": "0605",
+      "title": "Administration request repeat",
+      "version": "1987",
+      "className": "Administration",
+      "group": "administration",
+      "function": "request",
+      "origin": "Other origin repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        117,
+        117
+      ]
+    },
+    {
+      "code": "1605",
+      "title": "Administration request repeat",
+      "version": "1993",
+      "className": "Administration",
+      "group": "administration",
+      "function": "request",
+      "origin": "Other origin repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        117,
+        117
+      ]
+    },
+    {
+      "code": "2605",
+      "title": "Administration request repeat",
+      "version": "2003",
+      "className": "Administration",
+      "group": "administration",
+      "function": "request",
+      "origin": "Other origin repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        117,
+        117
+      ]
+    },
+    {
+      "code": "0614",
+      "title": "Administration response",
+      "version": "1987",
+      "className": "Administration",
+      "group": "administration",
+      "function": "response",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        118,
+        118
+      ]
+    },
+    {
+      "code": "1614",
+      "title": "Administration response",
+      "version": "1993",
+      "className": "Administration",
+      "group": "administration",
+      "function": "response",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        118,
+        118
+      ]
+    },
+    {
+      "code": "2614",
+      "title": "Administration response",
+      "version": "2003",
+      "className": "Administration",
+      "group": "administration",
+      "function": "response",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        118,
+        118
+      ]
+    },
+    {
+      "code": "0624",
+      "title": "Administration advice",
+      "version": "1987",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        119,
+        119
+      ]
+    },
+    {
+      "code": "1624",
+      "title": "Administration advice",
+      "version": "1993",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        119,
+        119
+      ]
+    },
+    {
+      "code": "2624",
+      "title": "Administration advice",
+      "version": "2003",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        119,
+        119
+      ]
+    },
+    {
+      "code": "0625",
+      "title": "Administration advice repeat",
+      "version": "1987",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice",
+      "origin": "Other origin repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        120,
+        120
+      ]
+    },
+    {
+      "code": "1625",
+      "title": "Administration advice repeat",
+      "version": "1993",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice",
+      "origin": "Other origin repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        120,
+        120
+      ]
+    },
+    {
+      "code": "2625",
+      "title": "Administration advice repeat",
+      "version": "2003",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice",
+      "origin": "Other origin repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        120,
+        120
+      ]
+    },
+    {
+      "code": "0634",
+      "title": "Administration advice response",
+      "version": "1987",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice response",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        121,
+        121
+      ]
+    },
+    {
+      "code": "1634",
+      "title": "Administration advice response",
+      "version": "1993",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice response",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        121,
+        121
+      ]
+    },
+    {
+      "code": "2634",
+      "title": "Administration advice response",
+      "version": "2003",
+      "className": "Administration",
+      "group": "administration",
+      "function": "advice response",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        121,
+        121
+      ]
+    },
+    {
+      "code": "0644",
+      "title": "Administration notification",
+      "version": "1987",
+      "className": "Administration",
+      "group": "administration",
+      "function": "notification",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        122,
+        122
+      ]
+    },
+    {
+      "code": "1644",
+      "title": "Administration notification",
+      "version": "1993",
+      "className": "Administration",
+      "group": "administration",
+      "function": "notification",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        122,
+        122
+      ]
+    },
+    {
+      "code": "2644",
+      "title": "Administration notification",
+      "version": "2003",
+      "className": "Administration",
+      "group": "administration",
+      "function": "notification",
+      "origin": "Other origin",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        122,
+        122
+      ]
+    },
+    {
+      "code": "0720",
+      "title": "Fee collection advice",
+      "version": "1987",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        123,
+        123
+      ]
+    },
+    {
+      "code": "1720",
+      "title": "Fee collection advice",
+      "version": "1993",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        123,
+        123
+      ]
+    },
+    {
+      "code": "2720",
+      "title": "Fee collection advice",
+      "version": "2003",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        123,
+        123
+      ]
+    },
+    {
+      "code": "0721",
+      "title": "Fee collection advice repeat",
+      "version": "1987",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        124,
+        124
+      ]
+    },
+    {
+      "code": "1721",
+      "title": "Fee collection advice repeat",
+      "version": "1993",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        124,
+        124
+      ]
+    },
+    {
+      "code": "2721",
+      "title": "Fee collection advice repeat",
+      "version": "2003",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        124,
+        124
+      ]
+    },
+    {
+      "code": "0722",
+      "title": "Fee collection advice",
+      "version": "1987",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        125,
+        125
+      ]
+    },
+    {
+      "code": "1722",
+      "title": "Fee collection advice",
+      "version": "1993",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        125,
+        125
+      ]
+    },
+    {
+      "code": "2722",
+      "title": "Fee collection advice",
+      "version": "2003",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        125,
+        125
+      ]
+    },
+    {
+      "code": "0723",
+      "title": "Fee collection advice repeat",
+      "version": "1987",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Issuer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        126,
+        126
+      ]
+    },
+    {
+      "code": "1723",
+      "title": "Fee collection advice repeat",
+      "version": "1993",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Issuer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        126,
+        126
+      ]
+    },
+    {
+      "code": "2723",
+      "title": "Fee collection advice repeat",
+      "version": "2003",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice",
+      "origin": "Issuer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        126,
+        126
+      ]
+    },
+    {
+      "code": "0730",
+      "title": "Fee collection advice response",
+      "version": "1987",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        127,
+        127
+      ]
+    },
+    {
+      "code": "1730",
+      "title": "Fee collection advice response",
+      "version": "1993",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        127,
+        127
+      ]
+    },
+    {
+      "code": "2730",
+      "title": "Fee collection advice response",
+      "version": "2003",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        127,
+        127
+      ]
+    },
+    {
+      "code": "0732",
+      "title": "Fee collection advice response",
+      "version": "1987",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        128,
+        128
+      ]
+    },
+    {
+      "code": "1732",
+      "title": "Fee collection advice response",
+      "version": "1993",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        128,
+        128
+      ]
+    },
+    {
+      "code": "2732",
+      "title": "Fee collection advice response",
+      "version": "2003",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "advice response",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        128,
+        128
+      ]
+    },
+    {
+      "code": "0740",
+      "title": "Fee collection notification",
+      "version": "1987",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "notification",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        129,
+        129
+      ]
+    },
+    {
+      "code": "1740",
+      "title": "Fee collection notification",
+      "version": "1993",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "notification",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        129,
+        129
+      ]
+    },
+    {
+      "code": "2740",
+      "title": "Fee collection notification",
+      "version": "2003",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "notification",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        129,
+        129
+      ]
+    },
+    {
+      "code": "0742",
+      "title": "Fee collection notification",
+      "version": "1987",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "notification",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        130,
+        130
+      ]
+    },
+    {
+      "code": "1742",
+      "title": "Fee collection notification",
+      "version": "1993",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "notification",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        130,
+        130
+      ]
+    },
+    {
+      "code": "2742",
+      "title": "Fee collection notification",
+      "version": "2003",
+      "className": "Fee collection",
+      "group": "fees",
+      "function": "notification",
+      "origin": "Issuer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        130,
+        130
+      ]
+    },
+    {
+      "code": "0800",
+      "title": "Network management request",
+      "version": "1987",
+      "className": "Network management",
+      "group": "network",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        131,
+        131
+      ]
+    },
+    {
+      "code": "1800",
+      "title": "Network management request",
+      "version": "1993",
+      "className": "Network management",
+      "group": "network",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        131,
+        131
+      ]
+    },
+    {
+      "code": "2800",
+      "title": "Network management request",
+      "version": "2003",
+      "className": "Network management",
+      "group": "network",
+      "function": "request",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        131,
+        131
+      ]
+    },
+    {
+      "code": "0810",
+      "title": "Network management response",
+      "version": "1987",
+      "className": "Network management",
+      "group": "network",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        132,
+        132
+      ]
+    },
+    {
+      "code": "1810",
+      "title": "Network management response",
+      "version": "1993",
+      "className": "Network management",
+      "group": "network",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        132,
+        132
+      ]
+    },
+    {
+      "code": "2810",
+      "title": "Network management response",
+      "version": "2003",
+      "className": "Network management",
+      "group": "network",
+      "function": "response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        132,
+        132
+      ]
+    },
+    {
+      "code": "0820",
+      "title": "Network management advice",
+      "version": "1987",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        133,
+        133
+      ]
+    },
+    {
+      "code": "1820",
+      "title": "Network management advice",
+      "version": "1993",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        133,
+        133
+      ]
+    },
+    {
+      "code": "2820",
+      "title": "Network management advice",
+      "version": "2003",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        133,
+        133
+      ]
+    },
+    {
+      "code": "0821",
+      "title": "Network management advice repeat",
+      "version": "1987",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        134,
+        134
+      ]
+    },
+    {
+      "code": "1821",
+      "title": "Network management advice repeat",
+      "version": "1993",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        134,
+        134
+      ]
+    },
+    {
+      "code": "2821",
+      "title": "Network management advice repeat",
+      "version": "2003",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice",
+      "origin": "Acquirer repeat",
+      "repeat": true,
+      "source": "moov",
+      "sourceLines": [
+        134,
+        134
+      ]
+    },
+    {
+      "code": "0830",
+      "title": "Network management advice response",
+      "version": "1987",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        135,
+        135
+      ]
+    },
+    {
+      "code": "1830",
+      "title": "Network management advice response",
+      "version": "1993",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        135,
+        135
+      ]
+    },
+    {
+      "code": "2830",
+      "title": "Network management advice response",
+      "version": "2003",
+      "className": "Network management",
+      "group": "network",
+      "function": "advice response",
+      "origin": "Acquirer",
+      "repeat": false,
+      "source": "moov",
+      "sourceLines": [
+        135,
+        135
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "code": "1",
+      "title": "Bitmap, Secondary",
+      "sourceLabel": "Bitmap, Secondary",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        201,
+        1424
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "b",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Bitmap, Secondary"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Bitmap, Secondary"
+        }
+      }
+    },
+    {
+      "code": "2",
+      "title": "Primary Account Number (PAN)",
+      "sourceLabel": "Primary Account Number (PAN)",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        202,
+        1431
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 19,
+          "desc": "Primary Account Number (PAN)"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 19,
+          "desc": "Primary Account Number (PAN)"
+        }
+      }
+    },
+    {
+      "code": "3",
+      "title": "Processing Code",
+      "sourceLabel": "Processing Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        203,
+        1438
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "Processing Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "Processing Code"
+        }
+      }
+    },
+    {
+      "code": "4",
+      "title": "Amount, Transaction",
+      "sourceLabel": "Amount, Transaction",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        204,
+        1445
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Amount, Transaction"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Amount, Transaction"
+        }
+      }
+    },
+    {
+      "code": "5",
+      "title": "Amount, Settlement",
+      "sourceLabel": "Amount, Settlement",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        205,
+        1452
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Amount, Settlement"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Amount, Settlement"
+        }
+      }
+    },
+    {
+      "code": "6",
+      "title": "Amount, Cardholder Billing",
+      "sourceLabel": "Amount, Cardholder Billing",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        206,
+        1459
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Amount, Cardholder Billing"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Amount, Cardholder Billing"
+        }
+      }
+    },
+    {
+      "code": "7",
+      "title": "Transmission Date and Time",
+      "sourceLabel": "Transmission Date and Time",
+      "group": "dates",
+      "source": "pyiso8583",
+      "sourceLines": [
+        207,
+        1466
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Transmission Date and Time"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Transmission Date and Time"
+        }
+      }
+    },
+    {
+      "code": "8",
+      "title": "Amount, Cardholder Billing Fee",
+      "sourceLabel": "Amount, Cardholder Billing Fee",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        208,
+        1473
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Amount, Cardholder Billing Fee"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Amount, Cardholder Billing Fee"
+        }
+      }
+    },
+    {
+      "code": "9",
+      "title": "Conversion Rate, Settlement",
+      "sourceLabel": "Conversion Rate, Settlement",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        209,
+        1480
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Conversion Rate, Settlement"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Conversion Rate, Settlement"
+        }
+      }
+    },
+    {
+      "code": "10",
+      "title": "Conversion Rate, Cardholder Billing",
+      "sourceLabel": "Conversion Rate, Cardholder Billing",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        210,
+        1487
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Conversion Rate, Cardholder Billing"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Conversion Rate, Cardholder Billing"
+        }
+      }
+    },
+    {
+      "code": "11",
+      "title": "System Trace Audit Number",
+      "sourceLabel": "System Trace Audit Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        211,
+        1494
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "System Trace Audit Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "System Trace Audit Number"
+        }
+      }
+    },
+    {
+      "code": "12",
+      "title": "Time, Local Transaction",
+      "sourceLabel": "Time, Local Transaction",
+      "group": "dates",
+      "source": "pyiso8583",
+      "sourceLines": [
+        212,
+        1501
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "Time, Local Transaction"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "Time, Local Transaction"
+        }
+      }
+    },
+    {
+      "code": "13",
+      "title": "Date, Local Transaction",
+      "sourceLabel": "Date, Local Transaction",
+      "group": "dates",
+      "source": "pyiso8583",
+      "sourceLines": [
+        213,
+        1508
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Local Transaction"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Local Transaction"
+        }
+      }
+    },
+    {
+      "code": "14",
+      "title": "Date, Expiration",
+      "sourceLabel": "Date, Expiration",
+      "group": "dates",
+      "source": "pyiso8583",
+      "sourceLines": [
+        214,
+        1515
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Expiration"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Expiration"
+        }
+      }
+    },
+    {
+      "code": "15",
+      "title": "Date, Settlement",
+      "sourceLabel": "Date, Settlement",
+      "group": "dates",
+      "source": "pyiso8583",
+      "sourceLines": [
+        215,
+        1522
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Settlement"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Settlement"
+        }
+      }
+    },
+    {
+      "code": "16",
+      "title": "Date, Conversion",
+      "sourceLabel": "Date, Conversion",
+      "group": "dates",
+      "source": "pyiso8583",
+      "sourceLines": [
+        216,
+        1529
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Conversion"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Conversion"
+        }
+      }
+    },
+    {
+      "code": "17",
+      "title": "Date, Capture",
+      "sourceLabel": "Date, Capture",
+      "group": "dates",
+      "source": "pyiso8583",
+      "sourceLines": [
+        217,
+        1536
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Capture"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Date, Capture"
+        }
+      }
+    },
+    {
+      "code": "18",
+      "title": "Merchant Type",
+      "sourceLabel": "Merchant Type",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        218,
+        1543
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Merchant Type"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Merchant Type"
+        }
+      }
+    },
+    {
+      "code": "19",
+      "title": "Acquiring Institution Country Code",
+      "sourceLabel": "Acquiring Institution Country Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        219,
+        1550
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Acquiring Institution Country Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Acquiring Institution Country Code"
+        }
+      }
+    },
+    {
+      "code": "20",
+      "title": "PAN Country Code",
+      "sourceLabel": "PAN Country Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        220,
+        1557
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "PAN Country Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "PAN Country Code"
+        }
+      }
+    },
+    {
+      "code": "21",
+      "title": "Forwarding Institution Country Code",
+      "sourceLabel": "Forwarding Institution Country Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        221,
+        1564
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Forwarding Institution Country Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Forwarding Institution Country Code"
+        }
+      }
+    },
+    {
+      "code": "22",
+      "title": "Point of service Entry Mode",
+      "sourceLabel": "Point-of-Service Entry Mode",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        222,
+        1571
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Point-of-Service Entry Mode"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Point-of-Service Entry Mode"
+        }
+      }
+    },
+    {
+      "code": "23",
+      "title": "PAN Sequence Number",
+      "sourceLabel": "PAN Sequence Number",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        223,
+        1578
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "PAN Sequence Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "PAN Sequence Number"
+        }
+      }
+    },
+    {
+      "code": "24",
+      "title": "Network International ID (NII)",
+      "sourceLabel": "Network International ID (NII)",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        224,
+        1585
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Network International ID (NII)"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Network International ID (NII)"
+        }
+      }
+    },
+    {
+      "code": "25",
+      "title": "Point of service Condition Code",
+      "sourceLabel": "Point-of-Service Condition Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        225,
+        1592
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "Point-of-Service Condition Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "Point-of-Service Condition Code"
+        }
+      }
+    },
+    {
+      "code": "26",
+      "title": "Point of service Capture Code",
+      "sourceLabel": "Point-of-Service Capture Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        226,
+        1599
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "Point-of-Service Capture Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "Point-of-Service Capture Code"
+        }
+      }
+    },
+    {
+      "code": "27",
+      "title": "Authorizing ID Response Length",
+      "sourceLabel": "Authorizing ID Response Length",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        227,
+        1606
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 1,
+          "desc": "Authorizing ID Response Length"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 1,
+          "desc": "Authorizing ID Response Length"
+        }
+      }
+    },
+    {
+      "code": "28",
+      "title": "Amount, Transaction Fee",
+      "sourceLabel": "Amount, Transaction Fee",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        228,
+        1613
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 9,
+          "desc": "Amount, Transaction Fee"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 9,
+          "desc": "Amount, Transaction Fee"
+        }
+      }
+    },
+    {
+      "code": "29",
+      "title": "Amount, Settlement Fee",
+      "sourceLabel": "Amount, Settlement Fee",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        229,
+        1620
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 9,
+          "desc": "Amount, Settlement Fee"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 9,
+          "desc": "Amount, Settlement Fee"
+        }
+      }
+    },
+    {
+      "code": "30",
+      "title": "Amount, Transaction Processing Fee",
+      "sourceLabel": "Amount, Transaction Processing Fee",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        230,
+        1627
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 9,
+          "desc": "Amount, Transaction Processing Fee"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 9,
+          "desc": "Amount, Transaction Processing Fee"
+        }
+      }
+    },
+    {
+      "code": "31",
+      "title": "Amount, Settlement Processing Fee",
+      "sourceLabel": "Amount, Settlement Processing Fee",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        231,
+        1634
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 9,
+          "desc": "Amount, Settlement Processing Fee"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 9,
+          "desc": "Amount, Settlement Processing Fee"
+        }
+      }
+    },
+    {
+      "code": "32",
+      "title": "Acquiring Institution ID Code",
+      "sourceLabel": "Acquiring Institution ID Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        232,
+        1641
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 11,
+          "desc": "Acquiring Institution ID Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 11,
+          "desc": "Acquiring Institution ID Code"
+        }
+      }
+    },
+    {
+      "code": "33",
+      "title": "Forwarding Institution ID Code",
+      "sourceLabel": "Forwarding Institution ID Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        233,
+        1648
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 11,
+          "desc": "Forwarding Institution ID Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 11,
+          "desc": "Forwarding Institution ID Code"
+        }
+      }
+    },
+    {
+      "code": "34",
+      "title": "Primary Account Number, Extended",
+      "sourceLabel": "Primary Account Number, Extended",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        234,
+        1655
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 28,
+          "desc": "Primary Account Number, Extended"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 28,
+          "desc": "Primary Account Number, Extended"
+        }
+      }
+    },
+    {
+      "code": "35",
+      "title": "Track 2 Data",
+      "sourceLabel": "Track 2 Data",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        235,
+        1662
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 37,
+          "desc": "Track 2 Data"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 37,
+          "desc": "Track 2 Data"
+        }
+      }
+    },
+    {
+      "code": "36",
+      "title": "Track 3 Data",
+      "sourceLabel": "Track 3 Data",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        236,
+        1669
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 104,
+          "desc": "Track 3 Data"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 104,
+          "desc": "Track 3 Data"
+        }
+      }
+    },
+    {
+      "code": "37",
+      "title": "Retrieval Reference Number",
+      "sourceLabel": "Retrieval Reference Number",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        237,
+        1676
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Retrieval Reference Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Retrieval Reference Number"
+        }
+      }
+    },
+    {
+      "code": "38",
+      "title": "Authorization ID Response",
+      "sourceLabel": "Authorization ID Response",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        238,
+        1683
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "Authorization ID Response"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "Authorization ID Response"
+        }
+      }
+    },
+    {
+      "code": "39",
+      "title": "Response Code",
+      "sourceLabel": "Response Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        239,
+        1690
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "Response Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "Response Code"
+        }
+      }
+    },
+    {
+      "code": "40",
+      "title": "Service Restriction Code",
+      "sourceLabel": "Service Restriction Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        240,
+        1697
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Service Restriction Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Service Restriction Code"
+        }
+      }
+    },
+    {
+      "code": "41",
+      "title": "Card Acceptor Terminal ID",
+      "sourceLabel": "Card Acceptor Terminal ID",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        241,
+        1704
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Card Acceptor Terminal ID"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Card Acceptor Terminal ID"
+        }
+      }
+    },
+    {
+      "code": "42",
+      "title": "Card Acceptor ID Code",
+      "sourceLabel": "Card Acceptor ID Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        242,
+        1711
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 15,
+          "desc": "Card Acceptor ID Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 15,
+          "desc": "Card Acceptor ID Code"
+        }
+      }
+    },
+    {
+      "code": "43",
+      "title": "Card Acceptor Name/Location",
+      "sourceLabel": "Card Acceptor Name/Location",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        243,
+        1718
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 40,
+          "desc": "Card Acceptor Name/Location"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 40,
+          "desc": "Card Acceptor Name/Location"
+        }
+      }
+    },
+    {
+      "code": "44",
+      "title": "Additional Response Data",
+      "sourceLabel": "Additional Response Data",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        244,
+        1725
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 25,
+          "desc": "Additional Response Data"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 25,
+          "desc": "Additional Response Data"
+        }
+      }
+    },
+    {
+      "code": "45",
+      "title": "Track 1 Data",
+      "sourceLabel": "Track 1 Data",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        245,
+        1732
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 76,
+          "desc": "Track 1 Data"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 76,
+          "desc": "Track 1 Data"
+        }
+      }
+    },
+    {
+      "code": "46",
+      "title": "Additional Data \u00b7 ISO",
+      "sourceLabel": "Additional Data - ISO",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        246,
+        1739
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 999,
+          "desc": "Additional Data - ISO"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 999,
+          "desc": "Additional Data - ISO"
+        }
+      }
+    },
+    {
+      "code": "47",
+      "title": "Additional Data \u00b7 National",
+      "sourceLabel": "Additional Data - National",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        247,
+        1746
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 999,
+          "desc": "Additional Data - National"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 999,
+          "desc": "Additional Data - National"
+        }
+      }
+    },
+    {
+      "code": "48",
+      "title": "Additional Data \u00b7 Private",
+      "sourceLabel": "Additional Data - Private",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        248,
+        1753
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 999,
+          "desc": "Additional Data - Private"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 999,
+          "desc": "Additional Data - Private"
+        }
+      }
+    },
+    {
+      "code": "49",
+      "title": "Currency Code, Transaction",
+      "sourceLabel": "Currency Code, Transaction",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        249,
+        1760
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Currency Code, Transaction"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Currency Code, Transaction"
+        }
+      }
+    },
+    {
+      "code": "50",
+      "title": "Currency Code, Settlement",
+      "sourceLabel": "Currency Code, Settlement",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        250,
+        1767
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Currency Code, Settlement"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Currency Code, Settlement"
+        }
+      }
+    },
+    {
+      "code": "51",
+      "title": "Currency Code, Cardholder Billing",
+      "sourceLabel": "Currency Code, Cardholder Billing",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        251,
+        1774
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Currency Code, Cardholder Billing"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Currency Code, Cardholder Billing"
+        }
+      }
+    },
+    {
+      "code": "52",
+      "title": "PIN",
+      "sourceLabel": "PIN",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        252,
+        1781
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "b",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "PIN"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "PIN"
+        }
+      }
+    },
+    {
+      "code": "53",
+      "title": "Security related Control Information",
+      "sourceLabel": "Security-Related Control Information",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        253,
+        1788
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Security-Related Control Information"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Security-Related Control Information"
+        }
+      }
+    },
+    {
+      "code": "54",
+      "title": "Additional Amounts",
+      "sourceLabel": "Additional Amounts",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        254,
+        1795
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 240,
+          "desc": "Additional Amounts"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 240,
+          "desc": "Additional Amounts"
+        }
+      }
+    },
+    {
+      "code": "55",
+      "title": "ICC data",
+      "sourceLabel": "ICC data",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        255,
+        1802
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "b",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 255,
+          "desc": "ICC data"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 510,
+          "desc": "ICC data"
+        }
+      }
+    },
+    {
+      "code": "64",
+      "title": "MAC",
+      "sourceLabel": "MAC",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        264,
+        1865
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "b",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "MAC"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "MAC"
+        }
+      }
+    },
+    {
+      "code": "65",
+      "title": "Bitmap, Extended",
+      "sourceLabel": "Bitmap, Extended",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        265,
+        1872
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "b",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Bitmap, Extended"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Bitmap, Extended"
+        }
+      }
+    },
+    {
+      "code": "66",
+      "title": "Settlement Code",
+      "sourceLabel": "Settlement Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        266,
+        1879
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 1,
+          "desc": "Settlement Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 1,
+          "desc": "Settlement Code"
+        }
+      }
+    },
+    {
+      "code": "67",
+      "title": "Extended Payment Code",
+      "sourceLabel": "Extended Payment Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        267,
+        1886
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "Extended Payment Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "Extended Payment Code"
+        }
+      }
+    },
+    {
+      "code": "68",
+      "title": "Receiving Institution Country Code",
+      "sourceLabel": "Receiving Institution Country Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        268,
+        1893
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Receiving Institution Country Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Receiving Institution Country Code"
+        }
+      }
+    },
+    {
+      "code": "69",
+      "title": "Settlement Institution Country Code",
+      "sourceLabel": "Settlement Institution Country Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        269,
+        1900
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Settlement Institution Country Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Settlement Institution Country Code"
+        }
+      }
+    },
+    {
+      "code": "70",
+      "title": "Network Management Information Code",
+      "sourceLabel": "Network Management Information Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        270,
+        1907
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Network Management Information Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 3,
+          "desc": "Network Management Information Code"
+        }
+      }
+    },
+    {
+      "code": "71",
+      "title": "Message Number",
+      "sourceLabel": "Message Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        271,
+        1914
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Message Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Message Number"
+        }
+      }
+    },
+    {
+      "code": "72",
+      "title": "Message Number, Last",
+      "sourceLabel": "Message Number, Last",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        272,
+        1921
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Message Number, Last"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 4,
+          "desc": "Message Number, Last"
+        }
+      }
+    },
+    {
+      "code": "73",
+      "title": "Date, Action",
+      "sourceLabel": "Date, Action",
+      "group": "dates",
+      "source": "pyiso8583",
+      "sourceLines": [
+        273,
+        1928
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "Date, Action"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 6,
+          "desc": "Date, Action"
+        }
+      }
+    },
+    {
+      "code": "74",
+      "title": "Credits, Number",
+      "sourceLabel": "Credits, Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        274,
+        1935
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Credits, Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Credits, Number"
+        }
+      }
+    },
+    {
+      "code": "75",
+      "title": "Credits, Reversal Number",
+      "sourceLabel": "Credits, Reversal Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        275,
+        1942
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Credits, Reversal Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Credits, Reversal Number"
+        }
+      }
+    },
+    {
+      "code": "76",
+      "title": "Debits, Number",
+      "sourceLabel": "Debits, Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        276,
+        1949
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Debits, Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Debits, Number"
+        }
+      }
+    },
+    {
+      "code": "77",
+      "title": "Debits, Reversal Number",
+      "sourceLabel": "Debits, Reversal Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        277,
+        1956
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Debits, Reversal Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Debits, Reversal Number"
+        }
+      }
+    },
+    {
+      "code": "78",
+      "title": "Transfer, Number",
+      "sourceLabel": "Transfer, Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        278,
+        1963
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Transfer, Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Transfer, Number"
+        }
+      }
+    },
+    {
+      "code": "79",
+      "title": "Transfer, Reversal Number",
+      "sourceLabel": "Transfer, Reversal Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        279,
+        1970
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Transfer, Reversal Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Transfer, Reversal Number"
+        }
+      }
+    },
+    {
+      "code": "80",
+      "title": "Inquiries, Number",
+      "sourceLabel": "Inquiries, Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        280,
+        1977
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Inquiries, Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Inquiries, Number"
+        }
+      }
+    },
+    {
+      "code": "81",
+      "title": "Authorizations, Number",
+      "sourceLabel": "Authorizations, Number",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        281,
+        1984
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Authorizations, Number"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 10,
+          "desc": "Authorizations, Number"
+        }
+      }
+    },
+    {
+      "code": "82",
+      "title": "Credits, Processing Fee Amount",
+      "sourceLabel": "Credits, Processing Fee Amount",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        282,
+        1991
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Credits, Processing Fee Amount"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Credits, Processing Fee Amount"
+        }
+      }
+    },
+    {
+      "code": "83",
+      "title": "Credits, Transaction Fee Amount",
+      "sourceLabel": "Credits, Transaction Fee Amount",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        283,
+        1998
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Credits, Transaction Fee Amount"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Credits, Transaction Fee Amount"
+        }
+      }
+    },
+    {
+      "code": "84",
+      "title": "Debits, Processing Fee Amount",
+      "sourceLabel": "Debits, Processing Fee Amount",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        284,
+        2005
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Debits, Processing Fee Amount"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Debits, Processing Fee Amount"
+        }
+      }
+    },
+    {
+      "code": "85",
+      "title": "Debits, Transaction Fee Amount",
+      "sourceLabel": "Debits, Transaction Fee Amount",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        285,
+        2012
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Debits, Transaction Fee Amount"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 12,
+          "desc": "Debits, Transaction Fee Amount"
+        }
+      }
+    },
+    {
+      "code": "86",
+      "title": "Credits, Amount",
+      "sourceLabel": "Credits, Amount",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        286,
+        2019
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Credits, Amount"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Credits, Amount"
+        }
+      }
+    },
+    {
+      "code": "87",
+      "title": "Credits, Reversal Amount",
+      "sourceLabel": "Credits, Reversal Amount",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        287,
+        2026
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Credits, Reversal Amount"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Credits, Reversal Amount"
+        }
+      }
+    },
+    {
+      "code": "88",
+      "title": "Debits, Amount",
+      "sourceLabel": "Debits, Amount",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        288,
+        2033
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Debits, Amount"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Debits, Amount"
+        }
+      }
+    },
+    {
+      "code": "89",
+      "title": "Debits, Reversal Amount",
+      "sourceLabel": "Debits, Reversal Amount",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        289,
+        2040
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Debits, Reversal Amount"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Debits, Reversal Amount"
+        }
+      }
+    },
+    {
+      "code": "90",
+      "title": "Original Data Elements",
+      "sourceLabel": "Original Data Elements",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        290,
+        2047
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 42,
+          "desc": "Original Data Elements"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 42,
+          "desc": "Original Data Elements"
+        }
+      }
+    },
+    {
+      "code": "91",
+      "title": "File Update Code",
+      "sourceLabel": "File Update Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        291,
+        2054
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 1,
+          "desc": "File Update Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 1,
+          "desc": "File Update Code"
+        }
+      }
+    },
+    {
+      "code": "92",
+      "title": "File Security Code",
+      "sourceLabel": "File Security Code",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        292,
+        2061
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "File Security Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 2,
+          "desc": "File Security Code"
+        }
+      }
+    },
+    {
+      "code": "93",
+      "title": "Response Indicator",
+      "sourceLabel": "Response Indicator",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        293,
+        2068
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 5,
+          "desc": "Response Indicator"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 5,
+          "desc": "Response Indicator"
+        }
+      }
+    },
+    {
+      "code": "94",
+      "title": "Service Indicator",
+      "sourceLabel": "Service Indicator",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        294,
+        2075
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 7,
+          "desc": "Service Indicator"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 7,
+          "desc": "Service Indicator"
+        }
+      }
+    },
+    {
+      "code": "95",
+      "title": "Replacement Amounts",
+      "sourceLabel": "Replacement Amounts",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        295,
+        2082
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 42,
+          "desc": "Replacement Amounts"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 42,
+          "desc": "Replacement Amounts"
+        }
+      }
+    },
+    {
+      "code": "96",
+      "title": "Message Security Code",
+      "sourceLabel": "Message Security Code",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        296,
+        2089
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "b",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "Message Security Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "Message Security Code"
+        }
+      }
+    },
+    {
+      "code": "97",
+      "title": "Amount, Net Settlement",
+      "sourceLabel": "Amount, Net Settlement",
+      "group": "amounts",
+      "source": "pyiso8583",
+      "sourceLines": [
+        297,
+        2096
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 17,
+          "desc": "Amount, Net Settlement"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 17,
+          "desc": "Amount, Net Settlement"
+        }
+      }
+    },
+    {
+      "code": "98",
+      "title": "Payee",
+      "sourceLabel": "Payee",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        298,
+        2103
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 25,
+          "desc": "Payee"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 25,
+          "desc": "Payee"
+        }
+      }
+    },
+    {
+      "code": "99",
+      "title": "Settlement Institution ID Code",
+      "sourceLabel": "Settlement Institution ID Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        299,
+        2110
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 11,
+          "desc": "Settlement Institution ID Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 11,
+          "desc": "Settlement Institution ID Code"
+        }
+      }
+    },
+    {
+      "code": "100",
+      "title": "Receiving Institution ID Code",
+      "sourceLabel": "Receiving Institution ID Code",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        300,
+        2117
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 11,
+          "desc": "Receiving Institution ID Code"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 11,
+          "desc": "Receiving Institution ID Code"
+        }
+      }
+    },
+    {
+      "code": "101",
+      "title": "File Name",
+      "sourceLabel": "File Name",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        301,
+        2124
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 17,
+          "desc": "File Name"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 17,
+          "desc": "File Name"
+        }
+      }
+    },
+    {
+      "code": "102",
+      "title": "Account ID 1",
+      "sourceLabel": "Account ID 1",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        302,
+        2131
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 28,
+          "desc": "Account ID 1"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 28,
+          "desc": "Account ID 1"
+        }
+      }
+    },
+    {
+      "code": "103",
+      "title": "Account ID 2",
+      "sourceLabel": "Account ID 2",
+      "group": "identity",
+      "source": "pyiso8583",
+      "sourceLines": [
+        303,
+        2138
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 28,
+          "desc": "Account ID 2"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 2,
+          "max_len": 28,
+          "desc": "Account ID 2"
+        }
+      }
+    },
+    {
+      "code": "104",
+      "title": "Transaction Description",
+      "sourceLabel": "Transaction Description",
+      "group": "control",
+      "source": "pyiso8583",
+      "sourceLines": [
+        304,
+        2145
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 100,
+          "desc": "Transaction Description"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 3,
+          "max_len": 100,
+          "desc": "Transaction Description"
+        }
+      }
+    },
+    {
+      "code": "128",
+      "title": "MAC",
+      "sourceLabel": "MAC",
+      "group": "security",
+      "source": "pyiso8583",
+      "sourceLines": [
+        328,
+        2313
+      ],
+      "profiles": {
+        "default": {
+          "data_enc": "b",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 8,
+          "desc": "MAC"
+        },
+        "default_ascii": {
+          "data_enc": "ascii",
+          "len_enc": "ascii",
+          "len_type": 0,
+          "max_len": 16,
+          "desc": "MAC"
+        }
+      }
+    }
+  ],
+  "excludedReservedFields": [
+    "56",
+    "57",
+    "58",
+    "59",
+    "60",
+    "61",
+    "62",
+    "63",
+    "105",
+    "106",
+    "107",
+    "108",
+    "109",
+    "110",
+    "111",
+    "112",
+    "113",
+    "114",
+    "115",
+    "116",
+    "117",
+    "118",
+    "119",
+    "120",
+    "121",
+    "122",
+    "123",
+    "124",
+    "125",
+    "126",
+    "127"
+  ],
+  "sourceNotes": [
+    {
+      "source": "moov",
+      "note": "The prose mentions 2007 where its version table and examples use 2003. This reference uses the explicit example column and does not label it as the 2023 edition."
+    },
+    {
+      "source": "moov",
+      "note": "Some usage descriptions conflict with the digits. For example, the source labels 0320 as a request, while its function digit 2 denotes advice. Several response rows also describe a direction that conflicts with the request exchange. This reference explains the components and does not reuse those usage sentences or assert a universal direction of travel."
+    },
+    {
+      "source": "pyiso8583",
+      "note": "These are configurable starter profiles. Field labels, containers and lengths describe the selected profile, not a universal network contract or a complete code list."
+    }
+  ]
+}

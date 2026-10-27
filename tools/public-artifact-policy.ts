@@ -1,10 +1,13 @@
 /** Pure deployment-boundary detectors, shared by packaging checks and adversarial tests. */
+import { PUBLIC_CONTENT_PATHS, publicExportFile } from "../src/shared/public-page-inventory.ts";
+import { managedContentRoute, retiredArticleRoute } from "../src/shared/public-routes.ts";
+
 export const retiredFamilies = ["api", "checkout", "pay", "payments", "cardholder-services", "cards", "merchant-services", "merchants", "login", "profile", "security", "shared-access", "invitations", "operations", "money-accounts", "accounts", "services"] as const;
 export const boundarySource = "netlify/edge-functions/public-boundary.ts";
 export const edgeHandler = "public-boundary";
 
 /** Exact reviewed pages: adding a guide never opens the rest of its route family. */
-export const publicPageSources = [
+const retainedCorePageSources = [
   "page.tsx",
   "credit-card-services/page.tsx",
   "payment-acceptance-service/page.tsx",
@@ -12,30 +15,20 @@ export const publicPageSources = [
   "privacy/page.tsx",
   "terms/page.tsx",
   "guides/page.tsx",
-  "guides/stripe-alternatives/page.tsx",
-  "guides/payment-processing-systems/page.tsx",
-  "guides/what-is-a-chargeback/page.tsx",
-  "guides/how-to-create-a-payment-link/page.tsx",
-  "guides/optimize-your-mobile-checkout-experience/page.tsx",
-  "guides/cart-abandonment-vs-checkout-abandonment/page.tsx",
-  "guides/consuming-webhooks/page.tsx",
-  "guides/designing-robust-and-predictable-apis-with-idempotency/page.tsx",
-  "guides/how-3d-secure-works/page.tsx",
-  "guides/account-takeover-fraud/page.tsx",
-  "guides/important-invoice-management-tips/page.tsx",
-  "guides/types-of-invoice-discrepancies/page.tsx",
-  "guides/b2b-payment-methods/page.tsx",
-  "guides/ach-debit/page.tsx",
-  "guides/edi-payment-how-does-it-differ-from-ach-and-eft/page.tsx",
-  "guides/pick-the-right-payment-methods-in-a-new-country/page.tsx",
-  "guides/important-information-about-bic-and-swift-codes/page.tsx",
-  "guides/profit-and-loss-statement/page.tsx",
-  "guides/read-a-balance-sheet/page.tsx",
-  "guides/credit-card-interest/page.tsx",
 ] as const;
-export const publicHtmlFiles = publicPageSources.map(page => page === "page.tsx" ? "index.html" : page.replace(/\/page\.tsx$/, ".html"));
+export const publicHtmlFiles = PUBLIC_CONTENT_PATHS.map(path => path === "/" ? "index.html" : `${path.slice(1)}.html`);
+/** Local source/export permission is separate from the published-page allowlist. */
+export const localCorePreviewPageSources = ["software-partners/page.tsx", "docs/page.tsx", "online-businesses/page.tsx", "docs/merchant-onboarding/page.tsx", "docs/integration-access/page.tsx", "docs/checkout/page.tsx", "docs/payment-requests/page.tsx", "docs/payment-status/page.tsx", "docs/refunds-and-disputes/page.tsx", "docs/payouts/page.tsx", "docs/webhooks/page.tsx", "docs/testing-and-launch/page.tsx"] as const;
+export const localStandardPageSources = [
+  "guides/iso-20022/page.tsx", "guides/iso-20022/[set]/page.tsx", "guides/iso-20022/[set]/[code]/page.tsx",
+  "guides/iso-8583/page.tsx", "guides/iso-8583/[table]/page.tsx", "guides/iso-8583/[table]/[code]/page.tsx",
+] as const;
+export const publicPageSources = [...retainedCorePageSources, ...localCorePreviewPageSources, ...localStandardPageSources];
+/** Additional routes require explicit review before joining this release. */
+export const localPreviewPageSources: readonly string[] = [];
+export const builtPageSources = publicPageSources;
 const publicAppModules = new Set<string>([
-  ...publicPageSources,
+  ...builtPageSources,
   "layout.tsx", "not-found.tsx", "error.tsx", "global-error.tsx", "robots.ts", "sitemap.ts", "opengraph-image.tsx",
 ]);
 
@@ -61,6 +54,7 @@ export function forbiddenArtifact(filename: string): boolean {
 export function forbiddenStatic(filename: string): boolean {
   const normalized = filename.replaceAll("\\", "/");
   return forbiddenArtifact(normalized) || /(?:^|\/)(?:src|review|artifacts|content|outputs|tools|node_modules|\.next|functions|functions-internal)(?:\/|$)/.test(normalized) ||
+    (managedContentRoute(`/${normalized}`) && (!publicExportFile(normalized) || normalized !== filename)) || retiredArticleRoute(`/${normalized}`) ||
     /\.(?:sql|sqlite|sqlite3|db|dump|zip|eszip)$/i.test(normalized) ||
     retiredFamilies.some(family => normalized === family || normalized.startsWith(`${family}/`) || normalized === `${family}.html` || normalized === `${family}.txt`);
 }
@@ -80,4 +74,15 @@ export function edgeEntryFindings(entries: unknown): string[] {
     }
   }
   return [...new Set(issues)];
+}
+
+/** Review packaging uses the same content with preview search protection. */
+export const localReviewHtmlFiles = publicHtmlFiles;
+export const forbiddenLocalReviewStatic = forbiddenStatic;
+
+export function publicationBlockers(pendingPageSources: readonly string[], hasIso8583: boolean): string[] {
+  const blockers: string[] = [];
+  if (hasIso8583) blockers.push("ISO_8583_PERMISSION_UNCONFIRMED: written permission for website republication and public source distribution has not been recorded. The user chose to retain the full collection and wait for permission.");
+  if (pendingPageSources.length) blockers.push(`EXPANDED_RELEASE_SCOPE_HELD: ${pendingPageSources.length} page sources remain approved for local review only. Full scope production routing, metadata and release approval remain pending.`);
+  return blockers;
 }

@@ -18,6 +18,11 @@ async function staticResponse(url, method) {
   let pathname;
   try { pathname = decodeURIComponent(url.pathname); } catch { return new Response("Bad request", { status: 400 }); }
   if (pathname.includes("\\") || pathname.includes("\0") || pathname.split("/").some(part => part === ".." || part.startsWith("."))) return new Response("Not found", { status: 404 });
+  // Match the case-sensitive static host even on a case-insensitive local filesystem.
+  const referencePathname = pathname.replace(/\/__next[^/]*\.txt$/, "");
+  if (/^\/guides\/iso-(?:20022|8583)(?:\/|\.|$)/i.test(referencePathname) && referencePathname !== referencePathname.toLowerCase()) {
+    return new Response(method === "HEAD" ? null : await readFile(path.join(directory, "404.html")), { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } });
+  }
   const relative = pathname === "/" ? "index.html" : pathname.slice(1).replace(/\/$/, "");
   for (const file of [relative, `${relative}.html`, `${relative}/index.html`]) {
     const absolute = path.resolve(directory, file);
@@ -26,7 +31,8 @@ async function staticResponse(url, method) {
       if (!(await stat(absolute)).isFile()) continue;
       const type = pathname === "/opengraph-image" ? "image/png" : contentTypes[path.extname(absolute)] ?? "application/octet-stream";
       const body = method === "HEAD" ? null : await readFile(absolute);
-      return new Response(body, { headers: { "Content-Type": type } });
+      const status = ["404.html", "_not-found.html"].includes(path.relative(directory, absolute)) ? 404 : 200;
+      return new Response(body, { status, headers: { "Content-Type": type } });
     } catch (error) { if (error.code !== "ENOENT" && error.code !== "ENOTDIR") throw error; }
   }
   return new Response(method === "HEAD" ? null : await readFile(path.join(directory, "404.html")), { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } });
@@ -42,7 +48,11 @@ const server = createServer(async (incoming, outgoing) => {
       next: () => staticResponse(url, method),
       site: { id: process.env.SITE_ID },
       deploy: { context: process.env.ETAIL_PREVIEW_DEPLOY_CONTEXT || process.env.CONTEXT || "dev" },
-    }, { ...process.env, NODE_ENV: "production" });
+    }, {
+      ...process.env, NODE_ENV: "production",
+      APP_ENV: process.env.APP_ENV ?? "local",
+      ETAIL_SEARCH_CONTEXT: process.env.ETAIL_SEARCH_CONTEXT ?? "preview",
+    });
     outgoing.writeHead(response.status, Object.fromEntries(response.headers));
     outgoing.end(method === "HEAD" ? undefined : Buffer.from(await response.arrayBuffer()));
   } catch {

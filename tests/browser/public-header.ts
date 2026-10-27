@@ -7,5 +7,7 @@ export async function openMainNavigation(page: Page) {
   }
   const navigation = page.getByRole("navigation", { name: "Main navigation" });
   await expect(navigation).toBeVisible();
+  const services = navigation.locator("details").filter({ has: navigation.page().getByText("Services", { exact: true }) }).first();
+  if (await services.count() && await services.getAttribute("open") === null) await services.locator("summary").click();
   return navigation;
 }

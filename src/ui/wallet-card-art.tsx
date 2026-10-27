@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { serviceLabels } from "@/shared/service-language";
 import { BrandImage } from "./brand-image";
 import "./brand-images-ledgix.css";
 import { useId, useState } from "react";
 import type { KeyboardEvent } from "react";
+import { useClientReady } from "./use-client-ready";
 import { Icon } from "./icon";
 import { NetworkMark } from "./network-brands";
 import "./wallet-card-art.css";
@@ -34,7 +34,7 @@ export function LedgixCardFace() {
   return <div className="ledgix-wallet-card">
     <div className="ledgix-wallet-card-accent" />
     <BrandImage brand="ledgix" className="ledgix-wallet-card-logo" alt="" width={512} height={182} />
-    <span className="ledgix-wallet-card-name">{serviceLabels.cards}</span>
+    <span className="ledgix-wallet-card-name">Secured credit card</span>
     <div className="ledgix-wallet-card-network"><NetworkMark network="visa" decorative /></div>
   </div>;
 }
@@ -63,6 +63,7 @@ export function WalletCardArt({ compact = false, variant = "guide" }: { compact?
 }
 
 function WalletSetupGuide({ compact }: { compact: boolean }) {
+  const ready = useClientReady();
   const [wallet, setWallet] = useState<Wallet>("Apple Wallet");
   const [step, setStep] = useState(0);
   const id = useId();
@@ -78,11 +79,11 @@ function WalletSetupGuide({ compact }: { compact: boolean }) {
   }
   return <div className={`wallet-card-art${compact ? " wallet-card-art-compact" : ""}`}>
     <div className="wallet-setup-tabs" role="tablist" aria-label="Wallet preview options">
-      {wallets.map((name, index) => <button type="button" role="tab" key={name} id={`${id}-wallet-${index}`} aria-selected={wallet === name} aria-controls={`${id}-panel`} tabIndex={wallet === name ? 0 : -1} onClick={() => selectWallet(name)} onKeyDown={event => handleKeys(event, index)}>{name}</button>)}
+      {wallets.map((name, index) => <button type="button" disabled={!ready} role="tab" key={name} id={`${id}-wallet-${index}`} aria-selected={wallet === name} aria-controls={`${id}-panel`} tabIndex={wallet === name ? 0 : -1} onClick={() => selectWallet(name)} onKeyDown={event => handleKeys(event, index)}>{name}</button>)}
     </div>
     <div className="wallet-setup-panel" id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-wallet-${wallets.indexOf(wallet)}`} tabIndex={0}>
       <ol className="wallet-setup-steps">
-        {steps.map((label, index) => <li key={label}><button type="button" aria-label={`Show step ${index + 1}: ${label}`} aria-pressed={step === index} onClick={() => setStep(index)}><span>{index + 1}</span>{label}</button></li>)}
+        {steps.map((label, index) => <li key={label}><button type="button" disabled={!ready} aria-label={`Show step ${index + 1}: ${label}`} aria-pressed={step === index} onClick={() => setStep(index)}><span>{index + 1}</span>{label}</button></li>)}
       </ol>
       <div className="wallet-setup-scene">
         <div className={`wallet-setup-phone wallet-setup-phone-${wallet === "Apple Wallet" ? "apple" : "google"}`} aria-hidden="true">

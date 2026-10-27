@@ -1,4 +1,4 @@
-import { publicPageRedirect, retiredRoute } from "../../src/shared/public-routes.ts";
+import { retiredArticleRoute, managedContentRoute, publicDocumentPath, publicPayloadPath, publicPageRedirect, retiredRoute } from "../../src/shared/public-routes.ts";
 import { canonicalOrigin, defaultOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release.ts";
 
 type Environment = Readonly<Record<string, string | undefined>>;
@@ -38,6 +38,12 @@ export async function handlePublicRequest(
   environment: Environment,
 ): Promise<Response> {
   const url = new URL(request.url);
+  if (retiredArticleRoute(url.pathname)) {
+    return new Response(request.method === "HEAD" ? null : "This article is no longer available. Visit /guides for payment references.", {
+      status: 410,
+      headers: { ...publicSecurityHeaders, "Cache-Control": "no-store", "X-Robots-Tag": privateRobots, "Content-Type": "text/plain; charset=utf-8" },
+    });
+  }
   const retired = retiredRoute(url.pathname);
   if (retired) {
     const headers = { ...publicSecurityHeaders, "Cache-Control": "no-store", "X-Robots-Tag": privateRobots };
@@ -49,6 +55,16 @@ export async function handlePublicRequest(
     return new Response(request.method === "HEAD" ? null : retiredMessage, {
       status: 410,
       headers: { ...headers, "Content-Type": "text/plain; charset=utf-8" },
+    });
+  }
+
+  if (managedContentRoute(url.pathname)) {
+    const headers = { ...publicSecurityHeaders, "Cache-Control": "no-store", "X-Robots-Tag": privateRobots };
+    if (!publicDocumentPath(url.pathname) && !publicPayloadPath(url.pathname)) return new Response(request.method === "HEAD" ? null : "Not found", {
+      status: 404, headers: { ...headers, "Content-Type": "text/plain; charset=utf-8" },
+    });
+    if (!["GET", "HEAD"].includes(request.method)) return new Response("Method not allowed", {
+      status: 405, headers: { ...headers, Allow: "GET, HEAD", "Content-Type": "text/plain; charset=utf-8" },
     });
   }
 
@@ -103,7 +119,10 @@ export async function handlePublicRequest(
   const response = await context.next();
   const legalPage = /^\/(?:privacy|terms)(?:\.html|\/index\.html|\/)?$/.test(url.pathname);
   const navigationPayload = url.pathname.endsWith(".txt") && url.pathname !== "/robots.txt";
-  return withSecurityHeaders(response, !approved || legalPage || navigationPayload || response.status >= 400);
+  const alias = publicDocumentPath(url.pathname);
+  const result = withSecurityHeaders(response, !approved || legalPage || navigationPayload || Boolean(alias && alias !== url.pathname) || response.status >= 400);
+  if (!approved) result.headers.set("Cache-Control", "no-store");
+  return result;
 }
 
 export default function publicBoundary(request: Request, context: PublicBoundaryContext): Promise<Response> {
