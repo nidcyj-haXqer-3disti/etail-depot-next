@@ -3,8 +3,9 @@ import { readFileSync } from "node:fs";
 import targets from "../../project-targets.json";
 import { legalIdentity } from "../../src/shared/legal-identity";
 import { legalPageMetadata } from "../../src/modules/public-site/legal-metadata";
-import { PUBLISHED_GUIDES } from "../../src/modules/public-site/guide-catalog";
-import { canonicalOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL, PUBLIC_PAGES, PUBLIC_PAGE_MODIFIED, privateRobots, publicIndexingEnabled, publicPageJsonLd, publicPageMetadata, publicPageUrl, publicRobots, publicSitemap, publicSocialImage, rootMetadata, type PublicPath } from "../../src/modules/public-site/metadata";
+import { canonicalOrigin, isApprovedSearchRelease, servicePageMetadata, PUBLIC_INDEXING_APPROVAL, PUBLIC_PAGES, PUBLIC_PAGE_MODIFIED, privateRobots, publicIndexingEnabled, publicPageJsonLd, publicPageMetadata, publicPageUrl, publicRobots, publicSitemap, publicSocialImage, rootMetadata, type PublicPath } from "../../src/modules/public-site/metadata";
+import { INDEXABLE_PUBLIC_PATHS } from "../../src/shared/public-page-inventory";
+import { publicPageModified, pageRobots } from "../../src/modules/public-site/metadata";
 import robots from "../../src/app/robots";
 import sitemap from "../../src/app/sitemap";
 import socialImage, { dynamic as socialImageMode } from "../../src/app/opengraph-image";
@@ -13,28 +14,7 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production", CONTEXT: "production",
   SITE_ID: targets.netlify.site_id, ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
-const guidePaths = [
-  "/guides/how-to-create-a-payment-link",
-  "/guides/payment-processing-systems",
-  "/guides/stripe-alternatives",
-  "/guides/optimize-your-mobile-checkout-experience",
-  "/guides/cart-abandonment-vs-checkout-abandonment",
-  "/guides/consuming-webhooks",
-  "/guides/designing-robust-and-predictable-apis-with-idempotency",
-  "/guides/what-is-a-chargeback",
-  "/guides/how-3d-secure-works",
-  "/guides/account-takeover-fraud",
-  "/guides/important-invoice-management-tips",
-  "/guides/types-of-invoice-discrepancies",
-  "/guides/b2b-payment-methods",
-  "/guides/ach-debit",
-  "/guides/edi-payment-how-does-it-differ-from-ach-and-eft",
-  "/guides/pick-the-right-payment-methods-in-a-new-country",
-  "/guides/important-information-about-bic-and-swift-codes",
-  "/guides/profit-and-loss-statement",
-  "/guides/read-a-balance-sheet",
-  "/guides/credit-card-interest",
-] as const;
+const guidePaths = [] as const;
 const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides", ...guidePaths] as const;
 const heldPaths = [
   "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal",
@@ -61,13 +41,11 @@ function stubEnvironment(changes: Readonly<Record<string, string | undefined>> =
 afterEach(() => { vi.unstubAllEnvs(); vi.useRealTimers(); });
 
 describe("public search release boundary", () => {
-  it("records D215 domain migration for only the exact reviewed site", () => {
+  it("records candidate preparation for the exact reviewed site", () => {
     expect(PUBLIC_INDEXING_APPROVAL).toMatchObject({
       siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D215.*2026-10-14.*D122/);
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D333.*27 exact pages, 25 nonlegal search-eligible URLs/);
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toMatch(/D345.*push and deployment.*D340–D344.*No new URL or search submission/);
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3725 exact content pages and 3723 nonlegal discovery URLs");
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
@@ -84,7 +62,7 @@ describe("public search release boundary", () => {
     for (const path of publicPaths) {
       expect(publicPageMetadata(path).robots).toEqual({ index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } });
     }
-    expect(sitemap()).toEqual(publicPaths.map(path => ({ url: publicPageUrl(path), lastModified: PUBLIC_PAGE_MODIFIED[path] })));
+    expect(sitemap()).toEqual(INDEXABLE_PUBLIC_PATHS.map(path => ({ url: new URL(path, canonicalOrigin).href, lastModified: publicPageModified(path) })));
     expect(robots()).toMatchObject({ sitemap: `${canonicalOrigin}/sitemap.xml` });
   });
 
@@ -101,7 +79,10 @@ describe("public search release boundary", () => {
 
   it("keeps legal pages and the root fallback private even after production approval", () => {
     stubEnvironment();
-    for (const path of ["/privacy", "/terms"] as const) expect(legalPageMetadata(path).robots).toEqual(privateRobots);
+    for (const path of ["/privacy", "/terms"] as const) {
+      expect(legalPageMetadata(path).robots).toEqual(privateRobots);
+      expect(JSON.stringify(legalPageMetadata(path))).not.toMatch(/available now|coming soon|forthcoming|upcoming/i);
+    }
     expect(rootMetadata.robots).toMatchObject({ index: false, follow: false, googleBot: { index: false, follow: false } });
     expect(rootMetadata.alternates).toBeUndefined();
     expect(readFileSync("src/app/layout.tsx", "utf8")).toContain("metadata: Metadata = rootMetadata");
@@ -109,9 +90,49 @@ describe("public search release boundary", () => {
 });
 
 describe("reviewed public metadata", () => {
-  it("uses distinct truthful descriptions and fixed canonical URLs for exactly 25 reviewed pages", () => {
-    expect(publicPaths).toHaveLength(25);
-    expect(PUBLISHED_GUIDES.map(guide => guide.path)).toEqual(guidePaths);
+  it("keeps the merchant-facing Home metadata focused on payments and the partner preview separate", () => {
+    expect(PUBLIC_PAGES["/"]).toEqual({
+      title: "Merchant Services & Credit Card Processing",
+      description: "Merchant services for US businesses and payment partnerships for software providers. Explore card and ACH acceptance, checkout, transaction records and payouts.",
+    });
+    for (const changes of [{}, ...rejectedEnvironments.map(([, changes]) => changes)]) {
+      stubEnvironment(changes);
+      const metadata = servicePageMetadata("/software-partners");
+      expect(metadata.robots).toEqual(pageRobots("/software-partners"));
+      expect(metadata.alternates).toEqual({ canonical: `${canonicalOrigin}/software-partners` });
+      expect(metadata.title).toEqual({ absolute: "Payment Processing for Software Platforms | Etail Depot" });
+      expect(metadata.description).toBe("Explore Trolleys merchant services for the US businesses using your software: card and ACH acceptance, payment records, refunds and disputes.");
+      expect(metadata.openGraph).toMatchObject({ url: `${canonicalOrigin}/software-partners` });
+      expect(publicSitemap().some(entry => entry.url.includes("software-partners"))).toBe(publicIndexingEnabled());
+    }
+    expect(PUBLIC_PAGES).not.toHaveProperty("/software-partners");
+    expect(PUBLIC_PAGE_MODIFIED).not.toHaveProperty("/software-partners");
+    for (const path of ["/software-partners", "/software-partners/", "/software-partners?account=private", "/software-partners/contact"]) {
+      expect(() => publicPageUrl(path as PublicPath)).toThrow("Only reviewed public");
+      expect(() => publicPageMetadata(path as PublicPath)).toThrow("Only reviewed public");
+      expect(() => publicPageJsonLd(path as PublicPath)).toThrow("Only reviewed public");
+    }
+    for (const path of ["/", "/software-partners/", "/software-partners?account=private", "/software-partners#private", "/software-partners/contact", "__proto__"]) {
+      expect(() => servicePageMetadata(path as "/software-partners")).toThrow("Only the exact reviewed service page");
+    }
+  });
+
+  it.each(["/docs", "/online-businesses", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch"] as const)("applies the exact production guard to %s", (previewPath) => {
+    for (const changes of [{}, ...rejectedEnvironments.map(([, changes]) => changes)]) {
+      stubEnvironment(changes);
+      expect(servicePageMetadata(previewPath).robots).toEqual(pageRobots(previewPath));
+      expect(servicePageMetadata(previewPath).alternates).toEqual({ canonical: `${canonicalOrigin}${previewPath}` });
+      expect(publicSitemap().some(entry => entry.url.endsWith(previewPath))).toBe(publicIndexingEnabled());
+    }
+    expect(PUBLIC_PAGES).not.toHaveProperty(previewPath);
+    expect(() => publicPageUrl(previewPath as PublicPath)).toThrow("Only reviewed public");
+    for (const path of [`${previewPath}/`, `${previewPath}/api`, `${previewPath}?account=private`, `${previewPath}#private`]) {
+      expect(() => servicePageMetadata(path as typeof previewPath)).toThrow("Only the exact reviewed service page");
+    }
+  });
+
+  it("uses distinct truthful descriptions and fixed canonical URLs for the five retained nonlegal core pages", () => {
+    expect(publicPaths).toHaveLength(5);
     expect(Object.keys(PUBLIC_PAGES)).toEqual(publicPaths);
     expect(canonicalOrigin).toBe(targets.netlify.canonical_origin);
     expect(new URL(String(rootMetadata.metadataBase)).origin).toBe(canonicalOrigin);
@@ -119,11 +140,13 @@ describe("reviewed public metadata", () => {
     expect(new Set(Object.values(PUBLIC_PAGES).map(page => page.description)).size).toBe(publicPaths.length);
     for (const path of publicPaths) {
       const metadata = publicPageMetadata(path);
-      expect(JSON.stringify(metadata)).not.toMatch(/prepaid|Each service has its own sign-in/i);
+      expect(JSON.stringify(metadata)).not.toMatch(/prepaid|Each service has its own sign-in|available now|coming soon|forthcoming|upcoming/i);
       expect(metadata.title).toEqual({ absolute: `${PUBLIC_PAGES[path].title} | Etail Depot` });
       if (path === "/credit-card-services") {
         expect(metadata.description).toContain("virtual Visa secured credit card");
-        expect(metadata.description).toMatch(/upcoming|coming soon|forthcoming/i);
+        expect(metadata.description).toContain("$200 minimum deposit");
+        expect(metadata.description).toContain("$0 annual and monthly fees");
+        expect(metadata.description).toContain("Pay in full each month");
         expect(metadata.description).toContain("Applications are not open");
       }
       expect(metadata.alternates).toEqual({ canonical: new URL(path, canonicalOrigin).href });
@@ -145,7 +168,7 @@ describe("reviewed public metadata", () => {
     stubEnvironment();
     vi.stubEnv("URL", "https://another-site.test/?access_token=secret");
     vi.stubEnv("DEPLOY_PRIME_URL", "https://preview--another-site.test");
-    expect(publicSitemap()).toEqual(publicPaths.map(path => ({ url: `${canonicalOrigin}${path}`, lastModified: PUBLIC_PAGE_MODIFIED[path] })));
+    expect(publicSitemap()).toEqual(INDEXABLE_PUBLIC_PATHS.map(path => ({ url: new URL(path, canonicalOrigin).href, lastModified: publicPageModified(path) })));
     expect(sitemap()).toEqual(publicSitemap());
     for (const entry of sitemap()) {
       const url = new URL(entry.url);
@@ -163,14 +186,11 @@ describe("reviewed public metadata", () => {
   it("keeps reviewed page revision dates stable as the build clock advances", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
-    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-21");
-    const refinedGuides: readonly string[] = ["/guides/payment-processing-systems", "/guides/what-is-a-chargeback", "/guides/how-to-create-a-payment-link", "/guides/how-3d-secure-works", "/guides/stripe-alternatives", "/guides/profit-and-loss-statement", "/guides/important-invoice-management-tips", "/guides/designing-robust-and-predictable-apis-with-idempotency"];
-    for (const path of guidePaths) expect(PUBLIC_PAGE_MODIFIED[path]).toBe(refinedGuides.includes(path) ? "2026-10-21" : "2026-10-20");
-    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-10-21");
-    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-21");
-    for (const path of ["/", "/credit-card-services"] as const) {
-      expect(PUBLIC_PAGE_MODIFIED[path]).toBe("2026-10-19");
-    }
+    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-28");
+    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-10-27");
+    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-27");
+    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-10-27");
+    expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-10-24");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10)).toBe(date);
@@ -180,7 +200,7 @@ describe("reviewed public metadata", () => {
     const firstBuild = publicSitemap();
     vi.setSystemTime(new Date("2030-12-31T23:59:59Z"));
     expect(publicSitemap()).toEqual(firstBuild);
-    expect(firstBuild).toHaveLength(publicPaths.length);
+    expect(firstBuild).toHaveLength(INDEXABLE_PUBLIC_PATHS.length);
     for (const page of firstBuild) expect(Object.keys(page)).toEqual(["url", "lastModified"]);
   });
 });
@@ -190,7 +210,7 @@ describe("public structured data", () => {
     const serialized = publicPageJsonLd(path);
     const data = JSON.parse(serialized);
     const [organization, website, page] = data["@graph"];
-    const expectedTypes = ["Organization", "WebSite", "WebPage", ...(path === "/" ? [] : ["BreadcrumbList"])];
+    const expectedTypes = ["Organization", "WebSite", path === "/guides" ? "CollectionPage" : "WebPage", ...(path === "/guides" ? ["ItemList"] : []), ...(path === "/" ? [] : ["BreadcrumbList"])];
     expect(data["@context"]).toBe("https://schema.org");
     expect(data["@graph"].map((node: { "@type": string }) => node["@type"])).toEqual(expectedTypes);
     expect(organization).toMatchObject({
@@ -214,11 +234,23 @@ describe("public structured data", () => {
     expect(page).not.toHaveProperty("datePublished");
   });
 
+  it("describes the real guide collection without claiming a search feature or new destination", () => {
+    const graph = JSON.parse(publicPageJsonLd("/guides"))["@graph"];
+    const collection = graph.find((node: { "@type": string }) => node["@type"] === "CollectionPage");
+    const list = graph.find((node: { "@type": string }) => node["@type"] === "ItemList");
+    expect(collection.mainEntity).toEqual({ "@id": list["@id"] });
+    expect(list.numberOfItems).toBe(2);
+    expect(list.itemListElement.map((item: { url: string }) => item.url)).toEqual([`${canonicalOrigin}/guides/iso-20022`, `${canonicalOrigin}/guides/iso-8583`]);
+    expect(list.itemListElement.map((item: { name: string }) => item.name)).toEqual(["ISO 20022", "ISO 8583"]);
+    expect(new Set(list.itemListElement.map((item: { url: string }) => item.url)).size).toBe(2);
+    expect(JSON.stringify(graph)).not.toMatch(/SearchAction|aggregateRating|FAQPage/);
+  });
+
   it("provides two-level breadcrumbs for inner pages and no artificial home breadcrumb", () => {
-    const labels = { "/credit-card-services": "Credit card", "/payment-acceptance-service": "Payment acceptance", "/help": "Help", "/guides": "Guides" } as const;
+    const labels = { "/credit-card-services": "Card services", "/payment-acceptance-service": "Merchant services", "/help": "Help", "/guides": "Guides" } as const;
     for (const path of Object.keys(labels) as (keyof typeof labels)[]) {
       const graph = JSON.parse(publicPageJsonLd(path))["@graph"];
-      const breadcrumb = graph[3];
+      const breadcrumb = graph.find((node: { "@type": string }) => node["@type"] === "BreadcrumbList");
       expect(graph[2].breadcrumb).toEqual({ "@id": breadcrumb["@id"] });
       expect(breadcrumb.itemListElement).toEqual([
         { "@type": "ListItem", position: 1, name: "Etail Depot", item: publicPageUrl("/") },
@@ -226,18 +258,6 @@ describe("public structured data", () => {
       ]);
     }
     expect(JSON.parse(publicPageJsonLd("/"))["@graph"][2]).not.toHaveProperty("breadcrumb");
-  });
-
-  it("connects each approved article to the exact Guides hub", () => {
-    for (const { path, title } of PUBLISHED_GUIDES) {
-      const graph = JSON.parse(publicPageJsonLd(path))["@graph"];
-      expect(graph[2].breadcrumb).toEqual({ "@id": graph[3]["@id"] });
-      expect(graph[3].itemListElement).toEqual([
-        { "@type": "ListItem", position: 1, name: "Etail Depot", item: publicPageUrl("/") },
-        { "@type": "ListItem", position: 2, name: "Guides", item: publicPageUrl("/guides") },
-        { "@type": "ListItem", position: 3, name: title, item: publicPageUrl(path) },
-      ]);
-    }
   });
 
   it("escapes script-closing characters while preserving valid JSON and its original text", () => {

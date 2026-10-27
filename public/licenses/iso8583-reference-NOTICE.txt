@@ -1,0 +1,14 @@
+Independent ISO 8583 implementation reference
+
+Etail Depot provides original explanations and presentation. This collection is not an official ISO publication or a reproduction of the ISO 8583:2023 tables.
+
+Field containers and labels are adapted from pyiso8583 starter profiles.
+Copyright 2019-2020 Konstantin Novichikhin. MIT License.
+See pyiso8583-MIT.txt for the complete notice and licence.
+
+Message identifiers and their version columns are adapted from moov-io/iso8583.
+Copyright [2016] [Wade Arnold]. Apache License, Version 2.0.
+See moov-iso8583-Apache-2.0.txt for the complete licence.
+No upstream NOTICE file was present at the pinned revision.
+
+Modifications: converted selected implementation facts to JSON; excluded reserved field placeholders; wrote new explanations and byte diagrams; interpreted message components without reproducing the upstream usage sentences; recorded source inconsistencies. Original source revisions and content hashes are recorded in iso8583-independent-data.json in the application source. The licences apply to the respective source contributions; they do not grant rights in third party standards or establish network certification.

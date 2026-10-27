@@ -3,7 +3,7 @@
   --public-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --public-max: 1248px;
   --public-gutter: 32px;
-  --public-brand-width: 176px;
+  --public-brand-width: 160px;
   --public-chrome-gap: 40px;
   --public-ink: #183d35;
   --public-muted: #586960;
@@ -15,6 +15,8 @@
   --public-focus: #217262;
   --public-radius: 10px;
   --public-control-radius: 7px;
+  --public-frame-line: #d2ddd5;
+  --public-frame-surface: #f0f5f1;
   font-family: var(--public-font);
   color: var(--public-ink);
 }
@@ -35,9 +37,12 @@
 }
 .public-main p { text-wrap: pretty; }
 @media (max-width: 1000px) {
-  :where(.public-header, .public-main, .public-footer) { --public-gutter: 24px; --public-brand-width: 160px; --public-chrome-gap: 24px; }
+  :where(.public-header, .public-main, .public-footer) { --public-gutter: 24px; --public-chrome-gap: 24px; }
 }
-@media (max-width: 760px) {
+@media (max-width: 1100px) and (min-width: 960px) {
+  :where(.public-header, .public-main, .public-footer) { --public-brand-width: 144px; }
+}
+@media (max-width: 959px) {
   :where(.public-header, .public-main, .public-footer) { --public-brand-width: 150px; }
 }
 @media (max-width: 360px) {
@@ -47,3 +52,7 @@
   html:has(.public-main) { scroll-behavior: auto; }
   .public-header *, .public-main *, .public-footer * { transition: none !important; }
 }
+
+/* Shared labels and controls retain one scale across service and reference pages. */
+.public-main .eyebrow { font-size: 12px; line-height: 1.6; letter-spacing: .09em; color: var(--public-muted); }
+.public-main .button { min-height: 48px; border-radius: var(--public-control-radius); gap: 16px; }

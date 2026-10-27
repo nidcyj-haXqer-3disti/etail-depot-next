@@ -1,0 +1,59 @@
+.online-business-page .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.online-business-hero { background: #f7f8f5; border-bottom: 1px solid var(--bp-line); }
+.online-business-intro { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); align-items: center; gap: 56px; padding-block: 64px 48px; }
+.online-business-intro > div { min-width: 0; }
+.online-business-intro h1 { margin-top: 22px; font-size: clamp(42px,4.2vw,60px); line-height: 1.06; letter-spacing: -.045em; text-wrap: balance; }
+.online-business-intro h1 span { color: var(--public-ink); }
+.online-business-copy > p:first-child { max-width: 44ch; font-size: 18px; line-height: 1.65; color: var(--public-muted); }
+.online-business-actions { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; margin-top: 24px; }
+.online-business-actions .consumer-text-link { font-size: 14px; }
+.online-business-copy > .online-business-note { margin-top: 18px; font-size: 13px; line-height: 1.7; color: var(--public-muted); max-width: 58ch; }
+.online-business-page #customer-checkout, .online-business-page #payment-channels { scroll-margin-top: 32px; }
+@media (min-width:901px) and (min-height:650px) {
+ .online-business-page #customer-checkout, .online-business-page #payment-channels { scroll-margin-top: 88px; }
+}
+.online-business-journey { padding-bottom: 72px; }
+.online-business-page .payment-service-explorer { padding: 0; border-radius: var(--bp-radius); border-color: var(--bp-line); background: #fff; box-shadow: var(--bp-shadow); }
+.online-business-page .pse-context { padding: 20px 28px 16px; font-size: 13px; }
+.online-business-page .pse-tabs { margin-inline: 28px; padding: 4px; gap: 4px; border: 1px solid #dce5df; border-radius: 10px; background: #f7f8f5; }
+.online-business-page .pse-tabs button { min-height: 54px; padding-block: 16px; border: 0; border-radius: 7px; }
+.online-business-page .pse-tabs button[aria-selected="true"] { background: #fff; box-shadow: 0 1px 4px #02394114, inset 0 0 0 1px #c5d6cc; }
+.online-business-page .pse-panel { padding: 28px; }
+.online-business-page .pse-view-title { margin-bottom: 28px; font-size: 26px; }
+.online-business-page .payment-sharing-note { margin-top: 0; padding-block: var(--bp-space); border-top: 0; align-items: center; gap: 56px; }
+.online-business-page .payment-sharing-copy h2 { font-size: clamp(32px,3vw,42px); line-height: 1.14; letter-spacing: -.035em; }
+.online-business-page .payment-sharing-copy > p { font-size: 17px; line-height: 1.7; max-width: 44ch; }
+.online-business-page .payment-sharing-copy > .payment-sharing-qualification { font-size: 13px; }
+@media (min-width:1000px) {
+ .online-business-page .payment-service-explorer:not(:has(.pse-no-script)) .pse-panels { display: grid; align-items: start; }
+ .online-business-page .payment-service-explorer:not(:has(.pse-no-script)) .pse-panel { grid-area: 1 / 1; }
+ .online-business-page .payment-service-explorer:not(:has(.pse-no-script)) .pse-panel[hidden] { display: block !important; visibility: hidden; pointer-events: none; }
+}
+@media (max-width:900px) {
+ .online-business-intro { grid-template-columns: minmax(0,1fr); gap: 24px; padding-block: 48px 36px; }
+ .online-business-copy > p:first-child { max-width: 52ch; }
+ .online-business-journey { padding-bottom: 56px; }
+}
+@media (max-width:680px) {
+ .online-business-intro { padding-block: 40px 32px; }
+ .online-business-intro h1 { margin-top: 18px; font-size: clamp(36px,9.8vw,42px); line-height: 1.1; }
+ .online-business-copy > p:first-child { font-size: 17px; }
+ .online-business-copy .consumer-text-link { line-height: 1.6; }
+ .online-business-page .payment-service-explorer { border-radius: 10px; }
+ .online-business-page .pse-context { padding: 18px 16px 12px; min-height: 72px; align-content: center; gap: 4px 12px; }
+ .online-business-page .pse-tabs { margin-inline: 16px; }
+ .online-business-page .pse-tabs button { padding: 12px 4px; font-size: 14px; }
+ .online-business-page .pse-panel { padding: 24px 16px; }
+ .online-business-page .pse-view-title { font-size: 21px; margin-bottom: 20px; }
+ .online-business-page .payment-sharing-note { gap: 28px; }
+ .online-business-page .payment-sharing-copy h2 { font-size: 30px; line-height: 1.18; }
+}
+
+/* The view controls and inner product screen share one quiet frame. */
+.online-business-page .payment-artwork-surface { box-shadow: none; }
+.online-business-page .payment-sharing-copy > .eyebrow { margin: 0 0 16px; font-size: 12px; line-height: 1.5; color: var(--public-muted); }
+.online-business-page .unified-preview-notes { font-size: 13px; }
+@media (max-width:680px) {
+ .online-business-actions { gap: 12px 20px; }
+ .online-business-actions .button { width: 100%; justify-content: space-between; padding-inline: 18px; gap: 12px; }
+}

@@ -1,29 +1,31 @@
 /* Product understanding comes before the wallet setup guide. */
-.wallet-credit-section { padding-block: var(--consumer-space); }
+.consumer-cards .wallet-product-art { box-shadow: inset 0 1px 0 #ffffff80; border: 1px solid var(--public-frame-line); border-radius: var(--public-radius); background: var(--public-tint); }
+.wallet-credit-section { padding-block: var(--consumer-space); scroll-margin-top: 28px; }
+.consumer-cards #card-questions-title { scroll-margin-top: 28px; }
 .card-details-section { padding-top: var(--consumer-space); scroll-margin-top: 28px; }
-.card-details-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr); gap: 14px; margin: 0; }
-.card-details-grid > div { display: grid; grid-template-rows: subgrid; grid-row: span 2; row-gap: 0; min-width: 0; padding: 26px 28px 28px; border: 1px solid #dbe3d8; border-radius: 14px; background: #f7f8f2; }
-.card-details-grid > div.card-detail-deposit { background: #edf2e6; }
-.card-details-grid > div.card-detail-repayment { background: #f4f6f4; }
+.card-details-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr); gap: 24px; margin: 0; }
+.card-details-grid > div { display: grid; grid-template-rows: subgrid; grid-row: span 2; row-gap: 0; min-width: 0; padding: 26px 28px 28px; border: 1px solid var(--public-frame-line); border-radius: var(--public-radius); background: var(--public-paper); }
+.card-details-grid > div.card-detail-deposit { background: var(--public-tint); }
+.card-details-grid > div.card-detail-repayment { background: var(--public-paper); }
 .card-details-grid dt { display: flex; align-items: center; gap: 10px; color: #526b55; font-size: 13px; line-height: 1.5; }
-.card-detail-symbol { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border: 1px solid #d3decc; border-radius: 9px; background: #ffffffa3; }
+.card-detail-symbol { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; }
 .card-detail-symbol .icon { width: 17px; height: 17px; }
 .card-details-grid dd { margin: 25px 0 0; }
 .card-details-grid strong { display: block; font-size: 42px; line-height: 1.15; letter-spacing: -.035em; font-weight: 500; font-variant-numeric: tabular-nums; }
 .card-detail-note { display: block; margin-top: 10px; font-size: 13px; line-height: 1.65; color: var(--public-muted); }
-.card-details-grid dd > p { margin-top: 5px; color: var(--public-muted); font-size: 12px; line-height: 1.65; }
+.card-details-grid dd > p { margin-top: 5px; color: var(--public-muted); font-size: 13px; line-height: 1.65; }
 .card-detail-fees { display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 16px; }
 .card-detail-fees > span + span { padding-left: 20px; border-left: 1px solid #d6dfd0; }
 .card-detail-repayment strong { max-width: 13ch; padding-top: 2px; font-size: 27px; line-height: 1.3; letter-spacing: -.025em; }
 .card-detail-repayment .card-detail-note { max-width: 25ch; margin-top: 14px; }
-.card-details-disclosure { max-width: 90ch; margin-top: 20px; font-size: 12px; line-height: 1.7; color: var(--public-muted); }
+.card-details-disclosure { max-width: 90ch; margin-top: 20px; font-size: 13px; line-height: 1.7; color: var(--public-muted); }
 .wallet-guide-section { background: var(--public-tint); scroll-margin-top: 24px; }
 .wallet-guide-grid { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 64px; align-items: center; padding-block: var(--consumer-space); }
 .wallet-guide-copy h2 { margin-top: 16px; font-size: var(--consumer-heading); line-height: 1.2; letter-spacing: -.035em; }
 .wallet-guide-copy > p:not(.eyebrow) { max-width: 35ch; margin-top: 24px; font-size: var(--consumer-body); line-height: 1.7; color: var(--public-muted); }
 .wallet-guide-copy > p.wallet-guide-note { font-size: 13px; line-height: 1.65; }
 .wallet-guide-copy > .wallet-guide-contact + p.wallet-guide-note { margin-top: 8px; }
-.wallet-guide-section .wallet-card-art { background: #fff; }
+.wallet-guide-section .wallet-card-art { background: #fff; border-color: var(--public-frame-line); border-radius: var(--public-radius); }
 .wallet-guide-disclosure { min-width: 0; width: 100%; }
 .wallet-guide-disclosure > summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 48px; padding: 14px 8px; border-bottom: 1px solid var(--public-line); list-style: none; color: var(--public-ink); font-size: 14px; line-height: 1.5; font-weight: 500; cursor: pointer; }
 .wallet-guide-disclosure > summary::-webkit-details-marker { display: none; }

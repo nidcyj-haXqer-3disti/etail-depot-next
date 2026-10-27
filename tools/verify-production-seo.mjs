@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { INDEXABLE_PUBLIC_PATHS } from "../src/shared/public-page-inventory.ts";
+import { RETIRED_ARTICLE_PATHS } from "../src/shared/retired-article-paths.ts";
 /** Compile and inspect the approved public search release locally; never publish or contact a provider. */
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
@@ -18,31 +20,12 @@ assert.equal(targets.netlify.canonical_origin, "https://etaildepot.com");
 assert.equal(targets.release.real_money_allowed, false);
 
 const canonicalOrigin = targets.netlify.canonical_origin;
-const guidePaths = [
-  "/guides/stripe-alternatives",
-  "/guides/payment-processing-systems",
-  "/guides/what-is-a-chargeback",
-  "/guides/how-to-create-a-payment-link",
-  "/guides/optimize-your-mobile-checkout-experience",
-  "/guides/cart-abandonment-vs-checkout-abandonment",
-  "/guides/consuming-webhooks",
-  "/guides/designing-robust-and-predictable-apis-with-idempotency",
-  "/guides/how-3d-secure-works",
-  "/guides/account-takeover-fraud",
-  "/guides/important-invoice-management-tips",
-  "/guides/types-of-invoice-discrepancies",
-  "/guides/b2b-payment-methods",
-  "/guides/ach-debit",
-  "/guides/edi-payment-how-does-it-differ-from-ach-and-eft",
-  "/guides/pick-the-right-payment-methods-in-a-new-country",
-  "/guides/important-information-about-bic-and-swift-codes",
-  "/guides/profit-and-loss-statement",
-  "/guides/read-a-balance-sheet",
-  "/guides/credit-card-interest",
-];
-const publicPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides", ...guidePaths];
-assert.equal(guidePaths.length, 20);
-assert.equal(new Set(publicPaths).size, 25, "Only twenty guides and five core pages are eligible for search.");
+const guidePaths = [];
+const standardPaths = ["/guides/iso-20022", "/guides/iso-8583"];
+const coreSchemaPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides"];
+const publicPaths = INDEXABLE_PUBLIC_PATHS;
+assert.equal(guidePaths.length, 0);
+assert.equal(new Set(publicPaths).size, 3723, "Only the exact reviewed nonlegal pages are eligible for search.");
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -158,7 +141,7 @@ function checkSchema(html, route, description) {
     assert.equal(matches.length, 1, `${route}: expected one ${type} schema node.`);
     return matches[0];
   };
-  const organization = node("Organization"), website = node("WebSite"), page = node("WebPage");
+  const organization = node("Organization"), website = node("WebSite"), page = node(route === "/guides" ? "CollectionPage" : "WebPage");
   assert.equal(organization.name, "Etail Depot");
   assert.equal(organization.legalName, "Etail Depot US, Inc.");
   assert.equal(organization.url, `${canonicalOrigin}/`);
@@ -169,6 +152,12 @@ function checkSchema(html, route, description) {
   assert.equal(page.url, new URL(route, canonicalOrigin).href);
   assert.equal(page.description, description);
   assert.equal(page.isPartOf?.["@id"], website["@id"]);
+  if (route === "/guides") {
+    const list = node("ItemList");
+    assert.equal(page.mainEntity?.["@id"], list["@id"]);
+    assert.equal(list.numberOfItems, standardPaths.length);
+    assert.deepEqual(list.itemListElement.map(item => item.url).sort(), standardPaths.map(path => new URL(path, canonicalOrigin).href).sort());
+  }
   if (route !== "/") {
     const crumbs = node("BreadcrumbList").itemListElement;
     assert.equal(crumbs.length, guidePaths.includes(route) ? 3 : 2, `${route}: breadcrumb must reflect its actual page hierarchy.`);
@@ -184,13 +173,43 @@ function checkSchema(html, route, description) {
   assert.equal(nodes.some(entry => ["Offer", "AggregateRating", "Review", "ApplyAction"].includes(entry["@type"])), false, `${route}: unapproved offer or endorsement markup.`);
 }
 
+function checkCrawlablePageGraph(documents) {
+  const paths = new Set(publicPaths);
+  const graph = new Map();
+  for (const [route, html] of documents) {
+    const destinations = new Set();
+    for (const match of html.matchAll(/<a\b[^>]*>/gi)) {
+      const href = attributes(match[0]).href;
+      if (!href) continue;
+      const destination = new URL(href, new URL(route, canonicalOrigin));
+      if (destination.origin !== canonicalOrigin) continue;
+      assert.ok(!/^\/(?:card-services|payment-services)(?:$|[/.])/.test(destination.pathname), `${route}: link uses a retired product URL: ${href}`);
+      if (!paths.has(destination.pathname)) continue;
+      assert.equal(destination.search, "", `${route}: public navigation must use the clean canonical URL: ${href}`);
+      destinations.add(destination.pathname);
+    }
+    graph.set(route, destinations);
+  }
+  const reached = new Set(["/"]), queue = ["/"];
+  while (queue.length) {
+    for (const destination of graph.get(queue.shift()) ?? []) {
+      if (!reached.has(destination)) { reached.add(destination); queue.push(destination); }
+    }
+  }
+  assert.deepEqual([...reached].sort(), [...paths].sort(), "Every sitemap page must be discoverable from Home through initial-HTML links.");
+  const guideLinks = graph.get("/guides");
+  for (const route of guidePaths) assert.ok(guideLinks.has(route), `${route}: article is missing from the Guides HTML.`);
+  console.log(`Discovery graph passed: ${reached.size} canonical pages are reachable from Home; all ${guidePaths.length} articles are linked in the Guides HTML.`);
+}
+
 async function verifyResponses() {
-  const titles = new Set(), descriptions = new Set();
+  const titles = new Set(), descriptions = new Set(), documents = new Map();
   for (const route of publicPaths) {
     const response = await localFetch(route);
     assert.equal(response.status, 200, `${route}: public page must return 200 without a redirect.`);
     assert.equal(response.headers.has("set-cookie"), false, `${route}: public pages must not create sessions.`);
     const html = await response.text(), metadata = documentMetadata(html, route);
+    documents.set(route, html);
     assertIndexable(response, metadata, route);
     assert.equal(metadata.titles.length, 1, `${route}: expected one title.`);
     assert.ok(metadata.titles[0].trim(), `${route}: empty title.`);
@@ -206,10 +225,19 @@ async function verifyResponses() {
     assert.equal(new URL(canonicals[0].href).href, new URL(route, canonicalOrigin).href);
     assert.deepEqual(metadata.metaValues("property", "og:image"), [`${canonicalOrigin}/opengraph-image`]);
     assert.deepEqual(metadata.metaValues("name", "twitter:image"), [`${canonicalOrigin}/opengraph-image`]);
-    checkSchema(html, route, description[0]);
+    if (coreSchemaPaths.includes(route)) checkSchema(html, route, description[0]);
+    else if (route.startsWith("/guides/")) {
+      const nodes = schemaNodes(html);
+      const pages = nodes.filter(node => ["WebPage", "CollectionPage"].includes(node["@type"]));
+      assert.equal(pages.length, 1, `${route}: one reference page schema is required.`);
+      assert.equal(pages[0].url, canonicalOrigin + route);
+      assert.equal(nodes.filter(node => node["@type"] === "BreadcrumbList").length, 1);
+      assert.equal(nodes.some(node => ["Offer", "AggregateRating", "Review", "ApplyAction"].includes(node["@type"])), false);
+    }
   }
   assert.equal(titles.size, publicPaths.length, "Public titles must be distinct.");
   assert.equal(descriptions.size, publicPaths.length, "Public descriptions must be distinct.");
+  checkCrawlablePageGraph(documents);
 
   for (const [oldPath, destination] of [["/card-services", "/credit-card-services"], ["/payment-services", "/payment-acceptance-service"]]) {
     for (const suffix of ["", "/", ".html", "/index.html"]) {
@@ -232,7 +260,7 @@ async function verifyResponses() {
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => decode(match[1]));
-  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain only the twenty-five reviewed canonical pages.");
+  assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain exactly the reviewed canonical pages.");
   const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)];
   assert.equal(sitemapEntries.length, publicPaths.length);
   for (const [, entry] of sitemapEntries) {
@@ -240,7 +268,10 @@ async function verifyResponses() {
     assert.equal(dates.length, 1, "Each canonical page must have one maintained revision date.");
     assert.match(dates[0], /^\d{4}-\d{2}-\d{2}$/);
     assert.equal(new Date(`${dates[0]}T00:00:00Z`).toISOString().slice(0, 10), dates[0]);
-    assert.ok(dates[0] <= new Date().toISOString().slice(0, 10), "Sitemap revision dates must not be in the future.");
+    // Revision dates follow the project’s editorial calendar in Asia/Tokyo.
+    // A date-only revision must not be rejected during the UTC/local midnight gap.
+    const editorialToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+    assert.ok(dates[0] <= editorialToday, "Sitemap revision dates must not be in the future of the editorial calendar.");
   }
   assert.doesNotMatch(sitemap, /<(?:priority|changefreq)>/);
   const robotsResponse = await localFetch("/robots.txt");
@@ -249,6 +280,10 @@ async function verifyResponses() {
   assert.match(robots, /^User-Agent:\s*\*\s*$/im);
   assert.match(robots, /^Allow:\s*\/\s*$/im);
   assert.doesNotMatch(robots, /^Disallow:\s*\/\s*$/im);
+  // Preserve the existing universal crawl policy. No new bot-specific restriction
+  // may silently block search crawlers while ordinary visitors still see a page.
+  assert.deepEqual([...robots.matchAll(/^User-Agent:\s*(\S+)\s*$/gim)].map(match => match[1]), ["*"]);
+  assert.deepEqual([...robots.matchAll(/^Disallow:\s*(\S+)\s*$/gim)].map(match => match[1]), ["/api/"]);
   assert.deepEqual([...robots.matchAll(/^Sitemap:\s*(\S+)\s*$/gim)].map(match => match[1]), [`${canonicalOrigin}/sitemap.xml`]);
 
   const image = await localFetch("/opengraph-image");
@@ -259,12 +294,23 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/payment-processing-fees", "/guides/how-to-create-a-payment-link/unreviewed-missing-page", "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal", "/guides/use-a-cash-register", "/guides/charge-cards", "/guides/sections/payment-processing-checkout", "/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
+  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/payment-processing-fees", "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal", "/guides/use-a-cash-register", "/guides/unreviewed-charge-cards", "/guides/sections/payment-processing-checkout", "/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
     const response = await localFetch(route);
     assert.equal(response.status, ["/privacy", "/terms"].includes(route) ? 200 : 404, `${route}: unexpected status.`);
-    const metadata = documentMetadata(await response.text(), route);
+    const body = await response.text();
+    const metadata = /<head[\s>]/i.test(body) ? documentMetadata(body, route) : { metaValues: () => [] };
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
     assert.ok(values.some(forbidsIndexing), `${route}: must remain noindex.`);
+  }
+  // Previously published articles have no equivalent replacement; do not redirect them.
+  for (const path of RETIRED_ARTICLE_PATHS) {
+    for (const suffix of ["", ".html", "/index.html", ".txt"]) {
+      const response = await localFetch(`${path}${suffix}`);
+      assert.equal(response.status, 410);
+      assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""));
+      assert.equal(response.headers.has("location"), false);
+      await response.arrayBuffer();
+    }
   }
   for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-acceptance-service.txt", "/guides.txt", ...guidePaths.map(route => `${route}.txt`)]) {
     const response = await localFetch(route);
@@ -285,7 +331,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: twenty-five indexable public pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: 3723 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

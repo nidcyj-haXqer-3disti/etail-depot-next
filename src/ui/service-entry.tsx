@@ -1,11 +1,6 @@
 import Image from "next/image";
 import { hostedServices } from "@/shared/hosted-services";
 import { Icon } from "./icon";
-import "./service-entry.css";
-
-export function ServiceStatus({ service }: { service: "cards" | "payments" }) {
-  return <span className={`service-availability service-availability-${service}`}><span aria-hidden="true" />{hostedServices[service].status}</span>;
-}
 
 export function PaymentPortalLink({ className = "button primary", children = "Open Trolleys" }: { className?: string; children?: React.ReactNode }) {
   return <a className={className} href={hostedServices.payments.portalUrl} referrerPolicy="no-referrer" rel="external noreferrer">{children}<Icon name="external" /></a>;

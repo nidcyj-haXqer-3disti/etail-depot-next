@@ -24,10 +24,12 @@
     "verify:public": "pnpm lint && pnpm test:lint-tooling && pnpm typecheck && pnpm test:unit && pnpm test:architecture && pnpm build && pnpm test:e2e && pnpm test:a11y && pnpm test:security",
     "package:netlify": "node tools/package-public-site.mjs --production-review",
     "verify:package": "node tools/verify-architecture.mjs --artifacts",
-    "verify": "pnpm verify:public && pnpm test:seo:production && pnpm package:netlify && pnpm verify:package"
+    "verify": "pnpm verify:public && pnpm test:seo:production && pnpm package:netlify && pnpm verify:package",
+    "package:review": "node tools/package-public-site.mjs --local-review",
+    "verify:package:review": "node tools/verify-architecture.mjs --artifacts --local-review"
   },
   "dependencies": {
-    "next": "16.3.8",
+    "next": "16.4.1",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
@@ -40,8 +42,8 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.3.8",
+    "eslint-config-next": "16.4.1",
     "typescript": "6.0.3",
-    "vitest": "5.0.0"
+    "vitest": "5.0.3"
   }
 }

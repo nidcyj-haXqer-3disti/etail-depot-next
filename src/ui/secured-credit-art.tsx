@@ -39,6 +39,6 @@ export function SecuredCreditArt() {
         </ol>
       </div>
     </div>
-    <figcaption><Icon name="info" /><span>Example: a {exampleAmount} purchase adds {exampleAmount} to your purchase balance. Repay that balance in full; your security deposit does not make the payment.</span></figcaption>
+    <figcaption><Icon name="info" /><span>A {exampleAmount} purchase adds {exampleAmount} to your purchase balance. Repay that balance in full; your security deposit does not make the payment.</span></figcaption>
   </figure>;
 }

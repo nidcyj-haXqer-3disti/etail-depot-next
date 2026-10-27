@@ -7,11 +7,10 @@
   font-size: 14px;
   font-weight: 600;
   color: #245a4d;
-  text-decoration: underline;
-  text-decoration-color: #afc4b8;
+  text-decoration: none;
   text-underline-offset: 5px;
 }
-.welcome-text-link:hover { text-decoration-color: currentColor; }
+.welcome-text-link:hover { text-decoration: underline; }
 .welcome-text-link .icon { width: 18px; }
 
 .public-section { padding-block: 62px 64px; scroll-margin-top: 24px; }
@@ -33,15 +32,15 @@
   min-height: 76px;
   padding-block: 21px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.5;
-  font-weight: 600;
+  font-weight: 500;
   list-style: none;
 }
 .public-questions summary::-webkit-details-marker { display: none; }
-.public-questions summary > span { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; margin-inline-end: 6px; font-size: 23px; line-height: 1; font-weight: 400; color: #476d5d; transition: transform .15s; }
+.public-questions summary > span { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; margin-inline-end: 0; font-size: 23px; line-height: 1; font-weight: 400; color: #476d5d; transition: transform .15s; }
 .public-questions details[open] summary > span { transform: rotate(45deg); }
-.public-questions details > p { color: var(--muted); line-height: 1.85; font-size: 14px; margin: 0 0 24px; max-width: 62ch; }
+.public-questions details > p { color: var(--muted); line-height: 1.75; font-size: 15px; margin: 0 0 24px; max-width: 62ch; }
 .public-questions details > p a {
   color: #245a4d;
   text-decoration: underline;
@@ -83,14 +82,14 @@
   .public-section { padding-block: 40px 42px; }
   .public-faq-section { grid-template-columns: 1fr; gap: 18px; }
   .public-faq-section h2 br { display: none; }
-  .public-questions summary { font-size: 14px; min-height: 70px; }
-  .public-questions details > p { font-size: 13px; }
+  .public-questions summary { font-size: 15px; min-height: 70px; }
+  .public-questions details > p { font-size: 15px; }
   .public-help-intro { padding-top: 40px; text-align: left; }
   .public-help-intro > p:last-of-type { font-size: 15px; }
   .help-topic-links { grid-template-columns: 1fr; gap: 12px; margin-top: 26px; }
   .help-topic-links a { min-height: 56px; font-size: 14px; }
   .public-help-body .public-questions summary { font-size: 15px; }
-  .public-help-body .public-questions details > p { font-size: 14px; }
+  .public-help-body .public-questions details > p { font-size: 15px; }
   .help-guide { padding-block: 28px; }
 }
 @media (max-width: 390px) { .public-help-intro h1 { font-size: 2.8rem; } }

@@ -1,41 +1,132 @@
 import Link from "next/link";
+import { customerJourneys } from "@/modules/public-site/customer-journeys";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
-import { Shell } from "@/ui/shell";
-import { PaymentJourneyArt } from "@/ui/payment-journey-art";
-import { PaymentExperience } from "@/ui/payment-experience";
-import { PaymentExampleProvider } from "@/ui/payment-example-context";
-import { PaymentPortalLink } from "@/ui/service-entry";
-import { ConsumerHero } from "@/ui/consumer-layout";
-import { Icon } from "@/ui/icon";
 import { productFacts } from "@/shared/product-facts";
+import { Shell } from "@/ui/shell";
+import { ConsumerHero } from "@/ui/consumer-layout";
+import { MerchantCheckoutArt } from "@/ui/service-blueprint-art";
+import { ConsumerNetworks } from "@/ui/consumer-layout";
+import { PaymentLifecycleArt } from "@/ui/payment-lifecycle-art";
+import { PaymentOffer } from "@/ui/payment-offer";
+import { PaymentPortalLink } from "@/ui/service-entry";
+import { Icon } from "@/ui/icon";
+import { ServiceSectionNav } from "@/ui/service-section-nav";
 import "@/ui/public-site.css";
 import "@/ui/payment-page.css";
+import "@/ui/service-blueprint.css";
 
 export const metadata = publicPageMetadata("/payment-acceptance-service");
+
 export default function PaymentServicesPage() {
-  return <Shell><PublicPageStructuredData path="/payment-acceptance-service" /><div className="consumer-page consumer-product consumer-payments">
-    <PaymentExampleProvider>
-    <ConsumerHero product service="payments" title={<>Create. Share.<br /><span>Get paid.</span></>}
-      description="US businesses can accept credit and debit card payments online with Trolleys. Create a request for goods, services or information, then share a payment link or QR code with your customer."
-      actions={<><PaymentPortalLink>Continue to Trolleys</PaymentPortalLink><a className="consumer-text-link" href="#fees">View pricing<Icon name="arrow" /></a></>}
-      note={<p className="payment-hero-price"><strong>{productFacts.payments.cardRateLabel}</strong> per successful domestic online card payment.<br />No monthly fee. Create and share included.</p>}
-      visual={<div className="payment-workflow"><PaymentJourneyArt /><p className="payment-workflow-guide"><Link className="consumer-text-link" href="/guides/how-to-create-a-payment-link">How to create and share a payment link<Icon name="arrow" /></Link></p></div>}
-    />
-    <PaymentExperience />
-    </PaymentExampleProvider>
-    <section className="public-section page-container public-faq-section" aria-labelledby="payment-questions-title">
-      <div><p className="eyebrow">Before you start</p><h2 id="payment-questions-title">Good to know.</h2><Link href="/help#payments" className="consumer-text-link">Payment acceptance help<Icon name="arrow" /></Link></div>
-      <div className="public-questions">
-        <details><summary>How do I get started?<span aria-hidden="true">+</span></summary><p>Apply with Trolleys. Once approved and set up, create a payment request and share it with your customer. Your customer pays through checkout; you check the payment status in your Trolleys account before fulfilling the order. A confirmed payment and money arriving in your bank are separate steps.</p></details>
-        <details><summary>Who operates Trolleys?<span aria-hidden="true">+</span></summary><p>Trolleys is a trade name of Etail Depot US, Inc. Account setup and payment management take place at Trolleys.</p></details>
-        <details><summary>What can I request payment for?<span aria-hidden="true">+</span></summary><p>Goods can include physical products and orders. Services can include appointments and project work. Information can include research, analysis or advice delivered in a report, briefing or consultation. Make clear what the customer will receive, when it will be delivered and any access conditions. Business eligibility and account approval apply.</p></details>
-        <details><summary>How can I share a payment request?<span aria-hidden="true">+</span></summary><p>A payment link opens an online page where your customer can pay by card. Share it in a text message, email, social post or direct message without building a checkout into your own website. You can also add it to a website button or display its QR code on a sign or printed material. Each opens the same payment page. Sharing a link by text does not include a messaging subscription.</p></details>
-        <details><summary>Can I accept ACH payments?<span aria-hidden="true">+</span></summary><p>Yes. Trolleys also supports ACH payments. Contact Trolleys for ACH fees, timing and the payment options available for your account. The prices and fee calculator on this page apply to card payments.</p></details>
-        <details id="payouts"><summary>When will I receive my money?<span aria-hidden="true">+</span></summary><p>Payment confirmation, available funds and bank arrival are separate steps. Your account’s payout schedule applies; fees, refunds, disputes and holds affect the amount available. First payouts, reviews, reserves and bank holidays can affect timing.</p></details>
-        <details id="refunds-and-disputes"><summary>How do refunds and disputes work?<span aria-hidden="true">+</span></summary><p>Manage the original payment in Trolleys. Refunds reduce funds available for payout; original processing and currency conversion fees are not returned. For disputes, check the response deadline and provide the requested records.</p></details>
-        <details><summary>Does Clarity prevent every chargeback?<span aria-hidden="true">+</span></summary><p>No. Eligibility depends on the payment, participating bank and available data. Order Insight does not guarantee a dispute outcome. Automatic refund programs and services that respond to chargebacks for you are separate services.</p></details>
-      </div>
-    </section>
-  </div></Shell>;
+  return <Shell quietAccess>
+    <PublicPageStructuredData path="/payment-acceptance-service" />
+    <div className="consumer-page consumer-product consumer-payments service-blueprint">
+      <ServiceSectionNav title="Merchant services" className="payment-section-nav" links={[
+        { href: "#payment-operations", label: "Payment operations" },
+        { href: "#fees", label: "Pricing" },
+        { href: "#payment-questions-title", label: "Questions" },
+      ]} />
+      <ConsumerHero product service="payments" productLabel="Merchant services"
+        title={<>Online payments.<br /><span>From checkout to payout.</span></>}
+        description="Accept online card and ACH payments for your US business. Manage transactions, refunds and disputes, and match payouts to your bank statement."
+        actions={<PaymentPortalLink>Apply for a merchant account</PaymentPortalLink>}
+        note={<p className="payment-hero-price"><strong>{productFacts.payments.cardRateLabel}</strong> per successful domestic online card payment.<br />No monthly fee. ACH pricing is separate.<span className="payment-hero-handoff">Applications open at Trolleys, an Etail Depot service. Account approval and setup apply.</span></p>}
+        visual={<MerchantCheckoutArt />}
+      />
+
+      <div className="bp-method-band"><div className="page-container">
+        <span id="customer-checkout" className="payment-legacy-anchor" aria-hidden="true" />
+        <span id="payment-channels" className="payment-legacy-anchor" aria-hidden="true" />
+        <span id="request-details" className="payment-legacy-anchor" aria-hidden="true" />
+        <ConsumerNetworks />
+      </div></div>
+
+        <section className="payment-operations-section" id="payment-operations" aria-labelledby="payment-operations-title">
+          <div className="page-container">
+            <div className="consumer-section-heading">
+              <h2 id="payment-operations-title">From payment<br /><span>to bank deposit.</span></h2>
+              <p>Follow each payment through processing, account for fees and adjustments, then match the payout to your bank statement.</p>
+            </div>
+            <div className="bp-operations-layout">
+              <ol className="payment-operations-grid payment-funding-steps" aria-label="From payment to bank deposit" role="list">
+                <li className="payment-operation" id="payment-records">
+                  <div className="payment-operation-heading"><span className="payment-step-number" aria-hidden="true">1</span><h3>Capture</h3></div>
+                  <div className="payment-operation-content">
+                    <p>Confirm the approved payment has been submitted for processing. Check its status before fulfilling the order.</p>
+                    <details className="payment-operation-details">
+                      <summary>If the payment result is unclear<span aria-hidden="true" /></summary>
+                      <p>Check the existing attempt before trying again. A timeout does not establish that the payment failed, and a customer screenshot alone does not confirm payment. Contact account support if the result is still unclear.</p>
+                    </details>
+                  </div>
+                </li>
+                <li className="payment-operation">
+                  <div className="payment-operation-heading"><span className="payment-step-number" aria-hidden="true">2</span><h3>Settlement</h3></div>
+                  <div className="payment-operation-content">
+                    <p>Track the payment through settlement. Settlement and arrival in your bank account are separate.</p>
+                  </div>
+                </li>
+                <li className="payment-operation">
+                  <div className="payment-operation-heading"><span className="payment-step-number" aria-hidden="true">3</span><h3>Payout calculation</h3></div>
+                  <div className="payment-operation-content">
+                    <p>See how settled payments, applicable fees, refunds and chargeback adjustments determine the payout amount. A payout may combine several payments.</p>
+                  </div>
+                </li>
+                <li className="payment-operation payment-to-bank" id="payouts" aria-labelledby="payment-to-bank-title">
+                  <div className="payment-operation-heading"><span className="payment-step-number" aria-hidden="true">4</span><h3 id="payment-to-bank-title">Bank deposit</h3></div>
+                  <div className="payment-operation-content">
+                    <p>Check the payout status and match the deposit to your bank statement.</p>
+                    <details className="payment-operation-details">
+                      <summary>What affects payout timing?<span aria-hidden="true" /></summary>
+                      <p>Your account’s payout schedule applies. Payment confirmation, available funds and bank arrival are separate. First payouts, reviews, holds, reserves and bank holidays can affect your payout schedule.</p>
+                    </details>
+                  </div>
+                </li>
+              </ol>
+              <div className="bp-operations-art"><PaymentLifecycleArt variant="merchant" /></div>
+            </div>
+            <div className="payment-aftercare" id="refunds-and-disputes" role="group" aria-labelledby="payment-aftercare-title">
+              <span id="dispute-readiness" className="payment-legacy-anchor" aria-hidden="true" />
+              <span id="sale-records" className="payment-legacy-anchor" aria-hidden="true" />
+              <div className="payment-aftercare-heading">
+                <h3 id="payment-aftercare-title">Refunds and disputes</h3>
+                <p>Refunds and chargebacks can affect later payouts, including after the original payment has been deposited.</p>
+              </div>
+              <div className="payment-aftercare-grid">
+                <details className="payment-operation-details payment-support-detail">
+                  <summary>Manage a refund<span aria-hidden="true" /></summary>
+                  <div className="payment-support-content">
+                    <p>Issue a refund from the original transaction and track its status. Before settlement, a void or authorization reversal may be appropriate.</p>
+                    <p className="payment-operation-note">Refunds reduce funds available for payout. Available actions depend on the payment status and your account permissions.</p>
+                  </div>
+                </details>
+                <details className="payment-operation-details payment-support-detail">
+                  <summary>Respond to a dispute<span aria-hidden="true" /></summary>
+                  <div className="payment-support-content">
+                    <p>Review the reason and response deadline, provide the requested records, and track the case through resolution.</p>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+        </section>
+      <PaymentOffer />
+
+      <section className="public-section page-container public-faq-section" aria-labelledby="payment-questions-title">
+        <div className="service-questions-intro">
+          <p className="eyebrow">Account setup</p>
+          <h2 id="payment-questions-title">Your merchant account.</h2>
+          <Link href={customerJourneys.merchant.documentation} className="consumer-text-link">{customerJourneys.merchant.documentationLabel}<Icon name="arrow" /></Link>
+        </div>
+        <div className="payment-faq-content">
+          <div className="public-questions">
+            <details><summary>Can my business apply?<span aria-hidden="true">+</span></summary><p>US businesses can apply to accept payments in USD for goods, services or information. We review each business before approving an account.</p></details>
+            <details><summary>How do I open a merchant account?<span aria-hidden="true">+</span></summary><p>Apply through Trolleys, the merchant account service operated by Etail Depot US, Inc. Review your fees, payout schedule and account terms before accepting the agreement. You can start accepting payments once your account is approved and set up.</p></details>
+            <details><summary>Can my customers pay by ACH?<span aria-hidden="true">+</span></summary><p>Yes. Check the ACH fees, timing and options for your account before you start. The prices and calculator on this page are for card payments.</p></details>
+            <details><summary>Which payment methods can I offer at checkout?<span aria-hidden="true">+</span></summary><p>We’ll confirm the checkout and payment methods available for your account during setup. Digital wallet payments also depend on your customer’s card and device.</p></details>
+          </div>
+        </div>
+      </section>
+    </div>
+  </Shell>;
 }

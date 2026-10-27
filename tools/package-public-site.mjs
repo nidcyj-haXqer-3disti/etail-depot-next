@@ -1,6 +1,7 @@
+import { verifyReferenceRelease } from "./verify-reference-release.mjs";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { bundle, validateManifest } from "@netlify/edge-bundler";
@@ -9,16 +10,26 @@ import { publicSecurityHeaders } from "../netlify/edge-functions/public-boundary
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { clearPublicPackageOutputs } from "./public-package-cleanup.ts";
 import { preparePlatformEmail } from "./netlify-email-compat.ts";
-import { publicHtmlFiles } from "./public-artifact-policy.ts";
+import { localPreviewPageSources, localReviewHtmlFiles, publicationBlockers, publicHtmlFiles } from "./public-artifact-policy.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+verifyReferenceRelease(root);
 const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
 assert.equal(process.version, `v${manifest.engines.node}`, "Use the pinned Node.js runtime.");
 assert.equal(manifest.devDependencies["@netlify/edge-bundler"], "16.0.4", "Review any Edge bundler version change.");
 const argumentsList = process.argv.slice(2);
-assert(argumentsList.every(argument => argument === "--production-review") && argumentsList.length <= 1, "Only --production-review is supported; this tool never deploys.");
+assert(argumentsList.length <= 1 && argumentsList.every(argument => ["--production-review", "--local-review"].includes(argument)), "Choose either --production-review or --local-review; this tool never deploys.");
 const productionReview = argumentsList.includes("--production-review");
-const buildEnvironment = productionReview ? {
+const localReview = argumentsList.includes("--local-review");
+const blockers = publicationBlockers(localPreviewPageSources.filter(page => existsSync(path.join(root, "src/app", page))), existsSync(path.join(root, "src/modules/public-site/iso8583-data.json")));
+if (localReview) {
+  assert(process.env.NETLIFY !== "true" && (!process.env.CONTEXT || process.env.CONTEXT === "dev"), "Local review packaging must not run in a hosted build.");
+} else {
+  assert.equal(blockers.length, 0, `Production package is held.\n${blockers.join("\n")}\nUse pnpm package:review for isolated local technical verification. This does not authorize publication.`);
+}
+const buildEnvironment = localReview ? {
+  NODE_ENV: "production", APP_ENV: "local", ETAIL_SEARCH_CONTEXT: "preview", CONTEXT: "", SITE_ID: "", ETAIL_PUBLIC_ORIGIN: "",
+} : productionReview ? {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production", CONTEXT: "production",
   SITE_ID: PUBLIC_INDEXING_APPROVAL.siteId, ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 } : {
@@ -26,7 +37,7 @@ const buildEnvironment = productionReview ? {
   CONTEXT: process.env.CONTEXT ?? "", SITE_ID: process.env.SITE_ID ?? "", ETAIL_PUBLIC_ORIGIN: process.env.ETAIL_PUBLIC_ORIGIN ?? "",
 };
 
-if (productionReview) {
+if (productionReview || localReview) {
   const result = spawnSync(process.execPath, [path.join(root, "tools/build-public-site.mjs")], {
     cwd: root, env: { ...process.env, ...buildEnvironment }, stdio: "inherit",
   });
@@ -41,7 +52,14 @@ assert.deepEqual(buildRecord.buildEnvironment, buildEnvironment, "The export was
 assert.equal(buildRecord.indexingEnabled, isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, buildEnvironment), "The export search policy does not match this release.");
 
 const exportDirectory = path.join(root, "out");
-const netlifyDirectory = path.join(root, ".netlify");
+const netlifyDirectory = path.join(root, localReview ? ".local/package-review" : ".netlify");
+if (localReview) {
+  for (const name of [".local", ".local/package-review"]) {
+    const filename = path.join(root, name);
+    assert(!existsSync(filename) || (lstatSync(filename).isDirectory() && !lstatSync(filename).isSymbolicLink()), "Local review output must use ordinary project directories.");
+  }
+}
+const requiredHtmlFiles = localReview ? localReviewHtmlFiles : publicHtmlFiles;
 const publishDirectory = path.join(netlifyDirectory, "static");
 const edgeDirectory = path.join(netlifyDirectory, "edge-functions-dist");
 function rejectSymlinks(directory) {
@@ -52,7 +70,7 @@ function rejectSymlinks(directory) {
   }
 }
 rejectSymlinks(exportDirectory);
-for (const file of [...publicHtmlFiles, "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
+for (const file of [...requiredHtmlFiles, "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
   assert(existsSync(path.join(exportDirectory, file)), `The static export is missing ${file}.`);
 }
 
@@ -63,7 +81,7 @@ cpSync(exportDirectory, publishDirectory, { recursive: true, errorOnExist: true,
 mkdirSync(edgeDirectory, { recursive: true });
 
 // Static responses have the same baseline headers as the Edge response boundary.
-const headers = ["/*", ...Object.entries(publicSecurityHeaders).map(([key, value]) => `  ${key}: ${value}`), "", "/opengraph-image", "  Content-Type: image/png", ""].join("\n");
+const headers = ["/*", ...Object.entries(publicSecurityHeaders).map(([key, value]) => `  ${key}: ${value}`), ...(localReview ? ["  X-Robots-Tag: noindex, nofollow"] : []), "", "/opengraph-image", "  Content-Type: image/png", ""].join("\n");
 writeFileSync(path.join(publishDirectory, "_headers"), headers);
 
 const packaged = await bundle([path.join(root, "netlify/edge-functions")], edgeDirectory, [], {
@@ -84,4 +102,10 @@ assert.equal(packaged.manifest.bundles[0].format, "eszip2");
 assert.equal(publicSourceFingerprint(root), buildRecord.fingerprint, "Source changed during packaging; rebuild the candidate.");
 writeFileSync(path.join(netlifyDirectory, "public-build.json"), `${JSON.stringify(buildRecord, null, 2)}\n`);
 preparePlatformEmail(root);
-console.log(`Public static site packaged locally with one Edge boundary and the protected platform email handler. Search indexing in the build: ${buildRecord.indexingEnabled ? "approved production" : "disabled"}. No deployment was performed.`);
+if (localReview) {
+  const emailTarget = path.join(netlifyDirectory, "functions-internal/emails");
+  mkdirSync(emailTarget, { recursive: true });
+  for (const name of ["index.mjs", "vendor.cjs"]) cpSync(path.join(root, ".netlify/functions-internal/emails", name), path.join(emailTarget, name));
+  writeFileSync(path.join(netlifyDirectory, "review-policy.json"), JSON.stringify({ schemaVersion: 1, mode: "local-review", publicationAllowed: false, sourceFingerprint: buildRecord.fingerprint, contentPages: requiredHtmlFiles.length, blockers }, null, 2) + "\n");
+}
+console.log(`${localReview ? "Isolated local review package, not approved for publication" : "Public static site packaged locally"} with one Edge boundary and the protected platform email handler. Search indexing in the build: ${buildRecord.indexingEnabled ? "approved production" : "disabled"}. No deployment was performed.`);

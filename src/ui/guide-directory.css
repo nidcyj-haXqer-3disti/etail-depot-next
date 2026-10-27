@@ -1,0 +1,13 @@
+/* ISO reference directory. */
+.guides-directory { --guides-ink: #023941; --guides-muted: #53686a; --guides-line: #dce5e2; color: var(--guides-ink); padding-bottom: 72px; }
+.guides-directory [hidden] { display: none !important; }
+.guides-directory-heading { padding-block: 64px 52px; }
+.guides-directory-heading h1 { margin: 0; max-width: 1000px; font-size: clamp(36px, 4.45vw, 64px); font-weight: 500; line-height: 1.08; letter-spacing: -.045em; text-wrap: balance; }
+.guides-directory-intro { margin-top: 23px; max-width: 650px; font-size: 19px; line-height: 1.7; color: var(--guides-muted); }
+.guides-directory :is(a, button, select):focus-visible { outline: 3px solid #00836b; outline-offset: 5px; }
+@media (max-width: 700px) {
+ .guides-directory { padding-bottom: 44px; }
+ .guides-directory-heading { padding-block: 38px 30px; }
+ .guides-directory-heading h1 { font-size: 39px; }
+ .guides-directory-intro { margin-top: 18px; font-size: 17px; }
+}

@@ -21,3 +21,10 @@ artifacts/
 __MACOSX/
 __pycache__/
 *.pyc
+
+# Private research and obsolete editorial review evidence
+/docs/content/
+/planning/content-production/
+/planning/VENDOR_JOURNEY_ACCEPTANCE.json
+/planning/release-scope-20261027.json
+/outputs/

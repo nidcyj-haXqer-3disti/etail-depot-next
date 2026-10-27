@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { verifyReferenceRelease } from "./verify-reference-release.mjs";
 /** Public website boundary. Archived financial records are never active application inputs. */
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -6,12 +7,14 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
-import { boundarySource, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "./public-artifact-policy.ts";
+import { boundarySource, builtPageSources, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, forbiddenLocalReviewStatic, localReviewHtmlFiles, publicationBlockers, localCorePreviewPageSources, localPreviewPageSources, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "./public-artifact-policy.ts";
+import { STANDARD_REFERENCE_PATHS } from "../src/shared/standard-reference-paths.ts";
 import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { verifyPlatformEmail, verifyPlatformEmailBundle } from "./netlify-email-compat.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+verifyReferenceRelease(root);
 const relative = filename => path.relative(root, filename).split(path.sep).join("/");
 const failures = [];
 const publicPackages = new Set(["next", "react", "react-dom"]);
@@ -54,9 +57,12 @@ function sourceChecks(filename, source) {
   inspect(tree);
 }
 
-assert.equal(publicPageSources.length, 27, "Only the twenty approved guides and seven core pages may be built.");
+assert.equal(publicPageSources.length, 25, "Only the nineteen core sources and six reference templates are approved.");
 assert.equal(new Set(publicPageSources).size, publicPageSources.length, "Reviewed page paths must be unique.");
-assert.equal(publicHtmlFiles.length, 27);
+assert.equal(publicHtmlFiles.length, 3725);
+assert.deepEqual(localCorePreviewPageSources, ["software-partners/page.tsx", "docs/page.tsx", "online-businesses/page.tsx", "docs/merchant-onboarding/page.tsx", "docs/integration-access/page.tsx", "docs/checkout/page.tsx", "docs/payment-requests/page.tsx", "docs/payment-status/page.tsx", "docs/refunds-and-disputes/page.tsx", "docs/payouts/page.tsx", "docs/webhooks/page.tsx", "docs/testing-and-launch/page.tsx"], "Only the exact reviewed non-guide local preview pages may be added.");
+assert.equal(builtPageSources.length, 25, "Nineteen retained page sources and six ISO templates.");
+assert.equal(STANDARD_REFERENCE_PATHS.length, 3706, "Only the exact reviewed ISO reference inventory is included.");
 assert.equal(publicSourcePath(boundarySource), true);
 assert.equal(publicSourcePath("src/proxy.ts"), false);
 assert.equal(publicSourcePath("src/modules/identity/service.ts"), false);
@@ -92,7 +98,7 @@ assert.deepEqual(Object.keys(manifest.dependencies).sort(), [...publicPackages].
 for (const entry of ["src/platform", "src/app/api", "netlify/database", "netlify/functions", "src/proxy.ts", "drizzle.config.ts", "playwright.email.config.ts"]) {
   if (existsSync(path.join(root, entry))) fail(entry, "RETIRED_RUNTIME_PATH");
 }
-for (const page of publicPageSources) if (!existsSync(path.join(root, "src/app", page))) fail(`src/app/${page}`, "MISSING_PUBLIC_PAGE");
+for (const page of builtPageSources) if (!existsSync(path.join(root, "src/app", page))) fail(`src/app/${page}`, "MISSING_PUBLIC_PAGE");
 const sources = [...files(path.join(root, "src")), ...files(path.join(root, "netlify/edge-functions"))];
 if (!existsSync(path.join(root, boundarySource))) fail(boundarySource, "MISSING_PUBLIC_BOUNDARY");
 for (const filename of sources) {
@@ -106,19 +112,31 @@ for (const filename of sources) {
 }
 
 if (process.argv.includes("--artifacts")) {
+  const localReview = process.argv.includes("--local-review");
+  const blockers = publicationBlockers(localPreviewPageSources.filter(page => existsSync(path.join(root, "src/app", page))), existsSync(path.join(root, "src/modules/public-site/iso8583-data.json")));
+  if (!localReview) assert.equal(blockers.length, 0, `Production package verification is held.\n${blockers.join("\n")}\nUse pnpm verify:package:review for the separate local review package.`);
+  const packageRoot = path.join(root, localReview ? ".local/package-review" : ".netlify");
+  const expectedHtmlFiles = localReview ? localReviewHtmlFiles : publicHtmlFiles;
+  const staticForbidden = localReview ? forbiddenLocalReviewStatic : forbiddenStatic;
   const nextRoot = path.join(root, ".next");
   const buildRecord = JSON.parse(readFileSync(path.join(nextRoot, "public-build.json"), "utf8"));
-  const packageRecord = JSON.parse(readFileSync(path.join(root, ".netlify/public-build.json"), "utf8"));
+  const packageRecord = JSON.parse(readFileSync(path.join(packageRoot, "public-build.json"), "utf8"));
   assert.equal(buildRecord.schemaVersion, 1, "Unexpected public build record format.");
   assert.equal(buildRecord.fingerprint, publicSourceFingerprint(root), "The exported package is stale; rebuild the current candidate.");
   assert.equal(buildRecord.indexingEnabled, isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, buildRecord.buildEnvironment), "Recorded search approval must match the unchanged guard.");
   assert.deepEqual(packageRecord, buildRecord, "The package must preserve the reviewed source and search-environment identity.");
+  if (localReview) {
+    const review = JSON.parse(readFileSync(path.join(packageRoot, "review-policy.json"), "utf8"));
+    assert.deepEqual(review, { schemaVersion: 1, mode: "local-review", publicationAllowed: false, sourceFingerprint: buildRecord.fingerprint, contentPages: expectedHtmlFiles.length, blockers });
+    assert.equal(buildRecord.indexingEnabled, false, "A local review package cannot enable indexing.");
+    assert.deepEqual(buildRecord.buildEnvironment, { NODE_ENV: "production", APP_ENV: "local", ETAIL_SEARCH_CONTEXT: "preview", CONTEXT: "", SITE_ID: "", ETAIL_PUBLIC_ORIGIN: "" });
+  }
   const appManifest = path.join(nextRoot, "server/app-paths-manifest.json");
   if (!existsSync(appManifest)) throw new Error("Build the public static website before checking deployment artifacts.");
   const routes = Object.keys(JSON.parse(readFileSync(appManifest, "utf8")));
-  const expected = new Set([...publicPageSources.map(page => `/${page.replace(/\.tsx$/, "")}`), "/robots.txt/route", "/sitemap.xml/route", "/opengraph-image/route", "/_not-found/page", "/_global-error/page"]);
+  const expected = new Set([...builtPageSources.map(page => `/${page.replace(/\.tsx$/, "")}`), "/robots.txt/route", "/sitemap.xml/route", "/opengraph-image/route", "/_not-found/page", "/_global-error/page"]);
   for (const route of routes) if (!expected.has(route)) fail(".next/server/app-paths-manifest.json", `UNEXPECTED_BUILT_ROUTE ${route}`);
-  for (const page of publicPageSources) {
+  for (const page of builtPageSources) {
     const route = `/${page.replace(/\.tsx$/, "")}`;
     if (!routes.includes(route)) fail(".next/server/app-paths-manifest.json", `MISSING_BUILT_ROUTE ${route}`);
   }
@@ -133,7 +151,7 @@ if (process.argv.includes("--artifacts")) {
   }
 
   const exportRoot = path.join(root, "out");
-  const staticRoot = path.join(root, ".netlify/static");
+  const staticRoot = path.join(packageRoot, "static");
   if (!existsSync(exportRoot) || !existsSync(staticRoot)) throw new Error("Export and package the static website before checking deployment artifacts.");
   const exportFiles = files(exportRoot);
   const staticFiles = files(staticRoot);
@@ -142,13 +160,13 @@ if (process.argv.includes("--artifacts")) {
   const staticNames = staticFiles.map(filename => path.relative(staticRoot, filename).split(path.sep).join("/")).sort();
   assert.deepEqual(staticNames, [...exportNames, "_headers"].sort(), "Only the exact static export and reviewed security headers may be published.");
   for (const name of exportNames) assert.equal(digest(path.join(exportRoot, name)), digest(path.join(staticRoot, name)), `Static file changed during packaging: ${name}`);
-  for (const directory of ["public", "out", ".next/static", ".netlify/static"]) {
+  for (const directory of ["public", "out", ".next/static", path.relative(root, staticRoot)]) {
     const base = path.join(root, directory);
-    for (const filename of files(base)) if (forbiddenStatic(path.relative(base, filename))) fail(relative(filename), "PRIVATE_OR_ARCHIVED_STATIC_FILE");
+    for (const filename of files(base)) if (staticForbidden(path.relative(base, filename))) fail(relative(filename), "PRIVATE_OR_ARCHIVED_STATIC_FILE");
   }
-  const allowedHtml = new Set([...publicHtmlFiles, "404.html", "_not-found.html", "_global-error.html"]);
+  const allowedHtml = new Set([...expectedHtmlFiles, "404.html", "_not-found.html", "_global-error.html"]);
   for (const name of staticNames.filter(filename => filename.endsWith(".html"))) if (!allowedHtml.has(name)) fail(name, "UNEXPECTED_STATIC_PAGE");
-  for (const name of [...publicHtmlFiles, "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
+  for (const name of [...expectedHtmlFiles, "404.html", "robots.txt", "sitemap.xml", "opengraph-image"]) {
     const filename = path.join(staticRoot, name);
     assert.ok(existsSync(filename) && statSync(filename).isFile() && statSync(filename).size > 0, `Missing required public export: ${name}`);
   }
@@ -160,6 +178,17 @@ if (process.argv.includes("--artifacts")) {
     assert.ok(headers.includes(header), `Missing static security header: ${header}`);
   }
   assert.ok(staticNames.some(name => name.startsWith("_next/static/") && name.endsWith(".js")), "Client interaction assets are missing.");
+  if (localReview) {
+    assert.match(headers, /X-Robots-Tag: noindex, nofollow/);
+    assert.doesNotMatch(readFileSync(path.join(staticRoot, "sitemap.xml"), "utf8"), /<loc>/);
+    for (const file of expectedHtmlFiles) {
+      const html = readFileSync(path.join(staticRoot, file), "utf8");
+      assert.match(html, /<meta name="robots" content="noindex, nofollow"/, `Local page became indexable: ${file}`);
+    }
+    const emailTarget = path.join(packageRoot, "functions-internal/emails");
+    assert.deepEqual(readdirSync(emailTarget).sort(), ["index.mjs", "vendor.cjs"]);
+    for (const name of ["index.mjs", "vendor.cjs"]) assert.deepEqual(readFileSync(path.join(emailTarget, name)), readFileSync(path.join(root, ".netlify/functions-internal/emails", name)));
+  }
 
   // Only the existing, pinned and protected platform Emails handler is permitted.
   // Application server functions, retired adapters and unknown platform functions still fail.
@@ -169,7 +198,7 @@ if (process.argv.includes("--artifacts")) {
   for (const name of [".netlify/dist", ".netlify/edge-functions", ...(!functionsDist ? [".netlify/functions"] : [])]) {
     if (existsSync(path.join(root, name))) fail(name, "UNEXPECTED_SERVER_OR_ADAPTER_ARTIFACT");
   }
-  const distRoot = path.join(root, ".netlify/edge-functions-dist");
+  const distRoot = path.join(packageRoot, "edge-functions-dist");
   const edgeDist = JSON.parse(readFileSync(path.join(distRoot, "manifest.json"), "utf8"));
   for (const issue of edgeEntryFindings(edgeDist.routes)) fail(".netlify/edge-functions-dist/manifest.json", issue);
   assert.deepEqual(edgeDist.post_cache_routes, [], "The public boundary must execute before cache lookup.");
@@ -191,10 +220,10 @@ if (process.argv.includes("--artifacts")) {
   for (const signature of ["___netlify-server-handler", "___netlify-edge-handler-node-middleware", "@netlify/plugin-nextjs"]) {
     if (bundleText.includes(signature)) fail(relative(bundlePath), "RETIRED_ADAPTER_IN_EDGE_BUNDLE");
   }
-  console.log(`Artifact boundary checked ${routes.length} compiler routes, ${publicHtmlFiles.length} static pages, ${staticNames.length} static files, one public edge boundary covering ${retiredFamilies.length} retired families, and only the protected platform email handler.`);
+  console.log(`Artifact boundary checked ${routes.length} compiler routes, ${expectedHtmlFiles.length} static pages, ${staticNames.length} static files, one public edge boundary covering ${retiredFamilies.length} retired families, and only the protected platform email handler.`);
 }
 
 if (failures.length) {
   for (const failure of [...new Set(failures)]) console.error(failure);
   process.exitCode = 1;
-} else console.log(`Public architecture checks passed: ${sources.length} application source files; ${publicPageSources.length} public pages; no local account, payment or database runtime.`);
+} else console.log(`Public architecture checks passed: ${sources.length} application source files; ${publicPageSources.length} approved public pages and ${localPreviewPageSources.length} local-only preview page; no local account, payment or database runtime.`);

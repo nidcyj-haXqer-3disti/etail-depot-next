@@ -1,0 +1,10 @@
+ISO 20022 external code reference
+
+Source: ISO 20022 Financial Repository, maintained by the ISO 20022 Registration Authority.
+Collection: August 2026 (v3), workbook publication 28 August 2026.
+Catalogue: https://www.iso20022.org/catalogue/additional-content-messages/external-code-sets
+Repository rights policy: https://www.iso20022.org/intellectual-property-rights
+
+The repository policy provides a nonexclusive, royalty free licence for use of published repository information. Contributors retain their rights; contributor policies remain applicable. This is not a licence to reproduce purchased ISO standards, use ISO branding, or claim certification.
+
+Etail Depot supplies the website presentation, navigation and explanatory context. Source definitions, code identities, release information and source conflicts are identified on the reference pages. The reference is not an official ISO publication. Repository information is provided without warranties by the Registration Authority; consult the current source and applicable implementation specifications.

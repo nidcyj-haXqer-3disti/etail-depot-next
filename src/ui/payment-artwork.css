@@ -1,0 +1,14 @@
+/* Shared craft rules for the three merchant journey illustrations. */
+.payment-artwork-surface { --art-line: #cddbd3; --art-soft-line: #e2e9e4; --art-paper: #f7f6f2; --art-tint: #edf3ed; overflow: hidden; border: 1px solid var(--art-line); border-radius: 12px; background: #fff; box-shadow: 0 16px 36px -24px #02394129, 0 2px 6px -3px #02394114; }
+.payment-artwork-header { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; min-height: 72px; padding: 20px 28px; border-bottom: 1px solid var(--art-line); background: #fff; }
+.payment-artwork-business { display: flex; align-items: center; gap: 10px; color: var(--public-ink); font-size: 15px; font-weight: 500; line-height: 1.5; letter-spacing: -.01em; }
+.payment-artwork-monogram { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border: 1px solid #d0ddd1; border-radius: 8px; background: var(--art-tint); color: #023941; font-size: 13px; font-weight: 500; }
+.payment-artwork-caption { display: flex; align-items: center; gap: 7px; color: var(--public-muted); font-size: 13px; line-height: 1.5; }
+.payment-artwork-caption .icon { flex: 0 0 15px; width: 15px; height: 15px; }
+@media (max-width: 600px) {
+ .payment-artwork-header { flex-wrap: wrap; padding: 16px 18px; gap: 10px; }
+ .payment-artwork-business { font-size: 14px; }
+ .payment-artwork-caption { font-size: 12px; }
+}
+
+.payment-artwork-monogram .icon { width: 17px; height: 17px; stroke-width: 1.5; }

@@ -1,49 +1,24 @@
 import { describe, expect, it } from "vitest";
 import { estimateDomesticCardFee } from "../../src/modules/public-site/fee-estimate";
 
-describe("public fee estimate", () => {
-  it("leaves the optional service off unless selected", () => {
-    expect(estimateDomesticCardFee("100.00")).toEqual({
-      amountCents: 10000,
-      processingCents: 320,
-      serviceCents: 0,
-      subtotalCents: 9680,
-    });
-    expect(estimateDomesticCardFee("100", false)).toEqual(estimateDomesticCardFee("100"));
-  });
-
-  it("estimates displayed processing and optional service fees", () => {
-    const estimate = estimateDomesticCardFee("100", true);
-    expect(estimate).toEqual({
-      amountCents: 10000,
-      processingCents: 320,
-      serviceCents: 40,
-      subtotalCents: 9640,
-    });
-    expect(estimate).not.toHaveProperty("netCents");
-  });
-
+describe("domestic online card fee estimate", () => {
   it.each([
-    {amount: "1.24", amountCents: 124, processingCents: 34, serviceCents: 0, subtotalCents: 90},
-    {amount: "1.25", amountCents: 125, processingCents: 34, serviceCents: 1, subtotalCents: 90},
-    {amount: "5.00", amountCents: 500, processingCents: 45, serviceCents: 2, subtotalCents: 453},
-    {amount: " 9.99 ", amountCents: 999, processingCents: 59, serviceCents: 4, subtotalCents: 936},
-    {amount: "100000", amountCents: 10000000, processingCents: 290030, serviceCents: 40000, subtotalCents: 9669970},
-  ])("rounds the service and processing fees separately for $amount", ({amount, ...fees}) => {
-    expect(estimateDomesticCardFee(amount, true)).toEqual(fees);
-  });
-
-  it("rounds a sub-cent optional service fee to zero", () => {
-    expect(estimateDomesticCardFee("1", true)).toEqual({
-      amountCents: 100,
-      processingCents: 33,
-      serviceCents: 0,
-      subtotalCents: 67,
-    });
+    { amount: "100.00", amountCents: 10000, percentageCents: 290, fixedCents: 30, processingCents: 320, subtotalCents: 9680 },
+    { amount: "1", amountCents: 100, percentageCents: 3, fixedCents: 30, processingCents: 33, subtotalCents: 67 },
+    { amount: "4.99", amountCents: 499, percentageCents: 14, fixedCents: 30, processingCents: 44, subtotalCents: 455 },
+    { amount: "5", amountCents: 500, percentageCents: 15, fixedCents: 30, processingCents: 45, subtotalCents: 455 },
+    { amount: " 9.99 ", amountCents: 999, percentageCents: 29, fixedCents: 30, processingCents: 59, subtotalCents: 940 },
+    { amount: "480", amountCents: 48000, percentageCents: 1392, fixedCents: 30, processingCents: 1422, subtotalCents: 46578 },
+    { amount: "100000", amountCents: 10000000, percentageCents: 290000, fixedCents: 30, processingCents: 290030, subtotalCents: 9709970 },
+  ])("calculates and reconciles each component for $amount", ({ amount, ...expected }) => {
+    const estimate = estimateDomesticCardFee(amount);
+    expect(estimate).toEqual(expected);
+    expect(estimate!.percentageCents + estimate!.fixedCents).toBe(estimate!.processingCents);
+    expect(estimate!.processingCents + estimate!.subtotalCents).toBe(estimate!.amountCents);
+    expect(Object.values(estimate!).every(Number.isSafeInteger)).toBe(true);
   });
 
   it.each(["", "0", "0.99", "-100", "1.001", "1e3", "NaN", "1,000", "100000.01", "99999999", "$100"])("rejects invalid or unsupported amount %s", input => {
     expect(estimateDomesticCardFee(input)).toBeNull();
-    expect(estimateDomesticCardFee(input, true)).toBeNull();
   });
 });

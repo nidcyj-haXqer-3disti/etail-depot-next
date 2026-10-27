@@ -25,4 +25,4 @@ export const legalIdentity = {
   ],
 } as const;
 
-export const publicCompanyDescription = `Trolleys and Ledgix are trade names of ${legalIdentity.company}, which operates both services.`;
+export const publicCompanyDescription = `Trolleys and Ledgix are trade names of ${legalIdentity.company}, a nonbank payments company. Trolleys provides merchant services for US businesses, including card and ACH payment acceptance. Ledgix is the secured credit card service; applications are not open yet.`;

@@ -22,11 +22,11 @@ export interface SearchReleaseApproval {
   canonicalOrigin: string;
   reviewReference: string;
 }
-/** D345 authorizes the reviewed D340–D344 refinements within D333's 27 pages; 25 nonlegal URLs retain the D122/D215 production safeguards. */
+/** Exact candidate preparation approval; publication still requires a separate release action. */
 export const PUBLIC_INDEXING_APPROVAL: SearchReleaseApproval = {
   siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
   canonicalOrigin: "https://etaildepot.com",
-  reviewReference: "D215 — approved canonical-domain migration, 2026-10-14, preserving D122 safeguards. D333 — published twenty-guide release, commit 08e13bb27c9ed687f75149c9beaf86a69eaf6d74: 27 exact pages, 25 nonlegal search-eligible URLs under the production guard. D345 — user authorizes push and deployment of the reviewed D340–D344 refinements, 2026-10-21. No new URL or search submission is included.",
+  reviewReference: "2026-10-28: user authorizes preparation steps 1 to 3 for 3725 exact content pages and 3723 nonlegal discovery URLs. Independent 8583 implementation sources replace the reproduced tables. Production activation is prepared locally; no push or deployment is authorized by this record.",
 };
 export type Environment = Readonly<Record<string, string | undefined>>;
 

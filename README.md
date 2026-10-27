@@ -1,16 +1,16 @@
 # Etail Depot
 
-The customer-facing website for **Etail Depot US, Inc.**, introducing **Trolleys payment acceptance** and the **Ledgix credit card**.
+The customer-facing website for **Etail Depot US, Inc.**, introducing **Merchant services**, **Card services** and payment partnerships for software platforms.
 
 [Website](https://etaildepot.com) · [Payment acceptance](https://etaildepot.com/payment-acceptance-service) · [Credit card](https://etaildepot.com/credit-card-services) · [Guides](https://etaildepot.com/guides) · [Help](https://etaildepot.com/help)
 
 ## About the project
 
-Trolleys helps US businesses accept online payments. Ledgix is a virtual Visa secured credit card, **coming soon**; applications are not open. The website explains both products, their pricing and limitations, and where to get help.
+Trolleys helps US businesses accept online payments. Ledgix is a virtual Visa secured credit card. Applications are not open. The website explains both products, their pricing and limitations, and where to get help.
 
 This repository contains the public website: product pages, interactive illustrations, help, merchant guides, legal notices and fixed links to the services. It does not run customer accounts, card issuance or payment processing. Trolleys account access is handled separately at [trolleys.ai](https://trolleys.ai); Ledgix inquiries go to [ledgix@etaildepot.com](mailto:ledgix@etaildepot.com).
 
-The Guides library contains 20 reviewed articles in ten sections. Browse topics or follow article links; unpublished research and future content batches are outside the application.
+Guides contains ISO 20022 external code references and an independent ISO 8583 implementation reference. The candidate includes 3,725 content pages: 19 core pages, 3,455 ISO 20022 references and 251 independent 8583 references. The previous article library is retired. Source notices and implementation limits remain visible.
 
 Built with **Next.js, React and TypeScript**, exported as static pages and served on Netlify with a shared Edge request boundary. See the [architecture](docs/PUBLIC_SITE_ARCHITECTURE.md) for implementation details and [current status](planning/STATUS.md) for verified release information.
 
@@ -79,9 +79,9 @@ On Linux, Playwright may also require system libraries; use `pnpm exec playwrigh
 
 The active application is a public information website. Historical account code and database schemas are retained for reference; they are not setup instructions, customer-data backups or permission to reconnect retired services. The existing protected Netlify Emails handler is a platform compatibility exception; website pages do not call it.
 
-Preserve approved product wording, pricing, availability, authentic logos and the shared design. Service links use fixed destinations and must not forward customer identifiers, query strings, fragments or referrers. The `/guides` hub links four existing articles: `/guides/stripe-alternatives`, `/guides/payment-processing-systems`, `/guides/what-is-a-chargeback` and `/guides/how-to-create-a-payment-link`. No other editorial route or private draft is included. Product FAQs stay focused on their services; Guides is in the main navigation and Help remains in the footer.
+Preserve approved product wording, pricing, availability, authentic logos and the shared design. Service links use fixed destinations and must not forward customer identifiers, query strings, fragments or referrers. The Guides hub opens the two reference collections. Services, Use cases and Documentation have their own navigation. Private research and unsupported reference routes are excluded.
 
-D302 authorizes push and deployment of this eleven-page candidate through the reviewed release process. Nine nonlegal URLs are eligible for discovery under the recorded production site/origin guard: Home, Payment acceptance, Credit card, Help, Guides and four articles. Legal pages, local/preview builds, navigation payloads, errors and retired routes retain their indexing restrictions. Independent preflight source/scope review found no blocking issue. Exact-source release verification, packaging, GitHub CI/review and hosted acceptance are pending. D275 remains live until verified replacement. See current status for actual outcomes; eligibility does not establish indexing or rankings.
+The candidate is prepared locally. Exactly 3,723 nonlegal URLs are eligible for the sitemap under the recorded production site, origin and environment guard. Local previews, legal pages, navigation payloads and errors remain noindex. Publication requires the reviewed PR and manual release process; passing local checks does not establish indexing or rankings.
 
 Release targets are bound in [project-targets.json](project-targets.json). Deployment is a separate maintainer operation under the [deployment runbook](docs/NETLIFY_DEPLOYMENT.md). Use the [current work context](docs/CURRENT_WORK_CONTEXT.md) and [source precedence](docs/SOURCE_PRECEDENCE.md) before acting on older documents. Coding agents must also follow [AGENTS.md](AGENTS.md).
 
@@ -94,3 +94,5 @@ Release targets are bound in [project-targets.json](project-targets.json). Deplo
 ## License and assets
 
 No repository-wide open-source license has been selected. Public visibility is not a license announcement. For licensing or reuse questions, contact [compliance@etaildepot.com](mailto:compliance@etaildepot.com). Preserve the existing notices and attribution for dependencies and third-party brand assets.
+
+The independent 8583 collection includes identified MIT and Apache 2.0 contributions with notices in `public/licenses`. ISO 20022 repository information has its own recorded reuse basis. These source specific terms do not grant a licence to the rest of this repository or to purchased ISO standards.

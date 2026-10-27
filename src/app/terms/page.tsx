@@ -11,26 +11,26 @@ export const metadata = legalPageMetadata("/terms");
 const sections: LegalSection[] = [
   {
     id: "scope", title: "Our company and these terms", content: <>
-      <p>Etail Depot US, Inc. (“Etail Depot”, “we” or “us”) operates under the names Ledgix for its credit card service and Trolleys for payment acceptance. Ledgix and Trolleys are trade names of Etail Depot US, Inc.; the company remains the operator under each name.</p>
+      <p>Etail Depot US, Inc. (“Etail Depot”, “we” or “us”) operates merchant services under the name Trolleys and card services under the name Ledgix. Ledgix and Trolleys are trade names of Etail Depot US, Inc.; the company remains the operator under each name.</p>
       <LegalBrands />
       <h3>This website</h3>
-      <p>These Terms of Use cover this informational website and its links to product services. References to “you” include the person using the website and, where applicable, a business they are authorized to represent.</p>
+      <p>These Terms of Use cover this website, including service information, use cases, Guides, payment standards references, documentation, interactive tools and links to product services. References to “you” include the person using the website and, where applicable, a business they are authorized to represent.</p>
       <p>Our <Link href="/privacy">Privacy Policy</Link> explains information handling on this website. Visiting a product page or following a link does not open a financial account, transfer an existing account or guarantee approval.</p>
       <h3>Product agreements</h3>
-      <p>Trolleys payment acceptance and the Ledgix credit card have separate product websites. Each product has its own agreements and notices covering its use, eligibility requirements and the responsibilities of Etail Depot and the companies involved in delivering that service. These website terms do not replace those agreements.</p>
+      <p>Trolleys merchant services and the Ledgix credit card have separate product websites. Each product has its own agreements and notices covering its use, eligibility requirements and the responsibilities of Etail Depot and the companies involved in delivering that service. These website terms do not replace those agreements.</p>
     </>,
   },
   {
     id: "availability", title: "Service availability", content: <>
-      <p>This website provides product information and links to our product services. It does not register customer accounts, process financial transactions or issue payment credentials. Credit card and payment acceptance account actions take place on the relevant product’s website.</p>
-      <p>Trolleys payment acceptance is available through its website. The {cardProduct.name}, a virtual {cardProduct.creditType}, is coming soon. Availability does not guarantee eligibility or approval, and product features are governed by the applicable service agreement.</p>
+      <p>Etail Depot is not a bank. This website does not register customer accounts, process financial transactions or issue payment credentials. Merchant and credit card account actions take place on the relevant product’s website.</p>
+      <p>Trolleys merchant services are available through its website. Applications for the {cardProduct.name}, a virtual {cardProduct.creditType}, are not open yet. Availability does not guarantee eligibility or approval, and product features are governed by the applicable service agreement.</p>
       <p>Review each product’s disclosures for the companies responsible for your account, fees, funds arrangements and financial protections. Brand names, website access and network logos do not establish those arrangements.</p>
-      <p>Nothing in these website terms creates a credit facility, deposit account, deposit-insurance coverage or guarantee that a card or payment will be accepted.</p>
+      <p>Nothing in these website terms creates a credit facility, deposit account, deposit insurance coverage or guarantee that a card or payment will be accepted.</p>
     </>,
   },
   {
     id: "login", title: "Service access and responsibilities", content: <>
-      <p>For Trolleys sign-in and account management, follow the access instructions supplied with your account. If you are new to the service, visit Trolleys to apply. Ledgix credit card account access will be available when the service launches. Earlier Etail Depot website accounts and invitations no longer provide access here and do not sign you in to either product.</p>
+      <p>To sign in to Trolleys or manage your account, follow the access instructions supplied with your account. If you are new to the service, visit Trolleys to apply. Ledgix credit card account access will be available when the service launches. Earlier Etail Depot website accounts and invitations no longer provide access here and do not sign you in to either product.</p>
       <ul>
         <li>Use an email address you control and complete any required confirmation.</li>
         <li>Keep passwords, confirmation links and recovery links private. Each person must use their own login.</li>
@@ -43,9 +43,9 @@ const sections: LegalSection[] = [
   },
   {
     id: "cards", title: `Ledgix · ${serviceLabels.cards}`, content: <>
-      <p>The {cardProduct.name} is a virtual {cardProduct.creditType} for compatible digital wallets. This website does not currently offer a card application, security-deposit payment or credit card account sign-in for that service.</p>
+      <p>The {cardProduct.name} is a virtual {cardProduct.creditType} for compatible digital wallets. This website does not currently offer a card application, security deposit payment or credit card account access for that service.</p>
       <p>Eligible cards can be added to Apple Wallet or Google Wallet. Availability depends on card, device and regional compatibility and the applicable service’s terms.</p>
-      <p>The <Link href="/credit-card-services#wallets">wallet preview</Link> explains typical steps. It does not collect card details, add a card to a wallet or confirm eligibility. Follow the instructions in your wallet app and from your card issuer.</p>
+      <p>The <Link href="/credit-card-services#wallets">wallet guide</Link> explains typical steps. It does not collect card details, add a card to a wallet or confirm eligibility. Follow the instructions in your wallet app and from your card issuer.</p>
       <h3>Security deposit and card agreement</h3>
       <p>A security deposit backs the credit account. Purchases create a balance that must be repaid separately from the security deposit.</p>
       <p>The <Link href="/credit-card-services#card-details">card details</Link> describe the deposit, fees and repayment requirements. The card agreement and disclosures provided before enrollment will govern eligibility, credit limits, all charges, repayment, deposit return, cardholder access and available controls. Review them before opening an account. This website does not establish a credit account.</p>
@@ -53,18 +53,20 @@ const sections: LegalSection[] = [
     </>,
   },
   {
-    id: "payments", title: "Trolleys · Payment acceptance", content: <>
-      <p>Visit Trolleys to apply. Existing customers should follow the sign-in instructions supplied with their account.</p>
+    id: "payments", title: `Trolleys · ${serviceLabels.payments}`, content: <>
+      <p>Visit Trolleys to apply. Existing customers should follow the instructions for signing in supplied with their account.</p>
       <h3>Payment pricing and your agreement</h3>
-      <p>{productFacts.payments.offerName} includes payment-request creation and sharing in its published payment fee, with no monthly fee. The <Link href="/payment-acceptance-service#fees">payment acceptance pricing</Link> section describes the rate and its scope. Review the merchant agreement and disclosures before enrollment for the terms that apply to your account, including accepted payment methods, account permissions, all fees, refunds, disputes, settlement and payouts. This website does not perform those account actions.</p>
-      <p>Payment examples on this website illustrate ways to request payment for goods, services and information. Information can include research, insights or advice delivered as a report, briefing or consultation. Example amounts, items, messages and payment statuses are illustrative and do not create a payment request or record a transaction.</p>
-      <h3>Optional {saleRecordsOffer.brandName}</h3>
-      <p>Trolleys’ optional <Link href="/payment-acceptance-service#dispute-readiness">{saleRecordsOffer.name}</Link> service uses Order Insight to share supported merchant, transaction and order details with participating banks. It helps customers recognize purchases and can prevent eligible Visa online fraud disputes when the required transaction history and data qualify. Basic transaction receipts remain included without this service.</p>
-      <p>The Trolleys service fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Payment processing is separate. Applicable charges and service terms are disclosed before enrollment. Review the service agreement for transaction coverage, billing, refund treatment and information sharing. Selecting or previewing {saleRecordsOffer.name} on this website does not enroll you, accept a contract or create a charge.</p>
-      <p>The website examples use sample information. They do not collect actual sale records, generate or deliver documents, collect a signature, establish customer consent, share records with banks or submit dispute evidence. Payment and fulfillment are separate events that require accurate records; payment alone does not establish delivery, quality or a promised result.</p>
-      <p>{saleRecordsOffer.name} does not cover every bank, payment or dispute reason and does not guarantee an outcome. Refund programs and services that respond to existing chargebacks for you are separate services. Merchants remain responsible for accurate records, appropriate terms, fulfillment and timely responses. Website examples are not legal advice.</p>
+      <p>Payment request creation and sharing are included in the published payment fee for {productFacts.payments.offerName}, with no monthly fee. The <Link href="/payment-acceptance-service#fees">card processing fees</Link> section describes the rate and its scope. Review the merchant agreement and disclosures before enrollment for the terms that apply to your account, including accepted payment methods, account permissions, all fees, refunds, disputes, settlement and payouts. This website does not perform those account actions.</p>
+      <p>The website’s onboarding, checkout, payment record and payout diagrams explain how the service works. The amounts and statuses shown are not account activity. These diagrams do not create payment requests, record transactions, issue refunds or move funds. An application shown as submitted is not an approval, and a payment confirmation is not confirmation of a bank deposit.</p>
+      <h3>Software partnerships</h3>
+      <p>Software partnership inquiries do not open merchant accounts or grant access to payment systems. Integration scope, account permissions, support responsibilities and commercial terms must be agreed separately. Each merchant remains subject to the applicable account approval and service requirements.</p>
+      <h3 id="dispute-prevention">Optional {saleRecordsOffer.name}</h3>
+      <p>Trolleys’ optional {saleRecordsOffer.name} service uses Order Insight to share supported merchant, transaction and order details with participating banks. It helps customers recognize purchases and can prevent eligible Visa online fraud disputes when the required transaction history and data qualify. Basic transaction receipts remain included without this service.</p>
+      <p>The Trolleys service fee is {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}. Payment processing is separate. Applicable charges and service terms are disclosed before enrollment. Review the service agreement for transaction coverage, billing, refund treatment and information sharing. Exploring {saleRecordsOffer.name} on this website does not enroll you, accept a contract or create a charge.</p>
+      <p>This website does not collect sale records, share information with banks or submit dispute evidence. It does not collect signatures or establish customer consent. Payment and fulfillment are separate events; payment alone does not establish delivery, quality or a promised result.</p>
+      <p>{saleRecordsOffer.brandName} does not cover every bank, payment or dispute reason and does not guarantee an outcome. Refund programs and services that respond to existing chargebacks for you are separate services. Merchants remain responsible for accurate records, appropriate terms, fulfillment and timely responses. Website content is not legal advice.</p>
       <h3>Estimates and account records</h3>
-      <p>The fee calculator estimates only the displayed {productFacts.payments.offerName} online card payment fee and the {saleRecordsOffer.name} fee if selected. It does not calculate ACH fees. The remaining amount excludes any other applicable charges; it is not a guaranteed settlement amount or a prediction of when funds will reach your bank. Check your service agreement and account records for an actual payment’s charges and status.</p>
+      <p>The fee calculator estimates the displayed processing fee for one domestic online card payment. It excludes optional services and other applicable charges. It does not calculate ACH fees. The amount labeled “After card processing” is the payment amount less the displayed card processing fee. It excludes other applicable charges and adjustments; it is not a guaranteed bank deposit or a prediction of when funds will arrive. Check your service agreement and account records for an actual payment’s charges and status.</p>
       <p>Use the service’s recorded statuses and instructions to confirm an action’s outcome. A link to Trolleys does not enroll you in Ledgix, connect account balances or transfer funds between the two products.</p>
     </>,
   },
@@ -80,17 +82,31 @@ const sections: LegalSection[] = [
     </>,
   },
   {
-    id: "content", title: "Your content and external services", content: <>
+    id: "content", title: "Website content and external services", content: <>
+      <h3>Guides and documentation</h3>
+      <p>Guides and documentation provide reference information and general explanations. They are not advice about your particular legal, tax or financial circumstances. Describing a payment standard, network or technical function does not establish that it is supported or enabled for your account.</p>
+      <p>Confirm the instructions, permissions and implementation requirements for your account before using them in your business. Documentation does not issue credentials, enable account functions or authorize financial actions. The applicable product agreement and instructions govern those actions.</p>
+      <h3>Information you provide</h3>
       <p>You are responsible for material you send when contacting us, including descriptions, business names and messages, and for having permission to share it. We handle that material for the purposes described in our Privacy Policy.</p>
+      <h3>Ownership and external links</h3>
       <p>Website designs, text and branding remain the property of their respective owners. Access does not transfer ownership or authorize you to imply endorsement by Etail Depot, Ledgix, Trolleys or a card network.</p>
-      <p>Product services, external websites and the apps you select for email, text or social sharing may have additional terms and privacy notices. Review them and the information you share before continuing. Using a separate product website does not change Etail Depot’s obligations under applicable law or the agreements it enters into with you.</p>
+      <p>Linked product services and external references have their own terms and privacy notices. Email and telephone links open the application you choose on your device. Review the destination and the information you share before continuing. Using a separate product website does not change Etail Depot’s obligations under applicable law or the agreements it enters into with you.</p>
+    </>,
+  },
+  {
+    id: "standards", title: "Payment standards references", content: <>
+      <p>The Guides library includes independent references to ISO 20022 and ISO 8583. Etail Depot is not a standards body or registration authority. These references do not certify an implementation or establish approval by ISO, a card network, a bank or a payment provider.</p>
+      <p>Read a code together with its code set or table, standard edition and source release. The same value can have different meanings in different contexts. A source release date does not establish when a bank, network or provider adopted a value. Confirm the version and implementation rules that apply to your connection.</p>
+      <p>This is not the official ISO 20022 website. The official source of current ISO 20022 message standards and Repository information is <a href="https://www.iso20022.org/" rel="external noreferrer" referrerPolicy="no-referrer">iso20022.org</a>. Use the source links on each reference page to check the relevant release. The ISO 8583 implementation reference uses identified open source libraries with their respective licences and attribution. It does not reproduce the ISO 8583:2023 tables. Consult the applicable standard and the implementation specification supplied for your connection.</p>
+      <p>Standards text, definitions and source materials remain subject to their rights holders’ terms. Access to this website does not grant additional rights to reproduce, redistribute or use material from third parties in automated systems. Review the applicable source license and obtain any required permission.</p>
+      <p>If you find an error, contact us with the page address, code or message identifier and source edition. Do not include payment credentials or customer records in a correction request.</p>
     </>,
   },
   {
     id: "access-changes", title: "Service changes and access", content: <>
       <p>Maintenance, connectivity issues or errors can interrupt access. For actions within a product, check its recorded status and follow its instructions before trying again.</p>
-      <p>Access to this website may be restricted where reasonably necessary to address misuse, security risks or applicable legal requirements. Earlier website account tools are no longer available; retained records can be addressed through our compliance contact. Ending access does not automatically delete historical records. Product-specific terms govern access to each service.</p>
-      <p>Product-specific agreements govern financial account closure, outstanding obligations and any return of funds. Changes to these website terms remain subject to applicable notice and acceptance requirements.</p>
+      <p>Access to this website may be restricted where reasonably necessary to address misuse, security risks or applicable legal requirements. Earlier website account tools are no longer available; retained records can be addressed through our compliance contact. Ending access does not automatically delete historical records. Each product’s terms govern access to each service.</p>
+      <p>Each product’s agreement governs financial account closure, outstanding obligations and any return of funds. Changes to these website terms remain subject to applicable notice and acceptance requirements.</p>
     </>,
   },
   {
@@ -104,5 +120,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function TermsPage() {
-  return <LegalDocument title="Terms of Use" description="Terms for using this informational website and its links to product services." updated="October 19, 2026" currentPage="terms" sections={sections} />;
+  return <LegalDocument title="Terms of Use" description="Terms for using this informational website and its links to product services." updated="October 27, 2026" currentPage="terms" sections={sections} />;
 }
