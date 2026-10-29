@@ -1,4 +1,5 @@
 import { Icon } from "./icon";
+import type { DocRow } from "@/modules/public-site/documentation-content";
 
 const diagrams = {
   onboarding: {
@@ -6,8 +7,8 @@ const diagrams = {
     nodes: [
       ["01 · Application", "Submit the application", "Business details and agreements", "business"],
       ["02 · Review", "Complete the review", "Information requests and decision", "document"],
-      ["03 · Configuration", "Configure the account", "Payment methods and team access", "layers"],
-      ["04 · Verification", "Confirm readiness", "Account, checkout and reporting checks", "check"],
+      ["03 · Decision", "Configure the account", "Payment methods and team access", "layers"],
+      ["04 · Activation", "Confirm readiness", "Account, checkout and reporting checks", "check"],
     ],
   },
   records: {
@@ -57,7 +58,7 @@ const diagrams = {
       ["01 · Receiver", "Verify the delivery", "Authentication, environment and account", "shield"],
       ["02 · Storage", "Save, then acknowledge", "Retain the receipt and processing state", "document"],
       ["03 · Worker", "Apply the update once", "Match the record and current state", "layers"],
-      ["04 · Reconciliation", "Recover missing activity", "Check the account or payment record", "check"],
+      ["04 · Current record", "Recover missing activity", "Check the account or payment record", "check"],
     ],
   },
   launch: {
@@ -74,26 +75,25 @@ const diagrams = {
 
 function PaymentRequestSequence() {
   return <figure className="docs-sequence docs-request-sequence" aria-label="One shared request can produce separate purchases">
-    <div className="docs-diagram-heading"><Icon name="layers"/><span>One shared request, separate purchases</span></div>
-    <ol>
-      <li><span className="docs-sequence-number" aria-hidden="true">1</span><div><strong>Define the offer</strong><p>Purchase details, total, currency and terms</p></div></li>
-      <li><span className="docs-sequence-number" aria-hidden="true">2</span><div><strong>Share the payment request</strong><p>Payment link, button or QR code</p></div></li>
-      <li><span className="docs-sequence-number" aria-hidden="true">3</span><div><strong>Match each purchase separately</strong><div className="docs-request-purchases">
-        <div><span>Customer A</span><Icon name="document"/><strong>Order and payment</strong><p>Its own transaction reference and verified result</p></div>
-        <div><span>Customer B</span><Icon name="document"/><strong>Order and payment</strong><p>A different transaction reference and verified result</p></div>
-      </div></div></li>
-    </ol>
-    <figcaption>Do not use a reusable request as the unique payment identifier. Each buyer’s purchase keeps its own order and transaction records.</figcaption>
+    <div className="docs-diagram-heading"><Icon name="link"/><span>One request can receive several payments</span></div>
+    <div className="docs-request-map">
+      <div className="docs-request-origin"><Icon name="link"/><strong>Shared payment request</strong><span>One offer or destination</span></div>
+      <div className="docs-request-purchases">
+        <div><span>First purchase</span><Icon name="document"/><strong>Order and payment</strong><p>Its own transaction reference and verified result</p></div>
+        <div><span>Next purchase</span><Icon name="document"/><strong>Separate order and payment</strong><p>A different transaction reference and verified result</p></div>
+      </div>
+    </div>
+    <figcaption>The request identifies the offer. Each transaction identifies a payment against a purchase.</figcaption>
   </figure>;
 }
 
 function CheckoutSequence() {
   const exchanges = [
-    ["Your order", "Merchant account service", "Prepare checkout", "Keep the order, amount, currency and payment attempt together."],
-    ["Merchant account service", "Customer checkout", "Present the checkout page", "Present the purchase and methods configured for the merchant account."],
-    ["Customer checkout", "Payment processing", "Process the payment", "The customer submits payment through the configured checkout flow."],
-    ["Payment record", "Your application", "Verify and match", "Match the verified payment to its original order and attempt."],
-    ["Your application", "Your order", "Update the order once", "Record the confirmed result once. Investigate an unresolved attempt before retrying."],
+    ["Your order", "Merchant account service", "Prepare checkout", "Order reference, merchant, amount, currency and attempt."],
+    ["Merchant account service", "Customer checkout", "Present the checkout page", "Purchase details and the account’s configured payment methods."],
+    ["Customer checkout", "Payment processing", "Process the payment", "The customer submits through the assigned checkout connection."],
+    ["Payment record", "Your application", "Verify and match", "Match the account, amount, currency and operation to the original attempt."],
+    ["Your application", "Your order", "Update the order once", "Apply the verified result once. Hold an uncertain attempt for recovery."],
   ];
   return <figure className="docs-sequence docs-checkout-sequence" aria-label="Checkout journey from order to verified payment">
     <div className="docs-diagram-heading"><Icon name="layers"/><span>From order to verified result</span></div>
@@ -102,14 +102,21 @@ function CheckoutSequence() {
       <div className="docs-sequence-transfer"><span>{from}</span><Icon name="arrow"/><span>{to}</span></div>
       <div className="docs-sequence-action"><strong>{title}</strong><p>{detail}</p></div>
     </li>)}</ol>
-    <figcaption>Use the checkout instructions supplied through your merchant account service. A closed page or a browser redirect does not confirm the payment.</figcaption>
+    <figcaption>The payment record determines the result. The browser return only brings the customer back to the order.</figcaption>
   </figure>;
 }
 
-export function DocumentationFlow({kind}:{kind:keyof typeof diagrams | "checkout" | "requests"}) {
+export function DocumentationFlow({kind,steps}:{kind:keyof typeof diagrams | "checkout" | "requests";steps?:DocRow[]}) {
   if (kind === "checkout") return <CheckoutSequence/>;
   if (kind === "requests") return <PaymentRequestSequence/>;
   const diagram = diagrams[kind];
+  if (steps) return <figure className={`docs-diagram docs-diagram-${kind} docs-workflow`} aria-label={diagram.title}>
+    <div className="docs-diagram-heading"><Icon name={kind === "payouts" ? "bank" : "layers"}/><span>{diagram.title}</span></div>
+    <ol>{steps.map((step,index) => <li key={step.title}>
+      <span className="docs-workflow-number" aria-hidden="true">{index+1}</span>
+      <div><strong>{step.title}</strong><p>{step.text}</p></div>
+    </li>)}</ol>
+  </figure>;
   return <figure className={`docs-diagram docs-diagram-${kind}`} aria-label={diagram.title}>
     <div className="docs-diagram-heading"><Icon name={kind === "payouts" ? "bank" : "layers"}/><span>{diagram.title}</span></div>
     <ol>{diagram.nodes.map(([owner,title,record,icon]) => <li key={owner}>

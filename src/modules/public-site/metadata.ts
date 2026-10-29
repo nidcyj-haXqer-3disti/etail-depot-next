@@ -1,3 +1,4 @@
+import { industryUseCaseNavigation } from "@/shared/industry-use-cases";
 import type { Metadata, MetadataRoute } from "next";
 import { INDEXABLE_PUBLIC_PATHS, isIndexablePath } from "@/shared/public-page-inventory";
 import { serviceLabels } from "@/shared/service-language";
@@ -12,7 +13,7 @@ const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts
   : `$${productFacts.cards.annualFeeDollars} annual fee and $${productFacts.cards.monthlyFeeDollars} monthly fee`;
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Merchant Services & Credit Card Processing", description: "Merchant services for US businesses and payment partnerships for software providers. Explore card and ACH acceptance, checkout, transaction records and payouts." },
+  "/": { title: "Merchant Services & Credit Card Processing", description: "Credit card and ACH payment processing for online businesses and software platforms. Explore merchant onboarding, checkout, payment records and payouts." },
   "/credit-card-services": { title: "Card Services: Ledgix Secured Credit Card", description: `${cardProduct.name}: virtual ${cardProduct.creditType}, $${productFacts.cards.minimumDepositDollars} minimum deposit, ${cardFeesDescription}. ${productFacts.cards.repayment}. Applications are not open.` },
   "/payment-acceptance-service": { title: "Merchant Services & Online Card Processing", description: "Accept online card and ACH payments with Trolleys. Explore checkout, transaction records, payouts, refunds and disputes, plus clear card processing fees." },
   "/help": { title: "Help Center: Merchant and Card Services", description: "Find Trolleys merchant support, Ledgix secured credit card inquiries and help signing in. Contact Etail Depot for website, privacy and legal questions." },
@@ -25,11 +26,11 @@ export type PublicPath = keyof typeof PUBLIC_PAGES;
 // Do not advance for deployments, cosmetic edits or copyright-year changes alone.
 // Local revisions become public only in the next approved release.
 export const PUBLIC_PAGE_MODIFIED = {
-  "/": "2026-10-27",
-  "/credit-card-services": "2026-10-24",
-  "/payment-acceptance-service": "2026-10-27",
-  "/help": "2026-10-27",
-  "/guides": "2026-10-28",
+  "/": "2026-10-29",
+  "/credit-card-services": "2026-10-29",
+  "/payment-acceptance-service": "2026-10-29",
+  "/help": "2026-10-29",
+  "/guides": "2026-10-29",
 } as const satisfies Record<PublicPath, string>;
 
 export function publicIndexingEnabled(): boolean {
@@ -84,8 +85,8 @@ export const SERVICE_PAGES = {
   "/docs/webhooks": { title: "Events and Webhooks | Documentation", description: "Handle account, payment and funding events with verification, deduplication and recovery." },
   "/docs/testing-and-launch": { title: "Sandbox and Launch | Documentation", description: "Arrange sandbox access, confirm payment setup and prepare for launch." },
   "/online-businesses": { title: "Online Payments for Businesses", description: "Explore merchant onboarding, online card and ACH checkout, payment requests and payout records for your US business." },
-  "/docs": { title: "Payment Documentation: Merchant Operations and Developer Integration", description: "Set up merchant accounts, integrate checkout, and manage payments through reconciliation. Documentation for merchant operations and developer integration." },
-  "/software-partners": { title: "Payment Processing for Software Platforms", description: "Explore Trolleys merchant services for the US businesses using your software: card and ACH acceptance, payment records, refunds and disputes." },
+  "/docs": { title: "Payment Documentation: Merchant Operations and Developer Integration", description: "Set up merchant accounts, connect checkout, verify payment updates and reconcile bank deposits. Task documentation for operations teams and developers." },
+  "/software-partners": { title: "Payment Processing for Software Platforms", description: "Card and ACH payment processing for commerce marketplaces, freight, travel and legal software. Connect merchant accounts, checkout and reconciliation." },
 } as const;
 export function servicePageMetadata(path: keyof typeof SERVICE_PAGES): Metadata {
   if (!Object.hasOwn(SERVICE_PAGES, path)) throw new Error("Only the exact reviewed service page may use service metadata.");
@@ -102,7 +103,8 @@ export function pageRobots(path: string): Metadata["robots"] {
   return isIndexablePath(path) && publicIndexingEnabled() ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } } : privateRobots;
 }
 export function publicPageModified(path: string): string {
-  return Object.hasOwn(PUBLIC_PAGE_MODIFIED, path) ? PUBLIC_PAGE_MODIFIED[path as PublicPath] : path.startsWith("/guides/iso-8583") ? "2026-10-28" : "2026-10-27";
+  if (path === "/software-partners" || path === "/online-businesses" || path === "/docs" || path.startsWith("/docs/") || path.startsWith("/guides/iso-")) return "2026-10-29";
+  return Object.hasOwn(PUBLIC_PAGE_MODIFIED, path) ? PUBLIC_PAGE_MODIFIED[path as PublicPath] : "2026-10-27";
 }
 export function publicSitemap(): MetadataRoute.Sitemap {
   // Never read identities, services, cards, channels, support cases or database rows here.
@@ -170,4 +172,43 @@ export function publicPageJsonLd(path: PublicPath): string {
     ],
   };
   return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+/** Describe only the visible platform overview and its four reviewed use cases. */
+export function platformPageJsonLd(path: "/software-partners"): string {
+  const overviewPath = "/software-partners";
+  if (path !== overviewPath) throw new Error("Unknown software platform page.");
+  const page = SERVICE_PAGES[path];
+  const url = new URL(path, canonicalOrigin).href;
+  const overviewUrl = new URL(overviewPath, canonicalOrigin).href;
+  const breadcrumbId = `${url}#breadcrumb`;
+  const trail = [
+    { name: "Etail Depot", item: `${canonicalOrigin}/` },
+    { name: "Software platforms", item: overviewUrl },
+  ];
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#webpage`, url, name: page.title, description: page.description,
+        inLanguage: "en-US", dateModified: publicPageModified(path),
+        isPartOf: { "@id": `${canonicalOrigin}/#website` },
+        publisher: { "@id": `${canonicalOrigin}/#organization` },
+        breadcrumb: { "@id": breadcrumbId },
+        mainEntity: { "@id": `${overviewUrl}#industries` },
+      },
+      {
+        "@type": "BreadcrumbList", "@id": breadcrumbId,
+        itemListElement: trail.map((item, index) => ({ "@type": "ListItem", position: index + 1, ...item })),
+      },
+      ...([{
+        "@type": "ItemList", "@id": `${overviewUrl}#industries`, name: "Industry use cases",
+        numberOfItems: industryUseCaseNavigation.length, itemListOrder: "https://schema.org/ItemListUnordered",
+        itemListElement: industryUseCaseNavigation.map((item, index) => ({
+          "@type": "ListItem", position: index + 1, name: item.label, url: new URL(item.href, canonicalOrigin).href,
+        })),
+      }]),
+    ],
+  }).replace(/</g, "\\u003c");
 }

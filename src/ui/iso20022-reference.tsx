@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ISO20022_PATH, ISO20022_RELEASE, ISO20022_SETS, ISO20022_SOURCE, ISO20022_WORKBOOK, codeHeading, codePeers, codeReplacement, codeUsageRestriction, isoJsonLd, sourceDate, sourceName, type IsoCode, type IsoCodeSet } from "@/modules/public-site/iso20022-reference";
 import { Shell } from "./shell";
+import { ReferenceIndex } from "./reference-index";
 import { PaymentStatusContext } from "./iso20022-status-context";
 import "./standards-reference.css";
 import "./iso20022-reference.css";
@@ -16,7 +17,7 @@ function ReplacementValue({ set, code }: { set: IsoCodeSet; code: IsoCode }) {
 }
 function SourceDetails({ set, code }: Props) {
   const refs = code?.source_refs ?? set?.source_refs;
-  return <aside className="sr-reference" aria-label="Source and code identity"><h2>Reference details</h2><dl>
+  return <aside className="sr-reference" id="reference-source" aria-label="Source and code identity"><h2>Reference details</h2><dl>
     {code && <><dt>Code</dt><dd><code>{code.code}</code></dd><dt>Published name</dt><dd><code>{code.source_name}</code></dd><dt>Source status</dt><dd>{code.source_status}</dd>{code.replaced_by && set && <><dt>Source replacement</dt><dd><ReplacementValue set={set} code={code} /></dd></>}</>}
     {set && <><dt>Exact code set</dt><dd><code>{set.collection_id}</code></dd></>}
     <dt>Source release</dt><dd>{ISO20022_RELEASE}</dd><dt>Workbook publication</dt><dd>28 August 2026</dd>
@@ -25,8 +26,8 @@ function SourceDetails({ set, code }: Props) {
 }
 function Library() {
   const letters = [...new Set(ISO20022_SETS.map(set => set.title[0].toUpperCase()))];
-  return <><p className="sr-kicker">Financial messaging</p><h1>ISO 20022<br />external code sets.</h1><p className="sr-lead">Look up a code’s published meaning, identify its code set and find the message versions listed in the source.</p><div className="sr-meta"><span>140 code sets</span><span>3,314 registered codes</span><span>Source release: {ISO20022_RELEASE}</span></div>
-    <div className="sr-layout"><div className="sr-copy"><nav className="iso-alphabet" aria-label="Code sets by first letter">{letters.map(letter => <a key={letter} href={`#sets-${letter.toLowerCase()}`}>{letter}</a>)}</nav>
+  return <><p className="sr-kicker">Financial messaging</p><h1>ISO 20022 external code sets</h1><p className="sr-lead">Look up a code’s published meaning, identify its code set and find the message versions listed in the source.</p><div className="sr-meta"><span>140 code sets</span><span>3,314 registered codes</span><span>Source release: {ISO20022_RELEASE}</span><a href="#reference-source">Source details</a></div>
+    <div className="sr-layout"><div className="sr-copy"><ReferenceIndex label="Jump to a code set" navigationLabel="Code sets by first letter" items={letters.map(letter => ({label:letter,href:`#sets-${letter.toLowerCase()}`}))} />
       {letters.map(letter => <section className="iso-set-group" key={letter} id={`sets-${letter.toLowerCase()}`}><h2>{letter}</h2><ul className="iso-set-list">{ISO20022_SETS.filter(set => set.title[0].toUpperCase() === letter).map(set => <li key={set.id}><Link href={set.path} prefetch={false}><span>{set.title}</span><span className="iso-count">{set.codes.length} {set.codes.length === 1 ? "code" : "codes"}<span aria-hidden="true"> →</span></span></Link></li>)}</ul></section>)}
     </div><div className="iso-sidebar"><SourceDetails /></div></div></>;
 }
@@ -41,15 +42,15 @@ function History({ set, code }: { set: IsoCodeSet; code?: IsoCode }) {
 }
 function SetPage({ set }: { set: IsoCodeSet }) {
   const letters = [...new Set(set.codes.map(code => code.code[0]))];
-  return <><p className="sr-kicker">ISO 20022 · External code set</p><h1>{set.title} codes</h1><p className="sr-lead">{set.source_definition}</p><div className="sr-meta"><span>{set.codes.length} registered {set.codes.length === 1 ? "code" : "codes"}</span><span>Source release: {ISO20022_RELEASE}</span></div><div className="sr-layout"><div className="sr-copy">
-    {set.codes.length > 40 && <nav className="iso-alphabet" aria-label="Codes by first character">{letters.map(letter => <a key={letter} href={`#code-${set.codes.find(code => code.code[0] === letter)!.code.toLowerCase()}`}>{letter}</a>)}</nav>}
+  return <><p className="sr-kicker">ISO 20022 · External code set</p><h1>{set.title} codes</h1><p className="sr-lead">{set.source_definition}</p><div className="sr-meta"><span>{set.codes.length} registered {set.codes.length === 1 ? "code" : "codes"}</span><span>Source release: {ISO20022_RELEASE}</span><a href="#reference-source">Source details</a></div><p className="sr-identity"><span>Code set</span><code>{set.collection_id}</code></p><div className="sr-layout"><div className="sr-copy">
+    {set.codes.length > 40 && <ReferenceIndex label="Jump to a code" navigationLabel="Codes by first character" items={letters.map(letter => ({label:letter,href:`#code-${set.codes.find(code => code.code[0] === letter)!.code.toLowerCase()}`}))} />}
     <table className="sr-table iso-code-table"><caption>Registered codes in <code>{set.collection_id}</code>. Select a code for its full definition and source details.</caption><thead><tr><th scope="col">Code</th><th scope="col">Published name and definition</th></tr></thead><tbody>{set.codes.map(code => <tr key={code.id} id={`code-${code.code.toLowerCase()}`}><td><Link href={code.path} prefetch={false}><code>{code.code}</code></Link></td><td><strong>{sourceName(code.source_name)}</strong><p>{code.source_definition}</p>{codeUsageRestriction(code) && <p className="iso-source-advisory"><strong>Source note: {codeUsageRestriction(code)}</strong></p>}{code.replaced_by && <p className="iso-source-advisory">Source replacement: <ReplacementValue set={set} code={code} /></p>}</td></tr>)}</tbody></table>
     <MessageReferences set={set} /><History set={set} />
   </div><SourceDetails set={set} /></div></>;
 }
 function CodePage({ set, code }: { set: IsoCodeSet; code: IsoCode }) {
   const peers = codePeers(code), index = set.codes.indexOf(code), adjacent = [set.codes[index - 1], set.codes[index + 1]].filter(Boolean);
-  return <><p className="sr-kicker">ISO 20022 · {set.title}</p><h1><span className={`sr-code${code.code.length > 8 ? " iso-code-long" : ""}`}>{code.code}</span>{codeHeading(code)}</h1><div className="sr-meta"><span>Registered in source</span>{code.replaced_by && <span>Replacement listed</span>}<span>Source release: {ISO20022_RELEASE}</span></div><div className="sr-layout"><div className="sr-copy">
+  return <><p className="sr-kicker">ISO 20022 · {set.title}</p><h1><span className={`sr-code${code.code.length > 8 ? " iso-code-long" : ""}`}>{code.code}</span>{codeHeading(code)}</h1><div className="sr-meta"><span>Registered in source</span>{code.replaced_by && <span>Replacement listed</span>}<span>Source release: {ISO20022_RELEASE}</span><a href="#reference-source">Source details</a></div><p className="sr-identity"><span>Code set</span><code>{set.collection_id}</code></p><div className="sr-layout"><div className="sr-copy">
     <section id="definition" className="iso-definition"><h2>Published definition</h2><p>{code.source_definition}</p></section>
     {code.replaced_by && <section id="source-replacement" className="iso-source-replacement"><h2>Replacement listed in the source</h2><p>The workbook lists <ReplacementValue set={set} code={code} /> as the replacement for <code>{code.code}</code>. It still labels this record <strong>Registered</strong> in this release.</p><p>Read the replacement and usage notes together with the source status. Registration alone does not establish that a code should be used for a new instruction.</p></section>}
     {code.additional_information && <section id="source-notes"><h2>Additional source information</h2><p>{code.additional_information}</p></section>}
@@ -61,5 +62,5 @@ function CodePage({ set, code }: { set: IsoCodeSet; code: IsoCode }) {
   </div><SourceDetails set={set} code={code} /></div></>;
 }
 export function Iso20022Reference({ set, code }: Props) {
-  return <Shell quietAccess><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: isoJsonLd(set, code) }} /><div className="standards-reference iso-reference"><article className="sr-inner page-container"><Crumbs set={set} code={code} />{set ? code ? <CodePage set={set} code={code} /> : <SetPage set={set} /> : <Library />}</article></div></Shell>;
+  return <Shell quietAccess><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: isoJsonLd(set, code) }} /><div className="standards-reference iso-reference"><article className="sr-inner page-container" id="reference-top"><Crumbs set={set} code={code} />{set ? code ? <CodePage set={set} code={code} /> : <SetPage set={set} /> : <Library />}</article></div></Shell>;
 }

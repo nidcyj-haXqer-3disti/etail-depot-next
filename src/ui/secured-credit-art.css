@@ -1,6 +1,6 @@
 /* The deposit remains outside the illustrated purchase-to-repayment path. */
 .secured-credit-art { font-variant-numeric: tabular-nums; container-type: inline-size; min-width: 0; width: 100%; margin: 0; color: var(--public-ink); font-family: var(--public-font); }
-.secured-credit-scene { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,2.2fr); gap: 32px; padding: 32px; border: 1px solid var(--public-frame-line); border-radius: 12px; background: #fff; box-shadow: 0 12px 32px -16px #0239411a, 0 2px 5px #02394104; }
+.secured-credit-scene { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,2.2fr); gap: 32px; padding: 32px; border: 1px solid var(--public-frame-line); border-radius: 12px; background: #fff; box-shadow: 0 2px 8px -4px #02394114; }
 .secured-credit-deposit { display: grid; align-content: center; gap: 26px; min-width: 0; padding: 24px; border-radius: 8px; background: var(--public-tint); }
 .secured-deposit-art { position: relative; display: grid; place-items: center; min-width: 0; height: 180px; }
 .secured-deposit-sheet { position: relative; display: grid; justify-items: start; width: 156px; min-height: 158px; padding: 20px 17px; border: 1px solid #d2ddd5; border-radius: 8px; background: #fff; box-shadow: 0 3px 8px #0239410a; }
@@ -46,7 +46,7 @@
 .secured-repayment-paper > div { display: grid; justify-items: center; gap: 4px; width: 100%; margin-top: 13px; padding-top: 10px; border-top: 1px solid #e1e7e3; font-size: 11px; line-height: 1.5; color: #52676a; }
 .secured-repayment-paper b { font-weight: 550; color: #023941; }
 .secured-credit-step { display: flex; align-items: flex-start; gap: 9px; min-width: 0; padding-top: 20px; }
-.secured-step-number { flex: 0 0 23px; display: grid; place-items: center; width: 23px; height: 23px; border: 1px solid #c5d7d2; border-radius: 50%; color: #52676a; font-size: 11px; line-height: 1; }
+.secured-step-number { flex: 0 0 28px; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #c5d7d2; border-radius: 50%; color: #52676a; font-size: 11px; line-height: 1; }
 .secured-credit-step > div { min-width: 0; }
 .secured-credit-step h3 { margin: 0; font-size: 15px; line-height: 1.5; font-weight: 550; letter-spacing: -.015em; }
 .secured-credit-step p { max-width: 26ch; margin: 7px 0 0; font-size: 13px; line-height: 1.7; color: var(--public-muted); }

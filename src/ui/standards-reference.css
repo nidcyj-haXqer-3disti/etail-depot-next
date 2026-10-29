@@ -71,3 +71,34 @@
 @media(max-width:850px){.standards-reference .sr-layout{grid-template-columns:1fr;gap:30px}.standards-reference .sr-reference{max-width:none}.standards-reference .sr-hub-section{gap:32px}}
 @media(max-width:600px){.standards-reference .sr-inner{padding-block:28px 48px}.standards-reference .sr-crumbs{margin-bottom:28px;font-size:12px;gap:5px 9px}.standards-reference .sr-lead{font-size:17px}.standards-reference h2{font-size:23px}.standards-reference .sr-hub-section{grid-template-columns:1fr;gap:20px;padding-block:28px}.standards-reference .sr-hub-entries a{gap:12px;grid-template-columns:55px 1fr 18px}.standards-reference .sr-digits{grid-template-columns:repeat(2,minmax(0,1fr))}.standards-reference .sr-compare-row{grid-template-columns:58px minmax(0,1fr);gap:14px}.standards-reference .sr-table td:first-child{width:62px;padding-right:8px}.standards-reference .sr-reference{padding:22px}}
 @media(pointer:coarse){.standards-reference .sr-crumbs a,.standards-reference .sr-related a,.standards-reference .sr-source a,.standards-reference .sr-table a{min-height:44px;display:inline-flex;align-items:center}}
+
+/* Compact native navigation remains available throughout long reference lists. */
+.standards-reference .reference-index { position:sticky;top:0;z-index:3;isolation:isolate;background:#fff;border-bottom:1px solid var(--line);margin:0 0 28px;padding:0 0 8px; }
+.standards-reference .reference-index-heading { display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;font-size:13px;font-weight:500; }
+.standards-reference .reference-index-heading > div { display:flex;gap:18px;flex:none; }
+.standards-reference .reference-index-heading a { display:inline-flex;align-items:center;gap:4px;min-height:44px;text-decoration:none;font-size:12px;color:var(--muted); }
+.standards-reference .reference-index-links { display:flex;gap:4px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin;scrollbar-color:#9cb8ad #edf3ef;padding:5px 4px 9px; }
+.standards-reference .reference-index-links a { display:flex;align-items:center;justify-content:center;flex:none;min-width:40px;min-height:44px;padding:8px 12px;text-decoration:none;white-space:nowrap;font-size:14px;border-radius:4px;background:var(--wash); }
+.standards-reference .reference-index-links a:hover { background:#dfede7;color:var(--ink); }
+.standards-reference .reference-index-links a:focus-visible { outline-offset:1px; }
+.standards-reference .reference-index-links::-webkit-scrollbar { height:6px; }
+.standards-reference .reference-index-links::-webkit-scrollbar-thumb { background:#9cb8ad;border-radius:4px; }
+.standards-reference .reference-index-links::-webkit-scrollbar-track { background:#edf3ef; }
+.standards-reference .sr-meta a { text-decoration:none;border-bottom:1px solid var(--line); }
+.standards-reference .sr-identity { display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;padding:0 0 24px;margin:0;font-size:14px; }
+.standards-reference .sr-identity > span { color:var(--muted);font-size:12px; }
+.standards-reference .sr-identity code { overflow-wrap:anywhere;min-width:0; }
+.standards-reference .sr-summary { font-size:18px;line-height:1.75;margin-bottom:28px; }
+.standards-reference #reference-source { scroll-margin-top:24px; }
+.standards-reference .sr-copy :is(section,tr,details,a)[id],.standards-reference .sr-copy a[href] { scroll-margin-top:132px;scroll-margin-bottom:24px; }
+.standards-reference .sr-table tr:target { background:var(--wash); }
+.standards-reference .sr-table th { vertical-align:top;padding-right:16px; }
+.standards-reference .sr-table td p { font-size:14px; }
+@media(max-width:600px){
+ .standards-reference .reference-index { margin-bottom:24px; }
+ .standards-reference .reference-index-heading { font-size:12px;gap:8px; }
+ .standards-reference .reference-index-heading > div { gap:14px; }
+ .standards-reference .reference-index-links a { min-width:40px;padding-inline:10px; }
+ .standards-reference .sr-summary { font-size:17px; }
+}
+@media(max-height:450px){.standards-reference .reference-index { position:static; }}

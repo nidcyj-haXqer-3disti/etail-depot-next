@@ -25,7 +25,7 @@ export default function OnlineBusinessesPage() {
         <div className="page-container online-business-intro">
           <div><p className="eyebrow">Online businesses</p><h1 id="online-business-title">Payments for<br /><span>online businesses.</span></h1></div>
           <div className="online-business-copy">
-            <p>Give customers a choice of cards, digital wallets and ACH at checkout. Keep track of the payment from the order through to your bank deposit.</p>
+            <p>Let customers pay by card, digital wallet or ACH. Follow the order from checkout to the payment record and bank deposit.</p>
             <div className="online-business-actions"><PaymentPortalLink>Apply for a merchant account</PaymentPortalLink><Link href="/payment-acceptance-service#fees" className="consumer-text-link">View processing fees<Icon name="arrow" /></Link></div>
             <p className="online-business-note">Applications open at Trolleys, an Etail Depot service. Account approval and setup apply. ACH pricing is separate.</p>
           </div>
@@ -39,8 +39,8 @@ export default function OnlineBusinessesPage() {
         <section className="payment-sharing-note" id="payment-channels" aria-labelledby="payment-sharing-title">
           <div className="payment-sharing-copy" id="request-details">
             <p className="eyebrow">Payment requests</p><h2 id="payment-sharing-title">Take the checkout<br />to your customer.</h2>
-            <p>Send a payment request when the sale happens outside your website checkout. Your customer opens a hosted payment page to complete the purchase.</p>
-            <p>Share it by email, text, social media or a website button. Use a QR code on printed materials.</p>
+            <p>Use a payment request when an order is arranged outside your website checkout.</p>
+            <p>Share the hosted payment page by email, text, social media, a website button or a QR code.</p>
             <p className="payment-sharing-qualification">Available options depend on your account setup.</p>
             <Link href="/docs/payment-requests" className="consumer-text-link">Use payment requests<Icon name="arrow" /></Link>
           </div>

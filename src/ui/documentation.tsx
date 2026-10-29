@@ -15,11 +15,12 @@ function DocumentationLink({href,label}:{href:string;label:string}){
 }
 
 function ArticleSection({section}:{section:DocSection}){
+ const integratedSteps = section.steps && (section.flow === "onboarding" || section.flow === "events" || section.flow === "disputes" || section.flow === "payouts") ? section.steps : undefined;
  return <section className="docs-section" id={section.id} aria-labelledby={`${section.id}-title`}>
   <h2 id={`${section.id}-title`}>{section.title}</h2>
   {section.paragraphs?.map(p=><p key={p}>{p}</p>)}
-  {section.flow&&<DocumentationFlow kind={section.flow}/>}
-  {section.steps&&<ol className="docs-steps">{section.steps.map((step,i)=><li key={step.title}><span className="docs-step-number" aria-hidden="true">{i+1}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol>}
+  {section.flow&&<DocumentationFlow kind={section.flow} steps={integratedSteps}/>}
+  {section.steps&&!integratedSteps&&<ol className="docs-steps">{section.steps.map((step,i)=><li key={step.title}><span className="docs-step-number" aria-hidden="true">{i+1}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol>}
   {section.rows&&<dl className="docs-facts">{section.rows.map(row=><div key={row.title}><dt>{row.title}</dt><dd>{row.text}</dd></div>)}</dl>}
   {section.table&&<div className="docs-table-scroll" role="region" aria-label={`${section.table.caption}. Scroll horizontally if needed.`} tabIndex={0}>
    <table className="docs-table"><caption>{section.table.caption}</caption><thead><tr>{section.table.headers.map(h=><th scope="col" key={h}>{h}</th>)}</tr></thead>
@@ -55,7 +56,7 @@ export function DocumentationHome(){
  return <Shell quietAccess><div className="documentation-page"><div className="docs-workspace docs-workspace-home page-container">
   <DocumentationNavigation/>
   <div className="docs-hub">
-   <header className="docs-hub-heading"><h1>Payment documentation</h1><p>Set up merchant accounts, integrate checkout, and manage payments through reconciliation.</p></header>
+   <header className="docs-hub-heading"><h1>Payment documentation</h1><p>Set up an account, connect checkout and follow each payment through to reconciliation.</p></header>
    <div className="docs-task-paths">
     {documentationPaths.map(path => <section className="docs-task-path" key={path.id} id={path.id} aria-labelledby={`${path.id}-title`}>
      <header className="docs-task-path-heading"><Icon name={path.icon}/><h2 id={`${path.id}-title`}>{path.title}</h2><p>{path.description}</p></header>

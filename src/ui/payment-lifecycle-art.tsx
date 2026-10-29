@@ -54,9 +54,9 @@ function MerchantPaymentRecord() {
       <div className="pla-toolbar"><span className="pla-title"><Icon name="document" />Transaction details</span><span className="pla-business">{serviceExample.business}</span></div>
       <div className="pla-record-body">
         <dl className="pla-record-summary">
-          <div><dt>Order</dt><dd>{serviceExample.orderReference}</dd></div>
-          <div><dt>Amount</dt><dd>{amount(serviceExample.amountCents)}<span>{serviceExample.currency}</span></dd></div>
-          <div><dt>Status</dt><dd><span className="pla-status"><Icon name="check" />Captured</span></dd></div>
+          <div className="pla-record-value"><dt>Payment amount</dt><dd>{amount(serviceExample.amountCents)}<span>{serviceExample.currency}</span></dd></div>
+          <div className="pla-record-status"><dt>Status</dt><dd><span className="pla-status"><Icon name="check" />Captured</span></dd></div>
+          <div className="pla-record-reference"><dt>Order reference</dt><dd>{serviceExample.orderReference}</dd></div>
         </dl>
         <div className="pla-record-purchase"><span className="commerce-product-thumbnail"><CommerceProductArt /></span><div><p>{serviceExample.description}</p><span>1 pair · Chalk / Teal</span></div></div>
         <div className="pla-record-method"><span>Payment method</span><span className="pla-card"><span className="pla-card-brand"><NetworkMark network="visa" /></span><span><span aria-hidden="true">•••• </span><span className="pla-card-prefix">Card ending in </span>4242</span></span></div>

@@ -49,7 +49,7 @@ function normalizedPreviewPath(pathname: string): string | null {
 export function managedContentRoute(pathname: string): boolean {
   const normalized = normalizedPreviewPath(pathname);
   if (normalized === null) return false;
-  if (/^\/(?:software-partners|docs|online-businesses)(?:$|[/.])/.test(normalized)) return true;
+  if (/^\/(?:software-partners|docs|online-businesses|use-cases)(?:$|[/.])/.test(normalized)) return true;
   if (/^\/guides(?:$|[/.])/.test(normalized)) return true;
   return false;
 }

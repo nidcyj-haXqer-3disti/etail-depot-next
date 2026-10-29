@@ -6,9 +6,9 @@ import "./secured-credit-art.css";
 
 const exampleAmount = formatUsdCents(6400);
 const purchaseSteps = [
-  { title: "Use your card", description: "Pay with your credit card through your digital wallet.", kind: "purchase" },
-  { title: "Review your statement", description: "See the purchases you need to repay.", kind: "statement" },
-  { title: "Pay in full", description: "Repay your full statement balance each month. Earlier or daily payments are optional.", kind: "repayment" },
+  { title: "Use your card", description: "Pay through your digital wallet.", kind: "purchase" },
+  { title: "Review your statement", description: "Check your purchases and the amount due.", kind: "statement" },
+  { title: "Pay in full", description: "Repay the full statement balance each month.", kind: "repayment" },
 ] as const;
 
 function PurchaseIllustration({kind}: {kind: (typeof purchaseSteps)[number]["kind"]}) {
@@ -27,7 +27,7 @@ export function SecuredCreditArt() {
     <div className="secured-credit-scene">
       <div className="secured-credit-deposit">
         <div className="secured-deposit-art" aria-hidden="true"><div className="secured-deposit-sheet"><span>Security deposit<Icon name="lock" /></span><strong>${productFacts.cards.minimumDepositDollars}</strong><small>Minimum deposit</small></div></div>
-        <div className="secured-deposit-copy"><p>YOUR SECURITY DEPOSIT</p><h3>Backing for <br />your account.</h3><span>Purchases create a separate balance to repay.</span></div>
+        <div className="secured-deposit-copy"><p>YOUR SECURITY DEPOSIT</p><h3>Backs your account.</h3><span>Purchases create a separate balance to repay.</span></div>
       </div>
       <div className="secured-credit-purchases">
         <div className="secured-cycle-heading"><span>Purchases &amp; repayment</span><small>One purchase, from start to finish</small></div>

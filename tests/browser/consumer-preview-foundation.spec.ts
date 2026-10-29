@@ -140,22 +140,23 @@ test("software partners can review the payment experience and reach the fixed in
   await expect(page.locator("main form,main input,main textarea,main select,main iframe,main [contenteditable=true]")).toHaveCount(0);
   await expect(page.locator("main")).not.toContainText(/\b(proposed|roadmap|sandbox|simulation)\b/i);
   const experience = page.locator("#payment-experience");
-  await expect(experience.getByRole("heading", { level: 3 })).toHaveText(["Onboarding", "Checkout", "Payouts"]);
-  await expect(page.locator(".partner-hero-note")).toHaveText("Each merchant needs an approved account before accepting payments.");
-  await expect(page.locator("#integration")).toContainText("Confirm payment before fulfillment; submission alone is not confirmation.");
+  await expect(experience.getByRole("heading", { level: 3 })).toHaveText(["Onboard the business", "Accept the payment", "Reconcile the deposit"]);
+  await expect(page.locator(".platform-journey-list")).toContainText("Each merchant needs approval before accepting payments.");
+  await expect(page.locator("#integration")).toContainText("Our integration team provides documentation and access for the agreed setup.");
   await experience.scrollIntoViewIfNeeded();
   await expect(experience).toBeInViewport();
-  const art = experience.getByRole("group", { name: "Payout reconciliation", exact: true });
+  const art = page.locator(".platform-payment-art");
   await expect(art).toBeVisible();
-  await expect(art).toContainText("Match to your bank statement");
+  await expect(art).toContainText("From payment to reconciliation.");
+  await art.scrollIntoViewIfNeeded();
   await expect(art.locator("button,input,form,textarea,select,[role=button]")).toHaveCount(0);
   const box = await art.boundingBox();
   expect(box).not.toBeNull();
   expect(box!.width).toBeGreaterThan(200);
   expect(box!.x).toBeGreaterThanOrEqual(0);
   expect(box!.x + box!.width).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
-  const localInquiry = page.locator('.partner-hero a[href="#partner-contact"]');
-  await expect(localInquiry).toHaveAccessibleName("Talk to our payments team");
+  const localInquiry = page.locator('.platform-opening a[href="#partner-contact"]');
+  await expect(localInquiry).toHaveAccessibleName("Talk to our team");
   await localInquiry.focus();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#partner-contact$/);
@@ -186,17 +187,16 @@ test("software partner content and inquiry remain usable without JavaScript", as
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     await expect(page.locator("main form,main input,main textarea,main select,main iframe")).toHaveCount(0);
     const experience = page.locator("#payment-experience");
-    await expect(experience.getByRole("heading", { level: 3 })).toHaveText(["Onboarding", "Checkout", "Payouts"]);
-    await expect(page.locator(".partner-hero-note")).toHaveText("Each merchant needs an approved account before accepting payments.");
+    await expect(experience.getByRole("heading", { level: 3 })).toHaveText(["Onboard the business", "Accept the payment", "Reconcile the deposit"]);
+    await expect(page.locator(".platform-journey-list")).toContainText("Each merchant needs approval before accepting payments.");
     await experience.scrollIntoViewIfNeeded();
     await expect(experience).toBeInViewport();
-    for (const name of ["Merchant account application", "Checkout and order reference", "Payout reconciliation"]) {
-      const art = experience.getByRole("group", { name, exact: true });
-      await expect(art).toBeVisible();
-      await expect(art.locator("a,button,input,form,textarea,select,[tabindex],[role=button]")).toHaveCount(0);
-    }
-    await expect(experience.getByRole("group", { name: "Payout reconciliation", exact: true })).toContainText("Match to your bank statement");
-    const questions = page.locator(".partner-questions details");
+    const art = page.locator(".platform-payment-art");
+    await art.scrollIntoViewIfNeeded();
+    await expect(art).toBeVisible();
+    await expect(art.locator("a,button,input,form,textarea,select,[tabindex],[role=button]")).toHaveCount(0);
+    await expect(art).toContainText("From payment to reconciliation.");
+    const questions = page.locator(".platform-questions-section details");
     await expect(questions).toHaveCount(3);
     for (const detail of await questions.all()) {
       const summary = detail.locator("summary");
@@ -205,8 +205,8 @@ test("software partner content and inquiry remain usable without JavaScript", as
       await expect(detail).toHaveAttribute("open", "");
       await expect(detail.locator("p")).toBeVisible();
     }
-    const inquiry = page.locator('.partner-hero a[href="#partner-contact"]');
-    await expect(inquiry).toHaveAccessibleName("Talk to our payments team");
+    const inquiry = page.locator('.platform-opening a[href="#partner-contact"]');
+    await expect(inquiry).toHaveAccessibleName("Talk to our team");
     await inquiry.focus();
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/#partner-contact$/);
@@ -281,8 +281,8 @@ test("public service discovery explains eligibility and card inquiries without l
       const payments=page.locator(".consumer-hero");
       const cards=page.locator(".consumer-card-section");
       await expect(payments.getByRole("heading",{level:1})).toContainText("Payment processing.");
-      await expect(payments.getByRole("heading",{level:1})).toContainText("Built around business.");
-      await expect(payments).toContainText("Merchant services for online businesses and the software platforms that serve them. Connect account setup, checkout and payouts.");
+      await expect(payments.getByRole("heading",{level:1})).toContainText("For business and");
+      await expect(payments).toContainText("Merchant services for online businesses. Payment integration for the software platforms that serve them.");
       await expect(payments.locator(".consumer-hero-actions").getByRole("link",{name:"Merchant services",exact:true})).toHaveAttribute("href","/payment-acceptance-service");
       await expect(payments.locator(".consumer-hero-actions").getByRole("link",{name:"For software platforms",exact:true})).toHaveAttribute("href","/software-partners");
       await expect(payments.locator(".consumer-product-note")).toHaveCount(0);
@@ -366,7 +366,7 @@ test("public service discovery explains eligibility and card inquiries without l
   await expect(page.locator("main").getByRole("link",{name:"Explore merchant services",exact:true})).toHaveCount(0);
   const navigation=await openMainNavigation(page);
   await expect(navigation.getByRole("link",{name:"Online businesses",exact:true,includeHidden:true})).toHaveAttribute("aria-current","page");
-  await expect(page.locator(".online-business-copy")).toContainText("Give customers a choice of cards, digital wallets and ACH at checkout.");
+  await expect(page.locator(".online-business-copy")).toContainText("Let customers pay by card, digital wallet or ACH.");
   await expect(page.locator(".online-business-note")).toContainText("Account approval and setup apply.");
   await navigation.getByRole("link",{name:"Card services",exact:true}).focus();
   await page.keyboard.press("Enter");

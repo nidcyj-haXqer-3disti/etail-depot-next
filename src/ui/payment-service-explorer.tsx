@@ -62,13 +62,13 @@ export function PaymentServiceExplorer() {
             <dl className="pse-facts"><div><dt>Order reference</dt><dd>{serviceExample.orderReference}</dd></div><div><dt>Payment method</dt><dd>Card</dd></div></dl>
             <ol className="pse-stages">
               <li><span className="pse-stage-index" aria-hidden="true">01</span><div><p><strong>Authorization</strong><span>Approved</span></p><p>The issuer approves the payment request.</p></div></li>
-              <li><span className="pse-stage-index" aria-hidden="true">02</span><div><p><strong>Capture</strong><span>Recorded</span></p><p>The approved payment is submitted for processing.</p></div></li>
+              <li><span className="pse-stage-index" aria-hidden="true">02</span><div><p><strong>Capture</strong><span>Captured</span></p><p>The approved payment is submitted for processing.</p></div></li>
             </ol>
             <p className="pse-record-note">Capture does not confirm that money has reached the merchant’s bank.</p>
           </div>
           <aside className="pse-related" aria-label="Related payment information">
             <p className="pse-related-title">Related payment records</p>
-            <p>Refunds and disputes belong with the original payment record.</p>
+            <p>Keep refunds and disputes connected to the original payment.</p>
             <details><summary>Refunds</summary><p>A refund has its own status and reference. Requesting one does not confirm completion.</p></details>
             <details><summary>Disputes</summary><p>A dispute has its own case reference, evidence and response deadline.</p></details>
             <details><summary>If the result is unclear</summary><p>An unknown result is not a decline. Check the original payment reference and its status before trying again.</p></details>
@@ -76,7 +76,7 @@ export function PaymentServiceExplorer() {
         </div>
       </div>
       <div className="pse-panel" id={`${prefix}-panel-3`} role="tabpanel" aria-labelledby={`${prefix}-tab-3`} tabIndex={0} hidden={selected !== 3} aria-hidden={enhanced && selected !== 3} inert={enhanced && selected !== 3}>
-        <h3 className="pse-view-title">Reconcile the card payout to your bank.</h3>
+        <h3 className="pse-view-title">Reconcile your card payout.</h3>
         <MerchantPayoutArt />
       </div>
       </div>

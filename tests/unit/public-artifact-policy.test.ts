@@ -15,7 +15,12 @@ describe("static public deployment boundary", () => {
 
   it("admits only the approved documentation and use case sources and exports", () => {
     expect(builtPageSources).toHaveLength(25);
-    expect(localPreviewPageSources).toEqual([]);
+    expect(localPreviewPageSources).toHaveLength(0);
+    for (const page of localPreviewPageSources) {
+      expect(publicPageSources).not.toContain(page);
+      expect(forbiddenStatic(page.replace("/page.tsx", ".html"))).toBe(true);
+      expect(reviewedPublicAppModule(page)).toBe(true);
+    }
     for (const page of localCorePreviewPageSources) {
       expect(publicPageSources).toContain(page);
       expect(forbiddenStatic(page.replace("/page.tsx", ".html"))).toBe(false);

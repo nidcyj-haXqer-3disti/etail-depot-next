@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("merchant services explain the lifecycle, pricing and safe account handoff", async ({ page }) => {
   await page.goto("/payment-acceptance-service");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Online payments\.\s*From checkout to payout\./);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Credit card processing\.\s*From checkout to payout\./);
   const fees = page.locator("#fees");
   for (const [container, name] of [[page.locator(".consumer-hero-actions"), "Apply for a merchant account"]] as const) {
     const continuation = container.getByRole("link", { name, exact: true });
@@ -121,7 +121,7 @@ test("cards separate the deposit from debt and keep material terms outside discl
   await expect(inquiry).toHaveAttribute("href", "mailto:ledgix@etaildepot.com");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Secured credit");
   await expect(page.locator("main")).toContainText("Applications are not open yet");
-  const preview = page.getByRole("region", { name: "Preview the wallet experience.", exact: true });
+  const preview = page.getByRole("region", { name: "Add a card to your wallet.", exact: true });
   await expect(preview).toContainText("Applications are not open yet.");
   await expect(preview).toContainText("Availability depends on your card, device and region");
   await expect(page.locator(".consumer-product-note")).toContainText("Inquiries do not submit an application or subscribe you to launch updates");
