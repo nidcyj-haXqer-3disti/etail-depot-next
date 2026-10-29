@@ -28,7 +28,7 @@ test("Guides opens both ISO collections, preserves exact code identity and retur
     await page.goBack();
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", origin + codePath);
     await breadcrumb.getByRole("link", {name:"Guides", exact:true}).click();
-    await expect(page.getByRole("heading", {level:1})).toHaveText("Payments reference.");
+    await expect(page.getByRole("heading", {level:1})).toHaveText("Payment code reference");
   }
 });
 
@@ -95,3 +95,48 @@ for (const [interaction, reducedMotion] of [["keyboard", "no-preference"], ["poi
   } finally { await context.close(); }
 });
 }
+
+
+test("long reference directories retain keyboard jumps without JavaScript and keep their destination clear", async ({ browser, baseURL, viewport }) => {
+  const context = await browser.newContext({ baseURL, viewport, javaScriptEnabled: false, reducedMotion: "reduce" });
+  try {
+    const page = await context.newPage();
+    for (const [path, label, minimumRows] of [
+      ["/guides/iso-20022/purpose", "Codes by first character", 366],
+      ["/guides/iso-8583/fields", "Field groups", 97],
+    ] as const) {
+      await page.goto(path);
+      await expect(page.locator(".sr-table tbody tr")).toHaveCount(minimumRows);
+      await page.evaluate(() => window.scrollTo(0, 1800));
+      const index = page.locator(".reference-index");
+      const initial = await index.boundingBox();
+      expect(initial).not.toBeNull();
+      expect(initial!.y).toBeGreaterThanOrEqual(0);
+      expect(initial!.y).toBeLessThan(2);
+      const finalJump = page.getByRole("navigation", { name: label, exact: true }).getByRole("link").last();
+      const href = await finalJump.getAttribute("href");
+      await finalJump.focus();
+      await expect(finalJump).toBeFocused();
+      await page.keyboard.press("Enter");
+      await expect(page).toHaveURL(new RegExp(`${href}$`));
+      const target = await page.locator(href!).boundingBox();
+      const bar = await index.boundingBox();
+      expect(target).not.toBeNull();
+      expect(bar).not.toBeNull();
+      expect(target!.y).toBeGreaterThanOrEqual(bar!.y + bar!.height);
+      expect(target!.y).toBeLessThan(180);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await index.getByRole("link", { name: "Sources", exact: true }).click();
+      await expect(page).toHaveURL(/#reference-source$/);
+      await expect(page.getByRole("complementary")).toBeInViewport();
+      await page.goBack();
+      await expect(page).toHaveURL(new RegExp(`${href}$`));
+      await index.getByRole("link", { name: "Top", exact: true }).click();
+      await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+    }
+    await page.setViewportSize({ width: 740, height: 400 });
+    await page.goto("/guides/iso-20022/purpose");
+    await page.evaluate(() => window.scrollTo(0, 1800));
+    expect(await page.locator(".reference-index").evaluate(element => getComputedStyle(element).position)).toBe("static");
+  } finally { await context.close(); }
+});

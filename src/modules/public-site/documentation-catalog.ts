@@ -38,11 +38,11 @@ export const documentationPaths: readonly {
   {
     id: "merchant-operations",
     title: "Merchant operations",
-    description: "Account setup, payment requests and daily payment operations.",
+    description: "Manage your account, payments and bank deposits.",
     icon: "business",
     tasks: [
-      { title: "Set up an account", description: "Prepare your application and complete account setup.", anchor: "getting-started", links: [{ slug: "merchant-onboarding", label: "Set up an account" }] },
-      { title: "Create a payment request", description: "Create, share and follow a request through payment.", anchor: "payment-requests", links: [{ slug: "payment-requests", label: "Create a payment request" }] },
+      { title: "Set up an account", description: "Prepare business information and follow the account review.", anchor: "getting-started", links: [{ slug: "merchant-onboarding", label: "Set up an account" }] },
+      { title: "Create a payment request", description: "Share a request and match each payment to its purchase.", anchor: "payment-requests", links: [{ slug: "payment-requests", label: "Create a payment request" }] },
       { title: "Check payments and refunds", anchor: "payment-records", links: [{ slug: "payment-status", label: "Payment status" }, { slug: "refunds-and-disputes", label: "Refunds", section: "refund-payment", anchor: "refunds-and-disputes" }] },
       { title: "Review disputes and payouts", links: [{ slug: "refunds-and-disputes", label: "Disputes", section: "dispute-case" }, { slug: "payouts", label: "Payouts", anchor: "payouts" }] },
     ],
@@ -50,13 +50,13 @@ export const documentationPaths: readonly {
   {
     id: "developer-integration",
     title: "Developer integration",
-    description: "Access, checkout integration, payment events and launch preparation.",
+    description: "Connect your application and prepare it for launch.",
     icon: "layers",
     tasks: [
-      { title: "Configure integration access", description: "Map account access and request the assigned specifications.", anchor: "integration-access", links: [{ slug: "integration-access", label: "Configure integration access" }] },
-      { title: "Integrate checkout", description: "Connect the order journey and verify the payment result.", anchor: "checkout-setup", links: [{ slug: "checkout", label: "Integrate checkout" }] },
-      { title: "Receive payment events", description: "Plan verification, repeated deliveries and recovery.", anchor: "webhooks", links: [{ slug: "webhooks", label: "Receive payment events" }] },
-      { title: "Sandbox and launch", description: "Prepare sandbox access and live payment setup.", anchor: "testing-and-launch", links: [{ slug: "testing-and-launch", label: "Sandbox and launch" }] },
+      { title: "Configure integration access", description: "Map merchant accounts, permissions and connection requirements.", anchor: "integration-access", links: [{ slug: "integration-access", label: "Configure integration access" }] },
+      { title: "Integrate checkout", description: "Connect an order to checkout and verify the result.", anchor: "checkout-setup", links: [{ slug: "checkout", label: "Integrate checkout" }] },
+      { title: "Receive payment events", description: "Verify notifications and handle repeated or missing updates.", anchor: "webhooks", links: [{ slug: "webhooks", label: "Receive payment events" }] },
+      { title: "Sandbox and launch", description: "Confirm the payment journey before enabling production.", anchor: "testing-and-launch", links: [{ slug: "testing-and-launch", label: "Sandbox and launch" }] },
     ],
   },
 ];

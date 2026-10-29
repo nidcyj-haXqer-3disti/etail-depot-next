@@ -39,7 +39,7 @@
 .iso8583-reference .reference-wire>div,.iso8583-reference .reference-byte-comparison>div{padding:16px 12px}
 .iso8583-reference .reference-wire code,.iso8583-reference .reference-byte-comparison code{font-size:19px}
 .iso8583-reference .reference-facts{grid-template-columns:repeat(2,1fr)}
-.iso8583-reference .sr-table{font-size:12px}
+.iso8583-reference .sr-table{font-size:14px}
 .iso8583-reference .sr-table th{font-size:12px}
 .iso8583-reference .sr-table th,.iso8583-reference .sr-table td{padding-right:8px}
 }

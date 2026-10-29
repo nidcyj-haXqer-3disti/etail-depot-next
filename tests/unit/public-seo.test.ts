@@ -93,7 +93,7 @@ describe("reviewed public metadata", () => {
   it("keeps the merchant-facing Home metadata focused on payments and the partner preview separate", () => {
     expect(PUBLIC_PAGES["/"]).toEqual({
       title: "Merchant Services & Credit Card Processing",
-      description: "Merchant services for US businesses and payment partnerships for software providers. Explore card and ACH acceptance, checkout, transaction records and payouts.",
+      description: "Credit card and ACH payment processing for online businesses and software platforms. Explore merchant onboarding, checkout, payment records and payouts.",
     });
     for (const changes of [{}, ...rejectedEnvironments.map(([, changes]) => changes)]) {
       stubEnvironment(changes);
@@ -101,7 +101,7 @@ describe("reviewed public metadata", () => {
       expect(metadata.robots).toEqual(pageRobots("/software-partners"));
       expect(metadata.alternates).toEqual({ canonical: `${canonicalOrigin}/software-partners` });
       expect(metadata.title).toEqual({ absolute: "Payment Processing for Software Platforms | Etail Depot" });
-      expect(metadata.description).toBe("Explore Trolleys merchant services for the US businesses using your software: card and ACH acceptance, payment records, refunds and disputes.");
+      expect(metadata.description).toBe("Card and ACH payment processing for commerce marketplaces, freight, travel and legal software. Connect merchant accounts, checkout and reconciliation.");
       expect(metadata.openGraph).toMatchObject({ url: `${canonicalOrigin}/software-partners` });
       expect(publicSitemap().some(entry => entry.url.includes("software-partners"))).toBe(publicIndexingEnabled());
     }
@@ -186,11 +186,11 @@ describe("reviewed public metadata", () => {
   it("keeps reviewed page revision dates stable as the build clock advances", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
-    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-28");
-    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-10-27");
-    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-27");
-    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-10-27");
-    expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-10-24");
+    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-29");
+    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-10-29");
+    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-29");
+    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-10-29");
+    expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-10-29");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10)).toBe(date);

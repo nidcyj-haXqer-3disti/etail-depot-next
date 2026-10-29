@@ -45,7 +45,7 @@ export default function CardServicesPage() {
       <SecuredCreditArt />
     </section>
     <section className="wallet-guide-section" id="wallets" aria-labelledby="wallet-guide-title"><div className="page-container wallet-guide-grid">
-      <div className="wallet-guide-copy"><p className="eyebrow">Digital wallets</p><h2 id="wallet-guide-title">Preview the wallet experience.</h2><p>See the steps for adding an eligible card to Apple Wallet or Google Wallet. Applications are not open yet.</p><p className="wallet-guide-note">Follow the instructions from your wallet app and card issuer. Availability depends on your card, device and region.</p></div>
+      <div className="wallet-guide-copy"><p className="eyebrow">Digital wallets</p><h2 id="wallet-guide-title">Add a card to your wallet.</h2><p>See how an eligible card is added to Apple Wallet or Google Wallet. Applications are not open yet.</p><p className="wallet-guide-note">Follow the instructions from your wallet app and card issuer. Availability depends on your card, device and region.</p></div>
       <WalletGuide><WalletCardArt /></WalletGuide>
     </div></section>
     <section className="page-container public-section public-faq-section" aria-labelledby="card-questions-title">

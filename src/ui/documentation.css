@@ -233,3 +233,30 @@ html:has(.documentation-page) { scroll-behavior:auto; }
 
 .docs-diagram-owner,.docs-diagram-heading > span,.docs-sequence-transfer > span { min-width:0;overflow-wrap:break-word; }
 .docs-sequence-number { font-size:12px; }
+
+/* A workflow and its instructions share one sequence instead of repeating the steps. */
+.docs-workflow ol { display:block;padding:6px 24px;background:#fff; }
+.docs-workflow li { position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:18px;padding:22px 0;border:0;border-radius:0;background:transparent; }
+.docs-workflow li+li { border-top:1px solid var(--docs-line); }
+.docs-workflow-number { display:grid;place-items:center;width:30px;height:30px;border:1px solid #bdd5cb;border-radius:50%;background:#edf4f1;color:var(--docs-ink);font-size:12px;font-variant-numeric:tabular-nums; }
+.docs-workflow li > div { min-width:0; }
+.docs-workflow strong { display:block;font-size:16px;font-weight:600;line-height:1.5;margin:2px 0 8px; }
+.docs-workflow p { margin:0;font-size:15px;line-height:1.8;color:var(--docs-muted); }
+.docs-request-map { padding:24px;background:#fff; }
+.docs-request-origin { display:grid;grid-template-columns:20px minmax(0,1fr);gap:6px 12px;padding:18px 20px;border:1px solid #cdded8;border-radius:8px;background:#edf4f1; }
+.docs-request-origin .icon { grid-row:1/3;width:20px;height:20px;margin-top:3px;color:#006b58; }
+.docs-request-origin strong { font-size:15px;font-weight:600;line-height:1.5; }
+.docs-request-origin span { font-size:13px;line-height:1.6;color:var(--docs-muted); }
+.docs-request-map .docs-request-purchases { position:relative;margin-top:30px; }
+.docs-request-map .docs-request-purchases::before { content:"";position:absolute;width:1px;height:30px;top:-30px;left:50%;background:#b6cdc3; }
+.docs-request-purchases strong { font-size:15px;font-weight:500;line-height:1.6; }
+.docs-request-purchases p { font-size:14px;line-height:1.7; }
+@media(max-width:680px){
+ .docs-workflow ol { padding:4px 18px; }
+ .docs-workflow li { grid-template-columns:28px minmax(0,1fr);gap:12px;padding:20px 0; }
+ .docs-workflow-number { width:28px;height:28px; }
+ .docs-request-map { padding:18px; }
+ .docs-request-origin { padding:16px; }
+ .docs-request-map .docs-request-purchases { margin-top:22px; }
+ .docs-request-map .docs-request-purchases::before { height:22px;top:-22px; }
+}

@@ -230,7 +230,7 @@ test("a new visitor can review payment eligibility and closed card applications 
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.goto("/");
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Payment processing\.\s*Built around business\.$/);
+  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Payment processing\.\s*For business and\s*software platforms\.$/);
   await expectLoadedNetworkMarks(page.getByLabel("Accepted card networks", {exact:true}));
   const mainNavigation = await openMainNavigation(page);
   await mainNavigation.getByRole("link", {name:"Card services",exact:true}).click();
@@ -250,7 +250,7 @@ test("a new visitor can review payment eligibility and closed card applications 
   }
   await mainNavigation.getByRole("link",{name:"Merchant services",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-acceptance-service$/);
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Online payments\.\s*From checkout to payout\.$/);
+  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Credit card processing\.\s*From checkout to payout\.$/);
   await openMainNavigation(page);
   await expect(mainNavigation.getByRole("link",{name:"Merchant services",exact:true,includeHidden:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator(".consumer-hero")).toContainText("Accept online card and ACH payments for your US business.");
@@ -315,12 +315,8 @@ test("public pages have unique canonical metadata and no private data", async ({
     await expect(page.locator('meta[name="description"]')).toHaveAttribute("content",/.{50,}/);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content",/noindex/);
     await expect(page.getByRole("heading",{level:1})).toHaveCount(1);
-    if (route === "/software-partners") {
-      await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(0);
-    } else {
-      const data = JSON.parse(await page.locator('script[type="application/ld+json"]').innerText());
-      expect(data["@graph"].find((node: { "@type": string }) => node["@type"] === "WebPage").url).toBe(`https://etaildepot.com${route}`);
-    }
+    const data = JSON.parse(await page.locator('script[type="application/ld+json"]').innerText());
+    expect(data["@graph"].find((node: { "@type": string }) => node["@type"] === "WebPage").url).toBe(`https://etaildepot.com${route}`);
     // The checkout has a labeled public specimen, not a signed-in customer record.
     // Keep the historical private-data guard on every other part of the page.
     const editorialText = await page.locator("main").evaluate(element => {
@@ -332,7 +328,7 @@ test("public pages have unique canonical metadata and no private data", async ({
     if (route === "/" || route === "/credit-card-services" || route === "/help") {
       expect(editorialText).toContain("Visa secured credit card");
     }
-    expect(editorialText).not.toMatch(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice|fixture/i);
+    expect(editorialText).not.toMatch(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice (?:mode|payment)|fixture/i);
     await expect(page.locator(".sandbox-badge")).toHaveCount(0);
     await expect(page.getByRole("banner")).not.toContainText(/\bsandbox\b/i);
     await expect(page.getByRole("contentinfo").getByRole("link", {name:"Help center"})).toBeVisible();
@@ -420,7 +416,7 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
   const mutations = await preventMutationRequests(page);
   for (const path of ["/", "/software-partners", "/payment-acceptance-service"]) {
     await page.goto(path);
-    const art = page.getByRole("figure", {name:path === "/" ? "Etail Depot" : path === "/software-partners" ? "Your software and merchant services" : "Card payment summary", exact:true});
+    const art = page.getByRole("figure", {name:path === "/" ? "Etail Depot" : path === "/software-partners" ? "Business context stays with the payment." : "Card payment summary", exact:true});
     await expect(art).toBeVisible();
     if (path === "/") {
       const symbol = art.locator('img[src="/brand/symbol.png"]');
@@ -428,8 +424,8 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
       await expect(symbol).toHaveAttribute("loading", "eager");
       await expectDecodedBrandMark(symbol);
     } else if (path === "/software-partners") {
-      await expect(art).toContainText("Your software");
-      await expect(art).toContainText("Merchant services");
+      await expect(art.getByRole("img")).toHaveAccessibleName(/Freight invoice INV 08421.*reconciliation/);
+      await expect(art).toContainText("Payment details");
     } else {
       await expect(art).toContainText("#10482");
       await expect(art).toContainText("Designer sneaker");

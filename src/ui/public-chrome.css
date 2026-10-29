@@ -101,7 +101,7 @@
   padding-bottom: 24px;
 }
 .public-footer-navigation { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); column-gap: 32px; padding: 0; }
-.public-footer-group { display: grid; grid-template-rows: subgrid; grid-row: span 4; row-gap: 0; }
+.public-footer-group { display: block; }
 .public-footer-group h2 {
   display: flex;
   align-items: center;
@@ -113,7 +113,7 @@
   line-height: 1.5;
   letter-spacing: 0;
 }
-.public-footer-group ul { display: grid; grid-template-rows: subgrid; grid-row: span 3; row-gap: 0; list-style: none; margin: 0; padding: 0; }
+.public-footer-group ul { display: grid; grid-auto-rows: minmax(44px, auto); align-content: start; list-style: none; margin: 0; padding: 0; }
 .public-footer-group li { min-width: 0; }
 .public-footer-group a {
   display: flex;

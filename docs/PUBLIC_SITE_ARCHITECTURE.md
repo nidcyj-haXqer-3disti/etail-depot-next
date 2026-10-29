@@ -1,3 +1,7 @@
+## Industry use cases on Software platforms
+
+Commerce marketplaces, freight, travel and legal software are sections of /software-partners. They have section fragments, not separate page routes. The four unpublished /use-cases pages, metadata entries and local preview/export exceptions were removed on 29 October 2026. Navigation lists only Online businesses and Software platforms under Use cases. The exact 3,725 page inventory and 3,723 member production sitemap remain unchanged. No publication is implied by this local consolidation.
+
 # Public site architecture
 
 The Next.js static export contains 19 core pages and 3,706 reference pages. Six parameterized source templates generate the frozen reference inventory. Unknown values do not generate pages. The exact inventory is shared by metadata, sitemap, request boundary and package verification.

@@ -113,7 +113,7 @@ test("online business use case owns the merchant walkthrough and preserves navig
 
 test("four service and use-case section menus remain usable without JavaScript", async ({ browser, baseURL }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
-  const context = await browser.newContext({ baseURL, javaScriptEnabled: false, viewport: { width: mobile ? 320 : 1440, height: 900 } });
+  const context = await browser.newContext({ baseURL, javaScriptEnabled: false, reducedMotion: "reduce", viewport: { width: mobile ? 320 : 1440, height: 900 } });
   const page = await context.newPage();
   try {
     for (const route of ["/payment-acceptance-service", "/online-businesses", "/software-partners", "/credit-card-services"]) {
@@ -162,4 +162,68 @@ test("online journey tabs keep the next chapter stable and inactive controls out
     await expect(explorer.getByRole("tabpanel", { name, exact: true })).toBeFocused();
   }
   expect(Math.max(...positions) - Math.min(...positions)).toBeLessThanOrEqual(1);
+});
+
+
+const industryPaths = ["commerce-marketplaces", "freight-platforms", "travel-platforms", "legal-software"];
+test("four industry cases share one page with useful workflows and no standalone pages", async ({page, request}) => {
+  await page.goto("/software-partners?tracking=private");
+  await expect(page.locator(".platform-case")).toHaveCount(4);
+  await expect(page.locator('a[href^="/use-cases/"]')).toHaveCount(0);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/software-partners");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  await expect(page.locator("main form, main input, main iframe")).toHaveCount(0);
+  await expect(page.locator("main")).not.toContainText(/Cybersource|Infinicept|SDK|prototype|illustrative|roadmap/i);
+  for (const slug of industryPaths) {
+    const card = page.locator(`#${slug}`);
+    await expect(card.getByRole("heading", {level:3})).toBeVisible();
+    await expect(card.locator(".platform-case-steps li")).toHaveCount(4);
+    await card.locator("summary").focus(); await page.keyboard.press("Enter");
+    await expect(card.locator("details")).toHaveAttribute("open", "");
+    await expect(card.locator(".platform-case-scope")).toBeVisible();
+    await page.keyboard.press("Enter"); await expect(card.locator(".platform-case-expanded")).toBeHidden();
+    expect((await request.get(`/use-cases/${slug}`)).status()).toBe(404);
+    expect((await request.get(`/use-cases/${slug}.txt`)).status()).toBe(404);
+  }
+  await expect(page.locator("main")).not.toContainText(/debt collection|collection account|receivable/i);
+  await expect(page.locator('a[href*="collection-software"], #collection-software')).toHaveCount(0);
+  await expect(page.locator("#commerce-marketplaces").getByRole("img", {name:/Marketplace order and linked payment record/})).toBeVisible();
+  const data = await page.locator('script[type="application/ld+json"]').textContent();
+  const entries = JSON.parse(data!)["@graph"][2].itemListElement;
+  expect(entries.map((item: {url:string})=>item.url)).toEqual(industryPaths.map(slug=>`https://etaildepot.com/software-partners#${slug}`));
+  expect(data).not.toContain("tracking");
+  expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/use-cases/");
+});
+
+test("all four industry cases remain readable without JavaScript", async ({browser, baseURL}, testInfo) => {
+  const context = await browser.newContext({baseURL,javaScriptEnabled:false,reducedMotion:"reduce",viewport:{width:testInfo.project.name === "mobile" ? 320 : 1440,height:900}});
+  const page = await context.newPage();
+  try {
+    await page.goto("/software-partners");
+    for (const slug of industryPaths) {
+      const card = page.locator(`#${slug}`);
+      await expect(card.getByRole("heading",{level:3})).toBeVisible();
+      await card.locator("summary").focus(); await page.keyboard.press("Enter");
+      await expect(card.locator(".platform-case-scope")).toBeVisible();
+      await page.keyboard.press("Enter");
+    }
+    const nav = page.getByRole("navigation", {name:"Main navigation"});
+    await nav.locator("summary").filter({hasText:/^Use cases$/}).click();
+    await expect(nav.locator("details[open] a")).toHaveCount(2);
+    await expect(nav.getByRole("link",{name:"Software platforms",exact:true})).toBeVisible();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+  } finally { await context.close(); }
+});
+
+test("footer use cases remain distinct and usable at every breakpoint", async ({page}) => {
+  for (const width of [1440,1024,768,390,320]) {
+    await page.setViewportSize({width,height:900}); await page.goto("/");
+    const nav = page.getByRole("navigation", {name:"Footer use cases"});
+    const links = nav.getByRole("link"); await expect(links).toHaveCount(2);
+    const boxes = await links.evaluateAll(items=>items.map(item=>{const r=item.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,height:r.height};}));
+    for (const [index,box] of boxes.entries()) {
+      expect(box.x).toBeGreaterThanOrEqual(0);expect(box.right).toBeLessThanOrEqual(width+1);expect(box.height).toBeGreaterThanOrEqual(44);
+      if(index) expect(box.y).toBeGreaterThanOrEqual(boxes[index-1].bottom-1);
+    }
+  }
 });

@@ -15,7 +15,7 @@ type DocArticle = { introduction: string; prerequisites: string[]; sections: Doc
 // assigned API contracts are requested through the integration team, not simulated here.
 export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
   "merchant-onboarding": {
-    "introduction": "Prepare your business information, follow the application review and confirm that your account is ready to accept payments. Keep the application and account references together throughout setup.",
+    "introduction": "Prepare your application, follow the review and confirm your account is ready to accept payments.",
     "prerequisites": [
       "An authorized representative of the business",
       "Business, ownership and payout account information",
@@ -53,24 +53,24 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       },
       {
         "id": "application-review",
-        "title": "Follow the application through review",
+        "title": "Complete the application review",
         "flow": "onboarding",
         "steps": [
           {
             "title": "Submit one complete application",
-            "text": "Review the required information and agreements before submitting. Keep the application reference and the submitted business identity together."
+            "text": "Review the business information and agreements, then submit. Keep the application reference with the submitted business identity."
           },
           {
             "title": "Resolve outstanding requests",
-            "text": "Return to that application when more information is requested. Read the specific request and provide the missing or corrected information through the account service."
+            "text": "Return to the same application when information is requested. Supply missing or corrected details through the secure account service."
           },
           {
             "title": "Read the review decision",
-            "text": "Check the decision recorded for the application. Submission, receipt of documents and an approval decision are different milestones."
+            "text": "Read the recorded decision. Submitting an application or providing documents is not approval."
           },
           {
             "title": "Confirm service setup",
-            "text": "After approval, check the payment configuration, account access and reporting. Make sure each required service is enabled and ready before using it."
+            "text": "After approval, confirm payment methods, team access and reporting are configured before using the account."
           }
         ],
         "note": {
@@ -121,14 +121,13 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
           ],
           "codeColumn": false,
           "breakCodeWords": false
-        },
-        "outcome": "Confirm the approved business, enabled payment methods and team access before using the relevant service."
+        }
       },
       {
         "id": "platform-onboarding",
         "title": "For software platforms: connect the application",
         "paragraphs": [
-          "For a software platform, connect the merchant application to your own business record. Keep the application decision separate from the account configuration needed to accept payments."
+          "Connect each application to the business in your platform. Keep the application decision separate from the services enabled for that merchant."
         ],
         "table": {
           "caption": "Application and service records",
@@ -191,7 +190,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "integration-access": {
-    "introduction": "Confirm the services your integration needs, how each merchant account is identified and which operations your application may perform. Request the documentation and access instructions before connecting your system.",
+    "introduction": "Map your merchant accounts, set permissions and obtain the connection details your developers need.",
     "prerequisites": [
       "The services and operations your integration needs",
       "The business and account references already available to your team",
@@ -202,29 +201,15 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "connection-map",
         "title": "Map your connections",
         "paragraphs": [
-          "Start with the access your business needs. Hosted account tools and API access are separate choices. A portal login does not grant API permissions, and reporting access does not automatically permit refunds, adjustments or funding instructions."
+          "A portal login does not grant API access. Confirm which services and operations your business needs; reporting access alone does not permit refunds, adjustments or funding instructions."
         ],
-        "flow": "access",
-        "note": {
-          "title": "Request integration documentation",
-          "text": "Our integration team can provide the API documentation, authentication requirements and permissions for the services available to your account."
-        },
-        "rows": [
-          {
-            "title": "Account and environment",
-            "text": "Record the business, merchant account references and whether the connection is for sandbox or production."
-          },
-          {
-            "title": "Access and contacts",
-            "text": "Record the permitted operations, documentation version and the person responsible for the connection."
-          }
-        ]
+        "flow": "access"
       },
       {
         "id": "account-mapping",
         "title": "Keep account identities distinct",
         "paragraphs": [
-          "Keep your business record connected to the account identifiers supplied for your integration. An application, processing merchant, reporting account and portal user can have different identifiers. Record only the account scopes used by your connection."
+          "Map your business record to the identifiers assigned for the application, processing and reporting services. Store sandbox and production mappings separately."
         ],
         "table": {
           "caption": "Account mapping",
@@ -274,20 +259,6 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "paragraphs": [
           "Store secrets in your backend’s protected configuration. Keep them out of browser bundles, URLs, analytics and application logs. Use credentials only for their assigned service and environment."
         ],
-        "rows": [
-          {
-            "title": "Account setup",
-            "text": "Use only the credentials and permissions assigned to the application or account connection."
-          },
-          {
-            "title": "Checkout",
-            "text": "Follow the access instructions supplied through your merchant account service. Keep server credentials out of the customer interface."
-          },
-          {
-            "title": "Reporting",
-            "text": "Confirm which merchant records may be read and which operations, if any, may be submitted."
-          }
-        ],
         "details": [
           {
             "title": "Rotate or revoke a key",
@@ -297,18 +268,13 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             "title": "Keep webhook security separate",
             "text": "Incoming events may use separate verification keys or encryption settings. Follow the event documentation; an outbound API credential does not authenticate an incoming notification."
           }
-        ],
-        "note": {
-          "title": "Request authentication instructions",
-          "text": "Ask our integration team for the credential format, authentication procedure, process for managing keys and access requirements for your connection."
-        }
+        ]
       },
       {
         "id": "verify-access",
         "title": "Verify access before changing records",
         "paragraphs": [
-          "Start by checking the account as described in your integration documentation, without changing its information. The response must belong to the intended merchant, and access to another merchant’s records must be refused. Ask our integration team for the account lookup and permission checks before connecting your system.",
-          "Request the response definitions, lookup procedures and retry rules from our integration team. Do not infer a business outcome from an HTTP status alone."
+          "Begin with the documented account lookup without changing records. Confirm both the intended merchant and refused access to other merchants. An HTTP status alone does not establish a payment result or application decision."
         ],
         "table": {
           "caption": "Verify access and outcomes",
@@ -342,31 +308,33 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       },
       {
         "id": "implementation-handoff",
-        "title": "Keep the integration record current",
+        "title": "Request the connection specifications",
         "rows": [
           {
-            "title": "Connection details",
-            "text": "Record the permitted operations, documentation version, website origins, enabled payment methods and payment completion settings."
+            "title": "Access and authentication",
+            "text": "Credential format, authentication procedure, key rotation and revocation, permitted operations and separate environment settings."
           },
           {
-            "title": "Identity and permissions",
-            "text": "Confirm the account mappings used by your connection and who may read records or perform each operation."
+            "title": "Accounts and checkout",
+            "text": "Merchant mappings, website origins, enabled methods, submission and capture responsibilities, and the authoritative payment lookup."
           },
           {
             "title": "Events and recovery",
-            "text": "Record any subscribed event types, required verification or encryption, retry rules and the payment lookup used to resolve an uncertain result."
+            "text": "Event field and status definitions, delivery verification or encryption, acknowledgment, retry rules, reporting availability and rate limits."
           },
           {
-            "title": "Support contacts",
-            "text": "Assign contacts for credential incidents, payment uncertainty, refunds, disputes and funding questions. Keep the connection record current when access changes."
+            "title": "Operational contacts",
+            "text": "Named contacts for access incidents, unresolved payments, refunds, disputes and funding questions. Update this record when the connection changes."
           }
         ],
-        "outcome": "Keep the account, access permissions, credential reference and support contact with each connection."
+        "paragraphs": [
+          "Ask our integration team for the specifications assigned to your account. Keep the approved version and configuration with the connection."
+        ]
       }
     ]
   },
   "checkout": {
-    "introduction": "Connect your order to the checkout page provided through your merchant account service. Verify the payment result, update the order once and recover any interrupted attempt.",
+    "introduction": "Connect your orders to checkout provided through your merchant account service. Verify each payment before updating the order.",
     "prerequisites": [
       "The checkout connection and instructions assigned to your merchant account",
       "Your order, amount, currency and references for each payment attempt",
@@ -377,9 +345,6 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       {
         "id": "checkout-flow",
         "title": "The checkout flow",
-        "paragraphs": [
-          "Your application keeps the order and its payable amount. The checkout page collects payment details and handles processing through the merchant account service. Use the verified payment record to decide how the order should proceed."
-        ],
         "flow": "checkout",
         "note": {
           "title": "Checkout, payment and bank receipt",
@@ -390,7 +355,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "completion-policy",
         "title": "Confirm processing responsibilities",
         "paragraphs": [
-          "Agree which service submits the payment, how capture is handled and how your application verifies the result. Use one processing path so a repeated click, callback or notification cannot trigger another charge."
+          "Agree on one payment submission path. Repeated clicks, callbacks and notifications must resolve to the existing attempt rather than trigger another charge."
         ],
         "table": {
           "caption": "Responsibilities to confirm",
@@ -416,8 +381,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
               "How repeated clicks, reloads and notifications resolve to the existing attempt."
             ]
           ]
-        },
-        "outcome": "Confirm who submits the payment, who controls capture and which record determines the order’s payment state."
+        }
       },
       {
         "id": "server-setup",
@@ -438,10 +402,6 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         ],
         "details": [
           {
-            "title": "Authorization or sale?",
-            "text": "Confirm whether the configured flow authorizes first or authorizes and captures together. Record the actual operation and follow the account’s capture policy; neither outcome confirms bank receipt."
-          },
-          {
             "title": "What if the order changes?",
             "text": "Recalculate the payable total on your server and check the existing attempt before starting a new checkout. Do not associate an existing attempt with a different merchant, currency or order total."
           }
@@ -455,8 +415,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "customer-interface",
         "title": "Present the checkout page",
         "paragraphs": [
-          "Use the checkout presentation supported by your assigned connection. Collect payment details within that checkout and display purchase information consistent with the stored order.",
-          "Check the customer journey on desktop and mobile, including cancellation, return to the order and an interrupted connection."
+          "Show purchase details from the stored order within the checkout presentation supported by your connection. Check desktop and mobile, including cancellation, return to the order and interrupted loading."
         ],
         "details": [
           {
@@ -476,13 +435,10 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       {
         "id": "complete-payment",
         "title": "Verify and update the order",
-        "paragraphs": [
-          "Obtain the payment result using the verification or lookup procedure assigned to your integration. A browser callback, redirect or successful HTTP response does not by itself establish that a payment was approved."
-        ],
         "steps": [
           {
             "title": "Verify the payment result",
-            "text": "Use the verification and payment lookup instructions supplied by our integration team. Check the result for the original attempt. If it cannot be verified, keep it unresolved and follow the recovery procedure."
+            "text": "Use the assigned verification or lookup procedure for the original attempt. A callback, redirect or HTTP success is not payment approval. Keep an unverifiable result unresolved and follow the recovery procedure."
           },
           {
             "title": "Match the payment to the attempt",
@@ -527,7 +483,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "checkout-recovery",
         "title": "Recover interrupted attempts",
         "paragraphs": [
-          "Treat an uncertain outcome differently from a confirmed decline. Start with the existing order, attempt and transaction references. Browser refresh, timeout and closing checkout are not evidence that processing stopped."
+          "Start with the original order, attempt and transaction references. A timeout or closed page is not proof that processing stopped."
         ],
         "table": {
           "caption": "Interrupted checkout and recovery",
@@ -561,11 +517,11 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "details": [
           {
             "title": "The browser closes or the result never arrives",
-            "text": "Recover through the assigned transaction lookup and verified payment events. If no transaction ID reached the browser, use the server’s stored attempt and supported reference mapping. No result found immediately is not proof of failure. Keep the attempt unresolved and escalate through support if the documented recovery path cannot establish its outcome."
+            "text": "Use the assigned transaction lookup and verified events. If no transaction ID reached the browser, recover using the server’s stored attempt and supported references. An empty lookup is not proof of failure. Keep the attempt unresolved and escalate if the recovery procedure cannot establish its outcome."
           },
           {
             "title": "Authentication is canceled or fails",
-            "text": "Distinguish a confirmed authentication failure or cancellation from a communication failure. Preserve the original attempt, resolve any uncertain processing state and let the customer choose a permitted next action. Do not automatically resubmit the payment."
+            "text": "Separate a confirmed authentication failure or cancellation from a communication failure. Resolve any uncertain processing state before offering the customer another permitted action. Do not resubmit automatically."
           },
           {
             "title": "What to record for support",
@@ -609,7 +565,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "payment-requests": {
-    "introduction": "Create a request, check the customer’s checkout and follow the payment back to its order. Keep the request reference separate from the transaction reference.",
+    "introduction": "Create and share a payment request, then match each payment to its order.",
     "prerequisites": [
       "A configured merchant account with access to payment request tools",
       "The purchase details, total and currency",
@@ -650,19 +606,18 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       {
         "id": "create-share",
         "title": "Create, review and share",
-        "flow": "requests",
         "steps": [
           {
-            "title": "Create the request in the account service",
-            "text": "Enter the purchase description, total, currency and reference. Check the available delivery, tax, shipping, expiry and reuse settings before sharing the request."
+            "title": "Create the request",
+            "text": "Enter the purchase, total, currency and reference. Check tax, shipping, delivery, expiry and reuse settings available in your account."
           },
           {
             "title": "Review the checkout page",
-            "text": "Open the generated destination and confirm the business identity, purchase details, amount and available payment methods. Check mobile readability and the terms the customer will see."
+            "text": "Confirm the business identity, purchase details, total and payment methods at the generated destination. Check the mobile view and customer terms."
           },
           {
             "title": "Share the payment request",
-            "text": "Use the link, QR code or button supplied by your account’s request tool. Keep it tied to the purchase and keep card details and credentials out of its URL."
+            "text": "Use the link, QR code or button supplied by the request tool. Keep it tied to the purchase; never include card details or credentials in its URL."
           }
         ],
         "details": [
@@ -680,13 +635,9 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "request-result",
         "title": "Match the payment to the order",
         "paragraphs": [
-          "Opening a link, scanning a QR code or viewing an invoice does not prove payment. Find the resulting transaction in the correct merchant account and compare its amount, currency and verified processing state with the purchase."
+          "Opening a link, scanning a QR code or viewing an invoice does not prove payment. Match the transaction’s merchant, amount, currency and verified state to the order before fulfillment or reminders."
         ],
         "rows": [
-          {
-            "title": "One request, several customers",
-            "text": "A reusable destination can produce several legitimate transactions. Associate each payment with its buyer and order; the request ID is not a unique payment ID."
-          },
           {
             "title": "One order, several attempts",
             "text": "Keep the attempt references together. Check whether an earlier payment remains unresolved before asking the customer to try again."
@@ -696,7 +647,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             "text": "A sent or canceled invoice is an invoice event. Use the payment record to determine what was authorized, captured or refunded, including any pending action."
           }
         ],
-        "outcome": "Fulfillment and reminders follow the verified payment record for that purchase, not the request’s delivery or viewing status."
+        "flow": "requests"
       },
       {
         "id": "request-follow-up",
@@ -746,7 +697,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "payment-status": {
-    "introduction": "Find a payment, read its current status and decide what to do next. Follow the original attempt through any later capture, refund or payout activity.",
+    "introduction": "Find the original payment, check its current status and resolve an uncertain result before taking action.",
     "prerequisites": [
       "Access to the merchant account that received the payment",
       "The order and transaction references, if available",
@@ -760,15 +711,15 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "steps": [
           {
             "title": "Start with the returned transaction ID",
-            "text": "Search the account and environment used for the payment. If no transaction ID was returned, use the original order or merchant reference with the narrowest useful time range."
+            "text": "Search the merchant account and environment used for the payment. If no transaction ID was returned, use the original order or merchant reference and a narrow time range."
           },
           {
             "title": "Match the purchase",
-            "text": "Check the merchant, amount and currency. Keep your order reference separate from the identifier returned for each authorization, capture, reversal or refund."
+            "text": "Match the merchant, amount and currency. Retain the separate identifiers for the order, authorization, capture, reversal and refund."
           },
           {
             "title": "Open the related activity",
-            "text": "Read the operations linked to the payment before acting. A capture and a refund attached to the same order do not represent two purchases."
+            "text": "Read the linked operations before acting. A capture and refund on one order are separate operations, not separate purchases."
           }
         ],
         "note": {
@@ -780,7 +731,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "read-status",
         "title": "Read the status before taking action",
         "paragraphs": [
-          "Use the exact status and operation recorded by the service. The meanings below help your team decide what to check; they are not a replacement for the status definitions assigned to an integration."
+          "Read the recorded operation as well as its status. Use these distinctions alongside the status definitions assigned to your connection."
         ],
         "table": {
           "caption": "Payment state and next action",
@@ -821,7 +772,6 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       {
         "id": "uncertain-result",
         "title": "Resolve an uncertain result",
-        "flow": "recovery",
         "steps": [
           {
             "title": "Preserve the original attempt",
@@ -845,8 +795,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             "title": "The checkout message and account record disagree",
             "text": "Retain both references and the time observed. Resolve the current processing record before changing fulfillment or sending the customer through another payment."
           }
-        ],
-        "outcome": "A timeout alone never triggers another charge. The original attempt has either a confirmed outcome or an assigned investigation."
+        ]
       },
       {
         "id": "reporting-results",
@@ -883,9 +832,6 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       {
         "id": "support-reference",
         "title": "Keep the details needed for investigation",
-        "paragraphs": [
-          "Keep enough information to trace the original attempt and explain what remains unresolved."
-        ],
         "rows": [
           {
             "title": "Account and purchase",
@@ -904,7 +850,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "refunds-and-disputes": {
-    "introduction": "Choose the permitted action for the original payment, follow a refund to its result and respond to disputes using the case notice. Keep every action linked to the purchase and its account adjustment.",
+    "introduction": "Refund the right payment, respond to a dispute and track the resulting account adjustments.",
     "prerequisites": [
       "The original payment and related operation references",
       "Permission for the action you need to take",
@@ -966,7 +912,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
           },
           {
             "title": "Check the amount still available",
-            "text": "Use the confirmed refundable amount and account rules. Include pending or uncertain refund attempts when deciding how much can safely be requested again."
+            "text": "Check the account’s confirmed refundable amount and limits. Include completed refunds and pending, uncertain or reserved amounts so the same remainder cannot be used twice."
           },
           {
             "title": "Submit one permitted action",
@@ -980,26 +926,11 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "details": [
           {
             "title": "For platforms handling concurrent refunds",
-            "text": "Reserve pending amounts in one atomic operation before submitting a refund, so concurrent requests cannot use the same remainder. Resolve uncertain outcomes before releasing a reservation. Investigate a negative remainder instead of hiding it by setting it to zero."
+            "text": "Reserve pending amounts atomically before submission so concurrent requests cannot use the same remainder. Resolve uncertain outcomes before releasing a reservation. This is an application safeguard, not a balance held by the payment service. Investigate a negative remainder instead of setting it to zero."
           },
           {
             "title": "A refund is still pending",
             "text": "Keep its original reference. Check the assigned processing record or contact support. A successful submission response does not by itself establish final completion or customer receipt."
-          }
-        ],
-        "outcome": "The refund stays linked to the original payment, with a recorded amount, reference and verified result.",
-        "rows": [
-          {
-            "title": "Confirmed capture",
-            "text": "Start with the confirmed captured amount for the payment and currency."
-          },
-          {
-            "title": "Refunds already committed",
-            "text": "Account for completed refunds and unresolved or reserved refund amounts before submitting another action."
-          },
-          {
-            "title": "Available for a new refund",
-            "text": "Use the account’s confirmed refundable amount and limits. A reservation in your application protects against concurrent requests; it is not a separate balance held by the payment service."
           }
         ]
       },
@@ -1010,19 +941,19 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "steps": [
           {
             "title": "Read the case notice",
-            "text": "Match the case and payment references. Record the reason, current stage, response deadline with its time zone, and the action requested."
+            "text": "Match the case to its payment. Record the reason, stage, deadline and time zone, and the action requested."
           },
           {
             "title": "Review the purchase and prior credits",
-            "text": "Check the order, fulfillment or access records, customer communication and refunds already issued. Decide how to respond under the case instructions."
+            "text": "Check the order, delivery or access records, customer communications and earlier refunds. Respond according to the case instructions."
           },
           {
             "title": "Submit the relevant response",
-            "text": "Provide evidence that addresses the stated reason in the required format. Confirm the response was submitted and retain its acknowledgment; an uploaded or saved file is not proof of submission."
+            "text": "Address the stated reason in the required format. Confirm submission and retain its acknowledgment; an uploaded or saved file is not proof of submission."
           },
           {
             "title": "Follow the case to its outcome",
-            "text": "Track further requests, the decision and related account adjustments. Keep later credits or debits connected to the case and their reporting period."
+            "text": "Track further requests, the decision and each account adjustment. Keep later debits and credits connected to the case and reporting period."
           }
         ],
         "note": {
@@ -1070,7 +1001,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "payouts": {
-    "introduction": "Match each payout to its bank deposit. The funding report explains the included payments and adjustments; the bank record confirms the amount received.",
+    "introduction": "Match the payments and adjustments in a funding report to the amount received in your bank account.",
     "prerequisites": [
       "Merchant transaction and funding report access",
       "The account’s payout terms, cutoff and reporting time zone",
@@ -1081,7 +1012,11 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "payment-to-deposit",
         "title": "Follow the payment to bank deposit",
         "flow": "payouts",
-        "rows": [
+        "note": {
+          "title": "Funding submission is not bank receipt",
+          "text": "Submission for funding is not confirmation of bank receipt. Check the funding result and the receiving bank’s record before marking reconciliation complete."
+        },
+        "steps": [
           {
             "title": "Capture",
             "text": "Keep the accepted capture or sale reference with the original order. Authorization alone is not an amount received by the business."
@@ -1098,11 +1033,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             "title": "Bank deposit",
             "text": "Match the final funding amount, currency and reference to the bank’s posted entry. Keep any unmatched difference open for investigation."
           }
-        ],
-        "note": {
-          "title": "Funding submission is not bank receipt",
-          "text": "Submission for funding is not confirmation of bank receipt. Check the funding result and the receiving bank’s record before marking reconciliation complete."
-        }
+        ]
       },
       {
         "id": "reconcile",
@@ -1123,21 +1054,6 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
           {
             "title": "Match the bank entry",
             "text": "Compare the reported funding amount with the posted bank credit and reference. Record the match, or retain the difference with an investigation owner."
-          }
-        ],
-        "outcome": "Each difference has an activity or adjustment reference. Reconciliation is complete only when the corresponding bank entry is matched.",
-        "rows": [
-          {
-            "title": "Included activity",
-            "text": "Start with the payments included in the funding report for that deposit."
-          },
-          {
-            "title": "Net deductions and credits",
-            "text": "Apply the report’s signed fees, refunds, dispute adjustments, reserve movements and credits once. Keep separately billed charges outside the deposit calculation."
-          },
-          {
-            "title": "Bank match",
-            "text": "Compare the calculated report total with the bank entry and investigate any difference."
           }
         ]
       },
@@ -1223,8 +1139,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "funding-instructions",
         "title": "For integrations: funding instructions",
         "paragraphs": [
-          "Where funding instructions are permitted for an account, track the submitted instruction separately from its later result. Reporting access alone does not grant permission to create or repeat an instruction.",
-          "If your integration needs funding instructions, request the permitted operations, submission instructions and recovery procedure from our integration team before implementing them."
+          "Only submit funding instructions when your account permits it. Reporting access does not grant this permission. Request the supported operations and recovery procedure from our integration team; track each instruction separately from its funding result."
         ],
         "table": {
           "caption": "Keep instruction and result separate",
@@ -1255,7 +1170,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "webhooks": {
-    "introduction": "Connect account, payment and payout notifications to the right records. Verify each delivery, retain what you need to resume processing and apply each update once.",
+    "introduction": "Verify incoming notifications, apply each change once and recover updates that arrive late or go missing.",
     "prerequisites": [
       "Enabled event subscriptions for each required service",
       "The event format, verification requirements and delivery rules for your connection",
@@ -1267,7 +1182,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "event-domains",
         "title": "Confirm the available event types",
         "paragraphs": [
-          "Account, payment and funding updates describe different records. Confirm which notifications are available for your connection and keep their definitions separate. Do not apply one event family’s status values or verification scheme to another."
+          "Account, payment and funding events describe different records. Confirm the available notifications and their definitions for your connection."
         ],
         "table": {
           "caption": "Events and their records",
@@ -1293,7 +1208,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         },
         "note": {
           "title": "Event delivery instructions",
-          "text": "Ask our integration team for the available event types, payload definitions, account scope, authentication and any encryption requirements, acknowledgment rules, retry policy and setup instructions."
+          "text": "Ask our integration team for event types and field names, account scope, status definitions, verification or encryption requirements, acknowledgment rules, retries, replay behavior and setup instructions."
         }
       },
       {
@@ -1338,7 +1253,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "payment-event",
         "title": "Match the event to its record",
         "paragraphs": [
-          "Keep the delivery record separate from the account, payment or payout it describes. One subscription can carry updates for many records, and one record can receive several legitimate updates."
+          "A subscription can carry many payments; a payment can receive several legitimate updates. Keep delivery identifiers separate from the business record and its state change."
         ],
         "table": {
           "caption": "Delivery and record references",
@@ -1368,10 +1283,6 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
               "The change your application may apply once, tied to the correct merchant, payment or operation and status."
             ]
           ]
-        },
-        "note": {
-          "title": "Use the event field definitions for your account",
-          "text": "Request the actual field names, event identifiers, versioned status definitions and replay behavior from our integration team. Do not infer a payment identity from a delivery or subscription identifier."
         }
       },
       {
@@ -1381,33 +1292,19 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "steps": [
           {
             "title": "Verify the event and account",
-            "text": "Validate the notification using its documentation and check the environment and merchant account. Do not use unsupported or uncertain data to change an order or account automatically."
+            "text": "Verify the notification using the assigned instructions, then check its environment and merchant. Unverified or mismatched data must not change business records."
           },
           {
             "title": "Save work before acknowledging receipt",
-            "text": "Durably record the receipt and the work needed to resume processing. Store only the necessary payload data with appropriate access and retention controls. Return the required acknowledgment after durable acceptance, within the subscription’s response window."
+            "text": "Durably record the receipt and work needed to resume processing, with appropriate access and retention controls. Acknowledge durable acceptance within the subscription’s response window."
           },
           {
             "title": "Apply the update once",
-            "text": "Prevent duplicate deliveries from repeating fulfillment or a financial action. Use an atomic update with an identity that covers the environment, merchant, payment or operation, and state change. A transaction ID alone can include several legitimate updates."
+            "text": "Prevent duplicate deliveries from repeating fulfillment or a financial action. Apply an atomic update identified by environment, merchant, payment or operation, and state change. A transaction ID alone may cover several legitimate updates."
           },
           {
             "title": "Resolve delayed or conflicting updates",
-            "text": "Check the current record before applying a delayed or conflicting event. Use the authorized lookup when necessary. A later arrival or a larger timestamp alone must not overwrite a confirmed outcome."
-          }
-        ],
-        "details": [
-          {
-            "title": "A retry has a different trace ID",
-            "text": "Keep both delivery attempts for diagnostics, then match them to the same order or account update. If the update was already applied, acknowledge the delivery according to its documentation without repeating the action."
-          },
-          {
-            "title": "Two payments share a subscription",
-            "text": "Keep both transactions. Deduplicating only by subscription identity would discard legitimate payments."
-          },
-          {
-            "title": "The worker stops after acknowledgment",
-            "text": "Resume from the saved receipt and processing state. Apply the update atomically so a worker restart cannot repeat the action."
+            "text": "Resolve delayed or conflicting updates against the current authoritative record. Arrival order or a larger timestamp alone must not overwrite a confirmed outcome."
           }
         ],
         "outcome": "Acknowledgment confirms receipt of the notification. Payment completion is established separately by the verified payment record."
@@ -1416,7 +1313,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "funding-events",
         "title": "Match funding updates to deposit records",
         "paragraphs": [
-          "Funding notifications do not use the checkout payment status model. A funding instruction, a batch and an individual merchant deposit are different records. Read each result in its own account scope."
+          "Use the assigned funding definitions, not checkout status labels. An instruction, batch and merchant deposit each has its own result and account scope."
         ],
         "table": {
           "caption": "Funding records and interpretation",
@@ -1438,17 +1335,13 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
               "Match the deposit to its merchant and report, then reconcile the receiving bank entry."
             ]
           ]
-        },
-        "note": {
-          "title": "Request funding event definitions",
-          "text": "Use the field mapping and status definitions assigned to your account. Ask our integration team for the documentation for funding events and the supported reconciliation procedure."
         }
       },
       {
         "id": "recovery-cases",
         "title": "Recover missing events and delivery failures",
         "paragraphs": [
-          "Record the retry policy and subscription health checks assigned to your connection. Do not assume a universal retry interval or that delivery will continue indefinitely. Reconcile against authoritative records when notifications stop or a result remains uncertain."
+          "Follow the assigned retry policy and subscription health checks. Delivery may stop; recover missing or uncertain activity against authoritative account and payment records."
         ],
         "table": {
           "caption": "Event delivery and recovery",
@@ -1463,7 +1356,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             ],
             [
               "Same payment, new retry trace",
-              "Retain the receipts needed for investigation; apply the order or account update only once."
+              "A retry can have a different trace ID. Keep the receipts for diagnostics, match the same business update and acknowledge as specified without repeating the action."
             ],
             [
               "Two payments, one subscription",
@@ -1479,7 +1372,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             ],
             [
               "Worker interruption",
-              "After receipt is acknowledged, stored work resumes without repeating fulfillment or a financial operation."
+              "Resume stored work after acknowledgment. Apply changes atomically so a worker restart cannot repeat fulfillment or a financial action."
             ],
             [
               "Delivery stops",
@@ -1498,7 +1391,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "testing-and-launch": {
-    "introduction": "Arrange sandbox access, connect the payment journey and prepare the account for launch. Our integration team provides the setup requirements and confirms the steps needed before live processing.",
+    "introduction": "Confirm the payment journey in sandbox, review the integration and prepare the production account for launch.",
     "prerequisites": [
       "The connection settings and services you plan to use",
       "Sandbox accounts, credentials and data supplied by our integration team",
@@ -1521,7 +1414,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         "id": "acceptance-tests",
         "title": "Confirm payment behavior",
         "paragraphs": [
-          "For each enabled payment method, follow the customer journey and compare the displayed result with the account or payment record. Retain the relevant references so your team can trace any difference."
+          "For each enabled method, compare the customer’s result with the payment record. Record the configuration, expected and observed result, references, reviewer and unresolved issues. Remove sensitive details from retained diagnostics."
         ],
         "table": {
           "caption": "Payment checks",
@@ -1568,27 +1461,13 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             ]
           ],
           "codeColumn": false
-        },
-        "rows": [
-          {
-            "title": "Setup",
-            "text": "The check, account, environment and configuration used."
-          },
-          {
-            "title": "Result",
-            "text": "The expected result, what happened and the relevant records with sensitive details removed."
-          },
-          {
-            "title": "Review",
-            "text": "Whether the result matches the expected behavior, who reviewed it and any issue still needing resolution."
-          }
-        ]
+        }
       },
       {
         "id": "customer-journey",
         "title": "Run the journey as a customer",
         "paragraphs": [
-          "Follow an order from sandbox checkout to its payment and account records. Confirm that the customer and your operations team can understand the result and find the next action."
+          "Follow the same order through checkout, operations and funding. The customer and your team should be able to identify its current state and next action."
         ],
         "steps": [
           {
@@ -1613,15 +1492,13 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             "title": "When the interface and records disagree",
             "text": "Record the customer message, payment state and relevant references. Resolve the discrepancy before confirming that the checkout setup is ready."
           }
-        ],
-        "outcome": "The customer, support team and finance team can follow the same transaction without confusing submission, authorization, capture or bank receipt."
+        ]
       },
       {
         "id": "technical-review",
         "title": "Complete the integration review",
         "paragraphs": [
-          "Work with our integration team to confirm account setup, checkout, payment events and reporting, including recovery from interrupted payments.",
-          "Record any required certification and the configuration it covers. Fix problems and repeat the affected checks. Keep a payment method or connection disabled until its own checks are complete."
+          "Review account setup, checkout, events, reporting and recovery with our integration team. Record required certification and its configuration. Resolve issues and repeat the affected checks before enabling that method or connection."
         ],
         "table": {
           "caption": "Launch readiness",
@@ -1680,14 +1557,13 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             "title": "What to monitor first",
             "text": "Watch unresolved attempts, verification failures, receiver and worker failures, delayed reports and unexplained reconciliation differences. Follow the agreed alert thresholds and contact the person responsible for each issue."
           }
-        ],
-        "outcome": "Launch only the services confirmed by the live checks, with the support team ready to handle ongoing payment activity."
+        ]
       },
       {
         "id": "ongoing-support",
         "title": "Support the service after launch",
         "paragraphs": [
-          "Keep the integration documentation, configuration, launch approval and support contacts together. Review the affected payment flow with our integration team before changing a connection or adding a payment method."
+          "Keep the documentation version, configuration, launch approval and support contacts together. Review the affected flow before changing a connection or adding a payment method."
         ],
         "rows": [
           {

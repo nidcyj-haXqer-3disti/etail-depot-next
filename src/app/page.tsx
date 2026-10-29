@@ -25,11 +25,35 @@ export default function HomePage() {
     <PublicPageStructuredData path="/" />
     <div className="consumer-page consumer-home service-home">
       <ConsumerHero service="payments" productLabel={null}
-        title={<>Payment processing.<br /><span>Built around business.</span></>}
-        description="Merchant services for online businesses and the software platforms that serve them. Connect account setup, checkout and payouts."
+        title={<>Payment processing.<br /><span>For business and<br />software platforms.</span></>}
+        description="Merchant services for online businesses. Payment integration for the software platforms that serve them."
         actions={<><Link href="/payment-acceptance-service" className="button primary">Merchant services<Icon name="arrow" /></Link><Link href="/software-partners" className="consumer-text-link">For software platforms<Icon name="arrow" /></Link></>}
         visual={<HomeBrandArt />}
       />
+
+      <section className="home-use-cases" aria-labelledby="use-cases-title">
+        <div className="page-container">
+          <p className="eyebrow" id="use-cases-title">Use cases</p>
+          <div className="home-audiences">
+            <article aria-labelledby="online-businesses-title">
+              <div className="home-audience-heading">
+                <span className="home-audience-symbol" aria-hidden="true"><Icon name="business" /></span>
+                <h2 id="online-businesses-title">Online businesses</h2>
+              </div>
+              <p>Accept card and ACH payments online, then follow each payment through to your bank deposit.</p>
+              <Link href="/online-businesses" className="consumer-text-link">Explore online businesses<Icon name="arrow" /></Link>
+            </article>
+            <article aria-labelledby="software-partners-title">
+              <div className="home-audience-heading">
+                <span className="home-audience-symbol" aria-hidden="true"><Icon name="layers" /></span>
+                <h2 id="software-partners-title">Software platforms</h2>
+              </div>
+              <p>Connect merchant onboarding, checkout and payment records to the software your customers already use.</p>
+              <Link href="/software-partners" className="consumer-text-link">Explore software platforms<Icon name="arrow" /></Link>
+            </article>
+          </div>
+        </div>
+      </section>
 
       <section className="page-container service-home-lifecycle" id="payment-channels" aria-labelledby="service-lifecycle-title">
         <div className="service-home-section-intro">
@@ -56,29 +80,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="home-use-cases" aria-labelledby="use-cases-title">
-        <div className="page-container">
-          <div className="home-section-heading">
-            <p className="eyebrow">Use cases</p>
-            <h2 id="use-cases-title">For your business.<br /><span>For your platform.</span></h2>
-          </div>
-          <div className="home-audiences">
-            <article aria-labelledby="online-businesses-title">
-              <div className="home-audience-symbol" aria-hidden="true"><Icon name="business" /></div>
-              <h3 id="online-businesses-title">Online businesses</h3>
-              <p>Connect the customer’s purchase to checkout, a payment record and your bank deposit.</p>
-              <Link href="/online-businesses" className="consumer-text-link">Explore online payments<Icon name="arrow" /></Link>
-            </article>
-            <article aria-labelledby="software-partners-title">
-              <div className="home-audience-symbol" aria-hidden="true"><Icon name="layers" /></div>
-              <h3 id="software-partners-title">Software platforms</h3>
-              <p>Bring merchant onboarding, checkout and payment records into the software your merchants use. Plan the connection and responsibilities with our team.</p>
-              <Link href="/software-partners" className="consumer-text-link">Explore platform payments<Icon name="arrow" /></Link>
-            </article>
-          </div>
-        </div>
-      </section>
-
       <section className="home-resources page-container" aria-labelledby="resources-title">
         <div className="home-section-heading">
           <p className="eyebrow">Documentation and Guides</p>
@@ -88,7 +89,7 @@ export default function HomePage() {
           <article aria-labelledby="home-docs-title">
             <p className="home-resource-label">Documentation</p>
             <h3 id="home-docs-title">Set up your connection.</h3>
-            <p>Follow account setup, checkout integration and payment operations. Understand the access, records and checks your connection needs.</p>
+            <p>Set up merchant accounts, connect checkout and follow payment activity through refunds, disputes and payouts.</p>
             <ul className="home-resource-outline" aria-label="Documentation topics">
               <li><span aria-hidden="true">01</span>Account setup</li>
               <li><span aria-hidden="true">02</span>Checkout and payment status</li>
@@ -99,7 +100,7 @@ export default function HomePage() {
           <article aria-labelledby="home-guides-title">
             <p className="home-resource-label">Guides</p>
             <h3 id="home-guides-title">Understand payment codes.</h3>
-            <p>Look up payment codes and message types, with published definitions, source releases and context for each edition.</p>
+            <p>Find ISO 20022 code definitions and independent ISO 8583 explanations, with source and edition details.</p>
             <dl className="home-reference-outline">
               <>
                 <div><dt>ISO 20022</dt><dd>External code sets and definitions</dd></div>

@@ -28,8 +28,8 @@ export default function PaymentServicesPage() {
         { href: "#payment-questions-title", label: "Questions" },
       ]} />
       <ConsumerHero product service="payments" productLabel="Merchant services"
-        title={<>Online payments.<br /><span>From checkout to payout.</span></>}
-        description="Accept online card and ACH payments for your US business. Manage transactions, refunds and disputes, and match payouts to your bank statement."
+        title={<>Credit card processing.<br /><span>From checkout to payout.</span></>}
+        description="Accept online card and ACH payments for your US business. Review transactions, handle refunds and disputes, and reconcile your bank deposits."
         actions={<PaymentPortalLink>Apply for a merchant account</PaymentPortalLink>}
         note={<p className="payment-hero-price"><strong>{productFacts.payments.cardRateLabel}</strong> per successful domestic online card payment.<br />No monthly fee. ACH pricing is separate.<span className="payment-hero-handoff">Applications open at Trolleys, an Etail Depot service. Account approval and setup apply.</span></p>}
         visual={<MerchantCheckoutArt />}
@@ -46,7 +46,7 @@ export default function PaymentServicesPage() {
           <div className="page-container">
             <div className="consumer-section-heading">
               <h2 id="payment-operations-title">From payment<br /><span>to bank deposit.</span></h2>
-              <p>Follow each payment through processing, account for fees and adjustments, then match the payout to your bank statement.</p>
+              <p>Keep the original payment, any adjustments and the bank deposit connected.</p>
             </div>
             <div className="bp-operations-layout">
               <ol className="payment-operations-grid payment-funding-steps" aria-label="From payment to bank deposit" role="list">
@@ -63,13 +63,13 @@ export default function PaymentServicesPage() {
                 <li className="payment-operation">
                   <div className="payment-operation-heading"><span className="payment-step-number" aria-hidden="true">2</span><h3>Settlement</h3></div>
                   <div className="payment-operation-content">
-                    <p>Track the payment through settlement. Settlement and arrival in your bank account are separate.</p>
+                    <p>Track settlement separately from the payout. A settled payment is not confirmation of a deposit in your bank account.</p>
                   </div>
                 </li>
                 <li className="payment-operation">
                   <div className="payment-operation-heading"><span className="payment-step-number" aria-hidden="true">3</span><h3>Payout calculation</h3></div>
                   <div className="payment-operation-content">
-                    <p>See how settled payments, applicable fees, refunds and chargeback adjustments determine the payout amount. A payout may combine several payments.</p>
+                    <p>Review the settled payments, fees, refunds and chargeback adjustments included in the payout. One payout may combine several payments.</p>
                   </div>
                 </li>
                 <li className="payment-operation payment-to-bank" id="payouts" aria-labelledby="payment-to-bank-title">

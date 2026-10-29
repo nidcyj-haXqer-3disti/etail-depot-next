@@ -36,7 +36,7 @@ test("Home gives merchants and software partners distinct next steps", async ({ 
 
   await merchants.click();
   await expect(page).toHaveURL(/\/payment-acceptance-service$/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Online payments.");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Credit card processing.");
   await page.goBack();
   await partners.click();
   await expect(page).toHaveURL(/\/software-partners$/);
@@ -197,9 +197,9 @@ test("software partner preview stays out of indexing and offers contact rather t
   const contact = page.locator("#partner-contact").getByRole("link", { name: "Email our payments team", exact: true });
   await expect(contact).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Software%20payment%20partnership");
   await expect(page.locator("main form")).toHaveCount(0);
-  await expect(page.locator("main")).toContainText("Each business needs its own account review.");
-  await expect(page.locator("main")).toContainText("Each merchant needs an approved account before accepting payments.");
-  await expect(page.locator("main")).toContainText("A software connection does not waive merchant approval or grant unrestricted account access.");
+  await expect(page.locator("main")).toContainText("Business activity and payment flow are reviewed for each merchant.");
+  await expect(page.locator("main")).toContainText("Each merchant needs approval before accepting payments.");
+  await expect(page.locator("main")).toContainText("Each merchant and payment flow needs approval before integration.");
   const sitemap = await page.request.get("/sitemap.xml");
   expect(sitemap.ok()).toBeTruthy();
   expect(await sitemap.text()).not.toContain("/software-partners");
@@ -245,7 +245,7 @@ test("service content and all payment records remain readable without JavaScript
     await expect(explorer.getByRole("tablist", { name: "Payment journey views", exact: true, includeHidden: true })).toBeHidden();
     await expect(explorer.getByRole("tablist", { name: "Checkout payment method", exact: true, includeHidden: true })).toBeHidden();
     await expect(explorer.locator(".pse-panel")).toHaveCount(4);
-    for (const name of ["Set up your merchant account.", "Let customers choose how to pay.", "Match the card payment to the order.", "Reconcile the card payout to your bank."]) {
+    for (const name of ["Set up your merchant account.", "Let customers choose how to pay.", "Match the card payment to the order.", "Reconcile your card payout."]) {
       await expect(explorer.getByRole("heading", { name, exact: true })).toBeVisible();
     }
     await expect(explorer).toContainText("$96.80");

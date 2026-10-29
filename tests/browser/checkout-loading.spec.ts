@@ -87,7 +87,7 @@ for (const width of [320, 390, 1440]) {
       await page.goto("/online-businesses");
       const explorer = page.locator(".payment-service-explorer");
       await expect(explorer.getByRole("tablist", { name: "Payment journey views", includeHidden: true })).toBeHidden();
-      for (const title of ["Set up your merchant account.", "Let customers choose how to pay.", "Match the card payment to the order.", "Reconcile the card payout to your bank."]) {
+      for (const title of ["Set up your merchant account.", "Let customers choose how to pay.", "Match the card payment to the order.", "Reconcile your card payout."]) {
         await expect(explorer.getByRole("heading", { name: title, exact: true })).toBeVisible();
       }
       const track = explorer.getByRole("group", { name: "Checkout artwork", exact: true });

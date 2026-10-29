@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import {expect,test,type Page} from "@playwright/test";
 import {openMainNavigation} from "./public-header";
 
-const publicRoutes = ["/", "/docs", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch", "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
+const publicRoutes = [ "/", "/docs", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch", "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
 
 for (const width of [1440,390,320]) {
   for(const route of publicRoutes) {
@@ -329,8 +329,11 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page.getByRole("group", {name: "Refunds and disputes", exact: true})).toContainText("Manage a refund");
       expect(await page.locator(".pla-record-method").ariaSnapshot()).toContain("Card ending in 4242");
       await page.goto(`${baseURL}/software-partners`);
-      await expect(page.getByRole("group", {name: "A clear division of responsibilities.", exact: true})).toContainText("Your software");
-      expect(await page.locator(".platform-checkout-method").ariaSnapshot()).toContain("Card ending in 4242");
+      await expect(page.locator("#integration")).toContainText("Account structure");
+      const platformArt = page.locator(".platform-payment-art");
+      await expect(platformArt.getByRole("img")).toHaveAccessibleName(/Freight invoice INV 08421.*reconciliation/);
+      await expect(platformArt.getByRole("heading")).toHaveCount(0);
+      if (javaScriptEnabled) await expectAccessible(page);
     } finally {
       await context.close();
     }
