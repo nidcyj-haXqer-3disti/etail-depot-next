@@ -1,0 +1,77 @@
+.commercial-page { --commercial-line:#cbd8cc }
+.commercial-hero { background:#f6f7f2;padding-block:58px 38px }
+.commercial-hero-copy { display:grid;grid-template-columns:1.3fr 1fr;gap:80px;align-items:end;padding-bottom:36px }
+.commercial-page .eyebrow { color:#365e48;margin-bottom:20px }
+.commercial-page h1 { font-size:clamp(42px,4.4vw,62px);max-width:19ch;line-height:1.07;letter-spacing:-.05em }
+.commercial-lead { font-size:18px;line-height:1.7;max-width:45ch }
+.commercial-action { margin-top:24px;display:flex;align-items:center;flex-wrap:wrap;gap:16px 24px }
+.commercial-page .commercial-note { font-size:12px;line-height:1.6;margin-top:16px;max-width:52ch }
+.commercial-diagram { padding:24px;background:#e4eee5;border:1px solid var(--commercial-line);border-radius:12px }
+.commercial-diagram-title { display:flex;align-items:center;gap:12px;margin-bottom:25px;font-size:14px;line-height:1.5 }
+.commercial-diagram-title strong { font-weight:500 }
+.commercial-diagram-mark { display:grid;place-items:center;background:#193c33;color:#fff;border-radius:7px;width:32px;height:32px;flex-shrink:0 }
+.commercial-diagram-nodes { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;position:relative }
+.commercial-diagram-nodes.count-4 { grid-template-columns:repeat(4,minmax(0,1fr)) }
+.commercial-diagram-node { background:#fff;border:1px solid #cedbd0;border-radius:8px;position:relative;padding:25px 22px;min-width:0;box-shadow:0 8px 15px -16px #193c3360 }
+.commercial-node-icon { display:block;margin-bottom:22px;color:#38634d }
+.commercial-node-icon .icon { width:25px;height:25px }
+.commercial-node-position { position:absolute;right:22px;top:26px;font-size:12px;font-variant-numeric:tabular-nums;color:#526a5b }
+.commercial-page .commercial-diagram-node h2 { font-size:23px;line-height:1.2;letter-spacing:-.03em }
+.commercial-page .commercial-diagram-node p { font-size:13px;line-height:1.65;margin-top:10px;max-width:30ch }
+.commercial-page .commercial-diagram figcaption { font-size:12px;line-height:1.7;color:#4a6257;margin-top:19px;max-width:100ch }
+.is-sequence .commercial-diagram-node:not(:last-child)::after { content:'→';position:absolute;right:-19px;top:50%;color:#42654f;font-size:17px;z-index:1 }
+.is-branch .commercial-diagram-nodes { grid-template-columns:1fr 1.5fr;grid-template-rows:1fr 1fr;gap:14px 46px;align-items:stretch }
+.is-branch .commercial-diagram-node:first-child { grid-row:1 / 3;display:flex;flex-direction:column;justify-content:center }
+.is-branch .commercial-diagram-node:nth-child(n+2) { display:grid;grid-template-columns:35px 1fr;column-gap:16px;padding-block:20px }
+.is-branch .commercial-diagram-node:nth-child(n+2) .commercial-node-icon { grid-row:1 / 3;margin:0;align-self:center }
+.is-branch .commercial-diagram-node:nth-child(n+2) p { max-width:none;margin-top:6px }
+.is-branch .commercial-diagram-node:first-child::after { content:'';position:absolute;left:100%;width:23px;height:1px;background:#739480 }
+.is-branch .commercial-diagram-node:nth-child(n+2)::before { content:'';position:absolute;right:100%;width:25px;top:50%;height:calc(50% + 9px);border-left:1px solid #739480;border-top:1px solid #739480 }
+.is-branch .commercial-diagram-node:last-child::before { top:auto;bottom:50%;border-top:0;border-bottom:1px solid #739480 }
+.commercial-section-grid { display:grid;grid-template-columns:1fr 1.15fr;gap:100px;padding-block:65px }
+.commercial-section-tint { background:#f2f6ef;border-block:1px solid #e0e7db }
+.commercial-page .commercial-section h2 { font-size:38px;line-height:1.14;max-width:19ch }
+.commercial-section-grid>div>p { margin-top:22px;max-width:43ch;font-size:16px;line-height:1.75 }
+.commercial-details>div+div { border-top:1px solid #d4dfd1;margin-top:23px;padding-top:23px }
+.commercial-details dt { color:#193c33;font-size:20px;line-height:1.3;letter-spacing:-.025em }
+.commercial-details dd { margin-top:10px;font-size:15px;line-height:1.75;color:#4a6257 }
+
+.commercial-page .text-link:hover { text-decoration:none }
+.commercial-methods { padding-block:30px;border-bottom:1px solid #e0e7db }
+.commercial-source { padding-block:28px;font-size:13px;line-height:1.75;border-bottom:1px solid #e0e7db }
+.commercial-source a { text-decoration:underline;text-underline-offset:3px }
+.commercial-offices { padding-block:45px;border-bottom:1px solid #e0e7db;display:grid;grid-template-columns:1fr 1.15fr;gap:100px }
+.commercial-page .commercial-offices h2 { font-size:32px;line-height:1.2 }
+.commercial-offices>div { display:grid;grid-template-columns:1fr 1fr;gap:30px }
+.commercial-offices address { font-style:normal;font-size:14px }
+.commercial-page .commercial-offices h3 { font-size:19px;margin-bottom:14px }
+.commercial-offices .text-link { margin-top:7px }
+.commercial-contacts { padding-block:45px }
+.commercial-page .commercial-contacts h2 { font-size:31px;margin-bottom:30px }
+.commercial-contact-list article { display:flex;gap:50px;align-items:center;justify-content:space-between;border-top:1px solid #d7e0d9;padding-block:28px;scroll-margin-top:30px }
+.commercial-contact-list article>div { max-width:650px }
+.commercial-page .commercial-contact-list h3 { font-size:23px;line-height:1.3 }
+.commercial-page .commercial-contact-list p { font-size:15px;line-height:1.75;margin-top:10px;max-width:66ch }
+.commercial-contact-list article>a { max-width:32%;flex-shrink:0;line-height:1.5 }
+.commercial-contact-list .commercial-contact-action { display:flex;flex-direction:column;align-items:flex-start;gap:8px;width:32%;flex-shrink:0;line-height:1.5 }
+.commercial-contact-email { color:#4a6257;font-size:14px;overflow-wrap:anywhere;user-select:text }
+.merchant-fee-overview { display:grid;grid-template-columns:1fr 1.15fr;gap:80px;padding-block:50px }
+.merchant-fee-overview .payment-base-rate { color:#193c33;font-size:42px;line-height:1.2;margin-bottom:15px }
+.merchant-fee-overview .text-link { margin-top:16px }
+.merchant-fee-overview .fee-summary-detail { font-size:13px;margin-top:12px }
+.merchant-related { display:flex;gap:24px;flex-wrap:wrap;padding-top:20px }
+@media(max-width:1000px){
+  .commercial-hero-copy { gap:40px;grid-template-columns:1.15fr 1fr }.commercial-page h1 { font-size:48px }.commercial-lead { font-size:16px }
+  .commercial-diagram-nodes { gap:16px }.commercial-diagram-node { padding:21px 18px }.commercial-diagram-nodes.count-4 .commercial-diagram-node { padding-inline:14px }.commercial-page .count-4 .commercial-diagram-node h2 { font-size:21px }.commercial-node-position { top:22px;right:18px }.is-sequence .commercial-diagram-node:not(:last-child)::after { right:-14px;font-size:15px }
+  .commercial-section-grid,.commercial-offices { gap:50px }.commercial-page .commercial-section h2 { font-size:34px }.commercial-details dd { font-size:14px }
+}
+@media(max-width:760px){
+  .commercial-page .container { padding-inline:var(--public-gutter) }.commercial-hero { padding-block:35px 24px }.commercial-hero-copy { grid-template-columns:1fr;gap:22px;padding-bottom:27px }.commercial-page h1 { font-size:clamp(37px,7.5vw,50px);max-width:21ch }.commercial-lead { max-width:50ch }.commercial-action { margin-top:20px }.commercial-page .eyebrow { font-size:11px;margin-bottom:17px }
+  .commercial-diagram { padding:20px 17px }.commercial-diagram-title { margin-bottom:20px;font-size:13px }.commercial-diagram-nodes,.commercial-diagram-nodes.count-4 { grid-template-columns:1fr;gap:18px }.commercial-diagram-node { display:grid;grid-template-columns:28px 1fr;gap:7px 16px;padding:20px 17px }.commercial-node-icon { grid-row:1 / 3;margin:0;align-self:center }.commercial-page .commercial-diagram-node h2 { font-size:21px }.commercial-page .commercial-diagram-node p { margin:0;max-width:none;grid-column:2 }.commercial-node-position { display:none }.is-sequence .commercial-diagram-node:not(:last-child)::after,.is-sequence .count-4 .commercial-diagram-node:nth-child(2)::after { display:block;content:'↓';right:50%;top:100%;font-size:15px;line-height:18px }
+  .is-branch .commercial-diagram-nodes { grid-template-columns:1fr;gap:18px }.is-branch .commercial-diagram-node:first-child { grid-row:auto;display:grid }.is-branch .commercial-diagram-node:nth-child(n+2) { margin-left:20px;grid-template-columns:28px 1fr }.is-branch .commercial-diagram-node:first-child::after { display:none }.is-branch .commercial-diagram-node:nth-child(n+2)::before { top:auto;bottom:50%;height:100%;width:11px;border-top:0;border-bottom:1px solid #739480 }
+  .is-branch .commercial-diagram-node:last-child::before { height:calc(100% + 19px) }
+  .commercial-section-grid { grid-template-columns:1fr;gap:28px;padding-block:42px }.commercial-page .commercial-section h2 { font-size:32px;max-width:23ch }.commercial-section-grid>div>p { margin-top:17px;font-size:15px;max-width:55ch }.commercial-details dt { font-size:19px }.commercial-details dd { font-size:14px }.commercial-details>div+div { margin-top:20px;padding-top:20px }
+  .commercial-offices { grid-template-columns:1fr;gap:25px;padding-block:35px }.commercial-offices>div { grid-template-columns:1fr;gap:25px }.commercial-contact-list article { display:block;padding-block:23px }.commercial-contact-list article>a { max-width:100%;margin-top:15px }.commercial-contacts { padding-block:30px }.commercial-page .commercial-contact-list h3 { font-size:22px }
+  .merchant-fee-overview { grid-template-columns:1fr;gap:25px;padding-block:38px }.merchant-related { gap:10px 23px }
+  .commercial-contact-list .commercial-contact-action { width:auto;max-width:100%;margin-top:15px }
+}

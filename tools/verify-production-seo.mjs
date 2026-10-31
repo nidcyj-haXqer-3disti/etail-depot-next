@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { socialPreviewImage } from "../src/shared/social-preview.ts";
+import { publicPageModified } from "../src/shared/public-page-revisions.ts";
 import { INDEXABLE_PUBLIC_PATHS } from "../src/shared/public-page-inventory.ts";
 import { RETIRED_ARTICLE_PATHS } from "../src/shared/retired-article-paths.ts";
 /** Compile and inspect the approved public search release locally; never publish or contact a provider. */
@@ -25,7 +27,7 @@ const standardPaths = ["/guides/iso-20022", "/guides/iso-8583"];
 const coreSchemaPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides"];
 const publicPaths = INDEXABLE_PUBLIC_PATHS;
 assert.equal(guidePaths.length, 0);
-assert.equal(new Set(publicPaths).size, 3723, "Only the exact reviewed nonlegal pages are eligible for search.");
+assert.equal(new Set(publicPaths).size, 3736, "Only the exact reviewed nonlegal pages are eligible for search.");
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -198,8 +200,8 @@ function checkCrawlablePageGraph(documents) {
   }
   assert.deepEqual([...reached].sort(), [...paths].sort(), "Every sitemap page must be discoverable from Home through initial-HTML links.");
   const guideLinks = graph.get("/guides");
-  for (const route of guidePaths) assert.ok(guideLinks.has(route), `${route}: article is missing from the Guides HTML.`);
-  console.log(`Discovery graph passed: ${reached.size} canonical pages are reachable from Home; all ${guidePaths.length} articles are linked in the Guides HTML.`);
+  for (const route of standardPaths) assert.ok(guideLinks.has(route), `${route}: collection is missing from the Guides HTML.`);
+  console.log(`Discovery graph passed: ${reached.size} canonical pages are reachable from Home; both reference collections are linked in the Guides HTML.`);
 }
 
 async function verifyResponses() {
@@ -223,8 +225,8 @@ async function verifyResponses() {
     const canonicals = metadata.links.filter(link => link.rel === "canonical");
     assert.equal(canonicals.length, 1, `${route}: expected one canonical.`);
     assert.equal(new URL(canonicals[0].href).href, new URL(route, canonicalOrigin).href);
-    assert.deepEqual(metadata.metaValues("property", "og:image"), [`${canonicalOrigin}/opengraph-image`]);
-    assert.deepEqual(metadata.metaValues("name", "twitter:image"), [`${canonicalOrigin}/opengraph-image`]);
+    assert.deepEqual(metadata.metaValues("property", "og:image"), [socialPreviewImage(route, canonicalOrigin).url]);
+    assert.deepEqual(metadata.metaValues("name", "twitter:image"), [socialPreviewImage(route, canonicalOrigin).url]);
     if (coreSchemaPaths.includes(route)) checkSchema(html, route, description[0]);
     else if (route.startsWith("/guides/")) {
       const nodes = schemaNodes(html);
@@ -259,13 +261,31 @@ async function verifyResponses() {
   const sitemapResponse = await localFetch("/sitemap.xml");
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
+  assert.match(sitemapResponse.headers.get("content-type") ?? "", /(?:application|text)\/xml/);
+  assert.ok(Buffer.byteLength(sitemap, "utf8") < 50 * 1024 * 1024, "The sitemap exceeds the uncompressed protocol size limit.");
+
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => decode(match[1]));
   assert.deepEqual(locations.sort(), publicPaths.map(route => new URL(route, canonicalOrigin).href).sort(), "Sitemap must contain exactly the reviewed canonical pages.");
   const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)];
   assert.equal(sitemapEntries.length, publicPaths.length);
+  assert.ok(sitemapEntries.length <= 50000, "The sitemap exceeds the protocol URL limit.");
   for (const [, entry] of sitemapEntries) {
+    const location = decode(entry.match(/<loc>([^<]+)<\/loc>/)?.[1] ?? "");
+    const url = new URL(location);
+    assert.equal(url.origin, canonicalOrigin, "Only the canonical HTTPS origin belongs in the sitemap.");
+    assert.equal(url.search, "", "Sitemap entries must not include query parameters.");
+    assert.equal(url.hash, "", "Sitemap entries must not include page fragments.");
+    assert.match(url.pathname, /^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*)?$/, "Use the exact clean, lowercase URL.");
+
     const dates = [...entry.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map(match => match[1]);
     assert.equal(dates.length, 1, "Each canonical page must have one maintained revision date.");
+    assert.equal(dates[0], publicPageModified(url.pathname), `${url.pathname}: sitemap revision differs from the reviewed register.`);
+    for (const node of schemaNodes(documents.get(url.pathname))) {
+      if (node.url === location && node.dateModified) {
+        assert.equal(node.dateModified, dates[0], `${url.pathname}: structured page date differs from the sitemap.`);
+      }
+    }
+
     assert.match(dates[0], /^\d{4}-\d{2}-\d{2}$/);
     assert.equal(new Date(`${dates[0]}T00:00:00Z`).toISOString().slice(0, 10), dates[0]);
     // Revision dates follow the project’s editorial calendar in Asia/Tokyo.
@@ -331,7 +351,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: 3723 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: 3736 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

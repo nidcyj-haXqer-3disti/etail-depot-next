@@ -24,8 +24,8 @@ test("payment requests explain the acceptance flow without duplicate actions", a
   await page.goto("/online-businesses#payment-channels");
   const initialStorage = await browserStorage(page);
   const channels = page.locator("#payment-channels");
-  await expect(channels.getByRole("heading", { name: /Take the checkout\s*to your customer\./ })).toBeVisible();
-  await expect(channels).toContainText("Share the hosted payment page by email, text, social media, a website button or a QR code.");
+  await expect(channels.getByRole("heading", { name: /Send a payment request\s*when the order is ready\./ })).toBeVisible();
+  await expect(channels).toContainText("For orders placed by phone, email or another channel, share a hosted payment page by email, text, social media, a website button or a QR code.");
   await expect(channels).toContainText("Available options depend on your account setup");
   await expect(channels.getByRole("img", { name: /Payment request flow/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Choose your checkout.", exact: true })).toHaveCount(0);
@@ -48,10 +48,13 @@ test("fee estimates are local and leave payment operations unchanged", async ({ 
   const estimate = page.locator(".fee-estimate");
   const operations = page.locator("#payment-operations");
   const operationsBefore = await operations.textContent();
+  await page.goto("/pricing");
   await expect(page.locator('input[type="checkbox"]')).toHaveCount(0);
   await estimate.getByLabel("Payment amount USD").fill("480");
   await expect(estimate.locator(".fee-net")).toContainText("$465.78");
+  await page.goto("/payment-acceptance-service");
   expect(await operations.textContent()).toBe(operationsBefore);
+  await page.goto("/pricing");
   expect(await browserStorage(page)).toEqual(initialStorage);
   await page.reload();
   await expect(estimate.getByLabel("Payment amount USD")).toHaveValue("100");
@@ -69,15 +72,18 @@ test("merchant operations and payment requests stay readable at narrow widths an
     await page.goto("/payment-acceptance-service");
     for (const spaced of [false, true]) {
       if (spaced) await page.addStyleTag({ content: "body *{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}body p{margin-bottom:2em!important}" });
-      for (const anchor of ["payouts", "refunds-and-disputes", "payment-questions-title"]) {
+      for (const anchor of ["payouts", "refunds-and-disputes", "fees"]) {
         await expect(page.locator(`#${anchor}`)).toBeVisible();
       }
       const geometry = await page.locator("main").evaluate(node => ({
         documentOverflow: document.documentElement.scrollWidth > window.innerWidth,
         containerOverflow: node.scrollWidth > node.clientWidth,
-        contentOverflow: [...node.querySelectorAll("#payment-channels, #payouts, #refunds-and-disputes, .fee-estimate, .payment-faq-content")].some(element => element.scrollWidth > element.clientWidth + 1),
+        contentOverflow: [...node.querySelectorAll("#payment-channels, #payouts, #refunds-and-disputes, .fee-estimate, #fees")].some(element => element.scrollWidth > element.clientWidth + 1),
       }));
-      expect(geometry, `${width}px ${spaced ? "increased spacing" : "normal"}`).toEqual({ documentOverflow: false, containerOverflow: false, contentOverflow: false });
+      const overflow = await page.locator("main").evaluate(node => [...node.querySelectorAll("*")].filter(el => {
+        const r=el.getBoundingClientRect();return r.width>0 && (r.right>innerWidth+1 || r.left < -1);
+      }).map(el => ({tag:el.tagName,class:el.className,text:el.textContent?.slice(0,80)})).slice(0,15));
+      expect(geometry, `${width}px ${spaced ? "increased spacing" : "normal"}: ${JSON.stringify(overflow)}`).toEqual({ documentOverflow: false, containerOverflow: false, contentOverflow: false });
     }
   }
   expect(observed.unexpected).toEqual([]);

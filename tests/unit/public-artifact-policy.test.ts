@@ -4,9 +4,9 @@ import { PUBLIC_CONTENT_PATHS } from "../../src/shared/public-page-inventory";
 
 describe("static public deployment boundary", () => {
   it("allows the reviewed sources and exact helpers without opening arbitrary guide routes", () => {
-    expect(publicPageSources).toHaveLength(25);
+    expect(publicPageSources).toHaveLength(38);
     expect(publicHtmlFiles).toEqual(PUBLIC_CONTENT_PATHS.map(path => path === "/" ? "index.html" : path.slice(1) + ".html"));
-    expect(publicHtmlFiles).toHaveLength(3725);
+    expect(publicHtmlFiles).toHaveLength(3738);
     for (const path of [...publicPageSources, "layout.tsx", "robots.ts", "sitemap.ts"]) expect(reviewedPublicAppModule(path), path).toBe(true);
     for (const path of ["guides/route.ts", "guides/unreviewed/page.tsx", "guides/payment-processing-fees/page.tsx", "guides/[slug]/page.tsx", "guides/[...slug]/page.tsx", "guides/stripe-alternatives/route.ts", "guides/stripe-alternatives/extra.tsx", "guides/stripe-alternatives/checkout/page.tsx", "guides/how-to-create-a-payment-link/route.ts", "guides/how-to-create-a-payment-link/extra.tsx", "guides/how-to-create-a-payment-link/checkout/page.tsx", "help/unreviewed.tsx", "api/route.ts", "login/page.tsx", "guides/booking-system-with-payment/page.tsx", "guides/countertop-payment-terminal/page.tsx", "guides/use-a-cash-register/page.tsx", "guides/charge-cards/unreviewed/page.tsx", "guides/[...browse]/page.tsx", "guides/sections/payment-processing-checkout/page.tsx", "guides/page/2/page.tsx"]) {
       expect(reviewedPublicAppModule(path), path).toBe(false);
@@ -14,7 +14,7 @@ describe("static public deployment boundary", () => {
   });
 
   it("admits only the approved documentation and use case sources and exports", () => {
-    expect(builtPageSources).toHaveLength(25);
+    expect(builtPageSources).toHaveLength(38);
     expect(localPreviewPageSources).toHaveLength(0);
     for (const page of localPreviewPageSources) {
       expect(publicPageSources).not.toContain(page);

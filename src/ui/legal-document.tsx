@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Shell } from "./shell";
 import "./legal-document.css";
+import "./connected-resources.css";
 
 export type LegalSection = {
   id: string;
@@ -20,7 +21,7 @@ type LegalDocumentProps = {
 /** Shared public policy layout; the date identifies the latest content revision. */
 export function LegalDocument({ title, description, updated, currentPage, sections }: LegalDocumentProps) {
   return <Shell>
-    <div className="legal-document">
+    <div className="legal-document cw-legal">
       <div className="legal-document-intro">
         <div className="page-container">
           <nav className="legal-document-navigation" aria-label="Legal documents">

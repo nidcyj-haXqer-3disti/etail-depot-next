@@ -8,8 +8,8 @@ const production = { NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH
 describe("frozen release inventory", () => {
   it("includes exactly the reviewed pages and legal exclusions", () => {
     expect(new Set(STANDARD_REFERENCE_PATHS).size).toBe(3706);
-    expect(new Set(PUBLIC_CONTENT_PATHS).size).toBe(3725);
-    expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3723);
+    expect(new Set(PUBLIC_CONTENT_PATHS).size).toBe(3738);
+    expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3736);
     expect(INDEXABLE_PUBLIC_PATHS).not.toContain("/privacy"); expect(INDEXABLE_PUBLIC_PATHS).not.toContain("/terms");
     for (const path of STANDARD_REFERENCE_PATHS) {
       expect(publicDocumentPath(path)).toBe(path);

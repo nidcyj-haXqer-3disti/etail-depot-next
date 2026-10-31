@@ -5,6 +5,8 @@ import { ReferenceIndex } from "./reference-index";
 import { PaymentStatusContext } from "./iso20022-status-context";
 import "./standards-reference.css";
 import "./iso20022-reference.css";
+import "./enterprise-support.css";
+import "./connected-resources.css";
 
 type Props = { set?: IsoCodeSet; code?: IsoCode };
 function SourceLink({ children }: { children: React.ReactNode }) { return <a href={ISO20022_SOURCE} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">{children} <span aria-hidden="true">↗</span></a>; }
@@ -50,7 +52,7 @@ function SetPage({ set }: { set: IsoCodeSet }) {
 }
 function CodePage({ set, code }: { set: IsoCodeSet; code: IsoCode }) {
   const peers = codePeers(code), index = set.codes.indexOf(code), adjacent = [set.codes[index - 1], set.codes[index + 1]].filter(Boolean);
-  return <><p className="sr-kicker">ISO 20022 · {set.title}</p><h1><span className={`sr-code${code.code.length > 8 ? " iso-code-long" : ""}`}>{code.code}</span>{codeHeading(code)}</h1><div className="sr-meta"><span>Registered in source</span>{code.replaced_by && <span>Replacement listed</span>}<span>Source release: {ISO20022_RELEASE}</span><a href="#reference-source">Source details</a></div><p className="sr-identity"><span>Code set</span><code>{set.collection_id}</code></p><div className="sr-layout"><div className="sr-copy">
+  return <><p className="sr-kicker">ISO 20022 · {set.title}</p><h1><span className={`sr-code${code.code.length > 8 ? " iso-code-long" : ""}`}>{code.code}</span>{" "}{codeHeading(code)}</h1><div className="sr-meta"><span>Registered in source</span>{code.replaced_by && <span>Replacement listed</span>}<span>Source release: {ISO20022_RELEASE}</span><a href="#reference-source">Source details</a></div><p className="sr-identity"><span>Code set</span><code>{set.collection_id}</code></p><div className="sr-layout"><div className="sr-copy">
     <section id="definition" className="iso-definition"><h2>Published definition</h2><p>{code.source_definition}</p></section>
     {code.replaced_by && <section id="source-replacement" className="iso-source-replacement"><h2>Replacement listed in the source</h2><p>The workbook lists <ReplacementValue set={set} code={code} /> as the replacement for <code>{code.code}</code>. It still labels this record <strong>Registered</strong> in this release.</p><p>Read the replacement and usage notes together with the source status. Registration alone does not establish that a code should be used for a new instruction.</p></section>}
     {code.additional_information && <section id="source-notes"><h2>Additional source information</h2><p>{code.additional_information}</p></section>}
@@ -62,5 +64,5 @@ function CodePage({ set, code }: { set: IsoCodeSet; code: IsoCode }) {
   </div><SourceDetails set={set} code={code} /></div></>;
 }
 export function Iso20022Reference({ set, code }: Props) {
-  return <Shell quietAccess><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: isoJsonLd(set, code) }} /><div className="standards-reference iso-reference"><article className="sr-inner page-container" id="reference-top"><Crumbs set={set} code={code} />{set ? code ? <CodePage set={set} code={code} /> : <SetPage set={set} /> : <Library />}</article></div></Shell>;
+  return <Shell><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: isoJsonLd(set, code) }} /><div className="standards-reference cw-reference iso-reference"><article className="sr-inner page-container" id="reference-top"><Crumbs set={set} code={code} />{set ? code ? <CodePage set={set} code={code} /> : <SetPage set={set} /> : <Library />}</article></div></Shell>;
 }

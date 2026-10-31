@@ -4,4 +4,4 @@ Use the pinned runtime and frozen lockfile. `pnpm verify:public` checks source, 
 
 `package:review` and `verify:package:review` prepare a separate local noindex package. None of these commands publishes or submits to a search engine. See docs/NETLIFY_DEPLOYMENT.md for the manual release workflow.
 
-The frozen inventory contains 3,725 pages with 3,723 nonlegal sitemap URLs. New routes require scope review. Reference data and licence changes require updating the reviewed receipt, not bypassing its hash checks. Private research and retired content must never enter the package.
+The frozen inventory contains 3,738 pages with 3,736 nonlegal sitemap URLs. New routes require scope review. Reference data and licence changes require updating the reviewed receipt, not bypassing its hash checks. Private research and retired content must never enter the package.

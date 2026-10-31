@@ -57,11 +57,11 @@ function sourceChecks(filename, source) {
   inspect(tree);
 }
 
-assert.equal(publicPageSources.length, 25, "Only the nineteen core sources and six reference templates are approved.");
+assert.equal(publicPageSources.length, 38, "Only the thirty two core sources and six reference templates are approved.");
 assert.equal(new Set(publicPageSources).size, publicPageSources.length, "Reviewed page paths must be unique.");
-assert.equal(publicHtmlFiles.length, 3725);
+assert.equal(publicHtmlFiles.length, 3738);
 assert.deepEqual(localCorePreviewPageSources, ["software-partners/page.tsx", "docs/page.tsx", "online-businesses/page.tsx", "docs/merchant-onboarding/page.tsx", "docs/integration-access/page.tsx", "docs/checkout/page.tsx", "docs/payment-requests/page.tsx", "docs/payment-status/page.tsx", "docs/refunds-and-disputes/page.tsx", "docs/payouts/page.tsx", "docs/webhooks/page.tsx", "docs/testing-and-launch/page.tsx"], "Only the exact reviewed non-guide local preview pages may be added.");
-assert.equal(builtPageSources.length, 25, "The four industry use cases are sections of Software platforms.");
+assert.equal(builtPageSources.length, 38, "The four industry use cases are sections of Software platforms.");
 assert.equal(localPreviewPageSources.length, 0);
 assert.equal(STANDARD_REFERENCE_PATHS.length, 3706, "Only the exact reviewed ISO reference inventory is included.");
 assert.equal(publicSourcePath(boundarySource), true);

@@ -1,4 +1,5 @@
 export { publicDocumentPath, publicPayloadPath, isIndexablePath } from "./public-page-inventory.ts";
+import { COMMERCIAL_PATHS } from "./commercial-paths.ts";
 import { RETIRED_ARTICLE_PATHS } from "./retired-article-paths.ts";
 
 /** Fixed local destinations for bookmarks from the retired account application. */
@@ -50,6 +51,7 @@ export function managedContentRoute(pathname: string): boolean {
   const normalized = normalizedPreviewPath(pathname);
   if (normalized === null) return false;
   if (/^\/(?:software-partners|docs|online-businesses|use-cases)(?:$|[/.])/.test(normalized)) return true;
+  if (COMMERCIAL_PATHS.some(path => normalized === path || normalized.startsWith(path + "/") || normalized.startsWith(path + "."))) return true;
   if (/^\/guides(?:$|[/.])/.test(normalized)) return true;
   return false;
 }

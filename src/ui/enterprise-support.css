@@ -1,0 +1,198 @@
+/* Supporting pages share the acquisition palette and rhythm, while documentation
+   and reference pages keep their denser reading layouts. */
+.enterprise-support{--ink:var(--public-ink);--body:var(--public-muted);--paper:var(--public-paper);--line:var(--public-line);color:var(--public-ink);font-family:var(--public-font)}
+.enterprise-support :is(h1,h2,h3){font-weight:500;text-wrap:balance}
+.enterprise-support .eyebrow{color:var(--public-accent);font-size:12px;letter-spacing:.07em}
+.enterprise-support.commercial-page .commercial-hero{background:#fff;padding-block:var(--public-hero-space)}
+.enterprise-support.commercial-page h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em;max-width:19ch}
+.enterprise-support.commercial-page .commercial-lead{font-size:17px;line-height:1.7;max-width:47ch}
+.enterprise-support .commercial-hero>.container{gap:var(--public-content-gap)}
+.enterprise-support .commercial-note{font-size:12px;line-height:1.7;max-width:58ch}
+.enterprise-support .commercial-action{gap:12px 24px;flex-wrap:wrap}
+.enterprise-support .cta{border-radius:6px;font-size:14px;min-height:46px}
+.enterprise-support .commercial-diagram{background:#e7ede3;border:1px solid #d4ded0;border-radius:10px;padding:26px}
+.enterprise-support .commercial-diagram-node{background:#fff;border-radius:7px;padding:20px}
+.enterprise-support .commercial-diagram-node h2{font-size:20px}
+.enterprise-support .commercial-diagram-node p{font-size:13px;line-height:1.6}
+.enterprise-support .commercial-diagram-title strong{font-size:14px;font-weight:500}
+.enterprise-support .commercial-diagram figcaption{color:var(--public-muted);font-size:12px;line-height:1.7}
+.enterprise-support .commercial-section-grid{padding-block:var(--public-section-space);gap:var(--public-content-gap);grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr)}
+.enterprise-support .commercial-section h2{font-size:clamp(30px,2.9vw,40px);line-height:1.13;letter-spacing:-.04em;max-width:20ch}
+.enterprise-support .commercial-section-grid>div>p{font-size:16px;line-height:1.75;max-width:43ch;margin-top:20px}
+.enterprise-support .commercial-section-number{display:block;font-size:12px;font-variant-numeric:tabular-nums;color:#536c59;margin-bottom:23px}
+.enterprise-support .commercial-details{padding-top:36px}
+.enterprise-support .commercial-details dt{font-size:20px;letter-spacing:-.02em;font-weight:500}
+.enterprise-support .commercial-details dd{font-size:15px;line-height:1.75;max-width:62ch}
+.enterprise-support .commercial-details>div+div{margin-top:24px;padding-top:24px}
+.enterprise-support .commercial-section-tint{background:var(--public-paper);border-block:1px solid #e2e7df}
+
+.enterprise-support .payment-decision-art{border-radius:10px;box-shadow:none}
+.enterprise-support .commercial-methods{padding-block:32px;border-bottom:1px solid var(--public-line)}
+.enterprise-support .payment-offer-section{padding-block:60px}
+.enterprise-support .pricing-panel{border-radius:10px;border-color:var(--public-line)}
+.enterprise-support .fee-estimate{background:var(--public-paper)}
+/* Company identity is a service relationship, not a fictional dashboard. */
+.enterprise-support .company-context-art{border-radius:10px;padding:28px;background:#e8ede3;border-color:#d2dccf}
+.enterprise-support .company-identity{padding:0;background:transparent;border:0}
+.enterprise-support .company-identity-name{padding:30px 32px;background:#193c33;border-radius:10px;color:#fff;gap:20px}
+.enterprise-support .company-identity-name span{font-size:31px;color:#fff}
+.enterprise-support .company-identity-name strong{color:#d2e0d5;font-size:12px;margin-top:10px}
+.enterprise-support .company-identity-name img{width:62px}
+.enterprise-support .company-identity-connection{height:60px;display:flex;align-items:center;justify-content:center;gap:18px;position:relative;font-size:11px;color:#536c59}
+.enterprise-support .company-identity-connection i{height:100%;width:1px;background:#b6c9b8;order:-1}
+.enterprise-support .company-identity-services{display:grid;grid-template-columns:1fr 1fr;gap:28px;border:1px solid #cfdbce;border-radius:9px;padding:28px;background:#fff}
+.enterprise-support .company-identity-services>div{display:block;padding:0}
+.enterprise-support .company-identity-services>div+div{border:0;border-left:1px solid var(--public-line);padding-left:28px}
+.enterprise-support .company-identity-services .icon{margin:0 0 20px;width:25px;height:25px;color:#46745a}
+.enterprise-support .company-identity-services h2{font-size:20px;line-height:1.25;letter-spacing:-.025em}
+.enterprise-support .company-identity-services p{font-size:13px;line-height:1.65;margin-top:12px}
+.enterprise-support .company-identity figcaption{display:grid;grid-template-columns:100px 1fr;gap:15px;margin-top:20px;padding-top:18px;border-top:1px solid #cdd8c9}
+.enterprise-support .company-identity figcaption>span{font-size:12px;margin:0;line-height:1.65}
+.enterprise-support .company-identity figcaption p{font-size:12px;line-height:1.65;margin:0}
+.enterprise-support .commercial-offices{background:#fff;padding-block:48px;gap:80px;border-top:1px solid var(--public-line)}
+.enterprise-support .commercial-offices h2{font-size:29px;letter-spacing:-.03em}
+.enterprise-support .commercial-offices address{font-size:14px;line-height:1.8}
+.enterprise-support .trust-documents{background:#fff;box-shadow:0 12px 40px #193c3306;padding:30px;border-radius:10px}
+.enterprise-support .trust-documents .context-art-heading{padding-bottom:24px}
+.enterprise-support .trust-documents .context-art-heading h2{font-size:21px}
+.enterprise-support .trust-documents dl>div{grid-template-columns:145px 1fr;gap:22px;padding-block:22px}
+.enterprise-support .trust-documents dt{font-size:14px;font-weight:500}
+.enterprise-support .trust-documents dd{font-size:13px;line-height:1.7}
+.enterprise-support .trust-documents figcaption{font-size:12px}
+/* Contact routes stay explicit, but no longer form an oversized vertical directory. */
+.enterprise-support.company-context-contact .commercial-hero-copy{margin:0}
+.enterprise-support.company-context-contact .commercial-contacts{padding-block:44px 60px}
+.enterprise-support .commercial-contacts>h2{font-size:28px;margin-bottom:28px}
+.enterprise-support .commercial-contact-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px;border-top:1px solid var(--public-line)}
+.enterprise-support .commercial-contact-list article{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:24px;border-top:0;border-bottom:1px solid var(--public-line);padding-block:28px;min-width:0}
+.enterprise-support .commercial-contact-list article h3{font-size:23px;margin:0;line-height:1.25;letter-spacing:-.025em}
+.enterprise-support .commercial-contact-list article p{max-width:53ch;font-size:14px;margin-top:13px;line-height:1.7}
+.enterprise-support .commercial-contact-category{display:block;color:#536c59;font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.enterprise-support .commercial-contact-list .commercial-contact-action{align-items:flex-start;text-align:left;width:100%}
+.enterprise-support .commercial-contact-list article>a{max-width:100%}
+.enterprise-support .commercial-contact-action a{min-height:44px;font-size:14px}
+.enterprise-support .commercial-contact-email{font-size:12px;color:#536c59;overflow-wrap:anywhere}
+/* Remaining service pages retain their working product controls and artwork. */
+.enterprise-support.online-craft .online-business-hero,.enterprise-support.card-craft .consumer-hero{background:#fff}
+.enterprise-support.online-craft .online-business-intro{padding-block:var(--public-hero-space)}
+.enterprise-support.online-craft .online-business-intro h1,.enterprise-support.card-craft.consumer-cards .consumer-hero h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
+.enterprise-support.online-craft .online-business-intro h1 span,.enterprise-support.card-craft .consumer-hero h1 span{color:var(--public-ink)}
+.enterprise-support.card-craft.consumer-cards .consumer-hero-grid{padding-block:var(--public-hero-space)}
+.enterprise-support.card-craft .bp-card-stage{border-radius:20px;background:var(--public-art-surface);box-shadow:none}
+.enterprise-support.card-craft .card-details-section{padding-block:64px}
+.enterprise-support.card-craft .wallet-guide-section{background:var(--public-paper);border-block:1px solid var(--public-line)}
+.enterprise-support .payment-sharing-note{padding-block:72px;border-top:1px solid var(--public-line)}
+/* Reading surfaces use the same palette, with intentionally smaller headings. */
+.documentation-page{--docs-ink:var(--public-ink);--docs-muted:var(--public-muted);--docs-line:var(--public-line);--docs-tint:var(--public-paper);font-family:var(--public-font)}
+.documentation-page .docs-navigation a[aria-current="page"]{background:#edf2e9;box-shadow:inset 2px 0 #19795d}
+.documentation-page .docs-article-heading{padding-bottom:24px;border-bottom:1px solid var(--public-line)}
+.documentation-page .docs-article-heading h1{font-size:var(--public-reading-title-size);letter-spacing:-.04em}
+.documentation-page .docs-hub-heading h1{font-size:var(--public-title-size);letter-spacing:-.045em;line-height:var(--public-title-line)}
+.documentation-page .docs-hub-heading>p{max-width:58ch}
+.documentation-page .docs-task-paths{gap:32px;margin-top:40px}
+.documentation-page .docs-task-path{border:0;border-radius:0;overflow:visible}
+.documentation-page .docs-task-path-heading{background:#eef1e8;border:1px solid #d7e0d9;border-radius:8px;padding:24px;min-height:158px}
+.documentation-page .docs-task-path-heading>.icon{color:#19795d;width:24px;height:24px}
+.documentation-page .docs-task-path-heading h2{font-size:22px;letter-spacing:-.025em}
+.documentation-page .docs-task{padding:24px 6px;min-height:130px;border-bottom:1px solid var(--public-line)}
+.documentation-page .docs-task+.docs-task{border-top:0}
+.documentation-page .docs-task h3{font-size:17px}
+.documentation-page .docs-task p{font-size:14px;line-height:1.7}
+.documentation-page .docs-prerequisites{background:#f6f7f2;border:0;border-left:2px solid #9ab29b;border-radius:0;margin-top:28px}
+.documentation-page .docs-note{border-left-color:#9ab29b}
+.documentation-page .docs-flow{border-radius:8px;background:#eef1e8;box-shadow:none}
+.documentation-page .docs-flow-marker{border-color:#c5d3c6}
+.documentation-page .docs-flow-marker>.icon{color:#376a4f}
+.documentation-page .docs-toc{padding-left:20px;border-left:1px solid var(--public-line)}
+.guides-directory-heading{padding-block:64px 40px}
+.guides-directory-heading h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
+.guides-directory .standards-collections-grid{gap:28px;border:0;border-radius:0;background:transparent;overflow:visible}
+.guides-directory .standards-collections-grid>a{position:relative;border:1px solid #d3ded0;border-radius:10px;padding:30px 34px;overflow:hidden;background:#f1f4eb}
+.guides-directory .standards-collections-grid>a:last-child{background:#f8f9f4}
+.guides-directory .standards-collections-grid>a:hover{border-color:#9db69f;background:#eaf0e3}
+.guides-directory .standards-collection-tag{font-size:11px;letter-spacing:.07em;color:#536c59}
+.guides-directory .standards-collections-grid h2{font-size:42px;font-weight:500;margin-top:36px;letter-spacing:-.045em}
+.guides-directory .standards-collections-grid p{font-size:15px;line-height:1.7;max-width:45ch}
+.guides-directory .standards-collection-path{padding-top:18px;margin-top:22px;border-top:0}
+.guides-directory .standards-collection-open{padding-top:22px;font-size:14px}
+.standards-reference .sr-crumbs{padding-bottom:17px;border-bottom:1px solid var(--public-line);margin-bottom:32px}
+.standards-reference .sr-kicker{color:var(--public-accent);letter-spacing:.07em;font-size:11px}
+.standards-reference .sr-reference{border-radius:8px;background:var(--public-paper)}
+.standards-reference .sr-meta{padding-block:4px 8px}
+.public-help-intro h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
+.public-help-intro>.eyebrow{color:var(--public-accent)}
+.public-help-intro .help-support-grid{margin-top:40px;background:var(--public-paper);border:1px solid var(--public-line);border-radius:8px;overflow:hidden}
+.public-help-intro .help-support-card{background:transparent;padding:28px}
+.public-help-intro .help-support-card:first-child{padding-left:28px}
+.public-help-body .help-guide{padding-block:38px}
+@media(max-width:1100px){
+.enterprise-support .commercial-hero>.container{gap:var(--public-content-gap)}
+.enterprise-support.commercial-page h1{font-size:var(--public-title-size)}
+.enterprise-support .commercial-section-grid{gap:var(--public-content-gap)}
+.enterprise-support .trust-documents{padding:24px}
+.enterprise-support .trust-documents dl>div{grid-template-columns:1fr;gap:7px}
+.enterprise-support .company-identity-services{padding:24px;gap:20px}
+.enterprise-support .company-identity-services>div+div{padding-left:20px}
+}
+@media(max-width:959px){
+.enterprise-support .commercial-hero>.container{grid-template-columns:1fr}
+.enterprise-support .company-identity{max-width:620px;width:100%;justify-self:start}
+.enterprise-support.commercial-page .commercial-hero{padding-block:var(--public-hero-space)}
+.enterprise-support .commercial-section-grid{padding-block:var(--public-section-space)}
+
+.enterprise-support.card-craft.consumer-cards .consumer-hero-grid{padding-block:var(--public-hero-space)}
+}
+@media(max-width:700px){
+.enterprise-support.commercial-page h1,.enterprise-support.online-craft .online-business-intro h1,.enterprise-support.card-craft.consumer-cards .consumer-hero h1{font-size:var(--public-title-size);line-height:var(--public-title-line)}
+.enterprise-support.commercial-page .commercial-hero{padding-block:var(--public-hero-space)}
+.enterprise-support .commercial-lead{font-size:16px!important}
+.enterprise-support .commercial-section-grid{grid-template-columns:1fr;gap:var(--public-content-gap);padding-block:var(--public-section-space)}
+.enterprise-support .commercial-section h2{font-size:32px}
+.enterprise-support .commercial-section-number{margin-bottom:16px}
+.enterprise-support .commercial-details{padding-top:0}
+.enterprise-support .commercial-details dt{font-size:19px}
+.enterprise-support .commercial-details dd{font-size:15px}
+
+.enterprise-support .company-identity-name{padding:26px}
+.enterprise-support .company-identity-name span{font-size:28px}
+.enterprise-support .company-identity-name img{width:48px}
+.enterprise-support .company-identity-services{gap:20px;padding:24px}
+.enterprise-support .company-identity-services h2{font-size:18px}
+.enterprise-support .company-identity-services p{font-size:12px}
+.enterprise-support .company-identity-services>div+div{padding-left:20px}
+.enterprise-support .company-identity figcaption{grid-template-columns:85px 1fr;gap:12px}
+.enterprise-support .commercial-offices{padding-block:36px;gap:26px}
+.enterprise-support .commercial-contact-list{grid-template-columns:1fr}
+.enterprise-support .commercial-contact-list article{padding-block:26px;gap:20px}
+.enterprise-support .commercial-contact-list article h3{font-size:22px}
+.enterprise-support .commercial-contact-list article p{font-size:15px}
+.enterprise-support .commercial-contact-category{margin-bottom:12px}
+.enterprise-support .commercial-contact-action{width:100%}
+.enterprise-support .commercial-contact-action a{justify-content:space-between;width:100%}
+.enterprise-support .commercial-diagram{padding:20px}
+.enterprise-support .commercial-diagram-node{padding:18px}
+.enterprise-support.online-craft .online-business-intro{padding-block:var(--public-hero-space)}
+.enterprise-support .payment-sharing-note{padding-block:44px}
+.enterprise-support.card-craft .card-details-section{padding-block:44px}
+.documentation-page .docs-hub-heading h1,.guides-directory-heading h1,.public-help-intro h1{font-size:var(--public-title-size)}
+.documentation-page .docs-task-paths{gap:32px}
+.documentation-page .docs-task-path-heading{min-height:0;padding:22px}
+.documentation-page .docs-task{min-height:0;padding:22px 0}
+.documentation-page .docs-article-heading{padding-bottom:18px}
+.documentation-page .docs-article-heading h1{font-size:var(--public-reading-title-size)}
+.guides-directory-heading{padding-block:40px 30px}
+.guides-directory .standards-collections-grid{gap:22px}
+.guides-directory .standards-collections-grid>a{padding:26px}
+.guides-directory .standards-collections-grid h2{font-size:34px;margin-top:26px}
+.public-help-intro .help-support-grid{border-radius:8px}
+.public-help-intro .help-support-card{padding:24px!important}
+.public-help-body .help-guide{padding-block:28px}
+}
+@media(max-width:360px){
+.enterprise-support.commercial-page h1,.enterprise-support.online-craft .online-business-intro h1,.enterprise-support.card-craft.consumer-cards .consumer-hero h1,.guides-directory-heading h1,.public-help-intro h1{font-size:var(--public-title-size)}
+.enterprise-support .company-identity-services{grid-template-columns:1fr;padding:24px}
+.enterprise-support .company-identity-services>div+div{border:0;border-top:1px solid var(--public-line);padding:20px 0 0}
+.enterprise-support .company-identity-services .icon{margin-bottom:12px}
+.enterprise-support .commercial-section h2{font-size:29px}
+}
+@media(forced-colors:active){.enterprise-support .company-identity-name{border:1px solid CanvasText}.enterprise-support .company-identity-name :is(span,strong){color:CanvasText}.guides-directory .standards-collections-grid>a{border-color:CanvasText}}

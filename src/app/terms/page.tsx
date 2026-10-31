@@ -23,14 +23,14 @@ const sections: LegalSection[] = [
   {
     id: "availability", title: "Service availability", content: <>
       <p>Etail Depot is not a bank. This website does not register customer accounts, process financial transactions or issue payment credentials. Merchant and credit card account actions take place on the relevant product’s website.</p>
-      <p>Trolleys merchant services are available through its website. Applications for the {cardProduct.name}, a virtual {cardProduct.creditType}, are not open yet. Availability does not guarantee eligibility or approval, and product features are governed by the applicable service agreement.</p>
+      <p>Trolleys merchant services are available through its website. The {cardProduct.name} is a virtual {cardProduct.creditType}. Availability does not guarantee eligibility or approval, and product features are governed by the applicable service agreement.</p>
       <p>Review each product’s disclosures for the companies responsible for your account, fees, funds arrangements and financial protections. Brand names, website access and network logos do not establish those arrangements.</p>
       <p>Nothing in these website terms creates a credit facility, deposit account, deposit insurance coverage or guarantee that a card or payment will be accepted.</p>
     </>,
   },
   {
     id: "login", title: "Service access and responsibilities", content: <>
-      <p>To sign in to Trolleys or manage your account, follow the access instructions supplied with your account. If you are new to the service, visit Trolleys to apply. Ledgix credit card account access will be available when the service launches. Earlier Etail Depot website accounts and invitations no longer provide access here and do not sign you in to either product.</p>
+      <p>To sign in to Trolleys or manage your account, follow the access instructions supplied with your account. If you are new to the service, visit Trolleys to apply. Earlier Etail Depot website accounts and invitations no longer provide access here and do not sign you in to either product.</p>
       <ul>
         <li>Use an email address you control and complete any required confirmation.</li>
         <li>Keep passwords, confirmation links and recovery links private. Each person must use their own login.</li>

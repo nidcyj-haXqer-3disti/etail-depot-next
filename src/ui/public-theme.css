@@ -1,19 +1,27 @@
 /* Shared theme for the public website. */
 :where(.public-header, .public-main, .public-footer) {
-  --public-font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --public-max: 1248px;
-  --public-gutter: 32px;
+  --public-font: Arial, Helvetica, sans-serif;
+  --public-max: 1280px;
+  --public-gutter: 48px;
   --public-brand-width: 160px;
   --public-chrome-gap: 40px;
-  --public-ink: #183d35;
-  --public-muted: #586960;
-  --public-accent: #527254;
-  --public-line: #dce3dc;
-  --public-paper: #f7f6f2;
+  --public-ink: #193c33;
+  --public-muted: #4a6257;
+  --public-accent: #19795d;
+  --public-line: #d7e0d9;
+  --public-paper: #f6f7f2;
   --public-tint: #eef1e8;
   --public-hover: #285c49;
   --public-focus: #217262;
-  --public-radius: 10px;
+  --public-radius: 12px;
+  --public-section-space: 72px;
+  --public-hero-space: 56px;
+  --public-content-gap: 64px;
+  --public-title-size: clamp(42px, 4.4vw, 64px);
+  --public-title-line: 1.08;
+  --public-reading-title-size: 48px;
+  --public-art-surface: #eef3ee;
+  --public-art-shadow: 0 12px 32px #193c330a, 0 2px 6px #193c3305;
   --public-control-radius: 7px;
   --public-frame-line: #d2ddd5;
   --public-frame-surface: #f0f5f1;
@@ -37,7 +45,7 @@
 }
 .public-main p { text-wrap: pretty; }
 @media (max-width: 1000px) {
-  :where(.public-header, .public-main, .public-footer) { --public-gutter: 24px; --public-chrome-gap: 24px; }
+  :where(.public-header, .public-main, .public-footer) { --public-gutter: 22px; --public-section-space: 56px; --public-chrome-gap: 24px; }
 }
 @media (max-width: 1100px) and (min-width: 960px) {
   :where(.public-header, .public-main, .public-footer) { --public-brand-width: 144px; }
@@ -56,3 +64,37 @@
 /* Shared labels and controls retain one scale across service and reference pages. */
 .public-main .eyebrow { font-size: 12px; line-height: 1.6; letter-spacing: .09em; color: var(--public-muted); }
 .public-main .button { min-height: 48px; border-radius: var(--public-control-radius); gap: 16px; }
+
+.public-main .docs-hub-heading h1, .public-main .guides-directory-heading h1, .public-main .public-help-intro > h1 { color: var(--public-ink); font-weight: 500; letter-spacing: -.045em; }
+.public-main .docs-article-heading h1 { font-weight: 500; letter-spacing: -.035em; }
+.public-main .docs-hub-heading > p, .public-main .guides-directory-intro { color: var(--public-muted); line-height: 1.7; }
+.public-main .online-business-intro h1, .public-main .consumer-cards .consumer-hero h1 { letter-spacing: -.05em; }
+
+@media (min-width: 1001px) and (max-width: 1150px) {
+ :where(.public-header, .public-main, .public-footer) { --public-gutter: 34px; }
+}
+
+/* Page families use the same scale and spacing at every viewport. */
+@media (max-width: 1100px) {
+  :where(.public-header, .public-main, .public-footer) {
+    --public-title-size: 48px;
+    --public-reading-title-size: 42px;
+    --public-content-gap: 40px;
+    --public-hero-space: 44px;
+  }
+}
+@media (max-width: 700px) {
+  :where(.public-header, .public-main, .public-footer) {
+    --public-title-size: 40px;
+    --public-reading-title-size: 34px;
+    --public-section-space: 48px;
+    --public-hero-space: 36px;
+    --public-content-gap: 28px;
+  }
+}
+@media (max-width: 360px) {
+  :where(.public-header, .public-main, .public-footer) {
+    --public-title-size: 36px;
+    --public-reading-title-size: 31px;
+  }
+}

@@ -13,7 +13,7 @@ describe("ISO 20022 frozen reference collection", () => {
     expect(new Set(paths).size).toBe(paths.length);
     expect([...paths].sort()).toEqual(STANDARD_REFERENCE_PATHS.filter(path => path.startsWith(ISO20022_PATH)).sort());
     expect(localStandardPageSources).toHaveLength(6);
-    expect(publicPageSources).toHaveLength(25);
+    expect(publicPageSources).toHaveLength(38);
     expect(isoCodeSet("not-a-code-set")).toBeUndefined();
     const status = isoCodeSet("payment-transaction-status")!;
     expect(isoCode(status, "ACSP")).toBeUndefined();

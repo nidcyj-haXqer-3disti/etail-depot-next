@@ -1,4 +1,5 @@
 /** Pure deployment-boundary detectors, shared by packaging checks and adversarial tests. */
+import { COMMERCIAL_PATHS } from "../src/shared/commercial-paths.ts";
 import { PUBLIC_CONTENT_PATHS, publicExportFile } from "../src/shared/public-page-inventory.ts";
 import { managedContentRoute, retiredArticleRoute } from "../src/shared/public-routes.ts";
 
@@ -23,7 +24,8 @@ export const localStandardPageSources = [
   "guides/iso-20022/page.tsx", "guides/iso-20022/[set]/page.tsx", "guides/iso-20022/[set]/[code]/page.tsx",
   "guides/iso-8583/page.tsx", "guides/iso-8583/[table]/page.tsx", "guides/iso-8583/[table]/[code]/page.tsx",
 ] as const;
-export const publicPageSources = [...retainedCorePageSources, ...localCorePreviewPageSources, ...localStandardPageSources];
+export const commercialPageSources = COMMERCIAL_PATHS.map(path => `${path.slice(1)}/page.tsx`);
+export const publicPageSources = [...commercialPageSources, ...retainedCorePageSources, ...localCorePreviewPageSources, ...localStandardPageSources];
 /** Additional routes require explicit review before joining this release. */
 export const localPreviewPageSources: readonly string[] = [];
 export const builtPageSources = publicPageSources;

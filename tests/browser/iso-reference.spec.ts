@@ -28,7 +28,7 @@ test("Guides opens both ISO collections, preserves exact code identity and retur
     await page.goBack();
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", origin + codePath);
     await breadcrumb.getByRole("link", {name:"Guides", exact:true}).click();
-    await expect(page.getByRole("heading", {level:1})).toHaveText("Payment code reference");
+    await expect(page.getByRole("heading", {level:1})).toHaveText("Guides");
   }
 });
 
