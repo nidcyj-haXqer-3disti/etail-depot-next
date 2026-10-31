@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import snapshot from "./iso20022-data.json";
-import { canonicalOrigin, pageRobots, publicSocialImage } from "./metadata";
+import { canonicalOrigin, pageRobots, publicPageModified, socialImageForPage } from "./metadata";
 
 export const ISO20022_SOURCE = "https://www.iso20022.org/catalogue/additional-content-messages/external-code-sets";
 export const ISO20022_PATH = "/guides/iso-20022";
@@ -57,8 +57,8 @@ export function isoIdentity(set?: IsoCodeSet, code?: IsoCode) {
 export function isoMetadata(set?: IsoCodeSet, code?: IsoCode): Metadata {
   const entry = isoIdentity(set, code), url = canonicalOrigin + entry.path;
   return { title: { absolute: entry.title }, description: entry.description, alternates: { canonical: url }, robots: pageRobots(entry.path),
-    openGraph: { type: "website", title: entry.title, description: entry.description, url, siteName: "Etail Depot", images: [publicSocialImage] },
-    twitter: { card: "summary_large_image", title: entry.title, description: entry.description, images: [publicSocialImage] } };
+    openGraph: { type: "website", title: entry.title, description: entry.description, url, siteName: "Etail Depot", images: [socialImageForPage(entry.path)] },
+    twitter: { card: "summary_large_image", title: entry.title, description: entry.description, images: [socialImageForPage(entry.path)] } };
 }
 export function isoJsonLd(set?: IsoCodeSet, code?: IsoCode) {
   const entry = isoIdentity(set, code), url = canonicalOrigin + entry.path;
@@ -66,7 +66,7 @@ export function isoJsonLd(set?: IsoCodeSet, code?: IsoCode) {
   if (set) crumbs.push({ name: set.title, path: set.path });
   if (code) crumbs.push({ name: code.code, path: code.path });
   return JSON.stringify({ "@context": "https://schema.org", "@graph": [
-    { "@type": code ? "WebPage" : "CollectionPage", "@id": url + "#webpage", url, name: entry.title, description: entry.description, inLanguage: "en-US", citation: ISO20022_SOURCE,
+    { "@type": code ? "WebPage" : "CollectionPage", "@id": url + "#webpage", url, name: entry.title, description: entry.description, inLanguage: "en-US", dateModified: publicPageModified(entry.path), citation: ISO20022_SOURCE,
       publisher: { "@id": `${canonicalOrigin}/#organization` }, isPartOf: { "@id": `${canonicalOrigin}/#website` }, breadcrumb: { "@id": url + "#breadcrumb" }, mainEntity: { "@id": url + "#reference" } },
     { "@type": "BreadcrumbList", "@id": url + "#breadcrumb", itemListElement: crumbs.map((crumb, i) => ({ "@type": "ListItem", position: i + 1, name: crumb.name, item: canonicalOrigin + crumb.path })) },
     code ? { "@type": "DefinedTerm", "@id": url + "#reference", url, name: codeHeading(code), termCode: code.code, description: code.source_definition, inDefinedTermSet: { "@type": "DefinedTermSet", "@id": canonicalOrigin + set!.path + "#reference", name: set!.collection_id, url: canonicalOrigin + set!.path }, citation: ISO20022_SOURCE }

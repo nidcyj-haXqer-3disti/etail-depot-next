@@ -1,10 +1,12 @@
+import { COMMERCIAL_PATHS } from "./commercial-paths.ts";
 import { STANDARD_REFERENCE_PATHS } from "./standard-reference-paths.ts";
 
-/** Frozen release candidate approved for preparation on 28 October 2026. */
+/** Exact local candidate including the approved PayFac and payment evaluation pages. */
 export const CORE_PUBLIC_PATHS = [
   "/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides",
   "/software-partners", "/online-businesses", "/docs", "/docs/merchant-onboarding", "/docs/integration-access",
   "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes",
+  ...COMMERCIAL_PATHS,
   "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch",
 ] as const;
 export const PUBLIC_CONTENT_PATHS: readonly string[] = [...CORE_PUBLIC_PATHS, ...STANDARD_REFERENCE_PATHS];

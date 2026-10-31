@@ -59,7 +59,7 @@ test("unhydrated pages preserve calculator, wallet and ISO reference behavior", 
     await merchant.click();
     await expect(page).toHaveURL(`${new URL(page.url()).origin}/payment-acceptance-service`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-    await page.goto("/payment-acceptance-service#fees");
+    await page.goto("/pricing#fees");
     const amount = page.locator("#payment-amount");
     await expect(amount).toHaveValue("100");
     await expect(amount).toBeDisabled();

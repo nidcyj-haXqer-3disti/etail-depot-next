@@ -5,7 +5,7 @@ export function Icon({ name, className = "" }: { name: string; className?: strin
     mail: <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m2 6 10 7L22 6" /></>,
     document: <><path d="M14 2H5v20h14V7l-5-5ZM14 2v6h5M8 12h8M8 16h6" /></>,
     qr: <><rect x="3" y="3" width="6" height="6" /><rect x="15" y="3" width="6" height="6" /><rect x="3" y="15" width="6" height="6" /><path d="M15 15h3v3h3v3h-6v-3M12 3v3M3 12h6M12 12h3M21 12h-3" /></>,
-    link: <><path d="m10 14 4-4M8 16l-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m4 2 1-1a4 4 0 0 1 6 6l-5 5a4 4 0 0 1-6 0" /></>,
+    link: <><path d="M9 7H7a5 5 0 0 0 0 10h2m6-10h2a5 5 0 0 1 0 10h-2M8 12h8" /></>,
     person: <><circle cx="12" cy="7" r="3.5" /><path d="M5 21v-3a7 7 0 0 1 14 0v3" /></>,
     arrow: <><path d="M4 12h16m-6-6 6 6-6 6" /></>,
     external: <><path d="M14 3h7v7M21 3 10 14M10 3H3v18h18v-7" /></>,

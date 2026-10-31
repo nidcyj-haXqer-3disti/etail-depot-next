@@ -1,4 +1,4 @@
-import type { DocumentationSlug } from "./documentation-catalog";
+import { documentationMetadata, type DocumentationSlug } from "./documentation-catalog";
 
 export type DocRow = { title: string; text: string };
 export type DocTable = { caption: string; headers: string[]; rows: string[][]; codeColumn?: boolean; breakCodeWords?: boolean };
@@ -15,7 +15,7 @@ type DocArticle = { introduction: string; prerequisites: string[]; sections: Doc
 // assigned API contracts are requested through the integration team, not simulated here.
 export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
   "merchant-onboarding": {
-    "introduction": "Prepare your application, follow the review and confirm your account is ready to accept payments.",
+    "introduction": documentationMetadata["/docs/merchant-onboarding"].description,
     "prerequisites": [
       "An authorized representative of the business",
       "Business, ownership and payout account information",
@@ -53,7 +53,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       },
       {
         "id": "application-review",
-        "title": "Complete the application review",
+        "title": "Submit and follow your application",
         "flow": "onboarding",
         "steps": [
           {
@@ -61,11 +61,11 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             "text": "Review the business information and agreements, then submit. Keep the application reference with the submitted business identity."
           },
           {
-            "title": "Resolve outstanding requests",
+            "title": "Respond to information requests",
             "text": "Return to the same application when information is requested. Supply missing or corrected details through the secure account service."
           },
           {
-            "title": "Read the review decision",
+            "title": "Check the application decision",
             "text": "Read the recorded decision. Submitting an application or providing documents is not approval."
           },
           {
@@ -190,7 +190,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "integration-access": {
-    "introduction": "Map your merchant accounts, set permissions and obtain the connection details your developers need.",
+    "introduction": documentationMetadata["/docs/integration-access"].description,
     "prerequisites": [
       "The services and operations your integration needs",
       "The business and account references already available to your team",
@@ -334,7 +334,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "checkout": {
-    "introduction": "Connect your orders to checkout provided through your merchant account service. Verify each payment before updating the order.",
+    "introduction": documentationMetadata["/docs/checkout"].description,
     "prerequisites": [
       "The checkout connection and instructions assigned to your merchant account",
       "Your order, amount, currency and references for each payment attempt",
@@ -402,7 +402,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
         ],
         "details": [
           {
-            "title": "What if the order changes?",
+            "title": "Order changes",
             "text": "Recalculate the payable total on your server and check the existing attempt before starting a new checkout. Do not associate an existing attempt with a different merchant, currency or order total."
           }
         ],
@@ -565,7 +565,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "payment-requests": {
-    "introduction": "Create and share a payment request, then match each payment to its order.",
+    "introduction": documentationMetadata["/docs/payment-requests"].description,
     "prerequisites": [
       "A configured merchant account with access to payment request tools",
       "The purchase details, total and currency",
@@ -697,7 +697,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "payment-status": {
-    "introduction": "Find the original payment, check its current status and resolve an uncertain result before taking action.",
+    "introduction": documentationMetadata["/docs/payment-status"].description,
     "prerequisites": [
       "Access to the merchant account that received the payment",
       "The order and transaction references, if available",
@@ -850,7 +850,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "refunds-and-disputes": {
-    "introduction": "Refund the right payment, respond to a dispute and track the resulting account adjustments.",
+    "introduction": documentationMetadata["/docs/refunds-and-disputes"].description,
     "prerequisites": [
       "The original payment and related operation references",
       "Permission for the action you need to take",
@@ -1001,7 +1001,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "payouts": {
-    "introduction": "Match the payments and adjustments in a funding report to the amount received in your bank account.",
+    "introduction": documentationMetadata["/docs/payouts"].description,
     "prerequisites": [
       "Merchant transaction and funding report access",
       "The account’s payout terms, cutoff and reporting time zone",
@@ -1170,7 +1170,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "webhooks": {
-    "introduction": "Verify incoming notifications, apply each change once and recover updates that arrive late or go missing.",
+    "introduction": documentationMetadata["/docs/webhooks"].description,
     "prerequisites": [
       "Enabled event subscriptions for each required service",
       "The event format, verification requirements and delivery rules for your connection",
@@ -1391,7 +1391,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
     ]
   },
   "testing-and-launch": {
-    "introduction": "Confirm the payment journey in sandbox, review the integration and prepare the production account for launch.",
+    "introduction": documentationMetadata["/docs/testing-and-launch"].description,
     "prerequisites": [
       "The connection settings and services you plan to use",
       "Sandbox accounts, credentials and data supplied by our integration team",

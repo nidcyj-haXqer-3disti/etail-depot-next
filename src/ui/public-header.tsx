@@ -8,7 +8,7 @@ import { PublicNavigation } from "./public-navigation";
 import { PaymentPortalLink } from "./service-entry";
 import { Icon } from "./icon";
 
-export function PublicHeader({ quietAccess = false }: { quietAccess?: boolean }) {
+export function PublicHeader() {
   const [open, setOpen] = useState(false);
   const header = useRef<HTMLElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
@@ -71,7 +71,7 @@ export function PublicHeader({ quietAccess = false }: { quietAccess?: boolean })
     };
   }, [open]);
 
-  return <header className={`site-header public-header${quietAccess ? " public-header-quiet" : ""}`} ref={header} onFocusCapture={event => {
+  return <header className="site-header public-header public-header-contact" ref={header} onFocusCapture={event => {
     if (event.target instanceof HTMLElement) focusedControl.current = event.target;
   }} onBlur={event => {
     if (event.currentTarget.contains(event.relatedTarget) || pointerInteraction.current) return;
@@ -92,8 +92,8 @@ export function PublicHeader({ quietAccess = false }: { quietAccess?: boolean })
       <div id="public-header-menu" className={`public-header-menu${open ? " is-open" : ""}`}>
         <PublicNavigation onNavigate={() => { focusedControl.current = null; setOpen(false); }} />
         <div className="header-actions">
-          <Link href="/help" className="header-help" onClick={() => setOpen(false)}>Help</Link>
           <PaymentPortalLink className="header-sign-in">Merchant access</PaymentPortalLink>
+          <Link href="/contact" className="header-contact header-contact-primary" onClick={() => setOpen(false)}>Contact sales</Link>
         </div>
       </div>
     </div>

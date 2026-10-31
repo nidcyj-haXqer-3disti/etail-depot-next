@@ -1,0 +1,191 @@
+/* Service and use case compositions. Company, documentation and reference pages retain their own layouts. */
+.service-craft .commercial-hero { padding-block:64px; background:#f6f7f2 }
+.service-craft .commercial-hero>.container { display:grid; grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr); align-items:center; gap:var(--public-content-gap)}
+.service-craft .commercial-hero-copy { display:block; padding:0 }
+.service-craft h1 { font-size:var(--public-title-size); max-width:18ch; line-height:var(--public-title-line); letter-spacing:-.048em; text-wrap:balance }
+.service-craft .commercial-lead { margin-top:24px; font-size:17px; line-height:1.7; max-width:43ch }
+.service-craft .commercial-note { font-size:13px; line-height:1.65; margin-top:19px }
+.service-craft .commercial-diagram { margin:0; padding:24px; background:#e8efe5; border-color:#cfddcd; border-radius:14px }
+.service-craft .commercial-diagram-title { margin-bottom:22px; gap:11px }
+.service-craft .commercial-diagram-nodes { grid-template-columns:1fr; gap:13px }
+.service-craft .commercial-diagram-node { display:grid; grid-template-columns:27px 1fr; column-gap:14px; row-gap:5px; padding:19px 20px; border-color:#d8e2d3; border-radius:9px; box-shadow:none }
+.service-craft .commercial-node-icon { grid-row:1 / 3; margin:0; align-self:center }
+.service-craft .commercial-node-icon .icon { width:23px; height:23px }
+.service-craft .commercial-diagram-node h2 { font-size:21px; line-height:1.25; padding-right:28px; letter-spacing:-.025em }
+.service-craft .commercial-diagram-node p { grid-column:2; margin:0; max-width:none; font-size:13px; line-height:1.6 }
+.service-craft .commercial-node-position { top:20px; right:19px; font-size:11px; color:#5c7662 }
+.service-craft .is-sequence .commercial-diagram-node:not(:last-child)::after { content:''; top:100%; left:31px; right:auto; width:1px; height:14px; background:#9bb49c }
+.service-craft .is-sequence .commercial-diagram-node:last-child { border-color:#b6ceb8; background:#f7faf4 }
+.service-craft .commercial-diagram figcaption { font-size:12px; line-height:1.65; margin-top:18px; max-width:67ch }
+.service-craft .is-branch .commercial-diagram-nodes { grid-template-columns:1fr 1fr; grid-template-rows:auto auto; gap:28px 14px }
+.service-craft .is-branch .commercial-diagram-node:first-child { grid-column:1 / -1; grid-row:auto; display:grid }
+.service-craft .is-branch .commercial-diagram-node:first-child::after { left:50%; top:100%; width:1px; height:14px; background:#9bb49c }
+.service-craft .is-branch .commercial-diagram-node:nth-child(n+2) { display:block; padding:20px 17px; margin:0 }
+.service-craft .is-branch .commercial-diagram-node:nth-child(n+2)::before { width:calc(50% + 8px); height:15px; left:50%; top:-15px; bottom:auto; border:0; border-top:1px solid #9bb49c; border-left:1px solid #9bb49c }
+.service-craft .is-branch .commercial-diagram-node:last-child::before { left:auto; right:50%; border-left:0; border-right:1px solid #9bb49c }
+.service-craft .is-branch .commercial-diagram-node:nth-child(n+2) .commercial-node-icon { margin-bottom:14px }
+.service-craft .is-branch .commercial-diagram-node:nth-child(n+2) h2 { padding:0; font-size:20px }
+.service-craft .is-branch .commercial-diagram-node:nth-child(n+2) p { margin-top:8px }
+.service-craft-wide .commercial-hero>.container { display:block }
+.service-craft-wide .commercial-hero-copy { display:grid; grid-template-columns:1.1fr 1fr; gap:var(--public-content-gap); align-items:start; margin-bottom:36px }
+.service-craft-wide .commercial-lead { margin-top:0 }
+.service-craft-wide .payment-decision-art { border-radius:14px; background:#e8efe5; padding:28px }
+.service-craft .commercial-section-grid { gap:var(--public-content-gap); padding-block:var(--public-section-space); grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr) }
+.service-craft .commercial-section h2 { font-size:clamp(30px,3vw,39px); line-height:1.13; text-wrap:balance }
+.service-craft .commercial-section-grid>div>p { margin-top:19px; line-height:1.7 }
+.service-craft .commercial-details>div+div { margin-top:25px; padding-top:25px }
+.service-craft .commercial-details dt { font-size:21px; font-weight:500 }
+.service-craft .commercial-details dd { line-height:1.75; max-width:63ch }
+
+/* Keep the platform value and the connected records in one first view. */
+.platform-craft .pf-platform-hero { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:56px; align-items:center; padding-block:64px }
+.platform-craft .pf-platform-intro h1 { font-size:var(--public-title-size); line-height:var(--public-title-line); letter-spacing:-.045em; max-width:20ch }
+.platform-craft .pf-platform-intro>div { display:block; margin-top:24px }
+.platform-craft .pf-platform-intro .hero-intro { font-size:17px; max-width:42ch; line-height:1.7 }
+.platform-craft .pf-actions { margin-top:25px; gap:11px; align-items:flex-start }
+.platform-craft .pf-platform-journey { padding-block:54px; border-block:1px solid #dbe4d6; background:#f6f8f2 }
+.platform-craft .pf-section-intro { gap:70px; margin-bottom:32px }
+.platform-craft .pf-section-intro h2,.platform-craft .pf-integration-grid h2,.platform-craft .pf-commercial h2 { font-size:38px; line-height:1.14; letter-spacing:-.04em; text-wrap:balance }
+.platform-craft .pf-section-intro .eyebrow { margin-bottom:16px }
+.platform-craft .pf-lifecycle { gap:28px }
+.platform-craft .pf-lifecycle h3 { font-size:22px; margin-block:13px 10px }
+.platform-craft .pf-lifecycle p { font-size:14px; line-height:1.7 }
+.platform-craft .industries { padding-block:66px }
+.platform-craft .industry-cases { gap:45px 36px }
+.platform-craft .industry-cases article>h3 { margin-top:24px; font-size:25px }
+.platform-craft .industry-cases article>p { max-width:60ch }
+.platform-craft .industry-cases article>p.industry-scope { padding-top:12px; margin-top:12px; border-top:1px solid #e0e7db }
+.platform-craft .pf-integration-grid,.platform-craft .pf-commercial { gap:80px; padding-block:58px }
+.platform-craft .pf-integration-rows { background:#f7f9f3; border:1px solid #d0ddcb; border-radius:12px; padding:25px 27px }
+.platform-craft .pf-integration-rows dt { font-size:19px }
+.platform-craft .pf-integration-rows dd { margin-left:31px; line-height:1.7 }
+.platform-craft .pf-commercial>div:last-child { display:grid; grid-template-columns:1fr 1fr; gap:24px }
+.platform-craft .pf-commercial article+article { margin:0; padding:0 0 0 24px; border-top:0; border-left:1px solid #d7e1d2 }
+.platform-craft .pf-commercial article { display:flex; flex-direction:column; align-items:flex-start }
+.platform-craft .pf-commercial article .text-link { margin-top:auto; padding-top:14px; line-height:1.6 }
+.platform-craft .pf-commercial h3 { font-size:21px; line-height:1.3 }
+.platform-craft .pf-commercial article>p { font-size:14px; line-height:1.7 }
+.platform-craft .pf-contact>.container { padding-block:38px }
+.platform-craft .pf-contact h2 { font-size:34px }
+
+/* A compact service overview, with a single pricing summary. */
+.merchant-craft .merchant-service-path { padding-block:50px 58px }
+.merchant-craft .merchant-service-path .section-lead { margin-bottom:28px }
+.merchant-service-path nav { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:28px }
+.merchant-service-path nav>a { color:#193c33; text-decoration:none; position:relative; padding:21px 26px 0 0; border-top:1px solid #bfcfc1; display:flex; flex-direction:column; align-items:flex-start; gap:11px }
+.merchant-service-path .service-path-number { color:#526e5c; font-size:12px; font-variant-numeric:tabular-nums }
+.merchant-service-path strong { font-size:23px; font-weight:500; letter-spacing:-.03em; line-height:1.25 }
+.merchant-service-path nav>a>span:not([class]) { color:#4a6257; font-size:14px; line-height:1.7; max-width:34ch }
+.merchant-service-path .service-path-arrow { position:absolute; right:0; top:20px; font-size:18px; transition:transform .15s ease }
+.merchant-service-path nav>a:hover .service-path-arrow { transform:translate(2px,-2px) }
+.merchant-service-path nav>a:focus-visible { outline:2px solid #245b47; outline-offset:6px; border-radius:2px }
+.merchant-craft .operations { border-top:1px solid #dce5d7; padding-top:54px }
+.merchant-craft .aftercare .text-link { margin-top:15px; font-size:14px; line-height:1.5 }
+.merchant-craft .merchant-fee-overview { padding-block:48px }
+.merchant-craft .faq { padding-block:52px }
+
+.online-craft .online-business-intro { gap:var(--public-content-gap); padding-block:var(--public-hero-space); align-items:center }
+.online-craft .online-business-intro h1 { font-size:var(--public-title-size); max-width:19ch; line-height:var(--public-title-line); letter-spacing:-.048em }
+.online-craft .online-business-copy>p:first-child { font-size:17px; line-height:1.7; max-width:45ch }
+.online-craft .online-business-journey { padding-bottom:54px }
+.online-craft .payment-sharing-note { padding-block:58px; gap:64px }
+.online-craft .payment-sharing-copy h2 { font-size:38px; line-height:1.14; max-width:21ch; letter-spacing:-.04em }
+.online-craft .payment-sharing-copy>p:not(.eyebrow):not(.payment-sharing-qualification) { max-width:43ch; font-size:16px; line-height:1.75 }
+
+.card-craft.service-blueprint.consumer-cards .consumer-hero-grid { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); align-items:center; gap:var(--public-content-gap); padding-block:var(--public-hero-space)}
+.card-craft.service-blueprint.consumer-cards .consumer-hero-copy { text-align:left; margin:0; max-width:none }
+.card-craft.service-blueprint.consumer-cards .consumer-hero h1 { margin:20px 0 0; font-size:var(--public-title-size); line-height:var(--public-title-line); max-width:17ch }
+.card-craft.service-blueprint.consumer-cards .consumer-product-eyebrow,.card-craft.service-blueprint.consumer-cards .consumer-hero-actions { justify-content:flex-start }
+.card-craft.service-blueprint.consumer-cards .consumer-hero-copy>p { margin:22px 0 0; max-width:39ch; font-size:17px; line-height:1.7 }
+.card-craft .consumer-product-note { font-size:13px; line-height:1.65; max-width:46ch }
+.card-craft .consumer-product-note strong { display:block; font-weight:500; color:#244b3b; margin-bottom:5px }
+.card-craft .bp-card-stage { margin:0; width:100%; min-height:380px; overflow:hidden; border-radius:14px }
+.card-craft.service-blueprint .card-details-section { padding-top:54px }
+.card-craft .consumer-section-heading h2,.card-craft .wallet-guide-copy h2 { font-size:38px; line-height:1.14; letter-spacing:-.04em }
+
+@media (max-width:1100px) {
+  .service-craft .commercial-hero>.container,.platform-craft .pf-platform-hero,.card-craft.service-blueprint.consumer-cards .consumer-hero-grid { gap:36px }
+  .service-craft h1,.platform-craft .pf-platform-intro h1,.card-craft.service-blueprint.consumer-cards .consumer-hero h1 { font-size:var(--public-title-size)}
+  .service-craft .commercial-section-grid,.platform-craft .pf-integration-grid,.platform-craft .pf-commercial { gap:48px }
+  .platform-craft .pf-commercial { grid-template-columns:.8fr 1.2fr }
+  .card-craft .bp-card-stage { min-height:340px }
+}
+@media (max-width:959px) {
+  .service-craft .commercial-hero>.container,.platform-craft .pf-platform-hero,.card-craft.service-blueprint.consumer-cards .consumer-hero-grid { grid-template-columns:1fr; gap:32px }
+  .service-craft .commercial-hero-copy,.platform-craft .pf-platform-intro,.card-craft.service-blueprint.consumer-cards .consumer-hero-copy { max-width:640px }
+  .service-craft h1,.platform-craft .pf-platform-intro h1 { max-width:23ch }
+  .service-craft-wide .commercial-hero-copy { grid-template-columns:1fr; gap:var(--public-content-gap)}
+  .service-craft .commercial-lead,.platform-craft .pf-platform-intro .hero-intro { max-width:53ch }
+  .platform-craft .pf-platform-intro .pf-actions { flex-direction:row; align-items:center; flex-wrap:wrap; gap:12px 22px }
+  .platform-craft .pf-commercial { grid-template-columns:1fr; gap:28px }
+  .merchant-service-path nav { gap:20px }
+  .merchant-service-path strong { font-size:21px }
+  .card-craft .bp-card-stage { max-width:660px; margin-inline:auto }
+}
+@media (max-width:760px) {
+  .service-craft .commercial-hero,.platform-craft .pf-platform-hero,.card-craft.service-blueprint.consumer-cards .consumer-hero-grid { padding-block:38px }
+  .service-craft h1,.platform-craft .pf-platform-intro h1,.online-craft .online-business-intro h1,.card-craft.service-blueprint.consumer-cards .consumer-hero h1 { font-size:var(--public-title-size); line-height:var(--public-title-line); max-width:21ch }
+  .service-craft .commercial-lead { margin-top:21px; font-size:16px }
+  .service-craft .commercial-action { gap:13px 20px }
+  .service-craft .commercial-diagram { padding:20px 17px }
+  .service-craft .commercial-diagram-node { padding:18px 16px; grid-template-columns:24px 1fr; gap:5px 12px }
+  .service-craft .commercial-diagram-node h2 { font-size:20px; padding-right:0 }
+  .service-craft .commercial-node-position { display:none }
+  .service-craft .commercial-diagram-node p { font-size:12px; line-height:1.65 }
+  .service-craft .is-sequence .commercial-diagram-node:not(:last-child)::after { left:28px }
+  .service-craft .is-branch .commercial-diagram-node:nth-child(n+2) { padding:17px 13px }
+  .service-craft .is-branch .commercial-diagram-node:nth-child(n+2) h2 { font-size:18px }
+  .service-craft-wide .commercial-hero-copy { margin-bottom:28px }
+  .service-craft-wide .commercial-lead { margin-top:0 }
+  .service-craft-wide .payment-decision-art { padding:20px 17px }
+  .service-craft .commercial-section-grid { grid-template-columns:1fr; padding-block:var(--public-section-space); gap:var(--public-content-gap)}
+  .service-craft .commercial-section h2 { font-size:32px; max-width:25ch }
+  .service-craft .commercial-section-grid>div>p { margin-top:17px; font-size:15px }
+  .service-craft .commercial-details dt { font-size:20px }
+  .service-craft .commercial-details dd { font-size:14px }
+
+  .platform-craft .pf-platform-intro .hero-intro { font-size:16px }
+  .platform-craft .pf-platform-intro .cta { margin-top:0 }
+  .platform-craft .pf-section-intro { gap:19px; margin-bottom:29px }
+  .platform-craft .pf-section-intro h2,.platform-craft .pf-integration-grid h2,.platform-craft .pf-commercial h2,.online-craft .payment-sharing-copy h2,.card-craft .consumer-section-heading h2,.card-craft .wallet-guide-copy h2 { font-size:32px }
+  .platform-craft .pf-platform-journey,.platform-craft .industries { padding-block:42px }
+  .platform-craft .pf-lifecycle { gap:25px 23px }
+  .platform-craft .pf-lifecycle h3 { font-size:21px }
+  .platform-craft .industry-cases { gap:36px }
+  .platform-craft .industry-cases article>h3 { margin-top:21px }
+  .platform-craft .pf-integration-grid,.platform-craft .pf-commercial { padding-block:42px; gap:28px }
+  .platform-craft .pf-integration-rows { padding:21px 20px }
+  .platform-craft .pf-integration-rows>div:first-child { padding-top:0; border-top:0 }
+  .platform-craft .pf-commercial>div:last-child { grid-template-columns:1fr; gap:23px }
+  .platform-craft .pf-commercial article+article { padding:23px 0 0; border-left:0; border-top:1px solid #d7e1d2 }
+  .platform-craft .pf-contact h2 { font-size:31px }
+  .merchant-craft .merchant-service-path { padding-block:37px 42px }
+  .merchant-service-path nav { grid-template-columns:1fr; gap:22px }
+  .merchant-service-path nav>a { padding-top:20px; gap:8px }
+  .merchant-service-path strong { font-size:23px }
+  .merchant-service-path nav>a>span:not([class]) { max-width:45ch }
+  .merchant-craft .operations { padding-top:42px }
+  .merchant-craft .merchant-fee-overview,.merchant-craft .faq { padding-block:40px }
+  .online-craft .online-business-intro { padding-block:var(--public-hero-space); gap:var(--public-content-gap)}
+  .online-craft .online-business-copy>p:first-child { font-size:16px }
+  .online-craft .online-business-journey { padding-bottom:40px }
+  .online-craft .payment-sharing-note { padding-block:42px; gap:30px }
+  .online-craft .payment-sharing-copy>p:not(.eyebrow):not(.payment-sharing-qualification) { font-size:15px }
+  .card-craft.service-blueprint.consumer-cards .consumer-hero-copy>p { font-size:16px; margin-top:21px }
+  .card-craft .bp-card-stage { min-height:0 }
+  .card-craft.service-blueprint .card-details-section { padding-top:42px }
+}
+@media (max-width:380px) {
+  .service-craft h1,.platform-craft .pf-platform-intro h1,.card-craft.service-blueprint.consumer-cards .consumer-hero h1 { font-size:var(--public-title-size)}
+  .service-craft .is-branch .commercial-diagram-nodes { grid-template-columns:1fr; gap:19px }
+  .service-craft .is-branch .commercial-diagram-node:first-child { grid-column:auto }
+  .service-craft .is-branch .commercial-diagram-node:first-child::after { display:none }
+  .service-craft .is-branch .commercial-diagram-node:nth-child(n+2) { margin-left:18px; display:grid; grid-template-columns:24px 1fr; gap:7px 11px; padding:17px 13px }
+  .service-craft .is-branch .commercial-diagram-node:nth-child(n+2)::before { left:auto; right:100%; top:auto; bottom:50%; width:10px; height:100%; border:0; border-left:1px solid #9bb49c; border-bottom:1px solid #9bb49c }
+  .service-craft .is-branch .commercial-diagram-node:last-child::before { height:calc(100% + 20px) }
+  .service-craft .is-branch .commercial-diagram-node:nth-child(n+2) .commercial-node-icon { margin:0 }
+  .service-craft .is-branch .commercial-diagram-node:nth-child(n+2) p { margin:0 }
+  .platform-craft .pf-integration-rows { padding:20px 16px }
+  .platform-craft .pf-integration-rows dd { margin-left:0 }
+}
+@media (prefers-reduced-motion:reduce) { .merchant-service-path .service-path-arrow { transition:none } }

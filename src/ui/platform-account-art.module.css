@@ -1,0 +1,130 @@
+.art {
+  margin: 0;
+  color: #244b3b;
+}
+.workspace {
+  overflow: hidden;
+  border: 1px solid #cedbd0;
+  border-radius: 18px;
+  background: #edf2e9;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 32px;
+  border-bottom: 1px solid #d5dfd2;
+  background: #f8faf5;
+}
+.platformName {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 16px;
+  font-weight: 550;
+}
+.platformName svg { width: 22px; height: 22px; }
+.context { font-size: 13px; color: #536554; }
+.scene {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 100px minmax(0, 1.1fr);
+  align-items: center;
+  padding: 44px 48px 48px;
+  background: radial-gradient(ellipse at 75% 40%, #dce7cc 0, transparent 68%);
+}
+.purchase {
+  position: relative;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid #d4ded1;
+  border-radius: 13px;
+  box-shadow: 0 18px 40px -26px #22452b55;
+}
+.purchaseHeader { display: flex; align-items: center; gap: 16px; }
+.customerIcon, .checkoutIcon, .accountIcon, .connectionIcon, .brandMark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.customerIcon {
+  width: 48px;
+  height: 48px;
+  border: 1px solid #d8e1ce;
+  border-radius: 50%;
+  background: #eef3e5;
+}
+.customerIcon svg { width: 23px; height: 23px; }
+.label { display: block; font-size: 12px; line-height: 1.5; color: #526650; }
+.purchaseTitle { display: block; margin-top: 5px; font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -.035em; }
+.art .purchaseDetails { margin: 24px 0 0; }
+.purchaseDetails > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 0; border-top: 1px solid #e3e8de; font-size: 13px; line-height: 1.5; }
+.purchaseDetails dt { color: #526650; }
+.purchaseDetails dd { margin: 0; text-align: right; }
+.purchaseDetails .seller dd { display: flex; align-items: center; gap: 7px; }
+.seller svg { width: 17px; height: 17px; flex-shrink: 0; }
+.checkout { display: flex; align-items: center; gap: 12px; margin-top: 15px; padding: 17px 14px; border: 1px solid #d1ddc5; border-radius: 9px; background: #f3f7ed; }
+.checkout .checkoutIcon { display: grid; width: 34px; height: 34px; border-radius: 7px; background: #dce8c9; }
+.checkoutIcon svg { width: 20px; height: 20px; }
+.checkout strong, .checkout span { display: block; }
+.checkout strong { font-size: 14px; font-weight: 550; line-height: 1.5; }
+.checkout div > span { font-size: 12px; color: #526650; line-height: 1.5; margin-top: 2px; }
+.checkout > svg { margin-left: auto; width: 16px; height: 16px; flex-shrink: 0; color: #526650; }
+.connection { position: relative; display: flex; align-items: center; flex-direction: column; gap: 10px; align-self: stretch; justify-content: center; font-size: 12px; line-height: 1.5; text-align: center; color: #466144; }
+.connection::before { content: ""; position: absolute; left: 0; right: 0; height: 1px; background: #9db38d; top: calc(50% - 23px); }
+.connectionIcon { position: relative; z-index: 1; width: 36px; height: 36px; border: 1px solid #bcccae; border-radius: 50%; background: #f4f7ed; }
+.connectionIcon svg { width: 18px; height: 18px; }
+.account { padding: 28px 32px 24px; border: 1px solid #315e48; border-radius: 14px; background: #204638; color: #fff; box-shadow: 0 22px 42px -25px #173a3355; }
+.accountHeader { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.account .label { color: #d0dfc9; }
+.accountIcon { width: 36px; height: 36px; border: 1px solid #557456; border-radius: 9px; color: #deebc4; }
+.accountIcon svg { width: 20px; height: 20px; }
+.accountTitle { display: block; margin-top: 17px; max-width: 12ch; font-size: 34px; font-weight: 500; line-height: 1.12; letter-spacing: -.035em; }
+.accountSummary { display: block; margin-top: 13px; font-size: 13px; line-height: 1.6; color: #d7e4d0; }
+.art .accountDetails { margin: 24px 0 0; }
+.accountDetails > div { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-top: 1px solid #496451; font-size: 13px; line-height: 1.5; }
+.accountDetails dt { color: #c8d8c1; }
+.accountDetails dd { margin: 0; text-align: right; }
+.service { display: flex; align-items: center; gap: 12px; border-top: 1px solid #496451; margin-top: 4px; padding-top: 20px; }
+.brandMark { width: 44px; height: 40px; border: 1px solid #cbd9bb; border-radius: 8px; background: #f1f6e8; }
+.brandMark img { display: block; width: 30px; height: auto; }
+.service strong, .service div > span { display: block; }
+.service strong { font-size: 14px; line-height: 1.5; font-weight: 550; }
+.service div > span { font-size: 12px; line-height: 1.5; color: #c8d8c1; }
+.art .caption { margin: 17px 0 0; max-width: 100ch; font-size: 13px; line-height: 1.7; color: #536554; }
+@media (max-width: 1100px) {
+  .scene { padding: 32px; grid-template-columns: minmax(0, 1fr) 80px minmax(0, 1.08fr); }
+  .purchase, .account { padding: 24px; }
+  .purchaseDetails > div, .accountDetails > div { flex-direction: column; align-items: flex-start; gap: 3px; padding-block: 12px; }
+  .purchaseDetails dd, .accountDetails dd { text-align: left; }
+  .accountTitle { font-size: 30px; }
+}
+@media (max-width: 700px) {
+  .toolbar { padding: 18px 22px; gap: 10px; }
+  .context { display: none; }
+  .scene { grid-template-columns: 1fr; padding: 24px; }
+  .purchase, .account { padding: 24px; }
+  .purchaseDetails > div, .accountDetails > div { flex-direction: row; align-items: center; gap: 12px; padding-block: 14px; }
+  .purchaseDetails dd, .accountDetails dd { text-align: right; }
+  .connection { flex-direction: row; height: 68px; justify-content: flex-start; gap: 10px; padding-left: 24px; }
+  .connection::before { left: 41px; right: auto; width: 1px; height: 100%; top: 0; }
+  .connection > span:last-child { position: relative; padding: 4px 7px; background: #edf2e9; }
+  .desktopBreak { display: none; }
+  .accountTitle { font-size: 32px; max-width: 15ch; }
+  .art .accountDetails { margin-top: 22px; }
+  .art .caption { margin-top: 15px; }
+}
+@media (max-width: 400px) {
+  .scene { padding: 16px; }
+  .purchase, .account { padding: 20px; }
+  .purchaseHeader { gap: 11px; }
+  .customerIcon { width: 40px; height: 40px; }
+  .purchaseTitle { font-size: 24px; }
+  .checkout { padding: 13px 10px; gap: 9px; }
+  .checkout > svg { display: none; }
+  .accountTitle { font-size: 28px; }
+}
+@media (max-width: 350px) {
+  .purchaseDetails > div, .accountDetails > div { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .purchaseDetails dd, .accountDetails dd { text-align: left; }
+}

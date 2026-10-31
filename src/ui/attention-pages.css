@@ -1,0 +1,154 @@
+/* Commercial emphasis sits on the existing shared reading and navigation system. */
+.public-main .attention-site {
+  --attention-heading: clamp(32px,3.2vw,44px);
+  --attention-surface: #f2f5ec;
+}
+.public-main .attention-site .ec-section-copy h2,
+.public-main .attention-site .ec-section-heading h2,
+.public-main .attention-site .ec-payout-copy h2 {
+  font-size:var(--attention-heading); line-height:1.12; letter-spacing:-.045em;
+}
+.public-main .attention-site .ec-orientation,
+.public-main .attention-site .ec-platform-journey { padding-block:64px; }
+.public-main .attention-site .ec-journey-rail { gap:30px; margin-top:36px; }
+.public-main .attention-site .ec-journey-rail>div { border-top:1px solid #a7bda9; padding-top:22px; }
+.public-main .attention-site .ec-journey-marker { background:none; border:0; padding:0; margin-bottom:20px; }
+.public-main .attention-site .ec-journey-rail h3 { font-size:22px; letter-spacing:-.03em; line-height:1.25; }
+.public-main .attention-site .ec-journey-rail p { max-width:260px; line-height:1.65; }
+.public-main .attention-site .ec-platform-band { background:#eef3e9; color:#193c33; padding-block:64px; }
+.public-main .attention-site .ec-platform-band h2 { color:#193c33; font-size:var(--attention-heading); }
+.public-main .attention-site .ec-platform-band .ec-category { color:#2e604c; }
+.public-main .attention-site .ec-platform-band .ec-lead { color:#304c40; }
+.public-main .attention-site .ec-platform-band .ec-industry-names { color:#3e5b4c; }
+.public-main .attention-site .ec-platform-band .ec-quiet { color:#193c33; }
+.public-main .attention-site .ec-industry-section { background:#f7f8f3; }
+.public-main .attention-site .ec-industry-scene { background:#eef3e7; border:1px solid #d3ded0; box-shadow:0 14px 32px #193c3309; }
+.public-main .attention-site .ec-industry-copy h3 { font-size:29px; line-height:1.18; letter-spacing:-.035em; }
+.public-main .attention-site .ec-industry-copy>p { max-width:530px; }
+.public-main .attention-site .ec-accept-section { background:#f2f5ec; }
+.public-main .attention-site .ec-method-panel {
+  min-width:0; padding:clamp(20px,2.5vw,32px); background:#fff;
+  border:1px solid #d2ded2; border-radius:16px; box-shadow:0 12px 28px #193c3308;
+}
+.public-main .attention-site .ec-method-panel .consumer-networks { border:0; padding-block:22px 6px; }
+.public-main .attention-site .ec-method-panel .consumer-payment-methods { grid-template-columns:minmax(0,1fr); gap:10px; }
+.public-main .attention-site .ec-method-panel .consumer-bank-wallets { width:75%; margin:0 auto; }
+.public-main .attention-site .ec-method-panel>p { margin-top:12px; }
+.public-main .attention-site .cw-merchant-art { background:transparent; padding:24px 10px; }
+.public-main .attention-site .cw-workbench { box-shadow:0 18px 38px #193c331c; border-radius:14px; }
+.public-main .attention-site .cw-merchant-reconcile { padding:24px; margin-left:8%; box-shadow:0 16px 32px #193c3315; }
+.public-main .attention-site .ec-business-letter,
+.public-main .attention-site .ec-reconciliation-art,
+.public-main .attention-site .cw-integration-art { box-shadow:0 16px 34px #193c3308; }
+.public-main .attention-site .ec-pricing-section { background:#f3f5ee; }
+
+/* Online checkout keeps its approved interaction and artwork. */
+.public-main .attention-online .online-business-hero { background:linear-gradient(115deg,#fff 40%,#f0f5eb); padding-top:48px; }
+.public-main .attention-online .online-business-intro { align-items:center; gap:56px; }
+.public-main .attention-online .online-business-intro h1 { font-size:clamp(50px,5.3vw,72px); letter-spacing:-.06em; line-height:1.04; max-width:640px; }
+.public-main .attention-online .online-business-intro h1 span { color:#347455; }
+.public-main .attention-online .online-business-copy>p:first-child { font-size:18px; line-height:1.65; }
+.public-main .attention-online .online-business-note { font-size:12px; line-height:1.65; }
+.public-main .attention-online .online-business-journey { padding-top:36px; }
+.public-main .attention-online .cw-order-outcome { padding-block:64px; }
+.public-main .attention-online .payment-sharing-note { border-top:1px solid #d7e0d9; padding-block:64px; }
+.public-main .attention-online .payment-sharing-copy h2 { font-size:var(--attention-heading); line-height:1.12; letter-spacing:-.045em; }
+
+/* The real price and calculation are the pricing page's visual evidence. */
+.public-main .attention-pricing .commercial-hero { background:linear-gradient(115deg,#fff 40%,#f0f5eb); padding-block:48px; }
+.public-main .attention-pricing .commercial-hero-copy { gap:56px; align-items:center; }
+.public-main .attention-pricing .commercial-hero h1 { font-size:clamp(50px,5.3vw,72px); line-height:1.04; letter-spacing:-.06em; }
+.public-main .attention-pricing .commercial-lead { font-size:18px; line-height:1.65; }
+.public-main .attention-pricing .payment-offer-section { padding-top:52px; }
+.public-main .attention-pricing .pricing-panel { border:1px solid #c9d8ca; border-radius:16px; overflow:hidden; box-shadow:0 18px 42px #193c330a; }
+.public-main .attention-pricing .pricing-rate { background:#193c33; color:white; }
+.public-main .attention-pricing .pricing-rate h3,
+.public-main .attention-pricing .pricing-rate .payment-base-rate,
+.public-main .attention-pricing .pricing-account-fees dd { color:#fff; }
+.public-main .attention-pricing .pricing-rate-basis,
+.public-main .attention-pricing .pricing-account-fees dt,
+.public-main .attention-pricing .pricing-included p,
+.public-main .attention-pricing .pricing-scope { color:#d5e4d5; }
+.public-main .attention-pricing .pricing-account-fees,
+.public-main .attention-pricing .pricing-included { border-color:#5b7b63; }
+.public-main .attention-pricing .pricing-included svg { color:#c6dda9; }
+.public-main .attention-pricing .fee-estimate { background:#fbfcf7; }
+.public-main .attention-provider .commercial-section-grid { grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:80px; }
+.public-main .attention-provider .commercial-section h2 { font-size:var(--attention-heading); letter-spacing:-.04em; line-height:1.15; }
+.public-main .attention-provider .commercial-section-tint { background:#f3f5ed; }
+@media(max-width:1100px) {
+  .public-main .attention-online .online-business-intro,
+  .public-main .attention-pricing .commercial-hero-copy { gap:36px; }
+  .public-main .attention-online .online-business-intro h1,
+  .public-main .attention-pricing .commercial-hero h1 { font-size:54px; }
+}
+@media(max-width:959px) {
+  .public-main .attention-online .online-business-intro,
+  .public-main .attention-provider .commercial-section-grid,
+  .public-main .attention-pricing .commercial-hero-copy { grid-template-columns:1fr; gap:26px; }
+  .public-main .attention-online .online-business-intro h1,
+  .public-main .attention-pricing .commercial-hero h1 { font-size:clamp(46px,7.8vw,68px); }
+  .public-main .attention-site .ec-journey-rail { gap:28px; }
+  .public-main .attention-site .ec-platform-band { padding-block:48px; }
+}
+@media(max-width:600px) {
+  .public-main .attention-site { --attention-heading:34px; }
+  .public-main .attention-site .ec-orientation,
+  .public-main .attention-site .ec-platform-journey,
+  .public-main .attention-online .cw-order-outcome,
+  .public-main .attention-online .payment-sharing-note { padding-block:48px; }
+  .public-main .attention-site .ec-journey-rail { gap:28px 22px; }
+  .public-main .attention-site .ec-journey-rail h3 { font-size:20px; }
+  .public-main .attention-site .ec-industry-copy h3 { font-size:26px; }
+  .public-main .attention-online .online-business-hero,
+  .public-main .attention-pricing .commercial-hero { padding-top:32px; }
+  .public-main .attention-online .online-business-intro h1,
+  .public-main .attention-pricing .commercial-hero h1 { font-size:46px; }
+  .public-main .attention-online .online-business-copy>p:first-child { font-size:16px; }
+  .public-main .attention-site .cw-merchant-art { padding-inline:0; }
+  .public-main .attention-site .cw-merchant-reconcile { margin-left:5%; padding:20px; }
+}
+@media(max-width:350px) {
+  .public-main .attention-site { --attention-heading:31px; }
+  .public-main .attention-online .online-business-intro h1,
+  .public-main .attention-pricing .commercial-hero h1 { font-size:40px; }
+}
+
+/* Align the merchant opening with the compact workflow illustrations. */
+.public-main .attention-site .ec-merchant-hero .cw-workbench-heading { padding-block:18px; }
+.public-main .attention-site .ec-merchant-hero .cw-payment-focus { padding-block:20px 10px; }
+.public-main .attention-site .ec-merchant-hero .cw-payment-fields>div { padding-block:10px; }
+.public-main .attention-site .ec-merchant-hero .cw-workbench p { margin-block:10px; }
+
+/* Contact choices follow the commercial journey without adding a local application. */
+.company-context-contact .contact-inquiry-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.company-context-contact .contact-inquiry-grid article{display:flex;flex-direction:column;gap:24px;min-width:0;background:#f0f4ed;border:1px solid #d5dfd3;border-radius:14px;padding:32px;scroll-margin-top:100px}
+.company-context-contact .contact-inquiry-grid h3{font-size:28px;line-height:1.15;letter-spacing:-.035em;max-width:20ch;margin:0}
+.company-context-contact .contact-inquiry-grid dl{display:grid;gap:20px;margin:0}
+.company-context-contact .contact-inquiry-grid dt{font-size:13px;font-weight:600;margin-bottom:7px;color:#294b38}
+.company-context-contact .contact-inquiry-grid dd{margin:0;font-size:15px;line-height:1.65;color:#354e40;max-width:52ch}
+.company-context-contact .contact-inquiry-note{font-size:12px;line-height:1.7;color:#425c4a;margin:0;max-width:60ch}
+.company-context-contact .contact-inquiry-grid .commercial-contact-action{display:flex;align-items:flex-start;flex-direction:column;gap:10px;margin-top:auto}
+.company-context-contact .contact-inquiry-grid .cta{font-size:14px;min-height:44px}
+.company-context-contact .contact-existing{margin-top:56px}
+.company-context-contact .contact-existing>h2{font-size:28px;margin-bottom:20px}
+.company-context-contact .contact-application{display:flex;align-items:center;justify-content:space-between;gap:32px;margin-top:36px;padding-top:28px;border-top:1px solid #d5dfd3;scroll-margin-top:100px}
+.company-context-contact .contact-application h2{font-size:23px;margin-bottom:8px}
+.company-context-contact .contact-application p{font-size:14px;line-height:1.7;max-width:65ch;margin:0}
+.company-context-contact .contact-application a{flex-shrink:0;min-height:44px;display:inline-flex;align-items:center}
+@media(max-width:700px){
+ .company-context-contact .contact-inquiry-grid{grid-template-columns:1fr;gap:18px}
+ .company-context-contact .contact-inquiry-grid article{padding:26px 22px;gap:22px}
+ .company-context-contact .contact-inquiry-grid h3{font-size:27px}
+ .company-context-contact .contact-existing{margin-top:38px}
+ .company-context-contact .contact-application{display:block}
+ .company-context-contact .contact-application a{margin-top:14px}
+}
+
+/* Keep the address usable without a mail application or client scripting. */
+.contact-email-tools{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;max-width:100%}
+.contact-copy-control{display:inline-flex;align-items:center;min-width:88px;min-height:44px}
+.contact-copy-control button{appearance:none;border:0;background:transparent;color:var(--public-ink);font:inherit;font-size:12px;font-weight:600;min-height:44px;padding:8px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.contact-copy-control button:hover{color:#327357}
+.contact-copy-control button:focus-visible{outline:2px solid #327357;outline-offset:3px;border-radius:3px}
+.contact-copy-feedback{flex-basis:100%;font-size:13px;line-height:1.6;color:#354e40}

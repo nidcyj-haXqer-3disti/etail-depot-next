@@ -3,8 +3,9 @@ import { readFileSync } from "node:fs";
 import targets from "../../project-targets.json";
 import { legalIdentity } from "../../src/shared/legal-identity";
 import { legalPageMetadata } from "../../src/modules/public-site/legal-metadata";
-import { canonicalOrigin, isApprovedSearchRelease, servicePageMetadata, PUBLIC_INDEXING_APPROVAL, PUBLIC_PAGES, PUBLIC_PAGE_MODIFIED, privateRobots, publicIndexingEnabled, publicPageJsonLd, publicPageMetadata, publicPageUrl, publicRobots, publicSitemap, publicSocialImage, rootMetadata, type PublicPath } from "../../src/modules/public-site/metadata";
-import { INDEXABLE_PUBLIC_PATHS } from "../../src/shared/public-page-inventory";
+import { canonicalOrigin, isApprovedSearchRelease, servicePageMetadata, PUBLIC_INDEXING_APPROVAL, PUBLIC_PAGES, PUBLIC_PAGE_MODIFIED, privateRobots, publicIndexingEnabled, publicPageJsonLd, publicPageMetadata, publicPageUrl, publicRobots, publicSitemap, publicSocialImage, socialImageForPage, rootMetadata, type PublicPath } from "../../src/modules/public-site/metadata";
+import { CORE_PAGE_MODIFIED, REFERENCE_PAGE_MODIFIED } from "../../src/shared/public-page-revisions";
+import { CORE_PUBLIC_PATHS, INDEXABLE_PUBLIC_PATHS } from "../../src/shared/public-page-inventory";
 import { publicPageModified, pageRobots } from "../../src/modules/public-site/metadata";
 import robots from "../../src/app/robots";
 import sitemap from "../../src/app/sitemap";
@@ -90,18 +91,18 @@ describe("public search release boundary", () => {
 });
 
 describe("reviewed public metadata", () => {
-  it("keeps the merchant-facing Home metadata focused on payments and the partner preview separate", () => {
+  it("keeps the reviewed Home and software platform metadata distinct", () => {
     expect(PUBLIC_PAGES["/"]).toEqual({
-      title: "Merchant Services & Credit Card Processing",
-      description: "Credit card and ACH payment processing for online businesses and software platforms. Explore merchant onboarding, checkout, payment records and payouts.",
+      title: "Merchant Services for Businesses and Platforms",
+      description: "Merchant services for US businesses and software platforms. Credit card processing, ACH payments, online checkout and payout reporting.",
     });
     for (const changes of [{}, ...rejectedEnvironments.map(([, changes]) => changes)]) {
       stubEnvironment(changes);
       const metadata = servicePageMetadata("/software-partners");
       expect(metadata.robots).toEqual(pageRobots("/software-partners"));
       expect(metadata.alternates).toEqual({ canonical: `${canonicalOrigin}/software-partners` });
-      expect(metadata.title).toEqual({ absolute: "Payment Processing for Software Platforms | Etail Depot" });
-      expect(metadata.description).toBe("Card and ACH payment processing for commerce marketplaces, freight, travel and legal software. Connect merchant accounts, checkout and reconciliation.");
+      expect(metadata.title).toEqual({ absolute: "Merchant Services for Software Platforms | Etail Depot" });
+      expect(metadata.description).toBe("Merchant accounts, credit card processing, checkout and reporting for software platforms, with guidance on integration and merchant eligibility.");
       expect(metadata.openGraph).toMatchObject({ url: `${canonicalOrigin}/software-partners` });
       expect(publicSitemap().some(entry => entry.url.includes("software-partners"))).toBe(publicIndexingEnabled());
     }
@@ -147,11 +148,11 @@ describe("reviewed public metadata", () => {
         expect(metadata.description).toContain("$200 minimum deposit");
         expect(metadata.description).toContain("$0 annual and monthly fees");
         expect(metadata.description).toContain("Pay in full each month");
-        expect(metadata.description).toContain("Applications are not open");
+        expect(metadata.description).not.toContain("Applications are not open");
       }
       expect(metadata.alternates).toEqual({ canonical: new URL(path, canonicalOrigin).href });
-      expect(metadata.openGraph).toMatchObject({ url: publicPageUrl(path), siteName: "Etail Depot", type: "website", images: [publicSocialImage] });
-      expect(metadata.twitter).toMatchObject({ card: "summary_large_image", images: [publicSocialImage] });
+      expect(metadata.openGraph).toMatchObject({ url: publicPageUrl(path), siteName: "Etail Depot", type: "website", images: [socialImageForPage(path)] });
+      expect(metadata.twitter).toMatchObject({ card: "summary_large_image", images: [socialImageForPage(path)] });
     }
     expect(rootMetadata.openGraph).toMatchObject({ images: [publicSocialImage] });
     expect(rootMetadata.twitter).toMatchObject({ images: [publicSocialImage] });
@@ -183,14 +184,32 @@ describe("reviewed public metadata", () => {
     expect(publicRobots().sitemap).toBe(`${canonicalOrigin}/sitemap.xml`);
   });
 
+  it("requires an explicit revision for every core page and preserves unchanged reference dates", () => {
+    expect(Object.keys(CORE_PAGE_MODIFIED).sort()).toEqual([...CORE_PUBLIC_PATHS].sort());
+    expect(publicPageModified("/merchant-onboarding")).toBe("2026-10-31");
+    expect(publicPageModified("/payouts-and-reconciliation")).toBe("2026-10-30");
+    for (const [collection, date] of Object.entries(REFERENCE_PAGE_MODIFIED)) {
+      expect(date).toBe("2026-10-29");
+      for (const path of INDEXABLE_PUBLIC_PATHS.filter(path => path === collection || path.startsWith(`${collection}/`))) {
+        expect(publicPageModified(path)).toBe(date);
+      }
+    }
+  });
+
+  it("does not invent revision dates for aliases, queries, retired or unknown references", () => {
+    for (const path of ["/merchant-services", "/merchant-onboarding/", "/docs/checkout?account=private", "/guides#articles", "/guides/iso-20022/unknown/code", "/guides/iso-8583/2023/messages/2100", "/guides/stripe-alternatives", "__proto__"]) {
+      expect(() => publicPageModified(path)).toThrow("Only an exact reviewed page");
+    }
+  });
+
   it("keeps reviewed page revision dates stable as the build clock advances", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
-    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-29");
-    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-10-29");
-    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-29");
-    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-10-29");
-    expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-10-29");
+    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-31");
+    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-10-31");
+    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-31");
+    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-10-31");
+    expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-10-31");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10)).toBe(date);
@@ -225,9 +244,9 @@ describe("public structured data", () => {
     });
     expect(page).toMatchObject({
       url: publicPageUrl(path), name: PUBLIC_PAGES[path].title, description: PUBLIC_PAGES[path].description, inLanguage: "en-US",
-      dateModified: PUBLIC_PAGE_MODIFIED[path],
+      dateModified: publicPageModified(path),
       isPartOf: { "@id": website["@id"] }, publisher: { "@id": organization["@id"] },
-      primaryImageOfPage: { "@type": "ImageObject", url: publicSocialImage.url, width: 1200, height: 630 },
+      primaryImageOfPage: { "@type": "ImageObject", url: socialImageForPage(path).url, width: 1200, height: 630 },
     });
     expect(serialized).not.toMatch(/<|FinancialService|BankOrCreditUnion|aggregateRating|offers|address|sameAs|personId|cardId|channelId|access_token/);
     expect(page).not.toHaveProperty("author");

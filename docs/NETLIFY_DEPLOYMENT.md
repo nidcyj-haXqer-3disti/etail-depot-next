@@ -4,7 +4,7 @@ The only target is etail-depot-next, site cbbb6c24-9dbc-43a2-9234-e4357b5b5280, 
 
 ## Candidate checks
 
-Use the pinned runtime and frozen lockfile. Run pnpm verify:public, pnpm test:seo:production, pnpm package:netlify and pnpm verify:package against the exact candidate. The production scope is 3,725 content pages and 3,723 nonlegal sitemap URLs. Reference data, notices, output bytes and source fingerprints must match. Exclude private research and the old reproduced ISO 8583 tables.
+Use the pinned runtime and frozen lockfile. Run pnpm verify:public, pnpm test:seo:production, pnpm package:netlify and pnpm verify:package against the exact candidate. The reviewed local PayFac candidate contains 3,738 content pages and 3,736 nonlegal sitemap URLs. The previously published baseline contains 3,725 content pages and 3,723 nonlegal sitemap URLs; the thirteen new commercial pages are not live until a separately authorized release. Reference data, notices, output bytes and source fingerprints must match the candidate receipt in tools/reference-release.json. Exclude private research and the old reproduced ISO 8583 tables.
 
 APP_ENV=production, ETAIL_SEARCH_CONTEXT=production and ETAIL_PUBLIC_ORIGIN=https://etaildepot.com must exist in build and function scopes. SITE_ID must identify the bound project and deploy context must be production. TOML only supplies build values. Verify the necessary nonsecret runtime settings before publication; do not expose secrets or copy production markers into local environment files.
 

@@ -28,3 +28,9 @@ __pycache__/
 /planning/VENDOR_JOURNEY_ACCEPTANCE.json
 /planning/release-scope-20261027.json
 /outputs/
+
+# Generated local design and verification receipts; preserved outside the publishable source
+/planning/attention-stage*.json
+/planning/connected-workflows-stage*.json
+/planning/final-production-review-*.json
+/planning/qa-consolidation-*.json

@@ -1,0 +1,92 @@
+/* Artwork presentation only. Page hierarchy, navigation and product controls retain their own styles. */
+.public-main .attention-site.cw-pilot .cw-merchant-art {padding:24px;border:1px solid #cedbd0;border-radius:16px;background:#edf3e6;}
+.public-main .cw-pilot .cw-workbench {border-radius:12px;box-shadow:0 18px 32px -25px #193c3350;}
+.public-main .cw-workbench-heading {padding:22px 24px;}
+.public-main .cw-workbench-heading small,.public-main .cw-workbench-heading div > span {font-size:12px;line-height:1.5;}
+.public-main .cw-workbench-tabs {padding-inline:24px;font-size:13px;}
+.public-main .cw-workbench .cw-payment-focus {padding:24px;margin:18px 22px 0;background:#204638;color:#fff;border-radius:10px;}
+.public-main .cw-payment-focus > small,.public-main .cw-payment-focus > p {color:#d4e3cb;font-size:12px;line-height:1.6;}
+.public-main .cw-payment-focus > div > strong {color:#fff;font-size:38px;line-height:1.15;letter-spacing:-.035em;}
+.public-main .cw-payment-focus .cw-art-tag {background:#e7f0d8;color:#244b3b;border-color:#bdd2ab;font-size:11px;}
+.public-main .cw-payment-fields {padding-inline:24px;}
+.public-main .cw-payment-fields > div {font-size:13px;line-height:1.6;padding-block:15px;}
+.public-main .cw-payment-record-footer {font-size:12px;}
+.public-main .cw-merchant-reconcile {border-radius:11px;padding:23px;gap:16px;}
+.public-main .cw-merchant-reconcile span {font-size:12px;line-height:1.6;}
+.public-main .cw-merchant-reconcile strong {font-size:18px;}
+.public-main .cw-pilot .ec-reconciliation-art {border:1px solid #cedbd0;border-radius:16px;padding:24px;background:#edf3e6;}
+.public-main .ec-reconciliation-art .ec-report-paper {border-radius:12px;border-color:#d0ddc6;box-shadow:0 18px 32px -25px #193c3350;}
+.public-main .ec-report-top {font-size:13px;line-height:1.5;}
+.public-main .ec-reconciliation-art .ec-record-line {font-size:14px;line-height:1.5;}
+.public-main .ec-reconciliation-art .ec-report-total {background:#f0f5e8;margin-inline:-16px;padding-inline:16px;border-radius:8px;border:0;}
+.public-main .ec-reconciliation-art .ec-record-caption {font-size:12px;line-height:1.7;}
+.public-main .ec-reconcile-band {border-radius:11px;gap:15px;}
+.public-main .ec-reconcile-band strong {font-size:19px;}
+.public-main .ec-reconcile-band p {font-size:13px;line-height:1.65;}
+.public-main .ec-journey-marker {border-radius:12px;background:#edf3e6;border:1px solid #cfddc5;}
+.public-main .ec-journey-marker svg {width:26px;height:26px;color:#315e48;}
+.public-main .ec-industry-scene {border:1px solid #cfddc5;border-radius:14px;box-shadow:0 16px 32px -27px #193c3345;background:#f2f6ec;}
+.public-main .ec-industry-scene .ec-scene-kicker {font-size:13px;line-height:1.6;color:#315e48;}
+.public-main .ec-industry-scene .ec-scene-kicker > svg {width:24px;height:24px;}
+.public-main .ec-industry-scene .ec-record-line {font-size:13px;line-height:1.6;}
+.public-main .ec-route-display {border-block:1px solid #d3dfca;padding-block:26px;}
+.public-main .ec-route-display strong {font-size:23px;}
+.public-main .ec-booking-display strong,.public-main .ec-matter-display strong {font-size:27px;line-height:1.2;}
+.public-main .cw-company.enterprise-support .company-context-art {border-radius:16px;border-color:#cedbd0;box-shadow:0 14px 35px -26px #193c3340;}
+.public-main .cw-company .company-identity-name {padding:28px;background:#204638;gap:18px;}
+.public-main .cw-company .company-identity-name img {width:64px;height:56px;object-fit:contain;padding:11px;background:#f0f5e8;border-radius:11px;}
+.public-main .cw-company .company-identity-name strong {font-size:13px;}
+.public-main .cw-company .company-identity-services p {font-size:14px;line-height:1.65;}
+.public-main .cw-company .company-identity-connection {font-size:12px;}
+.public-main .cw-company .company-identity figcaption > span,.public-main .cw-company .company-identity figcaption p {font-size:13px;line-height:1.7;}
+.public-main .cw-company .trust-documents .context-art-heading {background:#204638;}
+.public-main .cw-company .trust-documents dt {font-size:15px;}
+.public-main .cw-company .trust-documents dd {font-size:14px;line-height:1.7;}
+.public-main .cw-company .trust-documents figcaption {font-size:13px;line-height:1.7;}
+.public-main .cw-company .facilitator-relationship > div {border-radius:12px;box-shadow:0 14px 28px -27px #193c3345;}
+.public-main .cw-company .facilitator-etail {background:#204638;}
+.public-main .cw-company .facilitator-etail img {flex:none;width:48px;height:42px;object-fit:contain;padding:8px;background:#f0f5e8;border-radius:9px;}
+.public-main .cw-company .facilitator-context figcaption {font-size:13px;line-height:1.7;}
+.public-main .cw-docs :is(.docs-diagram,.docs-sequence) {border-radius:14px;border-color:#cedbd0;box-shadow:0 14px 28px -28px #193c3338;}
+.public-main .cw-docs .docs-diagram-heading {background:#204638;color:#f7faf1;border-bottom-color:#315e48;padding:21px 24px;}
+.public-main .cw-docs .docs-diagram-heading > svg {color:#d6e6c4;}
+.public-main .cw-docs .docs-diagram-heading > span {font-size:16px;font-weight:500;}
+.public-main .cw-docs .docs-diagram ol:not(.docs-workflow ol) {background:#f1f5eb;}
+.public-main .cw-docs .docs-diagram li {border-radius:10px;}
+.public-main .cw-docs .docs-workflow li {border-radius:0;}
+.public-main .cw-docs .docs-workflow-number,.public-main .cw-docs .docs-sequence-number {position:relative;z-index:1;background:#edf3e5;color:#244b3b;border-color:#becfaf;}
+.public-main .cw-docs .docs-workflow li:not(:last-child)::after {content:"";position:absolute;left:14px;top:52px;bottom:-22px;width:1px;background:#d0ddc4;}
+.public-main .cw-docs .docs-checkout-sequence li:not(:last-child)::after {content:"";position:absolute;left:13px;top:52px;bottom:-24px;width:1px;background:#d0ddc4;}
+.public-main .cw-docs .docs-sequence-transfer {font-size:12px;color:#526650;}
+.public-main .cw-docs .docs-request-origin {background:#edf3e5;border-radius:10px;padding:21px;}
+.public-main .cw-docs .docs-request-purchases > div {border-radius:10px;padding:21px;}
+.public-main .cw-docs .docs-request-purchases > div > span {font-size:13px;}
+.public-main .cw-docs .docs-diagram-access li > svg,.public-main .cw-docs .docs-diagram-launch li > svg {width:22px;height:22px;}
+.public-main .cw-online .payment-service-explorer {border-radius:16px;border-color:#cedbd0;}
+.public-main .cw-online .payment-link-art {border-radius:16px;}
+.public-main .cw-cards .bp-card-stage {border-radius:16px;border-color:#cedbd0;}
+@media(max-width:700px) {
+ .public-main .cw-company .facilitator-relationship > div{grid-template-columns:48px minmax(0,1fr);}
+ .public-main .cw-company .facilitator-relationship > div > .icon{justify-self:center;}
+ .public-main .attention-site.cw-pilot .cw-merchant-art{padding:20px;}
+ .public-main .cw-pilot .ec-reconciliation-art{padding:20px;}
+ .public-main .cw-company .company-identity-name{padding:24px;}
+ .public-main .cw-company .company-identity-name img{width:54px;height:48px;}
+ .public-main .cw-company .company-identity-services p{font-size:13px;}
+ .public-main .cw-company .company-identity figcaption{grid-template-columns:1fr;gap:5px;}
+ .public-main .cw-docs .docs-diagram-heading{padding:18px;}
+ .public-main .cw-docs .docs-diagram-heading > span{font-size:15px;}
+ .public-main .cw-docs .docs-workflow li:not(:last-child)::after{left:13px;top:48px;bottom:-20px;}
+}
+@media(max-width:380px) {
+ .public-main .attention-site.cw-pilot .cw-merchant-art{padding:16px;}
+ .public-main .cw-workbench-heading{padding:20px;}
+ .public-main .cw-workbench .cw-payment-focus{margin:16px 16px 0;padding:20px;}
+ .public-main .cw-payment-focus > div > strong{font-size:32px;}
+ .public-main .cw-payment-fields{padding-inline:20px;}
+ .public-main .cw-pilot .ec-reconciliation-art{padding:16px;}
+ .public-main .ec-route-display strong{font-size:20px;}
+}
+@media(forced-colors:active) {
+ .public-main .cw-workbench .cw-payment-focus,.public-main .cw-docs .docs-diagram-heading{background:Canvas;color:CanvasText;border:1px solid CanvasText;}
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import snapshot from "./iso8583-independent-data.json";
-import { canonicalOrigin, pageRobots, publicSocialImage } from "./metadata";
+import { canonicalOrigin, pageRobots, publicPageModified, socialImageForPage } from "./metadata";
 
 export const ISO8583_PATH = "/guides/iso-8583";
 export const REFERENCE_SOURCES = snapshot.sources;
@@ -118,8 +118,11 @@ export function bitmapPosition(field: string) {
   const n = Number(field), bitmap = n <= 64 ? "Primary" : "Secondary", position = n <= 64 ? n : n - 64;
   return { bitmap, position, byte: Math.floor((position - 1) / 8) + 1, bit: (position - 1) % 8 + 1 };
 }
+export function formatBytes(count: number, qualifier = "") {
+  return `${count} ${qualifier}${count === 1 ? "byte" : "bytes"}`;
+}
 export function formatProfile(profile: DataField["profiles"]["default"]) {
-  return { encoding: profile.data_enc === "b" ? "Binary" : "ASCII", size: `${profile.max_len} bytes`, length: profile.len_type === 0 ? "Fixed length" : `${profile.len_type} ASCII length bytes`, variable: profile.len_type !== 0 };
+  return { encoding: profile.data_enc === "b" ? "Binary" : "ASCII", size: formatBytes(profile.max_len), length: profile.len_type === 0 ? "Fixed length" : formatBytes(profile.len_type, "ASCII length "), variable: profile.len_type !== 0 };
 }
 export function referenceIdentity(section?: ReferenceSection, entry?: ReferenceEntry) {
   const path = referencePath(section, entry);
@@ -130,8 +133,8 @@ export function referenceIdentity(section?: ReferenceSection, entry?: ReferenceE
 export function iso8583Metadata(section?: ReferenceSection, entry?: ReferenceEntry): Metadata {
   const x = referenceIdentity(section, entry), url = canonicalOrigin + x.path;
   return { title: { absolute: x.title }, description: x.description, alternates: { canonical: url }, robots: pageRobots(x.path),
-    openGraph: { type: "website", title: x.title, description: x.description, url, siteName: "Etail Depot", images: [publicSocialImage] },
-    twitter: { card: "summary_large_image", title: x.title, description: x.description, images: [publicSocialImage] } };
+    openGraph: { type: "website", title: x.title, description: x.description, url, siteName: "Etail Depot", images: [socialImageForPage(x.path)] },
+    twitter: { card: "summary_large_image", title: x.title, description: x.description, images: [socialImageForPage(x.path)] } };
 }
 export function iso8583JsonLd(section?: ReferenceSection, entry?: ReferenceEntry) {
   const x = referenceIdentity(section, entry), url = canonicalOrigin + x.path;
@@ -140,7 +143,7 @@ export function iso8583JsonLd(section?: ReferenceSection, entry?: ReferenceEntry
   if (entry) crumbs.push({ name: entry.code, path: x.path });
   const citations = entry ? [sourceUrl(entry)] : REFERENCE_SOURCES.map(source => source.url);
   return JSON.stringify({ "@context": "https://schema.org", "@graph": [
-    { "@type": entry || section?.slug === "encoding" ? "WebPage" : "CollectionPage", "@id": url + "#webpage", url, name: x.name, description: x.description, inLanguage: "en-US", citation: citations, isBasedOn: citations,
+    { "@type": entry || section?.slug === "encoding" ? "WebPage" : "CollectionPage", "@id": url + "#webpage", url, name: x.name, description: x.description, inLanguage: "en-US", dateModified: publicPageModified(x.path), citation: citations, isBasedOn: citations,
       publisher: { "@id": canonicalOrigin + "/#organization" }, isPartOf: { "@id": canonicalOrigin + "/#website" }, breadcrumb: { "@id": url + "#breadcrumb" } },
     { "@type": "BreadcrumbList", "@id": url + "#breadcrumb", itemListElement: crumbs.map((crumb, index) => ({ "@type": "ListItem", position: index + 1, name: crumb.name, item: canonicalOrigin + crumb.path })) },
     ...(!entry && section?.slug !== "encoding" ? [{ "@type": "ItemList", numberOfItems: section ? referenceEntries(section).length : REFERENCE_SECTIONS.length, itemListElement: (section ? referenceEntries(section).map(item => ({ name: item.title, url: canonicalOrigin + referencePath(section, item) })) : REFERENCE_SECTIONS.map(item => ({ name: item.title, url: canonicalOrigin + referencePath(item) }))).map((item, index) => ({ "@type": "ListItem", position: index + 1, ...item })) }] : []),

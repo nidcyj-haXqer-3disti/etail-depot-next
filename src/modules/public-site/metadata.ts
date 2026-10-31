@@ -1,6 +1,11 @@
+import { documentationPages, documentationPaths, documentationPath, documentationMetadata, type DocumentationSlug } from "./documentation-catalog";
+import { COMMERCIAL_PAGES } from "./commercial-content";
 import { industryUseCaseNavigation } from "@/shared/industry-use-cases";
 import type { Metadata, MetadataRoute } from "next";
 import { INDEXABLE_PUBLIC_PATHS, isIndexablePath } from "@/shared/public-page-inventory";
+import { socialPreviewImage } from "@/shared/social-preview";
+import { CORE_PAGE_MODIFIED, publicPageModified } from "@/shared/public-page-revisions";
+export { publicPageModified } from "@/shared/public-page-revisions";
 import { serviceLabels } from "@/shared/service-language";
 import { productFacts } from "@/shared/product-facts";
 import { cardProduct } from "@/shared/card-product";
@@ -13,24 +18,21 @@ const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts
   : `$${productFacts.cards.annualFeeDollars} annual fee and $${productFacts.cards.monthlyFeeDollars} monthly fee`;
 
 export const PUBLIC_PAGES = {
-  "/": { title: "Merchant Services & Credit Card Processing", description: "Credit card and ACH payment processing for online businesses and software platforms. Explore merchant onboarding, checkout, payment records and payouts." },
-  "/credit-card-services": { title: "Card Services: Ledgix Secured Credit Card", description: `${cardProduct.name}: virtual ${cardProduct.creditType}, $${productFacts.cards.minimumDepositDollars} minimum deposit, ${cardFeesDescription}. ${productFacts.cards.repayment}. Applications are not open.` },
-  "/payment-acceptance-service": { title: "Merchant Services & Online Card Processing", description: "Accept online card and ACH payments with Trolleys. Explore checkout, transaction records, payouts, refunds and disputes, plus clear card processing fees." },
-  "/help": { title: "Help Center: Merchant and Card Services", description: "Find Trolleys merchant support, Ledgix secured credit card inquiries and help signing in. Contact Etail Depot for website, privacy and legal questions." },
-  "/guides": { title: "ISO 20022 & ISO 8583 Code Reference", description: "Browse ISO 20022 external code sets and an independent ISO 8583 implementation reference, with message types, field formats, explanations and identified sources." },
+  "/": { title: "Merchant Services for Businesses and Platforms", description: "Merchant services for US businesses and software platforms. Credit card processing, ACH payments, online checkout and payout reporting." },
+  "/credit-card-services": { title: "Card Services: Ledgix Secured Credit Card", description: `${cardProduct.name}: virtual ${cardProduct.creditType}, $${productFacts.cards.minimumDepositDollars} minimum deposit, ${cardFeesDescription}. ${productFacts.cards.repayment}.` },
+  "/payment-acceptance-service": { title: "Merchant Services and Credit Card Processing", description: "Merchant services and credit card processing for US businesses. Explore account setup, online checkout, ACH payments, refunds and payout reporting." },
+  "/help": { title: "Help Center", description: "Get help with merchant account access, payment status, refunds, disputes and payouts. Find contacts for software integrations, card inquiries and privacy." },
+  "/guides": { title: "ISO 20022 and ISO 8583 Payment References", description: "Find ISO 20022 external code definitions and independent ISO 8583 message and field explanations, with their code set, implementation and source context." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
-// UTC dates of each candidate page's last significant content update. Maintain when
-// its content, relevant shared content, metadata or links materially change.
-// Do not advance for deployments, cosmetic edits or copyright-year changes alone.
-// Local revisions become public only in the next approved release.
+// Preserve the public metadata subset while sharing one explicit page revision register.
 export const PUBLIC_PAGE_MODIFIED = {
-  "/": "2026-10-29",
-  "/credit-card-services": "2026-10-29",
-  "/payment-acceptance-service": "2026-10-29",
-  "/help": "2026-10-29",
-  "/guides": "2026-10-29",
+  "/": CORE_PAGE_MODIFIED["/"],
+  "/credit-card-services": CORE_PAGE_MODIFIED["/credit-card-services"],
+  "/payment-acceptance-service": CORE_PAGE_MODIFIED["/payment-acceptance-service"],
+  "/help": CORE_PAGE_MODIFIED["/help"],
+  "/guides": CORE_PAGE_MODIFIED["/guides"],
 } as const satisfies Record<PublicPath, string>;
 
 export function publicIndexingEnabled(): boolean {
@@ -38,12 +40,8 @@ export function publicIndexingEnabled(): boolean {
 }
 
 export const privateRobots: Metadata["robots"] = { index: false, follow: false, googleBot: { index: false, follow: false, noimageindex: true } };
-export const publicSocialImage = {
-  url: `${canonicalOrigin}/opengraph-image`,
-  width: 1200,
-  height: 630,
-  alt: `Etail Depot: Merchant services and card services. ${cardProduct.name}: applications are not open.`,
-};
+export const publicSocialImage = socialPreviewImage("/", canonicalOrigin);
+export const socialImageForPage = (path: string) => socialPreviewImage(path, canonicalOrigin);
 const homeTitle = `${PUBLIC_PAGES["/"].title} | Etail Depot`;
 export const rootMetadata: Metadata = {
   metadataBase: new URL(canonicalOrigin),
@@ -63,48 +61,39 @@ export function publicPageUrl(path: PublicPath): string {
 export function publicPageMetadata(path: PublicPath): Metadata {
   const url = publicPageUrl(path), page = PUBLIC_PAGES[path];
   const title = `${page.title} | Etail Depot`;
+  const image = socialImageForPage(path);
   return {
     // Absolute titles also brand Home, where the root layout's child template does not apply.
     title: { absolute: title }, description: page.description,
     alternates: { canonical: url },
     robots: pageRobots(path),
-    openGraph: { type: "website", url, title, description: page.description, siteName: "Etail Depot", locale: "en_US", images: [publicSocialImage] },
-    twitter: { card: "summary_large_image", title, description: page.description, images: [publicSocialImage] },
+    openGraph: { type: "website", url, title, description: page.description, siteName: "Etail Depot", locale: "en_US", images: [image] },
+    twitter: { card: "summary_large_image", title, description: page.description, images: [image] },
   };
 }
 
 // Reviewed service and documentation pages share the same exact production guard.
 export const SERVICE_PAGES = {
-  "/docs/merchant-onboarding": { title: "Merchant Account Setup | Documentation", description: "Prepare a merchant application, complete account review and confirm processing readiness." },
-  "/docs/integration-access": { title: "Integration Access | Documentation", description: "Map merchant accounts, permissions and separate credentials for checkout and reporting." },
-  "/docs/checkout": { title: "Online Checkout | Documentation", description: "Connect an order to checkout, payment completion and a verified transaction result." },
-  "/docs/payment-requests": { title: "Payment Requests | Documentation", description: "Create and share a hosted payment request, then match the transaction to the order." },
-  "/docs/payment-status": { title: "Payment Status | Documentation", description: "Understand authorization, capture, pending results and safe recovery from an interrupted payment." },
-  "/docs/refunds-and-disputes": { title: "Refunds and Disputes | Documentation", description: "Choose the appropriate refund or dispute action and follow the operation through its result." },
-  "/docs/payouts": { title: "Payouts and Reconciliation | Documentation", description: "Reconcile settlements, fees and adjustments with funding records and bank receipt." },
-  "/docs/webhooks": { title: "Events and Webhooks | Documentation", description: "Handle account, payment and funding events with verification, deduplication and recovery." },
-  "/docs/testing-and-launch": { title: "Sandbox and Launch | Documentation", description: "Arrange sandbox access, confirm payment setup and prepare for launch." },
-  "/online-businesses": { title: "Online Payments for Businesses", description: "Explore merchant onboarding, online card and ACH checkout, payment requests and payout records for your US business." },
-  "/docs": { title: "Payment Documentation: Merchant Operations and Developer Integration", description: "Set up merchant accounts, connect checkout, verify payment updates and reconcile bank deposits. Task documentation for operations teams and developers." },
-  "/software-partners": { title: "Payment Processing for Software Platforms", description: "Card and ACH payment processing for commerce marketplaces, freight, travel and legal software. Connect merchant accounts, checkout and reconciliation." },
+  ...COMMERCIAL_PAGES,
+  ...documentationMetadata,
+  "/online-businesses": { title: "Online Payments and Checkout", description: "Accept credit cards, digital wallets and ACH online. Connect checkout to orders and payment records using the methods enabled for your merchant account." },
+  "/docs": { title: "Documentation", description: "Set up a merchant account, connect checkout and follow payments through to reconciliation." },
+  "/software-partners": { title: "Merchant Services for Software Platforms", description: "Merchant accounts, credit card processing, checkout and reporting for software platforms, with guidance on integration and merchant eligibility." },
 } as const;
 export function servicePageMetadata(path: keyof typeof SERVICE_PAGES): Metadata {
   if (!Object.hasOwn(SERVICE_PAGES, path)) throw new Error("Only the exact reviewed service page may use service metadata.");
   const page = SERVICE_PAGES[path], url = new URL(path, canonicalOrigin).href;
-  const title = `${page.title} | Etail Depot`;
+  const title = page.title.endsWith("Etail Depot") ? page.title : `${page.title} | Etail Depot`;
+  const image = socialImageForPage(path);
   return {
     title: { absolute: title }, description: page.description,
     alternates: { canonical: url }, robots: pageRobots(path),
-    openGraph: { type: "website", url, title, description: page.description, siteName: "Etail Depot", locale: "en_US", images: [publicSocialImage] },
-    twitter: { card: "summary_large_image", title, description: page.description, images: [publicSocialImage] },
+    openGraph: { type: "website", url, title, description: page.description, siteName: "Etail Depot", locale: "en_US", images: [image] },
+    twitter: { card: "summary_large_image", title, description: page.description, images: [image] },
   };
 }
 export function pageRobots(path: string): Metadata["robots"] {
   return isIndexablePath(path) && publicIndexingEnabled() ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } } : privateRobots;
-}
-export function publicPageModified(path: string): string {
-  if (path === "/software-partners" || path === "/online-businesses" || path === "/docs" || path.startsWith("/docs/") || path.startsWith("/guides/iso-")) return "2026-10-29";
-  return Object.hasOwn(PUBLIC_PAGE_MODIFIED, path) ? PUBLIC_PAGE_MODIFIED[path as PublicPath] : "2026-10-27";
 }
 export function publicSitemap(): MetadataRoute.Sitemap {
   // Never read identities, services, cards, channels, support cases or database rows here.
@@ -149,9 +138,9 @@ export function publicPageJsonLd(path: PublicPath): string {
       {
         "@type": path === "/guides" ? "CollectionPage" : "WebPage", "@id": `${url}#webpage`, url, name: page.title, description: page.description,
         ...(path === "/guides" ? { mainEntity: { "@id": `${url}#reference-collections` } } : {}),
-        dateModified: PUBLIC_PAGE_MODIFIED[path],
+        dateModified: publicPageModified(path),
         inLanguage: "en-US", isPartOf: { "@id": websiteId }, publisher: { "@id": organizationId },
-        primaryImageOfPage: { "@type": "ImageObject", url: publicSocialImage.url, width: publicSocialImage.width, height: publicSocialImage.height },
+        primaryImageOfPage: { "@type": "ImageObject", url: socialImageForPage(path).url, width: 1200, height: 630 },
         ...(path !== "/" ? { breadcrumb: { "@id": breadcrumbId } } : {}),
       },
       ...(path === "/guides" ? [{
@@ -172,6 +161,43 @@ export function publicPageJsonLd(path: PublicPath): string {
     ],
   };
   return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+/** Describe the visible task library, without implying an API contract or rich result. */
+export function documentationJsonLd(slug?: DocumentationSlug): string {
+  const page = slug ? documentationPages.find(item => item.slug === slug)! : null;
+  const path = slug ? documentationPath(slug) : "/docs";
+  const details = SERVICE_PAGES[path];
+  const url = new URL(path, canonicalOrigin).href;
+  const group = page ? documentationPaths.find(item => item.title === page.group)! : null;
+  const breadcrumbId = `${url}#breadcrumb`;
+  const graph: object[] = [{
+    "@type": slug ? "WebPage" : "CollectionPage", "@id": `${url}#webpage`,
+    url, name: details.title, description: details.description,
+    inLanguage: "en-US", dateModified: publicPageModified(path),
+    isPartOf: { "@id": slug ? `${canonicalOrigin}/docs#webpage` : `${canonicalOrigin}/#website` },
+    publisher: { "@id": `${canonicalOrigin}/#organization` },
+    breadcrumb: { "@id": breadcrumbId },
+    ...(!slug ? { mainEntity: { "@id": `${url}#topics` } } : {}),
+  }];
+  graph.push({
+    "@type": "BreadcrumbList", "@id": breadcrumbId,
+    itemListElement: [
+      ...(!page ? [{ name: "Etail Depot", item: `${canonicalOrigin}/` }] : []),
+      { name: "Documentation", item: `${canonicalOrigin}/docs` },
+      ...(group ? [{ name: group.title, item: `${canonicalOrigin}/docs#${group.id}` }] : []),
+      ...(page ? [{ name: page.title, item: url }] : []),
+    ].map((item, index) => ({ "@type": "ListItem", position: index + 1, ...item })),
+  });
+  if (!page) {
+    graph.push({
+      "@type": "ItemList", "@id": `${url}#topics`, name: "Documentation topics",
+      numberOfItems: documentationPages.length, itemListOrder: "https://schema.org/ItemListUnordered",
+      itemListElement: documentationPaths.flatMap(group => documentationPages.filter(item => item.group === group.title))
+        .map((item, index) => ({ "@type": "ListItem", position: index + 1, name: item.title, url: new URL(documentationPath(item.slug), canonicalOrigin).href })),
+    });
+  }
+  return JSON.stringify({ "@context": "https://schema.org", "@graph": graph }).replace(/</g, "\\u003c");
 }
 
 /** Describe only the visible platform overview and its four reviewed use cases. */

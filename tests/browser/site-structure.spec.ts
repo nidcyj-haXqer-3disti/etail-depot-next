@@ -1,17 +1,18 @@
 import { expect, test } from "@playwright/test";
 
-test("primary categories support keyboard, outside dismissal and service navigation", async ({ page }) => {
+test("primary categories support keyboard, outside dismissal and service navigation", async ({ page, browserName }) => {
   await page.goto("/");
   const header = page.getByRole("banner");
   const menu = header.getByRole("button", { name: "Menu", exact: true });
   if (await menu.isVisible()) await menu.click();
   const nav = header.getByRole("navigation", { name: "Main navigation" });
   const services = nav.locator("summary").filter({ hasText: /^Services$/ });
-  const useCases = nav.locator("summary").filter({ hasText: /^Use cases$/ });
-  await expect(nav.locator(":scope > a, :scope > details > summary")).toHaveText(["Services", "Use cases", "Documentation", "Guides"]);
+  const useCases = nav.locator("summary").filter({ hasText: /^Platforms$/ });
+  await expect(nav.locator(":scope > a, :scope > details > summary")).toHaveText(["Services", "Platforms", "Resources", "Company", "Pricing"]);
   await services.focus(); await page.keyboard.press("Enter");
   await expect(nav.getByRole("link", { name: "Merchant services", exact: true })).toBeVisible();
-  await page.keyboard.press("Tab");
+  // WebKit on macOS uses Option+Tab to include links in keyboard navigation.
+  await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
   await expect(nav.getByRole("link", { name: "Merchant services", exact: true })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(services).toBeFocused();
@@ -26,13 +27,41 @@ test("primary categories support keyboard, outside dismissal and service navigat
   await services.click();
   await nav.getByRole("link", { name: "Card services", exact: true }).click();
   await expect(page).toHaveURL(/\/credit-card-services$/);
-  await expect(page.getByRole("main")).toContainText("Applications are not open yet.");
+  await expect(page.getByRole("main")).toContainText("An inquiry is not an application.");
   await expect(nav.locator("details[open]")).toHaveCount(0);
   if (await menu.isVisible()) await menu.click();
+  await nav.locator("summary").filter({hasText:/^Resources$/}).click();
   await nav.getByRole("link", { name: "Documentation", exact: true }).click();
   await expect(page).toHaveURL(/\/docs$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Payment documentation");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Documentation");
   await page.goBack(); await expect(page).toHaveURL(/\/credit-card-services$/);
+});
+
+test("platform visitors reach partnership terms through payment models without an extra platform section", async ({ page }) => {
+  await page.goto("/");
+  const header = page.getByRole("banner");
+  const nav = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
+  for (const [label, route] of [["Payment models", "/platform-payment-models"], ["Software platforms", "/software-partners"]]) {
+    const toggle = header.getByRole("button", { name: "Menu", exact: true });
+    if (await toggle.isVisible()) await toggle.click();
+    const category = nav.locator("summary").filter({ hasText: /^Platforms$/ });
+    await category.focus(); await page.keyboard.press("Enter");
+    await nav.getByRole("link", { name: label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${route}$`));
+    await expect(category).toHaveClass("is-current");
+    await expect(nav.locator("details[open]")).toHaveCount(0);
+    if (await toggle.isVisible()) await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  }
+  await expect(header.locator('a[href="/payment-partnerships"]')).toHaveCount(0);
+  await expect(page.getByRole("contentinfo").locator('a[href="/payment-partnerships"]')).toHaveCount(0);
+  await expect(page.locator(".ec-commercial-section")).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: "On this page", exact: true }).getByRole("link", { name: "Partnership", exact: true })).toHaveCount(0);
+  await page.getByRole("link", { name: "Account structure", exact: true }).click();
+  await expect(page).toHaveURL(/\/platform-payment-models$/);
+  await page.getByRole("main").getByRole("link", { name: "Reporting and commercial terms", exact: true }).click();
+  await expect(page).toHaveURL(/\/payment-partnerships$/);
+  await expect(nav.locator("summary").filter({ hasText: /^Platforms$/ })).toHaveClass("is-current");
 });
 
 test("Documentation connects tasks and keeps account access protected", async ({ page, request }) => {
@@ -59,9 +88,10 @@ test("Services, Use cases and Documentation remain usable without JavaScript", a
     await nav.locator("summary").filter({ hasText: /^Services$/ }).click();
     await nav.getByRole("link", { name: "Merchant services", exact: true }).click();
     await expect(page).toHaveURL(/\/payment-acceptance-service$/);
-    await nav.locator("summary").filter({ hasText: /^Use cases$/ }).click();
+    await nav.locator("summary").filter({ hasText: /^Platforms$/ }).click();
     await nav.getByRole("link", { name: "Software platforms", exact: true }).click();
     await expect(page).toHaveURL(/\/software-partners$/);
+    await nav.locator("summary").filter({hasText:/^Resources$/}).click();
     await nav.getByRole("link", { name: "Documentation", exact: true }).click();
     await expect(page).toHaveURL(/\/docs$/);
     await page.locator(".docs-task-paths").getByRole("link", { name: "Sandbox and launch", exact: true }).click();
@@ -87,24 +117,22 @@ test("online business use case owns the merchant walkthrough and preserves navig
   const menu = header.getByRole("button", { name: "Menu", exact: true });
   if (await menu.isVisible()) await menu.click();
   const navigation = header.getByRole("navigation", { name: "Main navigation" });
-  await navigation.locator("summary").filter({ hasText: /^Use cases$/ }).click();
+  if (await navigation.locator(".public-domain-services").getAttribute("open") === null) await navigation.locator("summary").filter({hasText:/^Services$/}).click();
   await navigation.getByRole("link", { name: "Online businesses", exact: true }).click();
   await expect(page).toHaveURL(/\/online-businesses$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Payments for\s*online businesses\./);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Online payments\.\s*Connected to your orders\./);
   await expect(page.locator(".payment-service-explorer")).toHaveCount(1);
   await expect(page.locator("#payment-channels")).toContainText("Payment requests");
   await expect(page.locator("#fees, #payment-operations")).toHaveCount(0);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/online-businesses");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/online-businesses");
-  await expect(page.getByRole("contentinfo").getByRole("link", { name: "Online businesses", exact: true })).toHaveAttribute("href", "/online-businesses");
-  const application = page.locator(".online-business-actions").getByRole("link", { name: "Apply for a merchant account", exact: true });
-  await expect(application).toHaveAttribute("href", "https://trolleys.ai");
-  await expect(application).toHaveAttribute("referrerpolicy", "no-referrer");
-  await expect(application).toHaveAttribute("rel", /\bnoreferrer\b/);
-  await page.getByRole("link", { name: "View processing fees", exact: true }).click();
-  await expect(page).toHaveURL(/\/payment-acceptance-service#fees$/);
-  await expect(page.locator("#fees")).toBeInViewport();
+  await expect(page.getByRole("contentinfo").getByRole("link", { name: "Merchant services", exact: true })).toHaveAttribute("href", "/payment-acceptance-service");
+  const service = page.locator(".online-business-actions").getByRole("link", { name: "Explore merchant services", exact: true });
+  await expect(service).toHaveAttribute("href", "/payment-acceptance-service");
+  await page.getByRole("link", { name: "Connect online checkout", exact: true }).click();
+  await expect(page).toHaveURL(/\/docs\/checkout$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.goBack();
   await expect(page).toHaveURL(/\/online-businesses$/);
   await page.goBack();
@@ -168,7 +196,7 @@ test("online journey tabs keep the next chapter stable and inactive controls out
 const industryPaths = ["commerce-marketplaces", "freight-platforms", "travel-platforms", "legal-software"];
 test("four industry cases share one page with useful workflows and no standalone pages", async ({page, request}) => {
   await page.goto("/software-partners?tracking=private");
-  await expect(page.locator(".platform-case")).toHaveCount(4);
+  await expect(page.locator(".industry-cases > article")).toHaveCount(4);
   await expect(page.locator('a[href^="/use-cases/"]')).toHaveCount(0);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/software-partners");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
@@ -187,7 +215,7 @@ test("four industry cases share one page with useful workflows and no standalone
   }
   await expect(page.locator("main")).not.toContainText(/debt collection|collection account|receivable/i);
   await expect(page.locator('a[href*="collection-software"], #collection-software')).toHaveCount(0);
-  await expect(page.locator("#commerce-marketplaces").getByRole("img", {name:/Marketplace order and linked payment record/})).toBeVisible();
+  await expect(page.locator("#commerce-marketplaces .ec-industry-scene")).toBeVisible();
   const data = await page.locator('script[type="application/ld+json"]').textContent();
   const entries = JSON.parse(data!)["@graph"][2].itemListElement;
   expect(entries.map((item: {url:string})=>item.url)).toEqual(industryPaths.map(slug=>`https://etaildepot.com/software-partners#${slug}`));
@@ -208,7 +236,7 @@ test("all four industry cases remain readable without JavaScript", async ({brows
       await page.keyboard.press("Enter");
     }
     const nav = page.getByRole("navigation", {name:"Main navigation"});
-    await nav.locator("summary").filter({hasText:/^Use cases$/}).click();
+    await nav.locator("summary").filter({hasText:/^Platforms$/}).click();
     await expect(nav.locator("details[open] a")).toHaveCount(2);
     await expect(nav.getByRole("link",{name:"Software platforms",exact:true})).toBeVisible();
     expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
@@ -218,7 +246,7 @@ test("all four industry cases remain readable without JavaScript", async ({brows
 test("footer use cases remain distinct and usable at every breakpoint", async ({page}) => {
   for (const width of [1440,1024,768,390,320]) {
     await page.setViewportSize({width,height:900}); await page.goto("/");
-    const nav = page.getByRole("navigation", {name:"Footer use cases"});
+    const nav = page.getByRole("navigation", {name:"Footer platforms"});
     const links = nav.getByRole("link"); await expect(links).toHaveCount(2);
     const boxes = await links.evaluateAll(items=>items.map(item=>{const r=item.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,height:r.height};}));
     for (const [index,box] of boxes.entries()) {
@@ -226,4 +254,53 @@ test("footer use cases remain distinct and usable at every breakpoint", async ({
       if(index) expect(box.y).toBeGreaterThanOrEqual(boxes[index-1].bottom-1);
     }
   }
+});
+
+
+test("compact navigation preserves merchant and developer journeys", async ({ page }) => {
+  await page.goto("/");
+  const header = page.getByRole("banner");
+  const toggle = header.getByRole("button", { name: "Menu", exact: true });
+  const navigation = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
+  const directory = page.locator(".public-footer-navigation");
+  await expect(directory.getByRole("navigation")).toHaveCount(4);
+  await expect(directory.getByRole("link")).toHaveCount(11);
+  const destinations = await directory.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")));
+  expect(new Set(destinations).size).toBe(destinations.length);
+  await expect(navigation.locator('a[href^="/docs"]')).toHaveCount(1);
+  if (await toggle.isVisible()) await toggle.click();
+  await navigation.locator("summary").filter({ hasText: /^Services$/ }).click();
+  await navigation.getByRole("link", { name: "Merchant onboarding", exact: true }).click();
+  await expect(page).toHaveURL(/\/merchant-onboarding$/);
+
+  for (const [label, route] of [["Manage refunds and disputes", "/refunds-and-disputes"], ["Understand your payouts", "/payouts-and-reconciliation"]]) {
+    await page.goto("/");
+    await directory.getByRole("link", { name: "Merchant services", exact: true }).click();
+    await page.getByRole("main").getByRole("link", { name: label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${route}$`));
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etaildepot.com${route}`);
+    await expect(navigation.locator("summary").filter({ hasText: /^Services$/ })).toHaveClass("is-current");
+  }
+
+  await page.goto("/");
+  await directory.getByRole("link", { name: "Software platforms", exact: true }).click();
+  await page.getByRole("main").getByRole("link", { name: "Explore developer integration", exact: true }).click();
+  await expect(page).toHaveURL(/\/docs#developer-integration$/);
+  await expect(page.locator("#developer-integration")).toBeInViewport();
+  await expect(navigation.locator("summary").filter({ hasText: /^Resources$/ })).toHaveClass("is-current");
+
+  await page.goto("/contact");
+  await expect(navigation.locator("summary").filter({ hasText: /^Company$/ })).toHaveClass("is-current");
+  await expect(header.getByRole("link", { name: "Contact sales", exact: true, includeHidden: true })).toHaveAttribute("href", "/contact");
+  await expect(directory.locator('a[href="/pricing"]')).toHaveCount(0);
+  if (await toggle.isVisible()) await toggle.click();
+  const pricing = navigation.locator(':scope > a[href="/pricing"]');
+  await pricing.focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/pricing$/);
+  await expect(pricing).toHaveAttribute("aria-current", "page");
+  await expect(navigation.locator("summary.is-current")).toHaveCount(0);
+  await expect(navigation.locator('details a[href="/pricing"]')).toHaveCount(0);
+  if (await toggle.isVisible()) await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });

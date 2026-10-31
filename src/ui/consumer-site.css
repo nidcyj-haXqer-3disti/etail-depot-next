@@ -35,8 +35,6 @@
 .consumer-home .consumer-hero h1 { font-size: clamp(2.5rem, 4vw, 3.375rem); }
 .consumer-hero-copy > p { max-width: 42ch; font-size: 17px; line-height: 1.7; color: var(--home-muted); margin-top: 24px; }
 .consumer-hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-top: 28px; }
-.consumer-hero-visual { position: relative; isolation: isolate; overflow: hidden; height: var(--consumer-art-height); margin: 0; border-radius: var(--public-radius); background: var(--public-ink); }
-.consumer-hero-visual > img { object-fit: cover; object-position: center; }
 .consumer-networks { display: grid; grid-template-columns: minmax(0,1fr); align-items: center; border-top: 1px solid var(--home-line); padding-block: 28px; }
 .consumer-networks .network-brands-accepted { width: 100%; justify-self: end; }
 
@@ -121,8 +119,6 @@
   .consumer-hero-copy > p { max-width: 38ch; font-size: 16px; margin-top: 20px; }
   .consumer-hero-actions { margin-top: 24px; gap: 10px 20px; }
   .consumer-page .button { padding-inline: 18px; }
-  .consumer-hero-visual > img { object-position: 50% 45%; }
-  .consumer-home .consumer-hero-visual { height: auto; aspect-ratio: 4 / 3; }
   .consumer-networks { grid-template-columns: minmax(0,1fr); gap: 20px; padding-block: 26px; }
   .consumer-section-heading { display: block; margin-bottom: 28px; }
   .consumer-section-heading > p { max-width: 43ch; margin-top: 20px; }

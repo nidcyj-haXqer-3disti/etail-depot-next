@@ -2,7 +2,9 @@ import AxeBuilder from "@axe-core/playwright";
 import {expect,test,type Page} from "@playwright/test";
 import {openMainNavigation} from "./public-header";
 
-const publicRoutes = [ "/", "/docs", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch", "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
+import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
+
+const publicRoutes = [...COMMERCIAL_PATHS, "/", "/docs", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch", "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
 
 for (const width of [1440,390,320]) {
   for(const route of publicRoutes) {
@@ -14,7 +16,12 @@ for (const width of [1440,390,320]) {
       expect(response?.status()).toBe(200);
       await page.evaluate(()=>document.fonts.ready);
       await expect(page.getByRole("heading",{level:1})).toHaveCount(1);
-      const brokenImages = await page.locator("img").evaluateAll(images=>images.flatMap(image=>image instanceof HTMLImageElement && (!image.complete || image.naturalWidth===0) ? [image.currentSrc || image.src] : []));
+      for (const image of await page.locator("img:visible").all()) {
+        await image.scrollIntoViewIfNeeded();
+        await expect.poll(() => image.evaluate(element => element instanceof HTMLImageElement && element.complete && element.naturalWidth > 0)).toBe(true);
+      }
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const brokenImages = await page.locator("img").evaluateAll(images=>images.flatMap(image=>image instanceof HTMLImageElement && image.complete && image.naturalWidth===0 ? [image.currentSrc || image.src] : []));
       expect(brokenImages).toEqual([]);
       const question=page.locator("main summary:visible:not(.wallet-guide-disclosure > summary)").first();
       if(await question.count())await question.click();
@@ -135,37 +142,24 @@ for(const width of [1440,320]){
     await expect(views.getByRole("tab",{name:"Checkout",exact:true})).toBeFocused();
   });
 
-  test(`payment fees, FAQs and operation disclosures remain accessible at ${width}px`,async({page})=>{
+  test(`payment fees and operation disclosures remain accessible at ${width}px`,async({page})=>{
     await page.setViewportSize({width,height:900});
-    await page.goto("/payment-acceptance-service");
+    await page.goto("/pricing");
     await page.evaluate(()=>document.fonts.ready);
     const amount=page.locator(".fee-estimate").getByLabel("Payment amount USD");
     await expect(amount).toHaveAccessibleDescription(/\S+/);
-    await amount.focus();
     await amount.fill("480");
     await expect(amount).toBeFocused();
     await expect(page.locator(".fee-net")).toContainText("$465.78");
     await expectAccessible(page);
-    for(const disclosure of [
-      page.locator(".offer-details"),
-      page.locator("#payment-records .payment-operation-details"),
-      page.locator("#payouts .payment-operation-details"),
-      page.locator("#refunds-and-disputes details").nth(0),
-      page.locator("#refunds-and-disputes details").nth(1),
-      ...await page.locator(".public-faq-section details").all(),
-    ]){
-      const summary=disclosure.locator("summary");
-      await summary.focus();
-      await page.keyboard.press("Enter");
-      await expect(disclosure).toHaveAttribute("open","");
-      await expect(disclosure.locator("p").first()).toBeVisible();
-      await expect(amount).toHaveValue("480");
-      await expectAccessible(page);
-      await page.keyboard.press("Space");
-      await expect(disclosure).not.toHaveAttribute("open");
-      await expect(disclosure.locator("p").first()).toBeHidden();
-      await expect(summary).toBeFocused();
-    }
+    const pricingDetails=page.locator(".offer-details");
+    await pricingDetails.locator("summary").focus();
+    await page.keyboard.press("Enter");
+    await expect(pricingDetails).toHaveAttribute("open", "");
+    await expect(amount).toHaveValue("480");
+    await expectAccessible(page);
+    await page.keyboard.press("Space");
+    await expect(pricingDetails).not.toHaveAttribute("open");
     await amount.fill("0");
     await expect(amount).toHaveAttribute("aria-invalid", "true");
     await expect(amount).toHaveAccessibleDescription(/Enter an amount from/);
@@ -173,6 +167,25 @@ for(const width of [1440,320]){
     await amount.fill("100");
     await expect(amount).toHaveAttribute("aria-invalid", "false");
     await expectAccessible(page);
+    await page.goto("/payment-acceptance-service");
+    await expect(page.locator("#payment-operations .ec-scope")).toBeVisible();
+    await expect(page.locator("#payment-operations .ec-scope")).toContainText("First payouts, reviews, holds, reserves and bank processing can affect timing.");
+    for(const disclosure of [
+      page.locator(".operation-detail").nth(0),
+      page.locator("#refunds-and-disputes details").nth(0),
+      page.locator("#refunds-and-disputes details").nth(1),
+    ]){
+      const summary=disclosure.locator("summary");
+      await summary.focus();
+      await page.keyboard.press("Enter");
+      await expect(disclosure).toHaveAttribute("open","");
+      await expect(disclosure.locator("p").first()).toBeVisible();
+      await expectAccessible(page);
+      await page.keyboard.press("Space");
+      await expect(disclosure).not.toHaveAttribute("open");
+      await expect(disclosure.locator("p").first()).toBeHidden();
+      await expect(summary).toBeFocused();
+    }
   });
 
   test(`both wallet guides and their steps remain keyboard accessible at ${width}px`,async({page})=>{
@@ -281,7 +294,7 @@ for (const width of [1440, 960, 390, 320]) {
     const menu = page.getByRole("banner").getByRole("button", { name: "Menu", exact: true });
     if (await menu.isVisible()) await menu.click();
     const nav = page.getByRole("navigation", { name: "Main navigation" });
-    for (const label of ["Services", "Use cases"]) {
+    for (const label of ["Services", "Platforms", "Resources", "Company"]) {
       const summary = nav.locator("summary").filter({ hasText: new RegExp(`^${label}$`) });
       await summary.click();
       // Evaluate the open foreground layer separately from page targets it covers.
@@ -326,12 +339,12 @@ for (const javaScriptEnabled of [true, false]) {
         await expect(checkout.getByRole("group", {name: "Card details", exact: true})).toContainText("Card number");
       }
       await page.goto(`${baseURL}/payment-acceptance-service`);
-      await expect(page.getByRole("group", {name: "Refunds and disputes", exact: true})).toContainText("Manage a refund");
-      expect(await page.locator(".pla-record-method").ariaSnapshot()).toContain("Card ending in 4242");
+      await expect(page.locator("#refunds-and-disputes")).toContainText("Manage a refund");
+      expect(await page.locator(".cw-workbench").textContent()).toContain("Designer sneaker");
       await page.goto(`${baseURL}/software-partners`);
       await expect(page.locator("#integration")).toContainText("Account structure");
-      const platformArt = page.locator(".platform-payment-art");
-      await expect(platformArt.getByRole("img")).toHaveAccessibleName(/Freight invoice INV 08421.*reconciliation/);
+      const platformArt = page.locator("[data-attention-art=platform]");
+      await expect(platformArt).toHaveAccessibleName(/Commerce, freight, travel and legal software.*Access and account structure depend on the approved integration/);
       await expect(platformArt.getByRole("heading")).toHaveCount(0);
       if (javaScriptEnabled) await expectAccessible(page);
     } finally {

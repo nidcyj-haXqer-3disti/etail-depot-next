@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ResponsiveContentsFocus } from "./responsive-contents-focus";
-import { documentationPages, documentationPaths, documentationPath, type DocumentationSlug } from "@/modules/public-site/documentation-catalog";
+import { documentationPages, documentationPaths, documentationPath, documentationServiceLinks, type DocumentationSlug } from "@/modules/public-site/documentation-catalog";
+import { documentationJsonLd } from "@/modules/public-site/metadata";
 import { documentationArticles, type DocSection } from "@/modules/public-site/documentation-content";
 import { Shell } from "./shell";
 import { Icon } from "./icon";
@@ -8,10 +9,13 @@ import { PaymentPortalLink } from "./service-entry";
 import { DocumentationNavigation } from "./documentation-navigation";
 import { DocumentationFlow } from "./documentation-diagrams";
 import "./documentation.css";
+import "./enterprise-support.css";
+import { ResourceBreadcrumb } from "./resource-context";
+import "./connected-resources.css";
 
 function DocumentationLink({href,label}:{href:string;label:string}){
  if(href==="portal")return <div className="docs-account-entry"><PaymentPortalLink className="button primary">{label}</PaymentPortalLink><p>Trolleys is the account service for Etail Depot merchant services.</p></div>;
- return <Link className="docs-text-link" href={href}>{label}<Icon name="arrow"/></Link>;
+ return <Link className="docs-text-link" href={href}>{label}</Link>;
 }
 
 function ArticleSection({section}:{section:DocSection}){
@@ -38,11 +42,12 @@ export function DocumentationArticle({slug}:{slug:DocumentationSlug}){
  const page=documentationPages.find(p=>p.slug===slug)!;
  const group=documentationPaths.find(path=>path.title===page.group)!;
  const article=documentationArticles[slug];
- return <Shell quietAccess><div className="documentation-page"><div className="docs-workspace page-container">
+ const service=documentationServiceLinks[slug];
+ return <Shell><script type="application/ld+json" dangerouslySetInnerHTML={{__html:documentationJsonLd(slug)}}/><div className="documentation-page cw-docs"><div className="docs-workspace page-container">
   <DocumentationNavigation current={slug}/>
   <ResponsiveContentsFocus rootSelector=".docs-workspace" desktopSelector=".docs-toc" mobileSelector=".docs-mobile-toc" breakpoint={1250} />
   <article className="docs-article">
-   <header className="docs-article-heading"><nav aria-label="Breadcrumb"><Link href="/docs">Documentation</Link><span aria-hidden="true">/</span><Link href={`/docs#${group.id}`}>{page.group}</Link></nav><h1>{page.title}</h1><p>{article.introduction}</p><span className="docs-audience">{page.audience}</span></header>
+   <header className="docs-article-heading"><ResourceBreadcrumb items={[{name:"Documentation",href:"/docs"},{name:page.group,href:`/docs#${group.id}`},{name:page.title,href:documentationPath(slug)}]}/><h1>{page.title}</h1><p>{article.introduction}</p><div className="docs-context"><span className="docs-audience">{page.audience}</span><Link className="docs-service-link" href={service.href}>{service.label}</Link></div></header>
    <div className="docs-prerequisites"><h2>Before you begin</h2><ul>{article.prerequisites.map(p=><li key={p}><Icon name="check"/>{p}</li>)}</ul></div>
    <details className="docs-mobile-toc"><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="Page sections">{article.sections.map(s=><a key={s.id} href={`#${s.id}`}>{s.title}</a>)}</nav></details>
    {article.sections.map(section=><ArticleSection key={section.id} section={section}/>)}
@@ -53,22 +58,22 @@ export function DocumentationArticle({slug}:{slug:DocumentationSlug}){
 }
 
 export function DocumentationHome(){
- return <Shell quietAccess><div className="documentation-page"><div className="docs-workspace docs-workspace-home page-container">
+ return <Shell><script type="application/ld+json" dangerouslySetInnerHTML={{__html:documentationJsonLd()}}/><div className="documentation-page cw-docs"><div className="docs-workspace docs-workspace-home page-container">
   <DocumentationNavigation/>
   <div className="docs-hub">
-   <header className="docs-hub-heading"><h1>Payment documentation</h1><p>Set up an account, connect checkout and follow each payment through to reconciliation.</p></header>
-   <div className="docs-task-paths">
+   <header className="docs-hub-heading"><ResourceBreadcrumb items={[{name:"Etail Depot",href:"/"},{name:"Documentation",href:"/docs"}]}/><h1>Documentation</h1><p>Set up a merchant account, connect checkout and follow payments through to reconciliation.</p></header>
+   <div className="docs-task-paths" id="topics">
     {documentationPaths.map(path => <section className="docs-task-path" key={path.id} id={path.id} aria-labelledby={`${path.id}-title`}>
-     <header className="docs-task-path-heading"><Icon name={path.icon}/><h2 id={`${path.id}-title`}>{path.title}</h2><p>{path.description}</p></header>
-     <ul>{path.tasks.map(task => <li key={task.title} id={task.anchor} className="docs-task">
+     <header className="docs-task-path-heading"><Icon name={path.icon}/><h2 id={`${path.id}-title`}>{path.title}</h2></header>
+     <ol>{path.tasks.map(task => <li key={task.title} id={task.anchor} className="docs-task">
       {task.links.length === 1 ? <>
-       <h3><Link href={documentationPath(task.links[0].slug)}>{task.title}<Icon name="arrow"/></Link></h3>
+       <h3><Link href={documentationPath(task.links[0].slug)}>{task.title}</Link></h3>
        {task.description && <p>{task.description}</p>}
       </> : <>
        <h3>{task.title}</h3>
-       <div className="docs-task-destinations">{task.links.map(link => <span key={link.label} id={link.anchor}><Link href={`${documentationPath(link.slug)}${link.section ? `#${link.section}` : ""}`}>{link.label}<Icon name="arrow"/></Link></span>)}</div>
+       <div className="docs-task-destinations">{task.links.map(link => <span key={link.label} id={link.anchor}><Link href={`${documentationPath(link.slug)}${link.section ? `#${link.section}` : ""}`}>{link.label}</Link></span>)}</div>
       </>}
-     </li>)}</ul>
+     </li>)}</ol>
     </section>)}
    </div>
   </div>

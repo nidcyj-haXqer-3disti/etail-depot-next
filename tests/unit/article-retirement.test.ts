@@ -16,7 +16,7 @@ describe("article retirement without changing ISO references", () => {
     expect(STANDARD_REFERENCE_PATHS).toHaveLength(3706);
     expect(STANDARD_REFERENCE_PATHS.every(path => !retiredArticleRoute(path))).toBe(true);
     expect(STANDARD_REFERENCE_PATHS).toContain("/guides/iso-8583/messages/2100");
-    expect(builtPageSources).toHaveLength(25);
+    expect(builtPageSources).toHaveLength(38);
     for (const path of RETIRED_ARTICLE_PATHS) {
       expect(builtPageSources as readonly string[]).not.toContain(`${path.slice(1)}/page.tsx`);
       expect(Object.hasOwn(PUBLIC_PAGES, path)).toBe(false);

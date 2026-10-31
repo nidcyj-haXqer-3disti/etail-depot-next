@@ -1,86 +1,31 @@
+import Image from "next/image";
 import Link from "next/link";
-import { customerJourneys } from "@/modules/public-site/customer-journeys";
-import { servicePageMetadata, platformPageJsonLd } from "@/modules/public-site/metadata";
-import { industryCases } from "@/modules/public-site/industry-content";
+import { AttentionHero, AttentionArt } from "@/ui/attention-hero";
+import "@/ui/attention-pages.css";
 import { Shell } from "@/ui/shell";
-import { Icon } from "@/ui/icon";
-import { PlatformPaymentArt, PlatformIndustryArt } from "@/ui/platform-experience-art";
+import { servicePageMetadata } from "@/modules/public-site/metadata";
+import { PlatformIntegrationArt } from "@/ui/connected-payment-art";
+import "@/ui/enterprise-pages.css";
+import "@/ui/connected-pilots.css";
 import { ServiceSectionNav } from "@/ui/service-section-nav";
-import "@/ui/public-site.css";
-import "@/ui/consumer-site.css";
-import "@/ui/platform-experience.css";
+import { IndustryWorkflow } from "@/ui/industry-workflow";
+import { industryCases } from "@/modules/public-site/industry-content";
+import { platformPageJsonLd } from "@/modules/public-site/metadata";
 
 export const metadata = servicePageMetadata("/software-partners");
-const partnerEmail = "mailto:trolleys@etaildepot.com?subject=Software%20payment%20partnership";
 
-const sectors = [
-  { page: industryCases.marketplaces, caption: "Keep seller orders, customer payments and refunds connected through to reconciliation." },
-  { page: industryCases.freight, caption: "Match customer payments to freight invoices, loads and shipment references." },
-  { page: industryCases.travel, caption: "Keep planning fees distinct from booking payments, with a clear record when plans change." },
-  { page: industryCases.legal, caption: "Connect legal billing to the matter, the invoice and the right receiving account." },
-];
-const journey = [
-  { title: "Onboard the business", body: "Confirm the business activity, account owner and payout destination. Each merchant needs approval before accepting payments." },
-  { title: "Accept the payment", body: "Add checkout to the agreed customer journey, with the order, invoice or booking reference attached to the payment." },
-  { title: "Reconcile the deposit", body: "Match each payout to the bank deposit, with refunds and adjustments tied to the original payment." },
-];
-const integration = [
-  { title: "Account structure", detail: "Which business owns each merchant account and who can access it." },
-  { title: "Checkout", detail: "Where customers pay and which methods the account supports." },
-  { title: "Payment updates", detail: "How payment results reach your software and link to the right record." },
-  { title: "Reconciliation", detail: "How payments, fees and adjustments match the bank deposit." },
-];
-
-export default function SoftwarePartnersPage() {
-  return <Shell quietAccess><div className="consumer-page platform-experience">
+export default function Page() {
+  return <Shell>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: platformPageJsonLd("/software-partners") }} />
-    <ServiceSectionNav title="Software platforms" links={[
-      { href: "#industries", label: "Industries" },
-      { href: "#payment-experience", label: "Payment journey" },
-      { href: "#integration", label: "Integration" },
-      { href: "#partner-commercial-title", label: "Pricing" },
-      { href: "#partner-contact", label: "Contact" },
-    ]} />
-    <section className="platform-opening" aria-labelledby="partner-title"><div className="page-container platform-opening-grid">
-      <div className="platform-opening-copy"><p className="eyebrow">Software platforms</p><h1 id="partner-title">Payment processing for software platforms.</h1><p className="platform-opening-intro">Connect merchant accounts, card and ACH payments, and reconciliation to your software. For commerce marketplaces, freight, travel and legal businesses.</p><a className="button primary" href="#partner-contact">Talk to our team<Icon name="arrow" /></a></div>
-      <PlatformPaymentArt />
-    </div></section>
-
-    <section className="page-container platform-industries" id="industries" aria-labelledby="industries-title">
-      <div className="platform-section-heading"><h2 id="industries-title">Every industry has its<br /> own payment needs.</h2><p>Connect each payment to the order, shipment, trip or legal matter it belongs to.</p></div>
-      <div className="platform-case-grid">{sectors.map(({page, caption}) => <article className="platform-case" id={page.slug} key={page.slug} aria-labelledby={`${page.slug}-title`}>
-        <PlatformIndustryArt industry={page.slug} />
-        <div className="platform-case-copy"><h3 id={`${page.slug}-title`}>{page.label}</h3><p className="platform-case-intro">{caption}</p>
-          <details className="platform-case-details">
-            <summary aria-label={`${page.label}: payment flow and account requirements`}>Payment flow and account requirements<span className="platform-case-toggle" aria-hidden="true">+</span></summary>
-            <div className="platform-case-expanded"><p className="platform-case-context">{page.intro}</p><h4>{page.workflowTitle}</h4><ol className="platform-case-steps">{page.workflow.map((step, i) => <li key={step.title}><span className="platform-step-number" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span><div><h5>{step.title}</h5><p>{step.body}</p></div></li>)}</ol><div className="platform-case-scope"><h4>{page.scopeTitle}</h4><p>{page.scope}</p></div></div>
-          </details>
-        </div>
-      </article>)}</div>
-      <p className="platform-eligibility">Business activity and payment flow are reviewed for each merchant. Availability is confirmed before integration.</p>
-    </section>
-
-    <section className="platform-journey-section" id="payment-experience" aria-labelledby="experience-title"><div className="page-container">
-      <div className="platform-section-heading"><div><p className="eyebrow">The merchant journey</p><h2 id="experience-title">From merchant account<br /> to bank deposit.</h2></div><p>Keep the customer’s order, invoice or booking reference with every payment.</p></div>
-      <ol className="platform-journey-list" role="list">{journey.map((step, i) => <li key={step.title}><span className="platform-journey-number" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span><h3>{step.title}</h3><p>{step.body}</p></li>)}</ol>
-    </div></section>
-
-    <section className="page-container platform-integration-section" id="integration" aria-labelledby="integration-title">
-      <div className="platform-integration-intro"><p className="eyebrow">Integration</p><h2 id="integration-title">Keep the payment connected<br /> to your software.</h2><p>Plan the account structure, payment flow and records your software needs. Our integration team provides documentation and access for the agreed setup.</p><Link href={customerJourneys.platform.documentation} className="platform-inline-link">{customerJourneys.platform.documentationLabel}<Icon name="arrow" /></Link></div>
-      <dl className="platform-integration-details">{integration.map(({title,detail},i)=><div key={title}><dt><span aria-hidden="true">{String(i+1).padStart(2,"0")}</span>{title}</dt><dd>{detail}</dd></div>)}</dl>
-    </section>
-
-    <section className="platform-commercial-section" aria-labelledby="partner-commercial-title"><div className="page-container platform-commercial-inner">
-      <div><p className="eyebrow">Commercial terms</p><h2 id="partner-commercial-title">Know the costs<br /> before you build.</h2></div>
-      <div className="platform-commercial-details"><div><h3>Payment processing</h3><p>Card fees apply per payment. ACH pricing and funding terms are confirmed separately.</p><Link href="/payment-acceptance-service#fees" className="platform-inline-link">View processing fees<Icon name="arrow" /></Link></div><div><h3>Platform arrangement</h3><p>Agree implementation scope and service charges for your workflow and account structure.</p></div></div>
-    </div></section>
-
-    <section className="page-container platform-questions-section" aria-labelledby="partner-questions-title"><div><p className="eyebrow">Before we talk</p><h2 id="partner-questions-title">Your questions.</h2></div><div className="public-questions">
-      <details><summary>Our payment provider cannot support some customers. Can you help?<span aria-hidden="true">+</span></summary><p>We can review the businesses and payment activities your current provider cannot support. Tell us what changed or why the arrangement does not fit. Each merchant and payment flow needs approval before integration.</p></details>
-      <details><summary>Would we need to move every customer?<span aria-hidden="true">+</span></summary><p>We agree the scope before planning a move. Existing contracts, merchant accounts, saved payment details and open transactions can affect what is possible. A selective rollout or data transfer needs confirmation.</p></details>
-      <details><summary>What happens after we contact you?<span aria-hidden="true">+</span></summary><p>We start with the businesses you serve and the payments they need to accept. If the activity is eligible, we agree the account structure, integration requirements and commercial terms before implementation.</p></details>
-    </div></section>
-
-    <section className="platform-contact-section" id="partner-contact" aria-labelledby="contact-title"><div className="page-container platform-contact-inner"><h2 id="contact-title">Tell us how your<br /> customers get paid.</h2><div><p>Share the businesses you serve, how they accept payments and what your current provider cannot support.</p><a href={partnerEmail} className="button primary">Email our payments team<Icon name="arrow" /></a></div></div></section>
-  </div></Shell>;
+    <div className="enterprise-page platforms cw-pilot attention-site"><ServiceSectionNav title="Software platforms" links={[{ href: "#payment-experience", label: "Payment journey" }, { href: "#industries", label: "Industries" }, { href: "#integration", label: "Integration" }]} /><AttentionHero className="ec-platform-hero" id="partner-title" label="Software platforms"
+      title={<>Your merchants{" "}<br /><em>aren’t all the same.</em></>}
+      intro="Merchant accounts, checkout and reporting for the businesses using your software. Get help with integration and account options for merchants your current provider cannot support."
+      actions={<><Link href="/contact#platforms">Discuss your platform</Link><Link href="#payment-experience">See the payment journey</Link></>}
+      note="Merchant approval is required. Payment methods depend on account setup."
+      artwork={<AttentionArt kind="platform" />}
+    /><section className="ec-container ec-platform-journey" aria-labelledby="platforms-section-2-title" id="payment-experience"><span className="ec-anchor" id="experience-title"></span><div className="ec-section-heading ec-split-heading"><div><span className="ec-category">The merchant journey</span><h2 id="platforms-section-2-title">From merchant signup to bank deposit.</h2></div><p>Connect each merchant account, purchase and payment record.</p></div><div className="ec-journey-rail"><div><div className="ec-journey-marker"><span>01</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 10h18L19 4H5L3 10Zm2 0v10h14V10M9 20v-6h6v6"></path></svg></div><h3>Onboard the business.</h3><p>The business submits its details for review and completes account setup after approval.</p></div><div><div className="ec-journey-marker"><span>02</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M3 10h18M7 15h4"></path></svg></div><h3>Connect the checkout.</h3><p>Match the customer’s purchase to the receiving merchant account.</p></div><div><div className="ec-journey-marker"><span>03</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3ZM9 7h6M9 11h6M9 15h3"></path></svg></div><h3>Follow the payment.</h3><p>Keep payment results, refunds and disputes with the original transaction.</p></div><div><div className="ec-journey-marker"><span>04</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m3 8 9-5 9 5H3Zm2 3v7m5-7v7m4-7v7m5-7v7M3 21h18"></path></svg></div><h3>Reconcile the deposit.</h3><p>Match payments, fees and adjustments to the payout report, then confirm the deposit on the bank statement.</p></div></div></section>
+ <section className="ec-industry-section" id="industries" aria-labelledby="platforms-section-3-title"><span className="ec-anchor" id="industries-title"></span><div className="ec-container"><div className="ec-section-heading ec-split-heading"><div><span className="ec-category">Industry workflows</span><h2 id="platforms-section-3-title">Payments for your industry.</h2></div><p>Account reviews consider the seller, purchase and delivery terms.</p></div><div className="ec-industry-grid industry-cases"><article id="commerce-marketplaces"><div className="ec-industry-scene"><div className="ec-scene-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 10h18L19 4H5L3 10Zm2 0v10h14V10M9 20v-6h6v6"></path></svg>Marketplace order</div><div className="ec-scene-commerce"><Image src="/marketing/everyday-sneaker-v2.webp" alt="Designer sneaker" width="576" height="384" unoptimized loading="lazy" /><div><span>Sold by Studio Store</span><strong>#10482</strong></div></div><div className="ec-record-line"><span>Order total</span><strong>$100.00</strong></div></div><div className="ec-industry-copy"><span className="ec-category">Commerce marketplaces</span><h3>Connect marketplace orders to payment records.</h3><p>Identify the seller behind each order. Match the payment to that seller and purchase when handling a return or reconciling a sale.</p><p className="ec-industry-scope">Seller transfers, split payments and holding funds require a separately approved setup.</p><IndustryWorkflow page={industryCases.marketplaces} /></div></article><article id="freight-platforms"><div className="ec-industry-scene"><div className="ec-scene-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 5h11v12H3V5Zm11 5h4l3 4v3h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path></svg>Freight invoice</div><div className="ec-route-display"><div><span>Origin</span><strong>Los Angeles</strong></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"></path></svg><div><span>Destination</span><strong>Phoenix</strong></div></div><div className="ec-record-line"><span>Shipment</span><strong>FT 02854</strong></div><div className="ec-record-line"><span>Invoice</span><strong>INV 08421</strong></div></div><div className="ec-industry-copy"><span className="ec-category">Freight platforms</span><h3>Connect customer payments to freight invoices.</h3><p>Confirm which business invoices the shipper. Match customer receipts to the shipment, invoice and payment reference.</p><p className="ec-industry-scope">Partial payments and allocation depend on the integration. Carrier payments, factoring and credit are separate arrangements.</p><IndustryWorkflow page={industryCases.freight} /></div></article><article id="travel-platforms"><div className="ec-industry-scene"><div className="ec-scene-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8-8-2Zm8 2 10-10"></path></svg>Travel booking</div><div className="ec-booking-display"><span>Trip TR 0428</span><strong>Lisbon &amp; Porto</strong><p>Custom itinerary</p></div><div className="ec-record-line"><span>Planning fee</span><strong>$250.00</strong></div></div><div className="ec-industry-copy"><span className="ec-category">Travel platforms</span><h3>Keep travel payments with the booking.</h3><p>Identify who collects each planning fee or booking payment and when travel is delivered. Keep changes and refunds with the booking.</p><p className="ec-industry-scope">Supplier payments, escrow and supplier failure protection are outside this acceptance service.</p><IndustryWorkflow page={industryCases.travel} /></div></article><article id="legal-software"><div className="ec-industry-scene"><div className="ec-scene-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"></rect><path d="M8 7V3h8v4M3 12h18M10 12v3h4v-3"></path></svg>Matter invoice</div><div className="ec-matter-display"><span>MT 0084</span><strong>Earned legal fees</strong><p>Invoice INV 0348</p></div><div className="ec-record-line"><span>Receiving account</span><strong>Operating account</strong></div></div><div className="ec-industry-copy"><span className="ec-category">Legal software</span><h3>Connect earned legal fees to the matter.</h3><p>Identify the firm collecting earned fees. Match the client invoice, matter and payment to its operating account records.</p><p className="ec-industry-scope">Client trust and IOLTA account support is not confirmed. Client trust funds, retainers and settlement distributions require a separately approved arrangement.</p><IndustryWorkflow page={industryCases.legal} /></div></article></div></div></section>
+ <section className="ec-container ec-integration-section" id="integration" aria-labelledby="platforms-section-4-title"><span className="ec-anchor" id="integration-title"></span><div className="ec-section-copy"><span className="ec-category">Integration</span><h2 id="platforms-section-4-title">Keep your software and payment records connected.</h2><dl className="ec-integration-notes"><div><dt><Link href="/platform-payment-models">Account structure</Link></dt><dd>Merchant accounts and permissions for the businesses using your software.</dd></div><div><dt>Checkout and results</dt><dd>Match the payment result to the purchase. Check an unclear result before retrying.</dd></div><div><dt>Records and reporting</dt><dd>Keep payment, refund and payout references connected to your system.</dd></div></dl><Link className="ec-concept-action ec-quiet" href="/docs#developer-integration">Explore developer integration</Link><p className="ec-scope">Request the specifications and access for your approved setup from our integration team.</p></div><PlatformIntegrationArt /></section>
+ <span className="ec-anchor" id="partner-commercial-title" aria-hidden="true"></span><span className="ec-anchor" id="platforms-section-5-title" aria-hidden="true"></span><span className="ec-anchor" id="partner-questions-title"></span><div className="ec-container ec-contact-section ec-contact-simple" id="partner-contact"><p>Tell us about your software and the businesses it serves.</p><Link className="ec-concept-action ec-solid" id="contact-title" href="/contact#platforms">Discuss your platform</Link></div></div>
+  </Shell>;
 }

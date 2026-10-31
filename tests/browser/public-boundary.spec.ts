@@ -1,3 +1,4 @@
+import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
 import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
 import { documentationPages, documentationPath } from "../../src/modules/public-site/documentation-catalog";
 import { expect, test } from "@playwright/test";
@@ -39,7 +40,7 @@ test("renamed product bookmarks retain their section and reject submitted data",
 });
 
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
-  const pages = ["/", "/docs", ...documentationPages.map(page => documentationPath(page.slug)), "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
+  const pages = [...COMMERCIAL_PATHS, "/", "/docs", ...documentationPages.map(page => documentationPath(page.slug)), "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
   const privateRequests: string[] = [], errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });
@@ -49,7 +50,7 @@ test("public pages and every internal link resolve without account APIs or cooki
     expect(response!.status()).toBe(200);
     expect(response!.headers()["set-cookie"]).toBeUndefined();
     await expect(page.locator("form,iframe")).toHaveCount(0);
-    if (path === "/payment-acceptance-service") {
+    if (path === "/pricing") {
       // The local fee estimate never submits a payment or creates an account.
       await expect(page.locator("input")).toHaveCount(1);
       await expect(page.locator('.fee-estimate input#payment-amount[type="text"]')).toHaveCount(1);
