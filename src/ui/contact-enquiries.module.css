@@ -1,47 +1,56 @@
-.sales {
-  margin-bottom: 56px;
-}
-
-.sales .choices {
+.merchant {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 40px;
-  padding: 30px 32px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 32px 48px;
+  padding: 32px;
+  margin-bottom: 24px;
   background: #f3f6ef;
   border-radius: 18px;
+  scroll-margin-top: 100px;
 }
 
-.sales .choice {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  scroll-margin-top: 20px;
+.bookmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  scroll-margin-top: 100px;
 }
 
-.sales .choice h3 {
-  margin: 0;
+.merchant .copy { min-width: 0; }
+
+.directory .merchant .copy h2,
+.directory .specialist.specialist h2 {
+  margin: 0 0 12px;
   color: var(--public-ink);
-  font-size: 23px;
+  font-size: 25px;
   line-height: 1.3;
   font-weight: 500;
   letter-spacing: -.025em;
 }
 
-.sales .choice p {
-  margin: 12px 0 16px;
-  max-width: 40ch;
+.merchant .copy p,
+.specialist p {
+  margin: 0;
+  max-width: 55ch;
   color: var(--public-muted);
   font-size: 16px;
   line-height: 1.65;
 }
 
-.sales .action {
+.merchant .copy .support {
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.email {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   min-height: 44px;
-  margin-top: auto;
   max-width: 100%;
   color: var(--public-ink);
   font-size: 16px;
@@ -52,29 +61,32 @@
   text-decoration-thickness: 1px;
 }
 
-.sales .action svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
+.email span { min-width: 0; overflow-wrap: anywhere; }
+.email svg { width: 18px; height: 18px; flex-shrink: 0; }
+.email:hover { text-decoration-thickness: 2px; }
+.email:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; border-radius: 2px; }
 
-.sales .action:hover {
-  text-decoration-thickness: 2px;
+.specialist {
+  min-width: 0;
+  padding-block: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  scroll-margin-top: 100px;
 }
+.specialist .email { margin-top: auto; }
 
-.sales .action:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 5px;
-  border-radius: 2px;
+@media (max-width: 959px) {
+  .merchant { grid-template-columns: 1fr; gap: 20px; }
 }
 
 @media (max-width: 700px) {
-  .sales { margin-bottom: 40px; }
-  .sales .choices { grid-template-columns: 1fr; gap: 30px; padding: 24px; }
-  .sales .choice h3 { font-size: 22px; }
-  .sales .choice p { margin-bottom: 10px; }
+  .merchant { padding: 24px; margin-bottom: 8px; }
+  .directory .merchant .copy h2, .directory .specialist.specialist h2 { font-size: 23px; }
+  .specialist { padding-block: 22px; gap: 14px; }
 }
 
 @media (forced-colors: active) {
-  .sales .choices { border: 1px solid CanvasText; }
+  .merchant { border: 1px solid CanvasText; }
 }

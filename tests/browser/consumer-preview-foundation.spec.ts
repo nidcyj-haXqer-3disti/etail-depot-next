@@ -167,10 +167,10 @@ test("software partners can review the payment experience and reach the fixed in
   await expect(page).toHaveURL(/\/contact#platforms$/);
   const contact = page.locator("#platforms");
   await expect(contact).toBeInViewport();
-  const email = page.locator('#integration a[href^="mailto:"]');
+  const email = page.locator('[data-merchant-contact] a[href^="mailto:"]');
   await expect(email).toBeVisible();
-  await expect(email).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Integration%20documentation");
-  await expect(page.locator('#integration a[href^="mailto:"]')).toHaveCount(1);
+  await expect(email).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(page.locator('[data-merchant-contact] a[href^="mailto:"]')).toHaveCount(1);
   await page.goBack();
   await expect(page).toHaveURL(/\/software-partners\?partner_probe=private#visit$/);
   await page.goForward();
@@ -208,7 +208,7 @@ test("software partner content and inquiry remain usable without JavaScript", as
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/contact#platforms$/);
     await expect(page.locator("#platforms")).toBeInViewport();
-    await expect(page.locator('#integration a[href^="mailto:"]')).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Integration%20documentation");
+    await expect(page.locator('[data-merchant-contact] a[href^="mailto:"]')).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
     expect(await page.evaluate(() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth)).toBeLessThanOrEqual(1);
     expect(await context.cookies()).toEqual([]);
   } finally {

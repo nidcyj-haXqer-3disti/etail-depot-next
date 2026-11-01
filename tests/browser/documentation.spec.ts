@@ -125,8 +125,8 @@ test("platform implementation progresses to testing and returns to its use case"
  await team.focus();
  await page.keyboard.press('Enter');
  await expect(page).toHaveURL(/\/contact#integration$/);
- await expect(page.locator('#integration').getByRole('heading')).toBeInViewport();
- await expect(page.locator('#integration a')).toHaveAttribute('href','mailto:trolleys@etaildepot.com?subject=Integration%20documentation');
+ await expect(page.locator('[data-merchant-contact]').getByRole('heading')).toBeInViewport();
+ await expect(page.locator('[data-merchant-contact] a')).toHaveAttribute('href','mailto:trolleys@etaildepot.com');
  await page.goBack();
  await expect(page).toHaveURL(/\/docs\/integration-access$/);
  for(const destination of ['checkout','webhooks','testing-and-launch']){

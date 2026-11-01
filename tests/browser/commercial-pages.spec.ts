@@ -40,13 +40,13 @@ test("merchant application and contact routes never forward visitor input", asyn
     expect(targets.some(target => target?.includes("private") || target?.includes("other.invalid"))).toBe(false);
   }
   await expect(page.locator("#cards")).toContainText("An inquiry is not an application.");
-  await expect(page.locator("#integration a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Integration%20documentation");
-  await expect(page.locator("#account-support a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
-  for (const contact of ["integration", "account-support", "cards", "compliance"]) {
-    const option = page.locator(`#${contact}`);
-    const email = (await option.locator("a").getAttribute("href"))!.slice("mailto:".length).split("?")[0];
-    await expect(option.locator(".commercial-contact-email")).toHaveText(email);
-    await expect(option.locator(".commercial-contact-email")).toBeVisible();
+  await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  const addresses = await page.locator('main a[href^="mailto:"]').evaluateAll(links => links.map(link => link.getAttribute("href")));
+  expect(addresses).toEqual(["mailto:trolleys@etaildepot.com", "mailto:ledgix@etaildepot.com", "mailto:compliance@etaildepot.com"]);
+  for (const contact of ["payment-review", "cards", "compliance"]) {
+    const link = page.locator(`#${contact} a`);
+    await expect(link).toBeVisible();
+    await expect(link).toHaveText((await link.getAttribute("href"))!.slice("mailto:".length));
   }
 });
 
@@ -55,17 +55,16 @@ test("merchants can discuss processing costs before applying while platforms rea
   await page.getByRole("link", { name: "Discuss your processing costs", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#payment-review$/);
   await expect(page.locator("#payment-review")).toBeInViewport();
-  await expect(page.locator("#payment-review").getByRole("heading")).toHaveText("For your business");
-  await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Merchant%20services%20enquiry");
-  await expect(page.locator("#account-support a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await expect(page.locator('main a[href="https://trolleys.ai"]')).toHaveAttribute("referrerpolicy", "no-referrer");
   await page.goBack();
   await page.getByRole("link", { name: "Discuss platform terms", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#platforms$/);
   await expect(page.locator("#platforms")).toBeInViewport();
-  await expect(page.locator("#platforms").getByRole("heading")).toHaveText("For your software platform");
-  await expect(page.locator("#platforms a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Software%20platform%20partnership");
-  await expect(page.locator("#integration a")).toHaveAttribute("href", /subject=Integration%20documentation$/);
+  await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
 });
 
 test("shared contact action routes developers and merchants to the appropriate contact choices", async ({ page, isMobile }) => {
@@ -75,11 +74,11 @@ test("shared contact action routes developers and merchants to the appropriate c
     await page.locator(".public-header").getByRole("link", { name: "Contact sales", exact: true }).click();
     await expect(page).toHaveURL(/\/contact$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Contact Etail Depot.");
-    const sales = page.getByRole("region", { name: "Contact sales.", exact: true });
-    await expect(sales.getByRole("link", { name: "Email business sales", exact: true })).toBeVisible();
-    await expect(sales.getByRole("link", { name: "Email platform sales", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Contact the integration team", exact: true })).toHaveAttribute("href", /subject=Integration%20documentation$/);
-    await expect(page.getByRole("link", { name: "Contact merchant support", exact: true })).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+    const merchant = page.getByRole("region", { name: "Merchant services", exact: true });
+    await expect(merchant.getByRole("link", { name: "trolleys@etaildepot.com", exact: true })).toBeVisible();
+    await expect(merchant).toContainText("software partnerships and integration documentation");
+    await expect(merchant).toContainText("For account support");
+    await expect(merchant.locator('a[href^="mailto:"]')).toHaveCount(1);
     if (isMobile) await expect(page.getByRole("button", { name: "Menu", exact: true })).toHaveAttribute("aria-expanded", "false");
   }
 });
@@ -113,8 +112,8 @@ test("buyers can find ACH, provider change and platform model decisions through 
   await page.getByRole("link", { name: "Discuss your platform", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#platforms$/);
   await expect(page.locator("#platforms")).toBeInViewport();
-  await expect(page.locator("#platforms").getByRole("heading")).toHaveText("For your software platform");
-  await expect(page.locator("#platforms a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Software%20platform%20partnership");
+  await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
 });
 
 // Commercial pages open directly with their hero while preserving the published URL hierarchy.
@@ -147,9 +146,9 @@ test("a merchant can request a review without submitting an application", async 
   await page.locator(".commercial-action").getByRole("link", { name: "Discuss your business", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#payment-review$/);
   await expect(page.locator("#payment-review")).toBeInViewport();
-  await expect(page.locator("#payment-review").getByRole("heading")).toHaveText("For your business");
-  await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Merchant%20services%20enquiry");
-  await expect(page.locator("#account-support a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await expect(page.locator("#merchant-application")).toContainText("Account approval and setup apply.");
   await expect(page.locator("main form, main input, main textarea")).toHaveCount(0);
   await expect(page.locator('main a[href="https://trolleys.ai"]')).toHaveAttribute("referrerpolicy", "no-referrer");
@@ -160,11 +159,15 @@ test("contact options remain usable without JavaScript", async ({ browser, baseU
   try {
     const page = await context.newPage();
     await page.goto(new URL("/contact", baseURL).href);
-    for (const id of ["payment-review", "platforms", "integration", "account-support", "cards", "compliance"]) {
-      const card = page.locator(`#${id}`);
-      await expect(card.locator(".commercial-contact-email")).toBeVisible();
-      await expect(card.locator("a")).toHaveAttribute("href", /^mailto:/);
-      await expect(card.getByRole("button")).toHaveCount(0);
+    for (const id of ["payment-review", "cards", "compliance"]) {
+      const contact = page.locator(`#${id}`);
+      await expect(contact.locator("a")).toBeVisible();
+      await expect(contact.locator("a")).toHaveAttribute("href", /^mailto:/);
+      await expect(contact.getByRole("button")).toHaveCount(0);
+    }
+    for (const id of ["payment-review", "platforms", "integration", "account-support"]) {
+      await page.goto(new URL(`/contact#${id}`, baseURL).href);
+      await expect(page.locator("[data-merchant-contact] a")).toBeInViewport();
     }
   } finally { await context.close(); }
 });
@@ -259,8 +262,8 @@ test("existing merchants can reach missing payout support without entering sales
   await page.getByRole("link", { name: "Not yet received", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#account-support$/);
   await expect(page.locator("#account-support")).toBeInViewport();
-  await expect(page.locator("#account-support")).toContainText("transaction or payout reference");
-  await expect(page.locator("#account-support a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(page.locator("[data-merchant-contact]")).toContainText("transaction or payout reference");
+  await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await page.goBack();
   await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
   await expect(page.locator("main")).toContainText("A missing payout is not a reason to charge the customer again.");

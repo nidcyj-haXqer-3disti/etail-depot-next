@@ -44,7 +44,7 @@ test("Home gives merchants and software partners distinct next steps", async ({ 
   await expect(page).toHaveURL(/\/contact$/);
   await expect(page.locator("#merchant-application")).toContainText("Account approval and setup apply.");
   await expect(page.locator("#cards")).toContainText("An inquiry is not an application.");
-  await expect(page.locator("#integration a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Integration%20documentation");
+  await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await page.goto("/");
   await partners.click();
   await expect(page).toHaveURL(/\/software-partners$/);

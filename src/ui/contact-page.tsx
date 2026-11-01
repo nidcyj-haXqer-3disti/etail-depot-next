@@ -16,35 +16,22 @@ import "./enterprise-support.css";
 
 function ContactOptions() {
   const contacts = [
-    { id: "integration", title: "Integration documentation", text: "Request documentation and access requirements for your service. Include your merchant account status.", label: "Contact the integration team", href: `${hostedServices.payments.contactHref}?subject=Integration%20documentation` },
-    { id: "account-support", title: "Merchant account support", text: "Describe the account or payment issue and include any relevant transaction or payout reference.", label: "Contact merchant support", href: hostedServices.payments.contactHref },
-    { id: "cards", title: "Card inquiries", text: "Ask about the secured credit card, deposits or wallet support. An inquiry is not an application.", label: "Contact card services", href: hostedServices.cards.contactHref },
-    { id: "compliance", title: "Privacy and compliance", text: "Contact us about privacy, data rights or a compliance matter involving the service.", label: "Contact compliance", href: `mailto:${legalIdentity.complianceEmail}` },
+    { id: "cards", title: "Card inquiries", text: "Ask about the secured credit card, deposits or wallet support. An inquiry is not an application.", email: hostedServices.cards.email, href: hostedServices.cards.contactHref },
+    { id: "compliance", title: "Privacy and compliance", text: "Contact us about privacy, data rights or a compliance matter involving the service.", email: legalIdentity.complianceEmail, href: `mailto:${legalIdentity.complianceEmail}` },
   ];
-  return <div id="contact-options" className="commercial-contacts container">
-    <section className={contactStyles.sales} aria-labelledby="contact-sales-title">
-      <h2 id="contact-sales-title">Contact sales.</h2>
-      <div className={contactStyles.choices}>
-        <article id="payment-review" aria-labelledby="business-enquiry-title" className={contactStyles.choice}>
-          <h3 id="business-enquiry-title">For your business</h3>
-          <p>Ask about account eligibility, processing costs or changing providers.</p>
-          <a className={contactStyles.action} href={`${hostedServices.payments.contactHref}?subject=Merchant%20services%20enquiry`}>Email business sales<Icon name="mail" /></a>
-          <span className="commercial-contact-email">{hostedServices.payments.email}</span>
-        </article>
-        <article id="platforms" aria-labelledby="platform-enquiry-title" className={contactStyles.choice}>
-          <h3 id="platform-enquiry-title">For your software platform</h3>
-          <p>Merchant onboarding, checkout and reporting for your software.</p>
-          <a className={contactStyles.action} href={`${hostedServices.payments.contactHref}?subject=Software%20platform%20partnership`}>Email platform sales<Icon name="mail" /></a>
-          <span className="commercial-contact-email">{hostedServices.payments.email}</span>
-        </article>
+  return <div id="contact-options" className={`commercial-contacts container ${contactStyles.directory}`}>
+    <section id="payment-review" className={contactStyles.merchant} aria-labelledby="contact-merchant-title" data-merchant-contact>
+      {["platforms", "integration", "account-support"].map(id => <span key={id} id={id} className={contactStyles.bookmark} aria-hidden="true" />)}
+      <div className={contactStyles.copy}>
+        <h2 id="contact-merchant-title">Merchant services</h2>
+        <p>Account eligibility, processing costs, software partnerships and integration documentation.</p>
+        <p className={contactStyles.support}>For account support, include the relevant transaction or payout reference.</p>
       </div>
+      <a className={contactStyles.email} href={hostedServices.payments.contactHref}><span>{hostedServices.payments.email}</span><Icon name="mail" /></a>
     </section>
-    <section className="contact-existing" aria-labelledby="contact-existing-title">
-      <h2 id="contact-existing-title">Account help and integration.</h2>
-      <div className="commercial-contact-list">
-        {contacts.map(contact => <article key={contact.id} id={contact.id}><div><h3>{contact.title}</h3><p>{contact.text}</p></div><div className="commercial-contact-action"><a className="text-link" href={contact.href}>{contact.label}<Icon name="mail" /></a><span className="commercial-contact-email">{contact.href.slice("mailto:".length).split("?")[0]}</span></div></article>)}
-      </div>
-    </section>
+    <div className="commercial-contact-list">
+      {contacts.map(contact => <section key={contact.id} id={contact.id} className={contactStyles.specialist} aria-labelledby={`${contact.id}-title`}><div><h2 id={`${contact.id}-title`}>{contact.title}</h2><p>{contact.text}</p></div><a className={contactStyles.email} href={contact.href}><span>{contact.email}</span><Icon name="mail" /></a></section>)}
+    </div>
     <div className="contact-application" id="merchant-application"><div><h2>Ready to apply?</h2><p>Merchant applications open at Trolleys, an Etail Depot service. Submit business documents through the secure account service. Account approval and setup apply.</p></div><PaymentPortalLink className="text-link">Open merchant application</PaymentPortalLink></div>
   </div>;
 }
