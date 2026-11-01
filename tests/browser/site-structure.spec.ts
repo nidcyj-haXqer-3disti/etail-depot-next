@@ -199,8 +199,10 @@ test("four industry cases share one page with useful workflows and no standalone
     const card = page.locator(`#${slug}`);
     await expect(card.getByRole("heading", {level:3})).toBeVisible();
     await expect(card.locator(".platform-case-steps li")).toHaveCount(4);
-    await card.locator("summary").focus(); await page.keyboard.press("Enter");
-    await expect(card.locator("details")).toHaveAttribute("open", "");
+    const disclosure = card.locator(":scope > details");
+    if (await disclosure.getAttribute("open") === null) await disclosure.locator(":scope > summary").click();
+    await card.locator(".platform-case-details > summary").focus(); await page.keyboard.press("Enter");
+    await expect(card.locator(".platform-case-details")).toHaveAttribute("open", "");
     await expect(card.locator(".platform-case-scope")).toBeVisible();
     await page.keyboard.press("Enter"); await expect(card.locator(".platform-case-expanded")).toBeHidden();
     expect((await request.get(`/use-cases/${slug}`)).status()).toBe(404);
@@ -224,7 +226,7 @@ test("all four industry cases remain readable without JavaScript", async ({brows
     for (const slug of industryPaths) {
       const card = page.locator(`#${slug}`);
       await expect(card.getByRole("heading",{level:3})).toBeVisible();
-      await card.locator("summary").focus(); await page.keyboard.press("Enter");
+      await card.locator(".platform-case-details > summary").focus(); await page.keyboard.press("Enter");
       await expect(card.locator(".platform-case-scope")).toBeVisible();
       await page.keyboard.press("Enter");
     }
@@ -374,6 +376,36 @@ test("footer groups work with a keyboard and adapt to screen size", async ({ pag
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
 });
 
+test("footer keyboard position survives responsive layout changes", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const directory = page.locator(".public-footer-navigation");
+  await expect(directory).toHaveAttribute("data-compact", "true");
+  const summary = directory.getByRole("navigation", { name: "Footer services", exact: true }).locator("summary");
+  await summary.focus();
+  await page.setViewportSize({ width: 1024, height: 900 });
+  const onboarding = directory.getByRole("link", { name: "Merchant onboarding", exact: true });
+  await expect(directory).toHaveAttribute("data-compact", "false");
+  await expect(onboarding).toBeFocused();
+  const payouts = directory.getByRole("link", { name: "Payouts", exact: true });
+  await payouts.focus();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(directory).toHaveAttribute("data-compact", "true");
+  await expect(payouts).toBeVisible();
+  await expect(payouts).toBeFocused();
+  await expect(directory.locator("details[open]")).toHaveCount(1);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(directory).toHaveAttribute("data-compact", "false");
+  await expect(payouts).toBeFocused();
+  // A resize must not move focus into the footer from elsewhere on the page.
+  const home = page.getByRole("banner").getByRole("link", { name: "Etail Depot home", exact: true });
+  await home.focus();
+  await page.setViewportSize({ width: 320, height: 900 });
+  await expect(directory).toHaveAttribute("data-compact", "true");
+  await expect(home).toBeFocused();
+  await expect(directory.locator("details[open]")).toHaveCount(0);
+});
+
 test("the complete footer remains usable without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   try {
@@ -385,4 +417,28 @@ test("the complete footer remains usable without JavaScript", async ({ browser }
     await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
     await expect(page.getByRole("heading", {level:1})).toBeInViewport();
   } finally { await context.close(); }
+});
+
+
+test("phone industries expand by intent and retain bookmarked workflows", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/software-partners#industries");
+  const cards = page.locator(".industry-cases > article > details");
+  await expect(cards).toHaveCount(4);
+  await expect(page.locator(".industry-cases > article > details[open]")).toHaveCount(0);
+  const freight = page.locator("#freight-platforms > details");
+  await freight.locator(":scope > summary").focus(); await page.keyboard.press("Enter");
+  await expect(freight).toHaveAttribute("open", "");
+  await expect(freight.locator(".ec-industry-scope")).toBeVisible();
+  await freight.locator(".platform-case-details summary").click();
+  await expect(freight.locator(".platform-case-steps li")).toHaveCount(4);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(page.locator(".industry-cases > article > details[open]")).toHaveCount(4);
+  await page.setViewportSize({ width: 320, height: 844 });
+  await expect(freight).toHaveAttribute("open", "");
+  await page.goto("/software-partners#legal-software");
+  await expect(page.locator("#legal-software > details")).toHaveAttribute("open", "");
+  await expect(page.locator("#legal-software h3")).toBeInViewport();
+  await expect(page.locator("#legal-software .ec-industry-scope")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

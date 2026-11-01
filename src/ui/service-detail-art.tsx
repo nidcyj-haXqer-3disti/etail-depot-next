@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import type { ServiceKind } from "@/modules/public-site/service-detail-content";
 import { Icon } from "./icon";
-import { LedgixCardFace } from "./wallet-card-art";
+import { PaymentChoiceArt, ReconciliationMatchArt } from "./merchant-record-art";
 import s from "./service-detail.module.css";
 
 function Label({ icon, children }: { icon: string; children: ReactNode }) {
@@ -17,7 +17,12 @@ function Record({ label, value }: { label: string; value: string }) {
 }
 
 /** Original process diagrams, without account data, live states or transaction controls. */
-export function ServiceDetailArt({ kind, title, caption }: { kind: ServiceKind | "cards"; title: string; caption: string }) {
+type ServiceDetailArtProps = { title: string; caption: string } & (
+  | { kind: ServiceKind; cardFace?: never }
+  | { kind: "cards"; cardFace: ReactNode }
+);
+
+export function ServiceDetailArt({ kind, title, caption, cardFace }: ServiceDetailArtProps) {
   return <figure className={s.art} data-service-workflow={kind} aria-label={title}>
     <div className={kind === "refunds" ? `${s.scene} ${s.refunds}` : s.scene}>
       {kind === "onboarding" && <>
@@ -27,14 +32,7 @@ export function ServiceDetailArt({ kind, title, caption }: { kind: ServiceKind |
           <div className={s.accountStages}><div><span>01</span><strong>Account review</strong><small>Information and eligibility</small></div><div><span>02</span><strong>Agreement</strong><small>Fees and service terms</small></div><div><span>03</span><strong>Activation</strong><small>After approval and setup</small></div></div>
         </div>
       </>}
-      {kind === "methods" && <>
-        <div className={s.sceneHeading}><Label icon="card">Customer checkout</Label><strong>A familiar way to pay.</strong></div>
-        <div className={s.checkoutPaper}>
-          <div className={s.method}><div><Icon name="card" /><strong>Cards</strong></div><div className={s.networkMarks}><Image src="/brand/networks/visa-blue.svg" alt="Visa" width={38} height={26} unoptimized /><Image src="/brand/networks/mastercard.svg" alt="Mastercard" width={32} height={26} unoptimized /><Image src="/brand/networks/american-express.svg" alt="American Express" width={26} height={26} unoptimized /><Image src="/brand/networks/discover.jpg" alt="Discover" width={42} height={26} unoptimized /></div></div>
-          <div className={s.method}><div><Icon name="card" /><strong>Digital wallets</strong></div><div className={s.walletMarks}><Image src="/brand/wallets/apple-pay.svg" alt="Apple Pay" width={44} height={29} unoptimized /><Image src="/brand/wallets/google-pay.svg" alt="Google Pay" width={48} height={29} unoptimized /></div></div>
-          <div className={s.method}><div><Icon name="bank" /><strong>Bank payments</strong></div><span className={s.achMark}>ACH</span></div>
-        </div><Connector /><div className={s.outcome}><Icon name="link" /><div><strong>One connected order</strong><span>Payment reference and status</span></div></div>
-      </>}
+      {kind === "methods" && <PaymentChoiceArt />}
       {kind === "ach" && <>
         <div className={s.sceneHeading}><Label icon="bank">ACH payment</Label><strong>Permission. Validation. Payment.</strong></div>
         <div className={s.permissionPair}><Node icon="document" title="Authorization" detail="Customer permission" /><Node icon="shield" title="Account validation" detail="Required bank checks" /></div>
@@ -48,9 +46,8 @@ export function ServiceDetailArt({ kind, title, caption }: { kind: ServiceKind |
         <p className={s.artFootnote}>Pending activity belongs to a later payout.</p>
       </>}
       {kind === "reconciliation" && <>
-        <div className={s.sceneHeading}><Label icon="link">Reconciliation</Label><strong>Two matches. One clear balance.</strong></div>
-        <div className={s.matchRecords}><Node icon="card" title="Payment activity" detail="Sales, fees and adjustments" /><div className={s.matchLink}><span>Match included activity</span><Connector /></div><Node icon="document" title="Payout report" detail="Included transactions and total" /><div className={s.matchLink}><span>Match amount and reference</span><Connector /></div><Node icon="bank" title="Bank statement" detail="Posted credit and date" /></div>
-        <div className={s.exception}><Icon name="insight" /><span>Any difference stays open for investigation.</span></div>
+        <div className={s.sceneHeading}><Label icon="link">Reconciliation</Label><strong>Match the records.</strong></div>
+        <ReconciliationMatchArt />
       </>}
       {kind === "refunds" && <>
         <div className={s.sceneHeading}><Label icon="card">Original payment</Label><strong>The status determines the return.</strong></div>
@@ -69,7 +66,7 @@ export function ServiceDetailArt({ kind, title, caption }: { kind: ServiceKind |
       </>}
       {kind === "cards" && <>
         <div className={s.sceneHeading}><Label icon="lock">Virtual secured credit</Label><strong>One card. Two separate balances.</strong></div>
-        <div className={s.cardFace}><LedgixCardFace /></div>
+        <div className={s.cardFace}>{cardFace}</div>
         <div className={s.cardRecords}><Node icon="lock" title="Security deposit" detail="Backs the credit account" /><Node icon="document" title="Purchase balance" detail="Repaid in full each month" /></div>
       </>}
     </div><figcaption>{caption}</figcaption>

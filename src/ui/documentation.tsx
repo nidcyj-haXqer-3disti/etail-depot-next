@@ -48,11 +48,11 @@ export function DocumentationArticle({slug}:{slug:DocumentationSlug}){
   <ResponsiveContentsFocus rootSelector=".docs-workspace" desktopSelector=".docs-toc" mobileSelector=".docs-mobile-toc" breakpoint={1250} />
   <article className="docs-article">
    <header className="docs-article-heading"><h1>{page.title}</h1><p>{article.introduction}</p><div className="docs-context"><span className="docs-audience">{page.audience}</span><Link className="docs-service-link" href={service.href}>{service.label}</Link></div></header>
+   <details className="docs-mobile-toc"><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="Page sections">{article.sections.map(s=><a key={s.id} href={`#${s.id}`}>{s.title}</a>)}</nav></details>
    <div className={`docs-prerequisites${materials ? " docs-integration-preparation" : ""}`}>
     <div><h2>{materials ? "What you need" : "Before you begin"}</h2><ul>{article.prerequisites.map(p=><li key={p}><Icon name="check"/>{p}</li>)}</ul></div>
-    {materials && <div className="docs-assigned-materials"><h2>Request from our integration team</h2><ul>{materials.map(item=><li key={item}><Icon name="document"/>{item}</li>)}</ul></div>}
+    {materials && <div className="docs-assigned-materials"><h2>Request from our {slug === "integration-access" ? <Link className="docs-team-link" href="/contact#integration">integration team</Link> : "integration team"}</h2><ul>{materials.map(item=><li key={item}><Icon name="document"/>{item}</li>)}</ul></div>}
    </div>
-   <details className="docs-mobile-toc"><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="Page sections">{article.sections.map(s=><a key={s.id} href={`#${s.id}`}>{s.title}</a>)}</nav></details>
    {article.sections.map(section=><ArticleSection key={section.id} section={section}/>)}
    <span className="docs-legacy-anchor" id="documentation-support" aria-hidden="true"/>
   </article>

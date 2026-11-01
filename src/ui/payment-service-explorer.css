@@ -82,3 +82,10 @@
 /* A disabled-script reader gets every view, rather than the pre-hydration layout. */
 .payment-service-explorer:has(.pse-no-script) .pse-tabs { display: none; }
 .payment-service-explorer:has(.pse-no-script) .pse-panel[hidden] { display: block !important; }
+
+/* Optical alignment and legibility at native artwork size. */
+
+.payment-service-explorer .pse-facts dd{margin-left:16px;text-align:right}
+.payment-service-explorer .pse-stage-index{align-self:start;margin-top:1px}
+.payment-service-explorer .pse-record-amount{font-feature-settings:"tnum"}
+.payment-service-explorer .pse-stages li>div>p:first-child{align-items:baseline}

@@ -9,7 +9,6 @@ import { PaymentPortalLink } from "./service-entry";
 import { Icon } from "./icon";
 import { ServiceDetailArt } from "./service-detail-art";
 import s from "./service-detail.module.css";
-import "./connected-services.css";
 
 export function ServiceDetailHero({ label, title, intro, actions, note, artwork }: { label: string; title: ReactNode; intro: ReactNode; actions: ReactNode; note?: ReactNode; artwork: ReactNode }) {
   return <section className={s.hero}><div className={s.container}><div className={s.heroCopy}><p className={s.eyebrow}>{label}</p><h1>{title}</h1><p className={s.intro}>{intro}</p><div className={s.actions} data-service-actions>{actions}</div>{note && <p className={s.note} data-service-note>{note}</p>}</div><div className={s.heroArt}>{artwork}</div></div></section>;

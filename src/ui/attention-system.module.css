@@ -160,3 +160,11 @@
  .platformLine{padding-block:13px;}
  .platformReview{margin-top:120px;}
 }
+
+/* Optical alignment and legibility at native artwork size. */
+
+.art .platformReview>small{font-size:12px}
+.art .platformLine{font-variant-numeric:tabular-nums}
+.art .platformReview,.art .next{box-shadow:0 22px 36px -24px #193c3366}
+.art .previous{border-color:#cedbcb}
+.art .legend{line-height:1.65}

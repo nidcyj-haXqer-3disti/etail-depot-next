@@ -88,11 +88,12 @@ test("home presents Etail brand artwork and local product discovery without acco
   const symbol=art.locator('img[src="/brand/symbol.png"]');
   await expect(symbol).toHaveCount(1);
   await expect(symbol).toBeVisible();
-  await expect(symbol).toHaveAttribute("width","56");
+  await expect(symbol).toHaveAttribute("width","800");
+  await expect(symbol).toHaveAttribute("height","484");
   await expectDecodedBrandMarks(symbol);
   await expect(art.locator('img[src^="/marketing/"]')).toHaveCount(0);
   await expect(art).not.toContainText(/Designer sneaker|Studio Store|10482/);
-  await expect(art).toHaveAccessibleName(/Etail Depot connects three service areas.*Merchant accounts require approval/);
+  await expect(art).toHaveAccessibleName(/Etail Depot connects three service areas:.*Merchant accounts require approval/);
   const artBox=await art.boundingBox(),copyBox=await hero.locator("[data-home-copy]").boundingBox();
   expect(artBox).not.toBeNull();expect(copyBox).not.toBeNull();
   expect(artBox!.width).toBeGreaterThan(200);expect(artBox!.height).toBeGreaterThan(200);
@@ -103,11 +104,7 @@ test("home presents Etail brand artwork and local product discovery without acco
   await expect(hero.locator("form,input,textarea,select,[contenteditable=true]")).toHaveCount(0);
   await expect(art.locator("a,button,input,form,textarea,select,[tabindex],[role=button]")).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
-  await hero.getByRole("link",{name:"Explore our services",exact:true}).click();
-  await expect(page).toHaveURL(/\/#services$/);
-  const serviceLink=page.locator("#services").getByRole("link",{name:"Explore merchant services",exact:true});
-  await expect(serviceLink).toHaveAttribute("href","/payment-acceptance-service");
-  await serviceLink.click();
+  await hero.getByRole("link",{name:"For my business",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   await expect(page.getByRole("heading",{level:1})).toBeVisible();
   await page.goto("/");
@@ -155,7 +152,7 @@ test("software partners can review the payment experience and reach the fixed in
   await expect(experience).toBeInViewport();
   const art = page.locator("[data-attention-art=platform]");
   await expect(art).toBeVisible();
-  await expect(art).toContainText("Account setupCheckoutReporting");
+  await expect(art).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records to merchant account setup, checkout and reporting/);
   await art.scrollIntoViewIfNeeded();
   await expect(art.locator("button,input,form,textarea,select,[role=button]")).toHaveCount(0);
   const box = await art.boundingBox();
@@ -170,10 +167,10 @@ test("software partners can review the payment experience and reach the fixed in
   await expect(page).toHaveURL(/\/contact#platforms$/);
   const contact = page.locator("#platforms");
   await expect(contact).toBeInViewport();
-  const email = page.locator('#integration a[href^="mailto:"]');
+  const email = page.locator('[data-merchant-contact] a[href^="mailto:"]');
   await expect(email).toBeVisible();
-  await expect(email).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Integration%20documentation");
-  await expect(page.locator('#integration a[href^="mailto:"]')).toHaveCount(1);
+  await expect(email).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(page.locator('[data-merchant-contact] a[href^="mailto:"]')).toHaveCount(1);
   await page.goBack();
   await expect(page).toHaveURL(/\/software-partners\?partner_probe=private#visit$/);
   await page.goForward();
@@ -203,7 +200,7 @@ test("software partner content and inquiry remain usable without JavaScript", as
     await art.scrollIntoViewIfNeeded();
     await expect(art).toBeVisible();
     await expect(art.locator("a,button,input,form,textarea,select,[tabindex],[role=button]")).toHaveCount(0);
-    await expect(art).toContainText("Account setupCheckoutReporting");
+    await expect(art).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records to merchant account setup, checkout and reporting/);
     await expect(page.locator(".faq, .public-faq-section")).toHaveCount(0);
     const inquiry = page.locator('.ec-platform-hero a[href="/contact#platforms"]');
     await expect(inquiry).toHaveAccessibleName("Discuss your platform");
@@ -211,7 +208,7 @@ test("software partner content and inquiry remain usable without JavaScript", as
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/contact#platforms$/);
     await expect(page.locator("#platforms")).toBeInViewport();
-    await expect(page.locator('#integration a[href^="mailto:"]')).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Integration%20documentation");
+    await expect(page.locator('[data-merchant-contact] a[href^="mailto:"]')).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
     expect(await page.evaluate(() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth)).toBeLessThanOrEqual(1);
     expect(await context.cookies()).toEqual([]);
   } finally {
@@ -283,7 +280,7 @@ test("public service discovery explains eligibility and card inquiries without l
       const payments=page.locator(".ec-home-hero");
       await expect(payments.getByRole("heading",{level:1})).toHaveText("Merchant services. For your business.");
       await expect(payments).toContainText("Credit card processing, online checkout and reporting for US businesses and software platforms.");
-      await expect(payments.getByRole("link",{name:"Explore our services",exact:true})).toHaveAttribute("href","#services");
+      await expect(payments.getByRole("link",{name:"For my business",exact:true})).toHaveAttribute("href","/payment-acceptance-service");
       await expect(page.getByRole("banner").getByRole("link",{name:"Merchant access",exact:true,includeHidden:true})).toHaveAttribute("href","https://trolleys.ai");
       await expect(page.getByRole("tablist")).toHaveCount(0);
       const serviceAreas=page.locator("#services");

@@ -23,7 +23,7 @@
 .public-help-body { max-width: var(--public-max); padding-bottom: 40px; }
 .public-help-body .help-guide { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; gap: 0 48px; padding-block: 40px; }
 .public-help-body > .help-guide:first-child { padding-top: 20px; }
-.public-help-body .help-guide h2 { margin: 18px 0 0; font-size: 28px; line-height: 1.25; letter-spacing: -.03em; }
+.public-help-body .help-guide h2 { margin: 18px 0 0; font-size: 30px; line-height: 1.25; letter-spacing: -.03em; }
 .public-help-body .help-guide .public-questions { grid-column: 2; }
 .public-help-body .help-guide > .welcome-text-link { grid-column: 2; justify-self: start; margin-top: 20px; }
 .public-help-body .public-questions summary { font-weight: 500; }
@@ -39,7 +39,7 @@
   .help-support-card + .help-support-card { border-left:0;border-top:1px solid var(--public-line); }
   .public-help-intro { padding-top: 40px; }
   .public-help-body .help-guide { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 28px; }
-  .public-help-body .help-guide h2 { margin: 0; font-size: 28px; }
+  .public-help-body .help-guide h2 { margin: 0; }
   .public-help-body .help-guide .public-questions, .public-help-body .help-guide > .welcome-text-link { grid-column: 1; }
   .public-help-body .help-guide > .welcome-text-link { margin-top: 0; }
 }

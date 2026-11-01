@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ISO20022_PATH, ISO20022_RELEASE, ISO20022_SETS, ISO20022_SOURCE, ISO20022_WORKBOOK, codeHeading, codePeers, codeReplacement, codeUsageRestriction, isoJsonLd, sourceDate, sourceName, type IsoCode, type IsoCodeSet } from "@/modules/public-site/iso20022-reference";
 import { Shell } from "./shell";
+import { ReferenceTableFilter } from "./reference-table-filter";
 import { ReferenceIndex } from "./reference-index";
 import { PaymentStatusContext } from "./iso20022-status-context";
 import "./standards-reference.css";
@@ -45,8 +46,9 @@ function History({ set, code }: { set: IsoCodeSet; code?: IsoCode }) {
 function SetPage({ set }: { set: IsoCodeSet }) {
   const letters = [...new Set(set.codes.map(code => code.code[0]))];
   return <><p className="sr-kicker">ISO 20022 · External code set</p><h1>{set.title} codes</h1><p className="sr-lead">{set.source_definition}</p><div className="sr-meta"><span>{set.codes.length} registered {set.codes.length === 1 ? "code" : "codes"}</span><span>Source release: {ISO20022_RELEASE}</span><a href="#reference-source">Source details</a></div><p className="sr-identity"><span>Code set</span><code>{set.collection_id}</code></p><div className="sr-layout"><div className="sr-copy">
+    {set.codes.length > 10 && <ReferenceTableFilter targetId="registered-codes" label="Filter this code set" />}
     {set.codes.length > 40 && <ReferenceIndex label="Jump to a code" navigationLabel="Codes by first character" items={letters.map(letter => ({label:letter,href:`#code-${set.codes.find(code => code.code[0] === letter)!.code.toLowerCase()}`}))} />}
-    <table className="sr-table iso-code-table"><caption>Registered codes in <code>{set.collection_id}</code>. Select a code for its full definition and source details.</caption><thead><tr><th scope="col">Code</th><th scope="col">Published name and definition</th></tr></thead><tbody>{set.codes.map(code => <tr key={code.id} id={`code-${code.code.toLowerCase()}`}><td><Link href={code.path} prefetch={false}><code>{code.code}</code></Link></td><td><strong>{sourceName(code.source_name)}</strong><p>{code.source_definition}</p>{codeUsageRestriction(code) && <p className="iso-source-advisory"><strong>Source note: {codeUsageRestriction(code)}</strong></p>}{code.replaced_by && <p className="iso-source-advisory">Source replacement: <ReplacementValue set={set} code={code} /></p>}</td></tr>)}</tbody></table>
+    <div id="registered-codes"><table className="sr-table iso-code-table"><caption>Registered codes in <code>{set.collection_id}</code>. Select a code for its full definition and source details.</caption><thead><tr><th scope="col">Code</th><th scope="col">Published name and definition</th></tr></thead><tbody>{set.codes.map(code => <tr key={code.id} id={`code-${code.code.toLowerCase()}`}><td><Link href={code.path} prefetch={false}><code>{code.code}</code></Link></td><td><strong>{sourceName(code.source_name)}</strong>{set.codes.length > 40 ? <details className="iso-code-definition"><summary>Definition</summary><p>{code.source_definition}</p></details> : <p>{code.source_definition}</p>}{codeUsageRestriction(code) && <p className="iso-source-advisory"><strong>Source note: {codeUsageRestriction(code)}</strong></p>}{code.replaced_by && <p className="iso-source-advisory">Source replacement: <ReplacementValue set={set} code={code} /></p>}</td></tr>)}</tbody></table></div>
     <MessageReferences set={set} /><History set={set} />
   </div><SourceDetails set={set} /></div></>;
 }

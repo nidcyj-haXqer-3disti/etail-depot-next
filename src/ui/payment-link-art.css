@@ -8,16 +8,16 @@
 .payment-link-art-flow { list-style: none; margin: 0; padding: 0 20px; }
 .payment-link-art-flow > li { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.5fr); gap: 24px; align-items: center; padding: 26px 0; }
 .payment-link-art-flow > li + li { border-top: 1px solid #e0e7e2; }
-.payment-link-art-stage { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.payment-link-art-stage > span { display: grid; place-items: center; width: 24px; height: 24px; flex: none; border: 1px solid #ccdcd4; border-radius: 50%; background: #f4f8f5; font-size: 11px; line-height: 1; }
+.payment-link-art-stage { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.payment-link-art-stage > span { display: grid; place-items: center; width: 28px; height: 28px; flex: none; border: 1px solid #ccdcd4; border-radius: 50%; background: #f4f8f5; font-size: 12px; line-height: 1; }
 .payment-link-art-stage strong { font-size: 14px; font-weight: 500; line-height: 1.5; }
 .payment-link-art-product { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .payment-link-art-product > div { min-width: 0; }
 .payment-link-art-product strong { display: block; font-size: 15px; font-weight: 500; line-height: 1.5; }
-.payment-link-art-product > div > span { display: block; margin-top: 3px; color: #526a60; font-size: 11px; line-height: 1.5; }
+.payment-link-art-product > div > span { display: block; margin-top: 3px; color: #526a60; font-size: 12px; line-height: 1.5; }
 .payment-link-art-product .commerce-product-thumbnail { width: 76px; height: 64px; }
 .payment-link-art-product > div > .payment-link-art-amount { margin-top: 7px; font-size: 20px; font-weight: 500; color: #023941; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-.payment-link-art-amount small { font-size: 10px; font-weight: 400; color: #526a60; letter-spacing: .02em; }
+.payment-link-art-amount small { font-size: 12px; font-weight: 400; color: #526a60; letter-spacing: .02em; }
 .payment-link-art-delivery { display: flex; flex-wrap: wrap; gap: 10px 16px; }
 .payment-link-art-delivery > div { display: flex; align-items: center; gap: 7px; color: #34574d; font-size: 13px; line-height: 1.5; }
 .payment-link-art-delivery .icon { width: 16px; height: 16px; flex: none; }
@@ -38,7 +38,7 @@
  .payment-link-art-product .commerce-product-thumbnail { width: 66px; height: 56px; }
  .payment-link-art-product,.payment-link-art-delivery,.payment-link-art-destination { margin-left: 0; }
  .payment-link-art-product strong { font-size: 13px; }
- .payment-link-art-header { font-size: 11px; gap: 8px; }
+ .payment-link-art-header { font-size: 12px; gap: 8px; }
  .payment-link-art-stage strong { font-size: 13px; }
 }
 

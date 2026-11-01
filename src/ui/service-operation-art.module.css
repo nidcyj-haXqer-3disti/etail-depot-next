@@ -116,3 +116,18 @@
 @media(max-width:480px){.art .heading{padding:18px 20px}.heading strong{font-size:14px}.art .profile{padding:24px 20px}.profileIdentity{gap:13px}.profileIdentity strong{font-size:24px}.profileFields{gap:12px}.art .timeline{padding-inline:20px}.timeline > li{gap:12px}.timeline strong{font-size:17px}.timeline > li > svg{width:19px;height:19px}.timeline div > span{font-size:12px}.boundary,.recordFoot{padding:19px 20px;font-size:12px}.art .body{padding:20px}.purchase{padding:18px;gap:12px}.purchase strong{font-size:20px}.methods{padding:0 18px}.methods > div{gap:14px}.methods strong{font-size:18px}.methods div > span:not(.methodIcon){font-size:12px}.branch{grid-template-columns:1fr;gap:16px;margin-top:24px}.branch::before{height:24px;top:-24px}.branchCard{padding:20px;display:grid;grid-template-columns:38px 1fr;gap:6px 14px}.branchCard::before{display:none}.branchIcon,.branchCard > .mark{grid-row:1 / 3;margin:0;align-self:center}.branchCard > strong{font-size:24px;margin:0}.art .branchCard ul{grid-column:1 / -1;margin-top:12px}.branchCard li{padding:7px 0}.branchCard .small{min-width:0}.platform{padding:20px;gap:7px 12px}.platform strong{font-size:21px}.art .payoutTimeline{padding:0}.payoutTimeline > li{padding:20px}.payoutTimeline > li:not(:last-child)::after{left:34px}.art .report{padding:4px 14px}.bankGrid{padding:20px}.invoice{padding:24px}.bankIdentity{padding:22px}.bankIdentity strong{font-size:22px}.return{padding:20px}.integrationRows{padding-inline:20px}.referencePair{grid-template-columns:1fr 24px 1fr;gap:10px}.referencePair div > span{font-size:12px}}
 @media(max-width:360px){.art .heading{padding:16px}.art .body{padding:16px}.art .profile{padding:22px 16px}.profileFields{gap:10px}.art .timeline{padding-inline:16px}.timeline > li > svg{display:none}.art .payoutTimeline{padding:0}.payoutTimeline > li{padding-inline:16px}.payoutTimeline > li:not(:last-child)::after{left:30px}.bankGrid{padding:16px}.invoice{padding:20px}.invoice dl > div{display:block}.invoice dd{text-align:left}.integrationHeader > div{padding:16px 12px;gap:7px;flex-wrap:wrap}.integrationRows{padding-inline:16px}.referencePair strong{font-size:15px}.referencePair{gap:8px}}
 @media(forced-colors:active){.art .surface,.art .number,.art .branchCard,.art .invoice,.art .bankProcess{border-color:CanvasText}.dark,.boundary,.bankIdentity,.deposit,.integrationHeader > div:last-child{background:Canvas;color:CanvasText}}
+
+/* Optical alignment and legibility at native artwork size. */
+
+.integration,.accountProfile{container-type:inline-size}
+.accountProfile .number{font-weight:500}
+.accountProfile .timeline>li{align-items:flex-start}
+.accountProfile .timeline>li>.number{margin-top:1px}
+.accountProfile .timeline>li>svg{margin-top:5px}
+.accountProfile .timeline>li:not(:last-child)::after{top:54px;bottom:-24px}
+.referenceDirection{margin-top:1px}
+.referencePair>div{min-width:0}
+.integration .integrationLabel{gap:10px}
+.branchCard li{min-height:38px;display:flex;align-items:center}
+.branchIcon,.mark{box-shadow:0 2px 4px #193c3305}
+@container(max-width:440px){.accountProfile .timeline div>span,.referencePair div>span{font-size:13px}.integration .referencePair{gap:9px}.integration .recordFoot{font-size:13px}}

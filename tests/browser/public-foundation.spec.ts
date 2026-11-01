@@ -434,11 +434,12 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
     if (path === "/") {
       const symbol = art.locator('img[src="/brand/symbol.png"]');
       await expect(symbol).toHaveCount(1);
-      await expect(symbol).toHaveAttribute("width", "56");
+      await expect(symbol).toHaveAttribute("width", "800");
+      await expect(symbol).toHaveAttribute("height", "484");
       await expectDecodedBrandMark(symbol);
     } else if (path === "/software-partners") {
-      await expect(art).toHaveAccessibleName(/Commerce, freight, travel and legal software.*Access and account structure depend on the approved integration/);
-      await expect(art).toContainText("Merchantservices");
+      await expect(art).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records.*Access and account structure depend on the approved integration/);
+      await expect(art).toContainText("Account setup");
     } else {
       await expect(art).toContainText("#10482");
       await expect(art).toContainText("$100.00");

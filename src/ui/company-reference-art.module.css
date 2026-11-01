@@ -3,3 +3,10 @@
 @container(max-width:420px){.surface{padding:23px}.brand{padding-bottom:24px;gap:14px}.brand strong{font-size:26px}.brand img{width:42px}.merchantHeading{padding:22px}.merchantHeading strong{font-size:21px}.functions{padding:22px;gap:10px}.related{gap:12px}.related>div{padding:20px 16px}.related strong{font-size:17px}.documentHeader{padding:22px}.documentList{padding:20px;gap:14px}.documentList>li{padding:20px;gap:12px;grid-template-columns:30px 1fr}.documentSymbol{width:30px;height:37px}}
 @container(max-width:310px){.surface{padding:18px}.brand strong{font-size:24px}.brand span{font-size:12px}.functions{grid-template-columns:1fr;gap:18px}.functions>span{display:flex;align-items:center;gap:12px}.functions svg{flex:none}.related{grid-template-columns:1fr}.related>div{padding:22px}.related strong{font-size:19px}.documentHeader{padding:22px 18px}.documentHeader strong{font-size:19px}.documentList{padding:16px}.documentList>li{padding:20px 16px}.documentList strong{font-size:16px}}
 @media(forced-colors:active){.surface,.merchant,.merchantHeading,.related>div,.documents,.documentHeader,.documentList>li,.documentSymbol{background:Canvas;color:CanvasText;border:1px solid CanvasText}.merchantHeading svg,.documentHeader svg{color:CanvasText}}
+
+/* Optical alignment and legibility at native artwork size. */
+
+.documentList>li{align-items:center;box-shadow:0 8px 18px -18px #234b3c50}
+.documentSymbol{align-self:start;margin-top:1px}
+.documentHeader svg,.documentSymbol svg{stroke-linecap:round;stroke-linejoin:round}
+@container(max-width:420px){.documentHeader{gap:12px}.art .documentList p{font-size:14px;line-height:1.6}.documentList>li{padding:20px 18px}}

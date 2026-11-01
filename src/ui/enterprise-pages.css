@@ -45,7 +45,7 @@
 .enterprise-page .ec-platform-band .ec-industry-names{font-size:12px;margin-top:24px;color:#a9c4b1}
 .enterprise-page .ec-record-line{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:13px 0;border-bottom:1px solid #e5eae3;font-size:12px;color:#607264}
 .enterprise-page .ec-record-line strong{font-weight:500;color:var(--ink);text-align:right}
-.enterprise-page .ec-record-caption{font-size:10px!important;line-height:1.6!important;color:#69796c!important;margin-top:14px!important}
+.enterprise-page .ec-record-caption{font-size:12px!important;line-height:1.65!important;color:#526650!important;margin-top:14px!important}
 .enterprise-page .ec-resource-section{display:grid;grid-template-columns:1fr 1fr;gap:80px;padding-bottom:70px}
 .enterprise-page .ec-resource-section>div{border-top:1px solid var(--line);padding-top:28px}
 .enterprise-page .ec-resource-icon{display:block;margin-bottom:23px;color:#3e7857}

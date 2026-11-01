@@ -78,3 +78,10 @@
   .wallet-product-art-compact { height: 380px; }
   .wallet-product-art-compact .wallet-product-device { width: 190px; }
 }
+
+/* Optical alignment and legibility at native artwork size. */
+
+.wallet-card-art .wallet-setup-screen-action{font-size:12px;line-height:1.45;min-height:40px}
+.wallet-card-art .wallet-setup-screen-info strong{font-size:12px;line-height:1.5}
+.wallet-card-art .wallet-setup-screen-heading{align-items:center}
+.wallet-card-art .wallet-setup-steps button{font-variant-numeric:tabular-nums}

@@ -127,7 +127,7 @@ export const COMMERCIAL_PAGES = {
   },
   "/ach-payments": SERVICE_DETAIL_PAGES["/ach-payments"],
   "/switch-payment-providers": {
-    label: "Switch merchant provider", title: "Switch Merchant Services Providers",
+    label: "Switch merchant services", title: "Switch Merchant Services Providers",
     description: "Stripe application declined or account closed? Discuss merchant services and credit card processing with Etail. New accounts require review and approval.",
     heading: "Declined by Stripe? Let’s look at your business.",
     intro: "Merchant services for businesses declined, restricted or no longer supported by their provider.",

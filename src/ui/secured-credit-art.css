@@ -3,12 +3,12 @@
 .secured-credit-scene { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,2.2fr); gap: 32px; padding: 32px; border: 1px solid var(--public-frame-line); border-radius: 12px; background: #fff; box-shadow: 0 2px 8px -4px #02394114; }
 .secured-credit-deposit { display: grid; align-content: center; gap: 26px; min-width: 0; padding: 24px; border-radius: 8px; background: var(--public-tint); }
 .secured-deposit-art { position: relative; display: grid; place-items: center; min-width: 0; height: 180px; }
-.secured-deposit-sheet { position: relative; display: grid; justify-items: start; width: 156px; min-height: 158px; padding: 20px 17px; border: 1px solid #d2ddd5; border-radius: 8px; background: #fff; box-shadow: 0 3px 8px #0239410a; }
-.secured-deposit-sheet > span { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; font-size: 11px; line-height: 1.5; color: #52676a; }
+.secured-deposit-sheet { position: relative; display: grid; justify-items: start; width: 156px; min-height: 158px; padding: 20px 17px; border: 1px solid #d2ddd5; border-radius: 8px; background: #fff; box-shadow: 0 8px 16px -12px #193c3340; }
+.secured-deposit-sheet > span { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; font-size: 12px; line-height: 1.5; color: #52676a; }
 .secured-deposit-sheet > span .icon { width: 12px; height: 12px; flex-shrink: 0; }
 .secured-deposit-sheet > strong { margin-top: 10px; font-size: 34px; line-height: 1.2; font-weight: 500; letter-spacing: -.035em; }
-.secured-deposit-sheet > small { margin-top: 4px; font-size: 11px; line-height: 1.5; color: #52676a; }
-.secured-deposit-copy > p { margin: 0; color: #52676a; font-size: 11px; font-weight: 550; letter-spacing: .08em; line-height: 1.6; }
+.secured-deposit-sheet > small { margin-top: 4px; font-size: 12px; line-height: 1.5; color: #52676a; }
+.secured-deposit-copy > p { margin: 0; color: #52676a; font-size: 12px; font-weight: 550; letter-spacing: .08em; line-height: 1.6; }
 .secured-deposit-copy h3 { margin-top: 12px; font-size: 24px; font-weight: 500; letter-spacing: -.025em; line-height: 1.3; }
 .secured-deposit-copy > span { display: block; margin-top: 13px; font-size: 13px; line-height: 1.7; color: var(--public-muted); max-width: 26ch; }
 .secured-credit-purchases { align-self: center; min-width: 0; }
@@ -20,33 +20,33 @@
 .secured-step-art { position: relative; display: grid; place-items: center; min-height: 252px; min-width: 0; padding: 22px 10px; border: 1px solid var(--public-line); border-radius: 8px; overflow: hidden; background: var(--public-paper); }
 .secured-step-art-statement { background: var(--public-paper); }
 .secured-step-art-repayment { background: var(--public-paper); }
-.secured-mini-phone { position: relative; width: 111px; height: 179px; padding: 8px; border: 2px solid #023941; border-radius: 18px; color: #023941; background: #fff; box-shadow: 0 3px 8px #0239410a; }
+.secured-mini-phone { position: relative; width: 111px; height: 179px; padding: 8px; border: 2px solid #023941; border-radius: 18px; color: #023941; background: #fff; box-shadow: 0 8px 16px -12px #193c3340; }
 .secured-mini-phone > i { display: block; width: 30px; height: 5px; margin: 0 auto 13px; border-radius: 4px; background: #023941; }
-.secured-mini-phone > span { display: block; padding-left: 2px; font-size: 11px; line-height: 1.5; font-weight: 550; }
+.secured-mini-phone > span { display: block; padding-left: 2px; font-size: 12px; line-height: 1.5; font-weight: 550; }
 .secured-mini-card { position: relative; aspect-ratio: 1.586; margin-top: 9px; }
 .secured-mini-card .ledgix-wallet-card { border-radius: 5px; }
 .secured-mini-phone > em { position: absolute; bottom: 6px; left: 35%; width: 30%; height: 3px; border-radius: 3px; background: #52676a; }
 .secured-purchase-tag { position: absolute; right: 8px; bottom: 20px; display: flex; align-items: center; gap: 7px; padding: 9px 11px; border: 1px solid #d2ddd5; border-radius: 8px; background: #fff; }
 .secured-purchase-tag .icon { width: 17px; height: 17px; color: #023941; }
-.secured-purchase-tag > span { font-size: 11px; line-height: 1.5; color: #52676a; }
+.secured-purchase-tag > span { font-size: 12px; line-height: 1.5; color: #52676a; }
 .secured-purchase-tag strong { display: block; font-size: 15px; line-height: 1.5; font-weight: 550; color: #023941; }
-.secured-statement-paper { width: 151px; padding: 20px 16px 16px; border: 1px solid #d2ddd5; border-radius: 8px; background: #fff; box-shadow: 0 3px 8px #0239410a; min-height: 179px; }
-.secured-statement-paper > span { display: block; font-size: 11px; line-height: 1.5; color: #52676a; }
+.secured-statement-paper { width: 151px; padding: 20px 16px 16px; border: 1px solid #d2ddd5; border-radius: 8px; background: #fff; box-shadow: 0 8px 16px -12px #193c3340; min-height: 179px; }
+.secured-statement-paper > span { display: block; font-size: 12px; line-height: 1.5; color: #52676a; }
 .secured-statement-paper > strong { display: block; font-size: 30px; line-height: 1.3; letter-spacing: -.03em; font-weight: 500; margin-top: 13px; }
-.secured-statement-paper > small { display: block; margin-top: 4px; font-size: 11px; line-height: 1.5; color: #52676a; }
-.secured-paper-total { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding-top: 9px; border-top: 1px solid #e1e7e3; color: #52676a; font-size: 11px; line-height: 1.5; }
+.secured-statement-paper > small { display: block; margin-top: 4px; font-size: 12px; line-height: 1.5; color: #52676a; }
+.secured-paper-total { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding-top: 9px; border-top: 1px solid #e1e7e3; color: #52676a; font-size: 12px; line-height: 1.5; }
 .secured-paper-total .icon { width: 12px; height: 12px; }
-.secured-repayment-paper { display: grid; justify-items: center; width: 151px; padding: 20px 14px 16px; border: 1px solid #d2ddd5; border-radius: 8px; background: #fff; box-shadow: 0 3px 8px #0239410a; min-height: 179px; }
+.secured-repayment-paper { display: grid; justify-items: center; width: 151px; padding: 20px 14px 16px; border: 1px solid #d2ddd5; border-radius: 8px; background: #fff; box-shadow: 0 8px 16px -12px #193c3340; min-height: 179px; }
 .secured-repayment-paper > *, .secured-statement-paper > * { min-width: 0; max-width: 100%; }
 .secured-repayment-paper > span:nth-child(2) { text-align: center; }
 .secured-payment-check { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 50%; background: #e4f5ef; color: #023941; }
 .secured-payment-check .icon { width: 16px; height: 16px; }
-.secured-repayment-paper > span:nth-child(2) { margin-top: 10px; color: #52676a; font-size: 11px; line-height: 1.5; }
+.secured-repayment-paper > span:nth-child(2) { margin-top: 10px; color: #52676a; font-size: 12px; line-height: 1.5; }
 .secured-repayment-paper > strong { font-size: 30px; font-weight: 500; line-height: 1.4; letter-spacing: -.03em; margin-top: 4px; }
-.secured-repayment-paper > div { display: grid; justify-items: center; gap: 4px; width: 100%; margin-top: 13px; padding-top: 10px; border-top: 1px solid #e1e7e3; font-size: 11px; line-height: 1.5; color: #52676a; }
+.secured-repayment-paper > div { display: grid; justify-items: center; gap: 4px; width: 100%; margin-top: 13px; padding-top: 10px; border-top: 1px solid #e1e7e3; font-size: 12px; line-height: 1.5; color: #52676a; }
 .secured-repayment-paper b { font-weight: 550; color: #023941; }
 .secured-credit-step { display: flex; align-items: flex-start; gap: 9px; min-width: 0; padding-top: 20px; }
-.secured-step-number { flex: 0 0 28px; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #c5d7d2; border-radius: 50%; color: #52676a; font-size: 11px; line-height: 1; }
+.secured-step-number { flex: 0 0 28px; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #c5d7d2; border-radius: 50%; color: #52676a; font-size: 12px; line-height: 1; }
 .secured-credit-step > div { min-width: 0; }
 .secured-credit-step h3 { margin: 0; font-size: 15px; line-height: 1.5; font-weight: 550; letter-spacing: -.015em; }
 .secured-credit-step p { max-width: 26ch; margin: 7px 0 0; font-size: 13px; line-height: 1.7; color: var(--public-muted); }
@@ -63,10 +63,10 @@
  .secured-credit-scene { padding: 18px; gap: 24px; }
  .secured-credit-deposit { grid-template-columns: 120px minmax(0,1fr); gap: 18px; padding: 18px; }
  .secured-deposit-art { height: 150px; }
- .secured-deposit-sheet { width: 114px; min-height: 130px; padding: 15px 12px; }
+ .secured-deposit-sheet { width: 126px; min-height: 142px; padding: 15px 12px; }
  .secured-deposit-sheet strong { font-size: 28px; }
  .secured-deposit-copy h3 { font-size: 21px; margin-top: 9px; }
- .secured-deposit-copy > span { margin-top: 10px; font-size: 11px; }
+ .secured-deposit-copy > span { margin-top: 10px; font-size: 12px; }
  .secured-cycle-heading { padding-bottom: 16px; }
  .secured-credit-purchase-flow { grid-template-columns: minmax(0,1fr); gap: 16px; }
  .secured-credit-purchase-flow > li { grid-template-columns: 154px minmax(0,1fr); grid-template-rows: auto; grid-row: auto; gap: 18px; align-items: center; }
@@ -94,13 +94,13 @@
  .secured-purchase-tag { right: 4px; bottom: 13px; gap: 5px; padding: 6px; }
  .secured-purchase-tag .icon { width: 12px; height: 12px; }
  .secured-purchase-tag strong { font-size: 12px; }
- .secured-purchase-tag > span { font-size: 11px; }
+ .secured-purchase-tag > span { font-size: 12px; }
  .secured-statement-paper { width: 96px; padding: 12px 8px 10px; }
  .secured-statement-paper > strong { font-size: 19px; }
- .secured-statement-paper > span, .secured-statement-paper > small { font-size: 11px; }
- .secured-paper-total { margin-top: 11px; font-size: 11px; }
+ .secured-statement-paper > span, .secured-statement-paper > small { font-size: 12px; }
+ .secured-paper-total { margin-top: 11px; font-size: 12px; }
  .secured-repayment-paper { width: 100px; padding: 12px 8px 10px; }
- .secured-repayment-paper > span:nth-child(2), .secured-repayment-paper > div { font-size: 11px; }
+ .secured-repayment-paper > span:nth-child(2), .secured-repayment-paper > div { font-size: 12px; }
  .secured-repayment-paper > strong { font-size: 19px; }
  .secured-credit-step h3 { font-size: 14px; }
  .secured-credit-step p { font-size: 12px; }

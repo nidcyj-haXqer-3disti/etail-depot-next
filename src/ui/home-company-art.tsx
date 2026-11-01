@@ -12,7 +12,7 @@ export function HomeCompanyArt() {
       <path d="M330 306V350Q330 374 354 374H448V480" />
     </svg>
     <div className={styles.artBrand} aria-hidden="true">
-      <Image src="/brand/symbol.png" alt="" width={56} height={56} unoptimized />
+      <Image src="/brand/symbol.png" alt="" width={800} height={484} unoptimized />
       <strong>Etail Depot</strong>
     </div>
     <div className={`${styles.artPanel} ${styles.merchantPanel}`} aria-hidden="true">
