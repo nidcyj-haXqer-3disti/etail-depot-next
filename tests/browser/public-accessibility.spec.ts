@@ -8,7 +8,7 @@ const publicRoutes = [...COMMERCIAL_PATHS, "/", "/docs", "/docs/merchant-onboard
 
 for (const width of [1440,390,320]) {
   for(const route of publicRoutes) {
-    test(`consumer ${route} is readable and accessible at ${width}px`,async({page})=>{
+    test(`consumer ${route} is readable and accessible at ${width}px`,async({page},testInfo)=>{
       await page.setViewportSize({width,height:900});
       const errors: string[] = [];
       page.on("pageerror",error=>errors.push(error.message));
@@ -38,6 +38,10 @@ for (const width of [1440,390,320]) {
       expect(result.incomplete.filter(({id})=>id==="aria-prohibited-attr").map(({id,nodes})=>({id,nodes:nodes.map(node=>node.target)}))).toEqual([]);
       expect(await page.evaluate(()=>Math.max(document.body.scrollWidth,document.documentElement.scrollWidth)-innerWidth)).toBeLessThanOrEqual(1);
       expect(errors).toEqual([]);
+      if (["/payment-methods", "/docs/integration-access", "/software-partners"].includes(route) && width !== 320) {
+        await page.screenshot({path:testInfo.outputPath(`${route.slice(1).replaceAll("/","_")}-${width}.png`),fullPage:true});
+      }
+      if (route === "/payouts-and-reconciliation" && width === 1440) await page.locator("#reconciliation").screenshot({path:testInfo.outputPath("reconciliation-section-desktop.png")});
       const nav=await openMainNavigation(page);
       if(width<960){
         const expandedResult=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
@@ -294,7 +298,7 @@ for (const width of [1440, 960, 390, 320]) {
     const menu = page.getByRole("banner").getByRole("button", { name: "Menu", exact: true });
     if (await menu.isVisible()) await menu.click();
     const nav = page.getByRole("navigation", { name: "Main navigation" });
-    for (const label of ["Services", "Platforms", "Resources", "Company"]) {
+    for (const label of ["Services", "Use cases", "Developers", "Resources"]) {
       const summary = nav.locator("summary").filter({ hasText: new RegExp(`^${label}$`) });
       await summary.click();
       // Evaluate the open foreground layer separately from page targets it covers.

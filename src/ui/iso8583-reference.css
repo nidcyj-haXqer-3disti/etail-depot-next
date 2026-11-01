@@ -43,3 +43,6 @@
 .iso8583-reference .sr-table th{font-size:12px}
 .iso8583-reference .sr-table th,.iso8583-reference .sr-table td{padding-right:8px}
 }
+
+/* Short code identifiers must stay intact in narrow reference tables. */
+.iso8583-reference .sr-table td:first-child a code{white-space:nowrap;overflow-wrap:normal}

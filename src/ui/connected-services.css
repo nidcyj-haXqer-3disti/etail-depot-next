@@ -1,11 +1,4 @@
 /* Service details use the shared commercial composition and reading scale. */
-.cw-context {max-width:var(--public-max);margin:auto;padding:18px var(--public-gutter) 0;color:#526b5c;font-size:12px;line-height:1.6;}
-.cw-context ol {display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;list-style:none;padding:0;margin:0;}
-.cw-context li {display:flex;align-items:center;gap:12px;}
-.cw-context li+li:before {content:"/";color:#8b9f8c;}
-.cw-context a {display:inline-flex;align-items:center;min-height:44px;text-decoration:none;color:#365a47;}
-.cw-context a:hover {text-decoration:underline;text-underline-offset:4px;}
-.cw-context a:focus-visible {outline:2px solid #315e48;outline-offset:4px;border-radius:2px;}
 .cw-commercial.enterprise-support {background:#fff;}
 .cw-commercial.enterprise-support .commercial-hero {padding-block:var(--public-hero-space);background:#fff;}
 .cw-commercial.enterprise-support .commercial-hero>.container {gap:var(--public-content-gap);grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);}
@@ -142,8 +135,6 @@
  .cw-cards.card-craft.service-blueprint.consumer-cards .consumer-hero-grid {gap:var(--public-content-gap);}
 }
 @media(max-width:680px){
- .cw-context {padding:8px var(--public-gutter) 0;font-size:11px;}
- .cw-context ol {gap:0 9px;}.cw-context li {gap:9px;}
  .cw-commercial.enterprise-support .commercial-hero {padding-block:var(--public-hero-space);}
  .cw-commercial.enterprise-support h1 {font-size:var(--public-title-size);line-height:var(--public-title-line);max-width:21ch;}
  .cw-commercial.enterprise-support .commercial-hero>.container {gap:var(--public-content-gap);}
@@ -177,7 +168,6 @@
  .cw-cards.card-craft .card-details-section,.cw-cards.card-craft .wallet-credit-section {padding-block:44px;}
 }
 @media(max-width:359px){
- .cw-context {padding-inline:var(--public-gutter);}
  .cw-commercial.enterprise-support h1,.cw-online.online-craft .online-business-intro h1,.cw-cards.card-craft.service-blueprint.consumer-cards .consumer-hero h1 {font-size:var(--public-title-size);}
  .cw-aftercare-branches,.cw-partnership-roles {gap:11px;padding:28px 14px 20px;}
  .cw-aftercare-branches>div,.cw-partnership-roles>div {padding:16px 10px;}
@@ -217,5 +207,7 @@
 }
 
 /* Context links stay within their explanation, without adding another section. */
-.public-main .cw-commercial .commercial-details dt a {color:inherit;text-decoration:underline;text-decoration-color:#9aafa0;text-underline-offset:5px;text-decoration-thickness:1px;}
+.public-main .cw-commercial .commercial-details dt a {display:inline-flex;align-items:center;min-height:32px;color:inherit;text-decoration:underline;text-decoration-color:#9aafa0;text-underline-offset:5px;text-decoration-thickness:1px;}
 .public-main .cw-commercial .commercial-details dt a:hover {color:#19795d;text-decoration-color:currentColor;}
+
+@media(pointer:coarse){.public-main .cw-commercial .commercial-details dt a {min-height:44px;}}

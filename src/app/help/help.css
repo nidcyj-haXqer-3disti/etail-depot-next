@@ -52,3 +52,13 @@
 @media(max-width:680px){.public-help-intro > p:not(.eyebrow):last-of-type { font-size:17px; }}
 
 .help-support-card h2>a { display:inline-flex;align-items:center;margin:0;padding:0;min-height:44px;font:inherit; }
+/* Clear routes to support with the same quiet product surfaces. */
+.public-main .cw-help .help-support-grid{gap:20px;border:0;margin-top:30px}
+.public-main .cw-help .help-support-card{padding:28px;border:1px solid #dce5d3;border-radius:14px;background:#f4f7ed}
+.public-main .cw-help .help-support-card h2::before{display:none}
+.public-main .cw-help .help-support-card p{font-size:14px}
+.public-main .cw-help .help-topic-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:32px}
+.public-main .cw-help .help-topic-links a{display:flex;align-items:center;gap:12px;background:white;border:1px solid #dce5d3;padding:20px;font-size:13px;line-height:1.5;border-radius:10px}
+.public-main .cw-help .help-topic-links .icon{width:21px;height:21px;flex:none;color:#315e48}
+@media(max-width:840px){.public-main .cw-help .help-support-grid{gap:14px}.public-main .cw-help .help-support-card{padding:24px}.public-main .cw-help .help-topic-links{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.public-main .cw-help .help-topic-links{gap:12px}.public-main .cw-help .help-topic-links a{flex-direction:column;align-items:flex-start;gap:12px;padding:18px}}

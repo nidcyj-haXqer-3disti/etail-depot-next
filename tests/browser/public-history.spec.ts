@@ -7,7 +7,7 @@ async function clickVisibleSectionLink(page: Page, fragment: string) {
       return;
     }
   }
-  for (const selector of [".service-section-mobile", ".legal-document-contents-mobile"]) {
+  for (const selector of [".legal-document-contents-mobile"]) {
     const contents = page.locator(selector);
     if (await contents.isVisible() && await contents.locator(`a[href="${fragment}"]`).count()) {
       if (await contents.getAttribute("open") === null) await contents.locator("summary").click();
@@ -19,7 +19,7 @@ async function clickVisibleSectionLink(page: Page, fragment: string) {
 }
 
 for (const [route, fragment] of [
-  ["/payment-acceptance-service", "#fees"],
+  ["/software-partners", "#payment-experience"],
   ["/help", "#cards"],
   ["/privacy", "#contact"],
   ["/guides/iso-20022", "#sets-p"],
@@ -54,10 +54,10 @@ test("unhydrated pages preserve calculator, wallet and ISO reference behavior", 
     const header = page.getByRole("banner");
     await expect(header.getByRole("button", { name: "Menu", exact: true })).not.toBeVisible();
     await header.locator("summary").filter({ hasText: /^Services$/ }).click();
-    const merchant = header.getByRole("link", { name: "Merchant services", exact: true });
+    const merchant = header.getByRole("link", { name: "Merchant onboarding", exact: true });
     await expect(merchant).toBeVisible();
     await merchant.click();
-    await expect(page).toHaveURL(`${new URL(page.url()).origin}/payment-acceptance-service`);
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}/merchant-onboarding`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await page.goto("/pricing#fees");
     const amount = page.locator("#payment-amount");

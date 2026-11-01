@@ -2,7 +2,7 @@
 .hero .layout { max-width:var(--public-max); padding-inline:var(--public-gutter); margin:auto; display:grid; grid-template-columns:minmax(0,1.04fr) minmax(0,1fr); gap:44px; align-items:center; }
 .hero .copy { min-width:0; position:relative; z-index:1; }
 .hero .copy .label { margin:0 0 25px; color:#456453; font-size:12px; font-weight:600; line-height:1.5; letter-spacing:.09em; text-transform:uppercase; }
-.hero .copy .title { font-size:clamp(52px,5.5vw,76px); font-weight:500; line-height:1.02; letter-spacing:-.062em; margin:0 0 30px; max-width:660px; text-wrap:balance; }
+.hero .copy .title { font-size:var(--public-title-size); font-weight:500; line-height:var(--public-title-line); letter-spacing:-.048em; margin:0 0 30px; max-width:660px; text-wrap:balance; }
 .hero .title em { font-style:normal; color:#347455; }
 .hero .copy .intro { color:var(--public-muted); font-size:18px; line-height:1.65; max-width:490px; margin:0 0 28px; }
 .hero .actions { display:flex; gap:12px 22px; flex-wrap:wrap; align-items:center; justify-content:flex-start; margin:0; }
@@ -56,7 +56,6 @@
 .provider .legend { grid-column:1 / -1; margin-top:26px; }
 @media(max-width:1100px) {
   .hero .layout { gap:32px; }
-  .hero .copy .title { font-size:54px; }
   .hero .copy .intro { font-size:17px; }
   .sheet { padding:23px; }
   .businessLine { gap:12px; padding:21px 0; }
@@ -73,7 +72,7 @@
 @media(max-width:959px) {
   .hero { padding:40px 0 44px; }
   .hero .layout { grid-template-columns:1fr; gap:30px; }
-  .hero .copy .title { font-size:clamp(46px,7.8vw,68px); max-width:700px; }
+  .hero .copy .title { max-width:700px; }
   .hero .copy .intro { max-width:570px; }
   .hero .copy .note { max-width:570px; }
   .hero .visual { width:100%; max-width:570px; justify-self:center; }
@@ -85,7 +84,7 @@
   .hero { padding:32px 0 34px; }
   .hero .layout { gap:25px; }
   .hero .copy .label { margin-bottom:20px; font-size:11px; }
-  .hero .copy .title { font-size:46px; margin-bottom:24px; }
+  .hero .copy .title { margin-bottom:24px; }
   .hero .copy .intro { font-size:16px; line-height:1.65; margin-bottom:24px; }
   .hero .actions { gap:12px 18px; }
   .hero .actions a { font-size:13px; }
@@ -121,7 +120,6 @@
   .next>div { font-size:12px; }
 }
 @media(max-width:350px) {
-  .hero .copy .title { font-size:40px; }
   .sheet { padding:20px 16px 10px; }
   .businessLine { gap:9px; }
   .businessLine>strong { font-size:15px; }
@@ -150,4 +148,15 @@
   .art .businessLine > .subjectIcon { width:30px; height:30px; border-radius:7px; }
   .art .subjectIcon svg { width:18px; height:18px; }
   .art .businessLine > strong { font-size:18px; }
+}
+
+@media(max-width:600px){
+ .hero{padding-block:28px 32px;}
+ .hero .layout{gap:22px;}
+ .hero .copy .label{margin-bottom:16px;}
+ .hero .copy .title{font-size:var(--public-title-size);line-height:1.08;margin-bottom:20px;}
+ .hero .copy .intro{margin-bottom:20px;}
+ .hero .copy .note{margin-top:16px;}
+ .platformLine{padding-block:13px;}
+ .platformReview{margin-top:120px;}
 }

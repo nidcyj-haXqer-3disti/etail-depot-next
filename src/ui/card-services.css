@@ -1,4 +1,10 @@
 /* Product understanding comes before the wallet setup guide. */
+/* Card sections keep their reading layout independent of other page imports. */
+.consumer-cards { --consumer-space:var(--public-section-space); --consumer-heading:var(--public-section-title-size); }
+.consumer-cards .consumer-section-heading { display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-bottom:32px; }
+.consumer-cards .consumer-section-heading h2 { margin:0; }
+.consumer-cards .consumer-section-heading > p { max-width:38ch;color:var(--public-muted);font-size:16px;line-height:1.7;margin:0; }
+@media(max-width:700px){.consumer-cards .consumer-section-heading { display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-bottom:28px; }}
 .consumer-cards .wallet-product-art { box-shadow: inset 0 1px 0 #ffffff80; border: 1px solid var(--public-frame-line); border-radius: var(--public-radius); background: var(--public-tint); }
 .wallet-credit-section { padding-block: var(--consumer-space); scroll-margin-top: 28px; }
 .consumer-cards #card-questions-title { scroll-margin-top: 28px; }

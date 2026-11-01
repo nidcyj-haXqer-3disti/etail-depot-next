@@ -27,7 +27,7 @@ const standardPaths = ["/guides/iso-20022", "/guides/iso-8583"];
 const coreSchemaPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides"];
 const publicPaths = INDEXABLE_PUBLIC_PATHS;
 assert.equal(guidePaths.length, 0);
-assert.equal(new Set(publicPaths).size, 3736, "Only the exact reviewed nonlegal pages are eligible for search.");
+assert.equal(new Set(publicPaths).size, 3738, "Only the exact reviewed nonlegal pages are eligible for search.");
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -351,7 +351,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: 3736 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: 3738 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

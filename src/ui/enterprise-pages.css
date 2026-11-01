@@ -51,7 +51,7 @@
 .enterprise-page .ec-resource-icon{display:block;margin-bottom:23px;color:#3e7857}
 .enterprise-page .ec-resource-section p{font-size:15px;margin-top:12px}
 .enterprise-page .ec-resource-section .ec-concept-action{margin-top:16px}
-.enterprise-page .ec-platform-hero{padding-top:78px;padding-bottom:100px}
+.enterprise-page .ec-platform-hero{padding-block:var(--public-hero-space)}
 .enterprise-page .ec-platform-hero .ec-hero-grid{grid-template-columns:.92fr 1.08fr;gap:var(--public-content-gap)}
 .enterprise-page .ec-platform-hero h1{font-size:var(--public-title-size);max-width:500px}
 .enterprise-page .ec-tile-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:8px;background:#eef2e9;color:#4f7558;flex:none}

@@ -46,7 +46,7 @@ describe("public search release boundary", () => {
     expect(PUBLIC_INDEXING_APPROVAL).toMatchObject({
       siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3725 exact content pages and 3723 nonlegal discovery URLs");
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3740 content pages and 3738 nonlegal discovery URLs");
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
@@ -186,8 +186,8 @@ describe("reviewed public metadata", () => {
 
   it("requires an explicit revision for every core page and preserves unchanged reference dates", () => {
     expect(Object.keys(CORE_PAGE_MODIFIED).sort()).toEqual([...CORE_PUBLIC_PATHS].sort());
-    expect(publicPageModified("/merchant-onboarding")).toBe("2026-10-31");
-    expect(publicPageModified("/payouts-and-reconciliation")).toBe("2026-10-30");
+    expect(publicPageModified("/merchant-onboarding")).toBe("2026-11-01");
+    expect(publicPageModified("/payouts-and-reconciliation")).toBe("2026-11-01");
     for (const [collection, date] of Object.entries(REFERENCE_PAGE_MODIFIED)) {
       expect(date).toBe("2026-10-29");
       for (const path of INDEXABLE_PUBLIC_PATHS.filter(path => path === collection || path.startsWith(`${collection}/`))) {
@@ -205,11 +205,11 @@ describe("reviewed public metadata", () => {
   it("keeps reviewed page revision dates stable as the build clock advances", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
-    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-10-31");
-    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-10-31");
+    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-11-01");
+    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-11-01");
     expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-31");
     expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-10-31");
-    expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-10-31");
+    expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-11-01");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10)).toBe(date);

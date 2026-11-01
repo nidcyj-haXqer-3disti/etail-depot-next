@@ -25,7 +25,7 @@ test("payment requests explain the acceptance flow without duplicate actions", a
   const initialStorage = await browserStorage(page);
   const channels = page.locator("#payment-channels");
   await expect(channels.getByRole("heading", { name: /Send a payment request\s*when the order is ready\./ })).toBeVisible();
-  await expect(channels).toContainText("For orders placed by phone, email or another channel, share a hosted payment page by email, text, social media, a website button or a QR code.");
+  await expect(channels).toContainText("Share a hosted payment page for orders arranged by phone, email or another channel.");
   await expect(channels).toContainText("Available options depend on your account setup");
   await expect(channels.getByRole("img", { name: /Payment request flow/ })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Choose your checkout.", exact: true })).toHaveCount(0);

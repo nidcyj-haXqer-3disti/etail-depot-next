@@ -1,0 +1,10 @@
+.hero{background:#fff;color:var(--public-ink)}
+.hero .layout{max-width:var(--public-max);width:100%;margin:0 auto;padding:20px var(--public-gutter) 32px;display:grid;grid-template-columns:1.1fr 1fr;gap:64px;align-items:center}
+.hero .copy{min-width:0}
+.hero .copy .title{font-size:clamp(42px,4.4vw,64px);line-height:1.08;letter-spacing:-.05em;font-weight:400;max-width:12ch;text-wrap:balance;margin:0}
+.hero .copy .intro{font-size:18px;line-height:1.65;color:var(--public-muted);max-width:34ch;margin:22px 0 0}
+.hero .art{width:100%;max-width:390px;justify-self:center}
+.art svg{display:block;width:100%;height:auto}
+@media(max-width:959px){.hero .layout{gap:32px;padding-block:28px 36px;grid-template-columns:1.1fr .9fr}.hero .copy .title{font-size:48px}.hero .copy .intro{font-size:17px}.hero .art{max-width:330px}}
+@media(max-width:600px){.hero .layout{grid-template-columns:1fr;gap:20px;padding-block:26px 16px}.hero .copy .title{font-size:40px;max-width:12ch}.hero .copy .intro{font-size:16px;line-height:1.65;margin-top:18px;max-width:34ch}.hero .art{max-width:250px;justify-self:center}}
+@media(forced-colors:active){.hero .art{display:none}.hero .layout{grid-template-columns:1fr}}

@@ -12,13 +12,15 @@
 .standards-reference h1{font-size:39px;line-height:1.16;letter-spacing:-1.4px;font-weight:500;max-width:700px;margin:0 0 18px}
 .standards-reference h1 .sr-code{display:block;font:500 59px/1.1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:-2.5px;margin-bottom:10px}
 .standards-reference .sr-lead{font-size:18px;line-height:1.65;max-width:720px;color:var(--muted);margin:0 0 22px}
-.standards-reference .sr-meta{display:flex;gap:8px 22px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:0 0 28px}
+.standards-reference .sr-meta{display:flex;align-items:center;gap:8px 22px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:0 0 28px}
 .standards-reference .sr-layout{border-top:1px solid var(--line);padding-top:28px;display:grid;grid-template-columns:minmax(0,1fr) 255px;gap:46px;align-items:start}
 .standards-reference h2{font-size:22px;line-height:1.35;letter-spacing:-.45px;font-weight:500;margin:0 0 12px}
 .standards-reference h3{font-size:17px;line-height:1.4;font-weight:500;margin:0 0 9px}
 .standards-reference .sr-copy section+section{margin-top:32px}
 .standards-reference p{margin:0 0 18px}
 .standards-reference .sr-copy p{max-width:68ch}
+.standards-reference .sr-copy p a{text-decoration:underline;text-decoration-color:#9db5a5;text-decoration-thickness:1px;text-underline-offset:4px}
+.standards-reference .sr-copy p a:hover{text-decoration-color:currentColor}
 .standards-reference .sr-reference{background:var(--wash);padding:24px;border-radius:8px}
 .standards-reference .sr-reference h2{font-size:16px;margin-bottom:19px;letter-spacing:0}
 .standards-reference dl{margin:0}
@@ -45,6 +47,7 @@
 .standards-reference .sr-table td{padding:15px 0;border-bottom:1px solid var(--line);vertical-align:top}
 .standards-reference .sr-table td:first-child{width:95px;padding-right:16px}
 .standards-reference .sr-table td:first-child code{font-size:15px}
+.standards-reference .sr-table td:first-child a{min-width:44px}
 .standards-reference .sr-table a{display:inline-block;min-height:30px}
 .standards-reference .sr-table td p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.6}
 .standards-reference .sr-digits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 20px}
@@ -84,7 +87,9 @@
 .standards-reference .reference-index-links::-webkit-scrollbar { height:6px; }
 .standards-reference .reference-index-links::-webkit-scrollbar-thumb { background:#9cb8ad;border-radius:4px; }
 .standards-reference .reference-index-links::-webkit-scrollbar-track { background:#edf3ef; }
-.standards-reference .sr-meta a { text-decoration:none;border-bottom:1px solid var(--line); }
+.standards-reference .sr-meta a { display:inline-flex;align-items:center;min-height:32px;text-decoration:underline;text-decoration-color:var(--line); }
+.standards-reference .sr-detail-link { display:inline-flex;align-items:center;min-height:36px; }
+@media(pointer:coarse){.standards-reference .sr-meta a,.standards-reference .sr-detail-link { min-height:44px; }}
 .standards-reference .sr-identity { display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;padding:0 0 24px;margin:0;font-size:14px; }
 .standards-reference .sr-identity > span { color:var(--muted);font-size:12px; }
 .standards-reference .sr-identity code { overflow-wrap:anywhere;min-width:0; }
@@ -102,3 +107,9 @@
  .standards-reference .sr-summary { font-size:17px; }
 }
 @media(max-height:450px){.standards-reference .reference-index { position:static; }}
+
+/* Alternate long reference rows without obscuring a linked code. */
+.sr-table tbody tr:nth-child(even):not(:target) { background:#f7f9f5; }
+.sr-table tbody tr:focus-within:not(:target) { background:#edf3e9; }
+.sr-table tr:target { box-shadow:inset 3px 0 var(--public-accent); }
+.sr-table td:first-child code { font-variant-numeric:tabular-nums; }
