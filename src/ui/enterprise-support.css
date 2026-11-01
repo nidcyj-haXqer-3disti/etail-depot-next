@@ -88,7 +88,6 @@
 .documentation-page .docs-article-heading{padding-bottom:24px;border-bottom:1px solid var(--public-line)}
 .documentation-page .docs-article-heading h1{font-size:var(--public-reading-title-size);letter-spacing:-.04em}
 .documentation-page .docs-hub-heading h1{font-size:var(--public-title-size);letter-spacing:-.045em;line-height:var(--public-title-line)}
-.documentation-page .docs-hub-heading>p{max-width:58ch}
 .documentation-page .docs-task-paths{gap:32px;margin-top:40px}
 .documentation-page .docs-task-path{border:0;border-radius:0;overflow:visible}
 .documentation-page .docs-task-path-heading{background:#eef1e8;border:1px solid #d7e0d9;border-radius:8px;padding:24px;min-height:158px}
@@ -97,7 +96,6 @@
 .documentation-page .docs-task{padding:24px 6px;min-height:130px;border-bottom:1px solid var(--public-line)}
 .documentation-page .docs-task+.docs-task{border-top:0}
 .documentation-page .docs-task h3{font-size:17px}
-.documentation-page .docs-task p{font-size:14px;line-height:1.7}
 .documentation-page .docs-prerequisites{background:#f6f7f2;border:0;border-left:2px solid #9ab29b;border-radius:0;margin-top:28px}
 .documentation-page .docs-note{border-left-color:#9ab29b}
 .documentation-page .docs-flow{border-radius:8px;background:#eef1e8;box-shadow:none}

@@ -291,7 +291,8 @@ export const SERVICE_DETAIL_PAGES = {
         "items": [
           {
             "title": "Not yet received",
-            "text": "Check the schedule, cutoff, account review and bank holidays before treating a deposit as missing."
+            "text": "Check the payout status, schedule and bank holidays. Contact merchant support with the payout reference if it is overdue.",
+            "href": "/contact#account-support"
           },
           {
             "title": "Failed or returned",

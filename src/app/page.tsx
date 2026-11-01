@@ -17,7 +17,7 @@ export default function Page() {
           <div className={styles.heroCopy} data-home-copy>
             <h1 id="welcome-title">Merchant services.{" "}<br /><span>For your business.</span></h1>
             <p className={styles.intro}>Credit card processing, online checkout and reporting for US businesses and software platforms. Opening an account or looking for another provider? Let’s talk about what you need.</p>
-            <div className={`${styles.heroActions} ec-hero-actions`}><Link className={styles.primary} href="#services">Explore our services</Link></div>
+            <div className={`${styles.heroActions} ec-hero-actions`}><Link className={styles.primary} href="/payment-acceptance-service">For my business</Link><Link className={styles.textLink} href="/software-partners">For my software platform</Link></div>
             <p className={styles.note}>Merchant account approval is required. Payment methods, pricing and payout terms depend on the account.</p>
           </div>
           <HomeCompanyArt />

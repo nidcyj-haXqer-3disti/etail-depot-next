@@ -2,7 +2,9 @@
 .online-business-hero { background: #f7f8f5; border-bottom: 1px solid var(--bp-line); }
 .online-business-intro { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); align-items: center; gap: 56px; padding-block: 64px 48px; }
 .online-business-intro > div { min-width: 0; }
-.online-business-intro h1 { margin-top: 22px; font-size: clamp(42px,4.2vw,60px); line-height: 1.06; letter-spacing: -.045em; text-wrap: balance; }
+.online-business-page.cw-online.enterprise-support .online-business-intro h1 { margin-top: 16px; font-size: var(--public-title-size); line-height: var(--public-title-line); letter-spacing: -.05em; text-wrap: balance; }
+.online-business-page.enterprise-support .eyebrow { letter-spacing: .07em; }
+.online-business-page.enterprise-support :is(.online-business-intro,.cw-order-outcome) .eyebrow { color: var(--public-accent); }
 .online-business-intro h1 span { color: var(--public-ink); }
 .online-business-copy > p:first-child { max-width: 44ch; font-size: 18px; line-height: 1.65; color: var(--public-muted); }
 .online-business-actions { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; margin-top: 24px; }

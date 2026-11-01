@@ -1,0 +1,80 @@
+.sales {
+  margin-bottom: 56px;
+}
+
+.sales .choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px;
+  padding: 30px 32px;
+  background: #f3f6ef;
+  border-radius: 18px;
+}
+
+.sales .choice {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  scroll-margin-top: 20px;
+}
+
+.sales .choice h3 {
+  margin: 0;
+  color: var(--public-ink);
+  font-size: 23px;
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: -.025em;
+}
+
+.sales .choice p {
+  margin: 12px 0 16px;
+  max-width: 40ch;
+  color: var(--public-muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.sales .action {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-top: auto;
+  max-width: 100%;
+  color: var(--public-ink);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
+.sales .action svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.sales .action:hover {
+  text-decoration-thickness: 2px;
+}
+
+.sales .action:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+
+@media (max-width: 700px) {
+  .sales { margin-bottom: 40px; }
+  .sales .choices { grid-template-columns: 1fr; gap: 30px; padding: 24px; }
+  .sales .choice h3 { font-size: 22px; }
+  .sales .choice p { margin-bottom: 10px; }
+}
+
+@media (forced-colors: active) {
+  .sales .choices { border: 1px solid CanvasText; }
+}

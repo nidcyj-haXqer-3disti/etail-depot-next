@@ -13,7 +13,7 @@ const contexts = {
   "/credit-card-services": ["Card services", "home"],
   "/platform-payment-models": ["Payment models", "platform"],
   "/payment-partnerships": ["Payment partnerships", "platform"],
-  "/switch-payment-providers": ["Switch merchant provider", "merchant"],
+  "/switch-payment-providers": ["Switch merchant services", "merchant"],
 } as const;
 export type ServiceContextPath = keyof typeof contexts;
 export function serviceBreadcrumb(path: ServiceContextPath) {

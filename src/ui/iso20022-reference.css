@@ -52,3 +52,5 @@
 .iso-reference .iso-code-table .iso-source-advisory { color:var(--ink);margin-top:8px; }
 .iso-reference .iso-code-table .iso-source-advisory a { min-height:24px;padding-block:0; }
 @media(max-width:600px) { .iso-reference .iso-source-replacement { padding-left:16px; } }
+
+.iso-reference .iso-code-definition{margin-top:4px}.iso-reference .iso-code-definition summary{display:list-item;cursor:pointer;min-height:44px;align-content:center;font-size:13px;color:#315c43;padding:10px 0;list-style:disclosure-closed inside}.iso-reference .iso-code-definition[open] summary{list-style-type:disclosure-open}.iso-reference .iso-code-definition p{margin-top:4px}.iso-reference .sr-table tr[hidden],.iso-reference [data-code-group][hidden]{display:none}

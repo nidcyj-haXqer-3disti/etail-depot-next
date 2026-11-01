@@ -276,4 +276,7 @@ html:has(.documentation-page) { scroll-behavior:auto; }
 
 .docs-integration-preparation { display:grid; grid-template-columns:1.1fr 1fr; gap:28px; }
 .docs-assigned-materials { min-width:0; }
+.docs-assigned-materials .docs-team-link { color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px; }
+.docs-assigned-materials .docs-team-link:hover { text-decoration-thickness:2px; }
+.docs-assigned-materials .docs-team-link:focus-visible { outline:2px solid var(--docs-ink); outline-offset:4px; border-radius:2px; }
 @media(max-width:900px) { .docs-integration-preparation { grid-template-columns:1fr; gap:24px; } }

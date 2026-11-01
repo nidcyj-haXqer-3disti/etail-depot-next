@@ -2,7 +2,7 @@ import styles from "./contact-hero.module.css";
 
 function ContactIllustration() {
   return <div className={styles.art} aria-hidden="true">
-    <svg viewBox="0 0 500 330" fill="none" focusable="false">
+    <svg viewBox="0 0 500 330" fill="none" focusable="false" strokeLinecap="round" strokeLinejoin="round">
       <ellipse cx="254" cy="179" rx="174" ry="137" fill="#eff4e8" />
       <ellipse cx="253" cy="299" rx="150" ry="10" fill="#dfe8d8" opacity=".6" />
       <path d="M92 147 239 61Q250 54 261 61L408 147V273H92Z" fill="#254d3f" />

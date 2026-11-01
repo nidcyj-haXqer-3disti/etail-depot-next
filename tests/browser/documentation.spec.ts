@@ -121,6 +121,14 @@ test("platform implementation progresses to testing and returns to its use case"
  await expect(page).toHaveURL(/\/docs#developer-integration$/);
  await page.locator('.docs-task-paths').getByRole('link',{name:'Prepare your integration',exact:true}).click();
  await expect(page).toHaveURL(/\/docs\/integration-access$/);
+ const team=page.getByRole('main').getByRole('link',{name:'integration team',exact:true});
+ await team.focus();
+ await page.keyboard.press('Enter');
+ await expect(page).toHaveURL(/\/contact#integration$/);
+ await expect(page.locator('#integration').getByRole('heading')).toBeInViewport();
+ await expect(page.locator('#integration a')).toHaveAttribute('href','mailto:trolleys@etaildepot.com?subject=Integration%20documentation');
+ await page.goBack();
+ await expect(page).toHaveURL(/\/docs\/integration-access$/);
  for(const destination of ['checkout','webhooks','testing-and-launch']){
   await openDocumentationTopic(page,destination);
  }
@@ -276,4 +284,22 @@ test("each task has one relevant service connection and matching search context"
   await page.goBack();
   await expect(page).toHaveURL(url=>url.pathname===documentationPath(item.slug));
  }
+});
+
+
+test("phone readers reach document sections before the preparation panels", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const item of documentationPages) {
+    await page.goto(documentationPath(item.slug));
+    const contents = page.locator(".docs-mobile-toc");
+    const before = await contents.boundingBox();
+    const preparation = await page.locator(".docs-prerequisites").boundingBox();
+    expect(before!.y).toBeLessThan(preparation!.y);
+    expect(before!.y).toBeLessThan(680);
+    await contents.locator("summary").focus(); await page.keyboard.press("Enter");
+    const target = contents.getByRole("link").last();
+    const href = await target.getAttribute("href");
+    await target.click();
+    await expect(page.locator(href! + " > h2")).toBeInViewport();
+  }
 });

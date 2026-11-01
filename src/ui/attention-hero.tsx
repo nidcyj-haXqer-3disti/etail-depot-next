@@ -30,7 +30,7 @@ export function AttentionHero({ id, label, title, intro, actions, note, artwork,
 }
 
 function Mark() {
-  return <span className={styles.mark}><Image src="/brand/symbol.png" alt="" width={56} height={56} unoptimized /></span>;
+  return <span className={styles.mark}><Image src="/brand/symbol.png" alt="" width={800} height={484} unoptimized /></span>;
 }
 
 export function AttentionArt({ kind }: { kind: "business" | "platform" | "provider" }) {

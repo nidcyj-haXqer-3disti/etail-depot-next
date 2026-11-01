@@ -47,3 +47,22 @@
  .scene{padding:20px}
 }
 @media(forced-colors:active){.scene,.profilePaper,.accountStages,.checkoutPaper,.permissionPair>.node,.processing,.payoutPaper,.outcome,.matchRecords>.node,.refundChecks,.refundRoutes,.notice,.caseBranches>div,.cardFace,.cardRecords>.node,.flowSteps li{background:Canvas!important;color:CanvasText!important;border:1px solid CanvasText}.primary{background:ButtonFace;color:ButtonText;border:1px solid ButtonText}}
+
+/* Optical alignment and legibility at native artwork size. */
+
+.scene{box-shadow:inset 0 1px 0 #ffffff99}
+.sceneHeading{padding-bottom:30px}
+.nodeIcon svg,.outcome>svg,.connector svg{stroke-linecap:round;stroke-linejoin:round}
+.accountStages span{font-size:12px;top:2px;font-variant-numeric:tabular-nums}
+.accountStages>div{padding-left:30px}
+.permissionPair>.node{height:100%}
+.record{align-items:baseline;gap:24px}
+.record>strong{font-variant-numeric:tabular-nums}
+.payoutTotal{min-height:78px}
+.refundRoutes>div{grid-template-columns:minmax(0,1.4fr) 26px minmax(0,1fr)}
+.refundRoutes .connector{justify-self:center}
+.caseBranches>div{display:flex;flex-direction:column}
+.caseBranches p{margin-top:12px}
+.cardFace{box-shadow:0 20px 32px -22px #193c3366,0 2px 6px #193c330a}
+.cardRecords>.node{gap:15px}
+@container(max-width:440px){.sceneHeading{padding-bottom:24px}.refundRoutes>div{grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr)}.payoutTotal{min-height:72px}.cardRecords>.node{gap:13px}}

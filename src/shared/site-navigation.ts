@@ -8,7 +8,7 @@ export const serviceNavigation = [
 export const audienceUseCaseNavigation = [
   { href: "/software-partners", label: "Software platforms", description: "Merchant services for your software." },
   { href: "/online-businesses", label: "Online businesses", description: "Online checkout for your customers." },
-  { href: "/switch-payment-providers", label: "Switch merchant provider", description: "Account options, fees and the steps to switch." },
+  { href: "/switch-payment-providers", label: "Switch merchant services", description: "Account options, fees and the steps to switch." },
 ] as const;
 
 export const useCaseNavigation = audienceUseCaseNavigation;
@@ -32,7 +32,7 @@ const destinations = {
   methods: { label: "Payment methods", href: "/payment-methods" },
   ach: { label: "ACH payments", href: "/ach-payments" },
   cards: { label: "Card services", href: "/credit-card-services" },
-  switchProvider: { label: "Switch merchant provider", href: "/switch-payment-providers" },
+  switchProvider: { label: "Switch merchant services", href: "/switch-payment-providers" },
   onboarding: { label: "Merchant onboarding", href: "/merchant-onboarding" },
   pricing: { label: "Pricing", href: "/pricing" },
   platforms: { label: "Software platforms", href: "/software-partners" },

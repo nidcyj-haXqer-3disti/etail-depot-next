@@ -19,3 +19,12 @@
  .journey .description p{line-height:1.6;}
 }
 @media(max-width:350px){.record{padding:15px;gap:12px;}.recordHeading{flex-direction:column;}}
+
+/* Optical alignment and legibility at native artwork size. */
+
+.number{font-size:12px}
+.record{box-shadow:0 12px 24px -20px #234b3c25}
+.fields{line-height:1.65;gap:8px}
+.recordHeading>svg{stroke-linecap:round;stroke-linejoin:round}
+@media(min-width:1101px){.record{min-height:164px}.recordHeading{min-height:45px}}
+@media(max-width:600px){.fields{font-size:13px;line-height:1.5}.record{padding:18px;gap:12px}.description{grid-template-columns:24px 1fr;gap:7px 10px}}

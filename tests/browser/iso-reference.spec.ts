@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const origin = "https://etaildepot.com";
@@ -138,5 +139,75 @@ test("long reference directories retain keyboard jumps without JavaScript and ke
     await page.goto("/guides/iso-20022/purpose");
     await page.evaluate(() => window.scrollTo(0, 1800));
     expect(await page.locator(".reference-index").evaluate(element => getComputedStyle(element).position)).toBe("static");
+  } finally { await context.close(); }
+});
+
+
+test("reference filters keep code identity, source context and ordinary links", async ({ page, context }) => {
+  for (const [path, label, code, noun] of [
+    ["/guides/iso-20022/purpose", "Filter this code set", "SALA", "codes"],
+    ["/guides/iso-8583/fields", "Filter data fields", "39", "fields"],
+    ["/guides/iso-8583/messages", "Filter message types", "2100", "message types"],
+  ]) {
+    await page.goto(path);
+    const total = await page.locator(".sr-table tbody tr").count();
+    const input = page.getByRole("searchbox", { name: label });
+    await input.fill("  " + code.toLowerCase() + "  ");
+    await expect(page.getByRole("status")).toHaveText(`1 of ${total} ${noun}`);
+    await expect(page.locator(".sr-table tbody tr:visible")).toHaveCount(1);
+    await expect(page.getByRole("cell").getByRole("link", { name: code, exact: true })).toBeVisible();
+    await expect(page.getByRole("complementary")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(path + "$"));
+    await input.fill("zznoentryexists");
+    await expect(page.locator(".sr-table tbody tr:visible")).toHaveCount(0);
+    await expect(page.getByText("No matching entries. Try another code or clear the filter.")).toBeVisible();
+    await page.getByRole("button", { name: "Clear", exact: true }).click();
+    await expect(input).toBeFocused();
+    await expect(page.locator(".sr-table tbody tr:visible")).toHaveCount(total);
+    await input.fill(code); await input.press("Escape");
+    await expect(input).toHaveValue("");
+    await expect(page.getByRole("status")).toHaveText(`All ${total} ${noun}`);
+    const result = await new AxeBuilder({page}).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+    expect(result.violations.map(v => v.id)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+  }
+  expect(await context.cookies()).toEqual([]);
+});
+
+test("filtering by meaning preserves definitions and alphabet navigation", async ({ page, request }) => {
+  const response = await request.get("/guides/iso-20022/purpose");
+  expect(await response.text()).toContain('/guides/iso-20022/purpose/sala');
+  await page.goto("/guides/iso-20022/purpose");
+  const filter = page.getByRole("searchbox", { name: "Filter this code set" });
+  await filter.fill("salary");
+  await expect(page.locator("#code-sala")).toBeVisible();
+  await page.locator("#code-sala summary").focus(); await page.keyboard.press("Enter");
+  await expect(page.locator("#code-sala details p")).toBeVisible();
+  await filter.fill("noentryhere");
+  const jump = page.getByRole("navigation", {name:"Codes by first character"}).getByRole("link", {name:"S", exact:true});
+  const href = await jump.getAttribute("href");
+  await jump.click();
+  await expect(filter).toHaveValue("");
+  await expect(page.locator(href!)).toBeInViewport();
+  await page.locator('#code-sala a').click();
+  await expect(page).toHaveURL(/purpose\/sala$/);
+  await expect(page.locator("#definition")).toContainText("Transaction is the payment of salaries.");
+});
+
+test("reference entries and definitions remain complete without JavaScript", async ({ browser, baseURL, viewport }) => {
+  const context = await browser.newContext({baseURL,viewport,javaScriptEnabled:false,reducedMotion:"reduce"});
+  try {
+    const page = await context.newPage();
+    await page.goto("/guides/iso-20022/purpose");
+    await expect(page.getByRole("searchbox")).toHaveCount(0);
+    await expect(page.locator(".sr-table tbody tr")).toHaveCount(366);
+    await page.locator("#code-sala summary").focus(); await page.keyboard.press("Enter");
+    await expect(page.locator("#code-sala details p")).toBeVisible();
+    await page.locator("#code-sala a").click();
+    await expect(page.locator("#definition")).toBeVisible();
+    await page.goto("/guides/iso-8583/fields");
+    await expect(page.getByRole("searchbox")).toHaveCount(0);
+    await expect(page.locator(".sr-table tbody tr:visible")).toHaveCount(97);
   } finally { await context.close(); }
 });

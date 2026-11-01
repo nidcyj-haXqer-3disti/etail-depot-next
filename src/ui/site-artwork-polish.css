@@ -90,3 +90,31 @@
 @media(forced-colors:active) {
  .public-main .cw-workbench .cw-payment-focus,.public-main .cw-docs .docs-diagram-heading{background:Canvas;color:CanvasText;border:1px solid CanvasText;}
 }
+
+/* Optical alignment and legibility at native artwork size. */
+
+.public-main .cw-workbench .cw-payment-focus .cw-art-tag{font-size:12px;padding:4px 9px}
+.public-main .cw-payment-fields>div{align-items:baseline;gap:20px}
+.public-main .cw-payment-fields strong,.public-main .ec-record-line>strong{font-variant-numeric:tabular-nums}
+.public-main .attention-site.cw-pilot .ec-reconciliation-art .ec-report-top{font-size:13px;gap:16px}
+.public-main .attention-site.cw-pilot .ec-reconciliation-art .ec-report-top>span:last-child{font-size:12px;line-height:1.5;text-align:right}
+.public-main .attention-site.cw-pilot .ec-reconciliation-art .ec-record-caption{font-size:12px;line-height:1.65}
+.public-main .attention-site.cw-pilot .ec-reconciliation-art .ec-reconcile-band p{font-size:13px;line-height:1.6}
+.public-main .ec-industry-scene .ec-record-line{align-items:baseline;gap:16px}
+.public-main .ec-industry-scene .ec-record-line>strong{text-align:right;max-width:60%}
+.public-main .ec-industry-scene .ec-scene-kicker{gap:12px}
+.public-main .ec-industry-scene :is(.ec-route-display,.ec-booking-display,.ec-matter-display){font-variant-numeric:tabular-nums}
+.public-main .ec-route-display>svg{flex:none;align-self:center}
+.public-main .cw-company .facilitator-relationship>div{box-shadow:0 12px 24px -22px #193c3328}
+.public-main .cw-company .facilitator-relationship .icon{stroke-linecap:round;stroke-linejoin:round}
+.public-main .cw-docs .docs-diagram-heading{gap:12px;align-items:center}
+.public-main .cw-docs .docs-workflow-number,.public-main .cw-docs .docs-sequence-number{font-variant-numeric:tabular-nums;font-weight:500}
+.public-main .cw-docs .docs-diagram:not(.docs-workflow) li{align-content:start}
+.public-main .cw-docs .docs-diagram-owner{line-height:1.6}
+.public-main .cw-docs .docs-request-origin{border-color:#cddcc2}
+.public-main .cw-docs .docs-request-purchases>div{box-shadow:0 8px 20px -20px #193c3333}
+.public-main .cw-docs .docs-request-purchases>div>span{line-height:1.6}
+.public-main .cw-docs .docs-workflow li:not(:last-child)::after,.public-main .cw-docs .docs-checkout-sequence li:not(:last-child)::after{background:#bdcdb3}
+.public-main .payment-offer-section :is(.payment-base-rate,.pricing-account-fees dd,.fee-result dd,.fee-input input){font-variant-numeric:tabular-nums}
+.public-main .payment-offer-section .fee-result dl>div{align-items:baseline;gap:20px}
+.public-main .payment-offer-section .fee-result dd{white-space:nowrap;text-align:right}

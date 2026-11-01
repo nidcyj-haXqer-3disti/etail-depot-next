@@ -92,7 +92,7 @@
  .onboarding-checklist li:not(:last-child)::after { display: none; }
  .onboarding-checklist strong { font-size: 13px; }
  .onboarding-checklist div > span { font-size: 12px; }
- .onboarding-step-mark { flex: 0 0 22px; width: 22px; height: 22px; margin-top: 1px; font-size: 11px; }
+ .onboarding-step-mark { flex: 0 0 22px; width: 22px; height: 22px; margin-top: 1px; font-size: 12px; }
  .onboarding-step-mark .icon { width: 12px; height: 12px; }
  .onboarding-content, .payout-statement, .payout-deposit { padding: 24px 18px; }
  .mja-content-heading { flex-direction: column; align-items: start; gap: 12px; margin-bottom: 24px; }
@@ -119,3 +119,12 @@
  .payout-totals dd { font-size: 17px; }
 }
 @media (prefers-contrast: more) { .payment-artwork-surface, .onboarding-submissions > div, .payout-transaction-line { border-color: var(--public-muted); } }
+
+/* Optical alignment and legibility at native artwork size. */
+
+.merchant-journey-art .onboarding-storefront{border-radius:10px;box-shadow:0 12px 24px -18px #193c3340}
+.merchant-journey-art .onboarding-fields dd{font-variant-numeric:tabular-nums}
+.merchant-journey-art .onboarding-step-mark,.merchant-journey-art .payout-trail-mark{font-variant-numeric:tabular-nums}
+.merchant-journey-art .payout-totals dd{white-space:nowrap;text-align:right}
+.merchant-journey-art .payout-transaction-amount{text-align:right}
+.merchant-journey-art .payout-bank-icon{box-shadow:inset 0 1px 0 #ffffffa0}

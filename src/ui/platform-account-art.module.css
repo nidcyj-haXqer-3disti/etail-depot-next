@@ -128,3 +128,13 @@
   .purchaseDetails > div, .accountDetails > div { flex-direction: column; align-items: flex-start; gap: 3px; }
   .purchaseDetails dd, .accountDetails dd { text-align: left; }
 }
+
+/* Optical alignment and legibility at native artwork size. */
+
+.purchase,.account{box-shadow:0 18px 32px -25px #22452b55}
+.purchaseHeader{align-items:flex-start}
+.customerIcon{margin-top:2px}
+.purchaseDetails dd,.accountDetails dd{font-variant-numeric:tabular-nums}
+.connectionIcon{box-shadow:0 2px 4px #193c3307}
+.art svg{stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:700px){.connection{height:72px}.accountHeader{align-items:center}}

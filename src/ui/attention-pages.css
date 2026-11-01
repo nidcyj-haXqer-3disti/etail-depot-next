@@ -44,7 +44,7 @@
 
 /* Online checkout keeps its approved interaction and artwork. */
 .public-main .attention-online .online-business-hero { background:linear-gradient(115deg,#fff 40%,#f0f5eb); padding-top:0; }
-.public-main .attention-online .online-business-intro { align-items:center; gap:56px; }
+.public-main .attention-site.attention-online .online-business-intro { align-items:center; gap:56px; }
 .public-main .attention-online .online-business-intro h1 { font-size:var(--public-title-size); letter-spacing:-.048em; line-height:var(--public-title-line); max-width:640px; }
 .public-main .attention-online .online-business-intro h1 span { color:#347455; }
 .public-main .attention-online .online-business-copy>p:first-child { font-size:18px; line-height:1.65; }
@@ -59,7 +59,7 @@
 .public-main .attention-pricing .commercial-hero-copy { gap:56px; align-items:center; }
 .public-main .attention-pricing .commercial-hero h1 { font-size:var(--public-title-size); line-height:var(--public-title-line); letter-spacing:-.048em; }
 .public-main .attention-pricing .commercial-lead { font-size:18px; line-height:1.65; }
-.public-main .attention-pricing .payment-offer-section { padding-top:52px; }
+.public-main .attention-site.attention-pricing .payment-offer-section { padding-top:52px; }
 .public-main .attention-pricing .pricing-panel { border:1px solid #c9d8ca; border-radius:16px; overflow:hidden; box-shadow:0 18px 42px #193c330a; }
 .public-main .attention-pricing .pricing-rate { background:#193c33; color:white; }
 .public-main .attention-pricing .pricing-rate h3,
@@ -74,14 +74,14 @@
 .public-main .attention-pricing .pricing-included svg { color:#c6dda9; }
 .public-main .attention-pricing .fee-estimate { background:#fbfcf7; }
 .public-main .attention-provider .commercial-section-grid { grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:80px; }
-.public-main .attention-provider .commercial-section h2 { font-size:var(--attention-heading); letter-spacing:-.04em; line-height:1.15; }
+.public-main .attention-site.attention-provider .commercial-section h2 { font-size:var(--attention-heading); letter-spacing:-.04em; line-height:1.15; }
 .public-main .attention-provider .commercial-section-tint { background:#f3f5ed; }
 @media(max-width:1100px) {
-  .public-main .attention-online .online-business-intro,
+  .public-main .attention-site.attention-online .online-business-intro,
   .public-main .attention-pricing .commercial-hero-copy { gap:36px; }
 }
 @media(max-width:959px) {
-  .public-main .attention-online .online-business-intro,
+  .public-main .attention-site.attention-online .online-business-intro,
   .public-main .attention-provider .commercial-section-grid,
   .public-main .attention-pricing .commercial-hero-copy { grid-template-columns:1fr; gap:26px; }
   .public-main .attention-site .ec-journey-rail { gap:28px; }
@@ -109,7 +109,6 @@
 
 /* Contact choices follow the commercial journey without adding a local application. */
 .company-context-contact .contact-existing{margin-top:0}
-.company-context-contact #platforms,.company-context-contact #payment-review{scroll-margin-top:100px}
 .company-context-contact .contact-existing>h2{font-size:28px;margin-bottom:20px}
 .company-context-contact .contact-application{display:flex;align-items:center;justify-content:space-between;gap:32px;margin-top:36px;padding-top:28px;border-top:1px solid #d5dfd3;scroll-margin-top:100px}
 .company-context-contact .contact-application h2{font-size:23px;margin-bottom:8px}

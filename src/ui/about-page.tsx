@@ -1,11 +1,13 @@
+import { Shell } from "./shell";
+import { CommercialStructuredData } from "./commercial-structured-data";
 import Link from "next/link";
-import type { CommercialPage } from "@/modules/public-site/commercial-content";
+import { COMMERCIAL_PAGES, type CommercialPage } from "@/modules/public-site/commercial-content";
 import { legalIdentity } from "@/shared/legal-identity";
 import styles from "./about-page.module.css";
 
 function CompanyIllustration() {
   return <div className={styles.illustration} aria-hidden="true">
-    <svg viewBox="0 0 420 260" fill="none" focusable="false">
+    <svg viewBox="0 0 420 260" fill="none" focusable="false" strokeLinecap="round" strokeLinejoin="round">
       <path d="M37 184 213 91 389 184 213 239Z" fill="#f0f4ec" />
       <g stroke="#c4d4c8" strokeWidth=".8">
         {[0,1,2,3,4,5].map(i => <path key={i} d={`M${59+i*22} ${172-i*11.5} ${235+i*22} ${227-i*6.9}`} />)}
@@ -37,7 +39,11 @@ export function AboutPageContent({ page }: { page: CommercialPage }) {
       <section className={styles.identity} aria-label="Company and account information">
         <p>{legalIdentity.company} operates as a <Link href="/payment-facilitator">nonbank payment facilitator</Link>. We are not a bank. Merchant accounts require review and approval. Card services have separate eligibility requirements, credit limits and account terms.</p>
       </section>
-      <div className={`commercial-action ${styles.contact}`}><p>For business and partnership inquiries, <Link href={page.action.href}>{page.action.label.toLowerCase()}</Link>.</p></div>
+      <div className={styles.contact}><p>For business and partnership inquiries, <Link href={page.action.href}>{page.action.label.toLowerCase()}</Link>.</p></div>
     </div>
   </article>;
+}
+
+export function AboutPage() {
+  return <Shell><CommercialStructuredData path="/company" /><AboutPageContent page={COMMERCIAL_PAGES["/company"]} /></Shell>;
 }

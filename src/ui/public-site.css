@@ -54,9 +54,7 @@
 .public-questions summary:focus-visible,
 .public-questions a:focus-visible { outline: 3px solid var(--public-focus); outline-offset: 4px; border-radius: 4px; }
 
-.public-help-intro { padding-block: 64px 44px; text-align: center; }
-.public-help-intro h1 { font-size: clamp(2.75rem,5vw,4.3rem); margin-top: 20px; line-height: 1.08; }
-.public-help-intro > p:last-of-type { font-size: 16px; margin-top: 23px; color: var(--muted); }
+.public-help-intro > p:last-of-type { font-size: 16px; color: var(--muted); }
 .help-topic-links { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 44px; text-align: left; }
 .help-topic-links a {
   display: flex;
@@ -73,7 +71,6 @@
 }
 .help-topic-links a:hover { border-color: #65947d; }
 .help-topic-links .icon { width: 18px; }
-.public-help-body { max-width: 900px; }
 .public-help-body .public-questions details > p { font-size: 15px; }
 .help-guide { padding-block: 38px 35px; scroll-margin-top: 24px; }
 .help-guide h2 { font-size: clamp(1.8rem,3vw,2.3rem); margin: 12px 0 22px; }

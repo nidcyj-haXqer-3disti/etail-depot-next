@@ -348,7 +348,7 @@ for (const javaScriptEnabled of [true, false]) {
       await page.goto(`${baseURL}/software-partners`);
       await expect(page.locator("#integration")).toContainText("Account structure");
       const platformArt = page.locator("[data-attention-art=platform]");
-      await expect(platformArt).toHaveAccessibleName(/Commerce, freight, travel and legal software.*Access and account structure depend on the approved integration/);
+      await expect(platformArt).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records.*Access and account structure depend on the approved integration/);
       await expect(platformArt.getByRole("heading")).toHaveCount(0);
       if (javaScriptEnabled) await expectAccessible(page);
     } finally {

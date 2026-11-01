@@ -5,7 +5,7 @@ import { CORE_PUBLIC_PATHS, isPublicContentPath } from "./public-page-inventory.
  * Every core route must be recorded explicitly; no inherited or guessed dates.
  */
 export const CORE_PAGE_MODIFIED = {
-  "/": "2026-10-31",
+  "/": "2026-11-01",
   "/payment-acceptance-service": "2026-11-01",
   "/credit-card-services": "2026-11-01",
   "/online-businesses": "2026-11-01",

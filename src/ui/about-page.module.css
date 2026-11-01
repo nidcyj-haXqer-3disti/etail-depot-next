@@ -9,7 +9,7 @@
 .identity p{font-size:15px;line-height:1.8;color:var(--public-muted);margin:0}
 .page a{color:var(--public-ink);text-decoration:underline;text-decoration-color:#91ac9d;text-underline-offset:4px;text-decoration-thickness:1px}
 .page a:hover{text-decoration-color:currentColor}
-.contact{display:block;margin:24px 0 0}
+.contact{display:flex;align-items:center;flex-wrap:wrap;gap:16px 24px;margin:24px 0 0}
 .contact p{font-size:16px;line-height:1.8;margin:0;color:var(--public-muted)}
 .contact a{display:inline-flex;align-items:center;min-height:44px}
 

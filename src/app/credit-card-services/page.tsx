@@ -8,7 +8,7 @@ import { Shell } from "@/ui/shell";
 import { Icon } from "@/ui/icon";
 import { ServiceDetailHero } from "@/ui/service-detail-page";
 import { ServiceDetailArt } from "@/ui/service-detail-art";
-import { WalletCardArt } from "@/ui/wallet-card-art";
+import { LedgixCardFace, WalletCardArt } from "@/ui/wallet-card-art";
 import { WalletGuide } from "@/ui/wallet-guide";
 import { SecuredCreditArt } from "@/ui/secured-credit-art";
 import "@/ui/public-site.css";
@@ -25,7 +25,7 @@ export default function CardServicesPage() {
       intro={<>A virtual {cardProduct.creditType} backed by your security deposit. Use it with Apple&nbsp;Wallet or Google&nbsp;Wallet, where supported.</>}
       actions={<Link className="button primary" href="/contact#cards">Ask about card services</Link>}
       note="An inquiry is not an application."
-      artwork={<ServiceDetailArt kind="cards" title="A virtual secured credit card backed by a separate security deposit" caption="Your deposit backs the account. Repay purchases separately under your cardholder agreement." />}
+      artwork={<ServiceDetailArt cardFace={<LedgixCardFace />} kind="cards" title="A virtual secured credit card backed by a separate security deposit" caption="Your deposit backs the account. Repay purchases separately under your cardholder agreement." />}
     />
 
     <section className="page-container card-details-section" id="card-details" aria-labelledby="card-details-title">
