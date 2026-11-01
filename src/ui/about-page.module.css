@@ -1,0 +1,18 @@
+.page{color:var(--public-ink);background:#fff;padding:56px var(--public-gutter) 72px}
+.reading{max-width:650px;margin-inline:auto}
+.illustration{width:350px;max-width:85%;margin:0 auto 42px}
+.illustration svg{display:block;width:100%;height:auto}
+.intro h1{font-size:14px;font-weight:600;line-height:1.6;letter-spacing:.04em;margin:0 0 23px;color:var(--public-accent)}
+.intro>p{font-size:25px;line-height:1.5;letter-spacing:-.025em;font-weight:400;margin:0 0 30px;max-width:none;text-wrap:pretty}
+.story p{font-size:18px;line-height:1.8;letter-spacing:-.008em;color:var(--public-muted);margin:0 0 24px}
+.identity{margin-top:32px}
+.identity p{font-size:15px;line-height:1.8;color:var(--public-muted);margin:0}
+.page a{color:var(--public-ink);text-decoration:underline;text-decoration-color:#91ac9d;text-underline-offset:4px;text-decoration-thickness:1px}
+.page a:hover{text-decoration-color:currentColor}
+.contact{display:block;margin:24px 0 0}
+.contact p{font-size:16px;line-height:1.8;margin:0;color:var(--public-muted)}
+.contact a{display:inline-flex;align-items:center;min-height:44px}
+
+@media(max-width:959px){.page{padding-block:44px 56px}.illustration{margin-bottom:34px}.intro>p{font-size:24px}}
+@media(max-width:600px){.page{padding-block:32px 48px}.illustration{width:280px;margin-bottom:30px}.intro h1{font-size:13px;margin-bottom:20px}.intro>p{font-size:23px;line-height:1.5;margin-bottom:25px}.story p{font-size:17px;line-height:1.8;margin-bottom:23px}.identity{margin-top:28px}.identity p{font-size:15px}.contact{margin-top:20px}.contact p{font-size:16px}}
+@media(forced-colors:active){.illustration{display:none}}

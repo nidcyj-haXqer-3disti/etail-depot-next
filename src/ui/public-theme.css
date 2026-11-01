@@ -19,6 +19,7 @@
   --public-content-gap: 64px;
   --public-title-size: clamp(42px, 4.4vw, 64px);
   --public-title-line: 1.08;
+  --public-section-title-size: clamp(30px, 3vw, 40px);
   --public-reading-title-size: 48px;
   --public-art-surface: #eef3ee;
   --public-art-shadow: 0 12px 32px #193c330a, 0 2px 6px #193c3305;
@@ -85,16 +86,18 @@
 }
 @media (max-width: 700px) {
   :where(.public-header, .public-main, .public-footer) {
-    --public-title-size: 40px;
+    --public-title-size: clamp(34px, 9.6vw, 40px);
     --public-reading-title-size: 34px;
+    --public-section-title-size: 32px;
     --public-section-space: 48px;
-    --public-hero-space: 36px;
+    --public-hero-space: 30px;
     --public-content-gap: 28px;
   }
 }
 @media (max-width: 360px) {
   :where(.public-header, .public-main, .public-footer) {
-    --public-title-size: 36px;
+    --public-title-size: 34px;
     --public-reading-title-size: 31px;
+    --public-section-title-size: 30px;
   }
 }

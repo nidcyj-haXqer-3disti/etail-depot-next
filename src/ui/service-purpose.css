@@ -1,0 +1,52 @@
+/* Service bookmarks land immediately, including repeated jumps on the same page. */
+html:has(.service-purpose-records) {scroll-behavior:auto;}
+/* Task specific sections use the shared page spacing and typography. */
+.public-main .cw-commercial.enterprise-support .service-purpose-methods .commercial-details>div {padding:28px;border-radius:14px;background:#f1f5ed;}
+.public-main .cw-commercial.enterprise-support .service-purpose-methods .commercial-details dt {font-size:22px;}
+.service-purpose-index {display:flex;align-items:center;width:40px;height:40px;margin-bottom:18px;color:#36634e;font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;}
+.service-purpose-index .icon {width:28px;height:28px;}
+.public-main .cw-commercial.enterprise-support .service-purpose-records .commercial-section-grid {grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);align-items:start;gap:var(--public-content-gap);}
+.public-main .cw-commercial.enterprise-support .service-purpose-records .commercial-section-grid>div {display:block;}
+.public-main .cw-commercial.enterprise-support .service-purpose-records .commercial-section-grid>div>p {margin-top:20px;}
+.public-main .cw-commercial.enterprise-support .service-purpose-records .commercial-details {grid-template-columns:1fr;gap:30px;}
+.service-record-art {margin:30px 0 0;max-width:440px;padding:10px 24px;background:linear-gradient(140deg,#f3f6ee,#e7efdf);border-radius:16px;color:#244b3b;}
+/* Preserve artwork spacing against the shared figure reset. */
+.commercial-page .service-record-art {margin-top:30px;}
+.service-record-art ol {list-style:none;margin:0;padding:0;}
+.service-record-art li {display:flex;gap:18px;padding:20px 0;align-items:flex-start;position:relative;}
+.service-record-art li>span {display:grid;place-items:center;flex:none;background:white;border-radius:50%;width:32px;height:32px;font-size:11px;position:relative;z-index:1;}
+.service-record-art li:not(:last-child)::after {content:"";position:absolute;width:1px;top:52px;bottom:-20px;left:16px;background:#b0c5ac;}
+.service-record-art strong {font-size:16px;font-weight:550;line-height:1.5;}
+.service-record-art p {font-size:13px;line-height:1.6;margin:5px 0 0;color:#4b6555;}
+@media(max-width:959px){
+ .public-main .cw-commercial.enterprise-support .service-purpose-methods .commercial-details>div {padding:24px;}
+ .public-main .cw-commercial.enterprise-support .service-purpose-records .commercial-section-grid {grid-template-columns:1fr;gap:30px;}
+ .service-purpose-index {height:28px;margin-bottom:16px;}
+ .service-record-art {max-width:none;}
+}
+.industry-cases article {scroll-margin-top:24px;}
+
+/* Distinct record surfaces make the relationship visible without a second text panel. */
+.public-main .cw-commercial.enterprise-support .service-purpose-steps .commercial-details{position:relative;gap:32px}
+.public-main .cw-commercial.enterprise-support .service-purpose-steps .service-purpose-index{width:36px;height:36px;border-radius:50%;justify-content:center;background:#eaf1df;color:#315e48;margin-bottom:20px}
+.public-main .cw-commercial.enterprise-support .service-purpose-methods .commercial-details>div{padding:30px;background:#f1f5e9;border:1px solid #e1e8d8}
+.public-main .cw-commercial.enterprise-support .service-purpose-methods .commercial-details>div:nth-child(2){background:#edf3e3}
+.public-main .cw-commercial.enterprise-support .service-purpose-methods .commercial-details>div:nth-child(3){background:#f6f7f1}
+.service-record-art{max-width:none;padding:26px;border-radius:16px;background:#edf2e4}
+.service-record-art ol{display:grid;gap:16px}
+.service-record-art li{padding:20px;background:#fff;border:1px solid #dce5d3;border-radius:10px;box-shadow:0 12px 25px -24px #20463870;gap:15px;align-items:center}
+.service-record-art li>span{width:30px;height:36px;border-radius:5px;background:#eef3e6;border:1px solid #d8e3cb}
+.service-record-art li:not(:last-child)::after{height:17px;bottom:-18px;top:auto;left:35px;background:#9eb58f}
+.service-record-art li:last-child{background:#204638;color:#fff;border-color:#204638}
+.service-record-art li:last-child p{color:#e1ecd2}
+.service-record-art li:last-child>span{background:#365740;border-color:#6b855d;color:#fff}
+@media(max-width:680px){.service-record-art{padding:20px}.service-record-art li{padding:18px 16px}.public-main .cw-commercial.enterprise-support .service-purpose-steps .commercial-details{gap:28px}.public-main .cw-commercial.enterprise-support .service-purpose-methods .commercial-details>div{padding:24px}}
+
+.public-main .platforms.cw-pilot .industry-cases .ec-industry-scene {min-height:280px;display:flex;flex-direction:column;background:linear-gradient(135deg,#f5f8ef,#e8efdd);border-color:#d6e2c9}
+.public-main .platforms.cw-pilot .industry-cases .ec-scene-kicker {border:0;padding-bottom:18px}
+.public-main .platforms.cw-pilot .industry-cases .ec-industry-scene>.ec-record-line:last-child {margin-top:auto}
+.public-main .platforms.cw-pilot .industry-cases .ec-industry-copy>p:not(.ec-industry-scope) {font-size:17px;line-height:1.65;color:#315e48;margin-top:14px}
+@media(max-width:680px){.public-main .platforms.cw-pilot .industry-cases .ec-industry-scene{min-height:250px}.public-main .platforms.cw-pilot .industry-cases .ec-industry-copy>p:not(.ec-industry-scope){font-size:16px}}
+@media(min-width:960px){
+ .public-main .platforms.cw-pilot .industry-cases>article{display:grid;grid-template-rows:subgrid;grid-row:span 2;row-gap:0}
+}

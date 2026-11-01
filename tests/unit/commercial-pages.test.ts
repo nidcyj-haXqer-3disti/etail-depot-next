@@ -1,3 +1,4 @@
+import { publicNavigationGroups, publicFooterGroups } from "../../src/shared/site-navigation";
 import { describe, it, expect } from "vitest";
 import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
 import { COMMERCIAL_PAGES } from "../../src/modules/public-site/commercial-content";
@@ -7,8 +8,8 @@ import { servicePageMetadata } from "../../src/modules/public-site/metadata";
 import { forbiddenStatic } from "../../tools/public-artifact-policy";
 
 describe("PayFac commercial page scope", () => {
-  it("includes exactly the thirteen approved decisions without adding industry or account routes", () => {
-    expect(COMMERCIAL_PATHS).toEqual(["/merchant-onboarding", "/payment-methods", "/payouts-and-reconciliation", "/refunds-and-disputes", "/pricing", "/payment-partnerships", "/payment-facilitator", "/company", "/trust", "/contact", "/ach-payments", "/switch-payment-providers", "/platform-payment-models"]);
+  it("includes exactly the fifteen approved decisions without adding industry or account routes", () => {
+    expect(COMMERCIAL_PATHS).toEqual(["/merchant-onboarding", "/payment-methods", "/payouts-and-reconciliation", "/refunds-and-disputes", "/pricing", "/payment-partnerships", "/payment-facilitator", "/company", "/trust", "/contact", "/ach-payments", "/switch-payment-providers", "/platform-payment-models", "/reconciliation", "/disputes"]);
     expect(Object.keys(COMMERCIAL_PAGES)).toEqual([...COMMERCIAL_PATHS]);
   });
   it.each(COMMERCIAL_PATHS)("keeps %s in exact metadata, export and boundary scope", path => {
@@ -20,5 +21,16 @@ describe("PayFac commercial page scope", () => {
     expect(managedContentRoute(path + "/unreviewed")).toBe(true);
     expect(publicDocumentPath(path + "/unreviewed")).toBeNull();
     expect(forbiddenStatic(path.slice(1) + "/unreviewed.html")).toBe(true);
+  });
+});
+
+
+describe("dedicated service destinations", () => {
+  it("gives all eight services distinct canonical pages shared by header and footer", () => {
+    const services = publicNavigationGroups.find(group => group.id === "services")!.sections[0].links;
+    expect(services.map(link => link.href)).toEqual(["/merchant-onboarding", "/payment-methods", "/ach-payments", "/payouts-and-reconciliation", "/reconciliation", "/refunds-and-disputes", "/disputes", "/credit-card-services"]);
+    expect(new Set(services.map(link => link.href)).size).toBe(8);
+    expect(publicFooterGroups[0].links).toEqual(services);
+    for (const link of services) { expect(link.href).not.toContain("#"); expect(INDEXABLE_PUBLIC_PATHS).toContain(link.href); }
   });
 });

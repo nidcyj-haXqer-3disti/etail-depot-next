@@ -7,6 +7,7 @@ import { legalIdentity } from "@/shared/legal-identity";
 import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
 import { serviceLabels } from "@/shared/service-language";
 import { Shell } from "@/ui/shell";
+import { Icon } from "@/ui/icon";
 import "@/ui/public-site.css";
 import "./help.css";
 import "@/ui/enterprise-support.css";
@@ -26,7 +27,7 @@ const topics = [
       { q: "I’m not sure a payment went through. What should I do?", a: <>Check the original payment before asking the customer to pay again. A timeout or missing confirmation does not mean the payment failed. If you cannot confirm the result in your account, contact Trolleys support with the payment reference.</> },
       { q: "What will I pay to accept card payments?", a: <>For US businesses, the card processing fee for {productFacts.payments.offerName} is {productFacts.payments.cardRateLabel} per successful domestic online card payment in USD. No setup or monthly fee. Payment request creation, sharing and basic receipts are included. See <Link href="/pricing#fees">card processing fees</Link> for optional services and other applicable charges.</> },
       { q: "When will the money reach my bank?", a: <>A completed payment does not mean the money has reached your bank. Check the payout status, expected timing and any review requirements in your Trolleys account. If a payout has not arrived, contact support with its reference. Do not ask the customer to pay again to resolve a missing payout. See <Link href="/payouts-and-reconciliation">payout information</Link>.</> },
-      { q: "How do I refund a customer?", a: <>Find the original payment and follow the refund instructions in your Trolleys account. Check whether a refund or dispute already exists before returning money again. You can track progress in the refund record. Processing the refund and posting it to the customer’s bank account are separate steps. See <Link href="/refunds-and-disputes">refund and dispute procedures</Link>.</> },
+      { q: "How do I refund a customer?", a: <>Find the original payment and follow the refund instructions in your Trolleys account. Check whether a refund or dispute already exists before returning money again. You can track progress in the refund record. Processing the refund and posting it to the customer’s bank account are separate steps. See <Link href="/refunds-and-disputes">refund procedures</Link>.</> },
       { q: "A customer disputed a payment. What should I do?", a: <>Open the dispute notice and check the reason, response deadline and requested evidence. Follow the instructions in your Trolleys account or contact support if you need help. If you have already refunded the payment, include that record. A refund does not automatically close a dispute, and closing a dispute does not confirm a refund.</> },
       { q: "Is dispute prevention included?", a: <>Basic payment receipts are included. Optional {saleRecordsOffer.name} costs {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}, separate from payment processing. It shares purchase details with participating banks. Eligible Visa online fraud disputes may be prevented when enrollment, transaction history and data requirements are met. It does not cover every bank, payment or dispute reason, and no outcome is guaranteed. Refund programs and responses to existing chargebacks are separate services. Continue to follow dispute deadlines. Review the <Link href="/terms#dispute-prevention">coverage, fees and service terms</Link> before enrollment.</> },
     ],
@@ -69,8 +70,8 @@ export default function HelpPage() {
     <section className="page-container public-help-intro">
       <ResourceBreadcrumb items={[{name:"Etail Depot",href:"/"},{name:"Help",href:"/help"}]} />
       <p className="eyebrow">Support</p>
-      <h1>Help with your account and payments.</h1>
-      <p>Check a payment, resolve an account question or find the right contact.</p>
+      <h1>Help center</h1>
+      <p>Get help with a merchant account, a payment or card services. Choose a topic or contact the team responsible for your account.</p>
       <section className="help-support-grid" aria-label="Support contacts">
         <article className="help-support-card">
           <h2>Merchant support</h2>
@@ -91,7 +92,7 @@ export default function HelpPage() {
         <p>Privacy and legal inquiries: <a href={`mailto:${legalIdentity.complianceEmail}`}>{legalIdentity.complianceEmail}</a></p>
         <p>Do not email passwords, verification codes, complete card or bank account numbers, or identity documents.</p>
       </div>
-      <nav aria-label="Help topics" className="help-topic-links">{topics.map(topic => <a key={topic.id} href={`#${topic.id}`}>{topic.label}</a>)}</nav>
+      <nav aria-label="Help topics" className="help-topic-links">{topics.map((topic, index) => <a key={topic.id} href={`#${topic.id}`}><Icon name={["business", "layers", "card", "lock"][index]} />{topic.label}</a>)}</nav>
     </section>
     <div className="page-container public-help-body">
       {topics.map(topic => <section key={topic.id} id={topic.id} className="help-guide">

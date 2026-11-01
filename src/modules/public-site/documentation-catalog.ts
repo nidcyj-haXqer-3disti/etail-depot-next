@@ -1,13 +1,13 @@
 export const documentationPages = [
   { slug: "merchant-onboarding", title: "Merchant account setup", description: "Prepare the business information, follow the account review and confirm what is needed before accepting payments.", group: "Merchant operations", audience: "Business owners and platform teams", icon: "business", anchor: "getting-started" },
-  { slug: "integration-access", title: "Integration access", description: "Confirm the merchant accounts, permissions and connection specifications for your setup.", group: "Developer integration", audience: "Developers and administrators", icon: "lock", anchor: "integration-access" },
-  { slug: "checkout", title: "Online checkout", description: "Connect the customer’s order to checkout, verify the payment result and recover an interrupted attempt.", group: "Developer integration", audience: "Developers", icon: "card", anchor: "checkout-setup" },
+  { slug: "integration-access", title: "Integration requirements", description: "Confirm the merchant accounts, permissions and connection specifications for your setup.", group: "Developer integration", audience: "Developers and administrators", icon: "lock", anchor: "integration-access" },
+  { slug: "checkout", title: "Checkout integration", description: "Connect the customer’s order to checkout, verify the payment result and recover an interrupted attempt.", group: "Developer integration", audience: "Developers", icon: "card", anchor: "checkout-setup" },
   { slug: "payment-requests", title: "Payment requests", description: "Create a hosted payment request, share it with the customer and match the result to the sale.", group: "Merchant operations", audience: "Business owners and operations teams", icon: "link", anchor: "payment-requests" },
   { slug: "payment-status", title: "Payment status", description: "Check authorization, capture and uncertain results before fulfilling an order or starting another payment.", group: "Merchant operations", audience: "Operations teams and developers", icon: "document", anchor: "payment-records" },
   { slug: "refunds-and-disputes", title: "Refunds and disputes", description: "Start with the original payment, choose the appropriate action and follow the refund or dispute to its outcome.", group: "Merchant operations", audience: "Operations teams", icon: "shield", anchor: "refunds-and-disputes" },
   { slug: "payouts", title: "Payouts and reconciliation", description: "Match payments, fees and adjustments to the payout report, then confirm the deposit on your bank statement.", group: "Merchant operations", audience: "Finance and operations teams", icon: "bank", anchor: "payouts" },
-  { slug: "webhooks", title: "Events and webhooks", description: "Confirm how payment updates reach your software and how to handle repeated, missing or delayed notifications.", group: "Developer integration", audience: "Developers", icon: "layers", anchor: "webhooks" },
-  { slug: "testing-and-launch", title: "Sandbox and launch", description: "Arrange the access and configuration checks needed before production is enabled.", group: "Developer integration", audience: "Developers and operations teams", icon: "check", anchor: "testing-and-launch" },
+  { slug: "webhooks", title: "Payment updates", description: "Confirm how payment updates reach your software and how to handle repeated, missing or delayed notifications.", group: "Developer integration", audience: "Developers", icon: "layers", anchor: "webhooks" },
+  { slug: "testing-and-launch", title: "Launch preparation", description: "Arrange the access and configuration checks needed before production is enabled.", group: "Developer integration", audience: "Developers and operations teams", icon: "check", anchor: "testing-and-launch" },
 ] as const;
 
 export type DocumentationSlug = typeof documentationPages[number]["slug"];
@@ -24,8 +24,8 @@ export const documentationServiceLinks = {
   "merchant-onboarding": { label: "Merchant onboarding", href: "/merchant-onboarding" },
   "payment-requests": { label: "Payment requests for online businesses", href: "/online-businesses#payment-channels" },
   "payment-status": { label: "Merchant payment operations", href: "/payment-acceptance-service#payment-operations" },
-  "refunds-and-disputes": { label: "Refund and dispute management", href: "/refunds-and-disputes" },
-  "payouts": { label: "Payouts and reconciliation", href: "/payouts-and-reconciliation" },
+  "refunds-and-disputes": { label: "Refunds", href: "/refunds-and-disputes" },
+  "payouts": { label: "Payouts", href: "/payouts-and-reconciliation" },
   "integration-access": { label: "Software platform integration", href: "/software-partners#integration" },
   "checkout": { label: "Cards, wallets and ACH", href: "/payment-methods" },
   "webhooks": { label: "Software platform integration", href: "/software-partners#integration" },
@@ -68,13 +68,33 @@ export const documentationPaths: readonly {
   {
     id: "developer-integration",
     title: "Developer integration",
-    description: "Connect your application and prepare it for launch.",
+    description: "Prepare your connection with our integration team.",
     icon: "layers",
     tasks: [
-      { title: "Configure integration access", description: "Map merchant accounts, permissions and connection requirements.", anchor: "integration-access", links: [{ slug: "integration-access", label: "Configure integration access" }] },
+      { title: "Prepare your integration", description: "Map merchant accounts, permissions and connection requirements.", anchor: "integration-access", links: [{ slug: "integration-access", label: "Prepare your integration" }] },
       { title: "Integrate checkout", description: "Connect an order to checkout and verify the result.", anchor: "checkout-setup", links: [{ slug: "checkout", label: "Integrate checkout" }] },
       { title: "Receive payment events", description: "Verify notifications and handle repeated or missing updates.", anchor: "webhooks", links: [{ slug: "webhooks", label: "Receive payment events" }] },
-      { title: "Sandbox and launch", description: "Confirm the payment journey before enabling production.", anchor: "testing-and-launch", links: [{ slug: "testing-and-launch", label: "Sandbox and launch" }] },
+      { title: "Launch preparation", description: "Confirm the payment journey before enabling production.", anchor: "testing-and-launch", links: [{ slug: "testing-and-launch", label: "Launch preparation" }] },
     ],
   },
 ];
+
+/** Account specific materials are provided through the integration team. */
+export const integrationMaterials: Partial<Record<DocumentationSlug, readonly string[]>> = {
+  "integration-access": [
+    "Account permissions and the operations available to your connection.",
+    "The specifications and access instructions assigned to your setup.",
+  ],
+  checkout: [
+    "Checkout instructions, supported display options and enabled payment methods.",
+    "Payment status definitions and the process for recovering an interrupted payment.",
+  ],
+  webhooks: [
+    "Available notifications, message formats and verification requirements.",
+    "Delivery, retry and payment lookup instructions for your connection.",
+  ],
+  "testing-and-launch": [
+    "The environment access and scenarios available for your integration.",
+    "Production configuration, activation requirements and support contacts.",
+  ],
+};

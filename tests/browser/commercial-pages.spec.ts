@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { isServiceDetailPath } from "../../src/modules/public-site/service-detail-content";
 import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
 
 test("commercial pages have distinct decisions, exact canonicals and direct primary actions", async ({ page, baseURL }) => {
@@ -15,7 +16,7 @@ test("commercial pages have distinct decisions, exact canonicals and direct prim
     await expect(page.locator("main form")).toHaveCount(0);
     await expect(page.locator("main")).not.toContainText(/Cybersource|Infinicept|prototype|illustrative|TODO/i);
     await expect(page.getByRole("navigation", { name: "Related information", exact: true })).toHaveCount(0);
-    const action = path === "/contact" ? page.locator("#integration a") : page.locator(".commercial-action a").first();
+    const action = path === "/contact" ? page.locator("#integration a") : page.locator(isServiceDetailPath(path) ? "[data-service-actions] a" : ".commercial-action a").first();
     await expect(action).toBeVisible();
     const href = await action.getAttribute("href");
     expect(href).toBeTruthy();
@@ -38,9 +39,9 @@ test("merchant application and contact routes never forward visitor input", asyn
     expect(targets.some(target => target?.includes("private") || target?.includes("other.invalid"))).toBe(false);
   }
   await expect(page.locator("#cards")).toContainText("An inquiry is not an application.");
-  await expect(page.locator("#platforms a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Software%20payment%20partnership");
   await expect(page.locator("#integration a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Integration%20documentation");
-  for (const contact of ["payment-review", "platforms", "integration", "account-support", "cards", "compliance"]) {
+  await expect(page.locator("#account-support a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  for (const contact of ["integration", "account-support", "cards", "compliance"]) {
     const option = page.locator(`#${contact}`);
     const email = (await option.locator("a").getAttribute("href"))!.slice("mailto:".length).split("?")[0];
     await expect(option.locator(".commercial-contact-email")).toHaveText(email);
@@ -53,13 +54,13 @@ test("merchants can discuss processing costs before applying while platforms rea
   await page.getByRole("link", { name: "Discuss your processing costs", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#payment-review$/);
   await expect(page.locator("#payment-review")).toBeInViewport();
-  await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Payment%20options%20review");
+  await expect(page.locator("#account-support a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await expect(page.locator('main a[href="https://trolleys.ai"]')).toHaveAttribute("referrerpolicy", "no-referrer");
   await page.goBack();
   await page.getByRole("link", { name: "Discuss platform terms", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#platforms$/);
   await expect(page.locator("#platforms")).toBeInViewport();
-  await expect(page.locator("#platforms a")).toHaveAttribute("href", /subject=Software%20payment%20partnership$/);
+  await expect(page.locator("#integration a")).toHaveAttribute("href", /subject=Integration%20documentation$/);
 });
 
 test("shared contact action routes developers and merchants to the appropriate contact choices", async ({ page, isMobile }) => {
@@ -68,7 +69,7 @@ test("shared contact action routes developers and merchants to the appropriate c
     if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
     await page.locator(".public-header").getByRole("link", { name: "Contact sales", exact: true }).click();
     await expect(page).toHaveURL(/\/contact$/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Let’s talk about your business.");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Contact Etail Depot.");
     await expect(page.getByRole("link", { name: "Contact the integration team", exact: true })).toHaveAttribute("href", /subject=Integration%20documentation$/);
     await expect(page.getByRole("link", { name: "Contact merchant support", exact: true })).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
     if (isMobile) await expect(page.getByRole("button", { name: "Menu", exact: true })).toHaveAttribute("aria-expanded", "false");
@@ -82,12 +83,13 @@ test("buyers can find ACH, provider change and platform model decisions through 
   await nav.locator("summary").filter({ hasText: /^Services$/ }).click();
   await nav.getByRole("link", { name: "ACH payments", exact: true }).click();
   await expect(page).toHaveURL(/\/ach-payments$/);
-  await expect(page.locator("main")).toContainText("A submitted ACH payment can still be returned");
-  await page.locator(".commercial-action").getByRole("link", { name: "Explore merchant services", exact: true }).click();
+  await expect(page.locator("main")).toContainText("A submitted bank payment can still be pending or returned");
+  await page.getByRole("banner").getByRole("link", { name: "Etail Depot home", exact: true }).click();
+  await page.locator("main").getByRole("link", { name: "Explore merchant services", exact: true }).click();
   await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
-  await nav.locator("summary").filter({ hasText: /^Services$/ }).click();
-  await nav.getByRole("link", { name: "Switch merchant services", exact: true }).click();
+  await nav.locator("summary").filter({ hasText: /^Use cases$/ }).click();
+  await nav.getByRole("link", { name: "Switch merchant provider", exact: true }).click();
   await expect(page).toHaveURL(/\/switch-payment-providers$/);
   await expect(page.locator("main")).toContainText("New accounts require review and approval");
   if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
@@ -95,7 +97,7 @@ test("buyers can find ACH, provider change and platform model decisions through 
   await nav.getByRole("link", { name: "Merchant onboarding", exact: true }).click();
   await expect(page).toHaveURL(/\/merchant-onboarding$/);
   if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
-  await nav.locator("summary").filter({ hasText: /^Platforms$/ }).click();
+  await nav.locator("summary").filter({ hasText: /^Use cases$/ }).click();
   await nav.getByRole("link", { name: "Software platforms", exact: true }).click();
   await page.getByRole("link", { name: "Account structure", exact: true }).click();
   await expect(page).toHaveURL(/\/platform-payment-models$/);
@@ -105,22 +107,21 @@ test("buyers can find ACH, provider change and platform model decisions through 
   await expect(page.locator("#platforms")).toBeInViewport();
 });
 
-// Visible hierarchy and structured breadcrumbs must name the same real parent routes.
-test("commercial details retain their service context and exact breadcrumb hierarchy", async ({ page }) => {
-  const merchant = ["/merchant-onboarding", "/payment-methods", "/ach-payments", "/payouts-and-reconciliation", "/refunds-and-disputes", "/pricing", "/online-businesses", "/switch-payment-providers"];
+// Commercial pages open directly with their hero while preserving the published URL hierarchy.
+test("commercial pages retain their URL hierarchy without duplicate navigation rows", async ({ page }) => {
+  const merchant = ["/merchant-onboarding", "/payment-methods", "/ach-payments", "/payouts-and-reconciliation", "/refunds-and-disputes", "/pricing", "/reconciliation", "/disputes", "/online-businesses", "/switch-payment-providers"];
   const platform = ["/platform-payment-models", "/payment-partnerships"];
-  for (const path of [...merchant, ...platform, "/credit-card-services"]) {
+  for (const path of [...merchant, ...platform]) {
     await page.goto(path);
-    const crumbs = page.getByRole("navigation", { name: "Breadcrumb", exact: true });
-    await expect(crumbs).toBeVisible();
-    const visible = await crumbs.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")));
+    await expect(page.getByRole("navigation", { name: "Breadcrumb", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("navigation", { name: "On this page", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("banner")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     const parent = merchant.includes(path) ? "/payment-acceptance-service" : "/software-partners";
-    expect(visible).toEqual(path === "/credit-card-services" ? ["/"] : ["/", parent]);
-    await expect(crumbs.locator('[aria-current="page"]')).toHaveCount(1);
     const structured = await page.locator('script[type="application/ld+json"]').evaluateAll(scripts => scripts.flatMap(script => {
       const data = JSON.parse(script.textContent || "{}"); return data["@graph"] || [data];
     }).filter(item => item["@type"] === "BreadcrumbList").map(item => item.itemListElement.map((entry: { item: string }) => new URL(entry.item).pathname)));
-    expect(structured).toEqual([[...visible, path]]);
+    expect(structured).toEqual([["/", parent, path]]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
     await expect(page.locator('.cw-workflow-surface a,.cw-workflow-surface button,.cw-workflow-surface input')).toHaveCount(0);
   }
@@ -136,45 +137,65 @@ test("a merchant can request a review without submitting an application", async 
   await page.locator(".commercial-action").getByRole("link", { name: "Discuss your business", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#payment-review$/);
   await expect(page.locator("#payment-review")).toBeInViewport();
-  await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Payment%20options%20review");
-  await expect(page.locator("#payment-review")).toContainText("An inquiry is not an application or approval");
+  await expect(page.locator("#account-support a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(page.locator("#merchant-application")).toContainText("Account approval and setup apply.");
   await expect(page.locator("main form, main input, main textarea")).toHaveCount(0);
   await expect(page.locator('main a[href="https://trolleys.ai"]')).toHaveAttribute("referrerpolicy", "no-referrer");
 });
 
-test("sales email copying confirms success and preserves a fallback when copying is denied", async ({ page }) => {
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, "clipboard", { configurable: true, value: {
-      writeText: async (text: string) => {
-        if (document.documentElement.dataset.denyCopy === "true") throw new DOMException("Denied", "NotAllowedError");
-        document.documentElement.dataset.copiedEmail = text;
-      },
-    } });
-  });
-  await page.goto("/contact?merchant=private");
-  const business = page.locator("#payment-review");
-  await business.getByRole("button", { name: "Copy email address for business owners", exact: true }).click();
-  await expect(business.getByRole("status")).toHaveText("Email address copied.");
-  expect(await page.locator("html").getAttribute("data-copied-email")).toBe("trolleys@etaildepot.com");
-  await page.evaluate(() => { document.documentElement.dataset.denyCopy = "true"; });
-  const platform = page.locator("#platforms");
-  await platform.getByRole("button", { name: "Copy email address for software platforms", exact: true }).click();
-  await expect(platform.getByRole("status")).toHaveText("Select the email address to copy it.");
-  await expect(platform.locator(".commercial-contact-email")).toHaveText("trolleys@etaildepot.com");
-  await expect(platform.getByRole("link", { name: "Email about your platform" })).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Software%20payment%20partnership");
-  await expect(page.locator("main form, main input, main textarea")).toHaveCount(0);
-});
-
-test("sales contact remains usable without JavaScript or a clipboard API", async ({ browser, baseURL }) => {
+test("contact options remain usable without JavaScript", async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   try {
     const page = await context.newPage();
     await page.goto(new URL("/contact", baseURL).href);
-    for (const id of ["platforms", "payment-review"]) {
+    for (const id of ["integration", "account-support", "cards", "compliance"]) {
       const card = page.locator(`#${id}`);
       await expect(card.locator(".commercial-contact-email")).toBeVisible();
-      await expect(card.locator("a")).toHaveAttribute("href", /^mailto:trolleys@etaildepot\.com\?subject=/);
+      await expect(card.locator("a")).toHaveAttribute("href", /^mailto:/);
       await expect(card.getByRole("button")).toHaveCount(0);
     }
   } finally { await context.close(); }
+});
+
+
+test("legacy service bookmarks remain useful after separating the service pages", async ({ page }, testInfo) => {
+  for (const [path, section, heading, evidence] of [
+    ["/payouts-and-reconciliation", "payouts", "Understand the amount you receive.", "Bank deposit"],
+    ["/payouts-and-reconciliation", "reconciliation", "When a payout needs attention.", "A different amount"],
+    ["/refunds-and-disputes", "refunds", "Choose the action that fits the payment.", "Authorization reversal"],
+    ["/refunds-and-disputes", "disputes", "Avoid duplicate refunds.", "Payment already disputed"],
+  ]) {
+    await page.goto(`${path}#${section}`);
+    await page.waitForLoadState("networkidle");
+    const task = page.locator(`#${section}`);
+    await expect(task.getByRole("heading", {level:2})).toHaveText(heading);
+    await expect(task.getByRole("heading", {level:2})).toBeInViewport();
+    await expect(task).toContainText(evidence);
+    if (section === "reconciliation") await page.screenshot({ path: testInfo.outputPath(`reconciliation-${testInfo.project.name}.png`) });
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etaildepot.com${path}`);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
+});
+
+
+test("eight service pages have distinct artwork and usable primary journeys", async ({ page }) => {
+  const targets = [["/merchant-onboarding", "onboarding"], ["/payment-methods", "methods"], ["/ach-payments", "ach"], ["/payouts-and-reconciliation", "payouts"], ["/reconciliation", "reconciliation"], ["/refunds-and-disputes", "refunds"], ["/disputes", "disputes"], ["/credit-card-services", "cards"]];
+  for (const [path, kind] of targets) {
+    await page.goto(path);
+    const artwork = page.locator(`[data-service-workflow="${kind}"]`);
+    await expect(artwork).toBeVisible();
+    await expect(artwork.locator("figcaption")).toBeVisible();
+    await expect(artwork.locator("input,button,a,form")).toHaveCount(0);
+    await expect(page.locator("[data-service-actions] a").first()).toBeVisible();
+    if (kind !== "cards") await expect(page.locator("#service-workflow-title")).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  }
+  await page.goto("/payouts-and-reconciliation#reconciliation");
+  await page.locator("#reconciliation").getByRole("link", {name:"A different amount"}).click();
+  await expect(page).toHaveURL(/\/reconciliation$/);
+  await expect(page.getByRole("heading", {level:1})).toBeInViewport();
+  await page.goto("/refunds-and-disputes#disputes");
+  await page.locator("#disputes").getByRole("link", {name:"Payment already disputed"}).click();
+  await expect(page).toHaveURL(/\/disputes$/);
+  await expect(page.getByRole("heading", {level:1})).toBeInViewport();
 });

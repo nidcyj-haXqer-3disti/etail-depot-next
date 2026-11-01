@@ -40,6 +40,8 @@
 .public-questions summary::-webkit-details-marker { display: none; }
 .public-questions summary > span { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; margin-inline-end: 0; font-size: 23px; line-height: 1; font-weight: 400; color: #476d5d; transition: transform .15s; }
 .public-questions details[open] summary > span { transform: rotate(45deg); }
+.public-questions summary:hover { color:var(--public-accent); }
+.public-questions details[open] > p { padding:20px 22px; background:#f3f6ef; border-radius:var(--public-radius); }
 .public-questions details > p { color: var(--muted); line-height: 1.75; font-size: 15px; margin: 0 0 24px; max-width: 62ch; }
 .public-questions details > p a {
   color: #245a4d;

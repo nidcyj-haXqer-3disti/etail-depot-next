@@ -107,3 +107,19 @@
 }
 @media(max-width:360px){.platformPanel{grid-template-columns:1fr;}.platformAccount{grid-column:1;margin-top:12px;}.service{padding-left:56px;}.service h2{font-size:23px;}.artBrand strong{font-size:20px;}.review h2{font-size:34px;}}
 @media(forced-colors:active){.primary,.artPanel,.cardFace{border:1px solid CanvasText;}.artBackdrop{display:none;}.connections{stroke:CanvasText;}.cardFace svg{stroke:CanvasText;}}
+
+/* Phone composition keeps the opening concise and the service map readable. */
+@media(max-width:619px){
+ .heroGrid{padding-block:30px;gap:24px;}
+ .heroCopy h1{font-size:clamp(34px,9.6vw,42px);line-height:1.08;}
+ .intro{margin-top:18px;line-height:1.65;}
+ .heroActions{margin-top:20px;}
+ .note{margin-top:16px;}
+ .art{gap:10px;padding-top:8px;}
+ .artBrand{padding-bottom:4px;}.artBrand img{width:40px;height:40px;}
+ .merchantPanel,.platformPanel,.cardPanel{padding:17px;}
+ .platformRecords{margin-top:10px;}.platformAccount{margin-top:8px;}
+ .services{gap:28px;padding-block:36px 40px;}
+ .service{padding-left:58px;}.service h2{font-size:23px;}
+ .service>p{margin-top:8px;line-height:1.65;}
+}

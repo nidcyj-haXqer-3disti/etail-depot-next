@@ -29,7 +29,7 @@ export const industryCases = {
         "body": "Match sales, fees, refunds and adjustments to funding reports and bank deposits under the agreed account structure."
       }
     ],
-    "scopeTitle": "Agree the marketplace money flow.",
+    "scopeTitle": "Account structure and seller funds.",
     "scope": "Seller eligibility, the merchant of record, platform fees and payout arrangements are confirmed before integration. Split payments, holding funds and transfers to sellers require a separately approved setup."
   },
   "freight": {
@@ -81,7 +81,7 @@ export const industryCases = {
         "body": "Follow refunds and disputes through to their outcomes, then match the adjustments to the payment and deposit records."
       }
     ],
-    "scopeTitle": "Confirm who collects the booking funds.",
+    "scopeTitle": "Booking funds and merchant responsibility.",
     "scope": "Planning fees, agency collections and tour sales need their own review. Funding schedules, reserves and holds depend on the business and the time before travel. Supplier payments, escrow and supplier failure protection are outside this payment acceptance scope."
   },
   "legal": {
@@ -107,7 +107,7 @@ export const industryCases = {
         "body": "Match receipts, adjustments and bank deposits to the relevant account and matter records."
       }
     ],
-    "scopeTitle": "Review specialist payment flows separately.",
+    "scopeTitle": "Trust accounts and specialist workflows.",
     "scope": "Trust and IOLTA account support is not confirmed. Client advances, bankruptcy fees and creditor collections need specific review. The firm must apply the professional rules and account requirements that govern its jurisdiction."
   }
 } as const satisfies Record<string, IndustryCase>;

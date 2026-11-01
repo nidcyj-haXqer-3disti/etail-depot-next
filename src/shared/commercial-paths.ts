@@ -12,5 +12,7 @@ export const COMMERCIAL_PATHS = [
   "/contact",
   "/ach-payments",
   "/switch-payment-providers",
-  "/platform-payment-models"
+  "/platform-payment-models",
+  "/reconciliation",
+  "/disputes"
 ] as const;

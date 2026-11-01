@@ -26,7 +26,7 @@ export interface SearchReleaseApproval {
 export const PUBLIC_INDEXING_APPROVAL: SearchReleaseApproval = {
   siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
   canonicalOrigin: "https://etaildepot.com",
-  reviewReference: "2026-10-30: user requests additional necessary payment marketing pages. The published baseline remains 3725 exact content pages and 3723 nonlegal discovery URLs. The exact local candidate adds ACH payments, changing payment providers and platform payment models to the previous 3735 content pages, for 3738 content pages and 3736 nonlegal discovery URLs. Reference data and the production guard are unchanged. This records local preparation only; no push or deployment is authorized.",
+  reviewReference: "2026-11-01: user requests eight distinct service pages. The published website remains unchanged. The local candidate adds dedicated reconciliation and disputes pages to the previous 3738 content pages, for 3740 content pages and 3738 nonlegal discovery URLs. Reference data and the production guard are unchanged. This records local preparation only; no push or deployment is authorized.",
 };
 export type Environment = Readonly<Record<string, string | undefined>>;
 

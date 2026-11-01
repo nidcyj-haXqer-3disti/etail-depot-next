@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { openFooterGroup } from "./public-footer";
 import { expectDecodedBrandMark } from "./brand-marks";
-import { openMainNavigation } from "./public-header";
+import { closeMainNavigation, openMainNavigation } from "./public-header";
 
 
 async function expectLoadedNetworkMarks(group: Locator) {
@@ -54,12 +55,12 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.locator("a")).toHaveCount(16);
-    for (const [label, destination] of [["Software platforms", "/software-partners"], ["Online businesses", "/online-businesses"], ["Merchant services", "/payment-acceptance-service"], ["Card services", "/credit-card-services"], ["Documentation", "/docs"], ["Guides", "/guides"], ["Pricing", "/pricing"]]) {
+    await expect(navigation.locator("a")).toHaveCount(23);
+    for (const [label, destination] of [["Software platforms", "/software-partners"], ["Online businesses", "/online-businesses"], ["Merchant onboarding", "/merchant-onboarding"], ["Card services", "/credit-card-services"], ["Documentation", "/docs"], ["Guides", "/guides"], ["Pricing", "/pricing"]]) {
       await expect(navigation.getByRole("link", { name: label, exact: true, includeHidden: true })).toHaveAttribute("href", destination);
     }
     const current = navigation.locator("[aria-current]");
-    if (["/software-partners", "/online-businesses", "/docs", "/payment-acceptance-service", "/credit-card-services", "/guides", "/help"].includes(route)) await expect(current).toHaveAttribute("href", route);
+    if (["/software-partners", "/online-businesses", "/docs", "/credit-card-services", "/guides", "/help"].includes(route)) await expect(current).toHaveAttribute("href", route);
     else if (route.startsWith("/guides/")) {
       await expect(current).toHaveAttribute("href", "/guides");
       await expect(current).toHaveAttribute("aria-current", "location");
@@ -70,6 +71,8 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(action).toHaveAttribute("referrerpolicy", "no-referrer");
     await expect(action).toHaveAttribute("rel", /\bnoreferrer\b/);
     await expect(header.getByRole("link", { name: "Ask about card services", exact: true })).toHaveCount(0);
+    // Let link prefetches settle before the next hard navigation, including in WebKit.
+    await page.waitForLoadState("networkidle");
   }
 
   await page.setViewportSize({ width: 390, height: 900 });
@@ -106,14 +109,14 @@ test("the shared company header stays consistent and its compact menu works with
 
   await page.keyboard.press("Space");
   await expect(menu).toHaveAttribute("aria-expanded", "true");
-  await page.getByRole("heading", { level: 1 }).click();
+  await menu.click();
   await expect(menu).toHaveAttribute("aria-expanded", "false");
   await expect(navigation).toBeHidden();
 
   await menu.click();
   await navigation.locator("summary").filter({ hasText: /^Services$/ }).click();
-  await navigation.getByRole("link", { name: "Merchant services", exact: true }).click();
-  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
+  await navigation.getByRole("link", { name: "Merchant onboarding", exact: true }).click();
+  await expect(page).toHaveURL(/\/merchant-onboarding$/);
   await expect(menu).toHaveAttribute("aria-expanded", "false");
   await expect(navigation).toBeHidden();
   await expect(header.getByRole("link", { name: "Etail Depot home", exact: true }).getByRole("img", { name: "Etail Depot", exact: true })).toBeVisible();
@@ -135,13 +138,14 @@ test("the shared company header stays consistent and its compact menu works with
   await guides.focus();
   await page.setViewportSize({ width: 960, height: 900 });
   await expect(navigation).toBeVisible();
+  await expect(header.locator(".header-menu-toggle")).toHaveAttribute("aria-expanded", "false");
   await expect(guides).toBeFocused();
   await page.setViewportSize({ width: 959, height: 900 });
   await expect(menu).toHaveAttribute("aria-expanded", "false");
   await expect(navigation).toBeHidden();
   await expect(menu).toBeFocused();
 
-  const pageAction = page.locator(".service-section-nav").getByRole("link", { name: "Pricing", exact: true });
+  const pageAction = page.locator("main").getByRole("link", { name: "Apply for a merchant account", exact: true });
   await pageAction.focus();
   await page.setViewportSize({ width: 960, height: 900 });
   await expect(pageAction).toBeFocused();
@@ -235,11 +239,12 @@ test("a new visitor can review payment eligibility and card inquiries without a 
   const mainNavigation = await openMainNavigation(page);
   await mainNavigation.getByRole("link", {name:"Card services",exact:true}).click();
   await expect(page).toHaveURL(/\/credit-card-services$/);
-  await expect(page.getByRole("heading", {level:1})).toHaveText(/^Secured credit\.\s*Made for your wallet\.$/);
+  await expect(page.getByRole("heading", {level:1})).toHaveText("Secured credit for your digital wallet.");
   await openMainNavigation(page);
   await expect(mainNavigation.getByRole("link",{name:"Card services",exact:true,includeHidden:true})).toHaveAttribute("aria-current","page");
-  await expect(page.locator(".consumer-product-note")).toBeVisible();
-  await expect(page.locator(".consumer-product-note")).toHaveText("An inquiry is not an application.");
+  await closeMainNavigation(page);
+  await expect(page.locator("[data-service-note]")).toBeVisible();
+  await expect(page.locator("[data-service-note]")).toHaveText("An inquiry is not an application.");
   await expect(page.locator("main form, main input, main textarea, main select")).toHaveCount(0);
   await expect(page.locator("main").getByRole("link", { name: /apply|create|sign in/i })).toHaveCount(0);
   const cardContacts = page.locator("main").getByRole("link", { name: "Ask about card services", exact: true });
@@ -247,11 +252,16 @@ test("a new visitor can review payment eligibility and card inquiries without a 
   for (const contact of await cardContacts.all()) {
     await expect(contact).toHaveAttribute("href", "/contact#cards");
   }
-  await mainNavigation.getByRole("link",{name:"Merchant services",exact:true}).click();
+  await openFooterGroup(page, "Services");
+  await page.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Merchant onboarding",exact:true}).click();
+  await expect(page).toHaveURL(/\/merchant-onboarding$/);
+  await page.getByRole("banner").getByRole("link", { name: "Etail Depot home", exact: true }).click();
+  await page.locator("main").getByRole("link", { name: "Explore merchant services", exact: true }).click();
   await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   await expect(page.getByRole("heading", {level:1})).toHaveText(/^Accept card\s*and ACH payments\.$/);
   await openMainNavigation(page);
-  await expect(mainNavigation.getByRole("link",{name:"Merchant services",exact:true,includeHidden:true})).toHaveAttribute("aria-current","page");
+  await expect(mainNavigation.locator("summary").filter({hasText:/^Services$/})).toHaveClass("is-current");
+  await closeMainNavigation(page);
   await expect(page.locator(".merchant-hero")).toContainText("Credit card processing and ACH for US businesses in USD, with account setup, online checkout and payment reporting.");
   await expect(page.locator(".merchant-hero .ec-hero-actions a").first()).toHaveText("Discuss your business");
   await expect(page.locator(".merchant-hero .ec-hero-actions a").first()).toHaveAttribute("href", "/contact#payment-review");
@@ -333,6 +343,7 @@ test("public pages have unique canonical metadata and no private data", async ({
     expect(editorialText).not.toMatch(/Alex Morgan|Jamie Morgan|personId|cardId|canonical|projection|idempotency|sandbox|demo|practice (?:mode|payment)|fixture/i);
     await expect(page.locator(".sandbox-badge")).toHaveCount(0);
     await expect(page.getByRole("banner")).not.toContainText(/\bsandbox\b/i);
+    await openFooterGroup(page, "Resources");
     await expect(page.getByRole("contentinfo").getByRole("link", {name:"Help center",exact:true})).toBeVisible();
   }
   expect(titles.size).toBe(5);
@@ -702,6 +713,101 @@ test("switching wallets never shows the previous payment mark while the new logo
     } finally {
       releaseLogo();
       await page.unrouteAll({behavior:"wait"});
+    }
+  }
+});
+
+
+test("mobile menu presents one level, keeps actions reachable and restores the page", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/software-partners");
+  const header = page.getByRole("banner");
+  const toggle = header.getByRole("button", { name: "Menu", exact: true });
+  const nav = header.getByRole("navigation", { name: "Main navigation" });
+  await toggle.click();
+  await expect(header.getByRole("dialog", { name: "Site menu" })).toBeVisible();
+  await expect(page.locator("main")).toHaveAttribute("inert", "");
+  await expect(page.locator("footer")).toHaveAttribute("inert", "");
+  const services = nav.locator("summary").filter({ hasText: /^Services$/ });
+  const platforms = nav.locator("summary").filter({ hasText: /^Use cases$/ });
+  await services.click();
+  await expect(platforms).toBeHidden();
+  await expect(nav.getByRole("link", { name: "Pricing", exact: true })).toBeHidden();
+  const back = nav.getByRole("button", { name: "Back", exact: true });
+  await back.click();
+  await expect(services).toBeFocused();
+  await expect(platforms).toBeVisible();
+  await expect(back).toBeHidden();
+
+  for (const viewport of [{ width: 320, height: 568 }, { width: 844, height: 390 }]) {
+    await page.setViewportSize(viewport);
+    await services.click();
+    const onboarding = nav.getByRole("link", { name: "Card services", exact: true });
+    await onboarding.scrollIntoViewIfNeeded();
+    const box = (await onboarding.boundingBox())!;
+    const actions = (await header.locator(".header-actions").boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(actions.y + 1);
+    expect(actions.y + actions.height).toBeLessThanOrEqual(viewport.height + 1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(viewport.width);
+    await back.click();
+  }
+
+  const contact = header.getByRole("link", { name: "Contact sales", exact: true });
+  const home = header.getByRole("link", { name: "Etail Depot home", exact: true });
+  await contact.focus();
+  await page.keyboard.press("Tab");
+  await expect(home).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(contact).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(toggle).toBeFocused();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.locator("main")).not.toHaveAttribute("inert");
+  await expect(page.locator("footer")).not.toHaveAttribute("inert");
+  expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
+
+  await toggle.click();
+  await services.click();
+  await back.focus();
+  await page.setViewportSize({ width: 960, height: 900 });
+  await expect(services).toBeFocused();
+  await expect(back).toBeHidden();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(toggle).toBeFocused();
+  await toggle.click();
+  await expect(back).toBeHidden();
+  await expect(platforms).toBeVisible();
+  await header.getByRole("link", { name: "Contact sales", exact: true }).click();
+  await expect(page).toHaveURL(/\/contact$/);
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("main")).not.toHaveAttribute("inert");
+});
+
+
+test("mobile navigation preserves the reading position and leaves reference navigation visible", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const path of ["/software-partners", "/guides/iso-8583/fields"]) {
+    await page.goto(path);
+    const header = page.getByRole("banner");
+    const toggle = header.getByRole("button", { name: "Menu", exact: true });
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await page.evaluate(() => window.scrollTo({ top: 1000, behavior: "instant" }));
+    const initialScroll = await page.evaluate(() => window.scrollY);
+    const headerBox = (await header.boundingBox())!;
+    expect(Math.abs(headerBox.y)).toBeLessThanOrEqual(1);
+    const buttonBox = (await toggle.boundingBox())!;
+    // Use the visible control without the locator's automatic scroll into view.
+    await page.mouse.click(buttonBox.x + buttonBox.width / 2, buttonBox.y + buttonBox.height / 2);
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("Escape");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(toggle).toBeFocused();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(initialScroll);
+    const index = page.locator(".reference-index");
+    if (await index.count()) {
+      expect((await index.boundingBox())!.y).toBeGreaterThanOrEqual(headerBox.height - 1);
     }
   }
 });

@@ -1,0 +1,59 @@
+.art{margin:0;min-width:0;color:#234b3c;font-family:var(--public-font);container-type:inline-size}
+.art .canvas{position:relative;isolation:isolate;padding:34px;border-radius:20px;background:radial-gradient(ellipse at 80% 0,#dce9bc,transparent 65%),#edf2e5;overflow:hidden;border:1px solid #dce5d3}
+.art figcaption{margin:18px 4px 0;font-size:13px;line-height:1.7;color:#536752;max-width:75ch}
+.badge{display:flex;gap:10px;align-items:center;font-size:12px;line-height:1.5;font-weight:500}
+.badge svg{width:19px;height:19px;flex:none}
+.businessCard{padding:28px 28px 80px;border-radius:14px;background:#204638;color:#f7faed}
+.businessCard>strong{display:block;margin-top:25px;font-size:32px;font-weight:500;letter-spacing:-.045em;line-height:1.15}
+.businessFacts{display:flex;flex-wrap:wrap;gap:12px 20px;margin-top:25px;color:#e1edcf}
+.businessFacts span{display:flex;gap:7px;align-items:center;font-size:12px;line-height:1.5}.businessFacts svg{width:15px;height:15px}
+.accountSheet,.checkoutSheet{position:relative;background:#fff;border-radius:12px;box-shadow:0 18px 42px -23px #234b3c60;border:1px solid #d5dfcc;overflow:hidden}
+.accountSheet{margin:-52px 0 0 42px}.sheetHeading{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:22px 24px;font-size:16px}.sheetHeading strong{font-weight:550}.sheetHeading svg{width:19px;height:19px;flex:none}.accountSheet .sheetHeading{justify-content:flex-start}
+.accountSheet dl{padding:0 24px;margin:0}.accountSheet dl>div{padding:12px 0;border-top:1px solid #e6ebdf;display:flex;gap:15px;justify-content:space-between;font-size:12px;line-height:1.55}.accountSheet dt{font-weight:500}.accountSheet dd{margin:0;text-align:right;color:#5b6d57}
+.sheetFoot{display:flex;align-items:center;gap:9px;padding:17px 24px;background:#f6f8f2;color:#52664f;font-size:12px;line-height:1.55}.sheetFoot svg{width:15px;height:15px;flex:none}
+.steps{padding:0;margin:30px 0 0;list-style:none;display:flex;justify-content:space-between;gap:8px;position:relative}.steps:before{content:"";height:1px;position:absolute;background:#b9cbb0;top:14px;left:14px;right:14px}.steps li{position:relative;display:flex;flex-direction:column;gap:10px;align-items:flex-start;flex:1;min-width:0}.steps li:last-child{align-items:flex-end;text-align:right}.steps span{display:grid;place-items:center;width:28px;height:28px;border:1px solid #c4d2b7;border-radius:50%;background:#f4f7ee;font-size:11px;font-variant-numeric:tabular-nums}.steps strong{font-size:12px;line-height:1.5;font-weight:500;max-width:11ch}
+.orderContext{padding:0 0 35px 14px;display:grid;gap:12px}.orderContext>.badge{font-size:16px}.orderContext>span:last-child{font-size:12px;color:#52664f}.checkoutSheet{margin-left:25px}.checkoutSheet:before{content:"";position:absolute;width:4px;inset:0 auto 0 0;background:#bcd294}.checkoutSheet .sheetHeading{font-size:20px;padding:26px}.methodChoices{padding:0 26px}.methodChoices>div{display:grid;grid-template-columns:34px 1fr;gap:8px 12px;padding:20px 0;border-top:1px solid #e4eadc}.methodChoices strong{font-size:15px;line-height:1.4;font-weight:500}.methodChoices>div>span:last-child{grid-column:2;font-size:12px;line-height:1.6;color:#596b53}.methodSymbol{grid-row:1 / 3;display:grid;place-items:center;align-self:start;border-radius:9px;background:#f0f5e8;width:34px;height:34px;color:#315e48}.methodSymbol svg{width:20px;height:20px}.walletMarks{display:flex;gap:18px;align-items:center}.walletMarks img{object-fit:contain}
+.payoutPair{display:grid;grid-template-columns:minmax(0,1.38fr) minmax(0,1fr);gap:15px;align-items:center;margin-top:28px}.record{padding:25px 22px;background:#fff;border:1px solid #d5dfcc;border-radius:12px;box-shadow:0 18px 42px -28px #234b3c60;min-width:0}.recordTitle{font-size:20px;line-height:1.3;font-weight:500;letter-spacing:-.025em}.record dl{padding:0;margin:20px 0 0}.record dl>div{padding:11px 0;border-top:1px solid #e4eadc;font-size:12px;line-height:1.5}.record dt{font-weight:500}.record dd{margin:5px 0 0;font-size:12px;color:#596b53}.record dl>div:last-child{padding-bottom:0}.depositCard,.bankCard{padding:25px 20px;border-radius:12px;background:#204638;color:#f5faec;position:relative}.depositCard>svg,.bankCard>svg{width:32px;height:32px;margin-bottom:26px}.depositCard>span,.bankCard>span{display:block;font-size:12px;line-height:1.5;color:#d8e5c8}.depositCard>strong,.bankCard>strong{display:block;font-size:27px;line-height:1.2;font-weight:500;letter-spacing:-.03em;margin-top:9px}.art .depositCard>p,.art .bankCard>p{font-size:12px;line-height:1.7;color:#e0eacd;margin:18px 0 0}.depositCard:before{content:"";position:absolute;right:100%;top:50%;width:16px;border-top:1px solid #809c71}
+.paymentOrigin{background:#fff;border:1px solid #d5dfcc;box-shadow:0 18px 42px -28px #234b3c60;border-radius:12px;padding:25px;max-width:80%;margin:auto;display:grid;gap:12px}.paymentOrigin .badge{font-size:17px}.paymentOrigin>span:last-child{font-size:12px;line-height:1.6;color:#596b53}.branchPair{display:grid;grid-template-columns:1fr 1fr;gap:16px;position:relative;margin-top:42px}.branchPair:before{content:"";position:absolute;width:50%;left:25%;height:21px;top:-21px;border:1px solid #9eb58f;border-bottom:0;border-radius:6px 6px 0 0}.branchPair:after{content:"";position:absolute;left:50%;height:21px;top:-42px;border-left:1px solid #9eb58f}.branch{padding:24px 20px;border-radius:12px;background:#fff;border:1px solid #d5dfcc;min-width:0}.branch>.badge{font-size:11px;min-height:30px;align-items:flex-start}.branch>.badge svg{width:16px;height:16px}.branch>strong{font-size:30px;line-height:1.2;letter-spacing:-.03em;font-weight:500;display:block;margin-top:20px}.branch ol{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:15px}.branch li{font-size:12px;line-height:1.6;padding-left:12px;position:relative}.branch li:before{content:"";position:absolute;top:7px;left:0;width:4px;height:4px;border-radius:50%;background:#95af76}.dark{background:#204638;border-color:#204638;color:#f7faed}.dark li{color:#e0eacd}
+.achPair{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:center;gap:24px}.bankCard{padding:30px 24px}.bankCard>strong{font-size:42px}.returnNote{display:flex;gap:10px;margin-top:25px;font-size:12px;line-height:1.65;color:#536752}.returnNote svg{width:17px;height:17px;flex:none}.returnNote strong{font-weight:550;color:#234b3c}
+@container(max-width:440px){.art .canvas{padding:24px;border-radius:16px}.businessCard{padding:23px 23px 70px}.businessCard>strong{font-size:29px}.businessFacts{gap:10px}.accountSheet{margin-left:18px}.accountSheet dl>div{display:block}.accountSheet dd{text-align:left;margin-top:4px}.checkoutSheet{margin-left:10px}.orderContext{padding-left:0}.payoutPair{gap:12px;grid-template-columns:1.3fr 1fr}.record{padding:22px 18px}.recordTitle{font-size:18px}.depositCard{padding:22px 16px}.depositCard>strong{font-size:23px}.branch{padding:22px 16px}.branch>strong{font-size:27px}.branch li{font-size:12px}.paymentOrigin{max-width:100%;padding:22px}.achPair{gap:16px}.bankCard{padding:24px 18px}.bankCard>strong{font-size:34px}}
+@container(max-width:320px){.art .canvas{padding:18px}.businessCard{padding:20px 18px 68px}.businessCard>strong{font-size:26px}.businessFacts{display:grid;gap:8px}.accountSheet{margin-left:10px}.sheetHeading{padding:20px 18px;font-size:15px}.accountSheet dl{padding-inline:18px}.sheetFoot{padding:16px 18px}.checkoutSheet{margin-left:0}.checkoutSheet .sheetHeading{padding:22px 18px}.methodChoices{padding-inline:18px}.methodChoices strong{font-size:14px}.steps{gap:5px}.steps strong{font-size:11px}.payoutPair,.achPair{grid-template-columns:1fr;gap:18px}.record dl>div{display:flex;gap:14px;justify-content:space-between}.record dd{margin:0;text-align:right;max-width:55%}.depositCard>svg,.bankCard>svg{float:right;margin:0 0 10px 12px}.depositCard:before{display:none}.art .depositCard>p,.art .bankCard>p{margin-top:12px}.branchPair{grid-template-columns:1fr;gap:18px;margin-top:26px}.branchPair:before,.branchPair:after{display:none}.branch>.badge{min-height:0}.branch>strong{margin-top:12px}.branch ol{margin-top:18px;gap:9px}.returnNote{font-size:12px}}
+@media(forced-colors:active){.canvas,.businessCard,.accountSheet,.checkoutSheet,.record,.depositCard,.bankCard,.branch,.paymentOrigin{border:1px solid CanvasText;background:Canvas;color:CanvasText}.steps:before,.branchPair:before,.branchPair:after{border-color:CanvasText}.steps span{background:Canvas;color:CanvasText;border-color:CanvasText}}
+
+@container(max-width:320px){.steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.steps:before{display:none}.steps li,.steps li:last-child{align-items:flex-start;text-align:left}.steps strong{font-size:12px;max-width:none}}
+
+/* Narrow records use their available width instead of miniature columns. */
+@container(max-width:440px){
+ .art .canvas{padding:20px;}
+ .businessCard{padding:22px 20px 62px;}
+ .businessCard>strong{font-size:27px;margin-top:18px;}
+ .businessFacts{margin-top:18px;gap:9px 14px;}
+ .accountSheet{margin-left:12px;margin-top:-40px;}
+ .accountSheet .sheetHeading{padding:18px;}
+ .accountSheet dl{padding-inline:18px;}
+ .accountSheet dl>div{display:flex;gap:12px;padding-block:10px;align-items:flex-start;}
+ .accountSheet dt{max-width:48%;}.accountSheet dd{margin:0;max-width:48%;text-align:right;}
+ .sheetFoot{padding:14px 18px;}
+ .checkoutSheet{margin-left:0;}.checkoutSheet .sheetHeading{padding:20px;}
+ .orderContext{padding-bottom:22px;}.methodChoices{padding-inline:20px;}
+ .methodChoices>div{padding-block:16px;}
+ .payoutPair,.achPair{grid-template-columns:1fr;gap:16px;}
+ .payoutPair{margin-top:20px;}
+ .record{padding:20px;}.record dl{margin-top:12px;}
+ .record dl>div{display:flex;justify-content:space-between;gap:16px;padding-block:10px;}
+ .record dt{max-width:42%;}.record dd{margin:0;max-width:55%;text-align:right;}
+ .depositCard,.bankCard{display:grid;grid-template-columns:minmax(0,1fr) 32px;gap:0 16px;padding:20px;}
+ .depositCard>svg,.bankCard>svg{grid-column:2;grid-row:1 / 3;margin:0;float:none;align-self:center;}
+ .depositCard>span,.bankCard>span{grid-column:1;}
+ .depositCard>strong,.bankCard>strong{grid-column:1;font-size:28px;margin-top:5px;}
+ .art .depositCard>p,.art .bankCard>p{grid-column:1 / -1;margin-top:12px;line-height:1.6;}
+ .depositCard:before{display:none;}
+ .branchPair{grid-template-columns:1fr;gap:16px;margin-top:24px;}
+ .branchPair:before,.branchPair:after{display:none;}
+ .branch{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:20px;}
+ .branch>.badge{font-size:12px;min-height:0;align-self:center;align-items:center;}
+ .branch>strong{font-size:25px;margin-top:0;align-self:center;}
+ .branch ol{grid-column:1 / -1;margin-top:0;gap:8px;}
+ .steps{margin-top:24px;}.returnNote{margin-top:20px;}
+}
+@container(max-width:320px){.art .canvas{padding:16px;}.record,.depositCard,.bankCard,.branch{padding:18px;}.businessFacts{display:flex;}}

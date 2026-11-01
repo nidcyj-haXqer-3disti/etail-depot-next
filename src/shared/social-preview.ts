@@ -21,7 +21,7 @@ export function socialPreviewKey(path: string): SocialPreviewKey {
   if (path === "/credit-card-services") return "cards";
   if (path === "/switch-payment-providers") return "provider";
   if (["/software-partners", "/platform-payment-models", "/payment-partnerships"].includes(path)) return "platforms";
-  if (["/payment-acceptance-service", "/online-businesses", "/payment-methods", "/merchant-onboarding", "/payouts-and-reconciliation", "/refunds-and-disputes", "/ach-payments", "/pricing"].includes(path)) return "merchant";
+  if (["/payment-acceptance-service", "/online-businesses", "/payment-methods", "/merchant-onboarding", "/payouts-and-reconciliation", "/refunds-and-disputes", "/ach-payments", "/reconciliation", "/disputes", "/pricing"].includes(path)) return "merchant";
   return "brand";
 }
 export function socialPreviewImage(path: string, origin: string) {

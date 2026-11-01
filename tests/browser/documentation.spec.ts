@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { openMainNavigation } from "./public-header";
+import { openFooterGroup } from "./public-footer";
 import { documentationPages, documentationPath, documentationServiceLinks } from "../../src/modules/public-site/documentation-catalog";
 
 async function openDocumentationTopic(page: Page, slug: string) {
@@ -19,12 +20,15 @@ test("all documentation tasks have working sections, unique canonicals and local
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content',/noindex/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href',`https://etaildepot.com${path}`);
   expect(sitemap).not.toContain(path);
-  const navigation=await openMainNavigation(page);
-  await navigation.locator('summary').filter({hasText:/^Resources$/}).click();
-  await expect(navigation.getByRole('link',{name:'Documentation',exact:true})).toHaveAttribute('aria-current','location');
+  const navigation=await openMainNavigation(page, "Developers");
+  const direct = ["integration-access", "checkout", "webhooks", "testing-and-launch"].includes(item.slug);
+  const current = navigation.locator("a[aria-current]");
+  await expect(current).toHaveCount(1);
+  await expect(current).toHaveAttribute("href", direct ? path : "/docs");
+  await expect(current).toHaveAttribute("aria-current", direct ? "page" : "location");
   const menu=page.getByRole('banner').getByRole('button',{name:'Menu',exact:true});
   if(await menu.isVisible())await menu.click();
-  await expect(page.getByRole('navigation',{name:'Footer resources'}).getByRole('link',{name:'Documentation',exact:true})).toHaveAttribute('href','/docs');
+  await expect((await openFooterGroup(page, 'Developers')).getByRole('link',{name:'Documentation',exact:true})).toHaveAttribute('href','/docs');
   const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));
   expect(new Set(ids).size).toBe(ids.length);
   for(const href of await page.locator('main a[href^="#"]').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('href')!))){
@@ -56,11 +60,11 @@ test("documentation distinguishes approval, payment results and bank receipt",as
 
 test("topic navigation and browser back support complete reading journeys",async({page})=>{
  await page.goto('/docs');
- await page.locator('.docs-task-paths').getByRole('link',{name:'Configure integration access',exact:true}).click();
+ await page.locator('.docs-task-paths').getByRole('link',{name:'Prepare your integration',exact:true}).click();
  await expect(page).toHaveURL(/\/docs\/integration-access$/);
  const topics=page.getByRole('navigation',{name:'Documentation topics'});
  if(await topics.locator('.docs-nav-mobile').isVisible())await topics.locator('summary').click();
- await topics.getByRole('link',{name:'Online checkout',exact:true}).filter({visible:true}).click();
+ await topics.getByRole('link',{name:'Checkout integration',exact:true}).filter({visible:true}).click();
  await expect(page).toHaveURL(/\/docs\/checkout$/);
  await openDocumentationTopic(page,'webhooks');
  await page.goBack();await expect(page).toHaveURL(/\/docs\/checkout$/);
@@ -88,12 +92,10 @@ test("responsive topic navigation retains keyboard focus",async({page})=>{
 
 test("merchant journey connects service, use case and account instructions without requiring developer access",async({page})=>{
  await page.goto('/payment-acceptance-service');
- const navigation=await openMainNavigation(page);
- if (await navigation.locator(".public-domain-services").getAttribute("open") === null) await navigation.locator("summary").filter({hasText:/^Services$/}).click();
+ const navigation=await openMainNavigation(page, "Use cases");
  await navigation.getByRole('link',{name:'Online businesses',exact:true}).click();
  await expect(page).toHaveURL(/\/online-businesses$/);
- const docsNavigation=await openMainNavigation(page);
- await docsNavigation.locator("summary").filter({hasText:/^Resources$/}).click();
+ const docsNavigation=await openMainNavigation(page, "Developers");
  await docsNavigation.getByRole('link',{name:'Documentation',exact:true}).click();
  await page.locator('.docs-task-paths').getByRole('link',{name:'Set up an account',exact:true}).click();
  await expect(page).toHaveURL(/\/docs\/merchant-onboarding$/);
@@ -106,8 +108,10 @@ test("merchant journey connects service, use case and account instructions witho
   await openDocumentationTopic(page,destination);
  }
  await expect(page.locator('.docs-next')).toHaveCount(0);
- const serviceNavigation=await openMainNavigation(page);
- await serviceNavigation.getByRole('link',{name:'Merchant services',exact:true}).click();
+ await (await openFooterGroup(page, 'Services')).getByRole('link',{name:'Payouts',exact:true}).click();
+ await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
+ await page.getByRole('banner').getByRole('link',{name:'Etail Depot home',exact:true}).click();
+ await page.locator('main').getByRole('link',{name:'Explore merchant services',exact:true}).click();
  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
 });
 
@@ -115,14 +119,13 @@ test("platform implementation progresses to testing and returns to its use case"
  await page.goto('/software-partners');
  await page.getByRole('main').getByRole('link',{name:'Explore developer integration',exact:true}).click();
  await expect(page).toHaveURL(/\/docs#developer-integration$/);
- await page.locator('.docs-task-paths').getByRole('link',{name:'Configure integration access',exact:true}).click();
+ await page.locator('.docs-task-paths').getByRole('link',{name:'Prepare your integration',exact:true}).click();
  await expect(page).toHaveURL(/\/docs\/integration-access$/);
  for(const destination of ['checkout','webhooks','testing-and-launch']){
   await openDocumentationTopic(page,destination);
  }
  await expect(page.locator('#production-readiness')).toContainText('Any live application, transaction, refund or movement of funds requires that separate procedure.');
- const navigation=await openMainNavigation(page);
- await navigation.locator('summary').filter({hasText:/^Platforms$/}).click();
+ const navigation=await openMainNavigation(page, "Use cases");
  await navigation.getByRole('link',{name:'Software platforms',exact:true}).click();
  await expect(page).toHaveURL(/\/software-partners$/);
 });
@@ -190,32 +193,30 @@ test("merchant checkout integration starts with access and retains its reader pa
  await page.goto('/docs/merchant-onboarding');
  await openDocumentationTopic(page,'integration-access');
  await expect(page).toHaveURL(/\/docs\/integration-access$/);
- await expect(page.getByRole('heading',{name:'Before you begin',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'What you need',exact:true})).toBeVisible();
  await openDocumentationTopic(page,'checkout');
  await openDocumentationTopic(page,'webhooks');
  await openDocumentationTopic(page,'testing-and-launch');
 });
 
-test("every article returns to its own documentation group", async ({page}) => {
+test("every article retains its reading path through topic navigation", async ({page}) => {
  for(const item of documentationPages){
   await page.goto(documentationPath(item.slug));
-  const group=item.group==='Merchant operations'?'merchant-operations':'developer-integration';
-  const crumbs=page.getByRole('navigation',{name:'Breadcrumb',exact:true});
-  await expect(crumbs.locator('[aria-current="page"]')).toHaveText(item.title);
-  const visibleTrail=await crumbs.locator('li').allTextContents();
+  await expect(page.getByRole('navigation',{name:'Breadcrumb',exact:true})).toHaveCount(0);
   const graph=await page.locator('script[type="application/ld+json"]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.textContent!)["@graph"]??[]));
-  expect(graph.find(node=>node['@type']==='BreadcrumbList').itemListElement.map((node:{name:string})=>node.name)).toEqual(visibleTrail);
-  const link=page.getByRole('navigation',{name:'Breadcrumb',exact:true}).getByRole('link',{name:item.group,exact:true});
-  await expect(link).toHaveAttribute('href',`/docs#${group}`);
-  await link.click();
-  await expect(page).toHaveURL(new RegExp(`/docs#${group}$`));
-  await expect(page.locator(`#${group}`)).toBeInViewport();
-  await expect(page.locator(`#${group} h2`)).toHaveText(item.group);
+  expect(graph.find(node=>node['@type']==='BreadcrumbList').itemListElement.map((node:{name:string})=>node.name)).toEqual(['Documentation',item.group,item.title]);
+  const topics=page.getByRole('navigation',{name:'Documentation topics'});
+  const mobile=topics.locator('.docs-nav-mobile');
+  if(await mobile.isVisible() && await mobile.getAttribute('open')===null)await mobile.locator('summary').click();
+  await expect(topics.locator('a[aria-current="page"]').filter({visible:true})).toHaveText(item.title);
+  await topics.getByRole('link',{name:'Overview',exact:true}).filter({visible:true}).click();
+  await expect(page).toHaveURL(/\/docs$/);
+  await expect(page.getByRole('heading',{level:1})).toHaveText('Documentation');
+  await expect(page.getByRole('navigation',{name:'Breadcrumb',exact:true})).toHaveCount(0);
   await page.goBack();
   await expect(page).toHaveURL(new RegExp(`/docs/${item.slug}$`));
  }
 });
-
 
 test("restored diagrams and recovery guidance remain usable without API samples", async ({page}) => {
  await page.goto('/docs/checkout');
@@ -245,8 +246,7 @@ test("documentation support remains accessible through shared Help navigation", 
   await expect(service).toHaveCount(1);
   await expect(service).toHaveAttribute('href',documentationServiceLinks[item.slug].href);
   await expect(page.locator('.docs-section a[href^="/software-partners"], .docs-section a[href^="/online-businesses"]')).toHaveCount(0);
-  const mainNavigation=await openMainNavigation(page);
-  await mainNavigation.locator('summary').filter({hasText:/^Resources$/}).click();
+  await openMainNavigation(page, "Resources");
   const help=page.getByRole('banner').getByRole('link',{name:'Help center',exact:true});
   await help.click();
   await expect(page).toHaveURL(/\/help$/);

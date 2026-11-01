@@ -17,7 +17,7 @@ function SourceDetails({ section, entry }: Props) {
   const sources = entry ? [referenceSource(entry.source)] : section?.slug === "messages" ? [referenceSource("moov")] : section ? [referenceSource("pyiso8583")] : REFERENCE_SOURCES;
   return <aside className="sr-reference" id="reference-source" aria-label="Reference scope and sources"><h2>Reference scope</h2><p className="ref-scope">Independent implementation guidance. This is not the ISO standard or an approved specification for a payment connection.</p><dl>{entry && <><dt>{isMessage(entry) ? "Message type" : "Data field"}</dt><dd><code>{entry.code}</code></dd>{isMessage(entry) ? <><dt>Version indicator</dt><dd>{entry.version} family in the cited source</dd></> : <><dt>Profiles compared</dt><dd><code>default</code><br /><code>default_ascii</code></dd></>}</>}</dl>
     {sources.map(source => <div className="sr-source" key={source.id}><SourceLink href={entry ? sourceUrl(entry) : source.url}>{source.name}</SourceLink><p>Source revision <code>{source.commit.slice(0, 12)}</code></p><a href={source.licensePath}>{source.license} licence and attribution</a></div>)}
-    <p><a href="/licenses/iso8583-reference-NOTICE.txt">Attribution and modifications</a></p>
+    <p><a className="sr-detail-link" href="/licenses/iso8583-reference-NOTICE.txt">Attribution and modifications</a></p>
   </aside>;
 }
 function ReadingNotes({ source }: { source?: string }) { return <details className="reference-notes"><summary>Source scope and interpretation</summary>{SOURCE_NOTES.filter(note => !source || source === note.source).map(note => <p key={note.note}>{note.note}</p>)}</details>; }

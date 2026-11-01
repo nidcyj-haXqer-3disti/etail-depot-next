@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { openFooterGroup } from "./public-footer";
 
 async function preventMutations(page: Page) {
   const attempts: string[] = [];
@@ -41,20 +42,21 @@ test("Home gives merchants and software partners distinct next steps", async ({ 
   if (await menu.isVisible()) await menu.click();
   await page.getByRole("banner").getByRole("link", { name: "Contact sales", exact: true }).click();
   await expect(page).toHaveURL(/\/contact$/);
-  await expect(page.locator("#payment-review")).toContainText("An inquiry is not an application or approval");
-  await expect(page.locator("#platforms")).toContainText("A partnership inquiry does not approve or activate merchant accounts.");
-  await expect(page.locator("#platforms a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Software%20payment%20partnership");
+  await expect(page.locator("#merchant-application")).toContainText("Account approval and setup apply.");
+  await expect(page.locator("#cards")).toContainText("An inquiry is not an application.");
+  await expect(page.locator("#integration a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com?subject=Integration%20documentation");
   await page.goto("/");
   await partners.click();
   await expect(page).toHaveURL(/\/software-partners$/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Your merchants aren’t all the same");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Merchant services for your software");
   await page.goBack();
+  await openFooterGroup(page, "Services");
   const cardLink = page.getByRole("contentinfo").getByRole("link", { name: "Card services", exact: true });
   await expect(cardLink).toHaveAttribute("href", "/credit-card-services");
   await cardLink.click();
   await expect(page.locator("#card-details")).toContainText("$200");
   await expect(page.locator("#card-details")).toContainText("$0");
-  await expect(page.locator(".consumer-product-note")).toHaveText("An inquiry is not an application.");
+  await expect(page.locator("[data-service-note]")).toHaveText("An inquiry is not an application.");
 });
 
 test("payment explorer supports keyboard tabs and exposes the corresponding record", async ({ page }) => {
@@ -201,7 +203,7 @@ test("software partner preview stays out of indexing and offers contact rather t
   await expect(contact).toHaveAttribute("href", "/contact#platforms");
   await expect(page.locator("main form")).toHaveCount(0);
   await expect(page.locator("main")).toContainText("Merchant approval is required.");
-  await expect(page.locator("main")).toContainText("The business submits its details for review and completes account setup after approval.");
+  await expect(page.locator("main")).toContainText("Review business details and complete account setup after approval.");
   await expect(page.locator("main")).toContainText("Payment methods depend on account setup.");
   const sitemap = await page.request.get("/sitemap.xml");
   expect(sitemap.ok()).toBeTruthy();
@@ -242,7 +244,7 @@ test("service content and all payment records remain readable without JavaScript
     await actions.getByRole("link", { name: "Explore merchant services", exact: true }).click();
     await expect(noScript).toHaveURL(/\/payment-acceptance-service$/);
     const navigation = noScript.getByRole("navigation", {name:"Main navigation"});
-    if (await navigation.locator(".public-domain-services").getAttribute("open") === null) await navigation.locator("summary").filter({hasText:/^Services$/}).click();
+    if (await navigation.locator(".public-domain-use-cases").getAttribute("open") === null) await navigation.locator("summary").filter({hasText:/^Use cases$/}).click();
     await navigation.getByRole("link", { name: "Online businesses", exact: true }).click();
     await expect(noScript).toHaveURL(/\/online-businesses$/);
     const explorer = noScript.locator("#customer-checkout");

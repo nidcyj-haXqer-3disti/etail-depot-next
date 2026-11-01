@@ -1,0 +1,21 @@
+.journey{margin:0;min-width:0;border:1px solid #d7e1d1;border-radius:16px;background:#f0f4e9;overflow:hidden;color:#234b3c}
+.context{display:flex;align-items:center;gap:12px;padding:22px 28px;background:#204638;color:#f7faee;font-size:14px;line-height:1.5}.context>svg{width:21px;height:21px;flex:none;color:#d2e3bd}.context>strong{font-weight:500}.context>span{margin-left:auto;font-size:12px;color:#dce8d0}
+.stages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;list-style:none;padding:28px;margin:0}.stages>li{min-width:0;position:relative}
+.record{background:#fff;border:1px solid #d3deca;border-radius:10px;box-shadow:0 14px 24px -24px #234b3c50;min-height:152px;padding:22px 18px;position:relative}.stages>li:not(:last-child) .record:after{content:"";position:absolute;left:100%;top:50%;width:25px;height:1px;background:#a2b591}
+.recordHeading{display:flex;align-items:center;gap:10px;min-height:42px}.recordHeading>svg{width:21px;height:21px;flex:none;color:#496c49}.recordHeading>strong{font-size:16px;line-height:1.4;font-weight:500;letter-spacing:-.015em}.fields{display:grid;gap:7px;margin-top:18px;font-size:12px;line-height:1.5;color:#526b58}.fields>span{padding-left:10px;border-left:2px solid #c0d3a7}.deposit{background:#204638;border-color:#204638;color:#f7faee}.deposit .recordHeading>svg{color:#d2e3bd}.deposit .fields{color:#e0ead4}.deposit .fields>span{border-color:#829d6c}
+.description{display:grid;grid-template-columns:24px 1fr;gap:8px 9px;margin:24px 0 0}.number{font-size:11px;line-height:24px;font-variant-numeric:tabular-nums;color:#536d55}.description h3{margin:0;font-size:18px;font-weight:500;letter-spacing:-.025em;line-height:1.35}.journey .description p{grid-column:2;margin:0;font-size:14px;line-height:1.7;color:#4a6257}
+@media(max-width:1100px){.stages{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}.stages>li:nth-child(2) .record:after{display:none}.record{min-height:145px}.description{margin-top:20px}}
+@media(max-width:600px){.context{padding:21px;flex-wrap:wrap;gap:8px 12px}.context>span{margin-left:33px;width:100%}.stages{grid-template-columns:1fr;padding:22px;gap:28px}.record{min-height:0;padding:21px}.recordHeading{min-height:0}.fields{margin-top:15px}.stages>li .record:after{display:none}.description{margin-top:18px}.description h3{font-size:19px}}
+@media(forced-colors:active){.journey,.context,.record,.deposit{background:Canvas;color:CanvasText;border:1px solid CanvasText}.context>span,.deposit .fields,.deposit .recordHeading>svg{color:CanvasText}.fields>span{border-color:CanvasText}}
+
+@media(max-width:600px){
+ .context{padding:17px 18px;}
+ .stages{padding:18px;gap:24px;}
+ .record{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.95fr);gap:14px;align-items:center;padding:17px;}
+ .recordHeading{gap:8px;align-items:flex-start;}.recordHeading>svg{width:18px;height:18px;}
+ .recordHeading>strong{font-size:15px;}
+ .fields{margin:0;font-size:12px;gap:6px;}
+ .description{margin-top:12px;}.description h3{font-size:18px;}
+ .journey .description p{line-height:1.6;}
+}
+@media(max-width:350px){.record{padding:15px;gap:12px;}.recordHeading{flex-direction:column;}}
