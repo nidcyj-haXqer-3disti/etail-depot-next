@@ -104,7 +104,7 @@ test("home presents Etail brand artwork and local product discovery without acco
   await expect(hero.locator("form,input,textarea,select,[contenteditable=true]")).toHaveCount(0);
   await expect(art.locator("a,button,input,form,textarea,select,[tabindex],[role=button]")).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
-  await hero.getByRole("link",{name:"For my business",exact:true}).click();
+  await hero.getByRole("link",{name:"Accept payments",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   await expect(page.getByRole("heading",{level:1})).toBeVisible();
   await page.goto("/");
@@ -279,8 +279,8 @@ test("public service discovery explains eligibility and card inquiries without l
     if(path==="/"){
       const payments=page.locator(".ec-home-hero");
       await expect(payments.getByRole("heading",{level:1})).toHaveText("Merchant services. For your business.");
-      await expect(payments).toContainText("Credit card processing, online checkout and reporting for US businesses and software platforms.");
-      await expect(payments.getByRole("link",{name:"For my business",exact:true})).toHaveAttribute("href","/payment-acceptance-service");
+      await expect(payments).toContainText("Credit card processing and ACH payments for US businesses and software platforms, from online checkout to payout reporting.");
+      await expect(payments.getByRole("link",{name:"Accept payments",exact:true})).toHaveAttribute("href","/payment-acceptance-service");
       await expect(page.getByRole("banner").getByRole("link",{name:"Merchant access",exact:true,includeHidden:true})).toHaveAttribute("href","https://trolleys.ai");
       await expect(page.getByRole("tablist")).toHaveCount(0);
       const serviceAreas=page.locator("#services");
@@ -288,7 +288,7 @@ test("public service discovery explains eligibility and card inquiries without l
       for (const [name,href] of [["Explore merchant services","/payment-acceptance-service"],["Explore software platforms","/software-partners"],["Explore card services","/credit-card-services"]]) await expect(serviceAreas.getByRole("link",{name,exact:true})).toHaveAttribute("href",href);
       await expect(serviceAreas.locator("button,input,form,textarea,select")).toHaveCount(0);
       await expect(page.locator("#card-services")).not.toContainText("Applications are not open");
-      await expect(payments).toContainText("Merchant account approval is required.");
+      await expect(payments).toContainText("Merchant accounts require approval.");
       await openFooterGroup(page, "Services");
       await expect(footer.getByRole("link",{name:"Card services",exact:true})).toHaveAttribute("href","/credit-card-services");
     }else if(path==="/credit-card-services"){

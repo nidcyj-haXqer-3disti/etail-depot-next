@@ -208,7 +208,7 @@ describe("reviewed public metadata", () => {
     expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-11-01");
     expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-11-01");
     expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-10-31");
-    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-01");
+    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-02");
     expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-11-01");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);

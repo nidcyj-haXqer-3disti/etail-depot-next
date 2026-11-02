@@ -1,5 +1,11 @@
 # Current public website scope
 
+## Homepage opening refinement, 2 November 2026
+
+Refined the opening description into one direct sentence naming credit card processing, ACH, online checkout and payout reporting for US businesses and software platforms. Hero actions now read Accept payments and For software platforms, with existing destinations. Preserved the approved headline and company artwork. Tightened desktop spacing, increased copy legibility and added an outlined secondary action with full width phone targets. Approval, payment methods, pricing and payout terms remain visible. Homepage revision date updated.
+
+Build with TypeScript, scoped lint and architecture checks pass. Seven existing checks pass across desktop, mobile and homepage accessibility. Visual inspection covers 1440, 1024, 768, 390 and 320 pixels. No horizontal page overflow. The browser heading inspection was corrected to a supported locator; no product defect was involved. Comparison and evidence: /Users/yu/Downloads/etail-depot-next/outputs/homepage-opening-20261102/review.html. Branch codex/homepage-opening-20261102. Local only, no push or deployment. The previously published package does not include this change; release packaging and hosted checks require refreshing before later publication.
+
 ## Push preparation refreshed, 2 November 2026
 
 Prepared the latest reviewed candidate on codex/sales-enquiry-20261101, including the simplified contact page and the completed desktop and mobile overview. GitHub main still matches the published base 3e76af835a1e83e147211e5b2ba498d00a8b4fea. The exact candidate retains 3,740 content pages and 3,738 eligible sitemap URLs. Existing contact and application bookmarks, pricing, eligibility, reference data, licence notices, legal terms and approved provider handoffs remain. No dependency, lockfile, hosting configuration or financial runtime changed.
