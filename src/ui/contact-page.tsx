@@ -32,7 +32,7 @@ function ContactOptions() {
     <div className="commercial-contact-list">
       {contacts.map(contact => <section key={contact.id} id={contact.id} className={contactStyles.specialist} aria-labelledby={`${contact.id}-title`}><div><h2 id={`${contact.id}-title`}>{contact.title}</h2><p>{contact.text}</p></div><a className={contactStyles.email} href={contact.href}><span>{contact.email}</span><Icon name="mail" /></a></section>)}
     </div>
-    <div className="contact-application" id="merchant-application"><div><h2>Ready to apply?</h2><p>Merchant applications open at Trolleys, an Etail Depot service. Submit business documents through the secure account service. Account approval and setup apply.</p></div><PaymentPortalLink className="text-link">Open merchant application</PaymentPortalLink></div>
+    <div className="contact-application" id="merchant-application"><div><h2>Ready to apply?</h2><p>Enter your email on the Trolleys welcome page, then choose Register to create your account. Submit business documents through the secure account service. Account approval and setup apply.</p></div><PaymentPortalLink intent="register" className="text-link" /></div>
   </div>;
 }
 

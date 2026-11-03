@@ -1,3 +1,4 @@
+import { hostedServices } from "@/shared/hosted-services";
 import type { CommercialPage } from "./commercial-content";
 
 export type ServiceKind = "onboarding" | "methods" | "ach" | "payouts" | "reconciliation" | "refunds" | "disputes";
@@ -16,14 +17,14 @@ export const SERVICE_DETAIL_PAGES = {
     "heading": "A merchant account for the way you do business.",
     "intro": "Bring your business, sales channels and processing needs into one application. Complete the account review, understand your terms and prepare to accept payments.",
     "action": {
-      "label": "Apply for a merchant account",
-      "href": "https://trolleys.ai"
+      "label": "Start now",
+      "href": hostedServices.payments.registrationUrl
     },
     "secondaryAction": {
       "label": "Discuss your business first",
       "href": "/contact#payment-review"
     },
-    "note": "Applications open at Trolleys, an Etail Depot service. Account approval and setup apply.",
+    "note": "Create your account to begin the merchant application. Account approval and setup apply.",
     "art": {
       "title": "Merchant application: business information, account review, agreement and activation",
       "caption": "Account approval and an accepted agreement are required before activation.",

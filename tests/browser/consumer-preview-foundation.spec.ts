@@ -74,7 +74,7 @@ test("home presents Etail brand artwork and local product discovery without acco
   page.on("pageerror",error=>errors.push(error.message));
   await page.route("**/*",async route=>{
     const request=route.request(),url=new URL(request.url());
-    if(!["GET","HEAD","OPTIONS"].includes(request.method())||url.pathname.startsWith("/api/")||["trolleys.ai","ledgix.com"].includes(url.hostname)){
+    if(!["GET","HEAD","OPTIONS"].includes(request.method())||url.pathname.startsWith("/api/")||["trolleys.ai","merchantapp.io","ledgix.com"].includes(url.hostname)){
       unexpected.push(`${request.method()} ${url.origin}${url.pathname}`);
       await route.abort();
     }else await route.continue();
@@ -107,7 +107,8 @@ test("home presents Etail brand artwork and local product discovery without acco
   await expect(hero.locator("form,input,textarea,select,[contenteditable=true]")).toHaveCount(0);
   await expect(art.locator("a,button,input,form,textarea,select,[tabindex],[role=button]")).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
-  await hero.getByRole("link",{name:"Accept payments",exact:true}).click();
+  await expect(hero.getByRole("link",{name:"Start now",exact:true})).toHaveAttribute("href","https://merchantapp.io/etaildepot/UserAccount/Login");
+  await page.locator("#services").getByRole("link",{name:"Explore merchant services",exact:true}).click();
   await expect(page).toHaveURL(/\/payment-acceptance-service$/);
   await expect(page.getByRole("heading",{level:1})).toBeVisible();
   await page.goto("/");
@@ -134,7 +135,7 @@ test("software partners can review the payment experience and reach the fixed in
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.route("**/*", async route => {
     const request = route.request(), url = new URL(request.url());
-    if (!["GET", "HEAD", "OPTIONS"].includes(request.method()) || url.pathname.startsWith("/api/") || ["trolleys.ai", "ledgix.com"].includes(url.hostname)) {
+    if (!["GET", "HEAD", "OPTIONS"].includes(request.method()) || url.pathname.startsWith("/api/") || ["trolleys.ai", "merchantapp.io", "ledgix.com"].includes(url.hostname)) {
       unexpected.push(`${request.method()} ${url.origin}${url.pathname}`);
       await route.abort();
     } else await route.continue();
@@ -254,9 +255,9 @@ test("public service discovery explains eligibility and card inquiries without l
     await expect(page.getByRole("region",{name:"Payments dashboard",exact:true})).toHaveCount(0);
     const localAccountLinks=await page.locator("a[href]").evaluateAll(links=>links.map(link=>new URL(link.getAttribute("href")!,location.href)).filter(url=>url.origin===location.origin&&/^\/(?:login|services|profile|cardholder-services|merchant-services|money-accounts)(?:\/|$)/.test(url.pathname)).map(url=>url.pathname));
     expect(localAccountLinks).toEqual([]);
-    const portalLinks=page.locator('a[href="https://trolleys.ai"]');
+    const portalLinks=page.locator('a[href^="https://merchantapp.io/etaildepot/"]');
     expect(await portalLinks.count()).toBeGreaterThan(0);
-    if(path==="/credit-card-services") await expect(page.locator('main a[href="https://trolleys.ai"]')).toHaveCount(0);
+    if(path==="/credit-card-services") await expect(page.locator('main a[href="https://merchantapp.io/etaildepot/UserAccount/Login"]')).toHaveCount(0);
     for(const link of await portalLinks.all()){
       await expect(link).toHaveAttribute("referrerpolicy","no-referrer");
       await expect(link).toHaveAttribute("rel",/\bnoreferrer\b/);
@@ -283,8 +284,8 @@ test("public service discovery explains eligibility and card inquiries without l
       const payments=page.locator(".ec-home-hero");
       await expect(payments.getByRole("heading",{level:1})).toHaveText("Merchant services. For your business.");
       await expect(payments).toContainText("Credit card processing and ACH payments for US businesses and software platforms, from online checkout to payout reporting.");
-      await expect(payments.getByRole("link",{name:"Accept payments",exact:true})).toHaveAttribute("href","/payment-acceptance-service");
-      await expect(page.getByRole("banner").getByRole("link",{name:"Merchant access",exact:true,includeHidden:true})).toHaveAttribute("href","https://trolleys.ai");
+      await expect(payments.getByRole("link",{name:"Start now",exact:true})).toHaveAttribute("href","https://merchantapp.io/etaildepot/UserAccount/Login");
+      await expect(page.getByRole("banner").getByRole("link",{name:"Sign in to Trolleys",exact:true,includeHidden:true})).toHaveAttribute("href","https://merchantapp.io/etaildepot/UserAccount/Login");
       await expect(page.getByRole("tablist")).toHaveCount(0);
       const serviceAreas=page.locator("#services");
       await expect(serviceAreas.getByRole("heading",{level:2})).toHaveText(["Merchant services","Software platforms","Card services"]);
@@ -295,7 +296,7 @@ test("public service discovery explains eligibility and card inquiries without l
       await openFooterGroup(page, "Services");
       await expect(footer.getByRole("link",{name:"Card services",exact:true})).toHaveAttribute("href","/credit-card-services");
     }else if(path==="/credit-card-services"){
-      await expect(page.getByRole("banner").getByRole("link",{name:"Merchant access",exact:true,includeHidden:true})).toHaveAttribute("href","https://trolleys.ai");
+      await expect(page.getByRole("banner").getByRole("link",{name:"Sign in to Trolleys",exact:true,includeHidden:true})).toHaveAttribute("href","https://merchantapp.io/etaildepot/UserAccount/Login");
       await expect(page.locator("[data-service-note]")).toBeVisible();
       await expect(page.locator("[data-service-note]")).toHaveText("An inquiry is not an application.");
       const cardContacts = page.locator("main").getByRole("link", { name: "Ask about card services", exact: true });
@@ -310,7 +311,7 @@ test("public service discovery explains eligibility and card inquiries without l
       await expect(page.locator(".merchant-hero [data-attention-copy]")).toContainText("Account approval and setup apply.");
       await expect(page.locator(".cw-merchant-art")).toBeVisible();
       await expect(page.locator(".merchant-hero").getByRole("link")).toHaveCount(2);
-      await expect(page.locator(".merchant-hero").getByRole("link",{name:"Apply for a merchant account",exact:true})).toHaveAttribute("href","https://trolleys.ai");
+      await expect(page.locator(".merchant-hero").getByRole("link",{name:"Start now",exact:true})).toHaveAttribute("href","https://merchantapp.io/etaildepot/UserAccount/Login");
       await expect(page.locator("#fees").getByRole("link", { name: "See all fees and calculate your costs", exact: true })).toHaveAttribute("href", "/pricing#fees");
       await expect(page.locator("main").getByRole("link",{name:"Explore merchant services",exact:true})).toHaveCount(0);
     }
@@ -343,7 +344,7 @@ test("public service discovery explains eligibility and card inquiries without l
   await expect(explorer.getByRole("tabpanel",{name:"Card payout",exact:true})).toBeVisible();
   await expect(explorer.locator("a,input,form,textarea,select,iframe")).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
-  await expect(page.locator("main").getByRole("link",{name:"Explore merchant services",exact:true})).toHaveAttribute("href", "/payment-acceptance-service");
+  await expect(page.locator(".online-business-actions").getByRole("link",{name:"Merchant services",exact:true})).toHaveAttribute("href", "/payment-acceptance-service");
   const navigation=await openMainNavigation(page);
   await expect(navigation.getByRole("link",{name:"Online businesses",exact:true,includeHidden:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator(".online-business-copy")).toContainText("Connect checkout and hosted payment requests to your orders, with cards, wallets and ACH enabled for your account.");
@@ -359,7 +360,8 @@ test("public service discovery explains eligibility and card inquiries without l
   expect(changes).toEqual([]);expect(privateReads).toEqual([]);expect(errors).toEqual([]);
 });
 
-test("payment entry points hand off only the approved portal address without queries or referrers",async({page})=>{
+test("payment entry points hand off to the welcome page without queries or referrers",async({page,isMobile})=>{
+  test.setTimeout(60_000);
   const handoffs:{url:string;method:string;referer:string|null}[]=[],changes:string[]=[],errors:string[]=[];
   page.on("pageerror",error=>errors.push(error.message));
   await page.route("**/*",async route=>{
@@ -367,7 +369,7 @@ test("payment entry points hand off only the approved portal address without que
     if(!["GET","HEAD","OPTIONS"].includes(request.method())){
       changes.push(`${request.method()} ${request.url()}`);
       await route.abort();
-    }else if(new URL(request.url()).origin==="https://trolleys.ai"){
+    }else if(new URL(request.url()).origin==="https://merchantapp.io"){
       // Capture the browser handoff locally; never load or operate the provider account.
       if(!request.isNavigationRequest()){await route.fulfill({status:204,body:""});return;}
       handoffs.push({url:request.url(),method:request.method(),referer:await request.headerValue("referer")});
@@ -375,24 +377,33 @@ test("payment entry points hand off only the approved portal address without que
     }else await route.continue();
   });
   const entries=[
-    {path:"/",scope:"header",label:"Merchant access"},
-    {path:"/software-partners",scope:"header",label:"Merchant access"},
-    {path:"/credit-card-services",scope:"header",label:"Merchant access"},
-    {path:"/payment-acceptance-service",scope:".merchant-hero",label:"Apply for a merchant account"},
-    {path:"/help",scope:"#payments",label:"Open Trolleys"},
+    {path:"/",scope:"header",label:"Sign in to Trolleys"},
+    {path:"/software-partners",scope:"header",label:"Sign in to Trolleys"},
+    {path:"/credit-card-services",scope:"header",label:"Sign in to Trolleys"},
+    {path:"/payment-acceptance-service",scope:".merchant-hero",label:"Start now"},
+    {path:"/help",scope:"#payments",label:"Sign in to Trolleys"},
+    {path:"/",scope:"footer",label:"Sign in to Trolleys"},
+    {path:"/",scope:".ec-home-hero",label:"Start now"},
+    {path:"/merchant-onboarding",scope:"[data-service-actions]",label:"Start now"},
+    {path:"/online-businesses",scope:".online-business-actions",label:"Start now"},
+    {path:"/pricing",scope:".commercial-action",label:"Start now"},
+    {path:"/contact",scope:"#merchant-application",label:"Start now"},
+    {path:"/docs/merchant-onboarding",scope:"#create-account",label:"Start now"},
+    ...(isMobile ? [{path:"/",scope:"header",label:"Start now"}] : []),
   ];
   for(const [index,entry] of entries.entries()){
     await page.goto(`${entry.path}?handoff_probe=public-entry-${index}#visit`);
     if(entry.scope==="header")await openMainNavigation(page);
     const link=page.locator(entry.scope).getByRole("link",{name:entry.label,exact:true});
-    await expect(link).toHaveAttribute("href","https://trolleys.ai");
+    const destination = "https://merchantapp.io/etaildepot/UserAccount/Login";
+    await expect(link).toHaveAttribute("href",destination);
     await expect(link).toHaveAttribute("referrerpolicy","no-referrer");
     await expect(link).toHaveAttribute("rel",/\bnoreferrer\b/);
     await link.click();
-    await expect(page).toHaveURL("https://trolleys.ai/");
+    await expect(page).toHaveURL(destination);
     await expect(page.getByRole("heading",{name:"Payment service handoff captured",exact:true})).toBeVisible();
     expect(handoffs).toHaveLength(index+1);
-    expect(handoffs[index]).toEqual({url:"https://trolleys.ai/",method:"GET",referer:null});
+    expect(handoffs[index]).toEqual({url:destination,method:"GET",referer:null});
   }
   expect(changes).toEqual([]);expect(errors).toEqual([]);
 });

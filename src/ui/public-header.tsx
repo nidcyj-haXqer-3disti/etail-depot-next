@@ -44,7 +44,9 @@ export function PublicHeader() {
         : active === document.body && previous && root.contains(previous) && !previous.getClientRects().length ? previous : null;
       const menu = root.querySelector<HTMLElement>("#public-header-menu");
       const destination = desktop.matches
-        ? focused === toggle.current || focused?.matches(".public-nav-back")
+        ? focused?.matches(".header-start-now")
+          ? root.querySelector<HTMLElement>(".header-sign-in")
+          : focused === toggle.current || focused?.matches(".public-nav-back")
           ? root.querySelector<HTMLElement>(".public-navigation details[open] summary") ?? root.querySelector<HTMLElement>(".public-navigation summary.is-current") ?? root.querySelector<HTMLElement>(".public-navigation > a[aria-current]") ?? root.querySelector<HTMLElement>(".public-navigation summary") ?? root.querySelector<HTMLElement>(".brand-link")
           : null
         : focused && menu?.contains(focused) ? toggle.current : null;
@@ -131,7 +133,8 @@ export function PublicHeader() {
       <div id="public-header-menu" className={`public-header-menu${open ? " is-open" : ""}`}>
         <PublicNavigation onNavigate={() => { focusedControl.current = null; closeMenu(); }} />
         <div className="header-actions">
-          <PaymentPortalLink className="header-sign-in">Merchant access</PaymentPortalLink>
+          <PaymentPortalLink intent="register" className="header-start-now" />
+          <PaymentPortalLink intent="sign-in" className="header-sign-in" showArrow />
           <Link href="/contact" className="header-contact header-contact-primary" onClick={closeMenu}>Contact sales</Link>
         </div>
       </div>

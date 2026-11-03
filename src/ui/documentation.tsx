@@ -5,16 +5,15 @@ import { documentationJsonLd } from "@/modules/public-site/metadata";
 import { documentationArticles, type DocSection } from "@/modules/public-site/documentation-content";
 import { Shell } from "./shell";
 import { Icon } from "./icon";
-import { PaymentPortalLink } from "./service-entry";
 import { DocumentationNavigation } from "./documentation-navigation";
 import { DocumentationFlow } from "./documentation-diagrams";
+import { MerchantAccountGuide } from "./merchant-account-guide";
 import "./documentation.css";
 import "./enterprise-support.css";
 import "./connected-resources.css";
 import "./documentation-craft.css";
 
 function DocumentationLink({href,label}:{href:string;label:string}){
- if(href==="portal")return <div className="docs-account-entry"><PaymentPortalLink className="button primary">{label}</PaymentPortalLink><p>Trolleys is the account service for Etail Depot merchant services.</p></div>;
  return <Link className="docs-text-link" href={href}>{label}</Link>;
 }
 
@@ -23,6 +22,7 @@ function ArticleSection({section}:{section:DocSection}){
  return <section className="docs-section" id={section.id} aria-labelledby={`${section.id}-title`}>
   <h2 id={`${section.id}-title`}>{section.title}</h2>
   {section.paragraphs?.map(p=><p key={p}>{p}</p>)}
+  {section.illustratedGuide&&<MerchantAccountGuide kind={section.illustratedGuide}/>}
   {section.flow&&<DocumentationFlow kind={section.flow} steps={integratedSteps}/>}
   {section.steps&&!integratedSteps&&<ol className="docs-steps">{section.steps.map((step,i)=><li key={step.title}><span className="docs-step-number" aria-hidden="true">{i+1}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol>}
   {section.rows&&<dl className="docs-facts">{section.rows.map(row=><div key={row.title}><dt>{row.title}</dt><dd>{row.text}</dd></div>)}</dl>}

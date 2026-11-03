@@ -7,6 +7,7 @@ import { legalIdentity } from "@/shared/legal-identity";
 import { productFacts, saleRecordsOffer } from "@/shared/product-facts";
 import { serviceLabels } from "@/shared/service-language";
 import { Shell } from "@/ui/shell";
+import { PaymentPortalLink } from "@/ui/service-entry";
 import { Icon } from "@/ui/icon";
 import "@/ui/public-site.css";
 import "./help.css";
@@ -18,17 +19,17 @@ export const metadata = publicPageMetadata("/help");
 
 const topics = [
   {
-    id: "payments", label: serviceLabels.payments, link: hostedServices.payments.portalUrl, action: "Open Trolleys",
+    id: "payments", label: serviceLabels.payments, link: hostedServices.payments.signInUrl, action: "Sign in",
     questions: [
-      { q: "Can my business apply for a merchant account?", a: "US businesses can apply to accept payments in USD for goods, services or information. Applications open at Trolleys, the merchant account service operated by Etail Depot US, Inc. Review the fees, payout schedule and account terms before accepting the agreement. Payments can start once the account is approved and set up." },
+      { q: "Can my business apply for a merchant account?", a: <>US businesses can apply to accept payments in USD for goods, services or information. Start with <a href="/merchant-onboarding">merchant account setup</a> to prepare your application. Review the fees, payout schedule and account terms before accepting the agreement. Payments can start once the account is approved and set up.</> },
       { q: "Another provider declined my business. Can I still apply?", a: "Yes. Contact us with your business website, processing history and the reason given. We review each business separately. A decision from another provider does not determine our decision. Account approval is still required." },
       { q: "Can customers pay by ACH, Apple Pay or Google Pay?", a: "We confirm the payment and checkout options for your account during setup. ACH has separate fees and payout terms. Wallet availability also depends on the customer’s card and device. The published card rate and fee calculator cover card payments." },
-      { q: "How do I check a customer’s payment?", a: <>Use your Trolleys account to check the payment record and match its reference, amount and date to the customer’s order. A customer’s screenshot or confirmation message does not replace the account record. Contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> if the status is unclear.</> },
-      { q: "I’m not sure a payment went through. What should I do?", a: <>Check the original payment before asking the customer to pay again. A timeout or missing confirmation does not mean the payment failed. If you cannot confirm the result in your account, contact Trolleys support with the payment reference.</> },
+      { q: "How do I check a customer’s payment?", a: <>Use your merchant account to check the payment record and match its reference, amount and date to the customer’s order. A customer’s screenshot or confirmation message does not replace the account record. Contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> if the status is unclear.</> },
+      { q: "I’m not sure a payment went through. What should I do?", a: <>Check the original payment before asking the customer to pay again. A timeout or missing confirmation does not mean the payment failed. If you cannot confirm the result in your account, contact merchant support with the payment reference.</> },
       { q: "What will I pay to accept card payments?", a: <>For US businesses, the card processing fee for {productFacts.payments.offerName} is {productFacts.payments.cardRateLabel} per successful domestic online card payment in USD. No setup or monthly fee. Payment request creation, sharing and basic receipts are included. See <Link href="/pricing#fees">card processing fees</Link> for optional services and other applicable charges.</> },
-      { q: "When will the money reach my bank?", a: <>A completed payment does not mean the money has reached your bank. Check the payout status, expected timing and any review requirements in your Trolleys account. If a payout has not arrived, contact support with its reference. Do not ask the customer to pay again to resolve a missing payout. See <Link href="/payouts-and-reconciliation">payout information</Link>.</> },
-      { q: "How do I refund a customer?", a: <>Find the original payment and follow the refund instructions in your Trolleys account. Check whether a refund or dispute already exists before returning money again. You can track progress in the refund record. Processing the refund and posting it to the customer’s bank account are separate steps. See <Link href="/refunds-and-disputes">refund procedures</Link>.</> },
-      { q: "A customer disputed a payment. What should I do?", a: <>Open the dispute notice and check the reason, response deadline and requested evidence. Follow the instructions in your Trolleys account or contact support if you need help. If you have already refunded the payment, include that record. A refund does not automatically close a dispute, and closing a dispute does not confirm a refund.</> },
+      { q: "When will the money reach my bank?", a: <>A completed payment does not mean the money has reached your bank. Check the payout status, expected timing and any review requirements in your merchant account. If a payout has not arrived, contact support with its reference. Do not ask the customer to pay again to resolve a missing payout. See <Link href="/payouts-and-reconciliation">payout information</Link>.</> },
+      { q: "How do I refund a customer?", a: <>Find the original payment and follow the refund instructions in your merchant account. Check whether a refund or dispute already exists before returning money again. You can track progress in the refund record. Processing the refund and posting it to the customer’s bank account are separate steps. See <Link href="/refunds-and-disputes">refund procedures</Link>.</> },
+      { q: "A customer disputed a payment. What should I do?", a: <>Open the dispute notice and check the reason, response deadline and requested evidence. Follow the instructions in your merchant account or contact support if you need help. If you have already refunded the payment, include that record. A refund does not automatically close a dispute, and closing a dispute does not confirm a refund.</> },
       { q: "Is dispute prevention included?", a: <>Basic payment receipts are included. Optional {saleRecordsOffer.name} costs {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}, separate from payment processing. It shares purchase details with participating banks. Eligible Visa online fraud disputes may be prevented when enrollment, transaction history and data requirements are met. It does not cover every bank, payment or dispute reason, and no outcome is guaranteed. Refund programs and responses to existing chargebacks are separate services. Continue to follow dispute deadlines. Review the <Link href="/terms#dispute-prevention">coverage, fees and service terms</Link> before enrollment.</> },
     ],
   },
@@ -56,9 +57,10 @@ const topics = [
   {
     id: "access", label: "Help signing in",
     questions: [
-      { q: "Where do I sign in to my merchant account?", a: "Follow the instructions for signing in provided with your Trolleys account. If you are new to the service, visit Trolleys to apply." },
-      { q: "I can’t sign in. What should I do?", a: <>Follow the recovery instructions supplied with your Trolleys account, or contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> for help.</> },
-      { q: "Does my merchant account include a credit card account?", a: "No. A Trolleys account does not create a Ledgix account. Merchant and card services have separate account relationships." },
+      { q: "Where do I sign in to my merchant account?", a: <>Sign in and Start now open the Trolleys welcome page at merchantapp.io. Enter your email, then choose Sign In for an existing account or Register for a new account. Trolleys is an Etail Depot service. See the <Link href="/docs/merchant-onboarding#create-account">account setup steps with screenshots</Link>. Registration does not approve or activate merchant services.</> },
+      { q: "Why can’t I enter my email on the registration page?", a: <>The registration page carries your email from Welcome and does not let you edit it. If the field is blank or incorrect, choose Sign in above Register New Account to return to Welcome. Enter the email you want to use, then choose Register. <Link href="/docs/merchant-onboarding#registration-email">See where to enter your email</Link>.</> },
+      { q: "I can’t sign in. What should I do?", a: <>Follow the recovery instructions supplied with your merchant account, or contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> for help.</> },
+      { q: "Does my merchant account include a credit card account?", a: "No. A merchant account does not include a credit card account. Merchant and card services have separate account relationships." },
       { q: "How can I access records from my old Etail Depot account?", a: <>Earlier Etail Depot accounts are no longer accessible on this website. For access, correction or deletion requests about those records, email <a href={`mailto:${legalIdentity.complianceEmail}`}>{legalIdentity.complianceEmail}</a>. You do not need to sign in. Records are not automatically deleted when account access ends; applicable rights and retention requirements still apply. See <Link href="/privacy#choices">your privacy request choices</Link>.</> },
     ],
   },
@@ -85,7 +87,7 @@ export default function HelpPage() {
         </article>
         <article className="help-support-card">
           <h2><a href="#access">Help signing in</a></h2>
-          <p>Use your account instructions or find help recovering access.</p>
+          <p>Find account setup steps and help with a blank registration email.</p>
         </article>
       </section>
       <div className="help-support-notes">
@@ -98,7 +100,7 @@ export default function HelpPage() {
       {topics.map(topic => <section key={topic.id} id={topic.id} className="help-guide">
         <h2>{topic.label}</h2>
         <div className="public-questions">{topic.questions.map(item => <details key={item.q}><summary>{item.q}<span aria-hidden="true">+</span></summary><p>{item.a}</p></details>)}</div>
-        {topic.id === "payments" && topic.link && <a className="welcome-text-link" href={topic.link} referrerPolicy="no-referrer" rel="noreferrer">{topic.action}</a>}
+        {topic.id === "payments" && topic.link && <PaymentPortalLink intent="sign-in" className="welcome-text-link">{topic.action}</PaymentPortalLink>}
       </section>)}
     </div>
   </div></Shell>;

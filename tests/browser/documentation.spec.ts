@@ -99,8 +99,8 @@ test("merchant journey connects service, use case and account instructions witho
  await docsNavigation.getByRole('link',{name:'Documentation',exact:true}).click();
  await page.locator('.docs-task-paths').getByRole('link',{name:'Set up an account',exact:true}).click();
  await expect(page).toHaveURL(/\/docs\/merchant-onboarding$/);
- const portal=page.getByRole('main').getByRole('link',{name:'Continue to Trolleys',exact:true});
- await expect(portal).toHaveAttribute('href','https://trolleys.ai');
+ const portal=page.getByRole('main').getByRole('link',{name:'Start now',exact:true});
+ await expect(portal).toHaveAttribute('href','https://merchantapp.io/etaildepot/UserAccount/Login');
  await expect(portal).toHaveAttribute('referrerpolicy','no-referrer');
  await openDocumentationTopic(page,'payment-requests');
  await expect(page).toHaveURL(/\/docs\/payment-requests$/);
@@ -144,7 +144,7 @@ test("card inquiries stay separate from merchant applications and developer acce
  await navigation.getByRole('link',{name:'Card services',exact:true}).click();
  await expect(page).toHaveURL(/\/credit-card-services$/);
  await expect(page.getByRole('main')).toContainText('An inquiry is not an application.');
- await expect(page.getByRole('main').locator('a[href^="https://trolleys.ai"],a[href^="/docs"]')).toHaveCount(0);
+ await expect(page.getByRole('main').locator('a[href^="https://merchantapp.io/etaildepot/UserAccount/Login"],a[href^="/docs"]')).toHaveCount(0);
  for(const link of await page.getByRole('main').getByRole('link',{name:'Ask about card services',exact:true}).all())await expect(link).toHaveAttribute('href','/contact#cards');
 });
 
@@ -302,4 +302,46 @@ test("phone readers reach document sections before the preparation panels", asyn
     await target.click();
     await expect(page.locator(href! + " > h2")).toBeInViewport();
   }
+});
+
+
+test("blank registration email help leads to the illustrated recovery steps", async ({ page }) => {
+ await page.goto('/help#access');
+ const question = page.locator('#access details').filter({hasText:'Why can’t I enter my email on the registration page?'});
+ await question.locator('summary').focus();
+ await page.keyboard.press('Enter');
+ await question.getByRole('link', {name:'See where to enter your email',exact:true}).click();
+ await expect(page).toHaveURL(/\/docs\/merchant-onboarding#registration-email$/);
+ const recovery = page.locator('#registration-email');
+ await expect(recovery.getByRole('heading')).toBeInViewport();
+ await expect(recovery).toContainText('Choose Sign in above the Register New Account heading.');
+ await expect(recovery.getByRole('img')).toHaveAttribute('src','/help/merchant-account/blank-registration.jpg');
+ await expect.poll(() => recovery.getByRole('img').evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0)).toBe(true);
+ await expect(page.locator('main form,main input,main iframe')).toHaveCount(0);
+ await expect(page.getByRole('main').getByRole('link', {name:'Start now',exact:true})).toHaveAttribute('href','https://merchantapp.io/etaildepot/UserAccount/Login');
+});
+
+test("account screenshot instructions work without JavaScript at desktop and phone widths", async ({ browser }, testInfo) => {
+ const context = await browser.newContext({javaScriptEnabled:false});
+ const page = await context.newPage();
+ for (const width of [1440,390,320]) {
+  await page.setViewportSize({width,height:1000});
+  await page.goto('http://127.0.0.1:3100/docs/merchant-onboarding#create-account');
+  const guide=page.locator('#create-account');
+  await expect(guide.getByRole('heading',{level:3})).toHaveText(['Enter your email on Welcome','Check your email and create a password','Sign in with your new password']);
+  for(const image of await page.locator('#create-account img,#registration-email img').all()) {
+   await image.scrollIntoViewIfNeeded();
+   await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth === 1280)).toBe(true);
+   expect(await image.getAttribute('alt')).toBeTruthy();
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+  const entry=guide.getByRole('link',{name:'Start now',exact:true});
+  await expect(entry).toHaveAttribute('referrerpolicy','no-referrer');
+  await expect(entry).toHaveAttribute('rel',/noreferrer/);
+  await page.goto('http://127.0.0.1:3100/docs/merchant-onboarding#create-account');
+  await page.screenshot({path:testInfo.outputPath(`account-guide-${width}.png`)});
+  await page.goto('http://127.0.0.1:3100/docs/merchant-onboarding#registration-email');
+  await page.screenshot({path:testInfo.outputPath(`account-recovery-${width}.png`)});
+ }
+ await context.close();
 });

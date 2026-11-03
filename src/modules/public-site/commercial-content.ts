@@ -1,3 +1,4 @@
+import { hostedServices } from "@/shared/hosted-services";
 import { SERVICE_DETAIL_PAGES } from "./service-detail-content";
 /** Public decision pages. Account specifications remain in the assigned integration documentation. */
 export interface CommercialPage {
@@ -23,14 +24,14 @@ export const COMMERCIAL_PAGES = {
     description: "Review Etail’s credit card processing fees, estimate the cost of domestic online payments and check additional charges, ACH pricing and platform terms.",
     heading: "Clear pricing for card processing.",
     intro: "Review card processing rates, estimate fees and check additional charges. ACH and platform terms are confirmed separately.",
-    action: { label: "Discuss your processing costs", href: "/contact#payment-review" },
-    secondaryAction: { label: "Discuss platform terms", href: "/contact#platforms" },
+    action: { label: "Start now", href: hostedServices.payments.registrationUrl },
+    secondaryAction: { label: "Discuss your processing costs", href: "/contact#payment-review" },
     art: { title: "A complete view of payment costs", caption: "The card processing estimate is not a guaranteed bank deposit.", steps: [
       { title: "Card processing", detail: "Percentage plus a fixed fee" }, { title: "Other charges", detail: "Payment type · account activity" }, { title: "Account terms", detail: "ACH · platform · payout schedule" },
     ] },
     sections: [{ title: "ACH and platform pricing.", intro: "ACH payments and software partnerships have separate pricing and account terms.", items: [
       { title: "ACH payments", text: "Confirm your ACH pricing, payout terms, authorization requirements, return handling and other charges. Available options depend on your account." },
-      { title: "Software partnerships", text: "Platform pricing reflects your integration, implementation costs and support responsibilities. Access and commercial terms are confirmed before launch." },
+      { title: "Software partnerships", href: "/contact#platforms", text: "Platform pricing reflects your integration, implementation costs and support responsibilities. Access and commercial terms are confirmed before launch." },
       { title: "Payouts and account conditions", text: "Read the payout schedule and any reserve or hold conditions in your merchant agreement. A fee estimate cannot predict when a deposit will arrive or every adjustment applied to it." },
     ] }],
   },
@@ -103,7 +104,7 @@ export const COMMERCIAL_PAGES = {
     ] },
     sections: [
       { title: "Protect account access and payment data.", items: [
-        { title: "Account access", text: "Apply for or manage your merchant account through Trolleys. Keep credentials private and limit access to authorized people. Submit verification documents through the secure account service." },
+        { title: "Account access", text: "Use Sign in to access your merchant account. Keep credentials private and limit access to authorized people. Submit verification documents through the secure account service." },
         { title: "Checkout and integration", text: "Confirm where payment details are entered, which systems receive them and who can access them. Request the specifications and permissions for your account before connecting your software." },
         { title: "Payment security requirements", text: "Merchants retain responsibilities under the Payment Card Industry Data Security Standard (PCI DSS) when using a payment provider. Confirm the assessment and documentation required for your business with your acquiring partner or the organization managing your compliance program." },
       ] },

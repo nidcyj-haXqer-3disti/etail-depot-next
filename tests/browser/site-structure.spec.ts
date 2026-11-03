@@ -75,8 +75,8 @@ test("Documentation connects tasks and keeps account access protected", async ({
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/docs");
   await page.locator(".docs-task-paths").getByRole("link", { name: "Set up an account", exact: true }).click();
   await expect(page).toHaveURL(/\/docs\/merchant-onboarding$/);
-  const portal = page.getByRole("main").getByRole("link", { name: "Continue to Trolleys", exact: true });
-  await expect(portal).toHaveAttribute("href", "https://trolleys.ai");
+  const portal = page.getByRole("main").getByRole("link", { name: "Start now", exact: true });
+  await expect(portal).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
   await expect(portal).toHaveAttribute("referrerpolicy", "no-referrer");
   await expect(page.locator("form, iframe, input")).toHaveCount(0);
   expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/docs");
@@ -133,7 +133,7 @@ test("online business use case owns the merchant walkthrough and preserves navig
   expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/online-businesses");
   await openFooterGroup(page, "Services");
   await expect(page.getByRole("contentinfo").getByRole("link", { name: "Merchant onboarding", exact: true })).toHaveAttribute("href", "/merchant-onboarding");
-  const service = page.locator(".online-business-actions").getByRole("link", { name: "Explore merchant services", exact: true });
+  const service = page.locator(".online-business-actions").getByRole("link", { name: "Merchant services", exact: true });
   await expect(service).toHaveAttribute("href", "/payment-acceptance-service");
   await page.getByRole("link", { name: "Connect online checkout", exact: true }).click();
   await expect(page).toHaveURL(/\/docs\/checkout$/);

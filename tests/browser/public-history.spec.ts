@@ -90,3 +90,19 @@ test("unhydrated pages preserve calculator, wallet and ISO reference behavior", 
     await context.close();
   }
 });
+
+
+test("Help application guidance opens account setup at the beginning", async ({ page }) => {
+  await page.goto("/help");
+  await page.locator("#payments summary").filter({ hasText: "Can my business apply for a merchant account?" }).click();
+  const setup = page.getByRole("link", { name: "merchant account setup", exact: true });
+  await setup.scrollIntoViewIfNeeded();
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+  await setup.click();
+  await expect(page).toHaveURL(/\/merchant-onboarding$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(1);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/help$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Help center");
+});

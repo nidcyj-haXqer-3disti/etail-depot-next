@@ -4,10 +4,10 @@ test("merchant services explain the lifecycle, pricing and safe account handoff"
   await page.goto("/payment-acceptance-service");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Accept card\s*and ACH payments\./);
   const fees = page.locator("#fees");
-  for (const [container, name] of [[page.locator(".merchant-hero"), "Apply for a merchant account"]] as const) {
+  for (const [container, name] of [[page.locator(".merchant-hero"), "Start now"]] as const) {
     const continuation = container.getByRole("link", { name, exact: true });
     await expect(continuation).toBeVisible();
-    await expect(continuation).toHaveAttribute("href", "https://trolleys.ai");
+    await expect(continuation).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
     await expect(continuation).toHaveAttribute("referrerpolicy", "no-referrer");
     await expect(continuation).toHaveAttribute("rel", /\bnoreferrer\b/);
   }
@@ -42,7 +42,7 @@ test("merchant services explain the lifecycle, pricing and safe account handoff"
   const setup = page.locator("#payments details").filter({ hasText: "Can my business apply for a merchant account?" });
   await setup.locator("summary").click();
   await expect(setup).toContainText("Payments can start once the account is approved and set up");
-  await expect(setup).toContainText("the merchant account service operated by Etail Depot US, Inc.");
+  await expect(setup.getByRole("link", { name: "merchant account setup", exact: true })).toHaveAttribute("href", "/merchant-onboarding");
   const wallets = page.locator("#payments details").filter({ hasText: "Can customers pay by ACH, Apple Pay or Google Pay?" });
   await wallets.locator("summary").click();
   await expect(wallets).toContainText("checkout options for your account during setup");

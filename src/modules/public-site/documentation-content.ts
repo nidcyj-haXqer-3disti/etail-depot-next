@@ -7,12 +7,11 @@ export type DocSection = {
   note?: { title: string; text: string };
   flow?: "onboarding" | "checkout" | "records" | "payouts" | "events" | "requests" | "access" | "launch" | "recovery" | "disputes";
   table?: DocTable; outcome?: string;
+  illustratedGuide?: "registration" | "email-recovery";
   details?: DocRow[]; link?: { label: string; href: string };
 };
 type DocArticle = { introduction: string; prerequisites: string[]; sections: DocSection[] };
 
-// Public task documentation. Vendor provenance lives in the local research record;
-// assigned API contracts are requested through the integration team, not simulated here.
 export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
   "merchant-onboarding": {
     "introduction": documentationMetadata["/docs/merchant-onboarding"].description,
@@ -22,6 +21,16 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
       "Your website, products and expected processing activity"
     ],
     "sections": [
+      {
+        "id": "create-account",
+        "title": "Create your account",
+        "illustratedGuide": "registration"
+      },
+      {
+        "id": "registration-email",
+        "title": "Email blank or incorrect?",
+        "illustratedGuide": "email-recovery"
+      },
       {
         "id": "prepare",
         "title": "Prepare the business information",
@@ -45,11 +54,7 @@ export const documentationArticles: Record<DocumentationSlug, DocArticle> = {
             "title": "Payout account",
             "text": "The receiving bank account and any documents requested to verify it. Confirm that the information belongs to the business applying."
           }
-        ],
-        "link": {
-          "label": "Continue to Trolleys",
-          "href": "portal"
-        }
+        ]
       },
       {
         "id": "application-review",
