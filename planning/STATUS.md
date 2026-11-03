@@ -1,5 +1,9 @@
 # 2026-10-30 Company navigation update
 
+## Checkout loading test timing correction, 3 November 2026
+
+GitHub push run 41583996026 found a 10 pixel geometry difference at 320 pixels. Delaying stylesheets locally reproduced the same failure. The test was measuring default browser geometry before stylesheet completion. It now waits for the server rendered stylesheets before recording the baseline while scripts remain held. The one pixel tolerance and all geometry comparisons are unchanged. A 500 millisecond stylesheet delay retains this race as an explicit regression condition. All 27 repeated checkout loading, keyboard and no JavaScript checks pass across 320, 390 and 1440 pixels. No application code or design changed for this correction. The four full local checks and GitHub CI are being refreshed for the corrected candidate before merge and deployment. Evidence: outputs/artwork-publication-20261103/checkout-race-reproduction.log and checkout-race-fixed.log in the local Downloads checkout.
+
 ## Artwork publication candidate, 3 November 2026
 
 The user explicitly authorized pushing and deploying the reviewed artwork loading candidate. The exact production source fingerprint is 40fc78cdb03a669c7f4323a8cfb988c79339201f0d157e4ca60fb9ab6fab4e2d. The shared header retains Merchant access. The release preserves all 3,740 content pages, 3,738 eligible sitemap URLs, artwork bytes, layout, public copy and provider handoffs.
