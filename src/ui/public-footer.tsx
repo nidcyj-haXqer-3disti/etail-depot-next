@@ -1,6 +1,7 @@
 import { BrandImage } from "./brand-image";
 import "./brand-images-etail.css";
 import Link from "next/link";
+import { PaymentPortalLink } from "./service-entry";
 import { FooterNavigation } from "./footer-navigation";
 import { legalIdentity } from "@/shared/legal-identity";
 
@@ -18,9 +19,12 @@ export function PublicFooter() {
             <p>© {new Date().getUTCFullYear()} <span className="public-footer-company-name">{legalIdentity.company}</span> All rights reserved.</p>
           </div>
         </div>
-        <nav className="public-footer-legal" aria-label="Footer legal">
-          <Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link>
-        </nav>
+        <div className="public-footer-utilities">
+          <PaymentPortalLink intent="sign-in" className="public-footer-sign-in" />
+          <nav className="public-footer-legal" aria-label="Footer legal">
+            <Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link>
+          </nav>
+        </div>
       </div>
     </div>
   </footer>;

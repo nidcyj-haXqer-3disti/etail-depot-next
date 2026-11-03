@@ -1,6 +1,7 @@
 import type { ServiceDetailPath } from "@/modules/public-site/service-detail-content";
 import { CommercialStructuredData } from "./commercial-structured-data";
 import Link from "next/link";
+import { hostedServices } from "@/shared/hosted-services";
 import { COMMERCIAL_PAGES, type CommercialPage as PageContent, type CommercialPath } from "@/modules/public-site/commercial-content";
 import { Shell } from "./shell";
 import { Icon } from "./icon";
@@ -72,7 +73,7 @@ export function CommercialPage({ path }: { path: Exclude<CommercialPath, Service
       artwork={<AttentionArt kind="provider" />}
     /> : <section className="commercial-hero"><div className="container">
       <div className="commercial-hero-copy"><div><p className="eyebrow">{page.label}</p><h1>{page.heading}</h1></div><div><p className="commercial-lead">{page.intro}</p>
-        <div className="commercial-action">{page.action.href === "https://trolleys.ai" ? <PaymentPortalLink className="cta">{page.action.label}</PaymentPortalLink> : <Link className="cta" href={page.action.href}>{page.action.label}<Icon name="arrow" /></Link>}{page.secondaryAction && <Link className="text-link" href={page.secondaryAction.href}>{page.secondaryAction.label}</Link>}</div>
+        <div className="commercial-action">{page.action.href === hostedServices.payments.registrationUrl ? <PaymentPortalLink intent="register" className="cta">{page.action.label}</PaymentPortalLink> : <Link className="cta" href={page.action.href}>{page.action.label}<Icon name="arrow" /></Link>}{page.secondaryAction && <Link className="text-link" href={page.secondaryAction.href}>{page.secondaryAction.label}</Link>}</div>
         {page.note && <p className="commercial-note">{page.note}</p>}
       </div></div>
       {contextKind ? <CompanyContextArt kind={contextKind} /> : path !== "/pricing" && <ServiceDiagram path={path} page={page} />}

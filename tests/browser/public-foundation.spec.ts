@@ -65,9 +65,9 @@ test("the shared company header stays consistent and its compact menu works with
       await expect(current).toHaveAttribute("href", "/guides");
       await expect(current).toHaveAttribute("aria-current", "location");
     } else await expect(current).toHaveCount(0);
-    const action = header.getByRole("link", { name: "Merchant access", exact: true });
+    const action = header.getByRole("link", { name: "Sign in to Trolleys", exact: true });
     await expect(action).toBeVisible();
-    await expect(action).toHaveAttribute("href", "https://trolleys.ai");
+    await expect(action).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
     await expect(action).toHaveAttribute("referrerpolicy", "no-referrer");
     await expect(action).toHaveAttribute("rel", /\bnoreferrer\b/);
     await expect(header.getByRole("link", { name: "Ask about card services", exact: true })).toHaveCount(0);
@@ -145,7 +145,7 @@ test("the shared company header stays consistent and its compact menu works with
   await expect(navigation).toBeHidden();
   await expect(menu).toBeFocused();
 
-  const pageAction = page.locator("main").getByRole("link", { name: "Apply for a merchant account", exact: true });
+  const pageAction = page.locator("main").getByRole("link", { name: "Start now", exact: true });
   await pageAction.focus();
   await page.setViewportSize({ width: 960, height: 900 });
   await expect(pageAction).toBeFocused();
@@ -263,12 +263,13 @@ test("a new visitor can review payment eligibility and card inquiries without a 
   await expect(mainNavigation.locator("summary").filter({hasText:/^Services$/})).toHaveClass("is-current");
   await closeMainNavigation(page);
   await expect(page.locator(".merchant-hero")).toContainText("Credit card processing and ACH for US businesses in USD, with account setup, online checkout and payment reporting.");
-  await expect(page.locator(".merchant-hero .ec-hero-actions a").first()).toHaveText("Discuss your business");
-  await expect(page.locator(".merchant-hero .ec-hero-actions a").first()).toHaveAttribute("href", "/contact#payment-review");
+  await expect(page.locator(".merchant-hero .ec-hero-actions a").first()).toHaveText("Start now");
+  await expect(page.locator(".merchant-hero .ec-hero-actions a").first()).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
+  await expect(page.locator(".merchant-hero").getByRole("link", { name: "Discuss your business", exact: true })).toHaveAttribute("href", "/contact#payment-review");
   await expectLoadedNetworkMarks(page.getByLabel("Accepted card networks", {exact:true}));
   await expect(page.locator(".merchant-hero")).toContainText("Account approval and setup apply.");
-  const paymentEntry = page.locator(".merchant-hero").getByRole("link",{name:"Apply for a merchant account",exact:true});
-  await expect(paymentEntry).toHaveAttribute("href", "https://trolleys.ai");
+  const paymentEntry = page.locator(".merchant-hero").getByRole("link",{name:"Start now",exact:true});
+  await expect(paymentEntry).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
   await expect(paymentEntry).toHaveAttribute("referrerpolicy", "no-referrer");
   await expect(page.locator('a[href^="/login"], a[href^="/cardholder-services"], a[href^="/merchant-services"]')).toHaveCount(0);
   expect(errors).toEqual([]);
@@ -305,10 +306,10 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
   await expect(page).toHaveURL(/\/help#access$/);
   const recovery=page.locator("summary").filter({hasText:"I can’t sign in. What should I do?"});
   await recovery.focus();await page.keyboard.press("Enter");
-  await expect(recovery.locator("..")).toContainText("Follow the recovery instructions supplied with your Trolleys account");
+  await expect(recovery.locator("..")).toContainText("Follow the recovery instructions supplied with your merchant account");
   await expect(recovery.locator("..").getByRole("link",{name:"trolleys@etaildepot.com"})).toHaveAttribute("href","mailto:trolleys@etaildepot.com");
   await openMainNavigation(page);
-  await expect(page.getByRole("banner").getByRole("link",{name:"Merchant access",exact:true})).toHaveAttribute("href", "https://trolleys.ai");
+  await expect(page.getByRole("banner").getByRole("link",{name:"Sign in to Trolleys",exact:true})).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
 });
 
 test("public pages have unique canonical metadata and no private data", async ({page,request}) => {
@@ -372,7 +373,7 @@ test("payment previews stay local and the provider handoff drops visitor data", 
     if (!["GET", "HEAD", "OPTIONS"].includes(request.method())) {
       mutations.push(request.method() + " " + request.url());
       await route.abort("blockedbyclient");
-    } else if (url.origin === "https://trolleys.ai") {
+    } else if (url.origin === "https://merchantapp.io") {
       // Capture navigation locally; never contact a real provider account.
       if (!request.isNavigationRequest()) { await route.fulfill({status:204,body:""}); return; }
       providerRequests.push({url:request.url(), method:request.method(), referer:await request.headerValue("referer")});
@@ -408,16 +409,16 @@ test("payment previews stay local and the provider handoff drops visitor data", 
   expect(externalRequests).toEqual([]);
 
   await page.goto("/payment-acceptance-service?handoff_probe=public-example-check");
-  const openTools = page.locator(".merchant-hero").getByRole("link", {name:"Apply for a merchant account", exact:true});
-  await expect(openTools).toHaveAttribute("href", "https://trolleys.ai");
+  const openTools = page.locator(".merchant-hero").getByRole("link", {name:"Start now", exact:true});
+  await expect(openTools).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
   await expect(openTools).toHaveAttribute("referrerpolicy", "no-referrer");
   await expect(openTools).toHaveAttribute("rel", /\bnoreferrer\b/);
   await openTools.focus();
   await expect(openTools).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL("https://trolleys.ai/");
+  await expect(page).toHaveURL("https://merchantapp.io/etaildepot/UserAccount/Login");
   await expect(page.getByRole("heading", {name:"Payment service handoff captured",exact:true})).toBeVisible();
-  expect(providerRequests).toEqual([{url:"https://trolleys.ai/",method:"GET",referer:null}]);
+  expect(providerRequests).toEqual([{url:"https://merchantapp.io/etaildepot/UserAccount/Login",method:"GET",referer:null}]);
   expect(mutations).toEqual([]);
   expect(privateReads).toEqual([]);
   expect(externalRequests).toEqual([]);
@@ -811,4 +812,49 @@ test("mobile navigation preserves the reading position and leaves reference navi
       expect((await index.boundingBox())!.y).toBeGreaterThanOrEqual(headerBox.height - 1);
     }
   }
+});
+
+
+test("account actions remain distinct and reachable across mobile menu and desktop breakpoints", async ({ page }) => {
+  await page.goto("/");
+  const header = page.getByRole("banner");
+  const menu = header.getByRole("button", { name: "Menu", exact: true });
+  const start = header.getByRole("link", { name: "Start now", exact: true });
+  const signIn = header.getByRole("link", { name: "Sign in to Trolleys", exact: true });
+  const contact = header.getByRole("link", { name: "Contact sales", exact: true });
+  for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }]) {
+    await page.setViewportSize(viewport);
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    const footerSignIn = await page.locator(".public-footer-sign-in").boundingBox();
+    expect(footerSignIn!.width).toBeGreaterThanOrEqual(44);
+    expect(footerSignIn!.height).toBeGreaterThanOrEqual(44);
+    await expect(start).toBeHidden();
+    await expect(signIn).toBeHidden();
+    await menu.click();
+    for (const link of [start, signIn, contact]) {
+      await expect(link).toBeInViewport({ ratio: 1 });
+      const box = await link.boundingBox();
+      expect(box!.height).toBeGreaterThanOrEqual(44);
+    }
+    await expect(start).toHaveAccessibleDescription("Enter your email on the Trolleys welcome page, then choose Register. Account approval is required.");
+    await expect(signIn).toHaveAccessibleDescription("Trolleys is an Etail Depot service. Enter your email on the welcome page to access your merchant account.");
+    await expect(page.locator("main")).toHaveAttribute("inert", "");
+    await start.focus();
+    await page.keyboard.press("Tab");
+    await expect(signIn).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(contact).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeFocused();
+    await expect(page.locator("main")).not.toHaveAttribute("inert", "");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
+  }
+  await menu.click();
+  await start.focus();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect(start).toBeHidden();
+  await expect(signIn).toBeFocused();
+  await expect(contact).toBeVisible();
+  await expect(menu).toBeHidden();
+  await expect(page.getByRole("contentinfo").getByRole("link", { name: "Sign in to Trolleys", exact: true })).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
 });

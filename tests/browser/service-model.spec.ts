@@ -183,15 +183,15 @@ test("payment specimens cannot collect credentials, submit payments or advance a
 
 test("Trolleys entrance remains fixed and does not inherit a visitor query or fragment", async ({ page }) => {
   await page.goto("/payment-acceptance-service?account=sample-account&next=https%3A%2F%2Fexample.com#customer-checkout");
-  const links = page.getByRole("link", { name: "Apply for a merchant account", exact: true });
+  const links = page.getByRole("link", { name: "Start now", exact: true });
   expect(await links.count()).toBeGreaterThanOrEqual(1);
   for (const link of await links.all()) {
-    await expect(link).toHaveAttribute("href", "https://trolleys.ai");
+    await expect(link).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
     await expect(link).toHaveAttribute("referrerpolicy", "no-referrer");
     await expect(link).toHaveAttribute("rel", /\bnoreferrer\b/);
   }
-  await expect(page.locator('a[href^="https://trolleys.ai?"]')).toHaveCount(0);
-  await expect(page.locator('a[href^="https://trolleys.ai#"]')).toHaveCount(0);
+  await expect(page.locator('a[href^="https://merchantapp.io/etaildepot/UserAccount/Login?"]')).toHaveCount(0);
+  await expect(page.locator('a[href^="https://merchantapp.io/etaildepot/UserAccount/Login#"]')).toHaveCount(0);
 });
 
 test("software partner preview stays out of indexing and offers contact rather than unapproved API access", async ({ page }) => {

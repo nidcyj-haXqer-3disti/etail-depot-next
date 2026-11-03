@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { hostedServices } from "@/shared/hosted-services";
 import type { ReactNode } from "react";
 import { SERVICE_DETAIL_PAGES, type ServiceDetailContent, type ServiceDetailPath } from "@/modules/public-site/service-detail-content";
 import { canonicalOrigin } from "@/shared/public-release";
@@ -30,7 +31,7 @@ export function ServiceDetailPage({ path }: { path: ServiceDetailPath }) {
   }[page.kind];
   return <Shell><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured).replace(/</g, "\\u003c") }} /><div className={s.page} data-service-page={page.kind}>
     <ServiceDetailHero label={page.label} title={page.heading} intro={page.intro} note={page.note} actions={<>
-      {page.action.href === "https://trolleys.ai" ? <PaymentPortalLink className={s.primary}>{page.action.label}</PaymentPortalLink> : <Link className={s.primary} href={page.action.href}>{page.action.label}</Link>}
+      {page.action.href === hostedServices.payments.registrationUrl ? <PaymentPortalLink intent="register" className={s.primary}>{page.action.label}</PaymentPortalLink> : <Link className={s.primary} href={page.action.href}>{page.action.label}</Link>}
       {page.secondaryAction && <Link className={s.secondary} href={page.secondaryAction.href}>{page.secondaryAction.label}</Link>}
     </>} artwork={<ServiceDetailArt kind={page.kind} title={page.art.title} caption={page.art.caption} />} />
     <section id={overview.id} className={s.overview} aria-labelledby="service-section-1"><div className={s.container}>

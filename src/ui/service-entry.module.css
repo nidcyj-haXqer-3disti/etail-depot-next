@@ -1,0 +1,15 @@
+.label { white-space: nowrap; }
+.action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.arrow { display: block; flex: none; width: 14px; height: 14px; overflow: visible; }
+.shaft { opacity: 0; transform: scaleX(.6); transform-origin: 3px 8px; }
+.tip { transform: translateX(0); }
+.action:focus-visible .shaft { opacity: 1; transform: scaleX(1); }
+.action:focus-visible .tip { transform: translateX(2px); }
+@media (hover: hover) and (pointer: fine) {
+  .action:hover .shaft { opacity: 1; transform: scaleX(1); }
+  .action:hover .tip { transform: translateX(2px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .shaft { transition: opacity 160ms ease, transform 160ms ease; }
+  .tip { transition: transform 160ms ease; }
+}

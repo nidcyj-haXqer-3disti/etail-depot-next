@@ -32,7 +32,7 @@ test("commercial pages have distinct decisions, exact canonicals and direct prim
 test("merchant application and contact routes never forward visitor input", async ({ page }) => {
   for (const path of ["/merchant-onboarding", "/contact"]) {
     await page.goto(`${path}?merchant=private&next=https://other.invalid`);
-    const application = page.locator('main a[href="https://trolleys.ai"]');
+    const application = page.locator('main a[href="https://merchantapp.io/etaildepot/UserAccount/Login"]');
     await expect(application).toHaveCount(1);
     await expect(application).toHaveAttribute("rel", /noreferrer/);
     await expect(application).toHaveAttribute("referrerpolicy", "no-referrer");
@@ -58,9 +58,9 @@ test("merchants can discuss processing costs before applying while platforms rea
   await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
   await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
-  await expect(page.locator('main a[href="https://trolleys.ai"]')).toHaveAttribute("referrerpolicy", "no-referrer");
+  await expect(page.locator('main a[href="https://merchantapp.io/etaildepot/UserAccount/Login"]')).toHaveAttribute("referrerpolicy", "no-referrer");
   await page.goBack();
-  await page.getByRole("link", { name: "Discuss platform terms", exact: true }).click();
+  await page.getByRole("link", { name: "Software partnerships", exact: true }).click();
   await expect(page).toHaveURL(/\/contact#platforms$/);
   await expect(page.locator("#platforms")).toBeInViewport();
   await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
@@ -151,7 +151,7 @@ test("a merchant can request a review without submitting an application", async 
   await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await expect(page.locator("#merchant-application")).toContainText("Account approval and setup apply.");
   await expect(page.locator("main form, main input, main textarea")).toHaveCount(0);
-  await expect(page.locator('main a[href="https://trolleys.ai"]')).toHaveAttribute("referrerpolicy", "no-referrer");
+  await expect(page.locator('main a[href="https://merchantapp.io/etaildepot/UserAccount/Login"]')).toHaveAttribute("referrerpolicy", "no-referrer");
 });
 
 test("contact options remain usable without JavaScript", async ({ browser, baseURL }) => {

@@ -21,7 +21,7 @@ export const PUBLIC_PAGES = {
   "/": { title: "Merchant Services for Businesses and Platforms", description: "Merchant services for US businesses and software platforms. Credit card processing, ACH payments, online checkout and payout reporting." },
   "/credit-card-services": { title: "Card Services: Ledgix Secured Credit Card", description: `${cardProduct.name}: virtual ${cardProduct.creditType}, $${productFacts.cards.minimumDepositDollars} minimum deposit, ${cardFeesDescription}. ${productFacts.cards.repayment}.` },
   "/payment-acceptance-service": { title: "Merchant Services and Credit Card Processing", description: "Merchant services and credit card processing for US businesses. Explore account setup, online checkout, ACH payments, refunds and payout reporting." },
-  "/help": { title: "Help Center", description: "Get help with merchant account access, payment status, refunds, disputes and payouts. Find contacts for software integrations, card inquiries and privacy." },
+  "/help": { title: "Merchant and Card Services Help Center", description: "Get help with merchant account access, payment status, refunds, disputes and payouts. Find contacts for software integrations, card inquiries and privacy." },
   "/guides": { title: "ISO 20022 and ISO 8583 Payment References", description: "Find ISO 20022 external code definitions and independent ISO 8583 message and field explanations, with their code set, implementation and source context." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
@@ -77,7 +77,7 @@ export const SERVICE_PAGES = {
   ...COMMERCIAL_PAGES,
   ...documentationMetadata,
   "/online-businesses": { title: "Online Payments and Checkout", description: "Accept credit cards, digital wallets and ACH online. Connect checkout to orders and payment records using the methods enabled for your merchant account." },
-  "/docs": { title: "Documentation", description: "Set up a merchant account, connect checkout and follow payments through to reconciliation." },
+  "/docs": { title: "Merchant Services Documentation", description: "Merchant account setup, checkout integration, payment updates, refunds and payout reconciliation for businesses and software platforms." },
   "/software-partners": { title: "Merchant Services for Software Platforms", description: "Merchant accounts, credit card processing, checkout and reporting for software platforms, with guidance on integration and merchant eligibility." },
 } as const;
 export function servicePageMetadata(path: keyof typeof SERVICE_PAGES): Metadata {

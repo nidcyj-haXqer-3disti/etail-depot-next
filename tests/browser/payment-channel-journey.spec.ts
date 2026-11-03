@@ -7,7 +7,7 @@ async function blockAccountActions(page: Page) {
   await page.route("**/*", async route => {
     const request = route.request();
     const url = new URL(request.url());
-    if (!["GET", "HEAD", "OPTIONS"].includes(request.method()) || url.pathname.startsWith("/api/") || ["trolleys.ai", "ledgix.com"].includes(url.hostname)) {
+    if (!["GET", "HEAD", "OPTIONS"].includes(request.method()) || url.pathname.startsWith("/api/") || ["trolleys.ai", "merchantapp.io", "ledgix.com"].includes(url.hostname)) {
       unexpected.push(`${request.method()} ${url.origin}${url.pathname}`);
       await route.abort("blockedbyclient");
     } else await route.continue();
