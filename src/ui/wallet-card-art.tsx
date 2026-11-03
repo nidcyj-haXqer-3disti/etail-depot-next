@@ -1,5 +1,7 @@
 "use client";
 
+import { applePay, googlePay } from "./artwork-assets";
+
 import Image from "next/image";
 import { BrandImage } from "./brand-image";
 import "./brand-images-ledgix.css";
@@ -13,8 +15,8 @@ import "./wallet-card-art.css";
 const wallets = ["Apple Wallet", "Google Wallet"] as const;
 type Wallet = typeof wallets[number];
 const payMarks = {
-  "Apple Wallet": { src: "/brand/wallets/apple-pay.svg", width: 165.52107, height: 105.9651, className: "wallet-setup-apple-pay" },
-  "Google Wallet": { src: "/brand/wallets/google-pay.svg", width: 1094, height: 742, className: "wallet-setup-google-pay" },
+  "Apple Wallet": { src: applePay, width: 165.52107, height: 105.9651, className: "wallet-setup-apple-pay" },
+  "Google Wallet": { src: googlePay, width: 1094, height: 742, className: "wallet-setup-google-pay" },
 } as const;
 const steps = ["Add card", "Verify", "Use wallet"] as const;
 const guides = {

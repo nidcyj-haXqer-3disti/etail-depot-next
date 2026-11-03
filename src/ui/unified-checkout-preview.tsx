@@ -1,5 +1,7 @@
 "use client";
 
+import { applePay, googlePay } from "./artwork-assets";
+
 import Image from "next/image";
 import { useId, useRef, useState, useSyncExternalStore } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
@@ -99,8 +101,8 @@ export function UnifiedCheckoutPreview({ showPreviewNotice = true }: { showPrevi
             </div>
             <div className="unified-preview-wallets" role="group" aria-label="Wallet payment options">
               <div className="unified-preview-wallet-marks">
-                <span className="unified-preview-wallet-option"><Image src="/brand/wallets/apple-pay.svg" width={165.52107} height={105.9651} alt="Apple Pay" className="unified-preview-apple" loading="eager" unoptimized /></span>
-                <span className="unified-preview-wallet-option"><Image src="/brand/wallets/google-pay.svg" width={1094} height={742} alt="Google Pay" className="unified-preview-google" loading="eager" unoptimized /></span>
+                <span className="unified-preview-wallet-option"><Image src={applePay} width={165.52107} height={105.9651} alt="Apple Pay" className="unified-preview-apple" loading="eager" unoptimized /></span>
+                <span className="unified-preview-wallet-option"><Image src={googlePay} width={1094} height={742} alt="Google Pay" className="unified-preview-google" loading="eager" unoptimized /></span>
               </div>
             </div>
             <div className="unified-preview-networks" role="group" aria-label="Card networks">

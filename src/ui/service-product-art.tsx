@@ -1,3 +1,4 @@
+import { applePay, googlePay } from "./artwork-assets";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { CommercialPage } from "@/modules/public-site/commercial-content";
@@ -28,7 +29,7 @@ export function ServiceProductArt({ kind, art }: { kind: Kind; art: CommercialPa
         <div className={s.orderContext}><Badge icon="box">Customer purchase</Badge><span>Order reference · Amount · Merchant</span></div>
         <div className={s.checkoutSheet}><div className={s.sheetHeading}><strong>Payment methods</strong><Icon name="lock" /></div><div className={s.methodChoices}>
           <div><span className={s.methodSymbol}><Icon name="card" /></span><strong>Credit and debit cards</strong><span>Visa · Mastercard · Amex · Discover</span></div>
-          <div><span className={s.methodSymbol}><Icon name="card" /></span><strong>Digital wallets</strong><span className={s.walletMarks}><Image src="/brand/wallets/apple-pay.svg" width={43} height={26} alt="Apple Pay" unoptimized /><Image src="/brand/wallets/google-pay.svg" width={52} height={26} alt="Google Pay" unoptimized /></span></div>
+          <div><span className={s.methodSymbol}><Icon name="card" /></span><strong>Digital wallets</strong><span className={s.walletMarks}><Image src={applePay} width={43} height={26} alt="Apple Pay" unoptimized loading="eager" /><Image src={googlePay} width={52} height={26} alt="Google Pay" unoptimized loading="eager" /></span></div>
           <div><span className={s.methodSymbol}><Icon name="bank" /></span><strong>ACH bank payment</strong><span>From a US bank account</span></div>
         </div><div className={s.sheetFoot}><Icon name="link" />Payment result linked to the order</div></div>
       </>}

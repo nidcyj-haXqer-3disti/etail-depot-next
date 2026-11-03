@@ -1,3 +1,4 @@
+import { brandSymbol } from "./artwork-assets";
 import Image from "next/image";
 import { Icon } from "./icon";
 import styles from "./platform-account-art.module.css";
@@ -41,7 +42,7 @@ export function PlatformAccountArt({ title, caption }: { title: string; caption:
             <div><dt>Account records</dt><dd>Payments and payouts</dd></div>
           </dl>
           <div className={styles.service}>
-            <span className={styles.brandMark}><Image src="/brand/symbol.png" width={36} height={22} alt="" unoptimized /></span>
+            <span className={styles.brandMark}><Image src={brandSymbol} width={36} height={22} alt="" unoptimized preload /></span>
             <div><strong>Etail Depot</strong><span>Merchant services</span></div>
           </div>
         </div>

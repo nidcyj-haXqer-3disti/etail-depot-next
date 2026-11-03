@@ -1,6 +1,9 @@
+import { brandSymbol } from "./artwork-assets";
+import { preload } from "react-dom";
 import styles from "./contact-hero.module.css";
 
 function ContactIllustration() {
+  preload(brandSymbol.src, { as: "image" });
   return <div className={styles.art} aria-hidden="true">
     <svg viewBox="0 0 500 330" fill="none" focusable="false" strokeLinecap="round" strokeLinejoin="round">
       <ellipse cx="254" cy="179" rx="174" ry="137" fill="#eff4e8" />
@@ -9,7 +12,7 @@ function ContactIllustration() {
       <path d="m92 147 158 89 158-89" stroke="#47705a" strokeWidth="1.2" />
       <g transform="rotate(-7 250 145)">
         <rect x="143" y="44" width="214" height="211" rx="12" fill="#fff" stroke="#cbd8c5" strokeWidth="1.2" />
-        <image href="/brand/symbol.png" x="169" y="68" width="66" height="40" />
+        <image href={brandSymbol.src} x="169" y="68" width="66" height="40" />
         <path d="M170 135h129M170 151h93" stroke="#dce6d7" strokeWidth="6" strokeLinecap="round" />
       </g>
       <path d="M92 147 250 235 408 147V273a13 13 0 0 1-13 13H105a13 13 0 0 1-13-13Z" fill="#cbdcbb" />
