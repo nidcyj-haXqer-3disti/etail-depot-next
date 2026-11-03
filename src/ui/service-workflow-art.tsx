@@ -1,3 +1,4 @@
+import { brandSymbol } from "./artwork-assets";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { CommercialPage, CommercialPath } from "@/modules/public-site/commercial-content";
@@ -8,8 +9,8 @@ import { ServiceProductArt } from "./service-product-art";
 type Artwork = CommercialPage["art"];
 export const workflowArtPaths = ["/merchant-onboarding", "/payment-methods", "/payouts-and-reconciliation", "/refunds-and-disputes", "/payment-partnerships"] as const;
 
-function Mark() {
-  return <span className={styles.mark}><Image src="/brand/symbol.png" alt="" width={36} height={22} unoptimized /></span>;
+function Mark({ priority = false }: { priority?: boolean }) {
+  return <span className={styles.mark}><Image src={brandSymbol} alt="" width={36} height={22} unoptimized preload={priority} loading={priority ? undefined : "eager"} /></span>;
 }
 function Frame({ art, icon, kind, children }: { art: Artwork; icon: string; kind: string; children: ReactNode }) {
   return <figure className={styles.art} data-service-workflow={kind} aria-label={art.title}>
@@ -26,7 +27,7 @@ export function ServiceWorkflowArt({ path, art }: { path: CommercialPath; art: A
   return <Frame art={art} icon="layers" kind="partnerships">
     <div className={styles.body}><div className={styles.platform}><Icon name="layers"/><span>Your software</span><strong>The purchase experience</strong><span>Orders, invoices and bookings</span></div><div className={styles.branch}>
       <div className={styles.branchCard}><span className={styles.branchIcon}><Icon name="business"/></span><span className={styles.small}>The selling business</span><strong>Merchant</strong><ul><li>Customer relationship</li><li>Account agreement</li><li>Purchase and delivery</li></ul></div>
-      <div className={`${styles.branchCard} ${styles.dark}`}><Mark/><span className={styles.small}>Merchant services</span><strong>Etail Depot</strong><ul><li>Account setup</li><li>Payment acceptance</li><li>Operational support</li></ul></div>
+      <div className={`${styles.branchCard} ${styles.dark}`}><Mark priority/><span className={styles.small}>Merchant services</span><strong>Etail Depot</strong><ul><li>Account setup</li><li>Payment acceptance</li><li>Operational support</li></ul></div>
     </div></div><div className={styles.recordFoot}><Icon name="link"/><span>Merchant, order and payment references</span></div>
   </Frame>;
 }

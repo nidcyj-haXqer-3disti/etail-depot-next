@@ -45,7 +45,7 @@ test(`${name} network logos load with page styles and eager Discover delivery on
   let discoverRequested = false;
   await page.route("**/*", async route => {
     const request = route.request();
-    if (new URL(request.url()).pathname === "/brand/networks/discover.jpg") discoverRequested = true;
+    if (/^\/_next\/static\/media\/discover\.[^/]+\.jpg$/.test(new URL(request.url()).pathname)) discoverRequested = true;
     if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
     await route.continue();
   });
@@ -85,13 +85,16 @@ test("home presents Etail brand artwork and local product discovery without acco
   const hero=page.locator(".ec-home-hero");
   const art=hero.locator("[data-company-art]");
   await expect(art).toBeVisible();
-  const symbol=art.locator('img[src="/brand/symbol.png"]');
+  const symbol=art.locator('img[src^="/_next/static/media/symbol."]');
   await expect(symbol).toHaveCount(1);
   await expect(symbol).toBeVisible();
   await expect(symbol).toHaveAttribute("width","800");
   await expect(symbol).toHaveAttribute("height","484");
+  await expect(symbol).not.toHaveAttribute("loading","lazy");
+  const symbolSource=await symbol.getAttribute("src");
+  await expect(page.locator(`head link[rel="preload"][as="image"][href="${symbolSource}"]`)).toHaveCount(1);
   await expectDecodedBrandMarks(symbol);
-  await expect(art.locator('img[src^="/marketing/"]')).toHaveCount(0);
+  await expect(art.locator('img[src*="everyday-sneaker"]')).toHaveCount(0);
   await expect(art).not.toContainText(/Designer sneaker|Studio Store|10482/);
   await expect(art).toHaveAccessibleName(/Etail Depot connects three service areas:.*Merchant accounts require approval/);
   const artBox=await art.boundingBox(),copyBox=await hero.locator("[data-home-copy]").boundingBox();
@@ -392,4 +395,34 @@ test("payment entry points hand off only the approved portal address without que
     expect(handoffs[index]).toEqual({url:"https://trolleys.ai/",method:"GET",referer:null});
   }
   expect(changes).toEqual([]);expect(errors).toEqual([]);
+});
+
+
+test("opening artwork symbols load before styles and scripts on first visit and refresh", async ({ page }) => {
+  test.setTimeout(60_000);
+  let releaseResources = () => {};
+  let resourcesReady = Promise.resolve();
+  let symbolRequested = false;
+  await page.route("**/*", async route => {
+    const request = route.request();
+    if (/\/_next\/static\/media\/symbol\.[^/]+\.png$/.test(new URL(request.url()).pathname)) symbolRequested = true;
+    if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
+    await route.continue();
+  });
+  for (const path of ["/", "/software-partners", "/switch-payment-providers", "/merchant-onboarding", "/payment-partnerships", "/platform-payment-models", "/payment-facilitator", "/contact"]) {
+    for (const refresh of [false, true]) {
+      symbolRequested = false;
+      resourcesReady = new Promise<void>(resolve => { releaseResources = resolve; });
+      try {
+        if (refresh) await page.reload({ waitUntil: "commit" });
+        else await page.goto(path, { waitUntil: "commit" });
+        await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
+      } finally { releaseResources(); }
+      await page.waitForLoadState("load");
+      const preloads = page.locator('head link[rel="preload"][as="image"][href*="/symbol."]');
+      await expect(preloads).toHaveCount(1);
+      await expect(page.locator('img[src*="/symbol."][loading="lazy"]')).toHaveCount(0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
+    }
+  }
 });

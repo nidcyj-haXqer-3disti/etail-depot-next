@@ -1,3 +1,4 @@
+import { brandSymbol } from "./artwork-assets";
 import Image from "next/image";
 import { Icon } from "./icon";
 import styles from "./home-overview.module.css";
@@ -12,7 +13,7 @@ export function HomeCompanyArt() {
       <path d="M330 306V350Q330 374 354 374H448V480" />
     </svg>
     <div className={styles.artBrand} aria-hidden="true">
-      <Image src="/brand/symbol.png" alt="" width={800} height={484} unoptimized />
+      <Image src={brandSymbol} alt="" width={800} height={484} unoptimized preload />
       <strong>Etail Depot</strong>
     </div>
     <div className={`${styles.artPanel} ${styles.merchantPanel}`} aria-hidden="true">

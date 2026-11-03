@@ -1,3 +1,4 @@
+import { brandSymbol } from "./artwork-assets";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { ServiceKind } from "@/modules/public-site/service-detail-content";
@@ -28,7 +29,7 @@ export function ServiceDetailArt({ kind, title, caption, cardFace }: ServiceDeta
       {kind === "onboarding" && <>
         <div className={s.sceneHeading}><Label icon="business">Merchant application</Label><strong>Your business comes first.</strong></div>
         <div className={s.onboardingGrid}>
-          <div className={s.profilePaper}><div className={s.paperHeading}><Image src="/brand/symbol.png" alt="" width={34} height={22} unoptimized /><span>Business profile</span></div><Node icon="business" title="Business" detail="Activity and sales channels" /><Node icon="person" title="Ownership" detail="Owners and representatives" /><Node icon="bank" title="Bank account" detail="Where payouts are received" /></div>
+          <div className={s.profilePaper}><div className={s.paperHeading}><Image src={brandSymbol} alt="" width={34} height={22} unoptimized preload /><span>Business profile</span></div><Node icon="business" title="Business" detail="Activity and sales channels" /><Node icon="person" title="Ownership" detail="Owners and representatives" /><Node icon="bank" title="Bank account" detail="Where payouts are received" /></div>
           <div className={s.accountStages}><div><span>01</span><strong>Account review</strong><small>Information and eligibility</small></div><div><span>02</span><strong>Agreement</strong><small>Fees and service terms</small></div><div><span>03</span><strong>Activation</strong><small>After approval and setup</small></div></div>
         </div>
       </>}

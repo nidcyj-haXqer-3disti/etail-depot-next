@@ -24,3 +24,22 @@ test("embedded marks preserve every byte of the original artwork and stay small"
   // Large artwork stays a separately cached resource rather than growing every HTML response.
   expect(bytes).toBeLessThan(32_768);
 });
+
+
+test("versioned artwork sources remain byte identical to the approved public originals", () => {
+  const artwork = [
+    "brand/symbol.png",
+    "brand/wallets/apple-pay.svg",
+    "brand/wallets/google-pay.svg",
+    "brand/networks/visa-blue.svg",
+    "brand/networks/mastercard.svg",
+    "brand/networks/american-express.svg",
+    "brand/networks/discover.jpg",
+    "marketing/everyday-sneaker-v2.webp",
+  ];
+  for (const file of artwork) {
+    const original = readFileSync(new URL(`../../public/${file}`, import.meta.url));
+    const imported = readFileSync(new URL(`../../src/ui/assets/${file.split("/").at(-1)}`, import.meta.url));
+    expect(imported, file).toEqual(original);
+  }
+});

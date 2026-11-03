@@ -1,3 +1,4 @@
+import { discoverMark } from "./artwork-assets";
 import Image from "next/image";
 import { BrandImage } from "./brand-image";
 import "./brand-images-networks.css";
@@ -7,7 +8,7 @@ const networks = {
   visa: { name: "Visa", width: 278.075, height: 169.374 },
   mastercard: { name: "Mastercard", width: 126, height: 82.8 },
   amex: { name: "American Express", width: 45, height: 45 },
-  discover: { name: "Discover", src: "/brand/networks/discover.jpg", width: 521, height: 342 },
+  discover: { name: "Discover", src: discoverMark, width: 521, height: 342 },
 } as const;
 
 type Network = keyof typeof networks;

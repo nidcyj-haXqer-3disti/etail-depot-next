@@ -1,5 +1,5 @@
 /** Keep small, frequently visible marks available with the page, without altering the originals. */
-import { readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const root = new URL("../", import.meta.url);
 const groups = {
@@ -19,4 +19,20 @@ for (const [group, images] of Object.entries(groups)) {
   });
   writeFileSync(new URL(`src/ui/brand-images-${group}.css`, root),
     "/* Generated from original public/brand assets. Regenerate: node tools/generate-inline-brand-images.mjs */\n" + lines.join("\n") + "\n");
+}
+
+// Preserve public compatibility URLs while giving rendered artwork versioned cache keys.
+const artwork = [
+  "brand/symbol.png",
+  "brand/wallets/apple-pay.svg",
+  "brand/wallets/google-pay.svg",
+  "brand/networks/visa-blue.svg",
+  "brand/networks/mastercard.svg",
+  "brand/networks/american-express.svg",
+  "brand/networks/discover.jpg",
+  "marketing/everyday-sneaker-v2.webp",
+];
+mkdirSync(new URL("src/ui/assets/", root), { recursive: true });
+for (const file of artwork) {
+  copyFileSync(new URL(`public/${file}`, root), new URL(`src/ui/assets/${file.split("/").at(-1)}`, root));
 }

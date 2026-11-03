@@ -9,6 +9,11 @@ for (const width of [320, 390, 1440]) {
     let release!: () => void;
     const scripts = new Promise<void>(resolve => { release = resolve; });
     await page.route("**/*.js", async route => { await scripts; await route.continue(); });
+    // Slow styles expose a race between DOM visibility and the first styled layout.
+    await page.route("**/*.css", async route => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await route.continue();
+    });
     try {
       await page.goto("/online-businesses#customer-checkout", { waitUntil: "commit" });
       const explorer = page.locator(".payment-service-explorer");
@@ -16,6 +21,12 @@ for (const width of [320, 390, 1440]) {
       await expect(checkout).toBeVisible();
       await expect(explorer.getByRole("tabpanel", { name: "Onboarding", exact: true })).toBeHidden();
       await expect(explorer.getByRole("tab", { name: "Checkout", exact: true })).toBeDisabled();
+      // A visible DOM node can still have default browser geometry before CSS arrives.
+      // Keep scripts blocked until the server rendered stylesheet layout is ready.
+      await page.waitForFunction(() => {
+        const styles = [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')];
+        return styles.length > 0 && styles.every(style => style.sheet !== null);
+      });
       await page.evaluate(() => document.fonts.ready);
       const geometry = () => page.evaluate(() => Object.fromEntries([
         ".payment-service-explorer", ".pse-tabs", ".unified-preview",

@@ -432,7 +432,7 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
     const art = path === "/payment-acceptance-service" ? page.locator(".ec-reconciliation-art") : page.locator(path === "/" ? "[data-company-art]" : "[data-attention-art=platform]");
     await expect(art).toBeVisible();
     if (path === "/") {
-      const symbol = art.locator('img[src="/brand/symbol.png"]');
+      const symbol = art.locator('img[src^="/_next/static/media/symbol."]');
       await expect(symbol).toHaveCount(1);
       await expect(symbol).toHaveAttribute("width", "800");
       await expect(symbol).toHaveAttribute("height", "484");
@@ -672,7 +672,7 @@ test("switching wallets never shows the previous payment mark while the new logo
     let requestedLogo!: () => void;
     const heldLogo = new Promise<void>(resolve => { releaseLogo = resolve; });
     const logoRequested = new Promise<void>(resolve => { requestedLogo = resolve; });
-    await page.route("**/brand/wallets/google-pay.svg", async route => {
+    await page.route(/\/_next\/static\/media\/google-pay\.[^/]+\.svg$/, async route => {
       requestedLogo();
       await heldLogo;
       await route.continue();
@@ -689,17 +689,17 @@ test("switching wallets never shows the previous payment mark while the new logo
       await google.click();
       await expect(google).toHaveAttribute("aria-selected", "true");
       await expect(visibleMark).toHaveCount(1);
-      await expect(visibleMark).toHaveAttribute("src", "/brand/wallets/google-pay.svg");
+      await expect(visibleMark).toHaveAttribute("src", /\/_next\/static\/media\/google-pay\.[^/]+\.svg$/);
       await logoRequested;
       expect(await visibleMark.evaluate((img: HTMLImageElement) => img.complete)).toBe(false);
       // Do not reuse the decoded Apple image for a still-loading Google source.
       expect(await visibleMark.evaluate((img, previous) => img === previous, previousMark)).toBe(false);
-      expect(await visibleMark.evaluate((img: HTMLImageElement) => img.currentSrc)).not.toContain("apple-pay.svg");
+      expect(await visibleMark.evaluate((img: HTMLImageElement) => img.currentSrc)).not.toContain("apple-pay.");
       await apple.click();
       await expect(apple).toHaveAttribute("aria-selected", "true");
       releaseLogo();
       await page.waitForLoadState("load");
-      expect(await visibleMark.evaluate((img: HTMLImageElement) => img.currentSrc)).toContain("apple-pay.svg");
+      expect(await visibleMark.evaluate((img: HTMLImageElement) => img.currentSrc)).toContain("apple-pay.");
       await google.click();
       await expect(google).toHaveAttribute("aria-selected", "true");
       await expect.poll(() => visibleMark.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
@@ -707,8 +707,8 @@ test("switching wallets never shows the previous payment mark while the new logo
       for (const tab of [apple, google, apple, google]) {
         await tab.click();
         await expect(tab).toHaveAttribute("aria-selected", "true");
-        const mark = tab === apple ? "apple-pay.svg" : "google-pay.svg";
-        expect(await visibleMark.evaluate((img: HTMLImageElement) => new URL(img.currentSrc).pathname)).toBe(`/brand/wallets/${mark}`);
+        const mark = tab === apple ? "apple-pay" : "google-pay";
+        expect(await visibleMark.evaluate((img: HTMLImageElement) => new URL(img.currentSrc).pathname)).toMatch(new RegExp(`^/_next/static/media/${mark}\\.[^/]+\\.svg$`));
         await expect(guide.getByRole("button", {name:"Show step 1: Add card", exact:true})).toHaveAttribute("aria-pressed", "true");
       }
     } finally {

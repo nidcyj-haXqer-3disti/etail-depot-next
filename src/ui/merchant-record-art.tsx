@@ -1,3 +1,4 @@
+import { applePay, googlePay, visaMark, mastercardMark, amexMark, discoverMark } from "./artwork-assets";
 import Image from "next/image";
 import { Icon } from "./icon";
 import s from "./merchant-record-art.module.css";
@@ -7,8 +8,8 @@ export function PaymentChoiceArt() {
   return <div className={s.choiceArt} role="img" aria-label="Customer checkout for order 10482 offers enabled cards, digital wallets and ACH. The same order reference connects to the merchant payment record. A browser return does not confirm payment.">
     <div aria-hidden="true">
       <div className={s.checkout}><div className={s.checkoutHeading}><span>Order #10482</span><Icon name="lock" /></div><strong className={s.checkoutTitle}>Choose how to pay.</strong>
-        <div className={s.wallets}><div><Image src="/brand/wallets/apple-pay.svg" alt="" width={52} height={32} unoptimized loading="eager" /></div><div><Image src="/brand/wallets/google-pay.svg" alt="" width={57} height={32} unoptimized loading="eager" /></div></div>
-        <div className={s.cardMethod}><div><Icon name="card" /><strong>Credit or debit card</strong></div><div className={s.networks}><Image src="/brand/networks/visa-blue.svg" alt="" width={37} height={24} unoptimized loading="eager" /><Image src="/brand/networks/mastercard.svg" alt="" width={30} height={24} unoptimized loading="eager" /><Image src="/brand/networks/american-express.svg" alt="" width={24} height={24} unoptimized loading="eager" /><Image src="/brand/networks/discover.jpg" alt="" width={39} height={24} unoptimized loading="eager" /></div></div>
+        <div className={s.wallets}><div><Image src={applePay} alt="" width={52} height={32} unoptimized loading="eager" /></div><div><Image src={googlePay} alt="" width={57} height={32} unoptimized loading="eager" /></div></div>
+        <div className={s.cardMethod}><div><Icon name="card" /><strong>Credit or debit card</strong></div><div className={s.networks}><Image src={visaMark} alt="" width={37} height={24} unoptimized loading="eager" /><Image src={mastercardMark} alt="" width={30} height={24} unoptimized loading="eager" /><Image src={amexMark} alt="" width={24} height={24} unoptimized loading="eager" /><Image src={discoverMark} alt="" width={39} height={24} unoptimized loading="eager" /></div></div>
         <div className={s.bankMethod}><Icon name="bank" /><span>US bank account</span><strong>ACH</strong></div>
       </div>
       <div className={s.recordBridge}><Icon name="link" /><span>Keep the order reference</span></div>

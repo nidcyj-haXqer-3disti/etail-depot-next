@@ -1,3 +1,4 @@
+import { brandSymbol } from "./artwork-assets";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { Icon } from "./icon";
@@ -30,7 +31,7 @@ export function AttentionHero({ id, label, title, intro, actions, note, artwork,
 }
 
 function Mark() {
-  return <span className={styles.mark}><Image src="/brand/symbol.png" alt="" width={800} height={484} unoptimized /></span>;
+  return <span className={styles.mark}><Image src={brandSymbol} alt="" width={800} height={484} unoptimized preload /></span>;
 }
 
 export function AttentionArt({ kind }: { kind: "business" | "platform" | "provider" }) {
