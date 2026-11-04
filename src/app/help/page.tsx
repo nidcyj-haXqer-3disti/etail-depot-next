@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
 import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
 import { cardProduct } from "@/shared/card-product";
@@ -12,7 +13,6 @@ import { Icon } from "@/ui/icon";
 import "@/ui/public-site.css";
 import "./help.css";
 import "@/ui/enterprise-support.css";
-import { ResourceBreadcrumb } from "@/ui/resource-context";
 import "@/ui/connected-resources.css";
 
 export const metadata = publicPageMetadata("/help");
@@ -26,11 +26,11 @@ const topics = [
       { q: "Can customers pay by ACH, Apple Pay or Google Pay?", a: "We confirm the payment and checkout options for your account during setup. ACH has separate fees and payout terms. Wallet availability also depends on the customer’s card and device. The published card rate and fee calculator cover card payments." },
       { q: "How do I check a customer’s payment?", a: <>Use your merchant account to check the payment record and match its reference, amount and date to the customer’s order. A customer’s screenshot or confirmation message does not replace the account record. Contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> if the status is unclear.</> },
       { q: "I’m not sure a payment went through. What should I do?", a: <>Check the original payment before asking the customer to pay again. A timeout or missing confirmation does not mean the payment failed. If you cannot confirm the result in your account, contact merchant support with the payment reference.</> },
-      { q: "What will I pay to accept card payments?", a: <>For US businesses, the card processing fee for {productFacts.payments.offerName} is {productFacts.payments.cardRateLabel} per successful domestic online card payment in USD. No setup or monthly fee. Payment request creation, sharing and basic receipts are included. See <Link href="/pricing#fees">card processing fees</Link> for optional services and other applicable charges.</> },
+      { q: "What will I pay to accept card payments?", a: <>Our published offer for US businesses is {productFacts.payments.cardRateLabel} per successful domestic online card payment in USD. No setup or monthly fee. Payment request creation, sharing and basic receipts are included. Your accepted fee schedule determines your charges. See <Link href="/pricing#fees">card processing fees</Link> for optional services and other applicable charges.</> },
       { q: "When will the money reach my bank?", a: <>A completed payment does not mean the money has reached your bank. Check the payout status, expected timing and any review requirements in your merchant account. If a payout has not arrived, contact support with its reference. Do not ask the customer to pay again to resolve a missing payout. See <Link href="/payouts-and-reconciliation">payout information</Link>.</> },
       { q: "How do I refund a customer?", a: <>Find the original payment and follow the refund instructions in your merchant account. Check whether a refund or dispute already exists before returning money again. You can track progress in the refund record. Processing the refund and posting it to the customer’s bank account are separate steps. See <Link href="/refunds-and-disputes">refund procedures</Link>.</> },
       { q: "A customer disputed a payment. What should I do?", a: <>Open the dispute notice and check the reason, response deadline and requested evidence. Follow the instructions in your merchant account or contact support if you need help. If you have already refunded the payment, include that record. A refund does not automatically close a dispute, and closing a dispute does not confirm a refund.</> },
-      { q: "Is dispute prevention included?", a: <>Basic payment receipts are included. Optional {saleRecordsOffer.name} costs {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}, separate from payment processing. It shares purchase details with participating banks. Eligible Visa online fraud disputes may be prevented when enrollment, transaction history and data requirements are met. It does not cover every bank, payment or dispute reason, and no outcome is guaranteed. Refund programs and responses to existing chargebacks are separate services. Continue to follow dispute deadlines. Review the <Link href="/terms#dispute-prevention">coverage, fees and service terms</Link> before enrollment.</> },
+      { q: "Is dispute prevention included?", a: <>Basic payment receipts are included. Optional {saleRecordsOffer.name} costs {saleRecordsOffer.rateLabel} {saleRecordsOffer.feeBasis}, separate from payment processing. It shares purchase details with participating banks. Eligible Visa online fraud disputes may be prevented when enrollment, transaction history and data requirements are met. It does not cover every bank, payment or dispute reason, and no outcome is guaranteed. Refund programs and responses to existing chargebacks are separate services. Continue to follow dispute deadlines. Review the <Link href="/legal/fees#optional-service">coverage, fees and service terms</Link> before enrollment.</> },
     ],
   },
   {
@@ -57,9 +57,10 @@ const topics = [
   {
     id: "access", label: "Help signing in",
     questions: [
-      { q: "Where do I sign in to my merchant account?", a: <>Sign in and Start now open the Trolleys welcome page at merchantapp.io. Enter your email, then choose Sign In for an existing account or Register for a new account. Trolleys is an Etail Depot service. See the <Link href="/docs/merchant-onboarding#create-account">account setup steps with screenshots</Link>. Registration does not approve or activate merchant services.</> },
-      { q: "Why can’t I enter my email on the registration page?", a: <>The registration page carries your email from Welcome and does not let you edit it. If the field is blank or incorrect, choose Sign in above Register New Account to return to Welcome. Enter the email you want to use, then choose Register. <Link href="/docs/merchant-onboarding#registration-email">See where to enter your email</Link>.</> },
-      { q: "I can’t sign in. What should I do?", a: <>Follow the recovery instructions supplied with your merchant account, or contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> for help.</> },
+      { q: "Where do I sign in to my merchant account?", a: <>Choose Sign in to Trolleys. On a phone, open Menu first. {merchantAccountGuidance.signIn} See the <Link href="/docs/merchant-onboarding#sign-in">sign in instructions</Link>.</> },
+      { q: "How do I create a merchant login?", a: <>Choose Start now. Enter your email on Welcome, then choose Register to create your password. Follow the <Link href="/docs/merchant-onboarding#create-account">account setup steps with screenshots</Link>. {merchantAccountGuidance.approval}</> },
+      { q: "Why can’t I enter my email on the registration page?", a: <>{merchantAccountGuidance.registrationEmail} Choose Sign in above Register New Account to return to Welcome and enter the correct email. Choose Register for a new account or Sign In for an existing account. <Link href="/docs/merchant-onboarding#registration-email">See where to enter your email</Link>.</> },
+      { q: "I can’t sign in. What should I do?", a: <>{merchantAccountGuidance.registeredEmail} For other access problems, follow the account recovery instructions or contact <a href={hostedServices.payments.contactHref}>{hostedServices.payments.email}</a> for help.</> },
       { q: "Does my merchant account include a credit card account?", a: "No. A merchant account does not include a credit card account. Merchant and card services have separate account relationships." },
       { q: "How can I access records from my old Etail Depot account?", a: <>Earlier Etail Depot accounts are no longer accessible on this website. For access, correction or deletion requests about those records, email <a href={`mailto:${legalIdentity.complianceEmail}`}>{legalIdentity.complianceEmail}</a>. You do not need to sign in. Records are not automatically deleted when account access ends; applicable rights and retention requirements still apply. See <Link href="/privacy#choices">your privacy request choices</Link>.</> },
     ],
@@ -70,8 +71,6 @@ export default function HelpPage() {
   return <Shell>
     <PublicPageStructuredData path="/help" /><div className="cw-help">
     <section className="page-container public-help-intro">
-      <ResourceBreadcrumb items={[{name:"Etail Depot",href:"/"},{name:"Help",href:"/help"}]} />
-      <p className="eyebrow">Support</p>
       <h1>Help center</h1>
       <p>Get help with a merchant account, a payment or card services. Choose a topic or contact the team responsible for your account.</p>
       <section className="help-support-grid" aria-label="Support contacts">
@@ -87,7 +86,7 @@ export default function HelpPage() {
         </article>
         <article className="help-support-card">
           <h2><a href="#access">Help signing in</a></h2>
-          <p>Find account setup steps and help with a blank registration email.</p>
+          <p>Sign in, continue an application or fix a registration email.</p>
         </article>
       </section>
       <div className="help-support-notes">

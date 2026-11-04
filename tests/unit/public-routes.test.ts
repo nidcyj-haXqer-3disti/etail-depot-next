@@ -1,3 +1,4 @@
+import { LEGAL_CENTER_PATHS } from "../../src/shared/legal-paths";
 import { describe, expect, it, vi } from "vitest";
 import { managedContentRoute, retiredRoute } from "../../src/shared/public-routes";
 import { canonicalOrigin, defaultOrigin, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release";
@@ -322,7 +323,7 @@ describe("public Edge search and security policy", () => {
       }
     }
   });
-  it.each(["/privacy", "/privacy/", "/privacy.html", "/terms", "/terms/index.html"])("keeps the legal page %s private in production", async path => {
+  it.each(["/privacy", "/privacy/", "/privacy.html", "/terms", "/terms/index.html", ...LEGAL_CENTER_PATHS.flatMap(path => [path, `${path}/`, `${path}.html`, `${path}.txt`, `${path}/index.html`])])("keeps the legal page %s private in production", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });

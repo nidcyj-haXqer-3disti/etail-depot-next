@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
+import { reviewedLegalPageSources } from "./public-artifact-policy.ts";
 import { PUBLIC_CONTENT_PATHS, INDEXABLE_PUBLIC_PATHS } from "../src/shared/public-page-inventory.ts";
 /** Fail closed when source data, provenance notices or the frozen inventory changes. */
 export function verifyReferenceRelease(root) {
@@ -13,6 +14,22 @@ export function verifyReferenceRelease(root) {
   assert.equal(existsSync(path.join(root, "src/modules/public-site/iso8583-data.json")), false, "Reproduced ISO tables are not part of this release.");
   for (const [file, expected] of Object.entries(receipt.files)) {
     assert.equal(createHash("sha256").update(readFileSync(path.join(root, file))).digest("hex"), expected, `${file}: reference source or notice changed; review and record the new source before packaging.`);
+  }
+  const legal = receipt.legalPublication;
+  assert(legal?.reviewed && legal?.basis, "Legal publication requires an explicit review record.");
+  assert.deepEqual(legal.paths.map(route => `${route.slice(1)}/page.tsx`).sort(), [...reviewedLegalPageSources].sort(), "Legal publication paths must match the reviewed source allowlist.");
+  const requiredLegalFiles = [
+    "src/app/legal/page.tsx",
+    "src/modules/public-site/legal-center.ts",
+    "src/modules/public-site/legal-metadata.ts",
+    "src/modules/public-site/merchant-legal-content.json",
+    "src/shared/legal-paths.ts",
+    "src/shared/legal-identity.ts",
+    "src/ui/legal-service-document.tsx",
+  ];
+  assert.deepEqual(Object.keys(legal.files ?? {}).sort(), requiredLegalFiles.sort(), "The exact reviewed legal content and document definitions must be recorded.");
+  for (const [file, expected] of Object.entries(legal.files)) {
+    assert.equal(createHash("sha256").update(readFileSync(path.join(root, file))).digest("hex"), expected, `${file}: legal publication content changed; review and update its receipt before packaging.`);
   }
   return receipt;
 }

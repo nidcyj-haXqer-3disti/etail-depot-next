@@ -72,7 +72,7 @@ export function CommercialPage({ path }: { path: Exclude<CommercialPath, Service
       note={page.note}
       artwork={<AttentionArt kind="provider" />}
     /> : <section className="commercial-hero"><div className="container">
-      <div className="commercial-hero-copy"><div><p className="eyebrow">{page.label}</p><h1>{page.heading}</h1></div><div><p className="commercial-lead">{page.intro}</p>
+      <div className="commercial-hero-copy"><div>{page.label !== page.heading.replace(/\.$/, "") && <p className="eyebrow">{page.label}</p>}<h1>{page.heading}</h1></div><div><p className="commercial-lead">{page.intro}</p>
         <div className="commercial-action">{page.action.href === hostedServices.payments.registrationUrl ? <PaymentPortalLink intent="register" className="cta">{page.action.label}</PaymentPortalLink> : <Link className="cta" href={page.action.href}>{page.action.label}<Icon name="arrow" /></Link>}{page.secondaryAction && <Link className="text-link" href={page.secondaryAction.href}>{page.secondaryAction.label}</Link>}</div>
         {page.note && <p className="commercial-note">{page.note}</p>}
       </div></div>

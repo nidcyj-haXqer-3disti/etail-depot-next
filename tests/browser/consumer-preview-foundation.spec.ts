@@ -389,6 +389,7 @@ test("payment entry points hand off to the welcome page without queries or refer
     {path:"/pricing",scope:".commercial-action",label:"Start now"},
     {path:"/contact",scope:"#merchant-application",label:"Start now"},
     {path:"/docs/merchant-onboarding",scope:"#create-account",label:"Start now"},
+    {path:"/docs/merchant-onboarding",scope:"#sign-in",label:"Sign in to Trolleys"},
     ...(isMobile ? [{path:"/",scope:"header",label:"Start now"}] : []),
   ];
   for(const [index,entry] of entries.entries()){

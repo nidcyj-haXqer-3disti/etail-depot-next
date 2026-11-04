@@ -7,7 +7,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
-import { boundarySource, builtPageSources, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, forbiddenLocalReviewStatic, localReviewHtmlFiles, publicationBlockers, localCorePreviewPageSources, localPreviewPageSources, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "./public-artifact-policy.ts";
+import { boundarySource, builtPageSources, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, forbiddenLocalReviewStatic, localReviewHtmlFiles, publicationBlockers, localCorePreviewPageSources, localPreviewPageSources, reviewedLegalPageSources, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "./public-artifact-policy.ts";
 import { STANDARD_REFERENCE_PATHS } from "../src/shared/standard-reference-paths.ts";
 import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
@@ -57,12 +57,13 @@ function sourceChecks(filename, source) {
   inspect(tree);
 }
 
-assert.equal(publicPageSources.length, 40, "Only the thirty four core sources and six reference templates are approved.");
+assert.equal(publicPageSources.length, 50, "The candidate contains forty four core sources and six reference templates.");
 assert.equal(new Set(publicPageSources).size, publicPageSources.length, "Reviewed page paths must be unique.");
-assert.equal(publicHtmlFiles.length, 3740);
+assert.equal(publicHtmlFiles.length, 3750);
 assert.deepEqual(localCorePreviewPageSources, ["software-partners/page.tsx", "docs/page.tsx", "online-businesses/page.tsx", "docs/merchant-onboarding/page.tsx", "docs/integration-access/page.tsx", "docs/checkout/page.tsx", "docs/payment-requests/page.tsx", "docs/payment-status/page.tsx", "docs/refunds-and-disputes/page.tsx", "docs/payouts/page.tsx", "docs/webhooks/page.tsx", "docs/testing-and-launch/page.tsx"], "Only the exact reviewed non-guide local preview pages may be added.");
-assert.equal(builtPageSources.length, 40, "The four industry use cases are sections of Software platforms.");
-assert.equal(localPreviewPageSources.length, 0);
+assert.equal(builtPageSources.length, 50, "The four industry use cases are sections of Software platforms.");
+assert.equal(reviewedLegalPageSources.length, 10, "Only the ten reviewed legal sources are admitted.");
+assert.equal(localPreviewPageSources.length, 0, "Unreviewed legal pages must not join the publication candidate.");
 assert.equal(STANDARD_REFERENCE_PATHS.length, 3706, "Only the exact reviewed ISO reference inventory is included.");
 assert.equal(publicSourcePath(boundarySource), true);
 assert.equal(publicSourcePath("src/proxy.ts"), false);

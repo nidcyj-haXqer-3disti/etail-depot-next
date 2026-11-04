@@ -26,7 +26,7 @@ export interface SearchReleaseApproval {
 export const PUBLIC_INDEXING_APPROVAL: SearchReleaseApproval = {
   siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
   canonicalOrigin: "https://etaildepot.com",
-  reviewReference: "2026-11-01: user requests eight distinct service pages. The published website remains unchanged. The local candidate adds dedicated reconciliation and disputes pages to the previous 3738 content pages, for 3740 content pages and 3738 nonlegal discovery URLs. Reference data and the production guard are unchanged. This records local preparation only; no push or deployment is authorized.",
+  reviewReference: "2026-11-05: the user authorizes targeted merchant legal corrections and removal of the ten page local publication hold. The reviewed website contains 3750 content pages and 3738 search eligible URLs. All twelve legal and website policy pages remain noindex. Exact legal sources and their content hashes are recorded in tools/reference-release.json. Account agreement acceptance, provider approval and activation remain separate from website publication. Reference data and the exact production indexing guard are unchanged. This authorizes local release preparation, not a push, merge or deployment.",
 };
 export type Environment = Readonly<Record<string, string | undefined>>;
 

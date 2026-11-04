@@ -1,3 +1,4 @@
+import { LEGAL_CENTER_PATHS } from "../../src/shared/legal-paths";
 import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
 import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
 import { documentationPages, documentationPath } from "../../src/modules/public-site/documentation-catalog";
@@ -40,7 +41,7 @@ test("renamed product bookmarks retain their section and reject submitted data",
 });
 
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
-  const pages = [...COMMERCIAL_PATHS, "/", "/docs", ...documentationPages.map(page => documentationPath(page.slug)), "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
+  const pages = [...LEGAL_CENTER_PATHS, ...COMMERCIAL_PATHS, "/", "/docs", ...documentationPages.map(page => documentationPath(page.slug)), "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
   const privateRequests: string[] = [], errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });

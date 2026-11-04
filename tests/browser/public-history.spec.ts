@@ -7,21 +7,13 @@ async function clickVisibleSectionLink(page: Page, fragment: string) {
       return;
     }
   }
-  for (const selector of [".legal-document-contents-mobile"]) {
-    const contents = page.locator(selector);
-    if (await contents.isVisible() && await contents.locator(`a[href="${fragment}"]`).count()) {
-      if (await contents.getAttribute("open") === null) await contents.locator("summary").click();
-      await contents.locator(`a[href="${fragment}"]`).click();
-      return;
-    }
-  }
   throw new Error(`No usable section link for ${fragment}`);
 }
 
 for (const [route, fragment] of [
   ["/software-partners", "#payment-experience"],
   ["/help", "#cards"],
-  ["/privacy", "#contact"],
+  ["/privacy", "#legal-document-title"],
   ["/guides/iso-20022", "#sets-p"],
   ["/guides/iso-8583/messages", "#version-1993"],
 ] as const) {

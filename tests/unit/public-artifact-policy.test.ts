@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { boundarySource, builtPageSources, edgeEntryFindings, forbiddenArtifact, forbiddenStatic, localCorePreviewPageSources, localPreviewPageSources, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "../../tools/public-artifact-policy";
+import { boundarySource, builtPageSources, edgeEntryFindings, forbiddenArtifact, forbiddenStatic, localCorePreviewPageSources, localPreviewPageSources, reviewedLegalPageSources, pendingLegalPageSources, publicHtmlFiles, publicationBlockers, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "../../tools/public-artifact-policy";
 import { PUBLIC_CONTENT_PATHS } from "../../src/shared/public-page-inventory";
 
 describe("static public deployment boundary", () => {
   it("allows the reviewed sources and exact helpers without opening arbitrary guide routes", () => {
-    expect(publicPageSources).toHaveLength(40);
+    expect(publicPageSources).toHaveLength(50);
     expect(publicHtmlFiles).toEqual(PUBLIC_CONTENT_PATHS.map(path => path === "/" ? "index.html" : path.slice(1) + ".html"));
-    expect(publicHtmlFiles).toHaveLength(3740);
+    expect(publicHtmlFiles).toHaveLength(3750);
     for (const path of [...publicPageSources, "layout.tsx", "robots.ts", "sitemap.ts"]) expect(reviewedPublicAppModule(path), path).toBe(true);
     for (const path of ["guides/route.ts", "guides/unreviewed/page.tsx", "guides/payment-processing-fees/page.tsx", "guides/[slug]/page.tsx", "guides/[...slug]/page.tsx", "guides/stripe-alternatives/route.ts", "guides/stripe-alternatives/extra.tsx", "guides/stripe-alternatives/checkout/page.tsx", "guides/how-to-create-a-payment-link/route.ts", "guides/how-to-create-a-payment-link/extra.tsx", "guides/how-to-create-a-payment-link/checkout/page.tsx", "help/unreviewed.tsx", "api/route.ts", "login/page.tsx", "guides/booking-system-with-payment/page.tsx", "guides/countertop-payment-terminal/page.tsx", "guides/use-a-cash-register/page.tsx", "guides/charge-cards/unreviewed/page.tsx", "guides/[...browse]/page.tsx", "guides/sections/payment-processing-checkout/page.tsx", "guides/page/2/page.tsx"]) {
       expect(reviewedPublicAppModule(path), path).toBe(false);
@@ -14,11 +14,13 @@ describe("static public deployment boundary", () => {
   });
 
   it("admits only the approved documentation and use case sources and exports", () => {
-    expect(builtPageSources).toHaveLength(40);
-    expect(localPreviewPageSources).toHaveLength(0);
-    for (const page of localPreviewPageSources) {
-      expect(publicPageSources).not.toContain(page);
-      expect(forbiddenStatic(page.replace("/page.tsx", ".html"))).toBe(true);
+    expect(builtPageSources).toHaveLength(50);
+    expect(reviewedLegalPageSources).toHaveLength(10);
+    expect(localPreviewPageSources).toEqual([]);
+    expect(publicationBlockers(localPreviewPageSources, false)).toEqual([]);
+    for (const page of reviewedLegalPageSources) {
+      expect(publicPageSources).toContain(page);
+      expect(forbiddenStatic(page.replace("/page.tsx", ".html"))).toBe(false);
       expect(reviewedPublicAppModule(page)).toBe(true);
     }
     for (const page of localCorePreviewPageSources) {
@@ -26,6 +28,14 @@ describe("static public deployment boundary", () => {
       expect(forbiddenStatic(page.replace("/page.tsx", ".html"))).toBe(false);
     }
     for (const file of ["docs/private.html", "docs/checkout/record.json", "docs/checkout/__next.secret.txt", "DOCS.html", "software-partners/private.html", "online-businesses/private.txt"]) expect(forbiddenStatic(file), file).toBe(true);
+  });
+
+  it("keeps a new legal page pending without reopening the reviewed publication scope", () => {
+    const pending = pendingLegalPageSources([...reviewedLegalPageSources, "legal/new-service/page.tsx"]);
+    expect(pending).toEqual(["legal/new-service/page.tsx"]);
+    expect(publicationBlockers(pending, false)[0]).toContain("EXPANDED_RELEASE_SCOPE_HELD");
+    expect(reviewedPublicAppModule("legal/new-service/page.tsx")).toBe(false);
+    expect(forbiddenStatic("legal/new-service.html")).toBe(true);
   });
 
   it("allows exactly the reviewed edge source without reopening retired runtime directories", () => {

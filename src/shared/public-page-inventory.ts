@@ -1,3 +1,4 @@
+import { LEGAL_CENTER_PATHS, LEGAL_DOCUMENT_PATHS } from "./legal-paths.ts";
 import { COMMERCIAL_PATHS } from "./commercial-paths.ts";
 import { STANDARD_REFERENCE_PATHS } from "./standard-reference-paths.ts";
 
@@ -6,11 +7,11 @@ export const CORE_PUBLIC_PATHS = [
   "/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides",
   "/software-partners", "/online-businesses", "/docs", "/docs/merchant-onboarding", "/docs/integration-access",
   "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes",
-  ...COMMERCIAL_PATHS,
+  ...COMMERCIAL_PATHS, ...LEGAL_CENTER_PATHS,
   "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch",
 ] as const;
 export const PUBLIC_CONTENT_PATHS: readonly string[] = [...CORE_PUBLIC_PATHS, ...STANDARD_REFERENCE_PATHS];
-export const INDEXABLE_PUBLIC_PATHS = PUBLIC_CONTENT_PATHS.filter(path => !["/privacy", "/terms"].includes(path));
+export const INDEXABLE_PUBLIC_PATHS = PUBLIC_CONTENT_PATHS.filter(path => !(LEGAL_DOCUMENT_PATHS as readonly string[]).includes(path));
 const pages = new Set(PUBLIC_CONTENT_PATHS);
 const indexable = new Set(INDEXABLE_PUBLIC_PATHS);
 export function isPublicContentPath(path: string): boolean { return pages.has(path); }

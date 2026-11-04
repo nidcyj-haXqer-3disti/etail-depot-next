@@ -3,12 +3,12 @@ import type { DocRow } from "@/modules/public-site/documentation-content";
 
 const diagrams = {
   onboarding: {
-    title: "Application to account readiness", caption: "Keep the application, review decision and account setup connected. Confirm the required services before accepting payments.",
+    title: "From application to account setup", caption: "Keep the application, review decision and account setup connected. Confirm the required services before accepting payments.",
     nodes: [
       ["01 · Application", "Submit the application", "Business details and agreements", "business"],
       ["02 · Review", "Complete the review", "Information requests and decision", "document"],
-      ["03 · Decision", "Configure the account", "Payment methods and team access", "layers"],
-      ["04 · Activation", "Confirm readiness", "Account, checkout and reporting checks", "check"],
+      ["03 · Decision", "Check the decision", "Approval and account conditions", "layers"],
+      ["04 · Activation", "Complete account setup", "Payment methods, access and reporting", "check"],
     ],
   },
   records: {
@@ -45,7 +45,7 @@ const diagrams = {
     ],
   },
   access: {
-    title: "Account and integration responsibilities", caption: "Confirm the connections assigned through the merchant account service. Keep server credentials out of the customer interface.",
+    title: "Account and integration responsibilities", caption: "Confirm which connections are enabled for your account. Keep server credentials out of the customer interface.",
     nodes: [
       ["Account service", "Application access", "Program and environment", "business"],
       ["Checkout service", "Payment access", "Processing account and environment", "card"],
@@ -91,9 +91,9 @@ function CheckoutSequence() {
   const exchanges = [
     ["Your order", "Merchant account service", "Prepare checkout", "Order reference, merchant, amount, currency and attempt."],
     ["Merchant account service", "Customer checkout", "Present the checkout page", "Purchase details and the account’s configured payment methods."],
-    ["Customer checkout", "Payment processing", "Process the payment", "The customer submits through the assigned checkout connection."],
+    ["Customer checkout", "Payment processing", "Process the payment", "The customer submits through the checkout connection enabled for the account."],
     ["Payment record", "Your application", "Verify and match", "Match the account, amount, currency and operation to the original attempt."],
-    ["Your application", "Your order", "Update the order once", "Apply the verified result once. Hold an uncertain attempt for recovery."],
+    ["Your application", "Your order", "Update the order once", "Apply the verified result once. Check an unresolved attempt before allowing another payment."],
   ];
   return <figure className="docs-sequence docs-checkout-sequence" aria-label="Checkout journey from order to verified payment">
     <div className="docs-diagram-heading"><Icon name="layers"/><span>From order to verified result</span></div>

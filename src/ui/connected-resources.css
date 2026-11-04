@@ -122,7 +122,6 @@
 .cw-help .help-topic-links a{border-radius:5px}
 .cw-legal .legal-document-intro{background:#fff}
 .cw-legal .legal-document-heading h1{font-size:var(--public-reading-title-size);line-height:var(--public-title-line);letter-spacing:-.04em}
-.cw-legal .legal-document-contents a{min-height:44px;display:flex;align-items:center}
 .cw-legal .legal-section-copy{line-height:1.8}
 
 @media(max-width:1100px){.cw-company.enterprise-support .commercial-offices{margin-inline:auto;padding-inline:var(--public-gutter)}.cw-company.enterprise-support .commercial-section-grid{gap:var(--public-content-gap)}.cw-docs .docs-workspace-home{gap:34px}}

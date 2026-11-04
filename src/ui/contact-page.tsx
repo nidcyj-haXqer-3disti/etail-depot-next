@@ -32,7 +32,7 @@ function ContactOptions() {
     <div className="commercial-contact-list">
       {contacts.map(contact => <section key={contact.id} id={contact.id} className={contactStyles.specialist} aria-labelledby={`${contact.id}-title`}><div><h2 id={`${contact.id}-title`}>{contact.title}</h2><p>{contact.text}</p></div><a className={contactStyles.email} href={contact.href}><span>{contact.email}</span><Icon name="mail" /></a></section>)}
     </div>
-    <div className="contact-application" id="merchant-application"><div><h2>Ready to apply?</h2><p>Enter your email on the Trolleys welcome page, then choose Register to create your account. Submit business documents through the secure account service. Account approval and setup apply.</p></div><PaymentPortalLink intent="register" className="text-link" /></div>
+    <div className="contact-application" id="merchant-application"><div><h2>Ready to apply?</h2><p>Start on the Trolleys Welcome page with your email. Follow the account instructions, then complete your business application. Submit documents through the account service. Account approval and setup apply.</p></div><PaymentPortalLink intent="register" className="text-link" /></div>
   </div>;
 }
 

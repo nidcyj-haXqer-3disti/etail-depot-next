@@ -70,7 +70,7 @@ export const SERVICE_DETAIL_PAGES = {
     ],
     "workflow": {
       "title": "A clear path to account setup.",
-      "intro": "Four steps from your application to an approved, configured account.",
+      "intro": "Four steps through application, review and account setup.",
       "steps": [
         {
           "title": "Apply",
@@ -85,7 +85,7 @@ export const SERVICE_DETAIL_PAGES = {
           "detail": "Understand fees, permitted activity, payout timing and reserve conditions."
         },
         {
-          "title": "Activate acceptance",
+          "title": "Complete account setup",
           "detail": "After approval, configure payment methods, account access and the receiving bank."
         }
       ],
@@ -368,7 +368,7 @@ export const SERVICE_DETAIL_PAGES = {
       },
       {
         "id": "differences",
-        "title": "Make exceptions easier to investigate.",
+        "title": "Understand differences in your records.",
         "items": [
           {
             "title": "Different dates",
@@ -386,11 +386,11 @@ export const SERVICE_DETAIL_PAGES = {
       }
     ],
     "workflow": {
-      "title": "Close the gap between sales and cash.",
+      "title": "Match sales to your bank deposit.",
       "intro": "Start with one merchant account and currency, then follow the records through.",
       "steps": [
         {
-          "title": "Set the scope",
+          "title": "Choose the account and period",
           "detail": "Choose the account, currency and reporting period."
         },
         {
@@ -402,7 +402,7 @@ export const SERVICE_DETAIL_PAGES = {
           "detail": "Compare the payout amount and reference with the bank credit."
         },
         {
-          "title": "Resolve exceptions",
+          "title": "Investigate differences",
           "detail": "Explain timing differences and investigate amounts that remain unmatched."
         }
       ],
@@ -415,7 +415,7 @@ export const SERVICE_DETAIL_PAGES = {
     "title": "Merchant Refunds and Payment Reversals",
     "description": "Manage a customer refund from the original payment. Choose the permitted action, avoid duplicate returns and follow the refund record through its outcome.",
     "heading": "Manage refunds from the original payment.",
-    "intro": "Find the transaction, confirm the amount still eligible to return and follow the result. Keep the customer’s order and your account records in step.",
+    "intro": "Find the transaction, confirm the amount still eligible to return and follow the result. Keep the refund linked to the original order.",
     "action": {
       "label": "Explore refund guidance",
       "href": "/docs/refunds-and-disputes#refund-payment"
@@ -494,7 +494,7 @@ export const SERVICE_DETAIL_PAGES = {
     "title": "Chargeback and Dispute Management for Merchants",
     "description": "Review a cardholder dispute, understand the response deadline and organize evidence from the original sale. Follow the case outcome and account adjustment.",
     "heading": "Manage chargebacks with a clear record.",
-    "intro": "Understand the claim, decide whether to accept or challenge it, and keep the response on time. Follow the outcome and its effect on your account.",
+    "intro": "Understand the claim, decide whether to accept or challenge it, and respond before the deadline. Follow the outcome and its effect on your account.",
     "action": {
       "label": "Explore dispute guidance",
       "href": "/docs/refunds-and-disputes#dispute-case"

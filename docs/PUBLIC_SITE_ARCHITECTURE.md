@@ -1,5 +1,19 @@
 # Public site architecture
 
+## 5 November 2026: Reviewed merchant legal and website release
+
+The user authorized pushing and deploying the reviewed local candidate on 5 November 2026. This supersedes earlier preparation only status. Publication follows the existing PR checks and manual Netlify Git build process.
+
+The release contains 3,750 content pages, including ten reviewed Legal center routes. The 3,738 eligible sitemap URLs are unchanged. All ten Legal routes, Website Terms and Website Privacy remain noindex and excluded from the sitemap. Merchant terms, fees, payouts and reserves, acceptable use, software platform terms, acquiring disclosure, merchant privacy, data processing and security responsibilities are separate from website policies. International merchant service terms remain unavailable.
+
+The blanket legal packaging hold is replaced by an explicit reviewed source allowlist and a legal content receipt. Unreviewed legal routes remain excluded. Account funding timing, billing details and processing records follow applicable accepted account terms; general website publication does not establish acceptance, provider approval or account activation. Approved pricing, Washington, DC provisions, restricted category approval and the confirmed acquiring disclosure remain.
+
+Customer wording, responsive artwork and navigation are refined without changing established URLs, frozen reference data, source notices, eligibility or financial runtime boundaries. Merchant sign in and registration continue through the fixed Trolleys Welcome page at merchantapp.io, without forwarded visitor input or referrers. No account application or payment runtime is added.
+
+All four required local release checks previously passed on source fingerprint 0b89a21b91806a6b034a3a0de768f1dbb6529a4f977d5a4580ab35e5f853b94c: 422 unit checks, 254 browser checks and 150 accessibility checks, with one existing desktop skip for a mobile scenario. The subsequent complete view review passed 624 responsive observations, 58 navigation checks and 27 focused interaction tests. An initial WebKit navigation console message did not recur during the focused repeat. A previously recorded moderate development lint dependency advisory remains below the high and critical release threshold.
+
+The exact release branch must pass GitHub checks before merge. Confirm production build identity and hosted page, sitemap, security, cache and retirement behavior after the manual build. Keep the enabled Emails extension, pinned protected handler, production search guard, preview protections and denied resources unchanged.
+
 ## Push preparation refreshed, 2 November 2026
 
 Prepared the latest reviewed candidate on codex/sales-enquiry-20261101, including the simplified contact page and the completed desktop and mobile overview. GitHub main still matches the published base 3e76af835a1e83e147211e5b2ba498d00a8b4fea. The exact candidate retains 3,740 content pages and 3,738 eligible sitemap URLs. Existing contact and application bookmarks, pricing, eligibility, reference data, licence notices, legal terms and approved provider handoffs remain. No dependency, lockfile, hosting configuration or financial runtime changed.

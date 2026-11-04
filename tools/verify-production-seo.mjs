@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { LEGAL_DOCUMENT_PATHS } from "../src/shared/legal-paths.ts";
 import { socialPreviewImage } from "../src/shared/social-preview.ts";
 import { publicPageModified } from "../src/shared/public-page-revisions.ts";
 import { INDEXABLE_PUBLIC_PATHS } from "../src/shared/public-page-inventory.ts";
@@ -314,9 +315,9 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of ["/privacy", "/terms", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/payment-processing-fees", "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal", "/guides/use-a-cash-register", "/guides/unreviewed-charge-cards", "/guides/sections/payment-processing-checkout", "/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
+  for (const route of [...LEGAL_DOCUMENT_PATHS, "/legal/unreviewed", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/payment-processing-fees", "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal", "/guides/use-a-cash-register", "/guides/unreviewed-charge-cards", "/guides/sections/payment-processing-checkout", "/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
     const response = await localFetch(route);
-    assert.equal(response.status, ["/privacy", "/terms"].includes(route) ? 200 : 404, `${route}: unexpected status.`);
+    assert.equal(response.status, LEGAL_DOCUMENT_PATHS.includes(route) ? 200 : 404, `${route}: unexpected status.`);
     const body = await response.text();
     const metadata = /<head[\s>]/i.test(body) ? documentMetadata(body, route) : { metaValues: () => [] };
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
@@ -332,7 +333,7 @@ async function verifyResponses() {
       await response.arrayBuffer();
     }
   }
-  for (const route of ["/privacy.html", "/terms.html", "/privacy.txt", "/terms.txt", "/payment-acceptance-service.txt", "/guides.txt", ...guidePaths.map(route => `${route}.txt`)]) {
+  for (const route of [...LEGAL_DOCUMENT_PATHS.flatMap(path => [`${path}.html`, `${path}.txt`]), "/payment-acceptance-service.txt", "/guides.txt", ...guidePaths.map(route => `${route}.txt`)]) {
     const response = await localFetch(route);
     assert.equal(response.status, 200);
     assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: raw payloads and legal aliases must remain noindex.`);

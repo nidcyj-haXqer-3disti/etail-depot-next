@@ -7,7 +7,7 @@ export const documentationPages = [
   { slug: "refunds-and-disputes", title: "Refunds and disputes", description: "Start with the original payment, choose the appropriate action and follow the refund or dispute to its outcome.", group: "Merchant operations", audience: "Operations teams", icon: "shield", anchor: "refunds-and-disputes" },
   { slug: "payouts", title: "Payouts and reconciliation", description: "Match payments, fees and adjustments to the payout report, then confirm the deposit on your bank statement.", group: "Merchant operations", audience: "Finance and operations teams", icon: "bank", anchor: "payouts" },
   { slug: "webhooks", title: "Payment updates", description: "Confirm how payment updates reach your software and how to handle repeated, missing or delayed notifications.", group: "Developer integration", audience: "Developers", icon: "layers", anchor: "webhooks" },
-  { slug: "testing-and-launch", title: "Launch preparation", description: "Arrange the access and configuration checks needed before production is enabled.", group: "Developer integration", audience: "Developers and operations teams", icon: "check", anchor: "testing-and-launch" },
+  { slug: "testing-and-launch", title: "Launch preparation", description: "Check account access, checkout and reporting before accepting live payments.", group: "Developer integration", audience: "Developers and operations teams", icon: "check", anchor: "testing-and-launch" },
 ] as const;
 
 export type DocumentationSlug = typeof documentationPages[number]["slug"];
@@ -71,10 +71,10 @@ export const documentationPaths: readonly {
     description: "Prepare your connection with our integration team.",
     icon: "layers",
     tasks: [
-      { title: "Prepare your integration", description: "Map merchant accounts, permissions and connection requirements.", anchor: "integration-access", links: [{ slug: "integration-access", label: "Prepare your integration" }] },
+      { title: "Prepare your integration", description: "Confirm the accounts, permissions and access your integration needs.", anchor: "integration-access", links: [{ slug: "integration-access", label: "Prepare your integration" }] },
       { title: "Integrate checkout", description: "Connect an order to checkout and verify the result.", anchor: "checkout-setup", links: [{ slug: "checkout", label: "Integrate checkout" }] },
       { title: "Receive payment events", description: "Verify notifications and handle repeated or missing updates.", anchor: "webhooks", links: [{ slug: "webhooks", label: "Receive payment events" }] },
-      { title: "Launch preparation", description: "Confirm the payment journey before enabling production.", anchor: "testing-and-launch", links: [{ slug: "testing-and-launch", label: "Launch preparation" }] },
+      { title: "Launch preparation", description: "Check checkout, payment updates and reporting before launch.", anchor: "testing-and-launch", links: [{ slug: "testing-and-launch", label: "Launch preparation" }] },
     ],
   },
 ];
@@ -83,7 +83,7 @@ export const documentationPaths: readonly {
 export const integrationMaterials: Partial<Record<DocumentationSlug, readonly string[]>> = {
   "integration-access": [
     "Account permissions and the operations available to your connection.",
-    "The specifications and access instructions assigned to your setup.",
+    "The specifications and access instructions for your account.",
   ],
   checkout: [
     "Checkout instructions, supported display options and enabled payment methods.",

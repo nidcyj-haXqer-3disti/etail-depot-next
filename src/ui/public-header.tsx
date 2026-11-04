@@ -83,7 +83,7 @@ export function PublicHeader() {
       if (event.key === "Escape" && !event.defaultPrevented) {
         event.preventDefault();
         closeMenu();
-        toggle.current?.focus();
+        toggle.current?.focus({ preventScroll: true });
       }
     };
     document.addEventListener("click", closeOutside);
