@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
+import { openMainNavigation } from "./public-header";
 
 test("primary categories support keyboard, outside dismissal and service navigation", async ({ page, browserName }) => {
   await page.goto("/");
@@ -259,7 +260,7 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   const navigation = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
   const directory = page.locator(".public-footer-navigation");
   await expect(directory.getByRole("navigation")).toHaveCount(5);
-  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(21);
+  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(22);
   const destinations = await directory.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")));
   expect(new Set(destinations).size).toBe(destinations.length);
   await expect(navigation.locator('a[href^="/docs"]')).toHaveCount(5);
@@ -335,7 +336,7 @@ test("service links reach dedicated pages and industry links reach platform sect
 });
 
 
-test("footer groups work with a keyboard and adapt to screen size", async ({ page }) => {
+test("footer groups work with a keyboard and adapt to screen size", async ({ page, browserName }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/docs");
   const directory = page.locator(".public-footer-navigation");
@@ -347,7 +348,9 @@ test("footer groups work with a keyboard and adapt to screen size", async ({ pag
   await page.keyboard.press("Enter");
   const merchant = directory.getByRole("link", { name: "Merchant onboarding", exact: true });
   await expect(merchant).toBeVisible();
-  await page.keyboard.press("Tab");
+  // WebKit on macOS uses Option+Tab to include links in keyboard navigation.
+  // https://support.apple.com/guide/safari/cpsh003/mac
+  await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
   await expect(merchant).toBeFocused();
   const resources = directory.locator("summary").filter({ hasText: /^Resources$/ });
   await resources.click();
@@ -367,7 +370,7 @@ test("footer groups work with a keyboard and adapt to screen size", async ({ pag
   await expect(page).toHaveURL(/\/docs\/checkout$/);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "false");
-  await expect(directory.getByRole("link")).toHaveCount(21);
+  await expect(directory.getByRole("link")).toHaveCount(22);
   await expect(directory.locator("summary")).toHaveCount(0);
   await page.setViewportSize({ width: 320, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "true");
@@ -412,7 +415,7 @@ test("the complete footer remains usable without JavaScript", async ({ browser }
     const page = await context.newPage();
     await page.goto("http://127.0.0.1:3100/");
     const directory = page.locator(".public-footer-navigation");
-    await expect(directory.getByRole("link")).toHaveCount(21);
+    await expect(directory.getByRole("link")).toHaveCount(22);
     await directory.getByRole("link", { name: "Payouts", exact: true }).click();
     await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
     await expect(page.getByRole("heading", {level:1})).toBeInViewport();
@@ -441,4 +444,23 @@ test("phone industries expand by intent and retain bookmarked workflows", async 
   await expect(page.locator("#legal-software h3")).toBeInViewport();
   await expect(page.locator("#legal-software .ec-industry-scope")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+
+test("scrolling a short phone menu keeps the Back row clear and usable", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/");
+  const navigation = await openMainNavigation(page);
+  await navigation.evaluate(element => { element.scrollTop = element.scrollHeight; });
+  const back = navigation.getByRole("button", { name: "Back", exact: true });
+  await expect(back).toBeInViewport();
+  const menuBox = (await navigation.boundingBox())!;
+  const backBox = (await back.boundingBox())!;
+  const point = { x: menuBox.x + menuBox.width - 16, y: backBox.y + backBox.height / 2 };
+  // The right side of the Back row must not expose a scrolling destination underneath.
+  expect(await back.evaluate((button, { x, y }) => button.contains(document.elementFromPoint(x, y)), point)).toBe(true);
+  await page.mouse.click(point.x, point.y);
+  await expect(navigation.locator("details[open]")).toHaveCount(0);
+  await expect(navigation.locator("summary").filter({ hasText: /^Services$/ })).toBeFocused();
+  await expect(navigation.getByRole("link", { name: "Pricing", exact: true })).toBeVisible();
 });

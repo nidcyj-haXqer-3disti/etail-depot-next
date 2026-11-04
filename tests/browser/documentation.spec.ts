@@ -48,7 +48,7 @@ test("documentation distinguishes approval, payment results and bank receipt",as
  await expect(page.locator('#application-review')).toContainText('An approval decision does not confirm that every connection is ready.');
  await page.goto('/docs/checkout');
  await expect(page.locator('.docs-article-heading')).toContainText('verify the payment result and recover an interrupted attempt');
- await expect(page.locator('main')).toContainText('The checkout connection and instructions assigned to your merchant account');
+ await expect(page.locator('main')).toContainText('The checkout connection and instructions provided for your merchant account');
  await expect(page.locator('#complete-payment')).toContainText('Do not fulfill from a browser redirect');
  await expect(page.locator('#complete-payment')).toContainText('retain an unresolved state until the original attempt is reconciled');
  await page.goto('/docs/payouts');
@@ -132,7 +132,7 @@ test("platform implementation progresses to testing and returns to its use case"
  for(const destination of ['checkout','webhooks','testing-and-launch']){
   await openDocumentationTopic(page,destination);
  }
- await expect(page.locator('#production-readiness')).toContainText('Any live application, transaction, refund or movement of funds requires that separate procedure.');
+ await expect(page.locator('#production-readiness')).toContainText('Confirm with your account team who will perform the live checks, which actions and amounts are permitted, and when to stop.');
  const navigation=await openMainNavigation(page, "Use cases");
  await navigation.getByRole('link',{name:'Software platforms',exact:true}).click();
  await expect(page).toHaveURL(/\/software-partners$/);
@@ -315,6 +315,8 @@ test("blank registration email help leads to the illustrated recovery steps", as
  const recovery = page.locator('#registration-email');
  await expect(recovery.getByRole('heading')).toBeInViewport();
  await expect(recovery).toContainText('Choose Sign in above the Register New Account heading.');
+ await expect(recovery).toContainText('For a new account, choose Register. For an existing account, choose Sign In.');
+ await expect(page.locator('#create-account')).toContainText('If Welcome says your email is already registered, choose Sign In.');
  await expect(recovery.getByRole('img')).toHaveAttribute('src','/help/merchant-account/blank-registration.jpg');
  await expect.poll(() => recovery.getByRole('img').evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0)).toBe(true);
  await expect(page.locator('main form,main input,main iframe')).toHaveCount(0);
@@ -327,8 +329,11 @@ test("account screenshot instructions work without JavaScript at desktop and pho
  for (const width of [1440,390,320]) {
   await page.setViewportSize({width,height:1000});
   await page.goto('http://127.0.0.1:3100/docs/merchant-onboarding#create-account');
+  const signIn=page.locator('#sign-in');
+  await expect(signIn.getByRole('link',{name:'Sign in to Trolleys',exact:true})).toHaveAttribute('href','https://merchantapp.io/etaildepot/UserAccount/Login');
+  await expect(signIn).toContainText('continue the existing application');
   const guide=page.locator('#create-account');
-  await expect(guide.getByRole('heading',{level:3})).toHaveText(['Enter your email on Welcome','Check your email and create a password','Sign in with your new password']);
+  await expect(guide.getByRole('heading',{level:3})).toHaveText(['Enter your email on Welcome','Check the email shown and create a password','Continue to your business application']);
   for(const image of await page.locator('#create-account img,#registration-email img').all()) {
    await image.scrollIntoViewIfNeeded();
    await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth === 1280)).toBe(true);
@@ -344,4 +349,26 @@ test("account screenshot instructions work without JavaScript at desktop and pho
   await page.screenshot({path:testInfo.outputPath(`account-recovery-${width}.png`)});
  }
  await context.close();
+});
+
+
+test("Help separates returning account access from new registration", async ({ page }) => {
+ for (const [question, label, fragment] of [
+  ['Where do I sign in to my merchant account?', 'sign in instructions', 'sign-in'],
+  ['How do I create a merchant login?', 'account setup steps with screenshots', 'create-account'],
+ ] as const) {
+  await page.goto('/help#access');
+  const answer = page.locator('#access details').filter({has:page.locator('summary').filter({hasText:question})});
+  await answer.locator('summary').focus();
+  await page.keyboard.press('Enter');
+  await answer.getByRole('link',{name:label,exact:true}).click();
+  await expect(page).toHaveURL(new RegExp('/docs/merchant-onboarding#'+fragment+'$'));
+  const section=page.locator('#'+fragment);
+  await expect(section.getByRole('heading',{level:2})).toBeInViewport();
+  const action=section.getByRole('link',{name:fragment==='sign-in'?'Sign in to Trolleys':'Start now',exact:true});
+  await expect(action).toHaveAttribute('href','https://merchantapp.io/etaildepot/UserAccount/Login');
+  await expect(action).toHaveAttribute('referrerpolicy','no-referrer');
+  await expect(action).toHaveAttribute('rel',/noreferrer/);
+  await expect(page.locator('main form,main input,main iframe')).toHaveCount(0);
+ }
 });

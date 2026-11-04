@@ -18,7 +18,7 @@
 .public-main .ec-reconciliation-art .ec-report-paper {border-radius:12px;border-color:#d0ddc6;box-shadow:0 18px 32px -25px #193c3350;}
 .public-main .ec-report-top {font-size:13px;line-height:1.5;}
 .public-main .ec-reconciliation-art .ec-record-line {font-size:14px;line-height:1.5;}
-.public-main .ec-reconciliation-art .ec-report-total {background:#f0f5e8;margin-inline:-16px;padding-inline:16px;border-radius:8px;border:0;}
+.public-main .ec-reconciliation-art .ec-report-paper .ec-report-total {background:#f0f5e8;margin-inline:-16px;padding-inline:16px;border-radius:8px;border:0;}
 .public-main .ec-reconciliation-art .ec-record-caption {font-size:12px;line-height:1.7;}
 .public-main .ec-reconcile-band {border-radius:11px;gap:15px;}
 .public-main .ec-reconcile-band strong {font-size:19px;}

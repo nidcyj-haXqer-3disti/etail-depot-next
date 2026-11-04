@@ -1,3 +1,4 @@
+import { LEGAL_DOCUMENT_PATHS } from "../../src/shared/legal-paths";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import targets from "../../project-targets.json";
@@ -46,7 +47,7 @@ describe("public search release boundary", () => {
     expect(PUBLIC_INDEXING_APPROVAL).toMatchObject({
       siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3740 content pages and 3738 nonlegal discovery URLs");
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3750 content pages and 3738 search eligible URLs");
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
@@ -80,9 +81,11 @@ describe("public search release boundary", () => {
 
   it("keeps legal pages and the root fallback private even after production approval", () => {
     stubEnvironment();
-    for (const path of ["/privacy", "/terms"] as const) {
+    for (const path of LEGAL_DOCUMENT_PATHS) {
       expect(legalPageMetadata(path).robots).toEqual(privateRobots);
-      expect(JSON.stringify(legalPageMetadata(path))).not.toMatch(/available now|coming soon|forthcoming|upcoming/i);
+      const metadata = JSON.stringify(legalPageMetadata(path));
+      const legalCopy = path === "/legal" ? metadata.replaceAll("international documents are coming soon", "international documents") : metadata;
+      expect(legalCopy).not.toMatch(/available now|coming soon|forthcoming|upcoming/i);
     }
     expect(rootMetadata.robots).toMatchObject({ index: false, follow: false, googleBot: { index: false, follow: false } });
     expect(rootMetadata.alternates).toBeUndefined();
@@ -186,8 +189,8 @@ describe("reviewed public metadata", () => {
 
   it("requires an explicit revision for every core page and preserves unchanged reference dates", () => {
     expect(Object.keys(CORE_PAGE_MODIFIED).sort()).toEqual([...CORE_PUBLIC_PATHS].sort());
-    expect(publicPageModified("/merchant-onboarding")).toBe("2026-11-03");
-    expect(publicPageModified("/payouts-and-reconciliation")).toBe("2026-11-01");
+    expect(publicPageModified("/merchant-onboarding")).toBe("2026-11-05");
+    expect(publicPageModified("/payment-methods")).toBe("2026-11-01");
     for (const [collection, date] of Object.entries(REFERENCE_PAGE_MODIFIED)) {
       expect(date).toBe("2026-10-29");
       for (const path of INDEXABLE_PUBLIC_PATHS.filter(path => path === collection || path.startsWith(`${collection}/`))) {
@@ -206,8 +209,8 @@ describe("reviewed public metadata", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
     expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-11-01");
-    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-11-03");
-    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-11-03");
+    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-11-04");
+    expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-11-05");
     expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-03");
     expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-11-01");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {

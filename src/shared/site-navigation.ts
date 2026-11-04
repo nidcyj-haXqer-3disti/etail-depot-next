@@ -54,6 +54,7 @@ const destinations = {
   company: { label: "About", href: "/company" },
   trust: { label: "Security and privacy", href: "/trust" },
   contact: { label: "Contact", href: "/contact" },
+  legalCenter: { label: "Legal", href: "/legal" },
 } as const;
 
 export const publicNavigationGroups = [
@@ -79,7 +80,7 @@ export const publicFooterGroups = [
   { label: "Use cases", links: [destinations.online, destinations.platforms, destinations.switchProvider] },
   { label: "Developers", links: [destinations.docs, destinations.access, destinations.checkout, destinations.updates, destinations.launch] },
   { label: "Resources", links: [destinations.guides, destinations.help] },
-  { label: "Company", links: [destinations.company, destinations.trust, destinations.contact] },
+  { label: "Company", links: [destinations.company, destinations.trust, destinations.contact, destinations.legalCenter] },
 ] as const;
 
 export function publicDomainForPath(pathname: string): string | undefined {

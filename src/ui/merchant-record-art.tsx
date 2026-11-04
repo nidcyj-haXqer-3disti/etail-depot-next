@@ -27,7 +27,7 @@ export function ReconciliationMatchArt() {
         <div className={s.statement}><div className={s.recordHeading}><Icon name="bank" /><strong>Bank statement</strong></div><dl><div><dt>Related reference</dt><dd>PO 10482</dd></div><div><dt>Posted credit</dt><dd>$96.80 <small>USD</small></dd></div></dl></div>
       </div>
       <div className={s.matchRule}><Icon name="link" /><div><strong>Reference and amount match</strong><span>Confirm the credit has reached the bank.</span></div></div>
-      <div className={s.unresolved}><span>Difference remains?</span><strong>Keep it open for review.</strong></div>
+      <div className={s.unresolved}><span>Difference remains?</span><strong>Check the unmatched amount.</strong></div>
     </div>
   </div>;
 }

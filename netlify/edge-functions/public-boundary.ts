@@ -117,7 +117,7 @@ export async function handlePublicRequest(
   }
 
   const response = await context.next();
-  const legalPage = /^\/(?:privacy|terms)(?:\.html|\/index\.html|\/)?$/.test(url.pathname);
+  const legalPage = /^\/(?:privacy|terms)(?:\.html|\/index\.html|\/)?$/.test(url.pathname) || /^\/legal(?:$|[/.])/.test(url.pathname);
   const navigationPayload = url.pathname.endsWith(".txt") && url.pathname !== "/robots.txt";
   const alias = publicDocumentPath(url.pathname);
   const result = withSecurityHeaders(response, !approved || legalPage || navigationPayload || Boolean(alias && alias !== url.pathname) || response.status >= 400);

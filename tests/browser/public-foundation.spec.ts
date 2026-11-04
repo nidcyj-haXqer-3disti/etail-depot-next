@@ -165,16 +165,19 @@ test("legal documents are reachable without sign-in and retain their search visi
   await page.goto("/");
   await page.getByRole("navigation", { name: "Footer legal" }).getByRole("link", { name: "Privacy", exact: true }).click();
   await expect(page).toHaveURL(/\/privacy$/);
-  for (const [path, title] of [["/privacy", "Privacy Policy"], ["/terms", "Terms of Use"]]) {
+  for (const [path, title] of [["/privacy", "Website Privacy Policy"], ["/terms", "Website Terms of Use"]]) {
     const searchTitle = `${path === "/terms" ? "Website Terms of Use" : title} | Etail Depot`;
-    if (path === "/terms") await page.getByRole("navigation", { name: "Legal documents" }).getByRole("link", { name: "Terms", exact: true }).click();
+    if (path === "/terms") await page.getByRole("navigation", { name: "Footer legal" }).getByRole("link", { name: "Terms", exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`${path}$`));
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title!);
     await expect(page.getByRole("complementary", { name: "Review status" })).toHaveCount(0);
     await expect(page).toHaveTitle(searchTitle);
     expect(await page.title()).not.toMatch(/draft|review/i);
-    await expect(page.locator(".legal-document-date")).toHaveText("Last updated October 27, 2026");
-    await expect(page.locator("main")).toContainText("uses Order Insight to share supported merchant, transaction and order details with participating banks");
+    await expect(page.locator(".legal-document-date")).toHaveText("Last updated November 4, 2026");
+    if (path === "/privacy") {
+      await expect(page.locator("main")).not.toContainText("Order Insight");
+      await expect(page.getByRole("link", { name: "Merchant privacy notice", exact: true })).toHaveAttribute("href", "/legal/merchant-privacy");
+    }
     await expect(page.locator("main")).not.toContainText("integration are not confirmed");
     for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
       await expect(page.locator(selector)).toHaveAttribute("content", searchTitle);
@@ -183,42 +186,33 @@ test("legal documents are reachable without sign-in and retain their search visi
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etaildepot.com${path}`);
     await expect(page.locator('form, script[type="application/ld+json"]')).toHaveCount(0);
     expect(await page.locator("main").innerText()).not.toMatch(/\b(draft|demo|sandbox|simulated|fictional)\b|not yet taken effect/i);
-    await expect(page.getByRole("region",{name:path === "/privacy" ? "Our company and services" : "Our company and these terms",exact:true})).toContainText("merchant services under the name Trolleys and card services under the name Ledgix");
     if (path === "/privacy") {
-      await expect(page.getByRole("region",{name:"Your choices and privacy requests",exact:true})).toContainText("this website, Ledgix or Trolleys");
+      await expect(page.getByRole("region", {name:"Our company and services",exact:true})).toContainText("operates etaildepot.com");
+      await expect(page.getByRole("region", {name:"Your choices and privacy requests",exact:true})).toContainText("this website, a merchant account or a card account");
+      await expect(page.locator("main .legal-brand, main a[href*=\"trolleys.ai\"]")).toHaveCount(0);
     } else {
-      await expect(page.getByRole("region",{name:"Trolleys · Merchant services",exact:true})).toContainText("do not create payment requests, record transactions, issue refunds or move funds");
+      await expect(page.getByRole("region", {name:"About these terms",exact:true})).toContainText("operates this website");
+      const agreements = page.getByRole("region", {name:"External websites and service agreements",exact:true});
+      await expect(agreements).toContainText("These website terms do not set account fees");
+      await expect(agreements.getByRole("link", {name:"Merchant Services Terms",exact:true})).toHaveAttribute("href", "/legal/merchant-services");
+      await expect(agreements.getByRole("link", {name:"card service disclosures",exact:true})).toHaveAttribute("href", "/credit-card-services#card-details");
     }
-    const cards = page.locator(".legal-brand").filter({ hasText: "Etail Depot US, Inc. DBA Ledgix" });
-    await expect(cards).toContainText("ledgix.com");
-    if (path === "/terms") {
-      const cardTerms = page.getByRole("region", { name: "Ledgix · Card services", exact: true });
-      await expect(cardTerms).toContainText("This website does not currently offer a card application, security deposit payment or credit card account access for that service.");
-      await expect(cardTerms).toContainText("Contacting Ledgix with an inquiry does not submit a card application, guarantee approval or enroll you in a mailing list.");
-    }
-    await expect(cards.getByRole("link")).toHaveCount(0);
-    await expect(page.locator(".legal-brand").filter({ hasText: "Etail Depot US, Inc. DBA Trolleys" }).getByRole("link")).toHaveAttribute("href", "https://trolleys.ai");
     const emailDestinations = await page.locator('a[href^="mailto:"]').evaluateAll(links => [...new Set(links.map(link => link.getAttribute("href")))].sort());
-    expect(emailDestinations).toEqual(["mailto:compliance@etaildepot.com", "mailto:ledgix@etaildepot.com", "mailto:trolleys@etaildepot.com"]);
-    const mobileContents = page.locator("summary").filter({ hasText: "On this page" });
-    if (await mobileContents.isVisible()) {
-      await mobileContents.focus();
-      await page.keyboard.press("Enter");
-      await expect(mobileContents.locator("..")).toHaveAttribute("open", "");
-    }
-    const contents = page.getByRole("navigation", { name: "On this page" });
-    for (const link of await contents.getByRole("link").all()) {
-      const destination = (await link.getAttribute("href"))!;
-      await expect(page.locator(destination)).toHaveCount(1);
-    }
-    await contents.getByRole("link", { name: "Contact us", exact: true }).click();
+    expect(emailDestinations).toEqual(["mailto:compliance@etaildepot.com"]);
+    await expect(page.locator("main nav, main .legal-document-contents-mobile")).toHaveCount(0);
+    const sectionIds = await page.locator(".legal-document-section > h2").evaluateAll(headings => headings.map(heading => heading.id));
+    expect(sectionIds).toContain("contact");
+    expect(new Set(sectionIds).size).toBe(sectionIds.length);
+    await page.goto(`${path}#contact`);
     await expect(page).toHaveURL(new RegExp(`${path}#contact$`));
     const contacts = page.getByRole("region", { name: "Contact us", exact: true });
     await expect(contacts).toContainText("Washington DC 20036");
-    for (const [phone,href] of [["+1 202-449-4962","tel:+12024494962"],["+81 70-3537-2563","tel:+817035372563"]]) {
-      await expect(contacts.getByRole("link", { name: phone, exact: true })).toHaveAttribute("href", href);
+    if (path === "/privacy") {
+      for (const [phone,href] of [["+1 202-449-4962","tel:+12024494962"],["+81 70-3537-2563","tel:+817035372563"]]) {
+        await expect(contacts.getByRole("link", { name: phone, exact: true })).toHaveAttribute("href", href);
+      }
     }
-    for (const email of ["ledgix@etaildepot.com", "trolleys@etaildepot.com", "compliance@etaildepot.com"]) {
+    for (const email of ["compliance@etaildepot.com"]) {
       await expect(contacts.getByRole("link", { name: email, exact: true })).toHaveAttribute("href", `mailto:${email}`);
     }
     await page.getByRole("link", { name: "Back to top", exact: true }).click();
@@ -306,7 +300,8 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
   await expect(page).toHaveURL(/\/help#access$/);
   const recovery=page.locator("summary").filter({hasText:"I can’t sign in. What should I do?"});
   await recovery.focus();await page.keyboard.press("Enter");
-  await expect(recovery.locator("..")).toContainText("Follow the recovery instructions supplied with your merchant account");
+  await expect(recovery.locator("..")).toContainText("If Welcome says your email is already registered, choose Sign In.");
+  await expect(recovery.locator("..")).toContainText("follow the account recovery instructions or contact");
   await expect(recovery.locator("..").getByRole("link",{name:"trolleys@etaildepot.com"})).toHaveAttribute("href","mailto:trolleys@etaildepot.com");
   await openMainNavigation(page);
   await expect(page.getByRole("banner").getByRole("link",{name:"Sign in to Trolleys",exact:true})).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
@@ -790,7 +785,7 @@ test("mobile menu presents one level, keeps actions reachable and restores the p
 test("mobile navigation preserves the reading position and leaves reference navigation visible", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  for (const path of ["/software-partners", "/guides/iso-8583/fields"]) {
+  for (const path of ["/", "/software-partners", "/guides/iso-8583/fields"]) {
     await page.goto(path);
     const header = page.getByRole("banner");
     const toggle = header.getByRole("button", { name: "Menu", exact: true });
@@ -803,6 +798,8 @@ test("mobile navigation preserves the reading position and leaves reference navi
     // Use the visible control without the locator's automatic scroll into view.
     await page.mouse.click(buttonBox.x + buttonBox.width / 2, buttonBox.y + buttonBox.height / 2);
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await header.getByRole("navigation", { name: "Main navigation" }).locator("summary").filter({ hasText: /^Services$/ }).click();
+    await header.getByRole("button", { name: "Back", exact: true }).click();
     await page.keyboard.press("Escape");
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
     await expect(toggle).toBeFocused();
@@ -836,7 +833,7 @@ test("account actions remain distinct and reachable across mobile menu and deskt
       const box = await link.boundingBox();
       expect(box!.height).toBeGreaterThanOrEqual(44);
     }
-    await expect(start).toHaveAccessibleDescription("Enter your email on the Trolleys welcome page, then choose Register. Account approval is required.");
+    await expect(start).toHaveAccessibleDescription("Enter your email on the Trolleys Welcome page to create or continue your account. Merchant account approval is required.");
     await expect(signIn).toHaveAccessibleDescription("Trolleys is an Etail Depot service. Enter your email on the welcome page to access your merchant account.");
     await expect(page.locator("main")).toHaveAttribute("inert", "");
     await start.focus();

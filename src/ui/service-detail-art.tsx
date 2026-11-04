@@ -44,7 +44,7 @@ export function ServiceDetailArt({ kind, title, caption, cardFace }: ServiceDeta
         <div className={s.sceneHeading}><Label icon="document">Payout breakdown</Label><strong>From activity to deposit.</strong></div>
         <div className={s.payoutPaper}><Record label="Included payments" value="Eligible activity" /><Record label="Fees" value="Processing charges" /><Record label="Adjustments" value="Refunds, disputes, reserves" /><div className={s.payoutTotal}><Icon name="layers" /><strong>Payout amount</strong></div></div>
         <Connector /><div className={s.outcome}><Icon name="bank" /><div><strong>Bank deposit</strong><span>Match the amount and reference</span></div></div>
-        <p className={s.artFootnote}>Pending activity belongs to a later payout.</p>
+        <p className={s.artFootnote}>Pending activity is not yet available for payout.</p>
       </>}
       {kind === "reconciliation" && <>
         <div className={s.sceneHeading}><Label icon="link">Reconciliation</Label><strong>Match the records.</strong></div>
@@ -55,7 +55,7 @@ export function ServiceDetailArt({ kind, title, caption, cardFace }: ServiceDeta
         <div className={s.refundChecks}><Icon name="document" /><span>Check previous refunds and open disputes</span></div>
         <div className={s.refundRoutes}>
           <div><span>Uncaptured authorization</span><Connector /><strong>Reversal</strong></div>
-          <div><span>Before settlement</span><Connector /><strong>Void</strong></div>
+          <div><span>Capture awaiting processing</span><Connector /><strong>Void</strong></div>
           <div><span>Eligible captured payment</span><Connector /><strong>Refund</strong></div>
         </div><div className={s.outcome}><Icon name="link" /><div><strong>Keep the return reference</strong><span>Follow its status with the original sale</span></div></div>
       </>}

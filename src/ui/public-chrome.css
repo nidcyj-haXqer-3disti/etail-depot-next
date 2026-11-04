@@ -144,7 +144,7 @@
   .public-header-menu.is-open { min-height: 0; align-self: stretch; grid-template-rows: minmax(0,1fr) auto; }
   .is-menu-open .public-navigation { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px 4px 24px; margin-inline: -4px; scrollbar-width: thin; }
   .is-menu-open .public-navigation:has(.public-nav-group[open]) > :not(.public-nav-back):not([open]) { display: none; }
-  .is-menu-open .public-navigation:has(.public-nav-group[open]) .public-nav-back { display: inline-flex; align-items: center; gap: 10px; justify-self: start; min-width: 44px; min-height: 44px; margin-bottom: 8px; padding: 8px 4px; border: 0; background: transparent; color: var(--public-muted); font-size: 14px; cursor: pointer; }
+  .is-menu-open .public-navigation:has(.public-nav-group[open]) .public-nav-back { display: inline-flex; align-items: center; gap: 10px; justify-self: stretch; min-width: 44px; min-height: 44px; margin-bottom: 8px; padding: 8px 4px; border: 0; background: transparent; color: var(--public-muted); font-size: 14px; cursor: pointer; }
   .is-menu-open .public-navigation:has(.public-nav-group[open]) .public-nav-back { position:sticky;top:0;z-index:2;background:#fff;box-shadow:0 0 0 6px #fff; }
   .public-nav-back span { font-size: 24px; line-height: 1; }
   .is-menu-open .public-nav-group[open] > summary { min-height: 48px; font-size: 24px; font-weight: 600; letter-spacing: -.03em; color: var(--public-ink); }

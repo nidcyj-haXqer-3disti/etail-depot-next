@@ -108,6 +108,6 @@ export const industryCases = {
       }
     ],
     "scopeTitle": "Trust accounts and specialist workflows.",
-    "scope": "Trust and IOLTA account support is not confirmed. Client advances, bankruptcy fees and creditor collections need specific review. The firm must apply the professional rules and account requirements that govern its jurisdiction."
+    "scope": "Ask whether trust and IOLTA accounts can be supported for your setup. Client advances, bankruptcy fees and creditor collections need specific review. The firm must apply the professional rules and account requirements that govern its jurisdiction."
   }
 } as const satisfies Record<string, IndustryCase>;

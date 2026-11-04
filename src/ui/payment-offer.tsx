@@ -17,7 +17,7 @@ export function PaymentOffer() {
           <div><dt>Setup fee</dt><dd>${fees.setupFeeDollars}</dd></div>
         </dl>
         <div className="pricing-included"><Icon name="check" /><p>Payment links, QR sharing and basic payment receipts are included.</p></div>
-        <p className="pricing-scope">For US businesses accepting payments in USD. Eligibility and account approval apply.</p>
+        <p className="pricing-scope">Published offer for US businesses accepting payments in USD. Account approval applies. Your accepted fee schedule determines your charges.</p>
       </div>
       <PaymentFeeEstimate />
     </div>

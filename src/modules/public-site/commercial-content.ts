@@ -68,13 +68,13 @@ export const COMMERCIAL_PAGES = {
     ] },
     sections: [
       { title: "Who handles a card payment?", items: [
-        { title: "Merchant and payment facilitator", text: "The merchant sells the product or service and handles customer communication and fulfillment. Etail provides account review, payment acceptance and operational support under the applicable agreements." },
+        { title: "Merchant and payment facilitator", text: "The merchant sells the product or service and handles customer communication and fulfillment. Etail provides account review, payment acceptance and account support under the applicable agreements." },
         { title: "Acquiring partner and network", text: "The acquiring arrangement connects merchant card acceptance to the card network. The network sets applicable participation and transaction rules. Responsibilities follow those rules and the parties’ agreements." },
         { title: "Issuer and cardholder", text: "The issuer provides the customer’s card account and participates in authorization and disputes. Etail’s merchant service role does not make Etail the card issuer or a bank." },
       ] },
       { title: "What that means for your business.", items: [
         { title: "Joining the service", text: "Your business is reviewed before payment acceptance is enabled. The merchant agreement defines the permitted activity, fees and other account conditions." },
-        { title: "Accepting and managing payments", text: "Use the methods configured for your account, track payment results and handle refunds or disputes through their appropriate processes." },
+        { title: "Accepting and managing payments", text: "Use the methods configured for your account, track payments, issue eligible refunds and respond to disputes." },
         { title: "Understanding deposits", text: "Use payment and payout records to explain fees and adjustments, then reconcile the deposit to your bank statement. Capture, settlement and bank receipt remain separate events." },
       ] },
     ],
@@ -110,7 +110,7 @@ export const COMMERCIAL_PAGES = {
       ] },
       { title: "Account agreements and security information.", items: [
         { title: "Security documentation", text: "Request the security and compliance documents available for your service. Check the named provider, services covered and review period." },
-        { title: "Privacy and account terms", text: "Our privacy notice explains how this website handles personal information. Merchant, integration and card account services have their own notices and agreements. Review the documents for the service you use." },
+        { title: "Privacy and account terms", text: "Our Website Privacy Policy covers browsing and contacting us. Request the account agreement and privacy notice for the merchant, integration or card service you use." },
         { title: "Questions and concerns", text: "Contact merchant support about account access or payment issues. Direct privacy, data rights and compliance questions to our compliance team. Use the requested secure channel when sharing sensitive records." },
       ] },
     ],
@@ -148,7 +148,7 @@ export const COMMERCIAL_PAGES = {
       { id: "service-section-3", title: "New payments. Existing obligations.", items: [
         { title: "Saved payment methods", text: "Ask both providers about secure transfers. Tokens, wallet credentials and consent records do not move automatically." },
         { title: "Existing payments", text: "Previous provider terms still apply to refunds, disputes, reserves and unsettled payments. A new account does not release funds held by another provider." },
-        { title: "Going live", text: "After approval, verify checkout, payment updates, refunds and recurring payments. Keep both providers’ records for reconciliation." },
+        { title: "Start with your new account", text: "After approval, verify checkout, payment updates, refunds and recurring payments. Keep both providers’ records for reconciliation." },
       ] },
     ],
   },

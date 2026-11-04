@@ -50,7 +50,7 @@ function normalizedPreviewPath(pathname: string): string | null {
 export function managedContentRoute(pathname: string): boolean {
   const normalized = normalizedPreviewPath(pathname);
   if (normalized === null) return false;
-  if (/^\/(?:software-partners|docs|online-businesses|use-cases)(?:$|[/.])/.test(normalized)) return true;
+  if (/^\/(?:software-partners|docs|online-businesses|use-cases|legal)(?:$|[/.])/.test(normalized)) return true;
   if (COMMERCIAL_PATHS.some(path => normalized === path || normalized.startsWith(path + "/") || normalized.startsWith(path + "."))) return true;
   if (/^\/guides(?:$|[/.])/.test(normalized)) return true;
   return false;

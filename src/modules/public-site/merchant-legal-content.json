@@ -1,0 +1,1357 @@
+{
+  "merchant-services": [
+    {
+      "id": "scope",
+      "title": "1. Your agreement with Etail",
+      "paragraphs": [
+        "These Merchant Services Terms are between Etail Depot US, Inc. (Etail, we or us) and the United States business identified in the Merchant Service Order (Merchant or you). They cover the account setup, approved payment acceptance and related support specified for that account. Etail is a nonbank payment facilitator. You remain the seller of your goods and services.",
+        "The agreement begins when both parties accept the Service Order and the terms it identifies. Browsing this website, asking a question or starting an application does not accept this merchant agreement or activate processing. An individual accepting for a business must have authority to bind it.",
+        "Section 16 contains individual arbitration and a jury waiver for business disputes, subject to applicable law. Read that section before accepting."
+      ],
+      "links": [
+        {
+          "label": "Business dispute provisions",
+          "href": "#business-disputes"
+        }
+      ]
+    },
+    {
+      "id": "account-documents",
+      "title": "2. Documents that form your agreement",
+      "paragraphs": [
+        "The Service Order records the legal parties, account, approved activities, payment methods, channels, prices, funding arrangements and the versions of incorporated documents. Each party must receive a copy it can retain. Only selected services and schedules form part of the agreement.",
+        "A signed amendment that expressly identifies a clause controls that clause. The Service Order controls the commercial terms you and Etail accept. Data Processing Terms control the processing they cover. The remaining merchant terms and agreed schedules apply within their scope. Mandatory law and applicable network requirements cannot be displaced by this order of priority.",
+        "Acquirer and other provider terms apply only as supplied and accepted for the account. These terms do not amend a bank’s contract, create a personal guarantee or authorize debits to your bank account.",
+        "Applicable provider agreements govern their own subject matter and do not grant Etail rights that the provider has not authorized. Changes to liability or business dispute provisions must identify the affected clause expressly.",
+        "Only the documents expressly identified in your agreement are incorporated; linking to a document does not incorporate every page it links to. An existing agreement remains effective until amended or replaced under its terms. A replacement must identify the prior agreement, affected accounts and effective date. A customer’s payment authorization is separate from acceptance of a merchant agreement."
+      ],
+      "links": [
+        {
+          "label": "Fees and billing",
+          "href": "/legal/fees"
+        },
+        {
+          "label": "Payouts and reserves",
+          "href": "/legal/payouts-and-reserves"
+        },
+        {
+          "label": "Acquirer disclosure",
+          "href": "/legal/acquirer-disclosure"
+        }
+      ]
+    },
+    {
+      "id": "approval",
+      "title": "3. Eligibility and account information",
+      "paragraphs": [
+        "Account approval and setup are required before accepting payments. Provide complete, accurate and current business, ownership, identity, website, bank and activity information for the application and continuing account review. Tell us promptly about changes in control, financial condition, bank destination, products, sales model, delivery periods or expected transaction volume, and any investigation or loss of a license that could materially affect the service.",
+        "Use the secure account service for application documents and bank changes. Keep account access limited to authorized people. Notify us promptly about suspected unauthorized access and supply requested information by the reasonable deadline stated in the request. We may restrict the affected service if information needed for a legal obligation, account review or provider requirement is not supplied. Approval does not authorize an undisclosed seller or business activity.",
+        "Your activation confirmation must identify the approved business, websites, methods, currencies and territories. Complete any required direct acquiring agreement or network registration by the applicable deadline. Registration requirements depend on your account and the applicable network rules, not solely on a published transaction volume threshold.",
+        "Obtain written approval before processing a restricted activity or making a material change to your approved business, payment flow or use of the account. Approval applies only to the identified merchant, activity, channels and conditions. Existing access, a successful transaction or a discussion with a sales representative is not approval. The Acceptable use policy identifies activities that require specific written approval.",
+        "This program is for approved United States businesses. Do not use a United States address or entity to conceal the actual seller, ownership, location or destination of funds. Acceptance of a card issued abroad, where enabled, does not authorize an international merchant account or unapproved overseas activity.",
+        "A previous provider’s commercial refusal does not automatically establish a network prohibition. Any binding restriction still applies. A personal credit inquiry requires its own lawful basis or permission.",
+        "We may ask you to confirm an instruction that is unclear, conflicting, outside the sender’s authority or raises a material security concern. Use of a valid credential does not by itself prove that an instruction was authorized. Responsibility for a loss follows the applicable agreement and law."
+      ],
+      "links": [
+        {
+          "label": "Activities requiring written approval",
+          "href": "/legal/acceptable-use#review"
+        }
+      ]
+    },
+    {
+      "id": "acceptance",
+      "title": "4. Selling and accepting payments",
+      "paragraphs": [
+        "You are responsible for lawful goods and services, licenses, fulfillment, customer support, taxes and the accuracy of information supplied for each transaction. Follow the applicable payment method rules and the instructions supplied for your approved account.",
+        "Before the customer pays, clearly present the seller identity, purchase description, total amount, currency, delivery terms and cancellation or refund policy. Use a recognizable business name in receipts and the statement description. Keep evidence of customer consent, fulfillment and any agreed recurring or stored credential arrangement.",
+        "Request authorization for the correct amount. Submit capture and settlement records within the applicable time limits and approved fulfillment arrangement. Do not submit the same sale twice, process a fictitious purchase or accept payment for another business without express approval. An approval response does not guarantee final settlement or remove dispute rights.",
+        "Surcharges, convenience fees, limited card acceptance and minimum amounts are subject to law and network and acquirer requirements. Obtain the applicable instructions before using them.",
+        "When Visa is enabled, each party must comply with the Visa requirements binding on its approved role. Do not knowingly, or where you should know, submit an unlawful transaction or require a customer to surrender a valid dispute right. Follow a binding direction to restrict or stop acceptance within the applicable authority, with notice where permitted.",
+        "Before retrying an interrupted request, check the available transaction reference and follow the approved recovery procedure. Do not represent an uncertain result as paid. Correct an established duplicate promptly through the authorized process."
+      ],
+      "links": [
+        {
+          "label": "Acceptable use",
+          "href": "/legal/acceptable-use"
+        }
+      ]
+    },
+    {
+      "id": "methods",
+      "title": "5. Payment methods and software access",
+      "paragraphs": [
+        "ACH, wallets, recurring billing, stored credentials and other methods apply only when enabled for the account. Their customer authorizations, notices, return rights, fees and record requirements must be supplied for the selected method. A card fee is not an ACH fee or a bank debit authorization.",
+        "If you use a software platform, its authorization must identify the affected accounts, permitted actions, information access, charges, duration and disconnection process. A referral or integration does not itself authorize refunds, bank changes or deductions. Act only on instructions within that authority and the enabled capability. You can request removal of access, subject to continuing legal duties and records. Platform service fees and responsibilities require their own agreement. Ending a platform relationship does not automatically close the merchant account.",
+        "The method terms identify the provider, permitted locations, currencies, transaction types, limits, pricing and applicable rules. For ACH, they must also identify permitted entry types, consumer or business use, authorization and evidence retention, verification, returns, retries, revocation and submission deadlines. Obtain the required authorization before submitting an entry. Submitted or pending ACH entries are not final, and later returns remain possible.",
+        "Wallet support depends on the enabled arrangement and the customer’s device and payment instrument. Card rules continue to apply to an underlying card. Explain the method, amount, currency and relevant timing, and obtain separate permission for future payments where required.",
+        "Where 3D Secure is enabled, the assigned configuration and network rules determine its use. The issuer may complete authentication without a challenge or ask the customer for an additional step. Handle completion, cancellation, timeouts and errors through the approved integration. Authentication is separate from authorization, capture and settlement; submit only the authentication result actually returned for the transaction.",
+        "Authentication does not guarantee approval or a shift in liability. Preserve the evidence required for the eligible transaction and supply only the information required for the enabled flow. Customer notices, permitted recipients, retention and security requirements continue to apply. Card security codes must not be retained as authentication records.",
+        "Changes to a payment method or authentication service must follow the applicable notice and approval process, including the treatment of existing transactions and saved authorizations. Currency conversion, cross border services and onward transfers require express approval. Your account documents must state any agreed service levels, supported versions, configuration responsibilities and support contacts."
+      ],
+      "links": [
+        {
+          "label": "Software platform terms",
+          "href": "/legal/software-platforms"
+        }
+      ]
+    },
+    {
+      "id": "website-service-disclosures",
+      "title": "6. Fees, funding and account records",
+      "paragraphs": [
+        "The standard merchant offer is 2.9% + $0.30 for each successful domestic online card payment, with no monthly account or setup fee. It applies when selected in your Service Order. The Fees and billing schedule describes supplements, disputes and optional services.",
+        "Authorization, capture, clearing, settlement, payout initiation and bank receipt are different events. Reconcile transaction records, adjustments and payouts against your bank statement. Report an unexplained difference promptly so we can assist with records within our control. Any deadline and consequence for reporting an error must be stated in your account documents and remain subject to law.",
+        "The funding provider and any reserve holder are identified for your account. Etail acts only within its assigned authority. These terms do not make Etail a bank, create a deposit account or grant a right to invest your funds."
+      ],
+      "links": [
+        {
+          "label": "Fees and billing",
+          "href": "/legal/fees"
+        },
+        {
+          "label": "Payouts and reserves",
+          "href": "/legal/payouts-and-reserves"
+        }
+      ]
+    },
+    {
+      "id": "refunds-disputes",
+      "title": "7. Refunds, reversals and disputes",
+      "paragraphs": [
+        "Honor the purchase terms and remedies required by law. Use the authorized refund or cancellation process for the payment’s status, ordinarily returning money to the original payment method under its rules. Keep enough available funds to meet properly due refunds and account obligations.",
+        "You are responsible for valid dispute amounts and agreed related charges attributable to your transactions under the applicable payment method and account terms.",
+        "A dispute can occur after a payout. Respond through the designated channel before the deadline in the dispute notice, with truthful and relevant evidence. We can assist within the agreed service, but the issuer and network process determines the outcome. A response does not guarantee recovery.",
+        "Check previous refunds, reversals and dispute adjustments before reimbursing the same amount again. Any correction must use a lawful authorized process. Do not condition a legally required remedy on the customer abandoning a valid issuer dispute.",
+        "Keep the refund request, provider response and final status. If a refund fails, investigate and inform your customer without describing it as complete. A processing deadline does not remove a refund otherwise owed. A failed account verification does not, by itself, authorize refunds of every previous sale.",
+        "Evidence must be accurate, relevant and limited to what the dispute requires. Record a dispute result, withdrawal or correction under the applicable rules. Coordination to avoid duplicate reimbursement must not delay a mandatory customer remedy.",
+        "You remain responsible for explaining your sale and providing product support. Do not describe card authorization or optional assistance as buyer protection or a guaranteed outcome."
+      ]
+    },
+    {
+      "id": "information",
+      "title": "8. Information and confidentiality",
+      "paragraphs": [
+        "Each party must protect confidential information received for the service, limit access to people with a legitimate role and use it only to perform the agreement or meet a lawful obligation. Information already public without a breach, lawfully known to the recipient without restriction before disclosure, independently developed or lawfully received without restriction is not confidential.",
+        "Compelled disclosure must be limited to what is required, with notice where lawful. The recipient must reasonably cooperate with protective measures where permitted. Ordinary confidential information remains protected for three years after termination; trade secrets while they qualify; personal information while retained. Personal information is governed by the applicable notice and selected data terms.",
+        "Each party retains ownership of its intellectual property and materials. Each grants the other only the access and use rights in its authorized materials reasonably necessary for the selected service. Applicable third party licences continue to apply. Do not claim endorsement or publish the other party’s logo without permission. These rights do not authorize publication of confidential terms, unrelated advertising, model training or resale of personal information.",
+        "When you provide customer information or instruct its use, you must give the required privacy notices and obtain the lawful permissions needed for the specified purpose. Share only information relevant to the service and follow the applicable data terms. Permission to process a payment does not by itself authorize unrelated advertising.",
+        "Etail staff can access application documents, owner identity information and bank information in the provider system. Access must remain within the assigned account permissions and permitted purpose. Any export, outside storage, recipient, access location and retention arrangement must be identified in the applicable processing record.",
+        "Each party must promptly notify the other of a known unauthorized disclosure affecting its confidential information and use the designated secure channel for credentials and sensitive records. On an agreed request or the end of service, return or securely delete confidential information except for lawful retained copies. Those copies remain protected and may be used only for the retention purpose."
+      ],
+      "links": [
+        {
+          "label": "Merchant privacy notice",
+          "href": "/legal/merchant-privacy"
+        },
+        {
+          "label": "Data processing terms",
+          "href": "/legal/data-processing"
+        },
+        {
+          "label": "Security responsibilities",
+          "href": "/legal/security-policy"
+        }
+      ]
+    },
+    {
+      "id": "service-commitments",
+      "title": "9. Service responsibilities",
+      "paragraphs": [
+        "We will perform the obligations expressly assigned to Etail with reasonable care and skill and assist with service issues within our control. Tell us about a material failure so we can investigate and take reasonable corrective action. Each party remains responsible for its own legal duties.",
+        "An agreed service level must be stated expressly. We do not guarantee uninterrupted access, every transaction’s approval, a dispute result or a deposit date. Nothing excludes a warranty or remedy that applicable law does not permit the parties to exclude.",
+        "A provider or communications interruption does not alone establish Etail’s breach. Etail remains responsible for its own acts, omissions and any duties to select, instruct or coordinate providers assigned to it. Neither party warrants that the other’s entire business complies with law."
+      ]
+    },
+    {
+      "id": "changes",
+      "title": "10. Changes and notices",
+      "paragraphs": [
+        "We will give at least 30 days’ written notice of a material adverse change to these terms or an increase in Etail’s fees, unless a longer period applies under law or the Service Order. The notice will identify the change, date and your options. You may end the affected service before the change takes effect without a charge solely for rejecting it.",
+        "Changes take effect through the acceptance process specified in your Service Order and permitted by law. Posting revised text alone does not amend an existing agreement. A change strictly required sooner by law or a binding provider or network requirement may apply within that period, with as much notice as permitted.",
+        "Keep your notice contact current. Formal notices take effect on documented receipt, subject to mandatory delivery rules. Failed electronic delivery requires another agreed method. Legal proceedings must be served as law requires.",
+        "Electronic delivery of account documents and notices is subject to the consent and copy provisions in Section 19 and applicable law."
+      ]
+    },
+    {
+      "id": "suspension",
+      "title": "11. Restrictions and suspension",
+      "paragraphs": [
+        "We may restrict affected access where reasonably necessary for suspected fraud or unauthorized activity, a material breach, a security risk, overdue amounts, material financial deterioration affecting your obligations, missing information required for account review, an unapproved activity or a binding legal, provider or network requirement. The restriction must remain within our authority and proportionate to the issue.",
+        "We will explain the reason and any available corrective steps where disclosure is permitted. An access restriction does not by itself establish a right to withhold or seize funds. Funding restrictions and reserves follow the applicable funding documents.",
+        "Where an issue can safely be corrected, we will provide a reasonable opportunity to do so and review relevant corrective information. Immediate action is permitted where delay would create a material risk or violate a binding requirement. Restricting access does not justify withholding every record or refunding every previous transaction. Do not bypass a restriction through another account, business or platform."
+      ]
+    },
+    {
+      "id": "termination",
+      "title": "12. Ending the service",
+      "paragraphs": [
+        "You may end this agreement at any time by requesting account closure through the support channel identified for your service. You may also terminate for Etail’s material breach if it cannot be corrected, or if it remains uncorrected 10 days after Etail receives your written notice describing it.",
+        "Unless a written agreement expressly provides otherwise, Etail may end this agreement or close your account access at any time. We will give the notice required by applicable law. There is no general requirement to give 30 days’ advance notice of termination.",
+        "Etail may terminate immediately for a material breach that cannot be corrected, a material breach remaining uncorrected 10 days after written notice, or any ground for suspension in Section 11. Immediate termination is also permitted, to the extent allowed by law, for your insolvency, bankruptcy, receivership or comparable financial distress proceedings, or when required by law or directed by a regulator or responsible financial provider. Any legally required notice still applies.",
+        "When termination takes effect, permission to use the affected service ends. Stop using it and remove credentials and copies of Etail supplied software held solely for that service, except for access expressly allowed to complete closure or retain records as required by law. Do not delete records that must be preserved under the agreement or applicable law.",
+        "Closure does not cancel fees already incurred, refunds, disputes, taxes or other existing obligations. Final payouts and reserves follow the accepted funding terms. Each party must provide the records it owes and return or delete information as the applicable data terms require. Surviving obligations are identified in Section 15.",
+        "We will acknowledge your closure request and explain any provider steps needed to complete it. A separate provider or platform agreement continues under its own terms unless expressly ended. Account closure does not transfer payment credentials or grant another provider access. Any agreed transition must follow an authorized, secure process."
+      ]
+    },
+    {
+      "id": "liability",
+      "title": "13. Liability",
+      "paragraphs": [
+        "This section applies to claims arising from or connected with the agreement, whatever legal basis is asserted, including contract, negligence or another civil claim. Its limits continue to apply if a remedy provided by the agreement fails to achieve its intended purpose. Mandatory rights and liabilities that law does not allow the parties to exclude remain unaffected.",
+        "Except for express commitments in the agreement and protections that cannot lawfully be excluded, the services are supplied in their existing condition. Etail disclaims implied warranties of merchantability, suitability for a particular purpose and freedom from infringement, including warranties inferred from prior dealings or industry practice. Service interruptions and matters outside Etail’s control remain subject to Section 9.",
+        "Except for the excluded claims described below, neither party owes the other compensation for indirect, consequential, incidental, special, punitive or reliance losses; lost revenue, profit, savings, goodwill or business opportunity; interrupted business; personal injury; property damage; or loss of data, to the extent law permits. This applies even if the possibility of the loss was known or foreseeable.",
+        "Except for excluded claims, the combined liability of either party is capped at the service fees you paid under this agreement during the 12 months before the first event giving rise to liability, excluding amounts passed to financial providers. The cap is aggregate, not renewed for each claim. It has no minimum amount.",
+        "Excluded claims are claims arising from a party’s gross negligence, fraud or willful misconduct; your breach of the service use restrictions in the accepted agreement, including any incorporated Acceptable Use Policy; breach of confidentiality other than a breach arising from a Data Incident; and amounts payable under the indemnities in Section 14. The exclusion of a Data Incident from the confidentiality exception does not remove another exception that independently applies, such as fraud or gross negligence.",
+        "Data protection duties continue to apply. A Data Incident or unlawful processing does not, solely for that reason, remove the liability cap or loss exclusions. Applicable law or an express amendment may require a different result.",
+        "Your payment obligations, including properly due fees, network assessments, taxes, refunds and dispute adjustments, are not limited by the damages cap. A network assessment still requires an applicable contractual basis. Nothing in this section permits either party to retain funds it is required to remit."
+      ]
+    },
+    {
+      "id": "claims",
+      "title": "14. Third party claims",
+      "paragraphs": [
+        "You will indemnify Etail, its Affiliates and their directors, employees and agents for Losses arising from third party claims connected with your use of the services, or with your gross negligence, willful misconduct, fraud or material breach of this agreement. This obligation is subject to the exclusions and claim procedure below.",
+        "Each party will also indemnify the other party, its Affiliates and their directors, employees and agents for Losses from a third party claim that use of the indemnifying party’s supplied Materials infringes intellectual property rights. For Etail, this includes the services and Etail supplied technology and branding. For you, it includes your branding and other Materials you supply. The obligation does not cover infringement caused only by combining those Materials with items the indemnifying party did not supply.",
+        "For an intellectual property claim, the supplying party may, at its expense, change or replace the affected Materials to avoid infringement, obtain permission for continued use, or end permission to use the affected Materials on 30 days’ notice. The intellectual property provisions of this section provide the parties’ exclusive contractual remedies and liability for that claim, to the extent law permits.",
+        "An indemnity does not cover Losses to the extent caused by the protected person’s negligence, fraud, willful misconduct or breach of this agreement. This exclusion applies to both the general merchant indemnity and the intellectual property indemnities.",
+        "The party seeking protection must promptly notify the indemnifying party and provide relevant information. The indemnifying party controls the defense, choice of counsel and settlement at its expense. The protected party must cooperate reasonably at that expense and must not prejudice the defense. Delay in notice reduces the indemnity only to the extent it actually harms the defense.",
+        "A settlement may impose a monetary obligation on a protected person only if the indemnifying party pays it. Any other obligation requires that person’s prior consent. Losses, Materials and Affiliates are defined in Section 17. These indemnities do not create authority to debit a bank account or change a provider agreement."
+      ]
+    },
+    {
+      "id": "general",
+      "title": "15. General terms",
+      "paragraphs": [
+        "Neither party may assign this agreement without the other’s written consent, not to be unreasonably withheld, except as expressly permitted in the Service Order or required by law. Using a service provider does not release a party from its own obligations.",
+        "A party affected by an event beyond its reasonable control must notify the other where practicable and mitigate its effects. The event does not excuse amounts already owed, confidentiality or data protection duties.",
+        "The accepted documents form the agreement for the identified service. An unenforceable provision is limited or severed only as necessary; the remainder continues where lawful. Failure to enforce a right once does not waive it. These terms give no unrelated third party enforcement rights and do not override rights granted in an applicable provider agreement.",
+        "After termination, accrued payment obligations, confidentiality, information protection, applicable records duties, liability limits, indemnities, intellectual property provisions and business dispute terms continue for the matters they cover. Related definitions and provisions needed to enforce those obligations also continue. Neither party may represent that it can bind the other, except for authority expressly granted in the accepted account documents.",
+        "An assignment must also satisfy applicable provider, network and legal requirements. Consent does not release existing obligations unless expressly agreed.",
+        "Relief for an event beyond reasonable control applies only to the extent the event actually prevents performance. Resume performance promptly when possible. Either party may end the affected service if the event prevents material performance for more than 30 consecutive days.",
+        "The parties should exchange relevant facts and the remedy sought when a disagreement arises. That process does not suspend a limitation period, prevent urgent relief or restrict contact with a regulator."
+      ]
+    },
+    {
+      "id": "business-disputes",
+      "title": "16. Business disputes and arbitration",
+      "paragraphs": [
+        "The substantive law of the District of Columbia governs this agreement, excluding its conflict of laws rules. The Federal Arbitration Act governs arbitration where applicable. Mandatory legal protections remain in force.",
+        "Except for intellectual property claims and matters that law does not permit to be arbitrated, disputes between the business parties arising from this agreement are resolved by binding arbitration administered by the American Arbitration Association under its Commercial Arbitration Rules. The seat of arbitration is Washington, DC. Charges follow the applicable AAA fee schedule, subject to law. A court with jurisdiction may enforce the award.",
+        "Claims outside arbitration and proceedings concerning the arbitration agreement or an award may be brought in the Superior Court of the District of Columbia or the United States District Court for the District of Columbia, where jurisdiction exists. A party may seek necessary temporary relief while arbitration is pending.",
+        "Where lawful, claims proceed individually rather than as class, consolidated or representative proceedings. A court determines enforceability; a claim to which this restriction cannot lawfully apply proceeds in a competent court. Each business party waives a jury in covered court proceedings only to the extent enforceable.",
+        "This section binds only business parties that expressly accept it and receive a copy they can save. It does not waive consumer rights, a separate acquiring agreement, regulatory authority or nonwaivable remedies. An amendment must identify this section expressly."
+      ]
+    },
+    {
+      "id": "definitions",
+      "title": "17. Defined terms",
+      "paragraphs": [
+        "These meanings apply within the merchant service agreement, subject to the applicable method rules and document priority."
+      ],
+      "record": [
+        {
+          "label": "Account",
+          "description": "The merchant account identified in the Service Order, including approved users and enabled services."
+        },
+        {
+          "label": "Agreement",
+          "description": "The accepted Service Order and the versions of terms, schedules and amendments it expressly identifies."
+        },
+        {
+          "label": "Alternative payment method",
+          "description": "A payment method other than the standard card arrangement that is expressly enabled for the account."
+        },
+        {
+          "label": "Authorization",
+          "description": "An issuer or payment service response concerning a payment. Approval is not final settlement or a bank deposit."
+        },
+        {
+          "label": "Capture",
+          "description": "Submission of an authorized card transaction for further processing, distinct from settlement."
+        },
+        {
+          "label": "Customer",
+          "description": "The person purchasing the merchant’s goods or services. In Data Processing Terms, customer means the business that accepts those terms."
+        },
+        {
+          "label": "Dispute",
+          "description": "A challenge handled through the applicable payment method, provider or network process."
+        },
+        {
+          "label": "Network requirements",
+          "description": "Rules applicable to an enabled method and the parties’ actual roles."
+        },
+        {
+          "label": "Payout",
+          "description": "Transfer of an available amount to the merchant’s approved destination account."
+        },
+        {
+          "label": "Provider",
+          "description": "An entity identified for the account that supplies an agreed part of the service."
+        },
+        {
+          "label": "Reserve",
+          "description": "An amount retained under identified contractual authority for exposure, subject to calculation, review and release conditions."
+        },
+        {
+          "label": "Settlement",
+          "description": "Movement and accounting of transaction obligations through the applicable payment system."
+        },
+        {
+          "label": "Affiliate",
+          "description": "An entity controlling, controlled by or under common control with a party. Control means direct or indirect ownership of more than half of its voting power or equity. This definition does not make every service provider an Affiliate."
+        },
+        {
+          "label": "Data Incident",
+          "description": "Unlawful or unauthorized handling of personal information, including access, use, alteration, disclosure, destruction or loss, while that information is held or controlled by a party, its Affiliates or people and providers acting for them."
+        },
+        {
+          "label": "Losses",
+          "description": "Amounts finally awarded to or settled with a third party bringing a claim, together with resulting penalties, fines and reasonable outside costs paid by a protected person, including legal fees. Recovery remains subject to Section 14 and applicable law."
+        },
+        {
+          "label": "Materials",
+          "description": "Software, hardware, documents, data, inventions, branding and other items a party supplies in connection with the agreed service. Intellectual property rights include copyright, patents, trademarks, service marks, trade secrets and other legally recognized rights."
+        }
+      ]
+    },
+    {
+      "id": "service-order",
+      "title": "18. Your Merchant Service Order",
+      "paragraphs": [
+        "Your Merchant Service Order sets out the services and terms agreed for your account. You must receive those terms before accepting them. Only the services, charges and account actions you authorize may be provided or carried out."
+      ],
+      "record": [
+        {
+          "label": "Parties and account",
+          "description": "The agreement identifies your business, its legal and trading names, entity type, jurisdiction, address, authorized representatives and account reference, alongside Etail Depot US, Inc."
+        },
+        {
+          "label": "Business scope",
+          "description": "Your approved activities, websites, transaction types, delivery times, locations and currencies define the scope of your account. A restricted activity requires written approval identifying the approving party, conditions and duration."
+        },
+        {
+          "label": "Payment methods",
+          "description": "Your account terms identify the enabled payment methods and card categories, any permitted limits on card acceptance and functions requiring separate authorization."
+        },
+        {
+          "label": "Providers and activation",
+          "description": "You must receive the names and roles of the acquiring bank and other providers, their applicable contracts and versions, and any acceptance deadline. Processing begins only after the responsible provider confirms activation."
+        },
+        {
+          "label": "Commercial and funding terms",
+          "description": "Your accepted terms include the fee schedule, billing arrangements, payout schedule, any reserve notice and agreed variations for your account."
+        },
+        {
+          "label": "Information and support",
+          "description": "You must receive the applicable privacy notices, data terms and agreed data processing arrangements. Your account terms identify the contacts for service questions, formal notices, privacy requests and urgent issues."
+        },
+        {
+          "label": "Contract versions",
+          "description": "You must receive a copy of each document forming your agreement, identified by title, version and date. Changes must be expressly identified. A replacement agreement identifies the earlier agreement and affected accounts."
+        }
+      ],
+      "links": [
+        {
+          "label": "Fees and billing",
+          "href": "/legal/fees"
+        },
+        {
+          "label": "Payouts and reserves",
+          "href": "/legal/payouts-and-reserves"
+        },
+        {
+          "label": "Data processing terms",
+          "href": "/legal/data-processing"
+        }
+      ]
+    },
+    {
+      "id": "agreement-acceptance",
+      "title": "19. Acceptance and copies",
+      "paragraphs": [
+        "Before accepting, you must be able to read and retain your Merchant Service Order and each document it incorporates. Both parties must keep a copy of the full agreement. The acceptance record must identify the authorized representatives and their roles, the exact document versions, the signature or other affirmative action, the acceptance and effective dates, and how copies were delivered.",
+        "Each required decision must be affirmative. Agreement acceptance, consent to electronic delivery, a bank debit authorization and enrollment in an optional service have separate purposes. An optional service or marketing choice must not be preselected.",
+        "Before you consent to electronic delivery, you must be told which communications it covers, how they will be delivered, and what you need to open, save or print them. The disclosure must explain any paper or accessible copy option, how to update your contact details, how to withdraw consent, and any disclosed fee or effect on the affected service. Changes to access requirements must follow applicable notice and consent rules.",
+        "You can contact compliance@etaildepot.com to request an agreement copy, ask about an accessible format, update your notice contact or request withdrawal of electronic delivery consent. Withdrawal applies to future delivery under the applicable process and does not invalidate previously accepted records. Where a provider holds your acceptance record, you must be told who holds it and how to obtain an authorized copy.",
+        "Accepting this agreement does not activate processing, authorize a customer’s payment or create a bank debit mandate, personal guarantee or security interest. Each requires its own applicable approval or valid authorization. Visiting this website does not provide that approval or authorization.",
+        "Only the document versions presented and accepted form part of your agreement. A document posted later does not become part of that acceptance merely because it appears on this website. A later change must follow the applicable notice and acceptance provisions. The exact accepted documents and evidence of acceptance must remain available through the responsible record holder.",
+        "An interrupted session or failed copy delivery does not authorize consent to be inferred or duplicated. If you cannot obtain your agreement or confirm its acceptance status, contact the service holding the record or compliance@etaildepot.com for assistance."
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ],
+  "fees": [
+    {
+      "id": "scope",
+      "title": "When this schedule applies",
+      "paragraphs": [
+        "This schedule covers United States merchant accounts accepting domestic online card payments in USD when selected in the Merchant Service Order. An expressly accepted account variation controls the affected charge. Services must be enabled for the account before use.",
+        "The amounts below are merchant service charges. They do not price a card issuance service or authorize charges that have not been disclosed."
+      ],
+      "table": "fees"
+    },
+    {
+      "id": "refund-treatment",
+      "title": "Refunds and dispute fees",
+      "paragraphs": [
+        "Original processing and currency conversion fees are not returned when a payment is refunded. The $15 manual dispute response fee is returned if you win the dispute. That does not imply return of the separate $35 dispute received fee. Any other reversal treatment must be stated in your account’s billing terms.",
+        "For a $100.00 domestic online card payment, the base fee is $3.20 and the amount after that fee is $96.80. Other charges, refunds, disputes and reserve adjustments may change the eventual payout."
+      ]
+    },
+    {
+      "id": "optional-service",
+      "title": "Optional dispute prevention",
+      "paragraphs": [
+        "Optional dispute prevention costs 0.4% of eligible successful payment volume enrolled in the service. Your enrollment must identify the transactions covered. Ordinary transaction receipts remain included without enrollment.",
+        "The service uses Order Insight to share supported purchase details with participating banks. Before you enroll, the terms must explain which accounts and transactions qualify, provider coverage, what information will be shared and the required permissions, when fees apply, billing and refund treatment, the start date and how to cancel. Eligibility depends on transaction history, required records and applicable rules. The service does not cover every issuer or dispute reason, guarantee prevention or replace response deadlines. It does not begin automatically or convert from a trial without your agreement."
+      ]
+    },
+    {
+      "id": "other-methods",
+      "title": "ACH and other charges",
+      "paragraphs": [
+        "ACH and other enabled methods have separate fees, availability and return rules. Your billing terms must identify any applicable return, transfer, network, reserve or other account charge before it applies. Only charges disclosed and accepted for your account may be collected."
+      ]
+    },
+    {
+      "id": "calculation",
+      "title": "Calculation and collection",
+      "paragraphs": [
+        "The standard processing fee is incurred on a successfully captured card payment, using the captured amount, including tax, shipping or tip within that payment. An authorization, decline or cancellation before capture does not incur that standard fee. Separately agreed event fees follow their own charging rules.",
+        "The billing terms for your account must explain how additional percentages, fixed fees, multiple captures, currency conversion and rounding are calculated. Any variation from the published rates must be disclosed and accepted before it applies. The same fixed charge must not be collected twice for the same chargeable transaction.",
+        "An international card is issued outside the United States, as identified in the processor’s transaction information. Currency alone does not establish issuer country. The merchant entered supplement applies to details entered by the merchant. A conversion supplement applies only when conversion occurs. The transaction information must show the original amount, USD calculation base, exchange rate source and time, and conversion fee. Any different provider calculation must be disclosed before it applies.",
+        "Pay charges when due under your accepted billing terms and maintain a valid means of payment for them. Collection may use an authorized settlement deduction or invoice. Charging a separate payment method requires valid consent. Debiting a bank account requires a separate valid authorization. The same charge must not be collected twice.",
+        "An invoice must identify the creditor, charges, credits, amounts already collected and balance due. It cannot create an unagreed charge or shorten an accepted payment period. These terms create no late fee or interest rate.",
+        "A payout delay, reserve or customer dispute does not defer an unrelated amount properly due. If an authorized collection fails, pay by another agreed lawful method by the applicable due date. Revoking a collection authorization does not cancel a debt, and a failed collection does not create permission for a new debit or retry. An overdue amount may result in a service restriction under the Merchant Services Terms."
+      ]
+    },
+    {
+      "id": "taxes-changes",
+      "title": "Taxes and changes",
+      "paragraphs": [
+        "Fees exclude applicable service taxes unless the accepted schedule states otherwise. Lawfully chargeable taxes must be shown separately. Keep your business address and tax information accurate and provide valid exemption evidence where applicable. Taxes on your own sales remain separate; this schedule does not include tax calculation or filing services.",
+        "A new fee or increase for a service already in use requires at least 30 days’ written notice, or longer where law or the accepted order requires, subject to the limited mandatory change provisions in the Merchant Services Terms. The notice identifies the amount or calculation, effective date and your options. An invoice alone does not amend an agreed fee."
+      ],
+      "links": [
+        {
+          "label": "Merchant Services Terms",
+          "href": "/legal/merchant-services#changes"
+        }
+      ]
+    },
+    {
+      "id": "statements",
+      "title": "Statements and billing corrections",
+      "paragraphs": [
+        "Your account’s billing terms state the statement period, availability date and delivery method. The billing record must distinguish when a fee was incurred from when it was collected and identify the account, transaction or service, calculation base, rate, fee, tax, credits and collection method. It must state the reporting time zone. Later adjustments identify their original transaction and posting period.",
+        "A summary of fees already collected is not a second demand for payment. Only the unpaid balance may be invoiced. Statement frequency does not determine collection frequency or create a monthly account fee.",
+        "A billing correction reverses the erroneous charge and related tax that must be corrected; it does not change retained processing fees on an ordinary customer refund. Promptly identify a disputed entry and its reason, and pay undisputed amounts when due. Etail will investigate and record the outcome with an adjustment reference. These terms create no automatic forfeiture for failing to report within a fixed number of days."
+      ]
+    },
+    {
+      "id": "billing-record",
+      "title": "Your account’s billing terms",
+      "paragraphs": [
+        "You must receive the charges and collection terms for your account before they apply. A published rate alone does not authorize a deduction or bank debit. Any calculation or collection performed by a provider must be confirmed for your account.",
+        "You are charged for an optional service or additional payment method only when you expressly select it and accept its applicable charges. Leaving an option unselected does not authorize an extra service, fee or collection method. Any agreed variation must identify your account, the affected provision and its effective date."
+      ],
+      "record": [
+        {
+          "label": "Billing party and currency",
+          "description": "Etail Depot US, Inc. bills in USD. You must be told the identity, role and collection authority of any provider or collection agent."
+        },
+        {
+          "label": "Calculation",
+          "description": "Your accepted rates, charging events and calculation method determine each fee. The provider must support the transaction classification and confirm any agreed currency conversion or multiple capture method."
+        },
+        {
+          "label": "Collection and due dates",
+          "description": "You must receive the collection method, collection authority, invoice due dates, statement delivery arrangements and reporting time zone. A bank debit requires its own valid authorization where applicable."
+        },
+        {
+          "label": "Additional charges",
+          "description": "Charges for other enabled methods or services must be disclosed as an amount or calculation. Applicable service taxes and any exemption must also be identified."
+        },
+        {
+          "label": "Optional enrollment",
+          "description": "Before choosing an optional service, you must receive its eligible volume, information sharing, charging and billing rules, refund treatment, start date and cancellation terms."
+        },
+        {
+          "label": "Questions and records",
+          "description": "You may raise a billing question and request review of an unresolved complaint through the contact identified for your account. Provide supporting records through the designated secure channel. An invoice cannot create a charge or collection right you have not agreed to."
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ],
+  "payouts-and-reserves": [
+    {
+      "id": "scope",
+      "title": "United States funding arrangements",
+      "paragraphs": [
+        "This schedule covers USD payouts to approved United States bank accounts for United States merchant accounts. It applies only when included in your Merchant Service Order and confirmed by the responsible funding provider. Your account’s payout terms must identify that provider, the receiving account, processing cutoff, time zone and any agreed variation.",
+        "Etail may coordinate and report funding only within its assigned authority. This schedule does not appoint Etail as custodian, authorize investment of funds or create a deposit account.",
+        "Payouts can be initiated only from funds available under the accepted account terms. Estimated timing does not override a return, reversal, lawful hold or reserve. Changing payout frequency does not make unsettled funds available sooner."
+      ]
+    },
+    {
+      "id": "schedule",
+      "title": "Your payout schedule",
+      "paragraphs": [
+        "Your accepted account terms identify when card or ACH funds become available, how often payouts are initiated and any conditions for the first payout. Account verification, risk restrictions, returns, bank holidays and an authorized hold can affect availability or receipt.",
+        "Confirm the applicable schedule before processing begins. Any change must follow the notice and acceptance provisions in your account agreement. Weekly, monthly or manual payouts require agreement and provider support. This schedule does not include instant payouts or accelerated settlement."
+      ],
+      "table": "funding"
+    },
+    {
+      "id": "calculation",
+      "title": "From settlement to bank deposit",
+      "paragraphs": [
+        "The available payout amount starts with eligible settled transactions and accounts for properly applied fees, refunds, disputes, reserve movements and prior balances. Each adjustment must have a traceable reference and contractual or legal basis. The same obligation must not be deducted twice.",
+        "Business days are Monday through Friday excluding United States banking holidays. Transactions after the recorded cutoff enter the next processing day. An initiated payout is not proof that your bank credited it.",
+        "Your payout records must show the period covered, transaction or batch references, adjustments, payout amount, transfer reference and status. Any correction must include the reason and the original references."
+      ]
+    },
+    {
+      "id": "bank-account",
+      "title": "Bank details and failed payouts",
+      "paragraphs": [
+        "Use the secure account process to establish or change the receiving account. An email alone does not authorize a different payout destination. Keep the account eligible to receive the applicable payments.",
+        "If a payout fails or is returned, the responsible provider must establish its status before a replacement is sent. We will assist with records available to us. Any related fee requires disclosure in your account documents."
+      ]
+    },
+    {
+      "id": "reserves",
+      "title": "Reserve notices and restrictions",
+      "paragraphs": [
+        "A reserve or funding restriction may be required to address exposure from refunds, disputes, delayed fulfillment, fraud, unusual activity or a binding legal, network or provider requirement. It must remain within the responsible party’s lawful authority and the accepted account terms.",
+        "The reserve notice must identify the holder and decision authority, reason where disclosure is permitted, calculation, funding method, review arrangements and release conditions. It must distinguish reserve funds from an available payout. Reserve percentages and holding periods are specified in the applicable reserve notice.",
+        "A change must be recorded and explained where permitted. Immediate measures strictly required for a legal, security or network obligation may take effect before notice, with notice as soon as permitted.",
+        "The amount and duration must relate to the identified exposure, including financial deterioration or continuing obligations after closure. There is no universal reserve percentage or holding period. You may submit relevant information for review through the contact stated in the notice.",
+        "Fund or replenish an authorized reserve by the amount, method and deadline stated in the valid notice. Supply information reasonably needed to assess continuing exposure. The notice must explain any shortfall and permitted consequence of failing to fund it. Additional deductions or transfers must remain within the accepted authority; a reserve notice alone does not create a bank debit mandate."
+      ]
+    },
+    {
+      "id": "recovery",
+      "title": "Amounts owed and recovery",
+      "paragraphs": [
+        "Recovery is limited to amounts properly owed for the identified merchant account, using lawful methods authorized by its agreements. The party collecting must provide a record of the obligation, calculation and credits already applied. These terms do not authorize recovery of another company’s debts.",
+        "A bank debit, guarantee or security interest requires its own valid instrument and authority. An account deficit does not create those rights automatically. Disputed amounts must follow the applicable account review process before being treated as final charges.",
+        "Within the accepted provider arrangement, you authorize settlement proceeds or reserves to be applied to amounts properly due for this account. Fund an authorized reserve as required by its valid notice and pay an invoiced shortfall by the accepted due date. The collecting party must identify the creditor and obligation, credit each recovery once and correct any overcollection. A request to return money paid in error must explain the error and amount owed. Collection costs apply only where the agreement and law permit.",
+        "A separate bank debit authorization must identify the originator, account and covered obligations, and address timing, notices, cancellation and permitted retries under applicable ACH rules. It must be accepted by a person with authority over the account, with a record of the accepted version, date and consent available to the merchant. Accepting this schedule alone is not that authorization. Revocation does not erase a debt; another lawful payment method may be required.",
+        "These terms grant no authority over affiliate assets, no right to reserve earnings and no security interest or personal guarantee. Such rights require their own valid instrument consistent with the provider arrangement and law."
+      ]
+    },
+    {
+      "id": "release",
+      "title": "Review, release and closure",
+      "paragraphs": [
+        "The reserve holder must review the amount against remaining exposure and applicable requirements, and release funds no longer required under the agreed conditions through the approved account process. A release estimate is not an unconditional date while unresolved obligations remain.",
+        "Ending the service does not erase existing refunds, disputes or amounts due. Final accounting must distinguish released funds, remaining reserves and unresolved adjustments. Contact us about an unexplained difference or to request the applicable reserve notice.",
+        "An extension requires an updated reason and notice where permitted. Closure does not forfeit a reserve or require immediate release while valid exposure remains. Released amounts follow the account’s payout schedule."
+      ],
+      "links": [
+        {
+          "label": "Merchant Services Terms",
+          "href": "/legal/merchant-services"
+        },
+        {
+          "label": "Fees and billing",
+          "href": "/legal/fees"
+        }
+      ]
+    },
+    {
+      "id": "funding-record",
+      "title": "Your account’s payout terms",
+      "paragraphs": [
+        "Your accepted payout terms explain the schedule for your account, the responsible provider and how to obtain help with a transfer or discrepancy."
+      ],
+      "record": [
+        {
+          "label": "Provider and destination",
+          "description": "You must receive the funding provider’s identity and a reference to your verified receiving account. Use the designated secure process for bank details; do not send full bank credentials in ordinary correspondence."
+        },
+        {
+          "label": "Timing",
+          "description": "Your schedule identifies the currency, cutoff and time zone, business days, funds availability, payout frequency, first payout conditions and accepted variations. Funds availability, payout initiation and bank receipt are separate events."
+        },
+        {
+          "label": "Adjustments and returns",
+          "description": "Your terms explain permitted deductions, the payout calculation, failed or returned transfers and any separate fee. A transfer’s status and trace reference must be checked before a replacement is issued."
+        },
+        {
+          "label": "Responsibilities and support",
+          "description": "You must be told who initiates and reports payouts, how to reconcile them and where to raise a discrepancy. Any reporting deadline and its consequence must be disclosed."
+        },
+        {
+          "label": "Account changes",
+          "description": "Changes follow the applicable notice and acceptance process. Bank details must be updated securely. Your terms explain the treatment of existing transactions, remaining reserves and final account records."
+        }
+      ]
+    },
+    {
+      "id": "reserve-notice",
+      "title": "Your reserve notice",
+      "paragraphs": [
+        "If a reserve applies to your account, you must receive a notice explaining its basis, calculation, review and release conditions. A reserve notice does not replace an acquiring agreement, bank debit authorization or security instrument."
+      ],
+      "record": [
+        {
+          "label": "Account and holder",
+          "description": "You must be told which business and account the reserve covers, who holds it, who decides it, the governing provider agreement and Etail’s authority in the arrangement."
+        },
+        {
+          "label": "Reason and calculation",
+          "description": "The notice explains the exposure or binding requirement and supporting reference, effective date, amount or percentage, calculation base, any cap and the treatment of the existing balance."
+        },
+        {
+          "label": "Funding and replenishment",
+          "description": "The notice explains authorized settlement deductions or transfers, funding deadlines, shortfall calculations and permitted consequences of nonpayment. A bank debit requires a separate valid authorization."
+        },
+        {
+          "label": "Review and release",
+          "description": "You must receive the review timing, conditions for fixed or rolling releases, treatment of unresolved exposure, any extension process and the method of release."
+        },
+        {
+          "label": "Recovery record",
+          "description": "If a reserve is applied to an amount owed, the record must identify the creditor, obligation, adjustment references, amount applied, credits and remaining balance."
+        },
+        {
+          "label": "Notice and review",
+          "description": "The notice identifies its recipient, delivery method and service contact. You may provide relevant information for review through that contact."
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ],
+  "acceptable-use": [
+    {
+      "id": "scope",
+      "title": "Use your approved merchant account",
+      "paragraphs": [
+        "Use the service only for the business, products, channels and locations approved for your account. Each party must comply with laws and payment method rules that apply to its activities. A binding legal, network or account restriction must not be evaded.",
+        "This policy forms part of the merchant agreement when selected. A restricted activity requires written approval before processing. Approval may include conditions, limits and an expiry date. No approval permits conduct prohibited by law, sanctions, binding network rules or the applicable acquiring program."
+      ]
+    },
+    {
+      "id": "prohibited",
+      "title": "Prohibited conduct",
+      "paragraphs": [
+        "Do not use the service for:"
+      ],
+      "bullets": [
+        "Illegal transactions, fraudulent investment or sales schemes, stolen goods, counterfeit products or knowing infringement of another person’s rights.",
+        "Transactions barred by applicable sanctions, concealment of a prohibited person or activity, or use of false identity, ownership, license or business information.",
+        "Fictitious sales, unauthorized charges, disguised cash advances, card testing, duplicate submission or deliberate evasion of network controls.",
+        "Processing for an undisclosed seller, disguising the true seller or routing transactions through another business or account to bypass a restriction.",
+        "Money laundering, knowing facilitation of criminal activity, unlawful pyramid schemes, deceptive payment collection or manipulation of refunds and disputes.",
+        "Unauthorized system access, harmful code, deliberate security interference or misuse of customer information."
+      ]
+    },
+    {
+      "id": "review",
+      "title": "Activities requiring written approval",
+      "paragraphs": [
+        "Do not submit transactions for the activities below until Etail has issued specific written approval reflecting any required acquirer, provider or network approval. Lawful operation, a license, account access or a successful payment is not that approval. Some activities cannot be supported under the applicable program and will be declined.",
+        "Provide the business model, actual seller, products, licenses, customer terms, delivery timing and intended movement of funds. The approval must identify the merchant account, approved activity, payment methods, channels, territories, limits, conditions and any expiry date. Approval of one activity does not approve another business or seller.",
+        "Tell us before changing an approved activity, adding a seller, changing payment routing or introducing fund holding or onward transfers. Obtain written approval before processing the changed activity. Report a lost or suspended license or other loss of eligibility immediately and stop the affected processing until written approval to resume is given.",
+        "An industry example on this website, a referral or a software integration is not approval. Client money, trust accounts, escrow and payments for other sellers require the specific legal, account and provider arrangements that apply to them. They must not be processed through an ordinary merchant account merely because the platform can submit a payment."
+      ],
+      "bullets": [
+        "Marketplaces, payment aggregation and sales or collections for other sellers, including commissions, split payments, escrow and holding or forwarding funds.",
+        "Shipping brokers, freight forwarders and related arrangements involving carrier payments, factoring or credit.",
+        "Travel agencies, booking platforms, tour operators and travel sold before delivery, including supplier collections and cancellation exposure.",
+        "Legal service payment arrangements involving client advances, retainers, trust or IOLTA accounts, bankruptcy services or creditor collections.",
+        "Financial services, lending, debt collection, debt relief, credit repair, insurance, investments, remittances and digital asset services.",
+        "Regulated healthcare, telehealth, pharmaceuticals, medical devices and products requiring professional or regulatory authorization.",
+        "Age restricted or otherwise controlled products and services, including alcohol, tobacco, cannabinoid products, weapons, adult content and gambling related activities where lawful.",
+        "Charitable fundraising, crowdfunding and collection of money for a beneficiary other than the merchant.",
+        "Stored value, gift cards, virtual currency, precious metals and other products whose main purpose is to store or transfer value.",
+        "Subscriptions, automatic renewals, free trials that convert to paid services, substantial advance payments, extended delivery, cross border activity or material increases in transaction volume outside the approved account scope."
+      ]
+    },
+    {
+      "id": "customer-practices",
+      "title": "Customer communications",
+      "paragraphs": [
+        "Use accurate product descriptions, total prices and recognizable seller information. Disclose delivery, renewal, cancellation and refund conditions before purchase. Honor required customer remedies and keep evidence of the agreed terms.",
+        "Do not use misleading statements, concealed subscriptions, forced consent or threats to prevent a legitimate complaint or issuer dispute. Do not claim Etail, a bank or a network guarantees your products or endorses your business."
+      ]
+    },
+    {
+      "id": "response",
+      "title": "Review and corrective action",
+      "paragraphs": [
+        "We may request records, licenses, customer disclosures and transaction evidence needed to assess compliance. Supply accurate information by the reasonable deadline stated and preserve relevant records. We may restrict or end affected processing under the Merchant Services Terms if an approval condition is breached, eligibility changes, required information is not supplied or a binding requirement applies.",
+        "Where permitted, we will explain the concern and available corrective steps. Processing may resume only after any required written approval; moving transactions to another account does not resolve the restriction.",
+        "Report suspected misuse to compliance@etaildepot.com with the account or website concerned and a brief description. Do not send customer credentials or sensitive records in the initial message."
+      ],
+      "links": [
+        {
+          "label": "Suspension and termination",
+          "href": "/legal/merchant-services#suspension"
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ],
+  "software-platforms": [
+    {
+      "id": "scope",
+      "title": "Platform services and acceptance",
+      "paragraphs": [
+        "These terms cover the referral, integration and support services agreed in a Platform Service Order between Etail Depot US, Inc. and the named software business. They apply to United States merchant accounts. Both parties must accept the order and the documents it identifies before the arrangement begins.",
+        "The Platform Service Order identifies the permitted integration, responsibilities, fees, support contacts and data access. These platform terms and the general provisions identified below form the platform agreement when accepted. The parties must receive and retain the incorporated version.",
+        "Approval covers only the merchant types, activities and territory specified in the order. A platform relationship does not approve its merchants or permit accounts outside the United States program. Restricted activities require the written approval described in the Acceptable use policy before processing begins."
+      ],
+      "links": [
+        {
+          "label": "Activities requiring written approval",
+          "href": "/legal/acceptable-use#review"
+        }
+      ]
+    },
+    {
+      "id": "merchant-relationship",
+      "title": "Each merchant has its own account",
+      "paragraphs": [
+        "The platform may introduce a merchant but cannot promise account approval, a particular price, funding time or removal of a restriction. The merchant must supply its own application and accept the terms applicable to its account.",
+        "The platform is not appointed to hold merchant funds, approve accounts or act for an acquiring bank by this agreement. Seller transfers and account aggregation require a separate expressly approved arrangement.",
+        "The platform’s separate software terms must explain its own service, charges, support and proposed account access. Do not imply that Etail supplies the entire software product. A platform is not appointed as merchant of record or agent with authority to bind Etail by this agreement.",
+        "Where a platform presents account documents, it must retain evidence of the versions shown, signer identity and authority, affirmative acceptance and date, and supply a copy the merchant can save. Acceptance on a merchant’s behalf requires specific valid authority and a process permitted by the responsible provider. If a provider handles acceptance, the merchant must be told who holds the record and how to obtain an authorized copy."
+      ]
+    },
+    {
+      "id": "permissions",
+      "title": "Merchant permissions",
+      "paragraphs": [
+        "Before accessing an account, obtain a clear authorization identifying permitted actions, information access and any platform charges. Keep evidence and make the authorization available to the merchant. Only request access necessary for the selected function.",
+        "A technical connection alone does not authorize refunds, recurring charges, changes to bank details or deductions from payouts. Provide a way to revoke access and promptly carry out an authorized revocation. Stop initiating affected actions when permission expires, is revoked or is suspended. Retain information only as permitted for continuing records and legal duties.",
+        "The merchant’s permission must identify the affected accounts, purpose, duration, information, actions and limits. Referring a merchant does not give you access to its account. Additional access requires additional authorization. Accepting your platform agreement does not provide the merchant’s consent."
+      ]
+    },
+    {
+      "id": "integration",
+      "title": "Integration and records",
+      "paragraphs": [
+        "Use the assigned integration instructions and credentials. Protect secrets, limit access, validate payment updates and design recovery so an interrupted request does not create a duplicate payment or refund. A successful technical response is not proof of final bank receipt.",
+        "Maintain accurate merchant and transaction references. Explain which party provides account support and which provides software support. Report a service or security issue promptly through the agreed route. Do not claim access to unapproved functions.",
+        "Access is limited to the assigned interfaces, environments, accounts and functions. Do not expose private credentials in browser code, URLs or logs, use one merchant’s permission for another or bypass provider limits. New functions or material changes to data use, transaction flow or authority require approval before use.",
+        "Distinguish application from activation, authorization from capture, and payout initiation from bank receipt. Follow the approved verification and recovery procedures for interrupted, repeated or out of order messages. Refunds, payout instructions and bank changes require both an enabled capability and specific authority.",
+        "Do not resell or share assigned access, delegate merchant permissions to an undisclosed party or enable another platform through your connection without prior written approval. Before live use, the required orders and merchant authorizations must be accepted, each merchant must be approved and activated, and the responsible provider must enable the specific functions. Approval of a platform connection does not waive those conditions."
+      ]
+    },
+    {
+      "id": "data-fees",
+      "title": "Data and fees",
+      "paragraphs": [
+        "Access to merchant and customer information follows the merchant authorization, applicable privacy notices and the agreed data terms. A referral does not authorize unrelated marketing, resale or unrestricted data access.",
+        "Platform fees, referral compensation and any permitted collection route must be recorded separately. Any allocation of merchant losses or negative balances must be expressly agreed; it is not implied by introducing the merchant.",
+        "A platform fee, referral payment or revenue share requires an express amount or formula, calculation base, eligible accounts, exclusions, payment date, reversals, taxes and treatment after termination. No compensation arises from a public link or inquiry alone. Merchant charges require disclosure in the merchant’s accepted terms; deductions also require valid authority and an enabled arrangement.",
+        "Each party retains its tax and information reporting duties. Any filing service must identify the responsible filer, data supplier, withholding, delivery and corrections. Integration alone does not include a filing service or transfer those duties.",
+        "Any separately accepted undertaking to cover merchant losses must identify the merchants, events, limits, evidence, recovery method and duration. A passed through network or provider assessment needs an applicable term and supporting explanation. No personal guarantee or security interest is created here.",
+        "Names, marks and customer stories require permission. Do not imply certification of another party’s entire business or promise support, settlement or protection beyond the accepted arrangement."
+      ],
+      "links": [
+        {
+          "label": "Data processing terms",
+          "href": "/legal/data-processing"
+        }
+      ]
+    },
+    {
+      "id": "ending",
+      "title": "Changes and ending access",
+      "paragraphs": [
+        "The general contract provisions below govern changes and termination unless the accepted Platform Service Order expressly varies them. On termination, disable the affected permissions, preserve required records and assist with an authorized transition within your control. Do not interrupt an unrelated merchant account or withhold its funds to recover a separate software debt.",
+        "A platform agreement does not replace the merchant’s acquiring or service agreement. Each party remains responsible for obligations that apply to its own activities.",
+        "On disconnection, stop new instructions outside the remaining authority and revoke credentials no longer needed. Explain affected functions, preserve lawful records and finish agreed transition tasks and incident corrections. Retention duties do not create unrestricted access to a disconnected account. Migration requires merchant permission, provider capability and a secure process."
+      ]
+    },
+    {
+      "id": "general-terms",
+      "title": "General contract provisions",
+      "paragraphs": [
+        "Sections 8 through 16 of the Merchant Services Terms, together with the definitions in Section 17 needed to interpret them, apply to the platform service using the version supplied with the accepted Platform Service Order. They cover confidentiality, service responsibilities, changes, suspension, termination, liability, indemnities, agreement administration and business disputes. An expressly accepted platform variation controls the provision it identifies.",
+        "In those sections, Merchant and you mean the software platform. The service and fees mean the platform services and fees payable by the platform to Etail. Merchant processing charges, refunds, reserves and payouts remain under each merchant’s separate agreement. A merchant’s losses are not assigned to the platform merely because it introduced that merchant.",
+        "For the service use restrictions referenced in Section 13, the platform’s restrictions on unapproved services, unauthorized account access, unlawful data use and misuse of integration credentials apply. The Section 14 indemnity concerns claims arising from the platform’s own use or conduct. It does not make the platform responsible for every merchant loss merely because it introduced or connected the merchant. Materials include items the platform supplies for its agreed service.",
+        "Section 16 provides for District of Columbia law, arbitration in Washington, DC and proceedings in the courts identified there where jurisdiction exists. It includes individual binding arbitration and a jury waiver for covered business disputes, subject to law. Read it before accepting the platform agreement. These provisions do not bind a platform or merchant solely because they view this website."
+      ],
+      "links": [
+        {
+          "label": "General provisions for the platform agreement",
+          "href": "/legal/merchant-services#information"
+        },
+        {
+          "label": "Business dispute provisions",
+          "href": "/legal/merchant-services#business-disputes"
+        }
+      ]
+    },
+    {
+      "id": "support-notices",
+      "title": "Support, notices and incidents",
+      "paragraphs": [
+        "The Platform Service Order must explain who handles account questions, technical faults, customer inquiries, refunds, disputes and reconciliation, and how unresolved issues receive further support. Promptly refer matters outside your authority to the responsible party and preserve applicable deadlines. Referring a question does not automatically transfer legal responsibility.",
+        "The order must also state who delivers account and contract notices, including when a merchant cannot access its account. Keep evidence of delivery and promptly address failed delivery. Passing a notice to another party does not extend a legal or contractual deadline.",
+        "Promptly report incidents, known fraud, unlawful use and misuse of permissions through the agreed secure route, subject to legal restrictions. Cooperate on containment, accurate communications, correction and restoration within your role. Limit disclosed personal information to what the lawful investigation requires."
+      ]
+    },
+    {
+      "id": "merchant-authorization",
+      "title": "Merchant authorization",
+      "paragraphs": [
+        "Before an account connection begins, the merchant, platform and responsible provider must receive a copy of the merchant’s authorization through the approved acceptance process. The authorization limits the access and actions permitted for that merchant."
+      ],
+      "record": [
+        {
+          "label": "Parties and purpose",
+          "description": "The authorization identifies the merchant and platform legal names, software, account references, service purpose, affected accounts, start date and duration."
+        },
+        {
+          "label": "Information and actions",
+          "description": "The merchant authorizes specific information access, recipients and actions, subject to the stated limits and exclusions."
+        },
+        {
+          "label": "Charges",
+          "description": "Each platform charge, billing party and separately authorized deduction must be disclosed to the merchant."
+        },
+        {
+          "label": "Removing permission",
+          "description": "The merchant must be told how to remove access, the identity checks and timing involved, the services affected and any continuing obligations."
+        },
+        {
+          "label": "Documents and evidence",
+          "description": "The merchant must receive the applicable merchant and provider document versions and privacy notices. The acceptance record must identify the signer and their authority, affirmative action, date, record holder and copy delivery."
+        }
+      ]
+    },
+    {
+      "id": "platform-order",
+      "title": "Platform Service Order",
+      "paragraphs": [
+        "Your Platform Service Order sets out the services and terms agreed with Etail. Both parties must receive and accept it, together with the documents it incorporates, before the arrangement begins."
+      ],
+      "record": [
+        {
+          "label": "Parties and territory",
+          "description": "Your agreement identifies each party, its address and authorized representatives, the agreement reference and the United States merchant accounts covered."
+        },
+        {
+          "label": "Approved role",
+          "description": "Your approved role defines the referral, integration and support services, eligible merchant types, restricted activities requiring written approval, provider permissions and governing documents."
+        },
+        {
+          "label": "Integration and support",
+          "description": "You must receive the interfaces, environments, accounts and actions available to your platform, security requirements and launch conditions. Any agreed service levels, notice delivery, support contacts and timing for changes must also be identified."
+        },
+        {
+          "label": "Commercial terms",
+          "description": "Your accepted terms identify fees or compensation, calculation methods, exclusions, payment dates, reversals, taxes and authorized collection methods."
+        },
+        {
+          "label": "Risk, data and branding",
+          "description": "Responsibility for merchant losses and its limits require express agreement. Your order includes applicable data terms, merchant authorizations and permissions to use names and branding."
+        },
+        {
+          "label": "Term and acceptance",
+          "description": "Your order identifies the start date, any fixed term, transition obligations, notice details, incorporated document versions and express variations. Authorized representatives must accept it and receive copies they can retain. A replacement identifies the prior agreement and affected parties."
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ],
+  "acquirer-disclosure": [
+    {
+      "id": "acquirer",
+      "title": "United States acquiring bank",
+      "paragraphs": [
+        "Etail Depot US, Inc. is a Payment Facilitator of Fifth Third Bank for the United States program identified in the merchant’s account documents.",
+        "Fifth Third Bank\n38 Fountain Square Plaza\nCincinnati, OH 45263, USA"
+      ]
+    },
+    {
+      "id": "responsibilities",
+      "title": "Account and provider responsibilities",
+      "paragraphs": [
+        "Etail provides the merchant services and support described in your agreement. The acquiring bank and other providers are responsible for the services covered by their agreements. Your account documents identify the payment methods, responsible providers and instructions you must follow.",
+        "The merchant remains responsible for its sales, customer obligations, authorized transaction submissions and applicable security and network requirements. Etail is not a bank. A payment facilitator relationship does not itself create a bank deposit, lending facility or deposit insurance coverage.",
+        "Accepting documents or opening account access does not activate processing. The responsible provider must confirm activation. Funding, reserves and recovery remain governed by the accepted account documents and required separate authorizations.",
+        "You must be told who receives transaction instructions, initiates payouts, holds reserves and collects amounts owed, together with the applicable authority and service contact. Each party acts only within its own assigned role. Required approvals and separate authorizations must be completed before the affected function is used."
+      ]
+    },
+    {
+      "id": "provider-terms",
+      "title": "Applicable acquirer terms",
+      "paragraphs": [
+        "Obtain and retain the provider terms supplied for your account before accepting them. The account’s registration, processing scope and applicable network requirements determine which documents are needed and when they take effect. Complete any required acceptance or registration before processing that requires it, and preserve the document versions and acceptance record.",
+        "This disclosure identifies the bank; it is not the bank’s contract and does not create or amend rights on its behalf. Only the applicable provider can supply or authorize its operative terms. Questions about those documents should identify the merchant account and service involved.",
+        "Where a direct acquiring agreement or registration is required, complete it within the applicable network and acquiring deadline. Your account documents must identify the accepted card categories, any permitted choice to limit card acceptance, the bank contact and payment terms. This disclosure adds no fee and does not replace your accepted fee schedule.",
+        "Acceptance of Etail’s terms does not by itself accept a separate bank agreement or authorize Etail to change the bank’s obligations. Mandatory acquiring or network requirements govern the activities to which they apply. If a required provider agreement is absent or inconsistent with your instructions, do not begin the affected processing until the responsible provider resolves it."
+      ]
+    },
+    {
+      "id": "network",
+      "title": "Network requirements",
+      "paragraphs": [
+        "Follow the applicable card network rules and acquiring instructions for the accepted methods, customer disclosures, transaction handling, security and disputes. A network or acquirer may require a service restriction or cessation within its lawful authority.",
+        "The Visa rules have geographic and product specific scope. An account agreement and current acquiring instructions provide requirements beyond the public overview. The reference below is not an endorsement or certification of Etail."
+      ],
+      "links": [
+        {
+          "label": "Visa rules and policies",
+          "href": "https://www.visa.com/en-us/support/visa-rules"
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ],
+  "merchant-privacy": [
+    {
+      "id": "scope",
+      "title": "Who this notice covers",
+      "paragraphs": [
+        "This notice addresses personal information handled by Etail Depot US, Inc. in connection with United States merchant applications, account support and payment services. It covers business representatives, owners and other individuals whose information is involved. It does not make a customer’s purchase subject to the merchant’s business contract.",
+        "Website browsing is covered by the Website Privacy Policy. A bank, gateway or other provider may handle information for its own purposes under its own notice. This notice describes Etail’s role and does not replace those notices."
+      ],
+      "links": [
+        {
+          "label": "Website Privacy Policy",
+          "href": "/privacy"
+        }
+      ]
+    },
+    {
+      "id": "information",
+      "title": "Information we handle",
+      "paragraphs": [
+        "Etail staff can access application documents, owner identity information and bank information in the provider system. Information available for a particular account depends on the application, enabled services and assigned permissions."
+      ],
+      "bullets": [
+        "Business and contact information, including names, addresses, roles and contact details.",
+        "Application and verification information supplied for the business and its owners or representatives, which may include identity documents and tax identifiers.",
+        "Bank information used for the merchant account and its approved funding arrangements.",
+        "Transaction references, amounts, statuses, adjustments and support correspondence available for the service.",
+        "Records of account instructions, authorizations, requests and service communications."
+      ]
+    },
+    {
+      "id": "sources",
+      "title": "Where information comes from",
+      "paragraphs": [
+        "Information may come from you and your representatives, the account service, service providers or an authorized software platform. Information you share in a support request becomes part of that request. We may view information in the provider system without downloading it.",
+        "Do not send sensitive application documents or complete payment credentials by ordinary email. Use the secure channel designated for the request."
+      ]
+    },
+    {
+      "id": "purposes",
+      "title": "How we use information",
+      "paragraphs": [
+        "We use information to review and support applications, verify the authority of account contacts, provide your merchant services, investigate transaction or funding questions, communicate about your account and respond to privacy or legal requests.",
+        "Information may also be needed for fraud and security controls, applicable legal or network requirements, records of acceptance and resolution of disputes. The purpose and responsible party depend on the activity. Access for account support is not permission for unrelated marketing."
+      ]
+    },
+    {
+      "id": "sharing",
+      "title": "Service relationships and sharing",
+      "paragraphs": [
+        "Information necessary for an account or transaction may be shared with the responsible acquiring bank, processing and verification providers, participating payment networks, and a software platform acting under the merchant’s authorization. Legal or security disclosures depend on the applicable obligation. Only information needed for the relevant purpose should be provided.",
+        "If you enroll in optional dispute prevention, Order Insight shares supported merchant, transaction and order information with participating banks. Eligibility, notices and permissions apply. Reading this notice does not enroll you in the service.",
+        "Banks and payment networks may handle information independently under their own privacy notices. Processing and access locations vary by provider and service. Contact us for the recipients and access arrangements applicable to your account."
+      ]
+    },
+    {
+      "id": "retention",
+      "title": "Retention and security",
+      "paragraphs": [
+        "How long we retain information depends on its purpose, the type of record, account obligations, unresolved claims and legal requirements. This includes records from closed accounts and abandoned applications. Account closure does not automatically erase required records. Retained information remains protected. Contact compliance@etaildepot.com to ask about a record’s retention, the applicable criteria or the available deletion process.",
+        "Access and disclosure must be limited to authorized purposes and appropriate roles. Use the designated secure account channel and keep your credentials private. No transmission or storage method can guarantee complete security."
+      ]
+    },
+    {
+      "id": "rights",
+      "title": "Privacy requests and choices",
+      "paragraphs": [
+        "Contact compliance@etaildepot.com without signing in. Identify the service, your relationship to the account and your request. Depending on applicable law, you may request confirmation, access, a portable copy, correction, deletion or limits on sensitive information use. Rights concerning sale, advertising or profiling apply where the relevant law and activity apply.",
+        "An authorized agent may act where permitted. We may verify identity and authority using information reasonably necessary for the request and arrange a secure channel for documents. Do not send identity documents, passwords or complete account numbers in the initial email.",
+        "We will respond within the applicable legal period and explain any permitted extension or refusal. To seek a review or an available appeal, email compliance@etaildepot.com with the subject Privacy appeal and the original request reference. We will explain the outcome and any available external complaint route. We will not unlawfully discriminate against you for exercising privacy rights.",
+        "Where consent is the basis for processing, you may withdraw it for future processing, subject to law. Withdrawal does not invalidate earlier lawful processing. Required records and lawful duties may continue. This notice does not itself authorize advertising, sale or unrelated use of personal information."
+      ]
+    },
+    {
+      "id": "updates",
+      "title": "Notice updates",
+      "paragraphs": [
+        "We will update this notice when necessary to reflect the service and provide additional notice or obtain consent where applicable law requires. The revision date appears at the top of this page. Updating this notice does not by itself authorize a new use of your information."
+      ]
+    },
+    {
+      "id": "collection",
+      "title": "Information at each account step",
+      "paragraphs": [
+        "Read the privacy information provided when you register, apply or submit documents. It should explain who collects your information, what is required, why it is needed, how long it is kept and your choices. A credit report, bank debit, optional service or business agreement may require separate authorization; this privacy notice does not provide it."
+      ],
+      "record": [
+        {
+          "label": "Welcome and registration",
+          "description": "Enter your email in the designated account service to find your account or begin registration. Create a password only in that service and do not share it with Etail support."
+        },
+        {
+          "label": "Business application",
+          "description": "Provide the requested business and representative information through the secure application. Etail staff can access application documents for the permitted account activities described in this notice."
+        },
+        {
+          "label": "Identity and bank documents",
+          "description": "Upload only the requested documents through the secure account process. Etail staff can access owner identity and bank information in the provider system. Any required consent for a credit report, bank debit or other action must be obtained separately."
+        },
+        {
+          "label": "Support records",
+          "description": "Start with an account reference and the information needed for the question. If documents are required, use the designated secure route rather than ordinary email."
+        },
+        {
+          "label": "Optional services",
+          "description": "Read the separate enrollment terms and data permissions before enabling an optional service. Agreement acceptance, payment authorization and promotional choices have different purposes."
+        }
+      ]
+    },
+    {
+      "id": "service-messages",
+      "title": "Service messages and other businesses",
+      "paragraphs": [
+        "Messages needed to administer an account or meet a legal obligation are separate from optional marketing. Withdrawing marketing consent where applicable does not necessarily stop required account messages. Account support access does not itself authorize promotional use.",
+        "For a purchase from a merchant, that merchant is responsible for its own privacy practices and records. Etail remains responsible for information it handles for its own purposes and assists with instructed processing under the applicable agreement and law. A separate cardholder service has its own terms and notices."
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ],
+  "data-processing": [
+    {
+      "id": "scope",
+      "title": "1. When these terms apply",
+      "paragraphs": [
+        "These Data Processing Terms apply between Etail Depot US, Inc. and the merchant or software platform that expressly incorporates them into an accepted Service Order. They govern only the identified processing activities. They do not replace the privacy notice owed to an individual.",
+        "Before Etail processes personal information on your behalf, the Service Order or another record accepted by both parties must identify the purposes and duration, categories of information and people, each party’s responsibilities, authorized recipients, access locations, safeguards, retention and return or deletion. This processing record forms part of these terms and limits the processing to the activities it describes.",
+        "Personal information means information about an identified or identifiable person, as well as information protected as personal information under applicable law. Processing includes viewing information in a provider system and collecting, storing, using, sharing or deleting it. Each party’s responsibilities depend on its role in the agreed processing. Access to information alone does not make every provider Etail’s processor.",
+        "Etail staff can access merchant application documents, owner identity information and bank information in the provider system. That access does not itself authorize downloads, bank changes, consumer reports or other services."
+      ]
+    },
+    {
+      "id": "roles",
+      "title": "2. Responsibilities and instructions",
+      "paragraphs": [
+        "Each party’s role depends on how it uses personal information and on applicable law. Etail follows the customer’s documented instructions for processing carried out on the customer’s behalf. A party that decides independently why information is used must have its own lawful basis and provide the required privacy notice.",
+        "The customer must have authority to provide the information and instructions. Neither party may use these terms to avoid its own statutory responsibilities.",
+        "When Etail processes information solely on a customer’s instructions, the customer is the controller or business and Etail is its processor or service provider, as applicable. The processing record must describe the agreed tasks, such as checking an application for completeness, making requested corrections or responding to account questions.",
+        "If Etail reasonably believes an instruction violates applicable law, it must notify the customer and suspend that instruction while the concern is resolved. If law requires other processing, Etail must notify the customer before acting unless notice is prohibited. Any compulsory disclosure must be limited to what is required and its legal basis documented. Each party remains responsible for the notices and authority required for its own activities."
+      ]
+    },
+    {
+      "id": "use",
+      "title": "3. Purpose limits and confidentiality",
+      "paragraphs": [
+        "Process information only for the recorded services, valid instructions or a legal duty. A legal requirement outside the instructions must be communicated where permitted. Restrict access to authorized people with a legitimate role and confidentiality obligations.",
+        "Review permissions when responsibilities change and remove access no longer needed. Exports, remote access and disclosures require a permitted purpose and appropriate controls. Do not copy customer information into unapproved personal accounts, public sharing locations or unrelated automated tools.",
+        "These terms do not authorize unrelated advertising, sale, biometric identification, unrestricted profiling or model training. A provider’s independent purposes must be described under its own role and governing terms; those purposes do not grant Etail equivalent use rights."
+      ]
+    },
+    {
+      "id": "us-privacy",
+      "title": "4. United States privacy requirements",
+      "paragraphs": [
+        "Where United States state privacy law applies and Etail acts as a processor, service provider or contractor, Etail acknowledges and agrees to comply with the duties attached to that role. The processing record must state the specific permitted business purposes.",
+        "Etail must not sell or share covered information as those terms are defined by the applicable law. Use, retention and disclosure are limited to those purposes and the direct service relationship, except as law permits. Combining covered information with other records is prohibited unless the applicable law allows it.",
+        "Etail must provide the protection required by that law and notify the customer if it determines that it cannot meet these obligations. The customer may take reasonable and appropriate steps to verify compliance and, upon notice, stop and remedy unauthorized use. Etail must assist with applicable individual requests. These duties also apply through written terms to processors Etail appoints for the covered work.",
+        "Where required, Etail certifies that it understands and will comply with the restrictions applicable to its role. Assistance includes applicable audits, risk assessments and automated decision requirements. A legal exemption applies only to the information and activity it covers; use of a financial provider does not exempt every account record."
+      ]
+    },
+    {
+      "id": "security",
+      "title": "5. Security and incidents",
+      "paragraphs": [
+        "Each party must implement and maintain safeguards appropriate to the information and its responsibilities, document those safeguards and require appropriate protection from people acting for it. The processing record must identify access controls, secure transmission and storage, incident handling and deletion arrangements.",
+        "A covered incident is an actual loss, unauthorized access, use, disclosure, alteration or destruction of the personal information governed by these terms. Investigation and notification duties apply to affected information within the party’s responsibility, including its appointed processors.",
+        "Notify the other party without undue delay after becoming aware of an incident affecting the covered information, subject to applicable law and any stricter agreed deadline. Provide available details about affected information, likely impact, investigation and mitigation, with further updates as information becomes available. Responsibility for regulatory and individual notices follows applicable law.",
+        "Each party must maintain a written security program appropriate to its activities and information risk. For Etail access, agreed safeguards must cover individual accounts, restricted permissions, multifactor authentication, protected devices, encrypted transmission and storage, access records, staff instruction, incident response and disposal. Any alternative must be documented, lawful and provide appropriate protection. Provider controls do not replace safeguards for Etail staff, devices or exports.",
+        "The processing record must describe the safeguards in place, who operates them and how they are checked. Etail must assess providers entrusted with information and require suitable written safeguards. A provider’s certification does not certify Etail’s systems or practices.",
+        "An initial incident notice must not wait for a complete investigation. Cooperate on containment, evidence preservation, recovery and required notices. Notification or cooperation is not an admission of fault. Costs follow responsibility and the accepted agreement, not an automatic charge to the customer."
+      ]
+    },
+    {
+      "id": "providers",
+      "title": "6. Service providers and locations",
+      "paragraphs": [
+        "Provider changes must follow the process in the agreed processing record. Etail must require equivalent privacy and security duties in its written contracts with appointed processors. Etail remains responsible to the customer for their covered processing as if Etail performed it itself, subject to the accepted service agreement and applicable law.",
+        "Etail must give at least 30 days’ advance notice before adding or replacing a processor it appoints, unless an urgent lawful requirement prevents that period. The customer may raise a reasonable data protection objection. The parties must resolve it or lawfully end the affected processing before the change where required. Independently acting banks and networks do not become Etail’s subprocessors under this clause.",
+        "Access outside the United States requires a lawful arrangement and any required notice or transfer measures. The processing record must identify the countries in which information may be stored or accessed.",
+        "For each authorized recipient, the processing record must identify its legal entity, who appoints it, its function and role, the information it can access, and the countries where it stores or accesses information. Etail must have written protection terms in place before an appointed processor receives information processed on the customer’s instructions. Linking to a provider’s public terms does not make that provider a party to this agreement or release Etail from its duties.",
+        "Any provider change procedure that differs from these terms must be expressly addressed in the agreement before acceptance. Services for United States merchants may involve access or storage outside the United States. Required transfer safeguards must cover the parties and processing involved; a provider’s certification or legal status does not extend to Etail."
+      ]
+    },
+    {
+      "id": "requests",
+      "title": "7. Requests and cooperation",
+      "paragraphs": [
+        "Etail must promptly forward privacy requests about information it processes on the customer’s instructions to that customer, unless law requires a direct response. Each party must provide reasonable assistance with requests, security inquiries and legally required assessments using information within its control.",
+        "Respond lawfully to government requests. Limit disclosure and notify the other party where permitted. Reasonable evidence of compliance may be supplied through documentation and agreed review arrangements without exposing another customer’s confidential information or weakening security.",
+        "For information processed on a customer’s instructions, Etail may verify a requester’s identity or direct the request to the customer. Etail must not decide the customer’s response without lawful instructions, except as law requires. Etail handles requests about information it uses for its own purposes. Verification must protect other people’s information.",
+        "A confidentiality or audit restriction cannot defeat a legal obligation to provide further inspection or corrective action. Protect other customers’ records while supplying the evidence reasonably needed for a lawful, proportionate review."
+      ]
+    },
+    {
+      "id": "retention",
+      "title": "8. Return and deletion",
+      "paragraphs": [
+        "When processing ends, Etail must return or delete information in accordance with the processing record and the customer’s lawful instructions, except for information required for a continuing obligation or legal retention. Etail must identify any retained categories, their purpose and access restrictions. Backups follow the documented deletion cycle. Retained information, including backups, remains protected after the service ends and until deletion, with access limited to the purpose requiring retention.",
+        "For each category of information, the parties must agree on a retention period or a measurable condition for deletion, the legal or service reason for retention, a review date and the deletion method. Each party must keep only the information needed for that purpose, document any legal hold and limit use accordingly. Identity and bank documents must not be kept indefinitely simply because they were once accessible.",
+        "The processing record must specify the format for returning information, the time allowed for return or deletion and the backup deletion cycle. Etail must document completion and any permitted exception. Removing account access does not delete the information. Independently acting recipients remain responsible for their own lawful retention."
+      ]
+    },
+    {
+      "id": "priority",
+      "title": "9. Relationship to the service agreement",
+      "paragraphs": [
+        "These terms control the covered data processing if inconsistent with general service wording, subject to mandatory law. Fees, funding, liability and dispute resolution remain in the accepted Service Order and service terms unless expressly amended.",
+        "Only provider documents expressly incorporated into the accepted service agreement form part of this processing arrangement."
+      ],
+      "links": [
+        {
+          "label": "Merchant privacy notice",
+          "href": "/legal/merchant-privacy"
+        },
+        {
+          "label": "Security responsibilities",
+          "href": "/legal/security-policy"
+        }
+      ]
+    },
+    {
+      "id": "processing-record",
+      "title": "10. Your data processing arrangements",
+      "paragraphs": [
+        "The processing record may be included in your Service Order or supplied as a separate schedule. Both parties must receive and accept it before the covered processing begins. It limits the purposes, information and activities covered. Changes require documentation and acceptance where applicable.",
+        "Access within a provider system does not by itself permit downloads, separate storage or onward disclosure. The agreed arrangements must describe actual safeguards and retention. An activity, recipient, location or use that has not been authorized is not permitted merely because account access is available."
+      ],
+      "record": [
+        {
+          "label": "Parties and account",
+          "description": "The arrangements identify Etail Depot US, Inc., your business or platform, the service and the account concerned."
+        },
+        {
+          "label": "People and information",
+          "description": "You must be told which representatives, owners or other people are affected, which information and document types are involved, and their sources. Access to application, identity and bank documents does not authorize access to other information."
+        },
+        {
+          "label": "Activities and roles",
+          "description": "Each agreed task is limited by its purpose, duration, information, your instructions and the parties’ roles. Any independent use must be identified separately with its applicable privacy notice."
+        },
+        {
+          "label": "Systems and permissions",
+          "description": "The agreed arrangements identify the systems and operators, authorized staff actions, access controls, and any permitted download or separate storage."
+        },
+        {
+          "label": "Recipients and locations",
+          "description": "You must receive the identity and role of each recipient, who appoints it, the service and information involved, and the countries of storage or access. Applicable document versions and the change notice procedure must be provided."
+        },
+        {
+          "label": "Safeguards and incidents",
+          "description": "The arrangements describe the safeguards in place and who operates and verifies them. They identify incident response responsibilities, secure contacts, provider escalation and applicable notice duties and deadlines."
+        },
+        {
+          "label": "Retention and deletion",
+          "description": "Retention is limited by the category, purpose, legal or service basis, approved period or deletion condition, and review date. You must receive the applicable return format, completion period, backup deletion cycle and legal hold arrangements. Completion and lawful exceptions must be documented."
+        },
+        {
+          "label": "Notices and requests",
+          "description": "You must receive the applicable privacy information for the service and at collection, including how requests are handled, applicable rights and exemptions, and notices from independently acting providers."
+        },
+        {
+          "label": "Acceptance and changes",
+          "description": "Both parties must receive the version accepted by their authorized representatives, including its date and any approved changes. Later versions do not silently replace the accepted arrangements."
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ],
+  "security-policy": [
+    {
+      "id": "scope",
+      "title": "Shared security responsibilities",
+      "paragraphs": [
+        "Each party is responsible for the security of the services and systems it controls. You are responsible for your website, devices, user access and handling of payment information. Etail is responsible for the safeguards and duties set out in its agreement. Providers retain their own responsibilities.",
+        "Each party must meet the security and validation requirements applicable to the systems it controls. Request current validation documents for the services and systems within your responsibility."
+      ]
+    },
+    {
+      "id": "account-access",
+      "title": "Protect account access",
+      "paragraphs": [
+        "Give each authorized person only the access required for their role. Keep credentials and verification codes private, use available account protection features and remove access when a person no longer needs it.",
+        "Verify bank changes and unusual instructions through the designated secure process. Do not send passwords or complete bank details in a support email. Report suspected unauthorized access promptly."
+      ]
+    },
+    {
+      "id": "payment-data",
+      "title": "Handle payment information safely",
+      "paragraphs": [
+        "Use the approved checkout and payment entry methods. PCI DSS requirements depend on the environment and the account’s validation obligations. A hosted checkout can reduce exposure but does not remove all merchant responsibilities.",
+        "Do not retain card verification codes, full magnetic stripe or equivalent chip track data, PINs or PIN blocks after authorization, even if encrypted. Keep payment credentials out of logs, analytics, support messages and ordinary email. Minimize other stored information and protect it under the applicable requirements."
+      ],
+      "links": [
+        {
+          "label": "PCI Security Standards Council merchant resources",
+          "href": "https://www.pcisecuritystandards.org/merchants/"
+        }
+      ]
+    },
+    {
+      "id": "systems",
+      "title": "Your website and integration",
+      "paragraphs": [
+        "Maintain supported software, protect integration credentials, limit access and review changes that can affect checkout or customer information. Confirm payment and refund status before retrying an uncertain request. Preserve useful references without placing sensitive information in records.",
+        "Follow the integration and security instructions supplied for your account. Obtain current documentation from your integration contact before enabling a new function.",
+        "For systems and information each party controls, its documented safeguards must address the following in proportion to the information and risks involved:"
+      ],
+      "bullets": [
+        "Individual access permissions, suitable authentication, periodic access review and prompt removal of unnecessary access.",
+        "Secure transmission and storage, with encryption and control of keys where appropriate to the information and risk.",
+        "Supported software, security updates, review of vulnerabilities and monitoring for unauthorized activity.",
+        "Staff confidentiality duties, security awareness and restrictions on unnecessary copies or exports.",
+        "Incident response, protected recovery arrangements where information is stored, and secure disposal at the end of retention."
+      ]
+    },
+    {
+      "id": "incident",
+      "title": "Report an incident",
+      "paragraphs": [
+        "Contact compliance@etaildepot.com with the affected service, approximate time and a brief description. Do not include passwords, complete card numbers, bank credentials or customer files in the first message. We will identify an appropriate channel for further information.",
+        "Take reasonable steps within your control to contain the issue and preserve relevant evidence. Follow the incident process and notice duties in the account and provider agreements. A routine report does not authorize access to another person’s systems or data."
+      ]
+    },
+    {
+      "id": "documentation",
+      "title": "Security documentation",
+      "paragraphs": [
+        "Request current security and responsibility information for the services in your account, including the service scope, document version and issuing organization.",
+        "A security validation or assurance must identify the entity, service, systems, scope and period it covers. Using a certified provider does not certify all merchant or Etail systems. The accepted data terms state the safeguards required for the information each party handles."
+      ],
+      "links": [
+        {
+          "label": "Data processing terms",
+          "href": "/legal/data-processing"
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Notices and contact",
+      "paragraphs": [
+        "Send legal notices and questions to compliance@etaildepot.com or Etail Depot US, Inc., 2001 L Street NW, Suite 500, Washington DC 20036, United States. Identify your business, service and the document concerned. Do not send identity documents, passwords or complete bank or card numbers by ordinary email."
+      ],
+      "links": [
+        {
+          "label": "Contact compliance",
+          "href": "mailto:compliance@etaildepot.com"
+        }
+      ]
+    }
+  ]
+}
