@@ -47,6 +47,10 @@ For changes affecting shared layout or image delivery, check:
 
 Fix reproduced regressions before marking the change complete. Record the exact routes, widths, browser engines and network conditions checked. Shared template coverage must not be described as an individual browser inspection of every generated URL. After an authorized deployment, recheck the affected hosted pages and asset headers. Local passing checks do not establish hosted behavior or guarantee zero delay on every device and connection.
 
+## Route scrolling
+
+Preserve `data-scroll-behavior="smooth"` on the root HTML element while global CSS enables smooth scrolling. Next.js 16 uses that declaration to suspend smooth scrolling during route positioning. Without it, opening a long page from shared navigation can continue scrolling toward the footer after the new route renders. Verify both the first and settled viewport, not merely the destination URL or DOM visibility. Keep native section links and browser Back coverage.
+
 ## Regression ownership
 
 | Coverage | Repository file |
