@@ -11,7 +11,7 @@ export function ShopifyGuideScreenshot({ step, title, file, width, height, alt, 
   const src = `/help/shopify/${file}`;
   return <figure className={styles.figure}>
     <a href={src} className={styles.screenshotButton} aria-label={`Enlarge screenshot for step ${step}`} aria-haspopup="dialog" onClick={event => { if (dialog.current && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); dialog.current.showModal(); } }}>
-      <Image src={src} width={width} height={height} alt={alt} loading="lazy" unoptimized />
+      <Image src={src} width={width} height={height} alt={alt} preload={step === 1} loading={step === 1 ? undefined : "lazy"} unoptimized />
       <span>Enlarge screenshot <span aria-hidden="true">＋</span></span>
     </a>
     <figcaption>{caption}</figcaption>

@@ -54,3 +54,42 @@ test("Guide screenshots remain available without JavaScript", async ({ browser }
     await expect(page).toHaveURL(/\/help\/shopify\/agreement\.webp$/);
   } finally { await context.close(); }
 });
+
+
+test("Shopify logo and first screenshot load before styles and scripts on first visit and refresh", async ({ page }) => {
+ let releaseResources = () => {};
+ let resourcesReady = Promise.resolve();
+ let logoRequested = false;
+ let firstScreenshotRequested = false;
+ await page.route("**/*", async route => {
+  const request = route.request();
+  const pathname = new URL(request.url()).pathname;
+  if (pathname.startsWith("/_next/static/media/trolleys-portal-logo.")) logoRequested = true;
+  if (pathname === "/help/shopify/settings.webp") firstScreenshotRequested = true;
+  if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
+  await route.continue();
+ });
+ // Interception disables the HTTP cache, including on refresh.
+ for (const refresh of [false, true]) {
+  logoRequested = false;
+  firstScreenshotRequested = false;
+  resourcesReady = new Promise<void>(resolve => { releaseResources = resolve; });
+  try {
+   if (refresh) await page.reload({ waitUntil: "commit" });
+   else await page.goto(path, { waitUntil: "commit" });
+   await expect.poll(() => firstScreenshotRequested, { message: "The first Shopify screenshot must not wait for layout or hydration" }).toBe(true);
+   await expect.poll(() => logoRequested).toBe(true);
+  } finally { releaseResources(); }
+  await page.waitForLoadState("load");
+  const openingImages = page.locator('#before-you-start img, #open-settings figure > a img');
+  await expect(openingImages).toHaveCount(2);
+  for (const image of await openingImages.all()) {
+   await expect(image).not.toHaveAttribute("loading", "lazy");
+   await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0)).toBe(true);
+  }
+  for (const image of await page.locator('main figure > a img:not([src="/help/shopify/settings.webp"])').all()) {
+   await expect(image).toHaveAttribute("loading", "lazy");
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
+ }
+});

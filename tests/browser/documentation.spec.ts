@@ -406,3 +406,41 @@ test("Guides leads to email first account setup and blank email recovery", async
  await expect(page.locator('#registration-email')).toContainText('The Email field on Register New Account cannot be edited.');
  await expect(page.locator('main form,main input,main iframe')).toHaveCount(0);
 });
+
+
+test("account guide opening images load before styles and scripts on first visit and refresh", async ({ page }) => {
+ let releaseResources = () => {};
+ let resourcesReady = Promise.resolve();
+ let logoRequested = false;
+ let welcomeRequested = false;
+ await page.route("**/*", async route => {
+  const request = route.request();
+  const path = new URL(request.url()).pathname;
+  if (path.startsWith("/_next/static/media/trolleys-portal-logo.")) logoRequested = true;
+  if (path === "/help/merchant-account/welcome.jpg") welcomeRequested = true;
+  if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
+  await route.continue();
+ });
+ // Request interception disables cache, including on refresh.
+ for (const refresh of [false, true]) {
+  logoRequested = false;
+  welcomeRequested = false;
+  resourcesReady = new Promise<void>(resolve => { releaseResources = resolve; });
+  try {
+   if (refresh) await page.reload({ waitUntil: "commit" });
+   else await page.goto("/docs/merchant-onboarding", { waitUntil: "commit" });
+   await expect.poll(() => welcomeRequested, { message: "The first account screenshot must not wait for layout or hydration" }).toBe(true);
+   await expect.poll(() => logoRequested).toBe(true);
+  } finally { releaseResources(); }
+  await page.waitForLoadState("load");
+  const openingImages = page.locator('.docs-article-heading img, img[src="/help/merchant-account/welcome.jpg"]');
+  await expect(openingImages).toHaveCount(2);
+  for (const image of await openingImages.all()) {
+   await expect(image).not.toHaveAttribute("loading", "lazy");
+   await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0)).toBe(true);
+  }
+  await expect(page.locator('img[src="/help/merchant-account/registration.jpg"]')).toHaveAttribute("loading", "lazy");
+  await expect(page.locator('img[src="/help/merchant-account/blank-registration.jpg"]')).toHaveAttribute("loading", "lazy");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
+ }
+});
