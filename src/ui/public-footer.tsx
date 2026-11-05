@@ -12,7 +12,7 @@ export function PublicFooter() {
       <FooterNavigation />
       <div className="public-footer-bottom">
         <div className="public-footer-identity">
-          <Link href="/" className="brand-link" aria-label="Etail Depot home">
+          <Link prefetch={false} href="/" className="brand-link" aria-label="Etail Depot home">
             <BrandImage brand="etail" alt="Etail Depot" width={800} height={150} className="brand-logo" />
           </Link>
           <div className="public-footer-company">
@@ -22,7 +22,7 @@ export function PublicFooter() {
         <div className="public-footer-utilities">
           <PaymentPortalLink intent="sign-in" className="public-footer-sign-in" />
           <nav className="public-footer-legal" aria-label="Footer legal">
-            <Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link>
+            <Link prefetch={false} href="/privacy">Privacy</Link><Link prefetch={false} href="/terms">Terms</Link>
           </nav>
         </div>
       </div>

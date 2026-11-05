@@ -14,8 +14,6 @@
 .bp-method-band { position: relative; border-block: 1px solid var(--bp-line); background: #fff; }
 .bp-method-band .consumer-networks { padding-block: 28px; border: 0; }
 .bp-method-band .consumer-networks > p { font-size: 16px; }
-/* A single checkout window is the hero. Its order and fields remain readable at every size. */
-.bp-order-summary > span:not(.bp-order-symbol) { display: block; margin-top: 9px; color: var(--bp-muted); font-size: 13px; }
 /* Feature chapters use full-width demonstrations and restrained supporting copy. */
 .service-blueprint .payment-service-explorer { padding: 28px; background: #f1f5f1; border-color: #cddbd3; box-shadow: 0 16px 40px -32px #02394133; }
 .service-blueprint .pse-tabs { background: transparent; border-bottom: 1px solid #cad8d0; }
@@ -31,9 +29,6 @@
 .service-blueprint .payment-operation h3 { font-size: 22px; max-width: none; }
 .bp-operations-art { min-width: 0; }
 .service-blueprint .payment-offer-section { border-top: 0; }
-/* Platform hero: orders and customer work connect to a separate merchant service. */
-.bp-service-nodes > div:nth-child(even) { border-left: 1px solid #e0e8e2; }
-.bp-service-nodes > div:nth-child(n+3) { border-top: 1px solid #e0e8e2; }
 .bp-partner-journey-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.85fr); align-items: start; gap: 56px; }
 .service-blueprint .partner-journey { display: block; margin: 0; }
 .service-blueprint .partner-journey > li > p { font-size: 16px; line-height: 1.75; }
@@ -57,13 +52,6 @@
 .service-blueprint.consumer-cards .consumer-hero-copy > p { max-width: 55ch; margin: 18px auto 0; }
 .service-blueprint.consumer-cards .consumer-hero-actions { margin-top: 22px; }
 .service-blueprint.consumer-cards .consumer-product-note { max-width: 68ch; margin: 16px auto 0; }
-.bp-card-stage { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); align-items: center; gap: 48px; max-width: 880px; margin: 28px auto 0; padding: 32px 48px 0; border: 1px solid #cfdfd4; border-bottom: 0; border-radius: 12px 12px 0 0; background: #f0f5f1; overflow: hidden; }
-.bp-card-display { min-width: 0; padding-bottom: 40px; }
-.bp-card-face { position: relative; aspect-ratio: 1.586; }
-.bp-card-face .ledgix-wallet-card { border-radius: 14px; box-shadow: 0 18px 30px -20px #163f4e40, 0 3px 8px -4px #163f4e1a; }
-.bp-card-caption { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-top: 20px; font-size: 12px; line-height: 1.5; color: #3a5b52; }
-.service-blueprint.consumer-cards .bp-card-stage .wallet-product-art { background: none; border: 0; box-shadow: none; min-height: 0; padding: 0; margin-bottom: -38px; }
-.service-blueprint .bp-card-stage .wallet-product-device { width: 208px; max-width: 100%; }
 .service-blueprint .card-details-section { padding-block: var(--bp-space) 0; }
 .service-blueprint .card-details-grid { gap: 0; border-block: 1px solid var(--bp-line); }
 .service-blueprint .card-details-grid > div { border: 0; border-radius: 0; background: #fff; padding: 32px; }
@@ -74,14 +62,11 @@
 .service-blueprint .card-detail-note, .service-blueprint .card-details-grid dd > p { font-size: 14px; }
 .service-blueprint .wallet-guide-section { background: #f0f5f0; border-block: 1px solid var(--bp-line); }
 .service-blueprint .wallet-guide-grid { padding-block: 80px; }
-@container bpcheckout (max-width:460px) {
- .bp-order-summary > span:not(.bp-order-symbol) { grid-column: 2; margin: 0; }
-}
+
 @media (max-width:1100px) {
  .service-blueprint.consumer-payments .consumer-hero-grid, .service-blueprint .partner-hero-grid { gap: 36px; }
  .service-blueprint .consumer-hero h1, .service-blueprint .partner-hero h1 { font-size: 48px; }
  .bp-operations-layout, .bp-partner-journey-layout { gap: 40px; }
- .bp-card-stage { gap: 32px; padding-inline: 40px; }
 }
 @media (max-width:850px) {
  .service-blueprint { --bp-space: 64px; }
@@ -99,12 +84,6 @@
  .bp-method-band .consumer-networks { padding-block: 24px; }
  .service-blueprint .payment-service-explorer { padding: 16px; }
  .service-blueprint .pse-tabs button { font-size: 13px; padding-block: 14px; }
- .bp-card-stage { padding: 28px 20px 0; gap: 20px; margin-top: 28px; }
- .bp-card-display { padding-bottom: 22px; }
- .bp-card-caption { display: block; margin-top: 16px; font-size: 10px; }
- .bp-card-face .ledgix-wallet-card { border-radius: 8px; }
- .service-blueprint .bp-card-stage .wallet-product-device { width: 160px; }
- .service-blueprint.consumer-cards .bp-card-stage .wallet-product-art { margin-bottom: -24px; }
  .service-blueprint.consumer-cards .consumer-hero-grid { padding-top: 40px; }
  .service-blueprint.consumer-cards .consumer-hero-copy { text-align: left; }
  .service-blueprint.consumer-cards .consumer-product-eyebrow, .service-blueprint.consumer-cards .consumer-hero-actions { justify-content: flex-start; }
@@ -116,11 +95,6 @@
  .service-blueprint .wallet-guide-grid { padding-block: 64px; }
 }
 @media (max-width:360px) {
- .bp-order-summary > span:not(.bp-order-symbol) { grid-column: 2; }
- .bp-card-stage { grid-template-columns: 1fr; padding: 26px 32px 0; gap: 26px; }
- .bp-card-display { padding: 0; }
- .bp-card-caption { font-size: 11px; margin-top: 12px; }
- .service-blueprint .bp-card-stage .wallet-product-device { width: 168px; }
  .service-blueprint .payment-service-explorer { padding: 12px; }
 }
 
@@ -129,12 +103,7 @@
  .service-blueprint .partner-hero h1 { font-size: clamp(42px,4.2vw,60px); }
  .service-blueprint .partner-hero h1 span { display: inline; }
 }
-@media (max-width:680px) {
- .bp-card-stage { display: block; padding: 24px 32px 0; }
- .bp-card-display { display: none; }
- .service-blueprint.consumer-cards .bp-card-stage .wallet-product-art { height: 388px; margin-bottom: 0; }
- .service-blueprint .bp-card-stage .wallet-product-device { width: 204px; }
-}
+
 
 .service-blueprint #payment-questions-title { scroll-margin-top: 28px; }
 
@@ -167,7 +136,6 @@
 }
 
 .service-blueprint :is(.bp-checkout-art,.bp-platform-art) figcaption { font-size: 13px; }
-.service-blueprint .bp-card-caption { font-size: 13px; }
 
 /* Service questions and artwork captions follow the homepage reading hierarchy. */
 .service-blueprint.consumer-payments .public-faq-section { padding-top:0; }

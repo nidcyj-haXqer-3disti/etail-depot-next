@@ -17,8 +17,8 @@ export function DocumentationNavigation({current}:{current?:DocumentationSlug}) 
   query.addEventListener("change",restore);return()=>query.removeEventListener("change",restore);
  },[]);
  const items=<>
-  <Link href="/docs" aria-current={!current?"page":undefined} className="docs-nav-overview">Overview</Link>
-  {documentationGroups.map(group=><div className="docs-nav-group" key={group}><p>{group}</p><ul>{documentationPages.filter(p=>p.group===group).map(p=><li key={p.slug}><Link href={documentationPath(p.slug)} aria-current={current===p.slug?"page":undefined}>{p.title}</Link></li>)}</ul></div>)}
+  <Link prefetch={false} href="/docs" aria-current={!current?"page":undefined} className="docs-nav-overview">Overview</Link>
+  {documentationGroups.map(group=><div className="docs-nav-group" key={group}><p>{group}</p><ul>{documentationPages.filter(p=>p.group===group).map(p=><li key={p.slug}><Link prefetch={false} href={documentationPath(p.slug)} aria-current={current===p.slug?"page":undefined}>{p.title}</Link></li>)}</ul></div>)}
  </>;
  return <nav ref={root} className="docs-navigation" aria-label="Documentation topics" onFocusCapture={e=>{if(e.target instanceof HTMLElement)previous.current=e.target;}} onBlur={e=>{if(e.relatedTarget&&!e.currentTarget.contains(e.relatedTarget))previous.current=null;}}>
   <div className="docs-nav-desktop">{items}</div>

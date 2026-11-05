@@ -1,4 +1,7 @@
 import Image from "next/image";
+import welcome from "./assets/welcome.jpg";
+import registration from "./assets/registration.jpg";
+import blankRegistration from "./assets/blank-registration.jpg";
 import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
 import { MerchantApplicationArt } from "./merchant-application-art";
 import { PaymentPortalLink } from "./service-entry";
@@ -7,17 +10,17 @@ import styles from "./merchant-account-guide.module.css";
 function AccountScreenshot({ screen }: { screen: "welcome" | "registration" | "blank" }) {
   const screens = {
     welcome: {
-      file: "welcome.jpg", height: 812,
+      src: welcome, height: 812,
       alt: "Trolleys Welcome screen with an editable Email field, a Sign In button and Register below it.",
       caption: "Welcome: enter your email before choosing Register or Sign In.",
     },
     registration: {
-      file: "registration.jpg", height: 903,
+      src: registration, height: 903,
       alt: "Register New Account screen with the email carried forward, followed by Password, Confirm Password and Register.",
       caption: "Registration: your email is filled in automatically.",
     },
     blank: {
-      file: "blank-registration.jpg", height: 903,
+      src: blankRegistration, height: 903,
       alt: "Top of the registration screen showing the Sign in link above Register New Account and a blank Email field.",
       caption: "Use Sign in above the heading to return to Welcome.",
     },
@@ -25,7 +28,7 @@ function AccountScreenshot({ screen }: { screen: "welcome" | "registration" | "b
   const shot = screens[screen];
   return <figure className={styles.figure}>
     <div className={`${styles.screenshot} ${styles[screen]}`}>
-      <Image src={`/help/merchant-account/${shot.file}`} width={1280} height={shot.height} alt={shot.alt} unoptimized preload={screen === "welcome"} loading={screen === "welcome" ? undefined : "lazy"} />
+      <Image src={shot.src} width={1280} height={shot.height} alt={shot.alt} unoptimized decoding="sync" preload={screen === "welcome"} loading={screen === "welcome" ? undefined : "eager"} />
     </div>
     <figcaption>{shot.caption}</figcaption>
   </figure>;

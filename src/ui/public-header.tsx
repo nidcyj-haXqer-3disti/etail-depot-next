@@ -120,7 +120,7 @@ export function PublicHeader() {
   }}>
     <noscript><span className="public-header-no-script" hidden /></noscript>
     <div className="header-inner" role={open ? "dialog" : undefined} aria-modal={open ? true : undefined} aria-label={open ? "Site menu" : undefined}>
-      <Link href="/" className="brand-link" aria-label="Etail Depot home" onClick={closeMenu}>
+      <Link prefetch={false} href="/" className="brand-link" aria-label="Etail Depot home" onClick={closeMenu}>
         <BrandImage brand="etail" alt="Etail Depot" width={800} height={150} className="brand-logo" />
       </Link>
       <button className="header-menu-toggle" type="button" ref={toggle} aria-label="Menu" aria-expanded={open} aria-controls="public-header-menu" onClick={() => {
@@ -135,7 +135,7 @@ export function PublicHeader() {
         <div className="header-actions">
           <PaymentPortalLink intent="register" className="header-start-now" />
           <PaymentPortalLink intent="sign-in" className="header-sign-in" showArrow />
-          <Link href="/contact" className="header-contact header-contact-primary" onClick={closeMenu}>Contact sales</Link>
+          <Link prefetch={false} href="/contact" className="header-contact header-contact-primary" onClick={closeMenu}>Contact sales</Link>
         </div>
       </div>
     </div>

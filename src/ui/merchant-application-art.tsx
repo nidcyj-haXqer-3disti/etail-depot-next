@@ -8,7 +8,7 @@ export function MerchantApplicationArt({ title, caption }: { title: string; capt
     <div className={s.stage} aria-hidden="true">
       <div className={s.portal}>
         <div className={s.top}>
-          <TrolleysBrand compact inverse preload />
+          <TrolleysBrand compact inverse />
           <span className={s.account}><Icon name="person" /></span>
         </div>
         <div className={s.body}>

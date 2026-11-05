@@ -1,4 +1,18 @@
-# 2026-10-30 Company navigation update
+# Public website status
+
+## 6 November 2026: Publication authorized
+
+After reviewing the completed local cleanup and release report, the user explicitly instructed: "push and deploy". This is the applicable publication authorization for the loading cleanup candidate and supersedes the preparation only restriction recorded below. Push the reviewed feature branch, confirm exact GitHub checks, use the normal PR merge and approved manual Netlify Git build, then verify the live pages and sitemap. Preserve all existing project and runtime boundaries.
+
+The active source fingerprint remains ba925bab17412602e379ba692faac352fca898984dbda5e1ccc360229d749164. All four required local release checks passed before authorization. This entry changes release status only; no public page, code, data, pricing, legal provision or source asset changes. Publication results belong in the separate completion receipt.
+
+## 6 November 2026: Loading cleanup and push preparation
+
+This candidate is prepared from published main 43cb0ed83de7918455ab840b6f7bfbb083de92d2 on a separate feature branch. It contains the reviewed first paint, artwork and navigation loading corrections. Shared responsive artwork and footer state are ready before hydration; critical guide screenshots use versioned static assets; small brand marks use the existing embedded system; directory navigation avoids unselected route downloads. Follow PAGE_PAINT_STANDARDS.md for future changes.
+
+Removed three unused presentation components and 46 obsolete CSS rules after checking source references. Structured breadcrumb data and the approved current design remain. The TypeScript ESLint minimatch dependency is pinned to the advisory fixed 11.0.1 version; runtime dependencies, Node and pnpm are unchanged. All four required commands pass: pnpm verify:public, pnpm test:seo:production, pnpm package:netlify and pnpm verify:package. Results include 424 unit checks, 286 desktop and mobile browser checks, 153 accessibility checks, and zero known dependency vulnerabilities. One existing desktop skip covers a mobile only case. The package contains 3,751 content pages and 18,879 static files, one public Edge boundary and only the protected email handler. Source, build and package fingerprints match ba925bab17412602e379ba692faac352fca898984dbda5e1ccc360229d749164. The all page audit found no errors in 152,402 internal links or 49,077 asset references and no public wording or link changes relative to the reviewed local build. All eight external base URLs were verified, with restricted automated access to the Visa PDF and two ISO pages confirmed through the web reader. All 147 pinned source line links are valid.
+
+The scope remains 3,751 content pages and 3,739 search eligible URLs. Twelve legal and website policy routes remain noindex and excluded from the sitemap. Merchant access uses the fixed merchantapp.io Welcome destination, with email entered there. Retired article responses, approved source notices, archived material, protected email handling and production/preview indexing boundaries are preserved. This request authorizes preparation only; no push, merge or deployment.
 
 ## 5 November 2026: Merchant setup and Shopify resource release
 

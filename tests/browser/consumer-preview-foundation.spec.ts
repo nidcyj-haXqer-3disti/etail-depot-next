@@ -430,11 +430,15 @@ test("opening artwork symbols load before styles and scripts on first visit and 
       try {
         if (refresh) await page.reload({ waitUntil: "commit" });
         else await page.goto(path, { waitUntil: "commit" });
-        await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
+        if (path !== "/merchant-onboarding") await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
       } finally { releaseResources(); }
       await page.waitForLoadState("load");
       const preloads = page.locator(`head link[rel="preload"][as="image"][href*="/${symbolName}."]`);
-      await expect(preloads).toHaveCount(1);
+      if (path === "/merchant-onboarding") {
+        expect(symbolRequested).toBe(false);
+        await expect(page.locator("main .brand-image-trolleys")).toHaveCSS("content", /url\("data:image\/png;base64,/);
+        await expect(preloads).toHaveCount(0);
+      } else await expect(preloads).toHaveCount(1);
       await expect(page.locator(`img[src*="/${symbolName}."][loading="lazy"]`)).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
     }

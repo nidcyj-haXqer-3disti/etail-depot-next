@@ -44,14 +44,14 @@ export function ShopifyGatewayGuide() {
       <div className={styles.content}>
         <section id="before-you-start">
           <h2>Before you start</h2>
-          <TrolleysBrand spacing="intro" preload />
+          <TrolleysBrand spacing="intro" />
           <p>Cybersource connects your Shopify checkout to your merchant account. Start once Trolleys has confirmed your account is ready to accept payments.</p>
           <dl className={styles.requirements}>
             <div><dt>Your Shopify owner account</dt><dd>The store owner must add or change the payment provider.</dd></div>
             <div><dt>Your Cybersource sign in</dt><dd>Have your Cybersource sign in email from Trolleys ready.</dd></div>
             <div><dt>Your setup details from Etail</dt><dd>Have Etail’s instructions for cards, currencies, payment capture and 3D Secure. Payment capture collects an authorized payment; 3D Secure adds a cardholder identity check.</dd></div>
           </dl>
-          <p className={styles.note}><strong>Need your Cybersource sign in details?</strong> <Link href="/contact#account-support">Contact Etail support.</Link></p>
+          <p className={styles.note}><strong>Need your Cybersource sign in details?</strong> <Link prefetch={false} href="/contact#account-support">Contact Etail support.</Link></p>
         </section>
         <section id="setup">
           <h2>Connect your store</h2>

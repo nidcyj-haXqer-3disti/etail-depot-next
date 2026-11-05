@@ -36,10 +36,50 @@ test("versioned artwork sources remain byte identical to the approved public ori
     "brand/networks/american-express.svg",
     "brand/networks/discover.jpg",
     "marketing/everyday-sneaker-v2.webp",
+    "help/shopify/settings.webp",
+    "help/shopify/payments.webp",
+    "help/shopify/other-providers.webp",
+    "help/shopify/choose-cybersource.webp",
+    "help/shopify/install.webp",
+    "help/shopify/permissions.webp",
+    "help/shopify/business-center.webp",
+    "help/shopify/agreement.webp",
+    "help/shopify/activate.webp",
+    "help/shopify/active.webp",
+    "help/merchant-account/welcome.jpg",
+    "help/merchant-account/registration.jpg",
+    "help/merchant-account/blank-registration.jpg",
   ];
   for (const file of artwork) {
     const original = readFileSync(new URL(`../../public/${file}`, import.meta.url));
     const imported = readFileSync(new URL(`../../src/ui/assets/${file.split("/").at(-1)}`, import.meta.url));
     expect(imported, file).toEqual(original);
   }
+});
+
+
+test("Trolleys is embedded without changing its approved artwork", () => {
+  const css = readFileSync(new URL("../../src/ui/brand-images-trolleys.css", import.meta.url), "utf8");
+  const data = css.match(/data:image\/png;base64,([^"]+)/)?.[1];
+  expect(data).toBeDefined();
+  const bytes = Buffer.from(data!, "base64");
+  expect(bytes).toEqual(readFileSync(new URL("../../src/ui/assets/trolleys-portal-logo.png", import.meta.url)));
+  expect(bytes.length).toBeLessThan(24_576);
+});
+
+
+test("opening checkout marks preserve their originals in a route scoped stylesheet", () => {
+  const files = { "apple-pay": "wallets/apple-pay.svg", "google-pay": "wallets/google-pay.svg", visa: "networks/visa-blue.svg", mastercard: "networks/mastercard.svg", amex: "networks/american-express.svg", discover: "networks/discover.jpg" };
+  const css = readFileSync(new URL("../../src/ui/brand-images-checkout.css", import.meta.url), "utf8");
+  const marks = [...css.matchAll(/\.brand-image-([a-z-]+) \{ --brand-image: url\("data:([^;]+);base64,([^\"]+)"\); \}/g)];
+  expect(marks.map(mark => mark[1]).sort()).toEqual(Object.keys(files).sort());
+  let bytes = 0;
+  for (const [, name, mime, data] of marks) {
+    const file = files[name as keyof typeof files];
+    expect(mime).toBe(file.endsWith(".jpg") ? "image/jpeg" : "image/svg+xml");
+    const original = readFileSync(new URL(`../../public/brand/${file}`, import.meta.url));
+    expect(Buffer.from(data, "base64")).toEqual(original);
+    bytes += original.length;
+  }
+  expect(bytes).toBeLessThan(65_536);
 });

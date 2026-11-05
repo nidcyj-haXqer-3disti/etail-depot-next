@@ -1,3 +1,4 @@
+import "@/ui/brand-images-checkout.css";
 import { servicePageMetadata } from "@/modules/public-site/metadata";
 import { ServiceDetailPage } from "@/ui/service-detail-page";
 

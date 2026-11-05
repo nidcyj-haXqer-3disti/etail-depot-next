@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { openMainNavigation } from "./public-header";
+import { expectCompleteGuidePaint } from "./guide-rendering";
 
 const path = "/resources/shopify-gateway-integration";
 
@@ -56,7 +57,7 @@ test("Guide screenshots remain available without JavaScript", async ({ browser }
 });
 
 
-test("Shopify logo and first screenshot load before styles and scripts on first visit and refresh", async ({ page }) => {
+test("Shopify branding and first screenshot avoid delayed image requests", async ({ page }) => {
  let releaseResources = () => {};
  let resourcesReady = Promise.resolve();
  let logoRequested = false;
@@ -65,7 +66,7 @@ test("Shopify logo and first screenshot load before styles and scripts on first 
   const request = route.request();
   const pathname = new URL(request.url()).pathname;
   if (pathname.startsWith("/_next/static/media/trolleys-portal-logo.")) logoRequested = true;
-  if (pathname === "/help/shopify/settings.webp") firstScreenshotRequested = true;
+  if (/^\/_next\/static\/media\/settings\.[^/]+\.webp$/.test(pathname)) firstScreenshotRequested = true;
   if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
   await route.continue();
  });
@@ -78,18 +79,61 @@ test("Shopify logo and first screenshot load before styles and scripts on first 
    if (refresh) await page.reload({ waitUntil: "commit" });
    else await page.goto(path, { waitUntil: "commit" });
    await expect.poll(() => firstScreenshotRequested, { message: "The first Shopify screenshot must not wait for layout or hydration" }).toBe(true);
-   await expect.poll(() => logoRequested).toBe(true);
   } finally { releaseResources(); }
   await page.waitForLoadState("load");
-  const openingImages = page.locator('#before-you-start img, #open-settings figure > a img');
-  await expect(openingImages).toHaveCount(2);
+  expect(logoRequested, "The small logo must be embedded, with no separate image request").toBe(false);
+  await expect(page.locator("main .brand-image-trolleys")).toHaveCount(2);
+  for (const logo of await page.locator("main .brand-image-trolleys").all()) {
+   await expect(logo).toHaveCSS("content", /url\("data:image\/png;base64,/);
+  }
+  const openingImages = page.locator('#open-settings figure > a img');
+  await expect(openingImages).toHaveCount(1);
   for (const image of await openingImages.all()) {
    await expect(image).not.toHaveAttribute("loading", "lazy");
    await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0)).toBe(true);
   }
-  for (const image of await page.locator('main figure > a img:not([src="/help/shopify/settings.webp"])').all()) {
-   await expect(image).toHaveAttribute("loading", "lazy");
+  for (const image of await page.locator('main figure > a img:not([src*="/settings."])').all()) {
+   await expect(image).toHaveAttribute("loading", "eager");
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
  }
+});
+
+
+test("Shopify screenshots start before layout at later steps and on refresh", async ({ page }) => {
+ const requested = new Set<string>();
+ let releaseStyles = () => {};
+ let stylesReady = Promise.resolve();
+ await page.route("**/*", async route => {
+  const request = route.request();
+  const pathname = new URL(request.url()).pathname;
+  if (pathname.startsWith("/help/shopify/") || /^\/_next\/static\/media\/[^/]+\.webp$/.test(pathname)) requested.add(pathname);
+  if (["stylesheet", "script"].includes(request.resourceType())) await stylesReady;
+  await route.continue();
+ });
+ for (const refresh of [false, true]) {
+  requested.clear();
+  stylesReady = new Promise<void>(resolve => { releaseStyles = resolve; });
+  try {
+   if (refresh) await page.reload({ waitUntil: "commit" });
+   else await page.goto(`${path}#confirm-active`, { waitUntil: "commit" });
+   await expect.poll(() => requested.size, { timeout: 4000, message: "All ten guide screenshots must start without waiting for layout or restored scroll position" }).toBe(10);
+  } finally { releaseStyles(); }
+  await page.waitForLoadState("load");
+  const screenshots = page.locator("main figure > a img");
+  await expect(screenshots).toHaveCount(10);
+  for (const image of await screenshots.all()) {
+   await expect(image).not.toHaveAttribute("loading", "lazy");
+   await expect(image).toHaveAttribute("src", /^\/_next\/static\/media\/[^/]+\.[^/]+\.webp$/);
+   expect(await image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0)).toBe(true);
+  }
+  await expect(page.locator("#confirm-active h3")).toBeInViewport();
+  for (const image of await page.locator("dialog img").all()) await expect(image).toHaveAttribute("loading", "lazy");
+ }
+});
+
+
+test("Refresh does not paint a partial guide while its HTML is arriving", async ({ page, baseURL, request }) => {
+ await expectCompleteGuidePaint(page, request, baseURL, path, "#confirm-active", "#confirm-active h3");
+ await expect(page.locator("main figure")).toHaveCount(12);
 });

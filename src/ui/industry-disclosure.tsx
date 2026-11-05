@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 import s from "./industry-disclosure.module.css";
 
 /** Native disclosure keeps every industry in HTML and usable without scripting. */
 export function IndustryDisclosure({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   const disclosure = useRef<HTMLDetailsElement>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const details = disclosure.current;
     if (!details) return;
     const article = details.parentElement!;
     const mobile = window.matchMedia("(max-width: 680px)");
-    let mobileOpen = false;
+    let mobileOpen = mobile.matches && details.hasAttribute("data-initial-open") && details.open;
     const destination = () => {
       try { const target = document.getElementById(decodeURIComponent(location.hash.slice(1))); return target && article.contains(target) ? target : null; } catch { return null; }
     };
@@ -24,7 +24,7 @@ export function IndustryDisclosure({ id, title, children }: { id: string; title:
     window.addEventListener("hashchange", follow);
     return () => { details.removeEventListener("toggle", remember); mobile.removeEventListener("change", resize); window.removeEventListener("hashchange", follow); };
   }, [id]);
-  return <article id={id}><details ref={disclosure} open className={s.card}>
+  return <article id={id}><details ref={disclosure} open className={s.card} data-responsive-artwork="industry" suppressHydrationWarning>
     <summary className={s.heading}><h3>{title}</h3><span aria-hidden="true" className={s.toggle}>+</span></summary>
     <div className={s.body}>{children}</div>
   </details></article>;

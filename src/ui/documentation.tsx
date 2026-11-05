@@ -48,7 +48,7 @@ export function DocumentationArticle({slug}:{slug:DocumentationSlug}){
   <DocumentationNavigation current={slug}/>
   <ResponsiveContentsFocus rootSelector=".docs-workspace" desktopSelector=".docs-toc" mobileSelector=".docs-mobile-toc" breakpoint={1250} />
   <article className="docs-article">
-   <header className="docs-article-heading"><h1 tabIndex={-1}>{page.title}</h1>{slug === "merchant-onboarding" && <TrolleysBrand spacing="intro" preload />}<p>{article.introduction}</p>{slug !== "merchant-onboarding" && <div className="docs-context"><span className="docs-audience">{page.audience}</span><Link className="docs-service-link" href={service.href}>{service.label}</Link></div>}</header>
+   <header className="docs-article-heading"><h1 tabIndex={-1}>{page.title}</h1>{slug === "merchant-onboarding" && <TrolleysBrand spacing="intro" />}<p>{article.introduction}</p>{slug !== "merchant-onboarding" && <div className="docs-context"><span className="docs-audience">{page.audience}</span><Link className="docs-service-link" href={service.href}>{service.label}</Link></div>}</header>
    <details className="docs-mobile-toc"><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="Page sections">{article.sections.map(s=><a key={s.id} href={`#${s.id}`}>{s.title}</a>)}</nav></details>
    {(article.prerequisites.length > 0 || materials) && <div className={`docs-prerequisites${materials ? " docs-integration-preparation" : ""}`}>
     <div><h2>{materials ? "What you need" : "Before you begin"}</h2><ul>{article.prerequisites.map(p=><li key={p}><Icon name="check"/>{p}</li>)}</ul></div>

@@ -64,7 +64,6 @@
 .public-main .cw-docs .docs-diagram-access li > svg,.public-main .cw-docs .docs-diagram-launch li > svg {width:22px;height:22px;}
 .public-main .cw-online .payment-service-explorer {border-radius:16px;border-color:#cedbd0;}
 .public-main .cw-online .payment-link-art {border-radius:16px;}
-.public-main .cw-cards .bp-card-stage {border-radius:16px;border-color:#cedbd0;}
 @media(max-width:700px) {
  .public-main .cw-company .facilitator-relationship > div{grid-template-columns:48px minmax(0,1fr);}
  .public-main .cw-company .facilitator-relationship > div > .icon{justify-self:center;}
