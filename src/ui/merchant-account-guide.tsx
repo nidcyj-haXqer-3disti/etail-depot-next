@@ -25,7 +25,7 @@ function AccountScreenshot({ screen }: { screen: "welcome" | "registration" | "b
   const shot = screens[screen];
   return <figure className={styles.figure}>
     <div className={`${styles.screenshot} ${styles[screen]}`}>
-      <Image src={`/help/merchant-account/${shot.file}`} width={1280} height={shot.height} alt={shot.alt} unoptimized loading="lazy" />
+      <Image src={`/help/merchant-account/${shot.file}`} width={1280} height={shot.height} alt={shot.alt} unoptimized preload={screen === "welcome"} loading={screen === "welcome" ? undefined : "lazy"} />
     </div>
     <figcaption>{shot.caption}</figcaption>
   </figure>;

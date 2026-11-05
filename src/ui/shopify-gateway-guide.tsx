@@ -44,7 +44,7 @@ export function ShopifyGatewayGuide() {
       <div className={styles.content}>
         <section id="before-you-start">
           <h2>Before you start</h2>
-          <TrolleysBrand spacing="intro" />
+          <TrolleysBrand spacing="intro" preload />
           <p>Cybersource connects your Shopify checkout to your merchant account. Start once Trolleys has confirmed your account is ready to accept payments.</p>
           <dl className={styles.requirements}>
             <div><dt>Your Shopify owner account</dt><dd>The store owner must add or change the payment provider.</dd></div>
