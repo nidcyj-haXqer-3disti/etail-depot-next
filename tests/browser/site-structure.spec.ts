@@ -260,10 +260,10 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   const navigation = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
   const directory = page.locator(".public-footer-navigation");
   await expect(directory.getByRole("navigation")).toHaveCount(5);
-  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(22);
+  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(24);
   const destinations = await directory.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")));
   expect(new Set(destinations).size).toBe(destinations.length);
-  await expect(navigation.locator('a[href^="/docs"]')).toHaveCount(5);
+  await expect(navigation.locator('a[href^="/docs"]')).toHaveCount(6);
   if (await toggle.isVisible()) await toggle.click();
   await navigation.locator("summary").filter({ hasText: /^Services$/ }).click();
   await navigation.getByRole("link", { name: "Merchant onboarding", exact: true }).click();
@@ -370,7 +370,7 @@ test("footer groups work with a keyboard and adapt to screen size", async ({ pag
   await expect(page).toHaveURL(/\/docs\/checkout$/);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "false");
-  await expect(directory.getByRole("link")).toHaveCount(22);
+  await expect(directory.getByRole("link")).toHaveCount(24);
   await expect(directory.locator("summary")).toHaveCount(0);
   await page.setViewportSize({ width: 320, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "true");
@@ -415,7 +415,7 @@ test("the complete footer remains usable without JavaScript", async ({ browser }
     const page = await context.newPage();
     await page.goto("http://127.0.0.1:3100/");
     const directory = page.locator(".public-footer-navigation");
-    await expect(directory.getByRole("link")).toHaveCount(22);
+    await expect(directory.getByRole("link")).toHaveCount(24);
     await directory.getByRole("link", { name: "Payouts", exact: true }).click();
     await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
     await expect(page.getByRole("heading", {level:1})).toBeInViewport();

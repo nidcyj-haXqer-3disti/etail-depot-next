@@ -51,6 +51,8 @@ const destinations = {
   launch: { label: "Launch preparation", href: "/docs/testing-and-launch" },
   guides: { label: "Guides", href: "/guides" },
   help: { label: "Help center", href: "/help" },
+  accountSetup: { label: "Merchant account setup", href: "/docs/merchant-onboarding" },
+  shopify: { label: "Shopify integration", href: "/resources/shopify-gateway-integration" },
   company: { label: "About", href: "/company" },
   trust: { label: "Security and privacy", href: "/trust" },
   contact: { label: "Contact", href: "/contact" },
@@ -68,7 +70,7 @@ export const publicNavigationGroups = [
     { label: "Developers", links: [destinations.docs, destinations.access, destinations.checkout, destinations.updates, destinations.launch] },
   ] },
   { id: "resources", label: "Resources", sections: [
-    { label: "Resources", links: [destinations.guides, destinations.help] },
+    { label: "Resources", links: [destinations.accountSetup, destinations.shopify, destinations.guides, destinations.help] },
   ] },
 ] as const;
 
@@ -79,7 +81,7 @@ export const publicFooterGroups = [
   { label: "Services", links: [destinations.onboarding, destinations.methods, destinations.ach, destinations.payouts, destinations.reconciliation, destinations.refunds, destinations.disputes, destinations.cards] },
   { label: "Use cases", links: [destinations.online, destinations.platforms, destinations.switchProvider] },
   { label: "Developers", links: [destinations.docs, destinations.access, destinations.checkout, destinations.updates, destinations.launch] },
-  { label: "Resources", links: [destinations.guides, destinations.help] },
+  { label: "Resources", links: [destinations.accountSetup, destinations.shopify, destinations.guides, destinations.help] },
   { label: "Company", links: [destinations.company, destinations.trust, destinations.contact, destinations.legalCenter] },
 ] as const;
 

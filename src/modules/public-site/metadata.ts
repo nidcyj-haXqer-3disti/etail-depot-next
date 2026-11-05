@@ -22,7 +22,7 @@ export const PUBLIC_PAGES = {
   "/credit-card-services": { title: "Card Services: Ledgix Secured Credit Card", description: `${cardProduct.name}: virtual ${cardProduct.creditType}, $${productFacts.cards.minimumDepositDollars} minimum deposit, ${cardFeesDescription}. ${productFacts.cards.repayment}.` },
   "/payment-acceptance-service": { title: "Merchant Services and Credit Card Processing", description: "Merchant services and credit card processing for US businesses. Explore account setup, online checkout, ACH payments, refunds and payout reporting." },
   "/help": { title: "Merchant and Card Services Help Center", description: "Get help with merchant account access, payment status, refunds, disputes and payouts. Find contacts for software integrations, card inquiries and privacy." },
-  "/guides": { title: "ISO 20022 and ISO 8583 Payment References", description: "Find ISO 20022 external code definitions and independent ISO 8583 message and field explanations, with their code set, implementation and source context." },
+  "/guides": { title: "Merchant Setup Guides and Payment Code References", description: "Set up your merchant account, connect Shopify to Cybersource, and find ISO 20022 code definitions and independent ISO 8583 message and field explanations." },
 } as const;
 export type PublicPath = keyof typeof PUBLIC_PAGES;
 
@@ -74,6 +74,7 @@ export function publicPageMetadata(path: PublicPath): Metadata {
 
 // Reviewed service and documentation pages share the same exact production guard.
 export const SERVICE_PAGES = {
+  "/resources/shopify-gateway-integration": { title: "Shopify Cybersource Gateway Setup Guide", description: "Connect your Shopify store to Cybersource with Etail Depot. Follow the setup screenshots, review payment settings and resolve common activation issues." },
   ...COMMERCIAL_PAGES,
   ...documentationMetadata,
   "/online-businesses": { title: "Online Payments and Checkout", description: "Accept credit cards, digital wallets and ACH online. Connect checkout to orders and payment records using the methods enabled for your merchant account." },
@@ -144,11 +145,13 @@ export function publicPageJsonLd(path: PublicPath): string {
         ...(path !== "/" ? { breadcrumb: { "@id": breadcrumbId } } : {}),
       },
       ...(path === "/guides" ? [{
-        "@type": "ItemList", "@id": `${url}#reference-collections`, name: "Payment standards",
-        numberOfItems: 2, itemListOrder: "https://schema.org/ItemListUnordered",
+        "@type": "ItemList", "@id": `${url}#reference-collections`, name: "Setup guides and payment references",
+        numberOfItems: 4, itemListOrder: "https://schema.org/ItemListUnordered",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "ISO 20022", url: `${url}/iso-20022` },
-          { "@type": "ListItem", position: 2, name: "ISO 8583", url: `${url}/iso-8583` },
+          { "@type": "ListItem", position: 1, name: "Merchant account setup", url: `${canonicalOrigin}/docs/merchant-onboarding` },
+          { "@type": "ListItem", position: 2, name: "Shopify integration", url: `${canonicalOrigin}/resources/shopify-gateway-integration` },
+          { "@type": "ListItem", position: 3, name: "ISO 20022", url: `${url}/iso-20022` },
+          { "@type": "ListItem", position: 4, name: "ISO 8583", url: `${url}/iso-8583` },
         ],
       }] : []),
       ...(path !== "/" ? [{

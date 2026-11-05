@@ -1,5 +1,15 @@
 # Current public website scope
 
+## 5 November 2026: Merchant setup and Shopify resource release
+
+The user authorized push and deployment of the reviewed local website. This candidate adds the Shopify gateway setup resource, simplifies merchant account instructions, refines shared Trolleys attribution and updates Resources navigation. The merchant Welcome page continues to collect email before sign in or registration. The Shopify resource contains sanitized setup screenshots and original illustrative email and verification artwork, not merchant credentials or transaction records.
+
+The exact scope is 3,751 content pages and 3,739 search eligible URLs. Existing URLs, reference datasets, legal provisions, pricing, eligibility and source notices are preserved. All twelve legal and website policy routes remain noindex and outside the sitemap. No provider configuration, merchant account submission or payment action is part of this release.
+
+The reviewed documentation layout removes the extra mobile topic row while keeping the desktop topic list and page section navigation. Footer columns and reference collection artwork align at desktop widths. Complete local release validation, exact GitHub CI and the manual Netlify Git build are required before publication. Hosted identity, page, sitemap and responsive checks are recorded separately in the publication receipt.
+
+Local validation passes 422 unit checks, 262 desktop and mobile browser checks, and 153 accessibility checks. One existing desktop skip covers a mobile only scenario. Production SEO verifies 3,739 eligible URLs and the exact sitemap. Packaging verifies 3,751 content pages, 18,869 static files, one Edge boundary and the protected email handler. Stale assertions for directory links, image destinations and accessible wording were corrected, and the onboarding logo now preloads. The production SEO script received a final assertion correction followed by lint, security, SEO and packaging checks. GitHub will rerun all four release commands on the exact submitted commit. One existing moderate development dependency advisory remains below the high severity release threshold.
+
 ## 5 November 2026: Reviewed merchant legal and website release
 
 The user authorized pushing and deploying the reviewed local candidate on 5 November 2026. This supersedes earlier preparation only status. Publication follows the existing PR checks and manual Netlify Git build process.

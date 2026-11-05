@@ -1,3 +1,4 @@
+import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
 import Link from "next/link";
 import { AttentionHero } from "@/ui/attention-hero";
 import "@/ui/attention-pages.css";
@@ -21,7 +22,7 @@ export default function Page() {
       title={<>Accept card and{" "}<em>ACH payments.</em></>}
       intro="Credit card processing and ACH for US businesses in USD, with account setup, online checkout and payment reporting."
       actions={<><PaymentPortalLink intent="register" /><Link className="text-link" href="/contact#payment-review">Discuss your business</Link></>}
-      note="Create your account to begin the merchant application. Account approval and setup apply."
+      note={`${merchantAccountGuidance.application} Account approval and setup apply.`}
       artwork={<MerchantOperationsArt />}
     /><section className="ec-container ec-setup-section" aria-labelledby="merchant-section-2-title"><span className="ec-anchor" id="merchant-service-path-title"></span><div className="ec-section-copy"><span className="ec-category">Account setup</span><h2 id="merchant-section-2-title">Set up your account.</h2><p className="ec-lead">Apply with your business and ownership details, review your account terms and complete setup after approval.</p><Link className="ec-concept-action ec-quiet" href="/merchant-onboarding">Prepare your application</Link></div><AccountSetupArt /></section>
  <section className="ec-accept-section" aria-labelledby="merchant-section-3-title"><span className="ec-anchor" id="request-details"></span><span className="ec-anchor" id="payment-channels"></span><span className="ec-anchor" id="customer-checkout"></span><div className="ec-container ec-accept-grid"><div><span className="ec-category">Payment acceptance</span><h2 id="merchant-section-3-title">Accept payments online.</h2><p className="ec-lead">Offer the card, wallet and ACH options enabled for your account. Connect each payment to the customer’s order, invoice or payment request.</p><Link className="ec-concept-action ec-quiet" href="/online-businesses">Explore the customer payment experience</Link><p className="ec-scope">Wallet availability depends on account setup and the customer’s card and device. ACH has separate fees and terms.</p></div><div className="ec-method-panel"><h3>Ways your customers pay.</h3><ConsumerNetworks /></div></div></section>

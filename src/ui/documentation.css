@@ -3,7 +3,6 @@ html:has(.documentation-page) { scroll-behavior:auto; }
 .docs-workspace { display:grid; grid-template-columns:214px minmax(0,720px) 154px; gap:38px; align-items:start; padding-block:44px 80px; }
 .docs-workspace-home { grid-template-columns:214px minmax(0,1fr); gap:56px; }
 .docs-navigation { min-width:0; position:sticky; top:28px; align-self:start; }
-.docs-nav-mobile { display:none; }
 .docs-navigation a { display:flex; align-items:center; min-height:44px; padding:9px 12px; border-radius:5px; font-size:14px; line-height:1.45; text-decoration:none; color:var(--docs-muted); }
 .docs-navigation a:hover { color:var(--docs-ink); background:var(--docs-tint); }
 .docs-navigation a[aria-current="page"] { background:#e7f4f0; color:var(--docs-ink); font-weight:600; box-shadow:inset 2px 0 #0ACEA9; }
@@ -62,7 +61,7 @@ html:has(.documentation-page) { scroll-behavior:auto; }
 .docs-details summary::-webkit-details-marker,.docs-references summary::-webkit-details-marker { display:none; }
 .docs-details summary > span,.docs-references summary > span { font-size:19px; font-weight:400; }
 .docs-details details[open] summary > span,.docs-references[open] summary > span { transform:rotate(45deg); }
-.docs-nav-mobile[open] summary > span:last-child > span,.docs-mobile-toc[open] summary > span { display:inline-block;transform:rotate(180deg); }
+.docs-mobile-toc[open] summary > span { display:inline-block;transform:rotate(180deg); }
 .docs-details details > p { margin:0; padding:0 22px 20px 0; color:var(--docs-muted); font-size:15px; line-height:1.8; }
 .docs-text-link { display:inline-flex; align-items:center; gap:12px; min-height:44px; color:var(--docs-ink); font-size:14px; font-weight:600; line-height:1.6; text-decoration:none; }
 .docs-text-link:hover { color:#006d5e; }
@@ -86,7 +85,7 @@ html:has(.documentation-page) { scroll-behavior:auto; }
 
 @media(min-width:1001px){.docs-navigation { max-height:calc(100vh - 56px); overflow-y:auto; scrollbar-width:thin; } }
 @media(max-width:1250px){.docs-workspace { grid-template-columns:200px minmax(0,1fr); gap:42px; }.docs-toc { display:none; }.docs-mobile-toc { display:block; margin-bottom:36px; border-block:1px solid var(--docs-line); }.docs-mobile-toc summary { cursor:pointer; padding:16px 0; font-size:14px; display:flex; justify-content:space-between; list-style:none; }.docs-mobile-toc summary::-webkit-details-marker {display:none;}.docs-mobile-toc nav { display:grid; padding-bottom:16px; }.docs-mobile-toc a { padding:10px 0; color:var(--docs-muted); font-size:14px; text-decoration:none; line-height:1.6; } }
-@media(max-width:1000px){.docs-workspace,.docs-workspace-home { grid-template-columns:minmax(0,1fr); gap:30px; padding-top:0; max-width:860px; }.docs-navigation { position:static; border-bottom:1px solid var(--docs-line); }.docs-nav-desktop { display:none; }.docs-nav-mobile { display:block; }.docs-nav-mobile summary { display:flex; justify-content:space-between; align-items:center; gap:16px; min-height:60px; font-size:14px; cursor:pointer; list-style:none; }.docs-nav-mobile summary::-webkit-details-marker{display:none;}.docs-nav-mobile summary > span:last-child { color:var(--docs-muted); font-size:12px; }.docs-nav-mobile > div { padding-bottom:22px; }.docs-nav-mobile .docs-nav-group { margin-top:14px; }.docs-hub-heading { padding-top:5px; } }
+@media(max-width:1000px){.docs-workspace,.docs-workspace-home { grid-template-columns:minmax(0,1fr); gap:30px; padding-top:0; max-width:860px; }.docs-navigation { display:none; }.docs-hub-heading { padding-top:5px; } }
 @media(max-width:680px){.docs-workspace { padding-bottom:52px; }.docs-article-heading h1 { font-size:34px; }.docs-article-heading > p,.docs-hub-heading > p { font-size:16px; }.docs-prerequisites { padding:20px; margin:26px 0 30px; }.docs-section { margin-top:38px; }.docs-section h2 { font-size:26px; }.docs-flow { padding:20px; }.docs-flow-records ol { grid-template-columns:minmax(0,1fr); gap:20px; }.docs-flow-records li { display:grid; grid-template-columns:1fr 2fr; gap:5px 18px; }.docs-flow-records .docs-flow-marker { grid-column:1/-1; }.docs-facts > div { grid-template-columns:minmax(0,1fr); gap:7px; padding-block:18px; }.docs-details summary { font-size:14px; }.docs-details details > p { padding-right:0; }}
 @media(max-width:360px){.docs-hub-heading h1,.docs-article-heading h1 { font-size:31px; }.docs-flow { padding:18px; }.docs-flow ol { gap:22px 16px; }.docs-flow strong { font-size:13px; }.docs-flow-detail { font-size:12px; }.docs-flow-records li { display:flex; }.docs-steps li { gap:14px; }.docs-note { padding:14px; } }
 

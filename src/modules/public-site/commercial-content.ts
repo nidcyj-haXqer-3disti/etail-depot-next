@@ -1,3 +1,4 @@
+import { merchantAccountGuidance } from "./merchant-account-content";
 import { hostedServices } from "@/shared/hosted-services";
 import { SERVICE_DETAIL_PAGES } from "./service-detail-content";
 /** Public decision pages. Account specifications remain in the assigned integration documentation. */
@@ -26,6 +27,7 @@ export const COMMERCIAL_PAGES = {
     intro: "Review card processing rates, estimate fees and check additional charges. ACH and platform terms are confirmed separately.",
     action: { label: "Start now", href: hostedServices.payments.registrationUrl },
     secondaryAction: { label: "Discuss your processing costs", href: "/contact#payment-review" },
+    note: merchantAccountGuidance.application,
     art: { title: "A complete view of payment costs", caption: "The card processing estimate is not a guaranteed bank deposit.", steps: [
       { title: "Card processing", detail: "Percentage plus a fixed fee" }, { title: "Other charges", detail: "Payment type · account activity" }, { title: "Account terms", detail: "ACH · platform · payout schedule" },
     ] },
@@ -104,7 +106,7 @@ export const COMMERCIAL_PAGES = {
     ] },
     sections: [
       { title: "Protect account access and payment data.", items: [
-        { title: "Account access", text: "Use Sign in to access your merchant account. Keep credentials private and limit access to authorized people. Submit verification documents through the secure account service." },
+        { title: "Account access", text: "Choose Sign in to Trolleys. Keep credentials private and limit access to authorized people. Submit verification documents through your account." },
         { title: "Checkout and integration", text: "Confirm where payment details are entered, which systems receive them and who can access them. Request the specifications and permissions for your account before connecting your software." },
         { title: "Payment security requirements", text: "Merchants retain responsibilities under the Payment Card Industry Data Security Standard (PCI DSS) when using a payment provider. Confirm the assessment and documentation required for your business with your acquiring partner or the organization managing your compliance program." },
       ] },
@@ -121,7 +123,7 @@ export const COMMERCIAL_PAGES = {
     heading: "Contact Etail Depot.",
     intro: "Merchant services, platform integrations and account support.",
     action: { label: "Explore contact options", href: "#contact-options" },
-    art: { title: "Contact Etail", caption: "Apply or sign in through the merchant account service. Contact our team by email for questions and account support.", steps: [
+    art: { title: "Contact Etail", caption: "Apply or sign in through Trolleys. Contact our team by email for questions and account support.", steps: [
       { title: "Your business", detail: "Application · payment account" }, { title: "Your software", detail: "Partnership · integration" }, { title: "Your question", detail: "Card service · privacy · compliance" },
     ] },
     sections: [],

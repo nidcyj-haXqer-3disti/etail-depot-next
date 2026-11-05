@@ -7,7 +7,7 @@
 .standards-collections-grid > a + a { border-left:1px solid var(--public-line); }
 .standards-collection-tag { font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--public-muted); }
 .standards-collections-grid h2 { margin-top:22px;font-size:36px;letter-spacing:-.035em;line-height:1.2; }
-.standards-collections-grid p { margin-top:16px;max-width:40ch;font-size:16px;line-height:1.65;color:var(--public-muted); }
+.standards-collections-grid p { margin:16px 0 30px;max-width:40ch;font-size:16px;line-height:1.65;color:var(--public-muted); }
 .standards-collections-grid>a { text-decoration:none; }
 .standards-collections-grid>a:first-child { background:#f0f4eb; }
 .standards-collections-grid>a:last-child { background:#fafbf7; }
@@ -22,7 +22,7 @@
 .cw-guides.guides-directory .standards-collections-grid>a{padding:34px;border:1px solid #dce5d3;border-radius:18px;overflow:hidden;background:#f0f4e9}
 .cw-guides.guides-directory .standards-collections-grid>a:last-child{background:#f8f9f4}
 .cw-guides.guides-directory .standards-collections-grid>a:hover{background:#e8efdf}
-.standards-collection-art{display:flex;align-items:center;gap:12px;width:100%;padding:28px 20px;margin-top:30px;border-radius:12px;background:#fff;box-shadow:0 14px 30px -24px #20463860;font-size:12px;line-height:1.6;color:#315e48}
+.standards-collection-art{display:flex;align-items:center;gap:12px;width:100%;padding:28px 20px;margin-top:auto;border-radius:12px;background:#fff;box-shadow:0 14px 30px -24px #20463860;font-size:12px;line-height:1.6;color:#315e48}
 .standards-collection-art span,.standards-collection-art strong{flex:1;text-align:center;font-weight:500;min-width:0}
 .standards-collection-art strong{padding:14px 10px;border-radius:7px;background:#204638;color:#fff}
 .standards-collection-art i{font-style:normal;color:#64815b;flex:none}

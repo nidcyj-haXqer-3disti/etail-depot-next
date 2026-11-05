@@ -47,7 +47,7 @@ describe("public search release boundary", () => {
     expect(PUBLIC_INDEXING_APPROVAL).toMatchObject({
       siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3750 content pages and 3738 search eligible URLs");
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3751 content pages and 3739 search eligible URLs");
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
@@ -208,10 +208,10 @@ describe("reviewed public metadata", () => {
   it("keeps reviewed page revision dates stable as the build clock advances", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
-    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-11-01");
-    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-11-04");
+    expect(PUBLIC_PAGE_MODIFIED["/guides"]).toBe("2026-11-05");
+    expect(PUBLIC_PAGE_MODIFIED["/payment-acceptance-service"]).toBe("2026-11-05");
     expect(PUBLIC_PAGE_MODIFIED["/help"]).toBe("2026-11-05");
-    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-03");
+    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-05");
     expect(PUBLIC_PAGE_MODIFIED["/credit-card-services"]).toBe("2026-11-01");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -261,10 +261,10 @@ describe("public structured data", () => {
     const collection = graph.find((node: { "@type": string }) => node["@type"] === "CollectionPage");
     const list = graph.find((node: { "@type": string }) => node["@type"] === "ItemList");
     expect(collection.mainEntity).toEqual({ "@id": list["@id"] });
-    expect(list.numberOfItems).toBe(2);
-    expect(list.itemListElement.map((item: { url: string }) => item.url)).toEqual([`${canonicalOrigin}/guides/iso-20022`, `${canonicalOrigin}/guides/iso-8583`]);
-    expect(list.itemListElement.map((item: { name: string }) => item.name)).toEqual(["ISO 20022", "ISO 8583"]);
-    expect(new Set(list.itemListElement.map((item: { url: string }) => item.url)).size).toBe(2);
+    expect(list.numberOfItems).toBe(4);
+    expect(list.itemListElement.map((item: { url: string }) => item.url)).toEqual([`${canonicalOrigin}/docs/merchant-onboarding`, `${canonicalOrigin}/resources/shopify-gateway-integration`, `${canonicalOrigin}/guides/iso-20022`, `${canonicalOrigin}/guides/iso-8583`]);
+    expect(list.itemListElement.map((item: { name: string }) => item.name)).toEqual(["Merchant account setup", "Shopify integration", "ISO 20022", "ISO 8583"]);
+    expect(new Set(list.itemListElement.map((item: { url: string }) => item.url)).size).toBe(4);
     expect(JSON.stringify(graph)).not.toMatch(/SearchAction|aggregateRating|FAQPage/);
   });
 

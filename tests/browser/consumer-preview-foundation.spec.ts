@@ -236,7 +236,7 @@ test("public service discovery explains eligibility and card inquiries without l
   for(const path of ["/","/software-partners","/credit-card-services","/payment-acceptance-service","/pricing","/help"]){
     await page.goto(path);
     const mainNavigation=await openMainNavigation(page);
-    await expect(mainNavigation.locator("a")).toHaveCount(23);
+    await expect(mainNavigation.locator("a")).toHaveCount(25);
     for(const [name,href] of [["Merchant onboarding","/merchant-onboarding"],["Software platforms","/software-partners"],["Online businesses","/online-businesses"],["Card services","/credit-card-services"],["Documentation","/docs"],["Guides","/guides"],["Pricing","/pricing"]]){
       await expect(mainNavigation.getByRole("link",{name,exact:true,includeHidden:true})).toHaveAttribute("href",href);
     }
@@ -273,8 +273,8 @@ test("public service discovery explains eligibility and card inquiries without l
     await expect(footer.getByRole("navigation",{name:"Footer developers"}).getByRole("link",{name:"Documentation",exact:true})).toHaveAttribute("href","/docs");
     await openFooterGroup(page, "Resources");
     const resourceLinks = footer.getByRole("navigation", {name:"Footer resources"}).getByRole("link");
-    await expect(resourceLinks).toHaveText(["Guides", "Help center"]);
-    for (const [index, href] of ["/guides", "/help"].entries()) await expect(resourceLinks.nth(index)).toHaveAttribute("href", href);
+    await expect(resourceLinks).toHaveText(["Merchant account setup", "Shopify integration", "Guides", "Help center"]);
+    for (const [index, href] of ["/docs/merchant-onboarding", "/resources/shopify-gateway-integration", "/guides", "/help"].entries()) await expect(resourceLinks.nth(index)).toHaveAttribute("href", href);
     await expect(footer.locator(".public-footer-company")).toHaveText(`© ${new Date().getUTCFullYear()} Etail Depot US, Inc. All rights reserved.`);
     if(productPage){
       await expect(page.locator("main")).not.toContainText(path==="/credit-card-services"?"Trolleys":"Ledgix",{useInnerText:true});
@@ -415,13 +415,15 @@ test("opening artwork symbols load before styles and scripts on first visit and 
   let releaseResources = () => {};
   let resourcesReady = Promise.resolve();
   let symbolRequested = false;
+  let symbolName = "symbol";
   await page.route("**/*", async route => {
     const request = route.request();
-    if (/\/_next\/static\/media\/symbol\.[^/]+\.png$/.test(new URL(request.url()).pathname)) symbolRequested = true;
+    if (new RegExp(`/_next/static/media/${symbolName}\\.[^/]+\\.png$`).test(new URL(request.url()).pathname)) symbolRequested = true;
     if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
     await route.continue();
   });
   for (const path of ["/", "/software-partners", "/switch-payment-providers", "/merchant-onboarding", "/payment-partnerships", "/platform-payment-models", "/payment-facilitator", "/contact"]) {
+    symbolName = path === "/merchant-onboarding" ? "trolleys-portal-logo" : "symbol";
     for (const refresh of [false, true]) {
       symbolRequested = false;
       resourcesReady = new Promise<void>(resolve => { releaseResources = resolve; });
@@ -431,9 +433,9 @@ test("opening artwork symbols load before styles and scripts on first visit and 
         await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
       } finally { releaseResources(); }
       await page.waitForLoadState("load");
-      const preloads = page.locator('head link[rel="preload"][as="image"][href*="/symbol."]');
+      const preloads = page.locator(`head link[rel="preload"][as="image"][href*="/${symbolName}."]`);
       await expect(preloads).toHaveCount(1);
-      await expect(page.locator('img[src*="/symbol."][loading="lazy"]')).toHaveCount(0);
+      await expect(page.locator(`img[src*="/${symbolName}."][loading="lazy"]`)).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
     }
   }

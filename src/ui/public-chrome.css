@@ -76,7 +76,7 @@
 /* The footer follows the same content edges as the header and page body. */
 .public-footer { flex: none; margin-top: 0; border-top: 0; background: var(--public-paper); }
 .public-footer-main { max-width: var(--public-max); padding: 40px var(--public-gutter) 16px; }
-.public-footer-navigation { display: grid; grid-template-columns: 1.1fr 1fr 1.2fr 1.25fr .8fr 1fr; gap: 24px; padding-bottom: 28px; }
+.public-footer-navigation { display: grid; grid-template-columns: 1fr .85fr 1.2fr 1.25fr 1.1fr 1fr; gap: 24px; padding-bottom: 28px; }
 .public-footer-group { min-width: 0; }
 .public-footer-group:first-child { grid-column: span 2; }
 .public-footer-group h2 { margin: 0 0 10px; color: var(--public-ink); font-size: 14px; font-weight: 600; line-height: 24px; letter-spacing: 0; }

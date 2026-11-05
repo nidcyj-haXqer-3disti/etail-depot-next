@@ -1,5 +1,6 @@
 /** Pure deployment-boundary detectors, shared by packaging checks and adversarial tests. */
 import { LEGAL_CENTER_PATHS } from "../src/shared/legal-paths.ts";
+import { RESOURCE_PATHS } from "../src/shared/resource-paths.ts";
 import { COMMERCIAL_PATHS } from "../src/shared/commercial-paths.ts";
 import { PUBLIC_CONTENT_PATHS, publicExportFile } from "../src/shared/public-page-inventory.ts";
 import { managedContentRoute, retiredArticleRoute } from "../src/shared/public-routes.ts";
@@ -26,7 +27,7 @@ export const localStandardPageSources = [
   "guides/iso-8583/page.tsx", "guides/iso-8583/[table]/page.tsx", "guides/iso-8583/[table]/[code]/page.tsx",
 ] as const;
 export const commercialPageSources = COMMERCIAL_PATHS.map(path => `${path.slice(1)}/page.tsx`);
-export const publicPageSources = [...LEGAL_CENTER_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...commercialPageSources, ...retainedCorePageSources, ...localCorePreviewPageSources, ...localStandardPageSources];
+export const publicPageSources = [...RESOURCE_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...LEGAL_CENTER_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...commercialPageSources, ...retainedCorePageSources, ...localCorePreviewPageSources, ...localStandardPageSources];
 /** Customer facing publication scope authorized on 5 November 2026. Account acceptance remains separate. */
 export const reviewedLegalPageSources: readonly string[] = [
   "legal/page.tsx", "legal/merchant-services/page.tsx", "legal/fees/page.tsx",

@@ -5,10 +5,18 @@ import { documentationPages, documentationPath, documentationServiceLinks } from
 
 async function openDocumentationTopic(page: Page, slug: string) {
  const topics=page.getByRole('navigation',{name:'Documentation topics'});
- const mobile=topics.locator('.docs-nav-mobile');
- if(await mobile.isVisible() && await mobile.getAttribute('open')===null)await mobile.locator('summary').click();
- await topics.locator(`a[href="/docs/${slug}"]`).filter({visible:true}).click();
- await expect(page).toHaveURL(new RegExp('/docs/'+slug+'$'));
+ if(await topics.isVisible()) {
+  await topics.locator(`a[href="/docs/${slug}"]`).click();
+ } else {
+  const navigation=await openMainNavigation(page,"Developers");
+  const direct=navigation.locator(`a[href="/docs/${slug}"]`);
+  if(await direct.isVisible())await direct.click();
+  else {
+   await navigation.getByRole('link',{name:'Documentation',exact:true}).click();
+   await page.locator(`.docs-task-paths a[href^="/docs/${slug}"]`).first().click();
+  }
+ }
+ await expect(page).toHaveURL(url=>url.pathname==='/docs/'+slug);
 }
 
 test("all documentation tasks have working sections, unique canonicals and local publication protection",async({page,request})=>{
@@ -21,7 +29,7 @@ test("all documentation tasks have working sections, unique canonicals and local
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href',`https://etaildepot.com${path}`);
   expect(sitemap).not.toContain(path);
   const navigation=await openMainNavigation(page, "Developers");
-  const direct = ["integration-access", "checkout", "webhooks", "testing-and-launch"].includes(item.slug);
+  const direct = ["merchant-onboarding", "integration-access", "checkout", "webhooks", "testing-and-launch"].includes(item.slug);
   const current = navigation.locator("a[aria-current]");
   await expect(current).toHaveCount(1);
   await expect(current).toHaveAttribute("href", direct ? path : "/docs");
@@ -45,7 +53,8 @@ test("all documentation tasks have working sections, unique canonicals and local
 
 test("documentation distinguishes approval, payment results and bank receipt",async({page})=>{
  await page.goto('/docs/merchant-onboarding');
- await expect(page.locator('#application-review')).toContainText('An approval decision does not confirm that every connection is ready.');
+ await expect(page.locator('#application-review')).toContainText('Creating a login is not approval to accept payments.');
+ await expect(page.locator('#account-readiness')).toContainText('Wait for account approval and confirmation that your payment setup is ready.');
  await page.goto('/docs/checkout');
  await expect(page.locator('.docs-article-heading')).toContainText('verify the payment result and recover an interrupted attempt');
  await expect(page.locator('main')).toContainText('The checkout connection and instructions provided for your merchant account');
@@ -62,9 +71,7 @@ test("topic navigation and browser back support complete reading journeys",async
  await page.goto('/docs');
  await page.locator('.docs-task-paths').getByRole('link',{name:'Prepare your integration',exact:true}).click();
  await expect(page).toHaveURL(/\/docs\/integration-access$/);
- const topics=page.getByRole('navigation',{name:'Documentation topics'});
- if(await topics.locator('.docs-nav-mobile').isVisible())await topics.locator('summary').click();
- await topics.getByRole('link',{name:'Checkout integration',exact:true}).filter({visible:true}).click();
+ await openDocumentationTopic(page,'checkout');
  await expect(page).toHaveURL(/\/docs\/checkout$/);
  await openDocumentationTopic(page,'webhooks');
  await page.goBack();await expect(page).toHaveURL(/\/docs\/checkout$/);
@@ -83,10 +90,12 @@ test("responsive topic navigation retains keyboard focus",async({page})=>{
  const nav=page.getByRole('navigation',{name:'Documentation topics'});
  await nav.locator('.docs-nav-desktop').getByRole('link',{name:'Payment status',exact:true}).focus();
  await page.setViewportSize({width:390,height:900});
- await expect(nav.locator('.docs-nav-mobile')).toHaveAttribute('open','');
- await expect(nav.locator('.docs-nav-mobile').getByRole('link',{name:'Payment status',exact:true})).toBeFocused();
+ await expect(nav).toBeHidden();
+ await expect(page.getByText('Browse topics',{exact:true})).toHaveCount(0);
+ await expect(page.getByRole('heading',{level:1})).toBeFocused();
  await page.setViewportSize({width:1440,height:1000});
- await expect(nav.locator('.docs-nav-desktop').getByRole('link',{name:'Payment status',exact:true})).toBeFocused();
+ await expect(nav).toBeVisible();
+ await expect(page.getByRole('heading',{level:1})).toBeFocused();
 });
 
 
@@ -214,10 +223,14 @@ test("every article retains its reading path through topic navigation", async ({
   const graph=await page.locator('script[type="application/ld+json"]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.textContent!)["@graph"]??[]));
   expect(graph.find(node=>node['@type']==='BreadcrumbList').itemListElement.map((node:{name:string})=>node.name)).toEqual(['Documentation',item.group,item.title]);
   const topics=page.getByRole('navigation',{name:'Documentation topics'});
-  const mobile=topics.locator('.docs-nav-mobile');
-  if(await mobile.isVisible() && await mobile.getAttribute('open')===null)await mobile.locator('summary').click();
-  await expect(topics.locator('a[aria-current="page"]').filter({visible:true})).toHaveText(item.title);
-  await topics.getByRole('link',{name:'Overview',exact:true}).filter({visible:true}).click();
+  if(await topics.isVisible()) {
+   await expect(topics.locator('a[aria-current="page"]')).toHaveText(item.title);
+   await topics.getByRole('link',{name:'Overview',exact:true}).click();
+  } else {
+   await expect(page.getByText('Browse topics',{exact:true})).toHaveCount(0);
+   const navigation=await openMainNavigation(page,"Developers");
+   await navigation.getByRole('link',{name:'Documentation',exact:true}).click();
+  }
   await expect(page).toHaveURL(/\/docs$/);
   await expect(page.getByRole('heading',{level:1})).toHaveText('Documentation');
   await expect(page.getByRole('navigation',{name:'Breadcrumb',exact:true})).toHaveCount(0);
@@ -251,8 +264,11 @@ test("documentation support remains accessible through shared Help navigation", 
   await page.goto('/docs/'+item.slug);
   await expect(page.locator('.docs-article a[href^="mailto:"]')).toHaveCount(0);
   const service=page.locator('.docs-article .docs-service-link');
-  await expect(service).toHaveCount(1);
-  await expect(service).toHaveAttribute('href',documentationServiceLinks[item.slug].href);
+  if(item.slug === 'merchant-onboarding') await expect(service).toHaveCount(0);
+  else {
+   await expect(service).toHaveCount(1);
+   await expect(service).toHaveAttribute('href',documentationServiceLinks[item.slug].href);
+  }
   await expect(page.locator('.docs-section a[href^="/software-partners"], .docs-section a[href^="/online-businesses"]')).toHaveCount(0);
   await openMainNavigation(page, "Resources");
   const help=page.getByRole('banner').getByRole('link',{name:'Help center',exact:true});
@@ -269,7 +285,8 @@ test("each task has one relevant service connection and matching search context"
   await page.goto(documentationPath(item.slug));
   const service=documentationServiceLinks[item.slug];
   const link=page.locator('.docs-service-link');
-  await expect(link).toHaveText(service.label);
+  if(item.slug === 'merchant-onboarding') await expect(link).toHaveCount(0);
+  else await expect(link).toHaveText(service.label);
   const graph=await page.locator('script[type="application/ld+json"]').evaluateAll(nodes=>nodes.flatMap(node=>JSON.parse(node.textContent!)["@graph"]??[]));
   const webPage=graph.find(node=>node['@type']==='WebPage');
   const canonical=await page.locator('link[rel="canonical"]').getAttribute('href');
@@ -278,6 +295,7 @@ test("each task has one relevant service connection and matching search context"
   expect(webPage.description).toBe(await page.locator('meta[name="description"]').getAttribute('content'));
   const breadcrumb=graph.find(node=>node['@type']==='BreadcrumbList');
   expect(breadcrumb.itemListElement.at(-1).item).toBe(canonical);
+  if(item.slug === 'merchant-onboarding') continue;
   await link.click();
   await expect(page).toHaveURL(url=>url.pathname+url.hash===service.href);
   if(service.href.includes('#'))await expect(page.locator('#'+service.href.split('#')[1])).toBeInViewport();
@@ -293,7 +311,7 @@ test("phone readers reach document sections before the preparation panels", asyn
     await page.goto(documentationPath(item.slug));
     const contents = page.locator(".docs-mobile-toc");
     const before = await contents.boundingBox();
-    const preparation = await page.locator(".docs-prerequisites").boundingBox();
+    const preparation = await page.locator(item.slug === "merchant-onboarding" ? ".docs-section" : ".docs-prerequisites").first().boundingBox();
     expect(before!.y).toBeLessThan(preparation!.y);
     expect(before!.y).toBeLessThan(680);
     await contents.locator("summary").focus(); await page.keyboard.press("Enter");
@@ -333,8 +351,8 @@ test("account screenshot instructions work without JavaScript at desktop and pho
   await expect(signIn.getByRole('link',{name:'Sign in to Trolleys',exact:true})).toHaveAttribute('href','https://merchantapp.io/etaildepot/UserAccount/Login');
   await expect(signIn).toContainText('continue the existing application');
   const guide=page.locator('#create-account');
-  await expect(guide.getByRole('heading',{level:3})).toHaveText(['Enter your email on Welcome','Check the email shown and create a password','Continue to your business application']);
-  for(const image of await page.locator('#create-account img,#registration-email img').all()) {
+  await expect(guide.getByRole('heading',{level:3})).toHaveText(['Enter your email on Welcome','Create your password','Continue your business application']);
+  for(const image of await page.locator('#create-account img[src^="/help/merchant-account/"],#registration-email img').all()) {
    await image.scrollIntoViewIfNeeded();
    await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth === 1280)).toBe(true);
    expect(await image.getAttribute('alt')).toBeTruthy();
@@ -371,4 +389,20 @@ test("Help separates returning account access from new registration", async ({ p
   await expect(action).toHaveAttribute('rel',/noreferrer/);
   await expect(page.locator('main form,main input,main iframe')).toHaveCount(0);
  }
+});
+
+
+test("Guides leads to email first account setup and blank email recovery", async ({page}) => {
+ await page.goto('/guides');
+ await page.getByRole('main').getByRole('link',{name:/Merchant account setup/}).click();
+ await expect(page).toHaveURL(/\/docs\/merchant-onboarding$/);
+ await expect(page.locator('#create-account')).toContainText('Enter your email in the Email field, then choose Register');
+ await expect(page.locator('#create-account')).toContainText('If Welcome says your email is already registered, choose Sign In.');
+ const start=page.locator('#create-account').getByRole('link',{name:'Start now',exact:true});
+ await expect(start).toHaveAttribute('href','https://merchantapp.io/etaildepot/UserAccount/Login');
+ await expect(start).toHaveAttribute('referrerpolicy','no-referrer');
+ await page.getByRole('link',{name:'Return to Welcome to correct it.',exact:true}).click();
+ await expect(page.locator('#registration-email>h2')).toBeInViewport();
+ await expect(page.locator('#registration-email')).toContainText('The Email field on Register New Account cannot be edited.');
+ await expect(page.locator('main form,main input,main iframe')).toHaveCount(0);
 });

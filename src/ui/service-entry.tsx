@@ -1,3 +1,4 @@
+import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
 import { useId } from "react";
 import { hostedServices } from "@/shared/hosted-services";
 import styles from "./service-entry.module.css";
@@ -13,5 +14,5 @@ export function PaymentPortalLink({ intent, className = "button primary", childr
   </svg>;
   return <><a className={showArrow ? `${className} ${styles.action}` : className} href={href} aria-describedby={descriptionId} referrerPolicy="no-referrer" rel="external noreferrer">
     {registration ? <>{children ?? "Start now"}{arrow}</> : <><span className={styles.label}>{children ?? "Sign in"} to {hostedServices.payments.name}</span>{arrow}</>}
-  </a><span id={descriptionId} hidden>{registration ? "Enter your email on the Trolleys Welcome page to create or continue your account. Merchant account approval is required." : "Trolleys is an Etail Depot service. Enter your email on the welcome page to access your merchant account."}</span></>;
+  </a><span id={descriptionId} hidden>{registration ? `${merchantAccountGuidance.application} Enter your email on Welcome to create or continue your account. Merchant account approval is required.` : "Trolleys is an Etail Depot service. Enter your email on the welcome page to access your merchant account."}</span></>;
 }

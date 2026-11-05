@@ -8,6 +8,7 @@ import { Icon } from "./icon";
 import { DocumentationNavigation } from "./documentation-navigation";
 import { DocumentationFlow } from "./documentation-diagrams";
 import { MerchantAccountGuide } from "./merchant-account-guide";
+import { TrolleysBrand } from "./trolleys-brand";
 import "./documentation.css";
 import "./enterprise-support.css";
 import "./connected-resources.css";
@@ -47,12 +48,12 @@ export function DocumentationArticle({slug}:{slug:DocumentationSlug}){
   <DocumentationNavigation current={slug}/>
   <ResponsiveContentsFocus rootSelector=".docs-workspace" desktopSelector=".docs-toc" mobileSelector=".docs-mobile-toc" breakpoint={1250} />
   <article className="docs-article">
-   <header className="docs-article-heading"><h1>{page.title}</h1><p>{article.introduction}</p><div className="docs-context"><span className="docs-audience">{page.audience}</span><Link className="docs-service-link" href={service.href}>{service.label}</Link></div></header>
+   <header className="docs-article-heading"><h1 tabIndex={-1}>{page.title}</h1>{slug === "merchant-onboarding" && <TrolleysBrand spacing="intro" />}<p>{article.introduction}</p>{slug !== "merchant-onboarding" && <div className="docs-context"><span className="docs-audience">{page.audience}</span><Link className="docs-service-link" href={service.href}>{service.label}</Link></div>}</header>
    <details className="docs-mobile-toc"><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="Page sections">{article.sections.map(s=><a key={s.id} href={`#${s.id}`}>{s.title}</a>)}</nav></details>
-   <div className={`docs-prerequisites${materials ? " docs-integration-preparation" : ""}`}>
+   {(article.prerequisites.length > 0 || materials) && <div className={`docs-prerequisites${materials ? " docs-integration-preparation" : ""}`}>
     <div><h2>{materials ? "What you need" : "Before you begin"}</h2><ul>{article.prerequisites.map(p=><li key={p}><Icon name="check"/>{p}</li>)}</ul></div>
     {materials && <div className="docs-assigned-materials"><h2>Request from our {slug === "integration-access" ? <Link className="docs-team-link" href="/contact#integration">integration team</Link> : "integration team"}</h2><ul>{materials.map(item=><li key={item}><Icon name="document"/>{item}</li>)}</ul></div>}
-   </div>
+   </div>}
    {article.sections.map(section=><ArticleSection key={section.id} section={section}/>)}
    <span className="docs-legacy-anchor" id="documentation-support" aria-hidden="true"/>
   </article>
@@ -64,7 +65,7 @@ export function DocumentationHome(){
  return <Shell><script type="application/ld+json" dangerouslySetInnerHTML={{__html:documentationJsonLd()}}/><div className="documentation-page cw-docs"><div className="docs-workspace docs-workspace-home page-container">
   <DocumentationNavigation/>
   <div className="docs-hub">
-   <header className="docs-hub-heading"><h1>Documentation</h1><p>Instructions for your merchant account, daily operations and software integration.</p></header>
+   <header className="docs-hub-heading"><h1 tabIndex={-1}>Documentation</h1><p>Instructions for your merchant account, daily operations and software integration.</p></header>
    <div className="docs-task-paths" id="topics">
     {documentationPaths.map(path => <section className="docs-task-path" key={path.id} id={path.id} aria-labelledby={`${path.id}-title`}>
      <header className="docs-task-path-heading"><Icon name={path.icon}/><h2 id={`${path.id}-title`}>{path.title}</h2></header>
