@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import styles from "./reference-table-filter.module.css";
 
 /** Filters the already rendered table. No remote search, storage or URL mutation. */
-export function ReferenceTableFilter({ targetId, label, noun = "codes" }: { targetId: string; label: string; noun?: string }) {
+export function ReferenceTableFilter({ targetId, label, noun = "codes", total }: { targetId: string; label: string; noun?: string; total: number }) {
   const controls = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const root = controls.current;
@@ -54,20 +54,21 @@ export function ReferenceTableFilter({ targetId, label, noun = "codes" }: { targ
     scope?.addEventListener("click", jump);
     window.addEventListener("hashchange", history);
     apply();
-    root.hidden = false;
+    input.disabled = false;
     return () => {
       input.removeEventListener("input", apply); input.removeEventListener("keydown", escape);
       clear.removeEventListener("click", clearAndFocus); scope?.removeEventListener("click", jump);
       window.removeEventListener("hashchange", history);
       for (const row of rows) row.element.hidden = false;
       for (const group of groups) group.hidden = false;
-      root.hidden = true;
+      input.disabled = true;
     };
   }, [targetId, noun]);
-  return <div ref={controls} className={styles.controls} hidden>
+  return <div ref={controls} className={styles.controls}>
+    <noscript><span className={styles.noScript} hidden /></noscript>
     <label htmlFor={`${targetId}-filter`}>{label}</label>
-    <div className={styles.inputRow}><input id={`${targetId}-filter`} type="search" placeholder="Code or meaning" autoComplete="off" autoCapitalize="none" spellCheck={false} aria-controls={targetId} /><button type="button">Clear</button></div>
-    <p role="status" aria-live="polite" aria-atomic="true" className={styles.count} />
+    <div className={styles.inputRow}><input id={`${targetId}-filter`} type="search" disabled placeholder="Code or meaning" autoComplete="off" autoCapitalize="none" spellCheck={false} aria-controls={targetId} /><button type="button" disabled>Clear</button></div>
+    <p role="status" aria-live="polite" aria-atomic="true" className={styles.count}>All {total} {noun}</p>
     <p data-empty hidden className={styles.empty}>No matching entries. Try another code or clear the filter.</p>
   </div>;
 }

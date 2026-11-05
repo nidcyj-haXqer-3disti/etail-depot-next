@@ -1,11 +1,6 @@
-import Link from "next/link";
 import { canonicalOrigin } from "@/shared/public-release";
 
-export type ResourceCrumb = { name: string; href: string };
-
-export function ResourceBreadcrumb({ items }: { items: readonly ResourceCrumb[] }) {
-  return <nav className="resource-crumbs" aria-label="Breadcrumb"><ol>{items.map((item, index) => <li key={item.href}>{index === items.length - 1 ? <span aria-current="page">{item.name}</span> : <Link href={item.href} prefetch={false}>{item.name}</Link>}</li>)}</ol></nav>;
-}
+type ResourceCrumb = { name: string; href: string };
 
 const companyLabels = {
   "/company": "Company",
@@ -14,7 +9,7 @@ const companyLabels = {
   "/contact": "Contact",
 } as const;
 export type CompanyContextPath = keyof typeof companyLabels;
-export function companyCrumbs(path: CompanyContextPath): ResourceCrumb[] {
+function companyCrumbs(path: CompanyContextPath): ResourceCrumb[] {
   return [{ name: "Etail Depot", href: "/" }, ...(path === "/company" ? [] : [{ name: "Company", href: "/company" }]), { name: companyLabels[path], href: path }];
 }
 export function companyBreadcrumbData(path: CompanyContextPath) {

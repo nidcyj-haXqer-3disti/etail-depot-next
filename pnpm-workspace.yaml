@@ -8,8 +8,8 @@ overrides:
   # Compatible patches for validation and URI tooling advisories.
   zod@4.5.4: 4.6.6
   fast-uri@3.1.8: 3.1.9
-  # Keep the existing compatible security fixes.
-  minimatch@10.2.6>brace-expansion: 5.0.12
+  # Resolve GHSA-g3hv-75wg-m249 in the TypeScript ESLint dependency only.
+  '@typescript-eslint/typescript-estree>minimatch': 11.0.1
   # This single-root lint plugin uses the pinned Node glob API instead.
   '@next/eslint-plugin-next@16.4.1>fast-glob': '-'
 patchedDependencies:

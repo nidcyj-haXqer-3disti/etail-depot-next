@@ -99,7 +99,6 @@
 .card-craft.service-blueprint.consumer-cards .consumer-hero-copy>p { margin:22px 0 0; max-width:39ch; font-size:17px; line-height:1.7 }
 .card-craft .consumer-product-note { font-size:13px; line-height:1.65; max-width:46ch }
 .card-craft .consumer-product-note strong { display:block; font-weight:500; color:#244b3b; margin-bottom:5px }
-.card-craft .bp-card-stage { margin:0; width:100%; min-height:380px; overflow:hidden; border-radius:14px }
 .card-craft.service-blueprint.consumer-cards .card-details-section { padding-top:54px }
 .card-craft .consumer-section-heading h2,.card-craft .wallet-guide-copy h2 { font-size:38px; line-height:1.14; letter-spacing:-.04em }
 
@@ -108,7 +107,6 @@
   .service-craft h1,.platform-craft .pf-platform-intro h1,.card-craft.service-blueprint.consumer-cards .consumer-hero h1 { font-size:var(--public-title-size)}
   .service-craft .commercial-section-grid,.platform-craft .pf-integration-grid,.platform-craft .pf-commercial { gap:48px }
   .platform-craft .pf-commercial { grid-template-columns:.8fr 1.2fr }
-  .card-craft .bp-card-stage { min-height:340px }
 }
 @media (max-width:959px) {
   .service-craft .commercial-hero>.container,.platform-craft .pf-platform-hero,.card-craft.service-blueprint.consumer-cards .consumer-hero-grid { grid-template-columns:1fr; gap:32px }
@@ -120,7 +118,6 @@
   .platform-craft .pf-commercial { grid-template-columns:1fr; gap:28px }
   .merchant-service-path nav { gap:20px }
   .merchant-service-path strong { font-size:21px }
-  .card-craft .bp-card-stage { max-width:660px; margin-inline:auto }
 }
 @media (max-width:760px) {
   .service-craft .commercial-hero,.platform-craft .pf-platform-hero,.card-craft.service-blueprint.consumer-cards .consumer-hero-grid { padding-block:38px }
@@ -172,7 +169,6 @@
   .online-craft .payment-sharing-note { padding-block:42px; gap:30px }
   .online-craft .payment-sharing-copy>p:not(.eyebrow):not(.payment-sharing-qualification) { font-size:15px }
   .card-craft.service-blueprint.consumer-cards .consumer-hero-copy>p { font-size:16px; margin-top:21px }
-  .card-craft .bp-card-stage { min-height:0 }
   .card-craft.service-blueprint.consumer-cards .card-details-section { padding-top:42px }
 }
 @media (max-width:380px) {

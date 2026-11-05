@@ -1,7 +1,7 @@
 .brand{display:flex;align-items:center;gap:11px;width:fit-content;max-width:100%;color:#183d35;font-family:var(--font-sans,Arial,sans-serif);text-align:left}
 .symbol{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;background:#161329;border-radius:11px;overflow:hidden}
 .crop{display:block;position:relative;width:26px;height:20px;overflow:hidden}
-.crop img{display:block;position:absolute;width:184px;max-width:none;height:auto;left:-51px;top:-10px}
+.crop .portalImage{display:block;position:absolute;width:184px;max-width:none;height:auto;left:-51px;top:-10px}
 .identity{display:grid;gap:3px;min-width:0}
 .identity>.name{display:block;margin:0;font-size:19px;font-weight:650;line-height:1.15;letter-spacing:-.035em}
 .identity>.attribution{display:block;font-size:11px;font-weight:400;line-height:1.45;letter-spacing:0;color:#53635f}
@@ -9,7 +9,7 @@
 .intro{margin:22px 0 20px}
 .smallSymbol{flex-basis:32px;width:32px;height:32px;border-radius:9px}
 .smallSymbol .crop{width:22.1px;height:17px}
-.smallSymbol .crop img{width:156.4px;left:-43.35px;top:-8.5px}
+.smallSymbol .crop .portalImage{width:156.4px;left:-43.35px;top:-8.5px}
 .compact{gap:9px}
 .compact .name{font-size:15px;letter-spacing:-.02em}
 .compact .identity{gap:2px}

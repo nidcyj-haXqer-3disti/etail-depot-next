@@ -2,16 +2,17 @@
 
 import Image from "next/image";
 import { useRef } from "react";
+import { shopifyScreenshotAssets } from "./shopify-screenshot-assets";
 import styles from "./shopify-gateway-guide.module.css";
 
-type ScreenshotProps = { step: number; title: string; file: string; width: number; height: number; alt: string; caption: string };
+type ScreenshotProps = { step: number; title: string; file: keyof typeof shopifyScreenshotAssets; width: number; height: number; alt: string; caption: string };
 
 export function ShopifyGuideScreenshot({ step, title, file, width, height, alt, caption }: ScreenshotProps) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const src = `/help/shopify/${file}`;
+  const src = shopifyScreenshotAssets[file];
   return <figure className={styles.figure}>
-    <a href={src} className={styles.screenshotButton} aria-label={`Enlarge screenshot for step ${step}`} aria-haspopup="dialog" onClick={event => { if (dialog.current && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); dialog.current.showModal(); } }}>
-      <Image src={src} width={width} height={height} alt={alt} preload={step === 1} loading={step === 1 ? undefined : "lazy"} unoptimized />
+    <a href={`/help/shopify/${file}`} className={styles.screenshotButton} aria-label={`Enlarge screenshot for step ${step}`} aria-haspopup="dialog" onClick={event => { if (dialog.current && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); dialog.current.showModal(); } }}>
+      <Image src={src} width={width} height={height} alt={alt} preload={step === 1} loading={step === 1 ? undefined : "eager"} unoptimized />
       <span>Enlarge screenshot <span aria-hidden="true">＋</span></span>
     </a>
     <figcaption>{caption}</figcaption>

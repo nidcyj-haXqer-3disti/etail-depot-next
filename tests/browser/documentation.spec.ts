@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { openMainNavigation } from "./public-header";
 import { openFooterGroup } from "./public-footer";
+import { expectCompleteGuidePaint } from "./guide-rendering";
 import { documentationPages, documentationPath, documentationServiceLinks } from "../../src/modules/public-site/documentation-catalog";
 
 async function openDocumentationTopic(page: Page, slug: string) {
@@ -335,7 +336,7 @@ test("blank registration email help leads to the illustrated recovery steps", as
  await expect(recovery).toContainText('Choose Sign in above the Register New Account heading.');
  await expect(recovery).toContainText('For a new account, choose Register. For an existing account, choose Sign In.');
  await expect(page.locator('#create-account')).toContainText('If Welcome says your email is already registered, choose Sign In.');
- await expect(recovery.getByRole('img')).toHaveAttribute('src','/help/merchant-account/blank-registration.jpg');
+ await expect(recovery.getByRole('img')).toHaveAttribute('src',/^\/_next\/static\/media\/blank-registration\.[^/]+\.jpg$/);
  await expect.poll(() => recovery.getByRole('img').evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0)).toBe(true);
  await expect(page.locator('main form,main input,main iframe')).toHaveCount(0);
  await expect(page.getByRole('main').getByRole('link', {name:'Start now',exact:true})).toHaveAttribute('href','https://merchantapp.io/etaildepot/UserAccount/Login');
@@ -352,7 +353,7 @@ test("account screenshot instructions work without JavaScript at desktop and pho
   await expect(signIn).toContainText('continue the existing application');
   const guide=page.locator('#create-account');
   await expect(guide.getByRole('heading',{level:3})).toHaveText(['Enter your email on Welcome','Create your password','Continue your business application']);
-  for(const image of await page.locator('#create-account img[src^="/help/merchant-account/"],#registration-email img').all()) {
+  for(const image of await page.locator('#create-account figure img,#registration-email img').all()) {
    await image.scrollIntoViewIfNeeded();
    await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth === 1280)).toBe(true);
    expect(await image.getAttribute('alt')).toBeTruthy();
@@ -408,39 +409,55 @@ test("Guides leads to email first account setup and blank email recovery", async
 });
 
 
-test("account guide opening images load before styles and scripts on first visit and refresh", async ({ page }) => {
+test("account guide screenshots start before layout on direct links and refresh", async ({ page }) => {
  let releaseResources = () => {};
  let resourcesReady = Promise.resolve();
  let logoRequested = false;
- let welcomeRequested = false;
+ const requestedScreenshots = new Set<string>();
  await page.route("**/*", async route => {
   const request = route.request();
   const path = new URL(request.url()).pathname;
   if (path.startsWith("/_next/static/media/trolleys-portal-logo.")) logoRequested = true;
-  if (path === "/help/merchant-account/welcome.jpg") welcomeRequested = true;
+  if (/^\/help\/merchant-account\/[^/]+\.jpg$/.test(path) || /^\/_next\/static\/media\/(?:welcome|registration|blank-registration)\.[^/]+\.jpg$/.test(path)) requestedScreenshots.add(path);
   if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
   await route.continue();
  });
  // Request interception disables cache, including on refresh.
  for (const refresh of [false, true]) {
   logoRequested = false;
-  welcomeRequested = false;
+  requestedScreenshots.clear();
   resourcesReady = new Promise<void>(resolve => { releaseResources = resolve; });
   try {
    if (refresh) await page.reload({ waitUntil: "commit" });
-   else await page.goto("/docs/merchant-onboarding", { waitUntil: "commit" });
-   await expect.poll(() => welcomeRequested, { message: "The first account screenshot must not wait for layout or hydration" }).toBe(true);
-   await expect.poll(() => logoRequested).toBe(true);
+   else await page.goto("/docs/merchant-onboarding#registration-email", { waitUntil: "commit" });
+   await expect.poll(() => requestedScreenshots.size, { message: "All three account screenshots must start before layout or hydration, including on refresh" }).toBe(3);
   } finally { releaseResources(); }
   await page.waitForLoadState("load");
-  const openingImages = page.locator('.docs-article-heading img, img[src="/help/merchant-account/welcome.jpg"]');
-  await expect(openingImages).toHaveCount(2);
+  expect(logoRequested, "The small logo must be embedded, with no separate image request").toBe(false);
+  await expect(page.locator("main .brand-image-trolleys")).toHaveCount(2);
+  for (const logo of await page.locator("main .brand-image-trolleys").all()) {
+   await expect(logo).toHaveCSS("content", /url\("data:image\/png;base64,/);
+  }
+  const openingImages = page.locator('img[src^="/_next/static/media/welcome."]');
+  await expect(openingImages).toHaveCount(1);
   for (const image of await openingImages.all()) {
    await expect(image).not.toHaveAttribute("loading", "lazy");
    await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0)).toBe(true);
   }
-  await expect(page.locator('img[src="/help/merchant-account/registration.jpg"]')).toHaveAttribute("loading", "lazy");
-  await expect(page.locator('img[src="/help/merchant-account/blank-registration.jpg"]')).toHaveAttribute("loading", "lazy");
+  await expect(page.locator('img[src^="/_next/static/media/registration."]')).toHaveAttribute("loading", "eager");
+  await expect(page.locator('img[src^="/_next/static/media/blank-registration."]')).toHaveAttribute("loading", "eager");
+  await expect(page.locator(".docs-article figure img")).toHaveCount(3);
+  for (const image of await page.locator(".docs-article figure img").all()) {
+   await expect(image).toHaveAttribute("src", /^\/_next\/static\/media\/[^/]+\.jpg$/);
+   await expect(image).toHaveAttribute("decoding", "sync");
+   await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth === 1280)).toBe(true);
+  }
+  await expect(page.locator("#registration-email h2")).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
  }
+});
+
+
+test("Refresh does not paint a partial account guide while its HTML is arriving", async ({ page, baseURL, request }) => {
+ await expectCompleteGuidePaint(page, request, baseURL, "/docs/merchant-onboarding", "#registration-email", "#registration-email h2");
 });

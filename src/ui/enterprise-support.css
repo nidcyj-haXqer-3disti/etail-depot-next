@@ -78,7 +78,6 @@
 .enterprise-support.online-craft .online-business-intro h1,.enterprise-support.card-craft.consumer-cards .consumer-hero h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
 .enterprise-support.online-craft .online-business-intro h1 span,.enterprise-support.card-craft .consumer-hero h1 span{color:var(--public-ink)}
 .enterprise-support.card-craft.consumer-cards .consumer-hero-grid{padding-block:var(--public-hero-space)}
-.enterprise-support.card-craft .bp-card-stage{border-radius:20px;background:var(--public-art-surface);box-shadow:none}
 .enterprise-support.card-craft .card-details-section{padding-block:64px}
 .enterprise-support.card-craft .wallet-guide-section{background:var(--public-paper);border-block:1px solid var(--public-line)}
 .enterprise-support .payment-sharing-note{padding-block:72px;border-top:1px solid var(--public-line)}

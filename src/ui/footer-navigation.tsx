@@ -6,7 +6,7 @@ import { publicFooterGroups } from "@/shared/site-navigation";
 
 const compactQuery = "(max-width: 959px)";
 const getCompact = () => window.matchMedia(compactQuery).matches;
-const getServerCompact = () => false;
+const getServerCompact = (): boolean | null => null;
 
 export function FooterNavigation() {
   const directory = useRef<HTMLDivElement>(null);
@@ -42,17 +42,21 @@ export function FooterNavigation() {
     destination.focus({ preventScroll: true });
   }, [compact]);
   return <div ref={directory} className="public-footer-navigation" data-compact={compact}>
-    {publicFooterGroups.map(group => {
+    {/* CSS chooses the initial layout before hydration; stable keys keep that markup in place. */}
+    {publicFooterGroups.flatMap(group => {
       const DestinationLink = group.label === "Services" ? "a" : Link;
       const links = <ul>{group.links.map(link =>
-        <li key={link.href}><DestinationLink href={link.href}>{link.label}</DestinationLink></li>
+        <li key={link.href}><DestinationLink {...(group.label === "Services" ? {} : { prefetch: false })} href={link.href}>{link.label}</DestinationLink></li>
       )}</ul>;
-      return <nav className="public-footer-group" aria-label={`Footer ${group.label.toLowerCase()}`} key={group.label}>
-        {compact ? <details name="footer-directory">
+      return (compact === null ? [false, true] : [compact]).map(isCompact =>
+        <nav className={`public-footer-group${group.label === "Services" ? " public-footer-services" : ""}`}
+          aria-label={`Footer ${group.label.toLowerCase()}`} data-footer-layout={isCompact ? "compact" : "full"}
+          key={`${group.label}-${isCompact ? "compact" : "full"}`}>
+        {isCompact ? <details name="footer-directory">
           <summary><h2>{group.label}</h2><span className="public-footer-chevron" aria-hidden="true" /></summary>
           {links}
         </details> : <><h2>{group.label}</h2>{links}</>}
-      </nav>;
+      </nav>);
     })}
   </div>;
 }

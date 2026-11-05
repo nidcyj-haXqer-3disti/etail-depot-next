@@ -108,7 +108,6 @@
 .cw-order-outcome dd {font-size:15px;line-height:1.75;margin-top:9px;color:#4a6257;}
 .cw-cards.card-craft.service-blueprint.consumer-cards .consumer-hero-grid {padding-block:var(--public-hero-space);gap:var(--public-content-gap);}
 .cw-cards.card-craft.service-blueprint.consumer-cards .consumer-hero h1 {font-size:var(--public-title-size);max-width:17ch;}
-.cw-cards.card-craft .bp-card-stage {background:var(--public-art-surface);border:1px solid #d7e0d9;border-radius:20px;box-shadow:none;}
 .cw-cards.card-craft .card-details-section,.cw-cards.card-craft .wallet-credit-section {padding-block:60px;}
 .cw-cards.card-craft .card-details-grid {border-radius:12px;border-color:#d1ddcc;}
 .cw-cards.card-craft .card-questions-intro .consumer-text-link {display:inline-flex;align-items:center;min-height:44px;margin-top:20px;}

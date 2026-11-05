@@ -43,10 +43,10 @@ export function PublicNavigation({ onNavigate }: { onNavigate?: () => void }) {
       <div className="public-nav-panel public-domain-panel">
         {group.sections.map(section => <div className="public-domain-section" key={section.label}>
           {group.sections.length > 1 ? <p>{section.label}</p> : null}
-          <ul>{section.links.map(link => <li key={link.href}><DestinationLink href={link.href} aria-current={currentLink?.href === link.href ? pathname === link.href ? "page" : "location" : undefined} onClick={navigate}>{link.label}</DestinationLink></li>)}</ul>
+          <ul>{section.links.map(link => <li key={link.href}><DestinationLink {...(group.id === "services" ? {} : { prefetch: false })} href={link.href} aria-current={currentLink?.href === link.href ? pathname === link.href ? "page" : "location" : undefined} onClick={navigate}>{link.label}</DestinationLink></li>)}</ul>
         </div>)}
       </div>
     </details>; })}
-    {publicNavigationLinks.map(link => <Link key={link.href} href={link.href} aria-current={pathname === link.href ? "page" : undefined} onClick={navigate}>{link.label}</Link>)}
+    {publicNavigationLinks.map(link => <Link prefetch={false} key={link.href} href={link.href} aria-current={pathname === link.href ? "page" : undefined} onClick={navigate}>{link.label}</Link>)}
   </nav>;
 }

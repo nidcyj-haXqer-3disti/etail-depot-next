@@ -410,16 +410,27 @@ test("footer keyboard position survives responsive layout changes", async ({ pag
 });
 
 test("the complete footer remains usable without JavaScript", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
-  try {
-    const page = await context.newPage();
-    await page.goto("http://127.0.0.1:3100/");
-    const directory = page.locator(".public-footer-navigation");
-    await expect(directory.getByRole("link")).toHaveCount(24);
-    await directory.getByRole("link", { name: "Payouts", exact: true }).click();
-    await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
-    await expect(page.getByRole("heading", {level:1})).toBeInViewport();
-  } finally { await context.close(); }
+  for (const width of [390, 1440]) {
+    const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height: 900 } });
+    try {
+      const page = await context.newPage();
+      await page.goto("http://127.0.0.1:3100/");
+      const directory = page.locator(".public-footer-navigation");
+      if (width < 960) {
+        await expect(directory.locator("summary:visible")).toHaveText(["Services", "Use cases", "Developers", "Resources", "Company"]);
+        let destinations = 0;
+        for (const summary of await directory.locator("summary:visible").all()) {
+          await summary.click();
+          destinations += await directory.getByRole("link").count();
+        }
+        expect(destinations).toBe(24);
+        await directory.locator("summary").filter({ hasText: /^Services$/ }).click();
+      } else await expect(directory.getByRole("link")).toHaveCount(24);
+      await directory.getByRole("link", { name: "Payouts", exact: true }).click();
+      await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
+      await expect(page.getByRole("heading", {level:1})).toBeInViewport();
+    } finally { await context.close(); }
+  }
 });
 
 
@@ -463,4 +474,26 @@ test("scrolling a short phone menu keeps the Back row clear and usable", async (
   await expect(navigation.locator("details[open]")).toHaveCount(0);
   await expect(navigation.locator("summary").filter({ hasText: /^Services$/ })).toBeFocused();
   await expect(navigation.getByRole("link", { name: "Pricing", exact: true })).toBeVisible();
+});
+
+
+test("phone footer is compact before JavaScript loads and does not change height during hydration", async ({ page }) => {
+ await page.setViewportSize({ width: 390, height: 844 });
+ let releaseScripts = () => {};
+ const scriptsReady = new Promise<void>(resolve => { releaseScripts = resolve; });
+ await page.route("**/*.js", async route => { await scriptsReady; await route.continue(); });
+ try {
+  await page.goto("/docs/merchant-onboarding#registration-email", { waitUntil: "commit" });
+  const footer = page.locator(".public-footer-navigation");
+  const services = footer.locator("summary").filter({ hasText: /^Services$/ });
+  await expect(services).toBeVisible();
+  await expect(footer.locator("details[open]")).toHaveCount(0);
+  const before = await footer.evaluate(el => el.getBoundingClientRect().height);
+  releaseScripts();
+  await page.waitForLoadState("load");
+  await expect(footer).toHaveAttribute("data-compact", "true");
+  expect(await footer.evaluate(el => el.getBoundingClientRect().height)).toBe(before);
+  await services.click();
+  await expect(footer.getByRole("link", { name: "Payouts", exact: true })).toBeVisible();
+ } finally { releaseScripts(); }
 });
