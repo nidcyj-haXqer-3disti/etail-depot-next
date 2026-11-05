@@ -1,5 +1,13 @@
 # Public website status
 
+## 6 November 2026: Navigation correction during publication verification
+
+The authorized loading release was published through PR 65 and the approved manual Netlify Git build. Hosted verification passed for 3,751 pages, the exact 3,739 URL sitemap and 73 referenced assets. A live mobile journey exposed a separate fault: opening the long Shopify guide from Resources could continue scrolling to the footer after navigation.
+
+A new browser regression reproduced the fault against the released build. The root HTML element now declares the existing smooth scrolling behavior using the attribute documented for Next.js 16. This lets route navigation set its position immediately while section links retain smooth scrolling. The regression passes in Chromium desktop and mobile; sixteen focused WebKit navigation and history checks also pass. No content, URLs, assets, account handoffs, legal provisions or hosting settings change.
+
+The user’s current "push and deploy" instruction covers completing this correction through a separate feature PR, all four release checks, exact GitHub checks and the manual Netlify build. Final validation and hosted results are recorded in the publication receipt. Earlier preparation only entries do not supersede this authorization.
+
 ## 6 November 2026: Publication authorized
 
 After reviewing the completed local cleanup and release report, the user explicitly instructed: "push and deploy". This is the applicable publication authorization for the loading cleanup candidate and supersedes the preparation only restriction recorded below. Push the reviewed feature branch, confirm exact GitHub checks, use the normal PR merge and approved manual Netlify Git build, then verify the live pages and sitemap. Preserve all existing project and runtime boundaries.

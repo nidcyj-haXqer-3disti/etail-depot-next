@@ -103,3 +103,19 @@ test("shared navigation does not download unselected pages during startup", asyn
   await expect(page).toHaveURL(/\/contact$/);
   await expect(page.locator("h1")).toBeVisible();
 });
+
+
+test("menu navigation opens a long guide at its beginning", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".public-footer-navigation")).toHaveAttribute("data-compact", /true|false/);
+  if (page.viewportSize()!.width < 960) await page.getByRole("button", { name: "Menu", exact: true }).click();
+  const navigation = page.getByRole("navigation", { name: "Main navigation", exact: true });
+  await navigation.locator("summary").filter({ hasText: "Resources" }).click();
+  await navigation.getByRole("link", { name: "Shopify integration", exact: true }).click();
+  await expect(page).toHaveURL(/\/resources\/shopify-gateway-integration$/);
+  await expect(page.locator("h1")).toBeInViewport();
+  // Observe the settled position too: a smooth scroll can move away after the route renders.
+  await page.waitForTimeout(1000);
+  await expect(page.locator("h1")).toBeInViewport();
+  expect(await page.evaluate(() => scrollY)).toBeLessThan(160);
+});
