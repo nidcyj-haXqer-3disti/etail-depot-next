@@ -1,3 +1,4 @@
+import { merchantAccountGuidance } from "./merchant-account-content";
 import { hostedServices } from "@/shared/hosted-services";
 import type { CommercialPage } from "./commercial-content";
 
@@ -14,8 +15,8 @@ export const SERVICE_DETAIL_PAGES = {
     "label": "Merchant onboarding",
     "title": "Merchant Onboarding and Account Setup",
     "description": "Apply for a merchant account with the right business records. Understand account review, service terms and payment setup before your first sale.",
-    "heading": "A merchant account for the way you do business.",
-    "intro": "Bring your business, sales channels and processing needs into one application. Complete the account review, understand your terms and prepare to accept payments.",
+    "heading": "Apply for your merchant account.",
+    "intro": "Complete your business information and check your application status in one place.",
     "action": {
       "label": "Start now",
       "href": hostedServices.payments.registrationUrl
@@ -24,10 +25,10 @@ export const SERVICE_DETAIL_PAGES = {
       "label": "Discuss your business first",
       "href": "/contact#payment-review"
     },
-    "note": "Create your account to begin the merchant application. Account approval and setup apply.",
+    "note": `${merchantAccountGuidance.application} Account approval and setup are required.`,
     "art": {
-      "title": "Merchant application: business information, account review, agreement and activation",
-      "caption": "Account approval and an accepted agreement are required before activation.",
+      "title": "Trolleys merchant application portal. Continue an incomplete application and begin with Company Profile.",
+      "caption": "Application portal illustration",
       "steps": []
     },
     "sections": [
@@ -74,7 +75,7 @@ export const SERVICE_DETAIL_PAGES = {
       "steps": [
         {
           "title": "Apply",
-          "detail": "Submit business and ownership information through the secure account service."
+          "detail": "Submit business and ownership information through Trolleys."
         },
         {
           "title": "Complete the review",

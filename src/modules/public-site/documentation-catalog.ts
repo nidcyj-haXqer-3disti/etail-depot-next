@@ -1,5 +1,5 @@
 export const documentationPages = [
-  { slug: "merchant-onboarding", title: "Merchant account setup", description: "Prepare the business information, follow the account review and confirm what is needed before accepting payments.", group: "Merchant operations", audience: "Business owners and platform teams", icon: "business", anchor: "getting-started" },
+  { slug: "merchant-onboarding", title: "Merchant account setup", description: "Enter your email on Trolleys Welcome before choosing Register or Sign In. Follow the illustrated steps to create or access your merchant account.", group: "Merchant operations", audience: "Business owners and platform teams", icon: "business", anchor: "getting-started" },
   { slug: "integration-access", title: "Integration requirements", description: "Confirm the merchant accounts, permissions and connection specifications for your setup.", group: "Developer integration", audience: "Developers and administrators", icon: "lock", anchor: "integration-access" },
   { slug: "checkout", title: "Checkout integration", description: "Connect the customer’s order to checkout, verify the payment result and recover an interrupted attempt.", group: "Developer integration", audience: "Developers", icon: "card", anchor: "checkout-setup" },
   { slug: "payment-requests", title: "Payment requests", description: "Create a hosted payment request, share it with the customer and match the result to the sale.", group: "Merchant operations", audience: "Business owners and operations teams", icon: "link", anchor: "payment-requests" },
@@ -59,7 +59,7 @@ export const documentationPaths: readonly {
     description: "Manage your account, payments and bank deposits.",
     icon: "business",
     tasks: [
-      { title: "Set up an account", description: "Prepare business information and follow the account review.", anchor: "getting-started", links: [{ slug: "merchant-onboarding", label: "Set up an account" }] },
+      { title: "Set up an account", description: "Follow the email, registration and sign in steps.", anchor: "getting-started", links: [{ slug: "merchant-onboarding", label: "Set up an account" }] },
       { title: "Create a payment request", description: "Share a request and match each payment to its purchase.", anchor: "payment-requests", links: [{ slug: "payment-requests", label: "Create a payment request" }] },
       { title: "Check payments and refunds", anchor: "payment-records", links: [{ slug: "payment-status", label: "Payment status" }, { slug: "refunds-and-disputes", label: "Refunds", section: "refund-payment", anchor: "refunds-and-disputes" }] },
       { title: "Review disputes and payouts", links: [{ slug: "refunds-and-disputes", label: "Disputes", section: "dispute-case" }, { slug: "payouts", label: "Payouts", anchor: "payouts" }] },

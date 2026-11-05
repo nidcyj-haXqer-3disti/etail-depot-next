@@ -1,0 +1,29 @@
+"use client";
+
+import Image from "next/image";
+import { useRef } from "react";
+import styles from "./shopify-gateway-guide.module.css";
+
+type ScreenshotProps = { step: number; title: string; file: string; width: number; height: number; alt: string; caption: string };
+
+export function ShopifyGuideScreenshot({ step, title, file, width, height, alt, caption }: ScreenshotProps) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const src = `/help/shopify/${file}`;
+  return <figure className={styles.figure}>
+    <a href={src} className={styles.screenshotButton} aria-label={`Enlarge screenshot for step ${step}`} aria-haspopup="dialog" onClick={event => { if (dialog.current && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); dialog.current.showModal(); } }}>
+      <Image src={src} width={width} height={height} alt={alt} loading="lazy" unoptimized />
+      <span>Enlarge screenshot <span aria-hidden="true">＋</span></span>
+    </a>
+    <figcaption>{caption}</figcaption>
+    <dialog ref={dialog} className={styles.dialog} aria-labelledby={`screenshot-title-${step}`}>
+      <div className={styles.dialogHeader}>
+        <h4 id={`screenshot-title-${step}`}>Step {step}: {title}</h4>
+        <button type="button" onClick={() => dialog.current?.close()} autoFocus>Close</button>
+      </div>
+      <div className={styles.imageScroll} tabIndex={0} role="region" aria-label="Enlarged screenshot. Scroll to see the whole image.">
+        <Image src={src} width={width} height={height} alt={alt} loading="lazy" unoptimized />
+      </div>
+      <p>{caption}</p>
+    </dialog>
+  </figure>;
+}

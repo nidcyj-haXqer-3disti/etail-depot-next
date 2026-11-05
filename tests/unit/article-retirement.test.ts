@@ -16,7 +16,7 @@ describe("article retirement without changing ISO references", () => {
     expect(STANDARD_REFERENCE_PATHS).toHaveLength(3706);
     expect(STANDARD_REFERENCE_PATHS.every(path => !retiredArticleRoute(path))).toBe(true);
     expect(STANDARD_REFERENCE_PATHS).toContain("/guides/iso-8583/messages/2100");
-    expect(builtPageSources).toHaveLength(50);
+    expect(builtPageSources).toHaveLength(51);
     for (const path of RETIRED_ARTICLE_PATHS) {
       expect(builtPageSources as readonly string[]).not.toContain(`${path.slice(1)}/page.tsx`);
       expect(Object.hasOwn(PUBLIC_PAGES, path)).toBe(false);
@@ -25,11 +25,13 @@ describe("article retirement without changing ISO references", () => {
     }
   });
 
-  it("lists exactly the two visible ISO collections in the hub schema", () => {
+  it("lists the two setup guides and two ISO collections in the hub schema", () => {
     const graph = JSON.parse(publicPageJsonLd("/guides"))["@graph"];
     const list = graph.find((item: { "@type": string }) => item["@type"] === "ItemList");
-    expect(list.numberOfItems).toBe(2);
+    expect(list.numberOfItems).toBe(4);
     expect(list.itemListElement.map((item: { url: string }) => item.url)).toEqual([
+      "https://etaildepot.com/docs/merchant-onboarding",
+      "https://etaildepot.com/resources/shopify-gateway-integration",
       "https://etaildepot.com/guides/iso-20022", "https://etaildepot.com/guides/iso-8583",
     ]);
   });

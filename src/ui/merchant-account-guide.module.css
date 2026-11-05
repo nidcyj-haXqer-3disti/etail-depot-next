@@ -1,11 +1,11 @@
-.guide, .recovery { color:var(--docs-ink); }
+.guide, .recovery { color:var(--docs-ink); container-type:inline-size; }
 .guide p, .recovery p, .recoverySteps { color:var(--docs-muted); font-size:16px; line-height:1.75; margin:0 0 20px; }
 .steps { list-style:none; padding:0; margin:32px 0; display:grid; gap:38px; }
-.steps > li { min-width:0; }
+.steps > li { min-width:0; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; align-items:start; scroll-margin-top:100px; }
 .stepHeading { display:flex; align-items:flex-start; gap:12px; margin:0 0 14px; }
 .stepHeading span { display:grid; place-items:center; flex:0 0 30px; height:30px; border-radius:50%; background:#e9f1df; color:#204638; font-size:14px; font-weight:600; }
 .stepHeading h3 { margin:2px 0 0; font-size:19px; line-height:1.45; font-weight:500; letter-spacing:-.015em; }
-.figure { margin:24px 0 18px; max-width:480px; }
+.figure { margin:0; width:100%; max-width:480px; min-width:0; }
 .screenshot { position:relative; overflow:hidden; border-radius:12px; background:#161329; }
 /* Display the actual hosted screen, framing only the relevant form area. */
 .screenshot img { position:absolute; top:0; left:50%; width:266.666667%; max-width:none; height:auto; }
@@ -16,8 +16,8 @@
 .blank { aspect-ratio:400 / 225; }
 .blank img { width:320%; transform:translate(-50%, -23.255814%); }
 .figure figcaption { padding-top:12px; color:var(--docs-muted); font-size:13px; line-height:1.6; }
-.guide .hint { font-size:14px; margin:0; }
-.guide .approval { padding:18px 20px; border-radius:10px; background:#f0f4e9; font-size:14px; margin:0; }
+.guide .hint { font-size:14px; margin:18px 0; }
+.guide .approval { font-size:14px; margin:18px 0 0; }
 .recoverySteps { padding-left:24px; }
 .recoverySteps li { padding-left:5px; margin-bottom:12px; }
 @media(max-width:680px) {
@@ -25,8 +25,15 @@
  .stepHeading h3 { font-size:18px; }
  .guide p, .recovery p, .recoverySteps { font-size:15px; }
  .figure { margin-block:20px 16px; }
- .guide .approval { padding:16px; }
 }
 @media(forced-colors:active) {
  .stepHeading span, .guide .approval { border:1px solid CanvasText; }
 }
+
+.stepCopy,.applicationArt{min-width:0}
+.recovery{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.guide a:not([class]),.guide .hint a{color:var(--docs-ink);text-decoration:underline;text-underline-offset:3px}
+.guide a:focus-visible{outline:3px solid #256c57;outline-offset:4px}
+.bookmark{display:block;scroll-margin-top:100px}
+@container(max-width:600px){.steps>li{grid-template-columns:1fr;gap:16px}.steps .figure{margin:0}.steps{gap:40px}.stepHeading h3{font-size:19px}.applicationArt{max-width:480px}}
+@media(max-width:1250px){.recovery{grid-template-columns:1fr}.recovery .figure{max-width:400px}}

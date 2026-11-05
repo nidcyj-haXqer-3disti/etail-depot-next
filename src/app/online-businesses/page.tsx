@@ -1,3 +1,4 @@
+import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
 import Link from "next/link";
 import { PaymentPortalLink } from "@/ui/service-entry";
 import { ServiceBreadcrumbStructuredData } from "@/ui/service-context";
@@ -28,7 +29,7 @@ export default function OnlineBusinessesPage() {
           <div className="online-business-copy">
             <p>Connect checkout and hosted payment requests to your orders, with cards, wallets and ACH enabled for your account.</p>
             <div className="online-business-actions"><PaymentPortalLink intent="register" /><Link href="/payment-acceptance-service" className="consumer-text-link">Merchant services</Link></div>
-            <p className="online-business-note">Account approval and setup apply. Wallet availability depends on the customer’s card and device. ACH pricing is separate.</p>
+            <p className="online-business-note">{merchantAccountGuidance.application} Account approval and setup apply. Wallet availability depends on the customer’s card and device. ACH pricing is separate.</p>
           </div>
         </div>
         <section className="page-container online-business-journey" id="customer-checkout" aria-label="Payment journey">

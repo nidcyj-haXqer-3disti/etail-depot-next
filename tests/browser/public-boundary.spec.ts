@@ -1,7 +1,9 @@
 import { LEGAL_CENTER_PATHS } from "../../src/shared/legal-paths";
 import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
+import { RESOURCE_PATHS } from "../../src/shared/resource-paths";
 import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
 import { documentationPages, documentationPath } from "../../src/modules/public-site/documentation-catalog";
+import { shopifySetupSteps } from "../../src/modules/public-site/shopify-guide-content";
 import { expect, test } from "@playwright/test";
 
 test("renamed product bookmarks retain their section and reject submitted data", async ({ page, request, baseURL }) => {
@@ -41,7 +43,7 @@ test("renamed product bookmarks retain their section and reject submitted data",
 });
 
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
-  const pages = [...LEGAL_CENTER_PATHS, ...COMMERCIAL_PATHS, "/", "/docs", ...documentationPages.map(page => documentationPath(page.slug)), "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
+  const pages = [...LEGAL_CENTER_PATHS, ...COMMERCIAL_PATHS, ...RESOURCE_PATHS, "/", "/docs", ...documentationPages.map(page => documentationPath(page.slug)), "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
   const privateRequests: string[] = [], errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });
@@ -73,6 +75,13 @@ test("public pages and every internal link resolve without account APIs or cooki
   }
   for (const destination of destinations) {
     const url = new URL(destination, "http://127.0.0.1:3100");
+    if (shopifySetupSteps.some(step => "file" in step && url.pathname === `/help/shopify/${step.file}`)) {
+      const screenshot = await request.get(url.pathname);
+      expect(screenshot.status()).toBe(200);
+      expect(screenshot.headers()["content-type"]).toContain("image/webp");
+      expect(url.search + url.hash).toBe("");
+      continue;
+    }
     expect([...pages, ...STANDARD_REFERENCE_PATHS]).toContain(url.pathname);
     expect((await request.get(url.pathname)).status()).toBe(200);
     if (url.hash) {

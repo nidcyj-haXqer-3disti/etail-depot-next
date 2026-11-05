@@ -12,10 +12,7 @@ export function DocumentationNavigation({current}:{current?:DocumentationSlug}) 
    const active=document.activeElement;
    const focused=active instanceof HTMLElement && el.contains(active)?active:active===document.body?previous.current:null;
    if(!focused||focused.getClientRects().length)return;
-   const scope=query.matches?".docs-nav-mobile":".docs-nav-desktop";
-   const target=[...el.querySelectorAll<HTMLAnchorElement>(`${scope} a`)].find(a=>a.getAttribute("href")===focused.getAttribute("href"));
-   if(query.matches){const disclosure=el.querySelector<HTMLDetailsElement>("details");if(disclosure)disclosure.open=true;}
-   target?.focus({preventScroll:true});
+   if(query.matches)el.closest(".docs-workspace")?.querySelector<HTMLElement>("h1")?.focus({preventScroll:true});
   };
   query.addEventListener("change",restore);return()=>query.removeEventListener("change",restore);
  },[]);
@@ -25,6 +22,5 @@ export function DocumentationNavigation({current}:{current?:DocumentationSlug}) 
  </>;
  return <nav ref={root} className="docs-navigation" aria-label="Documentation topics" onFocusCapture={e=>{if(e.target instanceof HTMLElement)previous.current=e.target;}} onBlur={e=>{if(e.relatedTarget&&!e.currentTarget.contains(e.relatedTarget))previous.current=null;}}>
   <div className="docs-nav-desktop">{items}</div>
-  <details className="docs-nav-mobile"><summary><span>Documentation</span><span>Browse topics <span aria-hidden="true">⌄</span></span></summary><div>{items}</div></details>
  </nav>;
 }

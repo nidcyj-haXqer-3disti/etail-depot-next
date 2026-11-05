@@ -55,7 +55,7 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.locator("a")).toHaveCount(23);
+    await expect(navigation.locator("a")).toHaveCount(25);
     for (const [label, destination] of [["Software platforms", "/software-partners"], ["Online businesses", "/online-businesses"], ["Merchant onboarding", "/merchant-onboarding"], ["Card services", "/credit-card-services"], ["Documentation", "/docs"], ["Guides", "/guides"], ["Pricing", "/pricing"]]) {
       await expect(navigation.getByRole("link", { name: label, exact: true, includeHidden: true })).toHaveAttribute("href", destination);
     }
@@ -833,7 +833,7 @@ test("account actions remain distinct and reachable across mobile menu and deskt
       const box = await link.boundingBox();
       expect(box!.height).toBeGreaterThanOrEqual(44);
     }
-    await expect(start).toHaveAccessibleDescription("Enter your email on the Trolleys Welcome page to create or continue your account. Merchant account approval is required.");
+    await expect(start).toHaveAccessibleDescription("Your application opens in Trolleys, an Etail Depot service. Enter your email on Welcome to create or continue your account. Merchant account approval is required.");
     await expect(signIn).toHaveAccessibleDescription("Trolleys is an Etail Depot service. Enter your email on the welcome page to access your merchant account.");
     await expect(page.locator("main")).toHaveAttribute("inert", "");
     await start.focus();

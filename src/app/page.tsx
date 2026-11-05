@@ -1,3 +1,4 @@
+import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
 import Link from "next/link";
 import { PaymentPortalLink } from "@/ui/service-entry";
 import { Shell } from "@/ui/shell";
@@ -19,7 +20,7 @@ export default function Page() {
             <h1 id="welcome-title">Merchant services.{" "}<br /><span>For your business.</span></h1>
             <p className={styles.intro}>Credit card processing and ACH payments for US businesses and software platforms, from online checkout to payout reporting.</p>
             <div className={`${styles.heroActions} ec-hero-actions`}><PaymentPortalLink intent="register" className={styles.primary} /><Link className={styles.secondary} href="/software-partners">For software platforms</Link></div>
-            <p className={styles.note}>Merchant accounts require approval. Payment methods, pricing and payout terms vary by account.</p>
+            <p className={styles.note}>{merchantAccountGuidance.application} Merchant accounts require approval. Payment methods, pricing and payout terms vary by account.</p>
           </div>
           <HomeCompanyArt />
         </div>

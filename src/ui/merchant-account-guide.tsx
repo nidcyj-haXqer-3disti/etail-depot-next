@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
+import { MerchantApplicationArt } from "./merchant-application-art";
 import { PaymentPortalLink } from "./service-entry";
 import styles from "./merchant-account-guide.module.css";
 
@@ -8,7 +9,7 @@ function AccountScreenshot({ screen }: { screen: "welcome" | "registration" | "b
     welcome: {
       file: "welcome.jpg", height: 812,
       alt: "Trolleys Welcome screen with an editable Email field, a Sign In button and Register below it.",
-      caption: "Welcome: enter your email here, then choose Register.",
+      caption: "Welcome: enter your email before choosing Register or Sign In.",
     },
     registration: {
       file: "registration.jpg", height: 903,
@@ -32,46 +33,56 @@ function AccountScreenshot({ screen }: { screen: "welcome" | "registration" | "b
 
 export function MerchantAccountGuide({ kind }: { kind: "sign-in" | "registration" | "email-recovery" }) {
   if (kind === "sign-in") return <div className={styles.guide}>
-    <p>{merchantAccountGuidance.service}</p>
-    <p><PaymentPortalLink intent="sign-in" className="text-link" /></p>
     <ol className={styles.recoverySteps}>
-      <li>{merchantAccountGuidance.signIn}</li>
-      <li>Follow the password prompt shown for your account.</li>
-      <li>For an application in progress, continue the existing application. For an approved account, use the services enabled for it.</li>
+      <li>Open <strong>Sign in to Trolleys</strong> below. Enter your registered email on <strong>Welcome</strong>, then choose <strong>Sign In</strong>.</li>
+      <li>Follow the password prompt. If asked to create a password, finish that step for the same email.</li>
+      <li id="account-changes">Once signed in, continue the existing application or open your approved account.</li>
     </ol>
+    <PaymentPortalLink intent="sign-in" className="text-link" />
   </div>;
 
   if (kind === "email-recovery") return <div className={styles.recovery}>
-    <p>{merchantAccountGuidance.registrationEmail}</p>
+    <div className={styles.recoveryCopy}>
+      <p>The Email field on <strong>Register New Account</strong> cannot be edited. It uses the address entered on Welcome.</p>
+      <ol className={styles.recoverySteps}>
+        <li>Choose <strong>Sign in</strong> above the Register New Account heading.</li>
+        <li>On <strong>Welcome</strong>, enter the correct email.</li>
+        <li>For a new account, choose <strong>Register</strong>. For an existing account, choose <strong>Sign In</strong>.</li>
+      </ol>
+    </div>
     <AccountScreenshot screen="blank" />
-    <ol className={styles.recoverySteps}>
-      <li>Choose <strong>Sign in</strong> above the Register New Account heading.</li>
-      <li>On Welcome, enter the email you want to use.</li>
-      <li>For a new account, choose <strong>Register</strong>. For an existing account, choose <strong>Sign In</strong>.</li>
-    </ol>
-    <p>Check the email shown before continuing, then follow the password instructions for that account.</p>
   </div>;
 
   return <div className={styles.guide}>
-    <p>Your merchant account opens in Trolleys, an Etail Depot service, at merchantapp.io. Enter your email on Welcome before continuing to registration.</p>
     <ol className={styles.steps}>
       <li>
-        <div className={styles.stepHeading}><span aria-hidden="true">1</span><h3>Enter your email on Welcome</h3></div>
-        <p>Open <strong>Start now</strong> below. Enter your own email in the Email field, then choose <strong>Register</strong> beneath the Sign In button.</p>
-        <PaymentPortalLink intent="register" className="button primary">Start now</PaymentPortalLink>
+        <div className={styles.stepCopy}>
+          <div className={styles.stepHeading}><span aria-hidden="true">1</span><h3>Enter your email on Welcome</h3></div>
+          <p>Open <strong>Start now</strong>. Enter your email in the <strong>Email</strong> field, then choose <strong>Register</strong> beneath the Sign In button.</p>
+          <PaymentPortalLink intent="register" className="button primary">Start now</PaymentPortalLink>
+          <p className={styles.hint}>{merchantAccountGuidance.registeredEmail}</p>
+        </div>
         <AccountScreenshot screen="welcome" />
-        <p className={styles.hint}>{merchantAccountGuidance.registeredEmail}</p>
       </li>
       <li>
-        <div className={styles.stepHeading}><span aria-hidden="true">2</span><h3>Check the email shown and create a password</h3></div>
-        <p>On Register New Account, your email is already filled in. Enter a password in Password and repeat it in Confirm Password. Follow any requirements shown, then choose <strong>Register</strong>.</p>
+        <div className={styles.stepCopy}>
+          <div className={styles.stepHeading}><span aria-hidden="true">2</span><h3>Create your password</h3></div>
+          <p>On <strong>Register New Account</strong>, check the email carried over from Welcome. Enter and confirm your password, follow the requirements shown, then choose <strong>Register</strong>.</p>
+          <p className={styles.hint}>Email blank or wrong? <a href="#registration-email">Return to Welcome to correct it.</a></p>
+        </div>
         <AccountScreenshot screen="registration" />
       </li>
-      <li>
-        <div className={styles.stepHeading}><span aria-hidden="true">3</span><h3>Continue to your business application</h3></div>
-        <p>After creating your password, continue to the business application. If asked to sign in, use the same email and your new password. Review the company information and account terms before submitting.</p>
+      <li id="application-review">
+        <div className={styles.stepCopy}>
+          <span id="prepare" className={styles.bookmark} aria-hidden="true" />
+          <span id="platform-onboarding" className={styles.bookmark} aria-hidden="true" />
+          <div className={styles.stepHeading}><span aria-hidden="true">3</span><h3>Continue your business application</h3></div>
+          <p>Open your application or choose <strong>Continue</strong> beside one already started. Enter the requested business, ownership and bank details. Check the information and terms before submitting.</p>
+          <p className={styles.hint}>If asked to sign in again, use the same email and password.</p>
+          <p className={styles.approval} id="account-readiness">Creating a login is not approval to accept payments. Wait for account approval and confirmation that your payment setup is ready.</p>
+        </div>
+        <div className={styles.applicationArt}><MerchantApplicationArt title="Merchant application and company profile" caption="Illustration of the application area. Your account may show different options." /></div>
       </li>
     </ol>
-    <p className={styles.approval}>{merchantAccountGuidance.approval}</p>
   </div>;
 }

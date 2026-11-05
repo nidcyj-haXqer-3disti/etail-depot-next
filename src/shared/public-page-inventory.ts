@@ -1,4 +1,5 @@
 import { LEGAL_CENTER_PATHS, LEGAL_DOCUMENT_PATHS } from "./legal-paths.ts";
+import { RESOURCE_PATHS } from "./resource-paths.ts";
 import { COMMERCIAL_PATHS } from "./commercial-paths.ts";
 import { STANDARD_REFERENCE_PATHS } from "./standard-reference-paths.ts";
 
@@ -7,7 +8,7 @@ export const CORE_PUBLIC_PATHS = [
   "/", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides",
   "/software-partners", "/online-businesses", "/docs", "/docs/merchant-onboarding", "/docs/integration-access",
   "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes",
-  ...COMMERCIAL_PATHS, ...LEGAL_CENTER_PATHS,
+  ...COMMERCIAL_PATHS, ...LEGAL_CENTER_PATHS, ...RESOURCE_PATHS,
   "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch",
 ] as const;
 export const PUBLIC_CONTENT_PATHS: readonly string[] = [...CORE_PUBLIC_PATHS, ...STANDARD_REFERENCE_PATHS];
