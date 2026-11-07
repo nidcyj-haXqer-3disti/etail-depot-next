@@ -1,3 +1,4 @@
+import "./site-artwork-polish-company.css";
 import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
 import { COMMERCIAL_PAGES } from "@/modules/public-site/commercial-content";
 import { legalIdentity } from "@/shared/legal-identity";

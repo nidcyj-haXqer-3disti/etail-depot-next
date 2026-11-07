@@ -5,7 +5,7 @@ type Environment = Readonly<Record<string, string | undefined>>;
 
 /** The platform supplies these fields; request headers cannot grant search approval. */
 export interface PublicBoundaryContext {
-  next(): Promise<Response>;
+  next(options?: { sendConditionalRequest?: boolean }): Promise<Response>;
   site?: { id?: string };
   deploy?: { context?: string };
 }
@@ -116,7 +116,12 @@ export async function handlePublicRequest(
     }
   }
 
-  const response = await context.next();
+  // Only headers change below, so approved static GET/HEAD responses can retain
+  // their validators and return 304. Netlify otherwise strips conditional headers.
+  // Preview responses must be complete and no-store; platform handlers keep their
+  // existing behavior. The policy itself still executes on every request.
+  const revalidate = approved && ["GET", "HEAD"].includes(request.method) && !/^\/\.netlify(?:\/|$)/.test(url.pathname);
+  const response = await context.next({ sendConditionalRequest: revalidate });
   const legalPage = /^\/(?:privacy|terms)(?:\.html|\/index\.html|\/)?$/.test(url.pathname) || /^\/legal(?:$|[/.])/.test(url.pathname);
   const navigationPayload = url.pathname.endsWith(".txt") && url.pathname !== "/robots.txt";
   const alias = publicDocumentPath(url.pathname);

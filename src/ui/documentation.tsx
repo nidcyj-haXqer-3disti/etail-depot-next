@@ -1,3 +1,4 @@
+import "./site-artwork-polish-documentation.css";
 import Link from "next/link";
 import { ResponsiveContentsFocus } from "./responsive-contents-focus";
 import { documentationPages, documentationPaths, documentationPath, documentationServiceLinks, integrationMaterials, type DocumentationSlug } from "@/modules/public-site/documentation-catalog";
@@ -10,8 +11,8 @@ import { DocumentationFlow } from "./documentation-diagrams";
 import { MerchantAccountGuide } from "./merchant-account-guide";
 import { TrolleysBrand } from "./trolleys-brand";
 import "./documentation.css";
-import "./enterprise-support.css";
-import "./connected-resources.css";
+import "./enterprise-support-documentation.css";
+import "./connected-resources-documentation.css";
 import "./documentation-craft.css";
 
 function DocumentationLink({href,label}:{href:string;label:string}){

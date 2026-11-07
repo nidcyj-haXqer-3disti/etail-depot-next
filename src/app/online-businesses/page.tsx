@@ -1,3 +1,4 @@
+import "@/ui/site-artwork-polish-online.css";
 import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
 import Link from "next/link";
 import { PaymentPortalLink } from "@/ui/service-entry";

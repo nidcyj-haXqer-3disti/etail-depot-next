@@ -1,3 +1,4 @@
+import "./site-artwork-polish-company.css";
 import type { ServiceDetailPath } from "@/modules/public-site/service-detail-content";
 import { CommercialStructuredData } from "./commercial-structured-data";
 import Link from "next/link";

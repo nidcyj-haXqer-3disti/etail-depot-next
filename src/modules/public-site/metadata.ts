@@ -74,7 +74,8 @@ export function publicPageMetadata(path: PublicPath): Metadata {
 
 // Reviewed service and documentation pages share the same exact production guard.
 export const SERVICE_PAGES = {
-  "/resources/shopify-gateway-integration": { title: "Shopify Cybersource Gateway Setup Guide", description: "Connect your Shopify store to Cybersource with Etail Depot. Follow the setup screenshots, review payment settings and resolve common activation issues." },
+  "/resources/woocommerce-gateway-integration": { title: "WooCommerce Checkout Setup with Cybersource", description: "Set up WooCommerce card payments on WordPress.com with Trolleys, powered by Etail Depot. Follow account, certificate upload and checkout steps." },
+  "/resources/shopify-gateway-integration": { title: "Shopify Cybersource Gateway Setup Guide", description: "Connect Shopify to Cybersource with Trolleys, powered by Etail Depot. Follow the setup screenshots, activate checkout and check a payment and refund." },
   ...COMMERCIAL_PAGES,
   ...documentationMetadata,
   "/online-businesses": { title: "Online Payments and Checkout", description: "Accept credit cards, digital wallets and ACH online. Connect checkout to orders and payment records using the methods enabled for your merchant account." },
@@ -146,12 +147,13 @@ export function publicPageJsonLd(path: PublicPath): string {
       },
       ...(path === "/guides" ? [{
         "@type": "ItemList", "@id": `${url}#reference-collections`, name: "Setup guides and payment references",
-        numberOfItems: 4, itemListOrder: "https://schema.org/ItemListUnordered",
+        numberOfItems: 5, itemListOrder: "https://schema.org/ItemListUnordered",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Merchant account setup", url: `${canonicalOrigin}/docs/merchant-onboarding` },
           { "@type": "ListItem", position: 2, name: "Shopify integration", url: `${canonicalOrigin}/resources/shopify-gateway-integration` },
-          { "@type": "ListItem", position: 3, name: "ISO 20022", url: `${url}/iso-20022` },
-          { "@type": "ListItem", position: 4, name: "ISO 8583", url: `${url}/iso-8583` },
+          { "@type": "ListItem", position: 3, name: "WooCommerce integration", url: `${canonicalOrigin}/resources/woocommerce-gateway-integration` },
+          { "@type": "ListItem", position: 4, name: "ISO 20022", url: `${url}/iso-20022` },
+          { "@type": "ListItem", position: 5, name: "ISO 8583", url: `${url}/iso-8583` },
         ],
       }] : []),
       ...(path !== "/" ? [{

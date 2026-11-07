@@ -1,0 +1,3 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.public-main .cw-online .payment-service-explorer {border-radius:16px;border-color:#cedbd0;}
+.public-main .cw-online .payment-link-art {border-radius:16px;}

@@ -1,0 +1,22 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.cw-reference.standards-reference{--wash:#f5f7ef;--line:#d7e1d2;--ink:#193c33;--muted:#526b5c}
+.cw-reference.standards-reference .sr-inner{padding-top:18px}
+.cw-reference.standards-reference .sr-crumbs{border-bottom:0;margin-bottom:32px;padding-bottom:15px;font-size:12px;gap:3px 12px}
+.cw-reference .sr-crumbs a{display:inline-flex;align-items:center;min-height:44px}
+.cw-reference.standards-reference h1{font-size:var(--public-reading-title-size);line-height:1.12;letter-spacing:-.04em}
+.cw-reference.standards-reference .sr-lead{font-size:18px;max-width:65ch;line-height:1.7}
+.cw-reference .sr-reference{padding:24px}
+.cw-reference .sr-reference h2{font-size:17px}
+.cw-reference .sr-reference dt{font-size:12px}
+.cw-reference .sr-source{border-top:1px solid #d7e1d2}
+.cw-reference .sr-layout{gap:48px;border-top:0}
+.cw-reference .sr-identity{border-radius:7px;background:#f3f6ed}
+.cw-reference .sr-table thead th{background:#f5f7ef;padding:14px 12px}
+.cw-reference .sr-table td{padding:18px 12px}
+.cw-reference .sr-table td:first-child{padding-right:18px}
+.cw-reference .sr-table a,.cw-reference .sr-related a{min-height:44px;align-content:center}
+.cw-reference .iso-set-list a{min-height:52px}
+.cw-reference .sr-reference a:focus-visible,.cw-reference .sr-table a:focus-visible{outline:2px solid #315e48;outline-offset:3px}
+@media(max-width:959px){.cw-reference .sr-layout{gap:32px}}
+@media(max-width:680px){.cw-reference.standards-reference h1{font-size:var(--public-reading-title-size)}.cw-reference.standards-reference .sr-lead{font-size:16px}.cw-reference .sr-table td,.cw-reference .sr-table thead th{padding-inline:8px}.cw-reference .sr-reference{padding:22px}}
+@media(max-width:359px){.cw-reference.standards-reference h1{font-size:var(--public-reading-title-size)}}

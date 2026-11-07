@@ -27,7 +27,7 @@
 .businessLine:nth-of-type(3)>i { transform:rotate(45deg); width:18px; height:18px; background:#d7e4ad; margin-right:3px; }
 .anchor { display:flex; align-items:center; gap:17px; margin:24px 0 0 10%; padding:24px; color:white; background:linear-gradient(110deg,#193c33,#285b43); border:1px solid #527a61; border-radius:12px; box-shadow:0 18px 30px #193c3320; }
 .mark { display:grid; place-items:center; width:46px; height:46px; flex-shrink:0; border:1px solid #6f9279; border-radius:9px; background:#ffffff0c; }
-.mark img { display:block; width:32px; height:32px; object-fit:contain; }
+.mark :global(.brand-image-symbol) { display:block; width:32px; height:32px; object-fit:contain; }
 .anchor small { display:block; font-size:12px; line-height:1.5; color:#c8ddca; margin-bottom:6px; }
 .anchor strong { display:block; font-size:23px; line-height:1.2; font-weight:400; letter-spacing:-.03em; }
 .legend { text-align:center; font-size:11px; line-height:1.6; color:#526652; margin:19px 0 0; }
@@ -102,7 +102,7 @@
   .anchor small { font-size:11px; }
   .anchor strong { font-size:19px; }
   .mark { width:36px; height:36px; }
-  .mark img { width:26px; height:26px; }
+  .mark :global(.brand-image-symbol) { width:26px; height:26px; }
   .platformSheet { padding:22px 18px; }
   .platformLine { padding:17px 0; }
   .platformLine strong { font-size:18px; }
@@ -134,7 +134,7 @@
 /* Match the site’s product diagrams with readable, purposeful record artwork. */
 .art .sheet { transform:none; background:#fff; border-radius:14px; box-shadow:0 18px 38px -24px #193c3355; }
 .art .mark { background:#f0f5e8; border-color:#cbd9bb; }
-.art .mark img { width:29px; height:auto; }
+.art .mark :global(.brand-image-symbol) { width:29px; height:auto; }
 .art .caption { font-size:13px; }
 .art .businessLine > .subjectIcon { display:grid; place-items:center; width:36px; height:36px; margin-left:auto; border:1px solid #cddbc2; border-radius:9px; background:#edf3e5; color:#315e48; }
 .art .subjectIcon svg { width:20px; height:20px; }

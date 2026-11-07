@@ -48,6 +48,7 @@ test("public pages and every internal link resolve without account APIs or cooki
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });
   const destinations = new Set<string>();
+  const renderedScreenshots = new Set<string>();
   for (const path of pages) {
     const response = await page.goto(path);
     expect(response!.status()).toBe(200);
@@ -67,6 +68,11 @@ test("public pages and every internal link resolve without account APIs or cooki
     } else await expect(page.locator("input")).toHaveCount(0);
     const links = await page.locator("a[href]").evaluateAll(nodes => nodes.map(node => new URL(node.getAttribute("href")!, location.href)).filter(url => url.origin === location.origin).map(url => url.pathname + url.search + url.hash));
     for (const link of links) destinations.add(link);
+    for (const href of await page.locator('main figure > a[href]').evaluateAll(links => links.filter(link => {
+      // A cropped preview can link to the full-size image in its sibling dialog.
+      const href = (link as HTMLAnchorElement).href;
+      return Array.from(link.closest('figure')!.querySelectorAll('img')).some(image => image.src === href);
+    }).map(link => new URL((link as HTMLAnchorElement).href).pathname))) renderedScreenshots.add(href);
     for (const image of await page.locator("img:visible").all()) {
       await image.scrollIntoViewIfNeeded();
       await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0)).toBe(true);
@@ -75,7 +81,7 @@ test("public pages and every internal link resolve without account APIs or cooki
   }
   for (const destination of destinations) {
     const url = new URL(destination, "http://127.0.0.1:3100");
-    if (shopifySetupSteps.some(step => "file" in step && url.pathname === `/help/shopify/${step.file}`)) {
+    if (renderedScreenshots.has(url.pathname) || shopifySetupSteps.some(step => "file" in step && url.pathname === `/help/shopify/${step.file}`)) {
       const screenshot = await request.get(url.pathname);
       expect(screenshot.status()).toBe(200);
       expect(screenshot.headers()["content-type"]).toContain("image/webp");

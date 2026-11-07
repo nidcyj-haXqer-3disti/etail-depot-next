@@ -17,7 +17,7 @@ export function socialPreviewKey(path: string): SocialPreviewKey {
   if (path === "/guides/iso-20022" || path.startsWith("/guides/iso-20022/")) return "iso20022";
   if (path === "/guides/iso-8583" || path.startsWith("/guides/iso-8583/")) return "iso8583";
   if (path === "/guides") return "references";
-  if (path === "/resources/shopify-gateway-integration") return "documentation";
+  if (path === "/resources/shopify-gateway-integration" || path === "/resources/woocommerce-gateway-integration") return "documentation";
   if (path === "/docs" || path.startsWith("/docs/")) return "documentation";
   if (path === "/credit-card-services") return "cards";
   if (path === "/switch-payment-providers") return "provider";

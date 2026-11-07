@@ -1,3 +1,5 @@
+import "@/ui/brand-images-symbol.css";
+import "@/ui/site-artwork-polish.css";
 import { commerceProduct } from "@/ui/artwork-assets";
 import Image from "next/image";
 import Link from "next/link";

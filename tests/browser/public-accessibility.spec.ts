@@ -5,7 +5,7 @@ import {openMainNavigation} from "./public-header";
 
 import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
 
-const publicRoutes = ["/resources/shopify-gateway-integration", ...LEGAL_CENTER_PATHS, ...COMMERCIAL_PATHS, "/", "/docs", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch", "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
+const publicRoutes = ["/resources/woocommerce-gateway-integration", "/resources/shopify-gateway-integration", ...LEGAL_CENTER_PATHS, ...COMMERCIAL_PATHS, "/", "/docs", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch", "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
 
 for (const width of [1440,390,320]) {
   for(const route of publicRoutes) {

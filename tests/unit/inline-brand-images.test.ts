@@ -83,3 +83,13 @@ test("opening checkout marks preserve their originals in a route scoped styleshe
   }
   expect(bytes).toBeLessThan(65_536);
 });
+
+
+test("opening artwork symbol keeps the original bytes in its shared stylesheet", () => {
+  const css = readFileSync(new URL("../../src/ui/brand-images-symbol.css", import.meta.url), "utf8");
+  const encoded = css.match(/data:image\/png;base64,([^"]+)/)?.[1];
+  expect(encoded).toBeDefined();
+  const bytes = Buffer.from(encoded!, "base64");
+  expect(bytes).toEqual(readFileSync(new URL("../../src/ui/assets/symbol.png", import.meta.url)));
+  expect(bytes.length).toBeLessThan(16_384);
+});

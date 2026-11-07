@@ -55,7 +55,7 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.locator("a")).toHaveCount(25);
+    await expect(navigation.locator("a")).toHaveCount(26);
     for (const [label, destination] of [["Software platforms", "/software-partners"], ["Online businesses", "/online-businesses"], ["Merchant onboarding", "/merchant-onboarding"], ["Card services", "/credit-card-services"], ["Documentation", "/docs"], ["Guides", "/guides"], ["Pricing", "/pricing"]]) {
       await expect(navigation.getByRole("link", { name: label, exact: true, includeHidden: true })).toHaveAttribute("href", destination);
     }
@@ -428,10 +428,10 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
     const art = path === "/payment-acceptance-service" ? page.locator(".ec-reconciliation-art") : page.locator(path === "/" ? "[data-company-art]" : "[data-attention-art=platform]");
     await expect(art).toBeVisible();
     if (path === "/") {
-      const symbol = art.locator('img[src^="/_next/static/media/symbol."]');
+      const symbol = art.locator('.brand-image-symbol');
       await expect(symbol).toHaveCount(1);
-      await expect(symbol).toHaveAttribute("width", "800");
-      await expect(symbol).toHaveAttribute("height", "484");
+      await expect(symbol).toHaveCSS("aspect-ratio", "800 / 484");
+      expect(await symbol.evaluate(mark => getComputedStyle(mark).content.startsWith('url("data:image/png;base64,'))).toBe(true);
       await expectDecodedBrandMark(symbol);
     } else if (path === "/software-partners") {
       await expect(art).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records.*Access and account structure depend on the approved integration/);

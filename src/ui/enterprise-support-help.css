@@ -1,0 +1,16 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.public-help-intro h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
+.public-help-intro>.eyebrow{color:var(--public-accent)}
+.public-help-intro .help-support-grid{margin-top:40px;background:var(--public-paper);border:1px solid var(--public-line);border-radius:8px;overflow:hidden}
+.public-help-intro .help-support-card{background:transparent;padding:28px}
+.public-help-intro .help-support-card:first-child{padding-left:28px}
+.public-help-body .help-guide{padding-block:38px}
+@media(max-width:700px){
+.public-help-intro h1{font-size:var(--public-title-size)}
+.public-help-intro .help-support-grid{border-radius:8px}
+.public-help-intro .help-support-card{padding:24px!important}
+.public-help-body .help-guide{padding-block:28px}
+}
+@media(max-width:360px){
+.public-help-intro h1{font-size:var(--public-title-size)}
+}

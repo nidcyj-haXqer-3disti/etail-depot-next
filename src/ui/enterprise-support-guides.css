@@ -1,0 +1,23 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.guides-directory-heading{padding-block:64px 40px}
+.guides-directory-heading h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
+.guides-directory .standards-collections-grid{gap:28px;border:0;border-radius:0;background:transparent;overflow:visible}
+.guides-directory .standards-collections-grid>a{position:relative;border:1px solid #d3ded0;border-radius:10px;padding:30px 34px;overflow:hidden;background:#f1f4eb}
+.guides-directory .standards-collections-grid>a:last-child{background:#f8f9f4}
+.guides-directory .standards-collections-grid>a:hover{border-color:#9db69f;background:#eaf0e3}
+.guides-directory .standards-collection-tag{font-size:11px;letter-spacing:.07em;color:#536c59}
+.guides-directory .standards-collections-grid h2{font-size:42px;font-weight:500;margin-top:36px;letter-spacing:-.045em}
+.guides-directory .standards-collections-grid p{font-size:15px;line-height:1.7;max-width:45ch}
+.guides-directory .standards-collection-path{padding-top:18px;margin-top:22px;border-top:0}
+.guides-directory .standards-collection-open{padding-top:22px;font-size:14px}
+@media(max-width:700px){
+.guides-directory-heading h1{font-size:var(--public-title-size)}
+.guides-directory-heading{padding-block:40px 30px}
+.guides-directory .standards-collections-grid{gap:22px}
+.guides-directory .standards-collections-grid>a{padding:26px}
+.guides-directory .standards-collections-grid h2{font-size:34px;margin-top:26px}
+}
+@media(max-width:360px){
+.guides-directory-heading h1{font-size:var(--public-title-size)}
+}
+@media(forced-colors:active){.guides-directory .standards-collections-grid>a{border-color:CanvasText}}

@@ -6,8 +6,8 @@ import { ReferenceIndex } from "./reference-index";
 import { PaymentStatusContext } from "./iso20022-status-context";
 import "./standards-reference.css";
 import "./iso20022-reference.css";
-import "./enterprise-support.css";
-import "./connected-resources.css";
+import "./enterprise-support-reference.css";
+import "./connected-resources-reference.css";
 
 type Props = { set?: IsoCodeSet; code?: IsoCode };
 function SourceLink({ children }: { children: React.ReactNode }) { return <a href={ISO20022_SOURCE} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">{children} <span aria-hidden="true">↗</span></a>; }
