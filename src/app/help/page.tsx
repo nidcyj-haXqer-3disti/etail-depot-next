@@ -12,8 +12,8 @@ import { PaymentPortalLink } from "@/ui/service-entry";
 import { Icon } from "@/ui/icon";
 import "@/ui/public-site.css";
 import "./help.css";
-import "@/ui/enterprise-support.css";
-import "@/ui/connected-resources.css";
+import "@/ui/enterprise-support-help.css";
+import "@/ui/connected-resources-help.css";
 
 export const metadata = publicPageMetadata("/help");
 

@@ -39,7 +39,7 @@ export const shopifySetupSteps = [
         "action": "Look for Choose a provider in Payment providers."
       }
     ],
-    "note": "Already accepting payments? Confirm the switch with Etail first. Keep access to your previous provider for older orders and refunds.",
+    "note": "Already accepting payments? Confirm the switch with Trolleys first. Keep access to your previous provider for older orders and refunds.",
     "file": "other-providers.webp",
     "width": 915,
     "height": 565,
@@ -60,12 +60,12 @@ export const shopifySetupSteps = [
     "id": "install-app",
     "title": "Select Install",
     "note": "If Business Center is already open in another tab, sign out there before continuing.",
-    "text": "On the Cybersource page, select Install to open the app permissions screen.",
+    "text": "Select Install to open the app permissions screen. If Cybersource is already installed, select Manage account and continue at step 7.",
     "file": "install.webp",
     "width": 1227,
     "height": 333,
     "alt": "Cybersource provider page with Install in the upper right corner.",
-    "caption": "You will see another Install button on the next screen."
+    "caption": "For a new installation, the next screen has a second Install button."
   },
   {
     "id": "review-access",
@@ -81,7 +81,7 @@ export const shopifySetupSteps = [
   {
     "id": "business-center-login",
     "title": "Open the Cybersource sign in page",
-    "text": "Business Center is where you view and manage your Cybersource payments.",
+    "text": "Shopify opens the live Cybersource sign in page for this connection.",
     "actions": [
       "Check for ebc2.cybersource.com in the address bar.",
       "Keep this page open while you find your account details in the next step."
@@ -102,7 +102,7 @@ export const shopifySetupSteps = [
       "Return to the Cybersource page. Enter those details in Organization ID, Username and Password.",
       "Select Log in. Do not choose Test login."
     ],
-    "note": "Cannot find the email? Check your spam or junk folder, then ask Etail to help before continuing.",
+    "note": "Cannot find the email? Check your spam or junk folder, then ask Trolleys to help before continuing.",
     "artwork": "credentials-email"
   },
   {
@@ -110,9 +110,9 @@ export const shopifySetupSteps = [
     "title": "Review the account connection",
     "text": "The Onboarding Agreement links your Shopify store to your Cybersource account.",
     "actions": [
-      "Under Tenant Merchant ID Mapping Information, check any existing account connection. If you do not recognize it, stop and ask Etail.",
+      "Under Tenant Merchant ID Mapping Information, check any existing account connection. If you do not recognize it, stop and ask Trolleys.",
       "Read the Access Terms. If you are authorized to accept them and agree, select I agree to the Access Terms.",
-      "Select Enable Payer Authentication (3D Secure) only if Etail has confirmed it is enabled for your account and needed for this store.",
+      "Select Enable Payer Authentication (3D Secure) only if Trolleys has confirmed it is enabled for your account and needed for this store.",
       "Select Confirm to return to Shopify."
     ],
     "note": "Selecting the 3D Secure checkbox does not enable that service on your merchant account. It must already be set up.",
@@ -125,9 +125,9 @@ export const shopifySetupSteps = [
   {
     "id": "activate-provider",
     "title": "Choose payment methods and activate",
-    "text": "Back in Shopify, look for Installed beside Cybersource.",
+    "text": "After confirming the Cybersource connection, return to Shopify.",
     "actions": [
-      "Select only the cards and payment methods Etail confirmed for your account.",
+      "Select only the cards and payment methods Trolleys confirmed for your account.",
       "Select Activate. Save any changes if Shopify prompts you."
     ],
     "note": "Review the fees shown before activating. Shopify fees are separate from your gateway and processing fees.",
@@ -135,7 +135,7 @@ export const shopifySetupSteps = [
     "width": 911,
     "height": 661,
     "alt": "Cybersource marked Installed in Shopify with payment method switches and an Activate button.",
-    "caption": "Installed means the app is connected. Activate turns it on for checkout."
+    "caption": "Installed does not confirm account setup. Activate makes Cybersource available at checkout."
   },
   {
     "id": "confirm-active",
@@ -148,7 +148,7 @@ export const shopifySetupSteps = [
     "alt": "Cybersource marked Active in Shopify payment settings.",
     "caption": "Active means the connection is enabled. It does not confirm a successful payment or payout.",
     "actions": [
-      "Review Payment capture method. Confirm when payments will be collected, using the setting agreed with Etail.",
+      "Review Payment capture method. Confirm when payments will be collected, using the setting agreed with Trolleys.",
       "Open the Cybersource settings for Apple Pay or Google Pay if they are enabled for your account. Save any changes."
     ]
   },
@@ -164,7 +164,7 @@ export const shopifySetupSteps = [
       "In Business Center, go to Transaction Management → Transactions. Find the matching amount and currency, then open the transaction’s Request ID to see its details. The merchant reference number must match Shopify’s payment ID.",
       "Refund the full captured amount in Shopify to the original card and check Business Center. If the payment has not settled, it may be voided instead. For an authorization only, cancel the order and confirm its reversal in both accounts."
     ],
-    "note": "If a payment or reversal is missing from either account, or the amount is wrong, contact Etail Depot before taking customer orders.",
+    "note": "If a payment or reversal is missing from either account, or the amount is wrong, contact Trolleys support before taking customer orders.",
     "artwork": "integration-verification"
   }
 ] as const;

@@ -1,0 +1,27 @@
+/** Exact frames already displayed by the guides. Originals remain the enlargement source. */
+export const guideImageSources = {
+  woocommerce: {
+    store: { file: 'woo-store.webp', frames: [[175, 300, 880, 210]] },
+    plugin: { file: 'woo-plugin.webp', frames: [[175, 170, 880, 160]] },
+    payments: { file: 'woo-payments.webp', frames: [[205, 448, 1030, 130]] },
+    login: { file: 'woo-login-detail.webp' },
+    apiValues: { file: 'woo-keys.webp', frames: [[55, 285, 885, 220]] },
+    apiFields: { file: 'woo-credentials.webp', frames: [[175, 760, 670, 315]] },
+    certificateDownload: { file: 'woo-certificate.webp', frames: [[30, 575, 930, 255]] },
+    certificatePassword: { file: 'woo-certificate.webp', frames: [[995, 55, 442, 760]] },
+    certificateFields: { file: 'woo-credentials.webp', frames: [[175, 1080, 670, 240]] },
+    settings: { file: 'woo-settings.webp' },
+    storage: { file: 'woo-storage.webp', frames: [[438, 190, 700, 435]] },
+    checkout: { file: 'woo-checkout.webp' },
+    records: { file: 'woo-records.webp' },
+    refund: { file: 'woo-refund.webp', frames: [[420, 405, 530, 290]] },
+    duckDownload: { file: 'woo-cyberduck-download.webp' },
+    duckConnect: { file: 'woo-cyberduck-connect.webp' },
+    duckFolders: { file: 'woo-cyberduck-folders.webp' },
+    duckFolderPermissions: { file: 'woo-cyberduck-folder-permissions.webp' },
+    duckSelectFile: { file: 'woo-cyberduck-select-file.webp', frames: [[320, 125, 700, 215], [1380, 710, 355, 170]] },
+    duckComplete: { file: 'woo-cyberduck-complete.webp' },
+    duckFilePermissions: { file: 'woo-cyberduck-file-permissions.webp' },
+  },
+  shopify: Object.fromEntries(['settings', 'payments', 'other-providers', 'choose-cybersource', 'install', 'permissions', 'business-center', 'agreement', 'activate', 'active'].map(name => [`${name}.webp`, { file: `${name}.webp` }])),
+};

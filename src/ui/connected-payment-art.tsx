@@ -1,3 +1,4 @@
+import "./site-artwork-polish.css";
 import { Icon } from "./icon";
 import { PlatformRecordArt } from "./service-workflow-art";
 

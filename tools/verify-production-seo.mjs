@@ -28,7 +28,7 @@ const standardPaths = ["/guides/iso-20022", "/guides/iso-8583"];
 const coreSchemaPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides"];
 const publicPaths = INDEXABLE_PUBLIC_PATHS;
 assert.equal(guidePaths.length, 0);
-assert.equal(new Set(publicPaths).size, 3739, "Only the exact reviewed nonlegal pages are eligible for search.");
+assert.equal(new Set(publicPaths).size, 3740, "Only the exact reviewed nonlegal pages are eligible for search.");
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -157,7 +157,7 @@ function checkSchema(html, route, description) {
   assert.equal(page.isPartOf?.["@id"], website["@id"]);
   if (route === "/guides") {
     const list = node("ItemList");
-    const directoryPaths = ["/docs/merchant-onboarding", "/resources/shopify-gateway-integration", ...standardPaths];
+    const directoryPaths = ["/docs/merchant-onboarding", "/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", ...standardPaths];
     assert.equal(page.mainEntity?.["@id"], list["@id"]);
     assert.equal(list.numberOfItems, directoryPaths.length);
     assert.deepEqual(list.itemListElement.map(item => item.url).sort(), directoryPaths.map(path => new URL(path, canonicalOrigin).href).sort());
@@ -353,7 +353,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: 3739 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: 3740 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

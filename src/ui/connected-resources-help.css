@@ -1,0 +1,8 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.cw-help .public-help-intro{padding-top:0}
+.cw-help .public-help-intro h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.048em}
+.cw-help .help-support-grid{gap:0;box-shadow:none}
+.cw-help .help-support-card h2{font-weight:500;font-size:20px}
+.cw-help .help-topic-links a{border-radius:5px}
+@media(max-width:680px){.cw-help .public-help-intro h1{font-size:var(--public-title-size)}}
+@media(max-width:359px){.cw-help .public-help-intro h1{font-size:var(--public-title-size)}}

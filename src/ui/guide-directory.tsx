@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Icon } from "./icon";
 import { StandardsCollections } from "./standards-collections";
 import "./guide-directory.css";
-import "./enterprise-support.css";
-import "./connected-resources.css";
+import "./enterprise-support-guides.css";
+import "./connected-resources-guides.css";
 
 export function GuideDirectory() {
   return <div className="guides-directory page-container cw-guides">
@@ -17,6 +17,11 @@ export function GuideDirectory() {
       <Link href="/resources/shopify-gateway-integration" className="guides-setup-card">
         <Icon name="link" /><h2>Shopify integration</h2>
         <p>Connect Shopify to Cybersource and check your first payment.</p>
+        <span className="guides-setup-format">Step by step with screenshots</span>
+      </Link>
+      <Link prefetch={false} href="/resources/woocommerce-gateway-integration" className="guides-setup-card">
+        <Icon name="link" /><h2>WooCommerce integration</h2>
+        <p>Connect your payment plugin and check an order and refund.</p>
         <span className="guides-setup-format">Step by step with screenshots</span>
       </Link>
     </section>

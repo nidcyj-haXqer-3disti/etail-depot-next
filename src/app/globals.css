@@ -50,3 +50,10 @@ svg { flex-shrink: 0; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* Shared embedded logos use the same first-paint base on every route. */
+.inline-brand-image {
+  display: block;
+  content: var(--brand-image);
+  object-fit: contain;
+}

@@ -6,8 +6,8 @@ import { ReferenceIndex } from "./reference-index";
 import "./standards-reference.css";
 import "./iso20022-reference.css";
 import "./iso8583-reference.css";
-import "./enterprise-support.css";
-import "./connected-resources.css";
+import "./enterprise-support-reference.css";
+import "./connected-resources-reference.css";
 
 type Props = { section?: ReferenceSection; entry?: ReferenceEntry };
 function SourceLink({ href, children }: { href: string; children: React.ReactNode }) { return <a href={href} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">{children}<span aria-hidden="true"> ↗</span></a>; }

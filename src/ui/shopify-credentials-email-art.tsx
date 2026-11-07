@@ -6,7 +6,7 @@ function HiddenEmailValue() {
   return <><span className={styles.masked} aria-hidden="true">••••••••••</span><span className={styles.srOnly}>Provided in your account email</span></>;
 }
 
-export function ShopifyCredentialsEmailArt() {
+export function ShopifyCredentialsEmailArt({ store = "Shopify", exampleValues }: { store?: "Shopify" | "WooCommerce"; exampleValues?: { organization: string; username: string } } = {}) {
   return <figure className={guideStyles.figure} data-shopify-artwork="credentials-email">
     <div className={styles.frame}>
       <div className={styles.email}>
@@ -28,10 +28,10 @@ export function ShopifyCredentialsEmailArt() {
         </div>
         <div className={styles.body}>
           <div className={styles.greeting}>Hello,</div>
-          <div className={styles.message}>Use your Cybersource account details to connect your Shopify store.</div>
+          <div className={styles.message}>Use your Cybersource account details to connect your {store} store.</div>
           <dl className={styles.details}>
-            <div><dt>Organization ID</dt><dd><HiddenEmailValue /></dd></div>
-            <div><dt>Username</dt><dd><HiddenEmailValue /></dd></div>
+            <div><dt>Organization ID</dt><dd>{exampleValues ? <code>{exampleValues.organization}</code> : <HiddenEmailValue />}</dd></div>
+            <div><dt>Username</dt><dd>{exampleValues ? <code>{exampleValues.username}</code> : <HiddenEmailValue />}</dd></div>
             <div><dt>Password</dt><dd>Follow the email instructions</dd></div>
           </dl>
           <div className={styles.message}>Return to Business Center and enter your details to sign in.</div>
@@ -39,6 +39,6 @@ export function ShopifyCredentialsEmailArt() {
         </div>
       </div>
     </div>
-    <figcaption>Illustrated email. Your message may look different.</figcaption>
+    <figcaption>{exampleValues ? "Illustrated email with fictional account details. Use the details sent to you." : "Illustrated email. Your message may look different."}</figcaption>
   </figure>;
 }

@@ -1,0 +1,5 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.standards-reference .sr-crumbs{padding-bottom:17px;border-bottom:1px solid var(--public-line);margin-bottom:32px}
+.standards-reference .sr-kicker{color:var(--public-accent);letter-spacing:.07em;font-size:11px}
+.standards-reference .sr-reference{border-radius:8px;background:var(--public-paper)}
+.standards-reference .sr-meta{padding-block:4px 8px}

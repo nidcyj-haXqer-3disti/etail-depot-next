@@ -1,0 +1,28 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.cw-guides.guides-directory .guides-directory-heading{padding-block:34px 38px}
+.cw-guides.guides-directory .guides-directory-heading h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.048em}
+.cw-guides .guides-directory-intro{font-size:18px;line-height:1.7;max-width:57ch}
+.cw-guides.guides-directory .standards-collections-grid>a{padding:36px;border-radius:14px;background:#f2f6f2;box-shadow:none;border-color:#d7e0d9;min-height:280px;transition:background .18s ease,border-color .18s ease}
+.cw-guides.guides-directory .standards-collections-grid>a:last-child{background:#f2f6f2}
+.cw-guides.guides-directory .standards-collections-grid>a:hover{background:#eaf1ea;border-color:#809c89}
+.cw-guides .standards-collection-tag{display:block;padding-bottom:0;border-bottom:0;width:100%}
+.cw-guides.guides-directory .standards-collections-grid h2{font-size:44px;line-height:1.1;margin-top:28px}
+.cw-guides.guides-directory .standards-collection-path{margin-top:24px;padding:20px 0;border-top:1px solid #d5dfcf;border-bottom:1px solid #d5dfcf;font-size:12px}
+.cw-guides.guides-directory .standards-collection-open{padding-top:24px;min-height:44px}
+@media(max-width:680px){.cw-guides.guides-directory .guides-directory-heading h1{font-size:var(--public-title-size)}.cw-guides.guides-directory .guides-directory-heading{padding-block:26px 30px}.cw-guides.guides-directory .standards-collections-grid>a{padding:26px}.cw-guides.guides-directory .standards-collections-grid h2{font-size:36px}.cw-guides .guides-directory-intro{font-size:16px}}
+@media(max-width:359px){.cw-guides.guides-directory .guides-directory-heading h1{font-size:var(--public-title-size)}}
+.public-main .cw-guides.guides-directory .guides-directory-heading {display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;padding-block:40px;}
+.public-main .cw-guides.guides-directory .guides-directory-intro {margin:0;max-width:48ch;}
+.public-main .cw-guides.guides-directory .standards-collections-grid {gap:24px;}
+.public-main .cw-guides.guides-directory .standards-collections-grid>a {border:0;border-radius:20px;padding:36px;min-height:260px;}
+.public-main .cw-guides.guides-directory .standards-collections-grid h2 {margin-top:32px;}
+@media(max-width:959px){
+ .public-main .cw-guides.guides-directory .guides-directory-heading {grid-template-columns:1fr;gap:20px;padding-block:32px;}
+}
+@media(max-width:680px){
+ .public-main .cw-guides.guides-directory .standards-collections-grid {gap:18px;}
+ .public-main .cw-guides.guides-directory .standards-collections-grid>a {padding:28px;min-height:240px;}
+}
+@media(forced-colors:active){
+ .public-main .cw-guides.guides-directory .standards-collections-grid>a {border:1px solid LinkText;}
+}

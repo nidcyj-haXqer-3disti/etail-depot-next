@@ -1,0 +1,4 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.public-main .payment-offer-section :is(.payment-base-rate,.pricing-account-fees dd,.fee-result dd,.fee-input input){font-variant-numeric:tabular-nums}
+.public-main .payment-offer-section .fee-result dl>div{align-items:baseline;gap:20px}
+.public-main .payment-offer-section .fee-result dd{white-space:nowrap;text-align:right}

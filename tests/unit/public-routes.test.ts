@@ -351,3 +351,112 @@ describe("public Edge search and security policy", () => {
     }
   });
 });
+
+describe("public response revalidation", () => {
+  const validators = { "If-None-Match": '"unchanged-public-file"' };
+  const deliveryHeaders = {
+    ETag: validators["If-None-Match"],
+    "Cache-Control": "public, max-age=0, must-revalidate",
+    Vary: "Accept-Encoding",
+  };
+
+  it.each(["GET", "HEAD"])("preserves body-free 304 responses and security policy for approved %s requests", async method => {
+    for (const [path, noindex] of [
+      ["/", false], ["/resources/shopify-gateway-integration", false],
+      ["/resources/woocommerce-gateway-integration", false], ["/docs/merchant-onboarding", false],
+      ["/_next/static/chunks/example.css", false], ["/_next/static/media/example.webp", false],
+      ["/robots.txt", false], ["/sitemap.xml", false],
+      ["/legal/merchant-services", true], ["/privacy", true], ["/terms", true],
+      ["/docs.html", true], ["/docs.txt", true],
+    ] as const) {
+      const next = context(new Response(null, { status: 304, headers: deliveryHeaders }));
+      const response = await handlePublicRequest(new Request(canonicalOrigin + path, { method, headers: validators }), next, production);
+      expect(next.next).toHaveBeenCalledExactlyOnceWith({ sendConditionalRequest: true });
+      expect(response.status).toBe(304);
+      expect(response.body).toBeNull();
+      for (const [key, value] of Object.entries({ ...deliveryHeaders, ...publicSecurityHeaders })) expect(response.headers.get(key)).toBe(value);
+      expect(response.headers.has("x-robots-tag")).toBe(noindex);
+      if (noindex) expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    }
+  });
+
+  it("delivers changed content and its new validator without buffering or replacing the body", async () => {
+    const upstream = new Response("new public content", { headers: { ...deliveryHeaders, ETag: '"new-public-file"' } });
+    const stream = upstream.body;
+    const next = context(upstream);
+    const response = await handlePublicRequest(new Request(canonicalOrigin, { headers: validators }), next, production);
+    expect(next.next).toHaveBeenCalledExactlyOnceWith({ sendConditionalRequest: true });
+    expect(response.status).toBe(200);
+    expect(response.body).toBe(stream);
+    expect(upstream.bodyUsed).toBe(false);
+    expect(response.headers.get("etag")).toBe('"new-public-file"');
+    expect(await response.text()).toBe("new public content");
+  });
+
+  it("requests a full response when any trusted production condition is missing", async () => {
+    const cases: [Partial<PublicBoundaryContext>, Record<string, string | undefined>][] = [
+      ...["deploy-preview", "branch-deploy", "dev", undefined].map(value => [{ deploy: { context: value } }, production] as [Partial<PublicBoundaryContext>, typeof production]),
+      [{ site: { id: "another-site" } }, production], [{ site: undefined }, production],
+      ...Object.keys(production).map(key => [{}, { ...production, [key]: undefined }] as [Partial<PublicBoundaryContext>, Record<string, string | undefined>]),
+    ];
+    for (const [changes, environment] of cases) {
+      const next = context(new Response("current page", { headers: deliveryHeaders }), changes);
+      const response = await handlePublicRequest(new Request(canonicalOrigin, { headers: validators }), next, environment);
+      expect(next.next).toHaveBeenCalledExactlyOnceWith({ sendConditionalRequest: false });
+      expect(response.status).toBe(200);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+      expect(await response.text()).toBe("current page");
+    }
+  });
+
+  it.each(["GET", "HEAD", "POST"])("leaves platform endpoint behavior unchanged for %s", async method => {
+    const request = new Request(canonicalOrigin + "/.netlify/functions/emails", {
+      method, headers: validators, ...(method === "POST" ? { body: "synthetic-private-input" } : {}),
+    });
+    const next = context(new Response(null, { status: 401 }));
+    const response = await handlePublicRequest(request, next, production);
+    expect(next.next).toHaveBeenCalledExactlyOnceWith({ sendConditionalRequest: false });
+    expect(response.status).toBe(401);
+    expect(request.bodyUsed).toBe(false);
+  });
+
+  it("does not revalidate submitted requests or read their bodies", async () => {
+    const request = new Request(canonicalOrigin, { method: "POST", headers: validators, body: "synthetic-private-input" });
+    const next = context(new Response(null, { status: 405 }));
+    const response = await handlePublicRequest(request, next, production);
+    expect(next.next).toHaveBeenCalledExactlyOnceWith({ sendConditionalRequest: false });
+    expect(response.status).toBe(405);
+    expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    expect(request.bodyUsed).toBe(false);
+  });
+
+  it("runs retirement, alias, unknown-route and preview metadata checks before revalidation", async () => {
+    for (const [origin, path, changes, status] of [
+      [canonicalOrigin, "/login", {}, 307],
+      [canonicalOrigin, "/api/checkout", {}, 410],
+      [canonicalOrigin, "/card-services", {}, 308],
+      [canonicalOrigin, "/docs/unreviewed", {}, 404],
+      [defaultOrigin, "/", {}, 308],
+      [canonicalOrigin, "/sitemap.xml", { deploy: { context: "deploy-preview" } }, 200],
+      [canonicalOrigin, "/robots.txt", { deploy: { context: "deploy-preview" } }, 200],
+    ] as const) {
+      const next = context(new Response(null, { status: 304, headers: deliveryHeaders }), changes);
+      const response = await handlePublicRequest(new Request(origin + path, { headers: validators }), next, production);
+      expect(next.next).not.toHaveBeenCalled();
+      expect(response.status).toBe(status);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      if (path === "/sitemap.xml") expect(await response.text()).not.toContain("<loc>");
+      if (path === "/robots.txt") expect(await response.text()).not.toContain("Sitemap:");
+    }
+  });
+
+  it("retains 404 and noindex when a previously cached file is no longer present", async () => {
+    const next = context(new Response("Not found", { status: 404 }));
+    const response = await handlePublicRequest(new Request(canonicalOrigin + "/_next/static/media/removed.webp", { headers: validators }), next, production);
+    expect(next.next).toHaveBeenCalledExactlyOnceWith({ sendConditionalRequest: true });
+    expect(response.status).toBe(404);
+    expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    expect(await response.text()).toBe("Not found");
+  });
+});

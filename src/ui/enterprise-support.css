@@ -1,5 +1,4 @@
-/* Supporting pages share the acquisition palette and rhythm, while documentation
-   and reference pages keep their denser reading layouts. */
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
 .enterprise-support{--ink:var(--public-ink);--body:var(--public-muted);--paper:var(--public-paper);--line:var(--public-line);color:var(--public-ink);font-family:var(--public-font)}
 .enterprise-support :is(h1,h2,h3){font-weight:500;text-wrap:balance}
 .enterprise-support .eyebrow{color:var(--public-accent);font-size:12px;letter-spacing:.07em}
@@ -31,7 +30,6 @@
 .enterprise-support .payment-offer-section{padding-block:60px}
 .enterprise-support .pricing-panel{border-radius:10px;border-color:var(--public-line)}
 .enterprise-support .fee-estimate{background:var(--public-paper)}
-/* Company identity is a service relationship, not a fictional dashboard. */
 .enterprise-support .company-context-art{border-radius:10px;padding:28px;background:#e8ede3;border-color:#d2dccf}
 .enterprise-support .company-identity{padding:0;background:transparent;border:0}
 .enterprise-support .company-identity-name{padding:30px 32px;background:#193c33;border-radius:10px;color:#fff;gap:20px}
@@ -59,7 +57,6 @@
 .enterprise-support .trust-documents dt{font-size:14px;font-weight:500}
 .enterprise-support .trust-documents dd{font-size:13px;line-height:1.7}
 .enterprise-support .trust-documents figcaption{font-size:12px}
-/* Contact routes stay explicit, but no longer form an oversized vertical directory. */
 .enterprise-support.company-context-contact .commercial-hero-copy{margin:0}
 .enterprise-support.company-context-contact .commercial-contacts{padding-block:44px 60px}
 .enterprise-support .commercial-contacts>h2{font-size:28px;margin-bottom:28px}
@@ -72,7 +69,6 @@
 .enterprise-support .commercial-contact-list article>a{max-width:100%}
 .enterprise-support .commercial-contact-action a{min-height:44px;font-size:14px}
 .enterprise-support .commercial-contact-email{font-size:12px;color:#536c59;overflow-wrap:anywhere}
-/* Remaining service pages retain their working product controls and artwork. */
 .enterprise-support.online-craft .online-business-hero,.enterprise-support.card-craft .consumer-hero{background:#fff}
 .enterprise-support.online-craft .online-business-intro{padding-block:var(--public-hero-space)}
 .enterprise-support.online-craft .online-business-intro h1,.enterprise-support.card-craft.consumer-cards .consumer-hero h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
@@ -81,47 +77,6 @@
 .enterprise-support.card-craft .card-details-section{padding-block:64px}
 .enterprise-support.card-craft .wallet-guide-section{background:var(--public-paper);border-block:1px solid var(--public-line)}
 .enterprise-support .payment-sharing-note{padding-block:72px;border-top:1px solid var(--public-line)}
-/* Reading surfaces use the same palette, with intentionally smaller headings. */
-.documentation-page{--docs-ink:var(--public-ink);--docs-muted:var(--public-muted);--docs-line:var(--public-line);--docs-tint:var(--public-paper);font-family:var(--public-font)}
-.documentation-page .docs-navigation a[aria-current="page"]{background:#edf2e9;box-shadow:inset 2px 0 #19795d}
-.documentation-page .docs-article-heading{padding-bottom:24px;border-bottom:1px solid var(--public-line)}
-.documentation-page .docs-article-heading h1{font-size:var(--public-reading-title-size);letter-spacing:-.04em}
-.documentation-page .docs-hub-heading h1{font-size:var(--public-title-size);letter-spacing:-.045em;line-height:var(--public-title-line)}
-.documentation-page .docs-task-paths{gap:32px;margin-top:40px}
-.documentation-page .docs-task-path{border:0;border-radius:0;overflow:visible}
-.documentation-page .docs-task-path-heading{background:#eef1e8;border:1px solid #d7e0d9;border-radius:8px;padding:24px;min-height:158px}
-.documentation-page .docs-task-path-heading>.icon{color:#19795d;width:24px;height:24px}
-.documentation-page .docs-task-path-heading h2{font-size:22px;letter-spacing:-.025em}
-.documentation-page .docs-task{padding:24px 6px;min-height:130px;border-bottom:1px solid var(--public-line)}
-.documentation-page .docs-task+.docs-task{border-top:0}
-.documentation-page .docs-task h3{font-size:17px}
-.documentation-page .docs-prerequisites{background:#f6f7f2;border:0;border-left:2px solid #9ab29b;border-radius:0;margin-top:28px}
-.documentation-page .docs-note{border-left-color:#9ab29b}
-.documentation-page .docs-flow{border-radius:8px;background:#eef1e8;box-shadow:none}
-.documentation-page .docs-flow-marker{border-color:#c5d3c6}
-.documentation-page .docs-flow-marker>.icon{color:#376a4f}
-.documentation-page .docs-toc{padding-left:20px;border-left:1px solid var(--public-line)}
-.guides-directory-heading{padding-block:64px 40px}
-.guides-directory-heading h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
-.guides-directory .standards-collections-grid{gap:28px;border:0;border-radius:0;background:transparent;overflow:visible}
-.guides-directory .standards-collections-grid>a{position:relative;border:1px solid #d3ded0;border-radius:10px;padding:30px 34px;overflow:hidden;background:#f1f4eb}
-.guides-directory .standards-collections-grid>a:last-child{background:#f8f9f4}
-.guides-directory .standards-collections-grid>a:hover{border-color:#9db69f;background:#eaf0e3}
-.guides-directory .standards-collection-tag{font-size:11px;letter-spacing:.07em;color:#536c59}
-.guides-directory .standards-collections-grid h2{font-size:42px;font-weight:500;margin-top:36px;letter-spacing:-.045em}
-.guides-directory .standards-collections-grid p{font-size:15px;line-height:1.7;max-width:45ch}
-.guides-directory .standards-collection-path{padding-top:18px;margin-top:22px;border-top:0}
-.guides-directory .standards-collection-open{padding-top:22px;font-size:14px}
-.standards-reference .sr-crumbs{padding-bottom:17px;border-bottom:1px solid var(--public-line);margin-bottom:32px}
-.standards-reference .sr-kicker{color:var(--public-accent);letter-spacing:.07em;font-size:11px}
-.standards-reference .sr-reference{border-radius:8px;background:var(--public-paper)}
-.standards-reference .sr-meta{padding-block:4px 8px}
-.public-help-intro h1{font-size:var(--public-title-size);line-height:var(--public-title-line);letter-spacing:-.05em}
-.public-help-intro>.eyebrow{color:var(--public-accent)}
-.public-help-intro .help-support-grid{margin-top:40px;background:var(--public-paper);border:1px solid var(--public-line);border-radius:8px;overflow:hidden}
-.public-help-intro .help-support-card{background:transparent;padding:28px}
-.public-help-intro .help-support-card:first-child{padding-left:28px}
-.public-help-body .help-guide{padding-block:38px}
 @media(max-width:1100px){
 .enterprise-support .commercial-hero>.container{gap:var(--public-content-gap)}
 .enterprise-support.commercial-page h1{font-size:var(--public-title-size)}
@@ -171,25 +126,12 @@
 .enterprise-support.online-craft .online-business-intro{padding-block:var(--public-hero-space)}
 .enterprise-support .payment-sharing-note{padding-block:44px}
 .enterprise-support.card-craft .card-details-section{padding-block:44px}
-.documentation-page .docs-hub-heading h1,.guides-directory-heading h1,.public-help-intro h1{font-size:var(--public-title-size)}
-.documentation-page .docs-task-paths{gap:32px}
-.documentation-page .docs-task-path-heading{min-height:0;padding:22px}
-.documentation-page .docs-task{min-height:0;padding:22px 0}
-.documentation-page .docs-article-heading{padding-bottom:18px}
-.documentation-page .docs-article-heading h1{font-size:var(--public-reading-title-size)}
-.guides-directory-heading{padding-block:40px 30px}
-.guides-directory .standards-collections-grid{gap:22px}
-.guides-directory .standards-collections-grid>a{padding:26px}
-.guides-directory .standards-collections-grid h2{font-size:34px;margin-top:26px}
-.public-help-intro .help-support-grid{border-radius:8px}
-.public-help-intro .help-support-card{padding:24px!important}
-.public-help-body .help-guide{padding-block:28px}
 }
 @media(max-width:360px){
-.enterprise-support.commercial-page h1,.enterprise-support.online-craft .online-business-intro h1,.enterprise-support.card-craft.consumer-cards .consumer-hero h1,.guides-directory-heading h1,.public-help-intro h1{font-size:var(--public-title-size)}
+.enterprise-support.commercial-page h1,.enterprise-support.online-craft .online-business-intro h1,.enterprise-support.card-craft.consumer-cards .consumer-hero h1{font-size:var(--public-title-size)}
 .enterprise-support .company-identity-services{grid-template-columns:1fr;padding:24px}
 .enterprise-support .company-identity-services>div+div{border:0;border-top:1px solid var(--public-line);padding:20px 0 0}
 .enterprise-support .company-identity-services .icon{margin-bottom:12px}
 .enterprise-support .commercial-section h2{font-size:29px}
 }
-@media(forced-colors:active){.enterprise-support .company-identity-name{border:1px solid CanvasText}.enterprise-support .company-identity-name :is(span,strong){color:CanvasText}.guides-directory .standards-collections-grid>a{border-color:CanvasText}}
+@media(forced-colors:active){.enterprise-support .company-identity-name{border:1px solid CanvasText}.enterprise-support .company-identity-name :is(span,strong){color:CanvasText}}

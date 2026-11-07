@@ -1,0 +1,32 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.public-main .cw-docs :is(.docs-diagram,.docs-sequence) {border-radius:14px;border-color:#cedbd0;box-shadow:0 14px 28px -28px #193c3338;}
+.public-main .cw-docs .docs-diagram-heading {background:#204638;color:#f7faf1;border-bottom-color:#315e48;padding:21px 24px;}
+.public-main .cw-docs .docs-diagram-heading > svg {color:#d6e6c4;}
+.public-main .cw-docs .docs-diagram-heading > span {font-size:16px;font-weight:500;}
+.public-main .cw-docs .docs-diagram ol:not(.docs-workflow ol) {background:#f1f5eb;}
+.public-main .cw-docs .docs-diagram li {border-radius:10px;}
+.public-main .cw-docs .docs-workflow li {border-radius:0;}
+.public-main .cw-docs .docs-workflow-number,.public-main .cw-docs .docs-sequence-number {position:relative;z-index:1;background:#edf3e5;color:#244b3b;border-color:#becfaf;}
+.public-main .cw-docs .docs-workflow li:not(:last-child)::after {content:"";position:absolute;left:14px;top:52px;bottom:-22px;width:1px;background:#d0ddc4;}
+.public-main .cw-docs .docs-checkout-sequence li:not(:last-child)::after {content:"";position:absolute;left:13px;top:52px;bottom:-24px;width:1px;background:#d0ddc4;}
+.public-main .cw-docs .docs-sequence-transfer {font-size:12px;color:#526650;}
+.public-main .cw-docs .docs-request-origin {background:#edf3e5;border-radius:10px;padding:21px;}
+.public-main .cw-docs .docs-request-purchases > div {border-radius:10px;padding:21px;}
+.public-main .cw-docs .docs-request-purchases > div > span {font-size:13px;}
+.public-main .cw-docs .docs-diagram-access li > svg,.public-main .cw-docs .docs-diagram-launch li > svg {width:22px;height:22px;}
+@media(max-width:700px) {
+ .public-main .cw-docs .docs-diagram-heading{padding:18px;}
+ .public-main .cw-docs .docs-diagram-heading > span{font-size:15px;}
+ .public-main .cw-docs .docs-workflow li:not(:last-child)::after{left:13px;top:48px;bottom:-20px;}
+}
+@media(forced-colors:active) {
+ .public-main .cw-docs .docs-diagram-heading{background:Canvas;color:CanvasText;border:1px solid CanvasText;}
+}
+.public-main .cw-docs .docs-diagram-heading{gap:12px;align-items:center}
+.public-main .cw-docs .docs-workflow-number,.public-main .cw-docs .docs-sequence-number{font-variant-numeric:tabular-nums;font-weight:500}
+.public-main .cw-docs .docs-diagram:not(.docs-workflow) li{align-content:start}
+.public-main .cw-docs .docs-diagram-owner{line-height:1.6}
+.public-main .cw-docs .docs-request-origin{border-color:#cddcc2}
+.public-main .cw-docs .docs-request-purchases>div{box-shadow:0 8px 20px -20px #193c3333}
+.public-main .cw-docs .docs-request-purchases>div>span{line-height:1.6}
+.public-main .cw-docs .docs-workflow li:not(:last-child)::after,.public-main .cw-docs .docs-checkout-sequence li:not(:last-child)::after{background:#bdcdb3}

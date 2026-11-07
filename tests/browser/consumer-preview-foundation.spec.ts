@@ -85,14 +85,11 @@ test("home presents Etail brand artwork and local product discovery without acco
   const hero=page.locator(".ec-home-hero");
   const art=hero.locator("[data-company-art]");
   await expect(art).toBeVisible();
-  const symbol=art.locator('img[src^="/_next/static/media/symbol."]');
+  const symbol=art.locator('.brand-image-symbol');
   await expect(symbol).toHaveCount(1);
   await expect(symbol).toBeVisible();
-  await expect(symbol).toHaveAttribute("width","800");
-  await expect(symbol).toHaveAttribute("height","484");
-  await expect(symbol).not.toHaveAttribute("loading","lazy");
-  const symbolSource=await symbol.getAttribute("src");
-  await expect(page.locator(`head link[rel="preload"][as="image"][href="${symbolSource}"]`)).toHaveCount(1);
+  await expect(symbol).toHaveCSS("aspect-ratio", "800 / 484");
+  expect(await symbol.evaluate(mark => getComputedStyle(mark).content.startsWith('url("data:image/png;base64,'))).toBe(true);
   await expectDecodedBrandMarks(symbol);
   await expect(art.locator('img[src*="everyday-sneaker"]')).toHaveCount(0);
   await expect(art).not.toContainText(/Designer sneaker|Studio Store|10482/);
@@ -236,7 +233,7 @@ test("public service discovery explains eligibility and card inquiries without l
   for(const path of ["/","/software-partners","/credit-card-services","/payment-acceptance-service","/pricing","/help"]){
     await page.goto(path);
     const mainNavigation=await openMainNavigation(page);
-    await expect(mainNavigation.locator("a")).toHaveCount(25);
+    await expect(mainNavigation.locator("a")).toHaveCount(26);
     for(const [name,href] of [["Merchant onboarding","/merchant-onboarding"],["Software platforms","/software-partners"],["Online businesses","/online-businesses"],["Card services","/credit-card-services"],["Documentation","/docs"],["Guides","/guides"],["Pricing","/pricing"]]){
       await expect(mainNavigation.getByRole("link",{name,exact:true,includeHidden:true})).toHaveAttribute("href",href);
     }
@@ -273,8 +270,8 @@ test("public service discovery explains eligibility and card inquiries without l
     await expect(footer.getByRole("navigation",{name:"Footer developers"}).getByRole("link",{name:"Documentation",exact:true})).toHaveAttribute("href","/docs");
     await openFooterGroup(page, "Resources");
     const resourceLinks = footer.getByRole("navigation", {name:"Footer resources"}).getByRole("link");
-    await expect(resourceLinks).toHaveText(["Merchant account setup", "Shopify integration", "Guides", "Help center"]);
-    for (const [index, href] of ["/docs/merchant-onboarding", "/resources/shopify-gateway-integration", "/guides", "/help"].entries()) await expect(resourceLinks.nth(index)).toHaveAttribute("href", href);
+    await expect(resourceLinks).toHaveText(["Merchant account setup", "Shopify integration", "WooCommerce integration", "Guides", "Help center"]);
+    for (const [index, href] of ["/docs/merchant-onboarding", "/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", "/guides", "/help"].entries()) await expect(resourceLinks.nth(index)).toHaveAttribute("href", href);
     await expect(footer.locator(".public-footer-company")).toHaveText(`© ${new Date().getUTCFullYear()} Etail Depot US, Inc. All rights reserved.`);
     if(productPage){
       await expect(page.locator("main")).not.toContainText(path==="/credit-card-services"?"Trolleys":"Ledgix",{useInnerText:true});
@@ -410,7 +407,7 @@ test("payment entry points hand off to the welcome page without queries or refer
 });
 
 
-test("opening artwork symbols load before styles and scripts on first visit and refresh", async ({ page }) => {
+test("opening artwork symbols use embedded styles or early image requests on first visit and refresh", async ({ page }) => {
   test.setTimeout(60_000);
   let releaseResources = () => {};
   let resourcesReady = Promise.resolve();
@@ -423,6 +420,7 @@ test("opening artwork symbols load before styles and scripts on first visit and 
     await route.continue();
   });
   for (const path of ["/", "/software-partners", "/switch-payment-providers", "/merchant-onboarding", "/payment-partnerships", "/platform-payment-models", "/payment-facilitator", "/contact"]) {
+    const embedded = ["/", "/software-partners", "/switch-payment-providers"].includes(path);
     symbolName = path === "/merchant-onboarding" ? "trolleys-portal-logo" : "symbol";
     for (const refresh of [false, true]) {
       symbolRequested = false;
@@ -430,7 +428,7 @@ test("opening artwork symbols load before styles and scripts on first visit and 
       try {
         if (refresh) await page.reload({ waitUntil: "commit" });
         else await page.goto(path, { waitUntil: "commit" });
-        if (path !== "/merchant-onboarding") await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
+        if (!embedded && path !== "/merchant-onboarding") await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
       } finally { releaseResources(); }
       await page.waitForLoadState("load");
       const preloads = page.locator(`head link[rel="preload"][as="image"][href*="/${symbolName}."]`);
@@ -438,6 +436,14 @@ test("opening artwork symbols load before styles and scripts on first visit and 
         expect(symbolRequested).toBe(false);
         await expect(page.locator("main .brand-image-trolleys")).toHaveCSS("content", /url\("data:image\/png;base64,/);
         await expect(preloads).toHaveCount(0);
+      } else if (embedded) {
+        const mark = page.locator('[data-company-art] .brand-image-symbol, [data-attention-art] .brand-image-symbol');
+        await expect(mark).toHaveCount(1);
+        await expect(mark).toHaveCSS("content", /url\("data:image\/png;base64,/);
+        await expectDecodedBrandMarks(mark);
+        // Other artwork and selectively prefetched routes may still use the PNG.
+        // Only the opening artwork has switched to embedded delivery.
+        await expect(page.locator('[data-company-art] img[src*="/symbol."], [data-attention-art] img[src*="/symbol."]')).toHaveCount(0);
       } else await expect(preloads).toHaveCount(1);
       await expect(page.locator(`img[src*="/${symbolName}."][loading="lazy"]`)).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);

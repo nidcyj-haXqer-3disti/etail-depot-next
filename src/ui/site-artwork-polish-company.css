@@ -1,0 +1,26 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.public-main .cw-company.enterprise-support .company-context-art {border-radius:16px;border-color:#cedbd0;box-shadow:0 14px 35px -26px #193c3340;}
+.public-main .cw-company .company-identity-name {padding:28px;background:#204638;gap:18px;}
+.public-main .cw-company .company-identity-name img {width:64px;height:56px;object-fit:contain;padding:11px;background:#f0f5e8;border-radius:11px;}
+.public-main .cw-company .company-identity-name strong {font-size:13px;}
+.public-main .cw-company .company-identity-services p {font-size:14px;line-height:1.65;}
+.public-main .cw-company .company-identity-connection {font-size:12px;}
+.public-main .cw-company .company-identity figcaption > span,.public-main .cw-company .company-identity figcaption p {font-size:13px;line-height:1.7;}
+.public-main .cw-company .trust-documents .context-art-heading {background:#204638;}
+.public-main .cw-company .trust-documents dt {font-size:15px;}
+.public-main .cw-company .trust-documents dd {font-size:14px;line-height:1.7;}
+.public-main .cw-company .trust-documents figcaption {font-size:13px;line-height:1.7;}
+.public-main .cw-company .facilitator-relationship > div {border-radius:12px;box-shadow:0 14px 28px -27px #193c3345;}
+.public-main .cw-company .facilitator-etail {background:#204638;}
+.public-main .cw-company .facilitator-etail img {flex:none;width:48px;height:42px;object-fit:contain;padding:8px;background:#f0f5e8;border-radius:9px;}
+.public-main .cw-company .facilitator-context figcaption {font-size:13px;line-height:1.7;}
+@media(max-width:700px) {
+ .public-main .cw-company .facilitator-relationship > div{grid-template-columns:48px minmax(0,1fr);}
+ .public-main .cw-company .facilitator-relationship > div > .icon{justify-self:center;}
+ .public-main .cw-company .company-identity-name{padding:24px;}
+ .public-main .cw-company .company-identity-name img{width:54px;height:48px;}
+ .public-main .cw-company .company-identity-services p{font-size:13px;}
+ .public-main .cw-company .company-identity figcaption{grid-template-columns:1fr;gap:5px;}
+}
+.public-main .cw-company .facilitator-relationship>div{box-shadow:0 12px 24px -22px #193c3328}
+.public-main .cw-company .facilitator-relationship .icon{stroke-linecap:round;stroke-linejoin:round}

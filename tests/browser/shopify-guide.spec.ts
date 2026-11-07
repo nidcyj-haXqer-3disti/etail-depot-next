@@ -14,10 +14,14 @@ test("Shopify guide is discoverable and its screenshots can be enlarged with the
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etaildepot.com${path}`);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   await expect(page.locator("main figure")).toHaveCount(12);
-  for (const screenshot of await page.locator("main figure > a img").all()) {
+  for (const summary of await page.locator('details[name="shopify-setup"] > summary').all()) {
+    if (await summary.locator("..").getAttribute("open") === null) await summary.click();
+    const screenshot = summary.locator("..").locator("figure > a img");
+    if (!await screenshot.count()) continue;
     await screenshot.scrollIntoViewIfNeeded();
     await expect.poll(() => screenshot.evaluate(image => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0)).toBe(true);
   }
+  await page.locator("#review-agreement > summary").click();
   const trigger = page.getByRole("link", { name: "Enlarge screenshot for step 9", exact: true });
   await trigger.focus();
   await page.keyboard.press("Enter");
@@ -30,7 +34,7 @@ test("Shopify guide is discoverable and its screenshots can be enlarged with the
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();
-  const sectionLinks = page.getByRole("navigation", { name: "On this page" }).getByRole("link");
+  const sectionLinks = page.getByRole("navigation", { name: "Setup overview" }).getByRole("link");
   for (const link of await sectionLinks.all()) {
     const href = await link.getAttribute("href");
     await expect(page.locator(href!)).toHaveCount(1);
@@ -51,6 +55,7 @@ test("Guide screenshots remain available without JavaScript", async ({ browser }
   try {
     const page = await context.newPage();
     await page.goto(`http://127.0.0.1:3100${path}`);
+    await page.locator("#review-agreement > summary").click();
     await page.getByRole("link", { name: "Enlarge screenshot for step 9", exact: true }).click();
     await expect(page).toHaveURL(/\/help\/shopify\/agreement\.webp$/);
   } finally { await context.close(); }
@@ -136,4 +141,61 @@ test("Shopify screenshots start before layout at later steps and on refresh", as
 test("Refresh does not paint a partial guide while its HTML is arriving", async ({ page, baseURL, request }) => {
  await expectCompleteGuidePaint(page, request, baseURL, path, "#confirm-active", "#confirm-active h3");
  await expect(page.locator("main figure")).toHaveCount(12);
+});
+
+
+test("Shopify step selection stays clear and saved steps reopen", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.goto(`${path}#open-settings`);
+  await expect(page.getByRole("link", { name: /^(Next:|All steps$)/ })).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: "On this page", exact: true })).toHaveCount(0);
+  await expect(page.locator('details[name="shopify-setup"]')).toHaveCount(12);
+  for (const summary of await page.locator('details[name="shopify-setup"] > summary').all()) {
+    if (await summary.locator("..").getAttribute("open") === null) await summary.click();
+    await expect(summary).toBeInViewport();
+    await expect(page.locator('details[name="shopify-setup"][open]')).toHaveCount(1);
+  }
+  await page.locator("#review-agreement > summary").click();
+  await expect(page).toHaveURL(/#review-agreement$/);
+  await page.reload();
+  await expect(page.locator("#review-agreement")).toHaveAttribute("open", "");
+  await expect(page.locator("#review-agreement > summary")).toBeInViewport();
+  await page.getByRole("navigation", { name: "Setup overview" }).getByRole("link", { name: /Install the payment app/ }).click();
+  await expect(page.locator("#open-settings > summary")).toBeInViewport();
+  await page.goBack();
+  await expect(page.locator("#review-agreement > summary")).toBeInViewport();
+  const audit = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+  expect(audit.violations).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+
+test("Shopify steps and artwork fit phone, tablet and desktop", async ({ page }, testInfo) => {
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`${path}#open-settings`);
+    for (const summary of await page.locator('details[name="shopify-setup"] > summary').all()) {
+      const detail = summary.locator("..");
+      if (await detail.getAttribute("open") === null) await summary.click();
+      await expect(summary).toBeInViewport();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+      const photo = detail.locator("figure > a img");
+      if (await photo.count()) {
+        const dimensions = await photo.evaluate(image => {
+          const box = image.getBoundingClientRect();
+          return { width: box.width, height: box.height, ratio: Number(image.getAttribute("width")) / Number(image.getAttribute("height")) };
+        });
+        expect(dimensions.width).toBeGreaterThan(0);
+        expect(Math.abs(dimensions.width / dimensions.height - dimensions.ratio)).toBeLessThan(0.01);
+      }
+    }
+    if (process.env.SHOPIFY_GUIDE_EVIDENCE_DIR && testInfo.project.name === "desktop") {
+      for (const id of ["before-you-start", "review-agreement", "check-your-email", "verify-integration"]) {
+        await page.goto(`${path}#${id}`);
+        await expect(page.locator(`#${id}`)).toBeInViewport();
+        await page.screenshot({ path: `${process.env.SHOPIFY_GUIDE_EVIDENCE_DIR}/${id}-${width}.png` });
+      }
+    }
+  }
 });

@@ -1,3 +1,4 @@
+import "./site-artwork-polish-pricing.css";
 import { productFacts } from "@/shared/product-facts";
 import { PaymentFeeEstimate } from "./payment-fee-estimate";
 import { Icon } from "./icon";
