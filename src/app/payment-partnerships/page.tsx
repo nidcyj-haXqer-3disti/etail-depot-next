@@ -1,5 +1,2 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { CommercialPage } from "@/ui/commercial-page";
-
-export const metadata = servicePageMetadata("/payment-partnerships");
-export default function Page() { return <CommercialPage path="/payment-partnerships" />; }
+export { metadata } from "@/features/use-cases/software-platforms/partnerships/metadata";
+export { default } from "@/features/use-cases/software-platforms/partnerships/page-content";

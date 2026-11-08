@@ -43,7 +43,7 @@ describe("static public deployment boundary", () => {
 
   it("allows exactly the reviewed edge source without reopening retired runtime directories", () => {
     expect(publicSourcePath(boundarySource)).toBe(true);
-    expect(publicSourcePath("src/modules/public-site/metadata.ts")).toBe(true);
+    expect(publicSourcePath("src/features/metadata.ts")).toBe(true);
     for (const path of ["src/proxy.ts", "src/platform/database.ts", "src/modules/identity/session.ts", "netlify/functions/account.ts", "netlify/edge-functions/account.ts"]) {
       expect(publicSourcePath(path), path).toBe(false);
     }

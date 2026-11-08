@@ -1,5 +1,15 @@
 # Public website status
 
+## 8 November 2026: Repository restructure, Stage 3
+
+Stage 3 is complete locally on `codex/restructure-stage3-20261108`, based on the completed Stage 2 commit `ba8fcf3`. Existing Home, Services, Use cases, Pricing, Resources and Company pages now own their content, metadata, presentation and artwork under `src/features`. Shared Shell, header, footer, brand, design, site facts and SEO builders remain under `src/shared`. Current vendor documentation and integration guides remain Resources. The separate unpublished Developers feature is not included.
+
+The migration records 193 relocation entries and 32 content/page extractions. Route wrappers keep their existing addresses. Removed the three Stage 2 forwarding modules and two obsolete service selectors after relinking all callers. Runtime pages use their own feature content instead of loading the whole-site validation catalogs. Tests guard this separation. Image generators now write to their feature-owned asset directories; all original and generated pixels are preserved. Protected legal receipt changes cover paths, imports and the extracted Legal center composition; provisions and reference data are unchanged.
+
+All four required release commands passed locally: `pnpm verify:public`, `pnpm test:seo:production`, `pnpm package:netlify` and `pnpm verify:package`. Results: 449 unit checks, 322 Chromium desktop/mobile journeys, 156 accessibility checks and 76 WebKit checks. One existing desktop skip covers a mobile-only scenario. All 3,752 exported pages match the Stage 2 baseline for semantic content, metadata, structured data, links, stable anchors and image references. All 86 visual comparisons at the tested desktop, tablet and phone widths are pixel-identical. The scope remains 3,752 pages, 3,740 sitemap URLs and 12 noindex legal/policy pages. The source, build and package fingerprint is `d596a8df16a8837a1dd565d9190851a6c2be9160fe28072983c000887b83f4d3`. See `docs/plans/repository-stage3.json` for the move receipt, verification scope, corrections and pending hosted checks.
+
+Stage 4 remains pending: consolidate engineering instructions and reviewed history, and relink active documentation. Stage 5 will review the combined candidate for release. This restructure has not been pushed, merged or deployed; previous release instructions do not authorize publishing it. The earlier working copy remains unchanged.
+
 ## 8 November 2026: Repository restructure, Stage 2
 
 The user authorized Stage 2 preparation on codex/restructure-stage2-20261108. Stage 1 verified published commit e9e44fb and preserved the earlier working copy. The exact baseline has 3,752 content pages and 3,740 sitemap URLs, as recorded in tools/reference-release.json. The earlier 3,751/3,739 totals predate WooCommerce. See docs/plans/repository-restructure.json for the five stages and complete file/URL map.

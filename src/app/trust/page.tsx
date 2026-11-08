@@ -1,5 +1,2 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { CommercialPage } from "@/ui/commercial-page";
-
-export const metadata = servicePageMetadata("/trust");
-export default function Page() { return <CommercialPage path="/trust" />; }
+export { metadata } from "@/features/company/trust/metadata";
+export { default } from "@/features/company/trust/page-content";

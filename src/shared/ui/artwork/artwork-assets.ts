@@ -7,4 +7,4 @@ export { default as visaMark } from "../../brand/assets/visa-blue.svg";
 export { default as mastercardMark } from "../../brand/assets/mastercard.svg";
 export { default as amexMark } from "../../brand/assets/american-express.svg";
 export { default as discoverMark } from "../../brand/assets/discover.jpg";
-export { default as commerceProduct } from "../../../ui/assets/everyday-sneaker-v2.webp";
+export { default as commerceProduct } from "./assets/everyday-sneaker-v2.webp";

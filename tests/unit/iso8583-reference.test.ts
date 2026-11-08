@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { ISO8583_PATH, REFERENCE_SOURCES, REFERENCE_SECTIONS, MESSAGE_TYPES, DATA_FIELDS, SOURCE_NOTES, referencePath, referenceEntry, referenceSection, referenceIdentity, sourceUrl, messageDigits, messageExplanation, bitmapPosition, iso8583Metadata, iso8583JsonLd } from "../../src/modules/public-site/iso8583-reference";
-import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
-import { canonicalOrigin, privateRobots, publicSitemap } from "../../src/modules/public-site/metadata";
+import { ISO8583_PATH, REFERENCE_SOURCES, REFERENCE_SECTIONS, MESSAGE_TYPES, DATA_FIELDS, SOURCE_NOTES, referencePath, referenceEntry, referenceSection, referenceIdentity, sourceUrl, messageDigits, messageExplanation, bitmapPosition, iso8583Metadata, iso8583JsonLd } from "../../src/features/resources/references/iso-8583/reference";
+import { STANDARD_REFERENCE_PATHS } from "../../src/shared/site/standard-reference-paths";
+import { canonicalOrigin, privateRobots, publicSitemap } from "../../src/features/metadata";
 import { forbiddenStatic } from "../../tools/public-artifact-policy";
 
 const messages = REFERENCE_SECTIONS[0], fields = REFERENCE_SECTIONS[1];

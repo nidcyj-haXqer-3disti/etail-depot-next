@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { publicIndexingEnabled, publicSocialImage } from "@/modules/public-site/metadata";
+import { publicIndexingEnabled, publicSocialImage } from "@/shared/seo/metadata";
 import { socialPreviewArt } from "@/shared/seo/social-preview-art";
 
 export const alt = publicSocialImage.alt;

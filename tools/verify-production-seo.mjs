@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { LEGAL_DOCUMENT_PATHS } from "../src/shared/legal-paths.ts";
+import { LEGAL_DOCUMENT_PATHS } from "../src/shared/site/legal-paths.ts";
 import { socialPreviewImage } from "../src/shared/seo/social-preview.ts";
 import { publicPageModified } from "../src/shared/site/public-page-revisions.ts";
 import { INDEXABLE_PUBLIC_PATHS } from "../src/shared/site/public-page-inventory.ts";

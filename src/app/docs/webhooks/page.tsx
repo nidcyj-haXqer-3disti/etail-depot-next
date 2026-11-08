@@ -1,5 +1,5 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { DocumentationArticle } from "@/ui/documentation";
+import { webhooksArticle } from "@/features/resources/documentation/webhooks/content";
+import { DocumentationArticle } from "@/features/resources/documentation/documentation";
 
-export const metadata = servicePageMetadata("/docs/webhooks");
-export default function Page() { return <DocumentationArticle slug="webhooks" />; }
+export { metadata } from "@/features/resources/documentation/webhooks/metadata";
+export default function Page() { return <DocumentationArticle article={webhooksArticle} slug="webhooks" />; }

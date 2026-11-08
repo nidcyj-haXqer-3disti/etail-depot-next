@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estimateDomesticCardFee } from "../../src/modules/public-site/fee-estimate";
+import { estimateDomesticCardFee } from "../../src/features/pricing/fee-estimate";
 
 describe("domestic online card fee estimate", () => {
   it.each([

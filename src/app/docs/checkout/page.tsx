@@ -1,5 +1,5 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { DocumentationArticle } from "@/ui/documentation";
+import { checkoutArticle } from "@/features/resources/documentation/checkout/content";
+import { DocumentationArticle } from "@/features/resources/documentation/documentation";
 
-export const metadata = servicePageMetadata("/docs/checkout");
-export default function Page() { return <DocumentationArticle slug="checkout" />; }
+export { metadata } from "@/features/resources/documentation/checkout/metadata";
+export default function Page() { return <DocumentationArticle article={checkoutArticle} slug="checkout" />; }

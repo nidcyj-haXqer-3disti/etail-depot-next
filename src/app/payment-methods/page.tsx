@@ -1,6 +1,3 @@
 import "@/shared/brand/brand-images-checkout.css";
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { ServiceDetailPage } from "@/ui/service-detail-page";
-
-export const metadata = servicePageMetadata("/payment-methods");
-export default function Page() { return <ServiceDetailPage path="/payment-methods" />; }
+export { metadata } from "@/features/services/payment-methods/metadata";
+export { PaymentMethodsPage as default } from "@/features/services/payment-methods/page-content";

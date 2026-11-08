@@ -23,7 +23,8 @@
   "records": {
     "fileMap": "repository-file-map.json",
     "routeMap": "repository-route-map.json",
-    "stage2": "repository-stage2.json"
+    "stage2": "repository-stage2.json",
+    "stage3": "repository-stage3.json"
   },
   "categories": {
     "website": [
@@ -148,7 +149,7 @@
     {
       "number": 3,
       "name": "Remaining business features",
-      "status": "planned",
+      "status": "complete",
       "deliverables": [
         "Migrate remaining Services, Home, Use cases, Pricing, Resources and Company in reviewed batches.",
         "Keep current vendor setup and integration guides under Resources.",
@@ -161,7 +162,17 @@
         "Retain all 3740 sitemap entries and the 12 noindex legal/policy pages.",
         "Compare route output, authored copy, metadata, artwork, interactions and responsive layouts.",
         "Preserve frozen reference data, licence notices and approved legal provisions."
-      ]
+      ],
+      "completion": {
+        "sourceFingerprint": "d596a8df16a8837a1dd565d9190851a6c2be9160fe28072983c000887b83f4d3",
+        "movedSourceEntries": 193,
+        "extractions": 32,
+        "reviewedFeatureSources": 280,
+        "exportedPagesMatched": 3752,
+        "pixelIdenticalObservations": 86,
+        "protectedSourcesVerified": 14,
+        "publicationPerformed": false
+      }
     },
     {
       "number": 4,
@@ -199,5 +210,5 @@
       ]
     }
   ],
-  "activeBranch": "codex/restructure-stage2-20261108"
+  "activeBranch": "codex/restructure-stage3-20261108"
 }

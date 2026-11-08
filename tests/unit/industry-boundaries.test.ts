@@ -3,7 +3,7 @@ import { industryUseCaseNavigation } from "../../src/shared/site/industry-use-ca
 import { INDEXABLE_PUBLIC_PATHS, PUBLIC_CONTENT_PATHS } from "../../src/shared/site/public-page-inventory";
 import { handlePublicRequest } from "../../netlify/edge-functions/public-boundary";
 import { PUBLIC_INDEXING_APPROVAL, canonicalOrigin } from "../../src/shared/site/public-release";
-import { platformPageJsonLd, publicSitemap, SERVICE_PAGES } from "../../src/modules/public-site/metadata";
+import { platformPageJsonLd, publicSitemap, SERVICE_PAGES } from "../../src/features/metadata";
 import { forbiddenStatic, forbiddenLocalReviewStatic, localPreviewPageSources, localReviewHtmlFiles } from "../../tools/public-artifact-policy";
 
 const sections = ["commerce-marketplaces", "freight-platforms", "travel-platforms", "legal-software"];

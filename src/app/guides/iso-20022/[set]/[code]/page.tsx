@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { ISO20022_SETS, isoCode, isoCodeSet, isoMetadata } from "@/modules/public-site/iso20022-reference";
-import { Iso20022Reference } from "@/ui/iso20022-reference";
+import { ISO20022_SETS, isoCode, isoCodeSet, isoMetadata } from "@/features/resources/references/iso-20022/reference";
+import { Iso20022Reference } from "@/features/resources/references/iso-20022/iso20022-reference";
 export const dynamicParams = false;
 export function generateStaticParams() { return ISO20022_SETS.flatMap(set => set.codes.map(code => ({ set: set.slug, code: code.path.split("/").at(-1)! }))); }
 type Props = { params: Promise<{ set: string; code: string }> };

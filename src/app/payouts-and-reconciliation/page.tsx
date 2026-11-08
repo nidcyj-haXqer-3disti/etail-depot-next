@@ -1,5 +1,2 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { ServiceDetailPage } from "@/ui/service-detail-page";
-
-export const metadata = servicePageMetadata("/payouts-and-reconciliation");
-export default function Page() { return <ServiceDetailPage path="/payouts-and-reconciliation" />; }
+export { metadata } from "@/features/services/payouts/metadata";
+export { PayoutsPage as default } from "@/features/services/payouts/page-content";

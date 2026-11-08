@@ -1,13 +1,13 @@
-import { LEGAL_DOCUMENT_PATHS } from "../../src/shared/legal-paths";
+import { LEGAL_DOCUMENT_PATHS } from "../../src/shared/site/legal-paths";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import targets from "../../project-targets.json";
-import { legalIdentity } from "../../src/shared/legal-identity";
-import { legalPageMetadata } from "../../src/modules/public-site/legal-metadata";
-import { canonicalOrigin, isApprovedSearchRelease, servicePageMetadata, PUBLIC_INDEXING_APPROVAL, PUBLIC_PAGES, PUBLIC_PAGE_MODIFIED, privateRobots, publicIndexingEnabled, publicPageJsonLd, publicPageMetadata, publicPageUrl, publicRobots, publicSitemap, publicSocialImage, socialImageForPage, rootMetadata, type PublicPath } from "../../src/modules/public-site/metadata";
+import { legalIdentity } from "../../src/shared/site/legal-identity";
+import { legalPageMetadata } from "../../src/features/company/legal/metadata";
+import { canonicalOrigin, isApprovedSearchRelease, servicePageMetadata, PUBLIC_INDEXING_APPROVAL, PUBLIC_PAGES, PUBLIC_PAGE_MODIFIED, privateRobots, publicIndexingEnabled, publicPageJsonLd, publicPageMetadata, publicPageUrl, publicRobots, publicSitemap, publicSocialImage, socialImageForPage, rootMetadata, type PublicPath } from "../../src/features/metadata";
 import { CORE_PAGE_MODIFIED, REFERENCE_PAGE_MODIFIED } from "../../src/shared/site/public-page-revisions";
 import { CORE_PUBLIC_PATHS, INDEXABLE_PUBLIC_PATHS } from "../../src/shared/site/public-page-inventory";
-import { publicPageModified, pageRobots } from "../../src/modules/public-site/metadata";
+import { publicPageModified, pageRobots } from "../../src/features/metadata";
 import robots from "../../src/app/robots";
 import sitemap from "../../src/app/sitemap";
 import socialImage, { dynamic as socialImageMode } from "../../src/app/opengraph-image";

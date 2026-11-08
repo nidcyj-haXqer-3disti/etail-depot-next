@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
-import { isServiceDetailPath } from "../../src/modules/public-site/service-detail-content";
+import { isServiceDetailPath } from "../../src/features/services/catalog";
 import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
 
 test("commercial pages have distinct decisions, exact canonicals and direct primary actions", async ({ page, baseURL }) => {

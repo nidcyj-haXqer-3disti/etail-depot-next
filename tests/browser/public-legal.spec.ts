@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { LEGAL_CENTER_PATHS, LEGAL_DOCUMENT_PATHS, RETIRED_LEGAL_PATHS } from "../../src/shared/legal-paths";
-import { legalDocuments } from "../../src/modules/public-site/legal-center";
+import { LEGAL_CENTER_PATHS, LEGAL_DOCUMENT_PATHS, RETIRED_LEGAL_PATHS } from "../../src/shared/site/legal-paths";
+import { legalDocuments } from "../../src/features/company/legal/legal-center/content";
 import { openFooterGroup } from "./public-footer";
 
 test("merchant legal center connects every document without retired marketplace contracts or inherited source material", async ({ page }) => {

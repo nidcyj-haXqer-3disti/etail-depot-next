@@ -52,7 +52,7 @@ test("versioned artwork sources remain byte identical to the approved public ori
   ];
   for (const file of artwork) {
     const original = readFileSync(new URL(`../../public/${file}`, import.meta.url));
-    const directory = file.startsWith("brand/") ? "shared/brand/assets" : "ui/assets";
+    const directory = file.startsWith("brand/") ? "shared/brand/assets" : file.startsWith("help/merchant-account/") ? "features/resources/merchant-account-setup/assets" : file.startsWith("help/shopify/") ? "features/resources/integrations/shopify/assets" : "shared/ui/artwork/assets";
     const imported = readFileSync(new URL(`../../src/${directory}/${file.split("/").at(-1)}`, import.meta.url));
     expect(imported, file).toEqual(original);
   }

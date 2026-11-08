@@ -3,7 +3,7 @@ import "../brand/brand-images-etail.css";
 import Link from "next/link";
 import { PaymentPortalLink } from "../ui/merchant-portal-link";
 import { FooterNavigation } from "./footer-navigation";
-import { legalIdentity } from "@/shared/legal-identity";
+import { legalIdentity } from "@/shared/site/legal-identity";
 
 
 export function PublicFooter() {

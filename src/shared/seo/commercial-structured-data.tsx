@@ -1,11 +1,10 @@
-import { COMMERCIAL_PAGES, type CommercialPath } from "@/modules/public-site/commercial-content";
+import type { CommercialPage } from "@/shared/ui/page-content-types";
 import { canonicalOrigin } from "@/shared/site/public-release";
-import { publicPageModified } from "@/modules/public-site/metadata";
+import { publicPageModified } from "@/shared/seo/metadata";
 import { serviceBreadcrumb, type ServiceContextPath } from "./service-context";
 import { companyBreadcrumbData, type CompanyContextPath } from "./resource-context";
 
-export function CommercialStructuredData({ path }: { path: CommercialPath }) {
-  const page = COMMERCIAL_PAGES[path];
+export function CommercialStructuredData({ path, page }: { path: string; page: Pick<CommercialPage, "title" | "description"> }) {
   const url = canonicalOrigin + path;
   const refined = !["/company", "/trust", "/contact", "/payment-facilitator"].includes(path);
   const jsonLd = { "@context": "https://schema.org", "@graph": [

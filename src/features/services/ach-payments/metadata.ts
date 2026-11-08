@@ -1,3 +1,5 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
+import { servicePageMetadata } from "@/shared/seo/metadata";
+import { achPaymentsContent } from "./content";
 
-export const achPaymentsMetadata = servicePageMetadata("/ach-payments");
+export const pageDetails = achPaymentsContent;
+export const metadata = servicePageMetadata("/ach-payments", pageDetails);

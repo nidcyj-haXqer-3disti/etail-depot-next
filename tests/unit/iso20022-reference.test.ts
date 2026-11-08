@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { ISO20022_PATH, ISO20022_SETS, codePeers, codeReplacement, codeUsageRestriction, isoCode, isoCodeSet, isoIdentity, isoJsonLd, isoMetadata } from "../../src/modules/public-site/iso20022-reference";
-import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
-import { canonicalOrigin, privateRobots } from "../../src/modules/public-site/metadata";
+import { ISO20022_PATH, ISO20022_SETS, codePeers, codeReplacement, codeUsageRestriction, isoCode, isoCodeSet, isoIdentity, isoJsonLd, isoMetadata } from "../../src/features/resources/references/iso-20022/reference";
+import { STANDARD_REFERENCE_PATHS } from "../../src/shared/site/standard-reference-paths";
+import { canonicalOrigin, privateRobots } from "../../src/features/metadata";
 import { forbiddenStatic, localStandardPageSources, publicPageSources } from "../../tools/public-artifact-policy";
 
 describe("ISO 20022 frozen reference collection", () => {

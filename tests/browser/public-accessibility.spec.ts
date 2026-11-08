@@ -1,4 +1,4 @@
-import { LEGAL_CENTER_PATHS } from "../../src/shared/legal-paths";
+import { LEGAL_CENTER_PATHS } from "../../src/shared/site/legal-paths";
 import AxeBuilder from "@axe-core/playwright";
 import {expect,test,type Page} from "@playwright/test";
 import {openMainNavigation} from "./public-header";

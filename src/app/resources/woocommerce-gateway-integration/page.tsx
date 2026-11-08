@@ -1,4 +1,3 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { WooCommerceGatewayGuide } from "@/ui/woocommerce-gateway-guide";
-export const metadata = servicePageMetadata("/resources/woocommerce-gateway-integration");
+import { WooCommerceGatewayGuide } from "@/features/resources/integrations/woocommerce/woocommerce-gateway-guide";
+export { metadata } from "@/features/resources/integrations/woocommerce/metadata";
 export default WooCommerceGatewayGuide;

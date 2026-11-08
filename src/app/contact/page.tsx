@@ -1,5 +1,4 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { ContactPage } from "@/ui/contact-page";
+import { ContactPage } from "@/features/company/contact/contact-page";
 
-export const metadata = servicePageMetadata("/contact");
+export { metadata } from "@/features/company/contact/metadata";
 export default function Page() { return <ContactPage />; }

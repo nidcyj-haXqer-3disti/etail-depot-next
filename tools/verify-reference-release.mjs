@@ -20,12 +20,14 @@ export function verifyReferenceRelease(root) {
   assert.deepEqual(legal.paths.map(route => `${route.slice(1)}/page.tsx`).sort(), [...reviewedLegalPageSources].sort(), "Legal publication paths must match the reviewed source allowlist.");
   const requiredLegalFiles = [
     "src/app/legal/page.tsx",
-    "src/modules/public-site/legal-center.ts",
-    "src/modules/public-site/legal-metadata.ts",
-    "src/modules/public-site/merchant-legal-content.json",
-    "src/shared/legal-paths.ts",
-    "src/shared/legal-identity.ts",
-    "src/ui/legal-service-document.tsx",
+    "src/features/company/legal/legal-center/page-content.tsx",
+    "src/features/company/legal/legal-center/metadata.ts",
+    "src/features/company/legal/legal-center/content.ts",
+    "src/features/company/legal/metadata.ts",
+    "src/features/company/legal/merchant-legal-content.json",
+    "src/shared/site/legal-paths.ts",
+    "src/shared/site/legal-identity.ts",
+    "src/features/company/legal/components/legal-service-document.tsx",
   ];
   assert.deepEqual(Object.keys(legal.files ?? {}).sort(), requiredLegalFiles.sort(), "The exact reviewed legal content and document definitions must be recorded.");
   for (const [file, expected] of Object.entries(legal.files)) {

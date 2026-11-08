@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { REFERENCE_SECTIONS, referenceSection, referenceEntries, referenceEntry, iso8583Metadata } from "@/modules/public-site/iso8583-reference";
-import { Iso8583Reference } from "@/ui/iso8583-reference";
+import { REFERENCE_SECTIONS, referenceSection, referenceEntries, referenceEntry, iso8583Metadata } from "@/features/resources/references/iso-8583/reference";
+import { Iso8583Reference } from "@/features/resources/references/iso-8583/iso8583-reference";
 export const dynamicParams = false;
 export function generateStaticParams() { return REFERENCE_SECTIONS.flatMap(section => referenceEntries(section).map(entry => ({ table: section.slug, code: entry.code }))); }
 type Props = { params: Promise<{ table: string; code: string }> };

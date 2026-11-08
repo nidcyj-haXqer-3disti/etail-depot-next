@@ -59,9 +59,9 @@ const artwork = [
   "help/merchant-account/registration.jpg",
   "help/merchant-account/blank-registration.jpg",
 ];
-mkdirSync(new URL("src/ui/assets/", root), { recursive: true });
+
 for (const file of artwork) {
-  const destination = file.startsWith("brand/") ? "src/shared/brand/assets" : "src/ui/assets";
+  const destination = file.startsWith("brand/") ? "src/shared/brand/assets" : file.startsWith("help/merchant-account/") ? "src/features/resources/merchant-account-setup/assets" : file.startsWith("help/shopify/") ? "src/features/resources/integrations/shopify/assets" : "src/shared/ui/artwork/assets";
   mkdirSync(new URL(`${destination}/`, root), { recursive: true });
   copyFileSync(new URL(`public/${file}`, root), new URL(`${destination}/${file.split("/").at(-1)}`, root));
 }

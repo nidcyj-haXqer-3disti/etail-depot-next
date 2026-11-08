@@ -1,5 +1,5 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { DocumentationArticle } from "@/ui/documentation";
+import { paymentStatusArticle } from "@/features/resources/documentation/payment-status/content";
+import { DocumentationArticle } from "@/features/resources/documentation/documentation";
 
-export const metadata = servicePageMetadata("/docs/payment-status");
-export default function Page() { return <DocumentationArticle slug="payment-status" />; }
+export { metadata } from "@/features/resources/documentation/payment-status/metadata";
+export default function Page() { return <DocumentationArticle article={paymentStatusArticle} slug="payment-status" />; }

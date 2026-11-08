@@ -1,5 +1,2 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { ServiceDetailPage } from "@/ui/service-detail-page";
-
-export const metadata = servicePageMetadata("/merchant-onboarding");
-export default function Page() { return <ServiceDetailPage path="/merchant-onboarding" />; }
+export { metadata } from "@/features/services/merchant-onboarding/metadata";
+export { MerchantOnboardingPage as default } from "@/features/services/merchant-onboarding/page-content";

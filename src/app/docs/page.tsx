@@ -1,5 +1,4 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { DocumentationHome } from "@/ui/documentation";
+import { DocumentationHome } from "@/features/resources/documentation/documentation";
 
-export const metadata = servicePageMetadata("/docs");
+export { metadata } from "@/features/resources/documentation/metadata";
 export default DocumentationHome;

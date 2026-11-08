@@ -1,7 +1,7 @@
-import { LEGAL_CENTER_PATHS, LEGAL_DOCUMENT_PATHS } from "../legal-paths.ts";
+import { LEGAL_CENTER_PATHS, LEGAL_DOCUMENT_PATHS } from "./legal-paths.ts";
 import { RESOURCE_PATHS } from "./resource-paths.ts";
 import { COMMERCIAL_PATHS } from "./commercial-paths.ts";
-import { STANDARD_REFERENCE_PATHS } from "../standard-reference-paths.ts";
+import { STANDARD_REFERENCE_PATHS } from "./standard-reference-paths.ts";
 
 /** Exact local candidate including the approved PayFac and payment evaluation pages. */
 export const CORE_PUBLIC_PATHS = [

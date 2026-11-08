@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { documentationPages, documentationPath, documentationPaths, documentationServiceLinks } from "../../src/modules/public-site/documentation-catalog";
-import { documentationArticles } from "../../src/modules/public-site/documentation-content";
-import { documentationJsonLd, publicPageModified, SERVICE_PAGES, servicePageMetadata } from "../../src/modules/public-site/metadata";
+import { documentationPages, documentationPath, documentationPaths, documentationServiceLinks } from "../../src/features/resources/documentation/catalog";
+import { documentationArticles } from "../../src/features/resources/documentation/articles";
+import { documentationJsonLd, publicPageModified, SERVICE_PAGES, servicePageMetadata } from "../../src/features/metadata";
 import { isPublicContentPath } from "../../src/shared/site/public-page-inventory";
 
 describe("documentation discovery", () => {

@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { openMainNavigation } from "./public-header";
 import { openFooterGroup } from "./public-footer";
 import { expectCompleteGuidePaint } from "./guide-rendering";
-import { documentationPages, documentationPath, documentationServiceLinks } from "../../src/modules/public-site/documentation-catalog";
+import { documentationPages, documentationPath, documentationServiceLinks } from "../../src/features/resources/documentation/catalog";
 
 async function openDocumentationTopic(page: Page, slug: string) {
  const topics=page.getByRole('navigation',{name:'Documentation topics'});

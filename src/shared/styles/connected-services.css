@@ -21,7 +21,7 @@
 .cw-commercial.enterprise-support .payment-decision-art .decision-art-heading {margin-bottom:28px;}
 .cw-commercial.enterprise-support .commercial-methods {max-width:1184px;padding-block:28px 32px;}
 .cw-commercial.enterprise-support .payment-offer-section {padding-block:54px 64px;background:#fff;}
-.cw-commercial.enterprise-support .pricing-panel {box-shadow:0 12px 36px #193c3306;border-radius:12px;}
+.public-main .cw-commercial.enterprise-support .pricing-panel {box-shadow:0 12px 36px #193c3306;border-radius:12px;}
 .cw-ach-return {margin:16px 0 0 30px;border-left:2px solid #8da786;padding:4px 0 4px 18px;}
 .cw-ach-return>span {font-size:13px;font-weight:500;color:#244b3b;}
 .cw-commercial .payment-decision-art .cw-ach-return p {font-size:12px;line-height:1.6;margin-top:6px;max-width:52ch;}

@@ -1,5 +1,5 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { DocumentationArticle } from "@/ui/documentation";
+import { testingAndLaunchArticle } from "@/features/resources/documentation/testing-and-launch/content";
+import { DocumentationArticle } from "@/features/resources/documentation/documentation";
 
-export const metadata = servicePageMetadata("/docs/testing-and-launch");
-export default function Page() { return <DocumentationArticle slug="testing-and-launch" />; }
+export { metadata } from "@/features/resources/documentation/testing-and-launch/metadata";
+export default function Page() { return <DocumentationArticle article={testingAndLaunchArticle} slug="testing-and-launch" />; }

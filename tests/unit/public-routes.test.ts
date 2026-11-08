@@ -1,4 +1,4 @@
-import { LEGAL_CENTER_PATHS } from "../../src/shared/legal-paths";
+import { LEGAL_CENTER_PATHS } from "../../src/shared/site/legal-paths";
 import { describe, expect, it, vi } from "vitest";
 import { managedContentRoute, retiredRoute } from "../../src/shared/site/public-routes";
 import { canonicalOrigin, defaultOrigin, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/site/public-release";

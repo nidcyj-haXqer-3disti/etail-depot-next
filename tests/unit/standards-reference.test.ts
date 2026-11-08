@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
+import { STANDARD_REFERENCE_PATHS } from "../../src/shared/site/standard-reference-paths";
 import { PUBLIC_CONTENT_PATHS, INDEXABLE_PUBLIC_PATHS, publicDocumentPath, publicPayloadPath } from "../../src/shared/site/public-page-inventory";
 import { handlePublicRequest } from "../../netlify/edge-functions/public-boundary";
 import { PUBLIC_INDEXING_APPROVAL, canonicalOrigin } from "../../src/shared/site/public-release";

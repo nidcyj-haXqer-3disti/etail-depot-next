@@ -24,9 +24,9 @@
     "excluded": "The previous reproduced ISO 8583 tables and edition routes. No ISO republication permission is asserted."
   },
   "files": {
-    "src/modules/public-site/iso20022-data.json": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
-    "src/modules/public-site/iso8583-independent-data.json": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
-    "src/shared/standard-reference-paths.ts": "8a9859adb7cf77a4ace61b641a9f8eae9dc77c6aa837069644c643932913a270",
+    "src/features/resources/references/iso-20022/data/iso20022-data.json": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
+    "src/features/resources/references/iso-8583/data/iso8583-independent-data.json": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
+    "src/shared/site/standard-reference-paths.ts": "8a9859adb7cf77a4ace61b641a9f8eae9dc77c6aa837069644c643932913a270",
     "public/licenses/iso20022-reference-NOTICE.txt": "2125d0188bbc870725f39c4240f168e173bc9dc14c77e2cfd6a7df37f1cf3586",
     "public/licenses/iso8583-reference-NOTICE.txt": "e63e5ebbd1dc6215baefd4ea69b111bb69d6afed418f25e33ea4c6c9bed98971",
     "public/licenses/pyiso8583-MIT.txt": "804badb01a7e2e71ddd21947faaef6823de4511da46fd97b7e91197570cc9faf",
@@ -49,13 +49,15 @@
       "/legal/security-policy"
     ],
     "files": {
-      "src/app/legal/page.tsx": "3b61c478d723d627cb1322dd433ec8881646b64743b5b5e8130af39b406a3a34",
-      "src/modules/public-site/legal-center.ts": "9dfac72f6a8660256d1429715dcdae4a10429941e8c69464601b5dde50ccf5d7",
-      "src/modules/public-site/legal-metadata.ts": "dc9cef410aa0aa620a41ee06540a6dc5aa83524dfd53197a24ec391d2d45bd7b",
-      "src/modules/public-site/merchant-legal-content.json": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152",
-      "src/shared/legal-paths.ts": "0835df2e7cdbb8f75f1974221d0d0407be7ff1a549670faaff5414ebfe1da30d",
-      "src/shared/legal-identity.ts": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77",
-      "src/ui/legal-service-document.tsx": "c7a56884b382dfc03a6771b01a5382725322ae7d358a6a968a0d1d05a60c2c34"
+      "src/app/legal/page.tsx": "41464521ef455da86503c177d891410bc9773ad39f0a098f324fe4174e52a5be",
+      "src/features/company/legal/legal-center/content.ts": "9dfac72f6a8660256d1429715dcdae4a10429941e8c69464601b5dde50ccf5d7",
+      "src/features/company/legal/metadata.ts": "73d2e81d2ad9ebfdec40ff16715b66ef4f03c8649627f8f6f940c0afbc9928c3",
+      "src/features/company/legal/merchant-legal-content.json": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152",
+      "src/shared/site/legal-paths.ts": "0835df2e7cdbb8f75f1974221d0d0407be7ff1a549670faaff5414ebfe1da30d",
+      "src/shared/site/legal-identity.ts": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77",
+      "src/features/company/legal/components/legal-service-document.tsx": "063f860514edf7d9531f1b15c7ac19735a6445b521056c6a64fdaf51b2b62925",
+      "src/features/company/legal/legal-center/page-content.tsx": "a17c681a65c847aca9600787c75f1bfed8d49fc0b92728c392c3464c0589ca28",
+      "src/features/company/legal/legal-center/metadata.ts": "353dbcf974b595f8ff65c5a95d7f738cc14054fb45b8aa39a1fc5b1debd860ac"
     }
   }
 }

@@ -8,7 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { boundarySource, builtPageSources, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, forbiddenLocalReviewStatic, localReviewHtmlFiles, publicationBlockers, localCorePreviewPageSources, localPreviewPageSources, reviewedLegalPageSources, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "./public-artifact-policy.ts";
-import { STANDARD_REFERENCE_PATHS } from "../src/shared/standard-reference-paths.ts";
+import { STANDARD_REFERENCE_PATHS } from "../src/shared/site/standard-reference-paths.ts";
 import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/site/public-release.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { verifyPlatformEmail, verifyPlatformEmailBundle } from "./netlify-email-compat.ts";

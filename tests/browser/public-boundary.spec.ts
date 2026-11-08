@@ -1,9 +1,9 @@
-import { LEGAL_CENTER_PATHS } from "../../src/shared/legal-paths";
+import { LEGAL_CENTER_PATHS } from "../../src/shared/site/legal-paths";
 import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
 import { RESOURCE_PATHS } from "../../src/shared/site/resource-paths";
-import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
-import { documentationPages, documentationPath } from "../../src/modules/public-site/documentation-catalog";
-import { shopifySetupSteps } from "../../src/modules/public-site/shopify-guide-content";
+import { STANDARD_REFERENCE_PATHS } from "../../src/shared/site/standard-reference-paths";
+import { documentationPages, documentationPath } from "../../src/features/resources/documentation/catalog";
+import { shopifySetupSteps } from "../../src/features/resources/integrations/shopify/shopify-content";
 import { expect, test } from "@playwright/test";
 
 test("renamed product bookmarks retain their section and reject submitted data", async ({ page, request, baseURL }) => {
