@@ -1,0 +1,247 @@
+{
+  "stage": 5,
+  "status": "complete",
+  "date": "2026-11-08",
+  "branch": "codex/restructure-stage5-20261108",
+  "baseCommit": "4a765c9fb0b4c8a0ba5b5ed98df887555d01bd1c",
+  "scope": "Final local verification and release preparation for the five-stage restructure. Website behavior preserved.",
+  "sourceFingerprint": "870ca5d021acc29ded6360937f6c9927223e678712d5d410f960e2d45348c3d7",
+  "publicationPerformed": false,
+  "checks": {
+    "requiredReleaseCommands": "verify:public, test:seo:production, package:netlify and verify:package passed",
+    "unitTests": 449,
+    "chromiumDesktopMobileJourneys": 322,
+    "existingMobileOnlyDesktopSkip": 1,
+    "accessibilityChecks": 156,
+    "additionalWebKitChecks": 76,
+    "generatedPagesMatched": 3752,
+    "sitemapUrls": 3740,
+    "pixelIdenticalViews": 86,
+    "staticPackageFiles": 18945,
+    "guidePreviewEntriesReproduced": 53,
+    "activeDocumentationLinksResolved": 138,
+    "sourceBuildPackageIdentity": "identical",
+    "dependencyAudit": "No known vulnerabilities found"
+  },
+  "combinedPreservation": {
+    "baselineCommit": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+    "baselineExport": "Stage 1 export retained before Stage 2; original published website source bytes identical",
+    "unchangedPublicFiles": 39,
+    "unchangedDatabaseHistoryFiles": 74,
+    "unchangedConfigAndPatchFiles": 13,
+    "identicalSourceAssets": 75,
+    "protectedLegalAndReferenceFiles": 14,
+    "protectedRows": [
+      {
+        "before": "src/modules/public-site/iso20022-data.json",
+        "after": "src/features/resources/references/iso-20022/data/iso20022-data.json",
+        "originalSha256": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
+        "currentSha256": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
+        "comparison": "identical bytes"
+      },
+      {
+        "before": "src/modules/public-site/iso8583-independent-data.json",
+        "after": "src/features/resources/references/iso-8583/data/iso8583-independent-data.json",
+        "originalSha256": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
+        "currentSha256": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
+        "comparison": "identical bytes"
+      },
+      {
+        "before": "src/shared/standard-reference-paths.ts",
+        "after": "src/shared/site/standard-reference-paths.ts",
+        "originalSha256": "8a9859adb7cf77a4ace61b641a9f8eae9dc77c6aa837069644c643932913a270",
+        "currentSha256": "8a9859adb7cf77a4ace61b641a9f8eae9dc77c6aa837069644c643932913a270",
+        "comparison": "identical non-import statements"
+      },
+      {
+        "before": "public/licenses/iso20022-reference-NOTICE.txt",
+        "after": "public/licenses/iso20022-reference-NOTICE.txt",
+        "originalSha256": "2125d0188bbc870725f39c4240f168e173bc9dc14c77e2cfd6a7df37f1cf3586",
+        "currentSha256": "2125d0188bbc870725f39c4240f168e173bc9dc14c77e2cfd6a7df37f1cf3586",
+        "comparison": "identical bytes"
+      },
+      {
+        "before": "public/licenses/iso8583-reference-NOTICE.txt",
+        "after": "public/licenses/iso8583-reference-NOTICE.txt",
+        "originalSha256": "e63e5ebbd1dc6215baefd4ea69b111bb69d6afed418f25e33ea4c6c9bed98971",
+        "currentSha256": "e63e5ebbd1dc6215baefd4ea69b111bb69d6afed418f25e33ea4c6c9bed98971",
+        "comparison": "identical bytes"
+      },
+      {
+        "before": "public/licenses/pyiso8583-MIT.txt",
+        "after": "public/licenses/pyiso8583-MIT.txt",
+        "originalSha256": "804badb01a7e2e71ddd21947faaef6823de4511da46fd97b7e91197570cc9faf",
+        "currentSha256": "804badb01a7e2e71ddd21947faaef6823de4511da46fd97b7e91197570cc9faf",
+        "comparison": "identical bytes"
+      },
+      {
+        "before": "public/licenses/moov-iso8583-Apache-2.0.txt",
+        "after": "public/licenses/moov-iso8583-Apache-2.0.txt",
+        "originalSha256": "3c96c0da3de9587c2062f25bc7efccba795f81dbf1b08dc71652c856e88b01a8",
+        "currentSha256": "3c96c0da3de9587c2062f25bc7efccba795f81dbf1b08dc71652c856e88b01a8",
+        "comparison": "identical bytes"
+      },
+      {
+        "before": "src/app/legal/page.tsx",
+        "after": "src/features/company/legal/legal-center/page-content.tsx",
+        "originalSha256": "3b61c478d723d627cb1322dd433ec8881646b64743b5b5e8130af39b406a3a34",
+        "currentSha256": "a17c681a65c847aca9600787c75f1bfed8d49fc0b92728c392c3464c0589ca28",
+        "comparison": "identical non-import statements"
+      },
+      {
+        "before": "src/modules/public-site/legal-center.ts",
+        "after": "src/features/company/legal/legal-center/content.ts",
+        "originalSha256": "9dfac72f6a8660256d1429715dcdae4a10429941e8c69464601b5dde50ccf5d7",
+        "currentSha256": "9dfac72f6a8660256d1429715dcdae4a10429941e8c69464601b5dde50ccf5d7",
+        "comparison": "identical non-import statements"
+      },
+      {
+        "before": "src/modules/public-site/legal-metadata.ts",
+        "after": "src/features/company/legal/metadata.ts",
+        "originalSha256": "dc9cef410aa0aa620a41ee06540a6dc5aa83524dfd53197a24ec391d2d45bd7b",
+        "currentSha256": "73d2e81d2ad9ebfdec40ff16715b66ef4f03c8649627f8f6f940c0afbc9928c3",
+        "comparison": "identical non-import statements"
+      },
+      {
+        "before": "src/modules/public-site/merchant-legal-content.json",
+        "after": "src/features/company/legal/merchant-legal-content.json",
+        "originalSha256": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152",
+        "currentSha256": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152",
+        "comparison": "identical bytes"
+      },
+      {
+        "before": "src/shared/legal-paths.ts",
+        "after": "src/shared/site/legal-paths.ts",
+        "originalSha256": "0835df2e7cdbb8f75f1974221d0d0407be7ff1a549670faaff5414ebfe1da30d",
+        "currentSha256": "0835df2e7cdbb8f75f1974221d0d0407be7ff1a549670faaff5414ebfe1da30d",
+        "comparison": "identical non-import statements"
+      },
+      {
+        "before": "src/shared/legal-identity.ts",
+        "after": "src/shared/site/legal-identity.ts",
+        "originalSha256": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77",
+        "currentSha256": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77",
+        "comparison": "identical non-import statements"
+      },
+      {
+        "before": "src/ui/legal-service-document.tsx",
+        "after": "src/features/company/legal/components/legal-service-document.tsx",
+        "originalSha256": "c7a56884b382dfc03a6771b01a5382725322ae7d358a6a968a0d1d05a60c2c34",
+        "currentSha256": "063f860514edf7d9531f1b15c7ac19735a6445b521056c6a64fdaf51b2b62925",
+        "comparison": "identical non-import statements"
+      }
+    ],
+    "unchangedRouteEntries": 54,
+    "unchangedPublishedScopeAndLicences": true,
+    "edgeLogicUnchanged": true,
+    "dependenciesAndExistingScriptsUnchanged": true,
+    "publicationCheckAdded": "node tools/verify-file-publication.mjs"
+  },
+  "visualScope": {
+    "routesAt1280And390": 34,
+    "routesAt320768And1024": 6,
+    "observations": 86,
+    "comparedWith": "Fresh captures of the saved pre-restructure export; website source bytes verified identical to the published baseline",
+    "pixelDifferences": 0,
+    "overflowOrBrokenVisibleImagesOrPageErrors": 0
+  },
+  "manuallyViewedCaptures": [
+    {
+      "path": "/",
+      "width": 1280
+    },
+    {
+      "path": "/company",
+      "width": 390
+    },
+    {
+      "path": "/payment-methods",
+      "width": 1280
+    },
+    {
+      "path": "/resources/shopify-gateway-integration",
+      "width": 390
+    }
+  ],
+  "loadingScope": [
+    "Chromium and WebKit shared page paint, responsive artwork, guide refresh and saved step navigation",
+    "Split HTML delivery, delayed JavaScript/images, pre-hydration interaction and native fallbacks",
+    "Header/menu, footer, browser history and fixed merchant portal handoff"
+  ],
+  "payloadComparison": {
+    "scope": "HTML-declared modern scripts and styles compressed locally. This is a bundle comparison, not measured visitor speed or hosted RUM.",
+    "pages": 3752,
+    "largestIncrease": {
+      "path": "/payment-acceptance-service",
+      "before": {
+        "files": 14,
+        "rawBytes": 655271,
+        "gzipBytes": 191182
+      },
+      "after": {
+        "files": 16,
+        "rawBytes": 656735,
+        "gzipBytes": 192384
+      },
+      "gzipChange": 1202,
+      "percentChange": 0.629
+    },
+    "largestDecrease": {
+      "path": "/credit-card-services",
+      "before": {
+        "files": 20,
+        "rawBytes": 703148,
+        "gzipBytes": 227027
+      },
+      "after": {
+        "files": 19,
+        "rawBytes": 667465,
+        "gzipBytes": 203450
+      },
+      "gzipChange": -23577,
+      "percentChange": -10.385
+    },
+    "pagesOverOnePercentIncrease": 0
+  },
+  "remoteBaseline": {
+    "checkedAt": "2026-11-08T11:22:03.559Z",
+    "repository": "nidcyj-haXqer-3disti/etail-depot-next",
+    "mainCommit": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+    "mainProtected": false,
+    "siteId": "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
+    "deployId": "6aef58f5c8e79bce7be0b5b3",
+    "deployCommit": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+    "state": "ready",
+    "context": "production",
+    "origin": "https://etaildepot.com",
+    "remoteChangesPerformed": false
+  },
+  "reviewedDiff": {
+    "base": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+    "sourceCandidate": "4a765c9fb0b4c8a0ba5b5ed98df887555d01bd1c",
+    "sourceChangesDuringStage5": false,
+    "review": "Reviewed feature extraction, route wrappers, shared imports, explicit source allowlist, frozen legal/reference scope, generators, file-publication checks, archived records and contributor instructions. Existing browser assertions only had import relinks."
+  },
+  "limits": [
+    "Browser and pixel checks cover representative routes and workflows, not every generated reference-code page at every viewport. Static output comparison covers all 3,752 content pages.",
+    "The complete page comparison uses matching preview builds. Production metadata, sitemap, indexing and preview protections were validated separately by the production SEO gate.",
+    "Local verification does not establish hosted performance or real visitor Core Web Vitals. WebKit is automated engine coverage, not a physical iPhone test.",
+    "The restructure changes source organization, not merchant capabilities, commercial/legal wording or provider arrangements.",
+    "Historical archived documents retain original-context paths and dates. Active documentation links resolve.",
+    "No remote branch settings, push, PR, merge or deployment was performed. Main remains at the recorded published baseline; exact candidate CI is pending publication."
+  ],
+  "correctionsThisStage": [
+    "The first full-page comparison used a preview baseline against a production candidate and reported the expected indexing-tag differences on 3,740 URLs. Preserved that result, rebuilt the unchanged candidate in the same preview context and repeated the exact comparison without relaxing assertions. Rebuilt and verified the production package afterward."
+  ],
+  "rollback": {
+    "sourceCommit": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+    "netlifyDeploy": "6aef58f5c8e79bce7be0b5b3",
+    "instructions": "If an authorized release regresses, obtain rollback authorization and restore the recorded ready Netlify deploy. Revert the restructure merge in a new reviewed branch if the source also needs rollback; do not force-push main or modify vendor/data resources."
+  },
+  "remainingReleaseWork": [
+    "Obtain authorization to push this candidate and open the prepared PR.",
+    "Run the bound GitHub workflow on the exact candidate; review and revalidate if main changes.",
+    "Merge under applicable authorization, then manually trigger the bound Netlify Git build with the existing Emails plugin and final artifact verifier.",
+    "Confirm deployed commit and ready status, then check hosted core pages, assets, mobile navigation/refresh, sitemap, canonical/indexing protections, compression/cache/security headers and source-file 404s."
+  ]
+}

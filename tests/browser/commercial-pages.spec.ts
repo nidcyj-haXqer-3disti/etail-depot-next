@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
-import { isServiceDetailPath } from "../../src/modules/public-site/service-detail-content";
-import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
+import { isServiceDetailPath } from "../../src/features/services/catalog";
+import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
 
 test("commercial pages have distinct decisions, exact canonicals and direct primary actions", async ({ page, baseURL }) => {
   const titles = new Set<string>();
@@ -17,7 +17,7 @@ test("commercial pages have distinct decisions, exact canonicals and direct prim
     await expect(page.locator("main form")).toHaveCount(0);
     await expect(page.locator("main")).not.toContainText(/Cybersource|Infinicept|prototype|illustrative|TODO/i);
     await expect(page.getByRole("navigation", { name: "Related information", exact: true })).toHaveCount(0);
-    const action = path === "/contact" ? page.locator("#payment-review a") : path === "/company" ? page.getByRole("main").getByRole("link", { name: "contact our team", exact: true }) : page.locator(isServiceDetailPath(path) ? "[data-service-actions] a" : ".commercial-action a").first();
+    const action = path === "/company/contact" ? page.locator("#payment-review a") : path === "/company/about" ? page.getByRole("main").getByRole("link", { name: "contact our team", exact: true }) : page.locator(isServiceDetailPath(path) ? "[data-service-actions] a" : ".commercial-action a").first();
     await expect(action).toBeVisible();
     const href = await action.getAttribute("href");
     expect(href).toBeTruthy();
@@ -30,7 +30,7 @@ test("commercial pages have distinct decisions, exact canonicals and direct prim
 });
 
 test("merchant application and contact routes never forward visitor input", async ({ page }) => {
-  for (const path of ["/merchant-onboarding", "/contact"]) {
+  for (const path of ["/services/merchant-onboarding", "/company/contact"]) {
     await page.goto(`${path}?merchant=private&next=https://other.invalid`);
     const application = page.locator('main a[href="https://merchantapp.io/etaildepot/UserAccount/Login"]');
     await expect(application).toHaveCount(1);
@@ -53,7 +53,7 @@ test("merchant application and contact routes never forward visitor input", asyn
 test("merchants can discuss processing costs before applying while platforms reach commercial terms", async ({ page }) => {
   await page.goto("/pricing");
   await page.getByRole("link", { name: "Discuss your processing costs", exact: true }).click();
-  await expect(page).toHaveURL(/\/contact#payment-review$/);
+  await expect(page).toHaveURL(/\/company\/contact#payment-review$/);
   await expect(page.locator("#payment-review")).toBeInViewport();
   await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
   await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
@@ -61,18 +61,18 @@ test("merchants can discuss processing costs before applying while platforms rea
   await expect(page.locator('main a[href="https://merchantapp.io/etaildepot/UserAccount/Login"]')).toHaveAttribute("referrerpolicy", "no-referrer");
   await page.goBack();
   await page.getByRole("link", { name: "Software partnerships", exact: true }).click();
-  await expect(page).toHaveURL(/\/contact#platforms$/);
+  await expect(page).toHaveURL(/\/company\/contact#platforms$/);
   await expect(page.locator("#platforms")).toBeInViewport();
   await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
   await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
 });
 
 test("shared contact action routes developers and merchants to the appropriate contact choices", async ({ page, isMobile }) => {
-  for (const path of ["/docs/checkout", "/payment-acceptance-service"]) {
+  for (const path of ["/developers/getting-started", "/services/merchant-services"]) {
     await page.goto(path);
     if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
     await page.locator(".public-header").getByRole("link", { name: "Contact sales", exact: true }).click();
-    await expect(page).toHaveURL(/\/contact$/);
+    await expect(page).toHaveURL(/\/company\/contact$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Contact Etail Depot.");
     const merchant = page.getByRole("region", { name: "Merchant services", exact: true });
     await expect(merchant.getByRole("link", { name: "trolleys@etaildepot.com", exact: true })).toBeVisible();
@@ -89,28 +89,28 @@ test("buyers can find ACH, provider change and platform model decisions through 
   const nav = page.getByRole("navigation", { name: "Main navigation" });
   await nav.locator("summary").filter({ hasText: /^Services$/ }).click();
   await nav.getByRole("link", { name: "ACH payments", exact: true }).click();
-  await expect(page).toHaveURL(/\/ach-payments$/);
+  await expect(page).toHaveURL(/\/services\/ach-payments$/);
   await expect(page.locator("main")).toContainText("A submitted bank payment can still be pending or returned");
   await page.getByRole("banner").getByRole("link", { name: "Etail Depot home", exact: true }).click();
   await page.locator("main").getByRole("link", { name: "Explore merchant services", exact: true }).click();
-  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
+  await expect(page).toHaveURL(/\/services\/merchant-services$/);
   if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
   await nav.locator("summary").filter({ hasText: /^Use cases$/ }).click();
   await nav.getByRole("link", { name: "Switch merchant services", exact: true }).click();
-  await expect(page).toHaveURL(/\/switch-payment-providers$/);
+  await expect(page).toHaveURL(/\/use-cases\/switch-merchant-services$/);
   await expect(page.locator("main")).toContainText("New accounts require review and approval");
   if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
   await nav.locator("summary").filter({ hasText: /^Services$/ }).click();
   await nav.getByRole("link", { name: "Merchant onboarding", exact: true }).click();
-  await expect(page).toHaveURL(/\/merchant-onboarding$/);
+  await expect(page).toHaveURL(/\/services\/merchant-onboarding$/);
   if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
   await nav.locator("summary").filter({ hasText: /^Use cases$/ }).click();
   await nav.getByRole("link", { name: "Software platforms", exact: true }).click();
   await page.getByRole("link", { name: "Account structure", exact: true }).click();
-  await expect(page).toHaveURL(/\/platform-payment-models$/);
+  await expect(page).toHaveURL(/\/use-cases\/software-platforms\/payment-models$/);
   await expect(page.locator("main")).toContainText("holding funds need a separately approved structure");
   await page.getByRole("link", { name: "Discuss your platform", exact: true }).click();
-  await expect(page).toHaveURL(/\/contact#platforms$/);
+  await expect(page).toHaveURL(/\/company\/contact#platforms$/);
   await expect(page.locator("#platforms")).toBeInViewport();
   await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
   await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
@@ -118,15 +118,15 @@ test("buyers can find ACH, provider change and platform model decisions through 
 
 // Commercial pages open directly with their hero while preserving the published URL hierarchy.
 test("commercial pages retain their URL hierarchy without duplicate navigation rows", async ({ page }) => {
-  const merchant = ["/merchant-onboarding", "/payment-methods", "/ach-payments", "/payouts-and-reconciliation", "/refunds-and-disputes", "/pricing", "/reconciliation", "/disputes", "/online-businesses", "/switch-payment-providers"];
-  const platform = ["/platform-payment-models", "/payment-partnerships"];
+  const merchant = ["/services/merchant-onboarding", "/services/payment-methods", "/services/ach-payments", "/services/payouts", "/services/refunds", "/pricing", "/services/reconciliation", "/services/disputes", "/use-cases/online-businesses", "/use-cases/switch-merchant-services"];
+  const platform = ["/use-cases/software-platforms/payment-models", "/use-cases/software-platforms/partnerships"];
   for (const path of [...merchant, ...platform]) {
     await page.goto(path);
     await expect(page.getByRole("navigation", { name: "Breadcrumb", exact: true })).toHaveCount(0);
     await expect(page.getByRole("navigation", { name: "On this page", exact: true })).toHaveCount(0);
     await expect(page.getByRole("banner")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    const parent = merchant.includes(path) ? "/payment-acceptance-service" : "/software-partners";
+    const parent = merchant.includes(path) ? "/services/merchant-services" : "/use-cases/software-platforms";
     const structured = await page.locator('script[type="application/ld+json"]').evaluateAll(scripts => scripts.flatMap(script => {
       const data = JSON.parse(script.textContent || "{}"); return data["@graph"] || [data];
     }).filter(item => item["@type"] === "BreadcrumbList").map(item => item.itemListElement.map((entry: { item: string }) => new URL(entry.item).pathname)));
@@ -139,12 +139,12 @@ test("commercial pages retain their URL hierarchy without duplicate navigation r
 // Inquiries stay separate from account applications and do not forward visitor input.
 test("a merchant can request a review without submitting an application", async ({ page }) => {
   await page.goto("/?merchant=private&reason=private");
-  await page.goto("/switch-payment-providers?merchant=private&reason=private");
-  await expect(page).toHaveURL(/\/switch-payment-providers(?:\?merchant=private&reason=private)?$/);
+  await page.goto("/use-cases/switch-merchant-services?merchant=private&reason=private");
+  await expect(page).toHaveURL(/\/use-cases\/switch-merchant-services(?:\?merchant=private&reason=private)?$/);
   await expect(page.locator("main")).toContainText("New accounts require review and approval");
   await expect(page.locator("main")).toContainText("A new account does not release funds held by another provider.");
   await page.locator(".commercial-action").getByRole("link", { name: "Discuss your business", exact: true }).click();
-  await expect(page).toHaveURL(/\/contact#payment-review$/);
+  await expect(page).toHaveURL(/\/company\/contact#payment-review$/);
   await expect(page.locator("#payment-review")).toBeInViewport();
   await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
   await expect(page.locator("#payment-review a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
@@ -158,7 +158,7 @@ test("contact options remain usable without JavaScript", async ({ browser, baseU
   const context = await browser.newContext({ javaScriptEnabled: false });
   try {
     const page = await context.newPage();
-    await page.goto(new URL("/contact", baseURL).href);
+    await page.goto(new URL("/company/contact", baseURL).href);
     for (const id of ["payment-review", "cards", "compliance"]) {
       const contact = page.locator(`#${id}`);
       await expect(contact.locator("a")).toBeVisible();
@@ -166,7 +166,7 @@ test("contact options remain usable without JavaScript", async ({ browser, baseU
       await expect(contact.getByRole("button")).toHaveCount(0);
     }
     for (const id of ["payment-review", "platforms", "integration", "account-support"]) {
-      await page.goto(new URL(`/contact#${id}`, baseURL).href);
+      await page.goto(new URL(`/company/contact#${id}`, baseURL).href);
       await expect(page.locator("[data-merchant-contact] a")).toBeInViewport();
     }
   } finally { await context.close(); }
@@ -175,10 +175,10 @@ test("contact options remain usable without JavaScript", async ({ browser, baseU
 
 test("legacy service bookmarks remain useful after separating the service pages", async ({ page }, testInfo) => {
   for (const [path, section, heading, evidence] of [
-    ["/payouts-and-reconciliation", "payouts", "Understand the amount you receive.", "Bank deposit"],
-    ["/payouts-and-reconciliation", "reconciliation", "When a payout needs attention.", "A different amount"],
-    ["/refunds-and-disputes", "refunds", "Choose the action that fits the payment.", "Authorization reversal"],
-    ["/refunds-and-disputes", "disputes", "Avoid duplicate refunds.", "Payment already disputed"],
+    ["/services/payouts", "payouts", "Understand the amount you receive.", "Bank deposit"],
+    ["/services/payouts", "reconciliation", "When a payout needs attention.", "A different amount"],
+    ["/services/refunds", "refunds", "Choose the action that fits the payment.", "Authorization reversal"],
+    ["/services/refunds", "disputes", "Avoid duplicate refunds.", "Payment already disputed"],
   ]) {
     await page.goto(`${path}#${section}`);
     await page.waitForLoadState("networkidle");
@@ -194,7 +194,7 @@ test("legacy service bookmarks remain useful after separating the service pages"
 
 
 test("eight service pages have distinct artwork and usable primary journeys", async ({ page }) => {
-  const targets = [["/merchant-onboarding", "onboarding"], ["/payment-methods", "methods"], ["/ach-payments", "ach"], ["/payouts-and-reconciliation", "payouts"], ["/reconciliation", "reconciliation"], ["/refunds-and-disputes", "refunds"], ["/disputes", "disputes"], ["/credit-card-services", "cards"]];
+  const targets = [["/services/merchant-onboarding", "onboarding"], ["/services/payment-methods", "methods"], ["/services/ach-payments", "ach"], ["/services/payouts", "payouts"], ["/services/reconciliation", "reconciliation"], ["/services/refunds", "refunds"], ["/services/disputes", "disputes"], ["/services/card-services", "cards"]];
   for (const [path, kind] of targets) {
     await page.goto(path);
     const artwork = page.locator(`[data-service-workflow="${kind}"]`);
@@ -205,13 +205,13 @@ test("eight service pages have distinct artwork and usable primary journeys", as
     if (kind !== "cards") await expect(page.locator("#service-workflow-title")).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
   }
-  await page.goto("/payouts-and-reconciliation#reconciliation");
+  await page.goto("/services/payouts#reconciliation");
   await page.locator("#reconciliation").getByRole("link", {name:"A different amount"}).click();
-  await expect(page).toHaveURL(/\/reconciliation$/);
+  await expect(page).toHaveURL(/\/services\/reconciliation$/);
   await expect(page.getByRole("heading", {level:1})).toBeInViewport();
-  await page.goto("/refunds-and-disputes#disputes");
+  await page.goto("/services/refunds#disputes");
   await page.locator("#disputes").getByRole("link", {name:"Payment already disputed"}).click();
-  await expect(page).toHaveURL(/\/disputes$/);
+  await expect(page).toHaveURL(/\/services\/disputes$/);
   await expect(page.getByRole("heading", {level:1})).toBeInViewport();
 });
 
@@ -219,16 +219,16 @@ test("eight service pages have distinct artwork and usable primary journeys", as
 test("page typography stays consistent when visitors move between page families", async ({ page, context }) => {
   test.setTimeout(60_000);
   const stops = [
-    { path: "/company", group: "Company" },
-    { path: "/contact", group: "Company" },
-    { path: "/payment-methods", group: "Services" },
-    { path: "/credit-card-services", group: "Services" },
-    { path: "/online-businesses", group: "Use cases" },
-    { path: "/docs", group: "Developers" },
-    { path: "/help", group: "Resources" },
-    { path: "/software-partners", group: "Use cases" },
-    { path: "/switch-payment-providers", group: "Use cases" },
-    { path: "/company", group: "Company" },
+    { path: "/company/about", group: "Company" },
+    { path: "/company/contact", group: "Company" },
+    { path: "/services/payment-methods", group: "Services" },
+    { path: "/services/card-services", group: "Services" },
+    { path: "/use-cases/online-businesses", group: "Use cases" },
+    { path: "/developers/getting-started", group: "Developers" },
+    { path: "/resources/help", group: "Resources" },
+    { path: "/use-cases/software-platforms", group: "Use cases" },
+    { path: "/use-cases/switch-merchant-services", group: "Use cases" },
+    { path: "/company/about", group: "Company" },
   ];
   async function readingStyles(target: Page) {
     await target.waitForLoadState("networkidle");
@@ -255,16 +255,16 @@ test("page typography stays consistent when visitors move between page families"
 
 
 test("existing merchants can reach missing payout support without entering sales or applying", async ({ page }) => {
-  await page.goto("/help");
+  await page.goto("/resources/help");
   await page.locator("summary").filter({ hasText: "When will the money reach my bank?" }).click();
   await page.getByRole("link", { name: "payout information", exact: true }).click();
-  await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
+  await expect(page).toHaveURL(/\/services\/payouts$/);
   await page.getByRole("link", { name: "Not yet received", exact: true }).click();
-  await expect(page).toHaveURL(/\/contact#account-support$/);
+  await expect(page).toHaveURL(/\/company\/contact#account-support$/);
   await expect(page.locator("#account-support")).toBeInViewport();
   await expect(page.locator("[data-merchant-contact]")).toContainText("transaction or payout reference");
   await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await page.goBack();
-  await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
+  await expect(page).toHaveURL(/\/services\/payouts$/);
   await expect(page.locator("main")).toContainText("A missing payout is not a reason to charge the customer again.");
 });

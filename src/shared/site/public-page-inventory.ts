@@ -1,0 +1,42 @@
+import { DEVELOPER_PATHS } from "./developer-paths.ts";
+import { LEGAL_CENTER_PATHS, LEGAL_DOCUMENT_PATHS } from "./legal-paths.ts";
+import { RESOURCE_PATHS } from "./resource-paths.ts";
+import { COMMERCIAL_PATHS } from "./commercial-paths.ts";
+import { STANDARD_REFERENCE_PATHS } from "./standard-reference-paths.ts";
+
+/** Exact local candidate including the approved PayFac and payment evaluation pages. */
+export const CORE_PUBLIC_PATHS = [
+  "/", "/services/card-services", "/services/merchant-services", "/resources/help", "/company/privacy", "/company/terms", "/resources/guides",
+  "/use-cases/software-platforms", "/use-cases/online-businesses",
+  ...COMMERCIAL_PATHS, ...LEGAL_CENTER_PATHS, ...RESOURCE_PATHS, ...DEVELOPER_PATHS,
+] as const;
+export const PUBLIC_CONTENT_PATHS: readonly string[] = [...CORE_PUBLIC_PATHS, ...STANDARD_REFERENCE_PATHS];
+export const INDEXABLE_PUBLIC_PATHS = PUBLIC_CONTENT_PATHS.filter(path => !(LEGAL_DOCUMENT_PATHS as readonly string[]).includes(path) && !(DEVELOPER_PATHS as readonly string[]).includes(path));
+const pages = new Set(PUBLIC_CONTENT_PATHS);
+const indexable = new Set(INDEXABLE_PUBLIC_PATHS);
+export function isPublicContentPath(path: string): boolean { return pages.has(path); }
+export function isIndexablePath(path: string): boolean { return indexable.has(path); }
+export function publicDocumentPath(path: string): string | null {
+  if (pages.has(path)) return path;
+  const candidate = path === "/index.html" ? "/" : path.replace(/(?:\/index\.html|\.html|\/)$/, "");
+  return pages.has(candidate) ? candidate : null;
+}
+/** Only real exported navigation payloads may accompany a reviewed document. */
+export function publicPayloadPath(path: string): string | null {
+  if (!path.endsWith(".txt")) return null;
+  const simple = path === "/index.txt" ? "/" : path.slice(0, -4);
+  if (pages.has(simple)) return simple;
+  const split = path.lastIndexOf("/__next.");
+  if (split < 0) return null;
+  const parent = path.slice(0, split) || "/";
+  if (!pages.has(parent)) return null;
+  let page = parent.slice(1).replaceAll("/", ".");
+  if (parent.startsWith("/resources/guides/iso-20022/")) page = "resources.guides.iso-20022.$d$set" + (parent.split("/").length === 6 ? ".$d$code" : "");
+  if (parent.startsWith("/resources/guides/iso-8583/")) page = "resources.guides.iso-8583.$d$table" + (parent.split("/").length === 6 ? ".$d$code" : "");
+  const file = path.slice(split + 1);
+  return ["__next._tree.txt", "__next._full.txt", `__next.${page}.__PAGE__.txt`].includes(file) ? parent : null;
+}
+export function publicExportFile(file: string): boolean {
+  if (file === "index.html") return true;
+  return file.endsWith(".html") ? pages.has("/" + file.slice(0, -5)) : publicPayloadPath("/" + file) !== null;
+}

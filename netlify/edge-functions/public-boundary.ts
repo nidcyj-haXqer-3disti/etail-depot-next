@@ -1,5 +1,5 @@
-import { retiredArticleRoute, managedContentRoute, publicDocumentPath, publicPayloadPath, publicPageRedirect, retiredRoute } from "../../src/shared/public-routes.ts";
-import { canonicalOrigin, defaultOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release.ts";
+import { isIndexablePath, retiredArticleRoute, managedContentRoute, publicDocumentPath, publicPayloadPath, publicPageRedirect, retiredRoute } from "../../src/shared/site/public-routes.ts";
+import { canonicalOrigin, defaultOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/site/public-release.ts";
 
 type Environment = Readonly<Record<string, string | undefined>>;
 
@@ -20,7 +20,7 @@ export const publicSecurityHeaders = {
 } as const;
 
 const privateRobots = "noindex, nofollow";
-const retiredMessage = "This service link is no longer available. Visit /help for support.";
+const retiredMessage = "This service link is no longer available. Visit /resources/help for support.";
 const previewRobots = "User-Agent: *\nAllow: /\nDisallow: /api/\n";
 const emptySitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n';
 
@@ -39,7 +39,7 @@ export async function handlePublicRequest(
 ): Promise<Response> {
   const url = new URL(request.url);
   if (retiredArticleRoute(url.pathname)) {
-    return new Response(request.method === "HEAD" ? null : "This article is no longer available. Visit /guides for payment references.", {
+    return new Response(request.method === "HEAD" ? null : "This article is no longer available. Visit /resources/guides for payment references.", {
       status: 410,
       headers: { ...publicSecurityHeaders, "Cache-Control": "no-store", "X-Robots-Tag": privateRobots, "Content-Type": "text/plain; charset=utf-8" },
     });
@@ -58,7 +58,7 @@ export async function handlePublicRequest(
     });
   }
 
-  if (managedContentRoute(url.pathname)) {
+  if (managedContentRoute(url.pathname) && !publicPageRedirect(url.pathname)) {
     const headers = { ...publicSecurityHeaders, "Cache-Control": "no-store", "X-Robots-Tag": privateRobots };
     if (!publicDocumentPath(url.pathname) && !publicPayloadPath(url.pathname)) return new Response(request.method === "HEAD" ? null : "Not found", {
       status: 404, headers: { ...headers, "Content-Type": "text/plain; charset=utf-8" },
@@ -88,7 +88,7 @@ export async function handlePublicRequest(
     return withSecurityHeaders(new Response(null, {
       status: 308,
       headers: { Location: new URL(publicDestination, moveToCanonical ? canonicalOrigin : url.origin).href, "Cache-Control": "no-store" },
-    }), !approved);
+    }), !approved || !isIndexablePath(publicDestination));
   }
   if (moveToCanonical && ["GET", "HEAD"].includes(request.method) && !/^\/\.netlify(?:\/|$)/.test(url.pathname)) {
     // Retirement checks run first. Preserve only the path; never carry queries or
@@ -122,10 +122,10 @@ export async function handlePublicRequest(
   // existing behavior. The policy itself still executes on every request.
   const revalidate = approved && ["GET", "HEAD"].includes(request.method) && !/^\/\.netlify(?:\/|$)/.test(url.pathname);
   const response = await context.next({ sendConditionalRequest: revalidate });
-  const legalPage = /^\/(?:privacy|terms)(?:\.html|\/index\.html|\/)?$/.test(url.pathname) || /^\/legal(?:$|[/.])/.test(url.pathname);
+  const legalPage = /^\/company\/(?:privacy|terms)(?:\.html|\/index\.html|\/)?$/.test(url.pathname) || /^\/company\/legal(?:$|[/.])/.test(url.pathname);
   const navigationPayload = url.pathname.endsWith(".txt") && url.pathname !== "/robots.txt";
   const alias = publicDocumentPath(url.pathname);
-  const result = withSecurityHeaders(response, !approved || legalPage || navigationPayload || Boolean(alias && alias !== url.pathname) || response.status >= 400);
+  const result = withSecurityHeaders(response, !approved || legalPage || Boolean(alias && !isIndexablePath(alias)) || navigationPayload || Boolean(alias && alias !== url.pathname) || response.status >= 400);
   if (!approved) result.headers.set("Cache-Control", "no-store");
   return result;
 }

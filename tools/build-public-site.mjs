@@ -3,12 +3,15 @@ import { spawnSync } from "node:child_process";
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
+import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/site/public-release.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
+
+import { verifyFilePublication } from "./verify-file-publication.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
 assert.equal(process.version, `v${manifest.engines.node}`, "Use the pinned Node.js runtime.");
+verifyFilePublication(root);
 const fingerprint = publicSourceFingerprint(root);
 const buildEnvironment = {
   NODE_ENV: "production",

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { brandWordmark } from "../../src/shared/brand-wordmark";
+import { brandWordmark } from "../../src/shared/brand/brand-wordmark";
 
 describe("public social wordmark", () => {
   it("uses the exact authentic logo asset without external or runtime file access", () => {

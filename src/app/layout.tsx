@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { rootMetadata } from "@/modules/public-site/metadata";
+import { rootMetadata } from "@/features/home/metadata";
 import "./globals.css";
 
 export const metadata: Metadata = rootMetadata;

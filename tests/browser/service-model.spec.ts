@@ -29,30 +29,30 @@ test("Home gives merchants and software partners distinct next steps", async ({ 
   const actions = page.locator("#services");
   const merchants = actions.getByRole("link", { name: "Explore merchant services", exact: true });
   const partners = page.locator("#services").getByRole("link", { name: "Explore software platforms", exact: true });
-  await expect(merchants).toHaveAttribute("href", "/payment-acceptance-service");
+  await expect(merchants).toHaveAttribute("href", "/services/merchant-services");
   await expect(page.getByRole("main").getByRole("link", { name: "Contact sales", exact: true })).toHaveCount(0);
-  await expect(partners).toHaveAttribute("href", "/software-partners");
+  await expect(partners).toHaveAttribute("href", "/use-cases/software-platforms");
   await expect(merchants).toBeVisible();
   await expect(partners).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Merchant services. For your business.");
 
   await merchants.click();
-  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
+  await expect(page).toHaveURL(/\/services\/merchant-services$/);
   const menu = page.getByRole("banner").getByRole("button", { name: "Menu", exact: true });
   if (await menu.isVisible()) await menu.click();
   await page.getByRole("banner").getByRole("link", { name: "Contact sales", exact: true }).click();
-  await expect(page).toHaveURL(/\/contact$/);
+  await expect(page).toHaveURL(/\/company\/contact$/);
   await expect(page.locator("#merchant-application")).toContainText("Account approval and setup apply.");
   await expect(page.locator("#cards")).toContainText("An inquiry is not an application.");
   await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await page.goto("/");
   await partners.click();
-  await expect(page).toHaveURL(/\/software-partners$/);
+  await expect(page).toHaveURL(/\/use-cases\/software-platforms$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Merchant services for your software");
   await page.goBack();
   await openFooterGroup(page, "Services");
   const cardLink = page.getByRole("contentinfo").getByRole("link", { name: "Card services", exact: true });
-  await expect(cardLink).toHaveAttribute("href", "/credit-card-services");
+  await expect(cardLink).toHaveAttribute("href", "/services/card-services");
   await cardLink.click();
   await expect(page.locator("#card-details")).toContainText("$200");
   await expect(page.locator("#card-details")).toContainText("$0");
@@ -60,7 +60,7 @@ test("Home gives merchants and software partners distinct next steps", async ({ 
 });
 
 test("payment explorer supports keyboard tabs and exposes the corresponding record", async ({ page }) => {
-  await page.goto("/online-businesses");
+  await page.goto("/use-cases/online-businesses");
   const explorer = page.locator("#customer-checkout");
   const tabs = explorer.getByRole("tablist", { name: "Payment journey views", exact: true });
   const onboarding = tabs.getByRole("tab", { name: "Onboarding", exact: true });
@@ -106,7 +106,7 @@ test("payment explorer supports keyboard tabs and exposes the corresponding reco
 });
 
 test("bank checkout never presents the domestic card fee as an ACH price", async ({ page }) => {
-  await page.goto("/online-businesses");
+  await page.goto("/use-cases/online-businesses");
   const explorer = page.locator("#customer-checkout");
   const methods = explorer.getByRole("tablist", { name: "Checkout payment method", exact: true });
   const card = methods.getByRole("tab", { name: "Card", exact: true });
@@ -158,7 +158,7 @@ test("bank checkout never presents the domestic card fee as an ACH price", async
 
 test("payment specimens cannot collect credentials, submit payments or advance a live transaction", async ({ page }) => {
   const mutations = await preventMutations(page);
-  await page.goto("/online-businesses");
+  await page.goto("/use-cases/online-businesses");
   const explorer = page.locator("#customer-checkout");
   const unsupportedControls = explorer.locator('form, input, textarea, select, [contenteditable="true"], button[type="submit"]');
   await expect(unsupportedControls).toHaveCount(0);
@@ -182,7 +182,7 @@ test("payment specimens cannot collect credentials, submit payments or advance a
 });
 
 test("Trolleys entrance remains fixed and does not inherit a visitor query or fragment", async ({ page }) => {
-  await page.goto("/payment-acceptance-service?account=sample-account&next=https%3A%2F%2Fexample.com#customer-checkout");
+  await page.goto("/services/merchant-services?account=sample-account&next=https%3A%2F%2Fexample.com#customer-checkout");
   const links = page.getByRole("link", { name: "Start now", exact: true });
   expect(await links.count()).toBeGreaterThanOrEqual(1);
   for (const link of await links.all()) {
@@ -195,29 +195,29 @@ test("Trolleys entrance remains fixed and does not inherit a visitor query or fr
 });
 
 test("software partner preview stays out of indexing and offers contact rather than unapproved API access", async ({ page }) => {
-  await page.goto("/software-partners");
+  await page.goto("/use-cases/software-platforms");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /\bnoindex\b/);
   await expect(page.locator('meta[name="googlebot"]')).toHaveAttribute("content", /\bnoindex\b/);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/software-partners");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/use-cases/software-platforms");
   const contact = page.locator(".ec-platform-hero").getByRole("link", { name: "Discuss your platform", exact: true });
-  await expect(contact).toHaveAttribute("href", "/contact#platforms");
+  await expect(contact).toHaveAttribute("href", "/company/contact#platforms");
   await expect(page.locator("main form")).toHaveCount(0);
   await expect(page.locator("main")).toContainText("Merchant approval is required.");
   await expect(page.locator("main")).toContainText("Review business details and complete account setup after approval.");
   await expect(page.locator("main")).toContainText("Payment methods depend on account setup.");
   const sitemap = await page.request.get("/sitemap.xml");
   expect(sitemap.ok()).toBeTruthy();
-  expect(await sitemap.text()).not.toContain("/software-partners");
+  expect(await sitemap.text()).not.toContain("/use-cases/software-platforms");
 });
 
 test("service journeys remain within a 320-pixel screen, including every payment view", async ({ page }) => {
   test.setTimeout(60_000);
   await page.setViewportSize({ width: 320, height: 900 });
-  for (const route of ["/", "/software-partners", "/online-businesses", "/payment-acceptance-service", "/credit-card-services", "/help", "/guides"]) {
+  for (const route of ["/", "/use-cases/software-platforms", "/use-cases/online-businesses", "/services/merchant-services", "/services/card-services", "/resources/help", "/resources/guides"]) {
     await page.goto(route);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expectNoHorizontalOverflow(page);
-    if (route === "/online-businesses") {
+    if (route === "/use-cases/online-businesses") {
       const explorer = page.locator("#customer-checkout");
       await explorer.getByRole("tab", { name: "Bank payment", exact: true }).click();
       await expectNoHorizontalOverflow(page);
@@ -239,14 +239,14 @@ test("service content and all payment records remain readable without JavaScript
     await noScript.goto("/");
     const actions = noScript.locator("#services");
     await expect(actions.getByRole("link", { name: "Explore merchant services", exact: true })).toBeVisible();
-    await expect(actions.getByRole("link", { name: "Explore merchant services", exact: true })).toHaveAttribute("href", "/payment-acceptance-service");
+    await expect(actions.getByRole("link", { name: "Explore merchant services", exact: true })).toHaveAttribute("href", "/services/merchant-services");
     await expect(noScript.locator("#services").getByRole("link", { name: "Explore software platforms", exact: true })).toBeVisible();
     await actions.getByRole("link", { name: "Explore merchant services", exact: true }).click();
-    await expect(noScript).toHaveURL(/\/payment-acceptance-service$/);
+    await expect(noScript).toHaveURL(/\/services\/merchant-services$/);
     const navigation = noScript.getByRole("navigation", {name:"Main navigation"});
     if (await navigation.locator(".public-domain-use-cases").getAttribute("open") === null) await navigation.locator("summary").filter({hasText:/^Use cases$/}).click();
     await navigation.getByRole("link", { name: "Online businesses", exact: true }).click();
-    await expect(noScript).toHaveURL(/\/online-businesses$/);
+    await expect(noScript).toHaveURL(/\/use-cases\/online-businesses$/);
     const explorer = noScript.locator("#customer-checkout");
     await expect(explorer.getByRole("tablist", { name: "Payment journey views", exact: true, includeHidden: true })).toBeHidden();
     await expect(explorer.getByRole("tablist", { name: "Checkout payment method", exact: true, includeHidden: true })).toBeHidden();
@@ -263,7 +263,7 @@ test("service content and all payment records remain readable without JavaScript
 
     await explorer.locator("summary").filter({ hasText: "If the result is unclear" }).click();
     await expect(explorer).toContainText("Check the original payment reference and its status before trying again.");
-    await noScript.goto("/software-partners");
+    await noScript.goto("/use-cases/software-platforms");
     await expect(noScript.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(noScript.locator('meta[name="robots"]')).toHaveAttribute("content", /\bnoindex\b/);
   } finally {
@@ -274,7 +274,7 @@ test("service content and all payment records remain readable without JavaScript
 
 test("onboarding artwork separates submitted information from approval", async ({ page }) => {
   const mutations = await preventMutations(page);
-  await page.goto("/online-businesses");
+  await page.goto("/use-cases/online-businesses");
   const explorer = page.locator("#customer-checkout");
   await explorer.getByRole("tab", { name: "Onboarding", exact: true }).click();
   const panel = explorer.getByRole("tabpanel", { name: "Onboarding", exact: true });
@@ -296,7 +296,7 @@ for (const width of [320, 768]) {
   test(`checkout screens stay readable, synchronized and local at ${width}px`, async ({ page }) => {
     await page.setViewportSize({width, height:900});
     const mutations = await preventMutations(page);
-    await page.goto("/online-businesses#customer-checkout");
+    await page.goto("/use-cases/online-businesses#customer-checkout");
     const checkout = page.locator(".unified-preview");
     const controls = checkout.getByRole("group", {name:"Checkout screens", exact:true});
     const track = checkout.getByRole("group", {name:"Checkout artwork", exact:true});

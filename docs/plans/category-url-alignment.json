@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-08",
+  "branch": "codex/url-category-alignment-20261108",
+  "baseCommit": "6c27b215debd78d9a453ae54a2cd1990a23a7f8d",
+  "authorization": "User approved mapping, route and link changes, search metadata and sitemap changes, and permanent redirects. Local implementation only.",
+  "publicationPerformed": false,
+  "predecessorReceipt": "docs/plans/developers-resource-alignment.json",
+  "urlMap": "docs/plans/category-url-map.json",
+  "scope": {
+    "contentPages": 3751,
+    "sitemapPages": 3731,
+    "noindexPages": 20,
+    "movedPages": 3738,
+    "unchangedPages": 13,
+    "oldDocumentationRedirects": 10,
+    "newOverviewPages": 0
+  },
+  "categories": [
+    "/services/",
+    "/use-cases/",
+    "/developers/",
+    "/resources/",
+    "/company/"
+  ],
+  "routing": [
+    "Exact 308 GET and HEAD redirects, with no query or submitted body forwarding.",
+    "Existing section bookmarks retained. No redirect chains.",
+    "Former docs pages are redirects only, absent from content exports and sitemap.",
+    "Only exact new public service documents and their real navigation payloads bypass the retired services account family.",
+    "Unknown operational paths and retired articles/legal pages remain closed.",
+    "Existing static asset addresses are preserved."
+  ],
+  "preservedInputs": [
+    {
+      "path": "src/features/resources/references/iso-20022/data/iso20022-data.json",
+      "baseline": "pre-migration snapshot",
+      "unchanged": true,
+      "sha256": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36"
+    },
+    {
+      "path": "src/features/resources/references/iso-8583/data/iso8583-independent-data.json",
+      "baseline": "pre-migration snapshot",
+      "unchanged": true,
+      "sha256": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e"
+    },
+    {
+      "path": "src/features/company/legal/merchant-legal-content.json",
+      "baseline": "pre-migration snapshot",
+      "unchanged": true,
+      "sha256": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152"
+    },
+    {
+      "path": "src/shared/site/legal-identity.ts",
+      "baseline": "pre-migration snapshot",
+      "unchanged": true,
+      "sha256": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77"
+    },
+    {
+      "path": "src/shared/site/hosted-services.ts",
+      "baseline": "pre-migration snapshot",
+      "unchanged": true,
+      "sha256": "c678fb7fc9fde26ec1900b55263db884f8704d25ec5f9b48af40d3f82f5980ac"
+    },
+    {
+      "path": "netlify.toml",
+      "baseline": "pre-migration snapshot",
+      "unchanged": true,
+      "sha256": "49ac0da185ed74e45bfb093660df6507079d0e2353aa334cd8eb7e266ae8bc13"
+    },
+    {
+      "path": "package.json",
+      "baseline": "pre-migration snapshot",
+      "unchanged": true,
+      "sha256": "b51a6a120b177d055bf91a5cdecda879eed8972549ce16a85c890270f19f7407"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "baseline": "HEAD",
+      "unchanged": true,
+      "sha256": "2083c273e3a8fa61757390ee95850312c7ddbfc3171df45f9f688b34b7e5b561"
+    }
+  ],
+  "stylesAndArtwork": {
+    "comparedAssetsAndStyles": 157,
+    "changed": [],
+    "unchangedRelocations": [
+      [
+        "src/app/help/help.css",
+        "src/app/resources/help/help.css"
+      ]
+    ]
+  },
+  "completedAudits": {
+    "internalLinks": {
+      "pages": 3751,
+      "linkOccurrences": 380388,
+      "distinctDestinations": 11792,
+      "errors": []
+    },
+    "redirects": {
+      "moves": 3748,
+      "requests": 11244,
+      "errors": []
+    },
+    "responsive": {
+      "cases": 72,
+      "engines": [
+        "Chromium",
+        "WebKit"
+      ],
+      "widths": [
+        320,
+        390,
+        1440
+      ],
+      "errors": 0
+    }
+  },
+  "corrections": [
+    "Restored the unchanged /help/shopify image fallback addresses after a page-prefix replacement affected ten image links.",
+    "Kept historical retired article and legal identifiers intact and checked their old and new-family exclusions.",
+    "Updated stale URL, navigation-payload, noindex and account-route assertions to the exact approved inventory.",
+    "Updated the route-only legal-path hash after preserving historical retired identifiers. Legal text and identity hashes did not change.",
+    "The first rapid-navigation WebKit audit aborted background prefetches; the final audit retains immediate paint measurements and waits for requests to settle between deliberate navigations.",
+    "Removed retired articles from an added generic 404 assertion; their existing dedicated SEO checks continue to require 410 with no redirect and noindex. No runtime change was needed."
+  ],
+  "verification": {
+    "status": "passed",
+    "commands": [
+      "pnpm verify:public",
+      "pnpm test:seo:production",
+      "pnpm package:netlify",
+      "pnpm verify:package"
+    ],
+    "unitTests": 491,
+    "desktopAndMobileTests": 310,
+    "expectedDesktopSkip": 1,
+    "accessibilityTests": 153,
+    "sourceSecurity": "passed",
+    "dependencyAudit": "No known vulnerabilities found",
+    "productionSeo": "3731 distinct canonical sitemap pages, crawlable from Home; exact metadata, structured data and social previews verified.",
+    "previewAndWrongSite": "noindex and empty sitemap verified against the production HTML",
+    "package": {
+      "contentPages": 3751,
+      "staticFiles": 18939,
+      "publicEdgeFunctions": 1,
+      "protectedEmailHandlerPreserved": true,
+      "websiteInputs": 536,
+      "repositoryOnlyFiles": 442
+    },
+    "evidenceNote": "The complete public suite passed before the final SEO-check-only correction. That corrected verifier passed targeted lint and the full production SEO run. No runtime, content or UI changed afterward; the final package and fingerprint include the correction."
+  },
+  "remainingHostedChecks": [
+    "Publish only after separate release authorization.",
+    "Verify permanent redirects, cache behavior and search headers on the actual Netlify deployment.",
+    "Check both canonical production and prior Netlify production-origin redirects after release."
+  ],
+  "completedDate": "2026-11-09",
+  "sourceFingerprint": "7c1f04949ef81b2c5d75baae995b216b468924ffaca92c0a4a0e8a3f2e2d7b3b"
+}

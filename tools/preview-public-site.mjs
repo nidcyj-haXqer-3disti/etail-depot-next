@@ -20,7 +20,7 @@ async function staticResponse(url, method) {
   if (pathname.includes("\\") || pathname.includes("\0") || pathname.split("/").some(part => part === ".." || part.startsWith("."))) return new Response("Not found", { status: 404 });
   // Match the case-sensitive static host even on a case-insensitive local filesystem.
   const referencePathname = pathname.replace(/\/__next[^/]*\.txt$/, "");
-  if (/^\/guides\/iso-(?:20022|8583)(?:\/|\.|$)/i.test(referencePathname) && referencePathname !== referencePathname.toLowerCase()) {
+  if (/^\/resources\/guides\/iso-(?:20022|8583)(?:\/|\.|$)/i.test(referencePathname) && referencePathname !== referencePathname.toLowerCase()) {
     return new Response(method === "HEAD" ? null : await readFile(path.join(directory, "404.html")), { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } });
   }
   const relative = pathname === "/" ? "index.html" : pathname.slice(1).replace(/\/$/, "");

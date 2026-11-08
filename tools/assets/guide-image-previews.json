@@ -1,0 +1,701 @@
+{
+  "schemaVersion": 1,
+  "sharp": "0.35.5",
+  "receipts": [
+    {
+      "group": "woocommerce",
+      "key": "store",
+      "source": "woo-store.webp",
+      "sourceSha256": "d9e608a73143746f485f74738a97cc5070ffd4b7477a5c051c1b959b942e056a",
+      "frame": [
+        175,
+        300,
+        880,
+        210
+      ],
+      "width": 640,
+      "file": "previews/woo-store-preview-store-640.webp",
+      "bytes": 32040,
+      "sha256": "d63531dca2e49c0f5c89908c26d3acffd68e4adba6fc204381e3cd2473d6d639"
+    },
+    {
+      "group": "woocommerce",
+      "key": "store",
+      "source": "woo-store.webp",
+      "sourceSha256": "d9e608a73143746f485f74738a97cc5070ffd4b7477a5c051c1b959b942e056a",
+      "frame": [
+        175,
+        300,
+        880,
+        210
+      ],
+      "width": 880,
+      "height": 210,
+      "file": "previews/woo-store-preview-store.webp",
+      "bytes": 52372,
+      "sha256": "bdcc72b7d8fc2ec8508f4301cf0429c15bda29c6e768fb16bfa65e27a6a95619"
+    },
+    {
+      "group": "woocommerce",
+      "key": "plugin",
+      "source": "woo-plugin.webp",
+      "sourceSha256": "accd1ca431dcadc8fb9ec7b92a426106a36be466abc83d81a3fcb235823650c0",
+      "frame": [
+        175,
+        170,
+        880,
+        160
+      ],
+      "width": 640,
+      "file": "previews/woo-plugin-preview-plugin-640.webp",
+      "bytes": 28568,
+      "sha256": "3a9df4b95c8bfff9227d099ad37633af46a2dcd91f02db57db6f24b43e4435e2"
+    },
+    {
+      "group": "woocommerce",
+      "key": "plugin",
+      "source": "woo-plugin.webp",
+      "sourceSha256": "accd1ca431dcadc8fb9ec7b92a426106a36be466abc83d81a3fcb235823650c0",
+      "frame": [
+        175,
+        170,
+        880,
+        160
+      ],
+      "width": 880,
+      "height": 160,
+      "file": "previews/woo-plugin-preview-plugin.webp",
+      "bytes": 48062,
+      "sha256": "408864f175007dc3e57fc28749fe3285afacbd7fc9d93062a4b4f442d78fe2c0"
+    },
+    {
+      "group": "woocommerce",
+      "key": "payments",
+      "source": "woo-payments.webp",
+      "sourceSha256": "9a0f432fd284f90d0fe741148feaea4431e1cb64870c2357c5173a50dd873bc8",
+      "frame": [
+        205,
+        448,
+        1030,
+        130
+      ],
+      "width": 640,
+      "file": "previews/woo-payments-preview-payments-640.webp",
+      "bytes": 9198,
+      "sha256": "34ea22239a1c1ef388c85a54096c0af6e35384c41271b10086872c31a435f4e1"
+    },
+    {
+      "group": "woocommerce",
+      "key": "payments",
+      "source": "woo-payments.webp",
+      "sourceSha256": "9a0f432fd284f90d0fe741148feaea4431e1cb64870c2357c5173a50dd873bc8",
+      "frame": [
+        205,
+        448,
+        1030,
+        130
+      ],
+      "width": 1030,
+      "height": 130,
+      "file": "previews/woo-payments-preview-payments.webp",
+      "bytes": 15786,
+      "sha256": "de14c347a5dcbe364d4fc9de13cf42f91415ce3cbdb685972fe4aa324184af3c"
+    },
+    {
+      "group": "woocommerce",
+      "key": "login",
+      "source": "woo-login-detail.webp",
+      "sourceSha256": "51e990fd6e55e742652c55fc4fb491114900ca46cbdf98c7dc7856232343aeac",
+      "frame": null,
+      "width": 440,
+      "height": 650,
+      "file": "woo-login-detail.webp",
+      "bytes": 38754,
+      "sha256": "51e990fd6e55e742652c55fc4fb491114900ca46cbdf98c7dc7856232343aeac"
+    },
+    {
+      "group": "woocommerce",
+      "key": "apiValues",
+      "source": "woo-keys.webp",
+      "sourceSha256": "3babe2d7a8e325b0fedec7c91e1bfba7aa54d1eb2e2065d577660fe730c2afac",
+      "frame": [
+        55,
+        285,
+        885,
+        220
+      ],
+      "width": 885,
+      "height": 220,
+      "file": "previews/woo-keys-preview-apiValues.webp",
+      "bytes": 7524,
+      "sha256": "f62bc0969e671906b24ce41a74f8200f7d8f40fa18ad96fd446765be7026a446"
+    },
+    {
+      "group": "woocommerce",
+      "key": "apiFields",
+      "source": "woo-credentials.webp",
+      "sourceSha256": "b5dda72aefa29bc23a2aa452899fe6820abf3bfc0fe29a9608f8239603fb274c",
+      "frame": [
+        175,
+        760,
+        670,
+        315
+      ],
+      "width": 670,
+      "height": 315,
+      "file": "previews/woo-credentials-preview-apiFields.webp",
+      "bytes": 19250,
+      "sha256": "0027ba4b5f40ebe68240624111c21026bdaa6a5d675c0f4d5d7a6ec9a5cee8f0"
+    },
+    {
+      "group": "woocommerce",
+      "key": "certificateDownload",
+      "source": "woo-certificate.webp",
+      "sourceSha256": "6b47f47eab2823c14336638443d96512a27a7d867da11913e90a9f3e9fe7ee12",
+      "frame": [
+        30,
+        575,
+        930,
+        255
+      ],
+      "width": 640,
+      "file": "previews/woo-certificate-preview-certificateDownload-640.webp",
+      "bytes": 12746,
+      "sha256": "1b8487fb0c69f72e22c2890ef4c7194dfa8137cd95cdce8f226b59c75ac80be8"
+    },
+    {
+      "group": "woocommerce",
+      "key": "certificateDownload",
+      "source": "woo-certificate.webp",
+      "sourceSha256": "6b47f47eab2823c14336638443d96512a27a7d867da11913e90a9f3e9fe7ee12",
+      "frame": [
+        30,
+        575,
+        930,
+        255
+      ],
+      "width": 930,
+      "height": 255,
+      "file": "previews/woo-certificate-preview-certificateDownload.webp",
+      "bytes": 20304,
+      "sha256": "2a60c4317fa96d25dbade1e914861d10709fb17ac88ccd753cd7611d95ce85db"
+    },
+    {
+      "group": "woocommerce",
+      "key": "certificatePassword",
+      "source": "woo-certificate.webp",
+      "sourceSha256": "6b47f47eab2823c14336638443d96512a27a7d867da11913e90a9f3e9fe7ee12",
+      "frame": [
+        995,
+        55,
+        442,
+        760
+      ],
+      "width": 442,
+      "height": 760,
+      "file": "previews/woo-certificate-preview-certificatePassword.webp",
+      "bytes": 76946,
+      "sha256": "8df1594d8cd50dd802f4899435076f52481c6401e905b1ba0ec37cf94324f6e0"
+    },
+    {
+      "group": "woocommerce",
+      "key": "certificateFields",
+      "source": "woo-credentials.webp",
+      "sourceSha256": "b5dda72aefa29bc23a2aa452899fe6820abf3bfc0fe29a9608f8239603fb274c",
+      "frame": [
+        175,
+        1080,
+        670,
+        240
+      ],
+      "width": 670,
+      "height": 240,
+      "file": "previews/woo-credentials-preview-certificateFields.webp",
+      "bytes": 20060,
+      "sha256": "b68a82b0161325f1eadee39333c2b039c88ca6f497bff59d179d8bd67300ebb5"
+    },
+    {
+      "group": "woocommerce",
+      "key": "settings",
+      "source": "woo-settings.webp",
+      "sourceSha256": "03cdbcbb4bb031ef4fecee1e722a81670f76e98508e220429cb6dbdbaea46b74",
+      "frame": null,
+      "width": 640,
+      "file": "previews/woo-settings-preview-settings-640.webp",
+      "bytes": 67224,
+      "sha256": "876f634d6ac56f0b63595bae0116aa53dac765b7f45de40e4f902aad97f252ec"
+    },
+    {
+      "group": "woocommerce",
+      "key": "settings",
+      "source": "woo-settings.webp",
+      "sourceSha256": "03cdbcbb4bb031ef4fecee1e722a81670f76e98508e220429cb6dbdbaea46b74",
+      "frame": null,
+      "width": 1040,
+      "file": "previews/woo-settings-preview-settings-1040.webp",
+      "bytes": 170722,
+      "sha256": "e1c013aa431add12026baebe3fd30b5ccfab6b181d028f5502c2a14c7c5d1b8b"
+    },
+    {
+      "group": "woocommerce",
+      "key": "settings",
+      "source": "woo-settings.webp",
+      "sourceSha256": "03cdbcbb4bb031ef4fecee1e722a81670f76e98508e220429cb6dbdbaea46b74",
+      "frame": null,
+      "width": 1440,
+      "height": 2124,
+      "file": "woo-settings.webp",
+      "bytes": 265228,
+      "sha256": "03cdbcbb4bb031ef4fecee1e722a81670f76e98508e220429cb6dbdbaea46b74"
+    },
+    {
+      "group": "woocommerce",
+      "key": "storage",
+      "source": "woo-storage.webp",
+      "sourceSha256": "9f8ff31639c826eebdc609ac90d79225f310c7b9f8ad958769999405f133b545",
+      "frame": [
+        438,
+        190,
+        700,
+        435
+      ],
+      "width": 700,
+      "height": 435,
+      "file": "previews/woo-storage-preview-storage.webp",
+      "bytes": 25866,
+      "sha256": "ccc4983b1c32b1a5efab2466866267184579cb1003c6ed5bc94e871e9c6c3a55"
+    },
+    {
+      "group": "woocommerce",
+      "key": "checkout",
+      "source": "woo-checkout.webp",
+      "sourceSha256": "ceda944d571f3039ece906ceed59d05b286d2414dd9abb34bd5760171e9fa6d3",
+      "frame": null,
+      "width": 640,
+      "file": "previews/woo-checkout-preview-checkout-640.webp",
+      "bytes": 34364,
+      "sha256": "13dabaadc8c87f5c67b1b9c5beb79d5e7d2b5538d8a2340df337b5d22f64804a"
+    },
+    {
+      "group": "woocommerce",
+      "key": "checkout",
+      "source": "woo-checkout.webp",
+      "sourceSha256": "ceda944d571f3039ece906ceed59d05b286d2414dd9abb34bd5760171e9fa6d3",
+      "frame": null,
+      "width": 1040,
+      "file": "previews/woo-checkout-preview-checkout-1040.webp",
+      "bytes": 85024,
+      "sha256": "792562a2f40ecb8a85b5e2ff266b7f5cb02e8bb74aec713e7e97f7980917880d"
+    },
+    {
+      "group": "woocommerce",
+      "key": "checkout",
+      "source": "woo-checkout.webp",
+      "sourceSha256": "ceda944d571f3039ece906ceed59d05b286d2414dd9abb34bd5760171e9fa6d3",
+      "frame": null,
+      "width": 1280,
+      "height": 840,
+      "file": "woo-checkout.webp",
+      "bytes": 112434,
+      "sha256": "ceda944d571f3039ece906ceed59d05b286d2414dd9abb34bd5760171e9fa6d3"
+    },
+    {
+      "group": "woocommerce",
+      "key": "records",
+      "source": "woo-records.webp",
+      "sourceSha256": "15c6325a9948747d3a65d523da3f6baf12da7b83a4036cbe72e10432b85c7502",
+      "frame": null,
+      "width": 640,
+      "file": "previews/woo-records-preview-records-640.webp",
+      "bytes": 21448,
+      "sha256": "98c6d7b8c65fe9dca9e1f2c935a697108958e0b3d886008b1eecec7e15865a35"
+    },
+    {
+      "group": "woocommerce",
+      "key": "records",
+      "source": "woo-records.webp",
+      "sourceSha256": "15c6325a9948747d3a65d523da3f6baf12da7b83a4036cbe72e10432b85c7502",
+      "frame": null,
+      "width": 1040,
+      "file": "previews/woo-records-preview-records-1040.webp",
+      "bytes": 48640,
+      "sha256": "6bde1979396333f8872e99093ee055427c228c352b69a7b4e7f93069923453ff"
+    },
+    {
+      "group": "woocommerce",
+      "key": "records",
+      "source": "woo-records.webp",
+      "sourceSha256": "15c6325a9948747d3a65d523da3f6baf12da7b83a4036cbe72e10432b85c7502",
+      "frame": null,
+      "width": 1880,
+      "height": 458,
+      "file": "woo-records.webp",
+      "bytes": 124848,
+      "sha256": "15c6325a9948747d3a65d523da3f6baf12da7b83a4036cbe72e10432b85c7502"
+    },
+    {
+      "group": "woocommerce",
+      "key": "refund",
+      "source": "woo-refund.webp",
+      "sourceSha256": "80b55a16e9913443a65a23142b8fc6a6742916d17148e97977cfa05b6ff6339a",
+      "frame": [
+        420,
+        405,
+        530,
+        290
+      ],
+      "width": 530,
+      "height": 290,
+      "file": "previews/woo-refund-preview-refund.webp",
+      "bytes": 20594,
+      "sha256": "9e6d74b69ab809dda9a8ffbca4c7d2a909b9b264ac8fb34bdac8e4deac85de02"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckDownload",
+      "source": "woo-cyberduck-download.webp",
+      "sourceSha256": "4912cd274744c6d79405dd8c2b1002bc6715e39fac0184665a5c780f0d0e5d9e",
+      "frame": null,
+      "width": 640,
+      "file": "previews/woo-cyberduck-download-preview-duckDownload-640.webp",
+      "bytes": 12256,
+      "sha256": "d80dc11b4a2aac991709721af863370dde3c6dc7197b06aba3d90a969cd3c525"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckDownload",
+      "source": "woo-cyberduck-download.webp",
+      "sourceSha256": "4912cd274744c6d79405dd8c2b1002bc6715e39fac0184665a5c780f0d0e5d9e",
+      "frame": null,
+      "width": 1160,
+      "height": 173,
+      "file": "woo-cyberduck-download.webp",
+      "bytes": 32014,
+      "sha256": "4912cd274744c6d79405dd8c2b1002bc6715e39fac0184665a5c780f0d0e5d9e"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckConnect",
+      "source": "woo-cyberduck-connect.webp",
+      "sourceSha256": "78aa30accce7fcb3da44a93e6c7e520c4086bda478d184335888189f8bc8e9c8",
+      "frame": null,
+      "width": 640,
+      "file": "previews/woo-cyberduck-connect-preview-duckConnect-640.webp",
+      "bytes": 39534,
+      "sha256": "56539d2ded60c62f32c9943d93e1e833b8eee15d7df5e7af57c25a69d040441f"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckConnect",
+      "source": "woo-cyberduck-connect.webp",
+      "sourceSha256": "78aa30accce7fcb3da44a93e6c7e520c4086bda478d184335888189f8bc8e9c8",
+      "frame": null,
+      "width": 1040,
+      "height": 740,
+      "file": "woo-cyberduck-connect.webp",
+      "bytes": 79866,
+      "sha256": "78aa30accce7fcb3da44a93e6c7e520c4086bda478d184335888189f8bc8e9c8"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckFolders",
+      "source": "woo-cyberduck-folders.webp",
+      "sourceSha256": "87eb4b36c93f415372e29648daa667fb74b4fa367d3eef960c18174acb497421",
+      "frame": null,
+      "width": 640,
+      "file": "previews/woo-cyberduck-folders-preview-duckFolders-640.webp",
+      "bytes": 27684,
+      "sha256": "3428523eb464fda3489104feb9e2f3bc5f56981c5bb6f9d9d558479014b1cda8"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckFolders",
+      "source": "woo-cyberduck-folders.webp",
+      "sourceSha256": "87eb4b36c93f415372e29648daa667fb74b4fa367d3eef960c18174acb497421",
+      "frame": null,
+      "width": 1040,
+      "file": "previews/woo-cyberduck-folders-preview-duckFolders-1040.webp",
+      "bytes": 64576,
+      "sha256": "6c42d280f3957ed7e5ff0bcf83cd1042b7168cceb56052564c12573c21e41b0e"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckFolders",
+      "source": "woo-cyberduck-folders.webp",
+      "sourceSha256": "87eb4b36c93f415372e29648daa667fb74b4fa367d3eef960c18174acb497421",
+      "frame": null,
+      "width": 1242,
+      "height": 580,
+      "file": "woo-cyberduck-folders.webp",
+      "bytes": 80752,
+      "sha256": "87eb4b36c93f415372e29648daa667fb74b4fa367d3eef960c18174acb497421"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckFolderPermissions",
+      "source": "woo-cyberduck-folder-permissions.webp",
+      "sourceSha256": "fba1cf6adf5f3cb0a801a2ee2f488b2a8ea96e7289d509b577f0928638ba1945",
+      "frame": null,
+      "width": 786,
+      "height": 344,
+      "file": "woo-cyberduck-folder-permissions.webp",
+      "bytes": 37138,
+      "sha256": "fba1cf6adf5f3cb0a801a2ee2f488b2a8ea96e7289d509b577f0928638ba1945"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckSelectFile",
+      "source": "woo-cyberduck-select-file.webp",
+      "sourceSha256": "d93659c0a5e1e0a06b3e253a27d8b724c64117dbf9f2acb1435f84e5605b2df7",
+      "frame": [
+        320,
+        125,
+        700,
+        215
+      ],
+      "width": 700,
+      "height": 215,
+      "file": "previews/woo-cyberduck-select-file-preview-duckSelectFile-1.webp",
+      "bytes": 21936,
+      "sha256": "9a83a3cb6b161631ff96224a268ed7d60a0558a20aad1ce51738a5286677f27e"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckSelectFile",
+      "source": "woo-cyberduck-select-file.webp",
+      "sourceSha256": "d93659c0a5e1e0a06b3e253a27d8b724c64117dbf9f2acb1435f84e5605b2df7",
+      "frame": [
+        1380,
+        710,
+        355,
+        170
+      ],
+      "width": 355,
+      "height": 170,
+      "file": "previews/woo-cyberduck-select-file-preview-duckSelectFile-2.webp",
+      "bytes": 11180,
+      "sha256": "b11af709f3d597723f20a6001cf9569abe35e5cdc9c9f0689301e709bcff68d8"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckComplete",
+      "source": "woo-cyberduck-complete.webp",
+      "sourceSha256": "d8e99e2c985332683c886a5eced810b0afba7e131fc9e7f6d323f171c8f73396",
+      "frame": null,
+      "width": 640,
+      "file": "previews/woo-cyberduck-complete-preview-duckComplete-640.webp",
+      "bytes": 24326,
+      "sha256": "6fab90a00e4eddd14c3513f74f8f14a5f17779359085c10559c9419db7524561"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckComplete",
+      "source": "woo-cyberduck-complete.webp",
+      "sourceSha256": "d8e99e2c985332683c886a5eced810b0afba7e131fc9e7f6d323f171c8f73396",
+      "frame": null,
+      "width": 1000,
+      "height": 528,
+      "file": "woo-cyberduck-complete.webp",
+      "bytes": 38562,
+      "sha256": "d8e99e2c985332683c886a5eced810b0afba7e131fc9e7f6d323f171c8f73396"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckFilePermissions",
+      "source": "woo-cyberduck-file-permissions.webp",
+      "sourceSha256": "819efd5aac8cf64db2c4e34291c509a23a56a036ec264c3429bf1d2ff4dc00e2",
+      "frame": null,
+      "width": 640,
+      "file": "previews/woo-cyberduck-file-permissions-preview-duckFilePermissions-640.webp",
+      "bytes": 61450,
+      "sha256": "dc0a06d0c99c6ca1040df38eb44855778a19aa6e2de1fbbe989e1ce0cbb7ed60"
+    },
+    {
+      "group": "woocommerce",
+      "key": "duckFilePermissions",
+      "source": "woo-cyberduck-file-permissions.webp",
+      "sourceSha256": "819efd5aac8cf64db2c4e34291c509a23a56a036ec264c3429bf1d2ff4dc00e2",
+      "frame": null,
+      "width": 786,
+      "height": 478,
+      "file": "woo-cyberduck-file-permissions.webp",
+      "bytes": 74188,
+      "sha256": "819efd5aac8cf64db2c4e34291c509a23a56a036ec264c3429bf1d2ff4dc00e2"
+    },
+    {
+      "group": "shopify",
+      "key": "settings.webp",
+      "source": "settings.webp",
+      "sourceSha256": "882dae1e23d5c3bc1f85c06e08e3252e43a538ce9e3a3e2d01096fdf90d26319",
+      "frame": null,
+      "width": 390,
+      "height": 285,
+      "file": "settings.webp",
+      "bytes": 3604,
+      "sha256": "882dae1e23d5c3bc1f85c06e08e3252e43a538ce9e3a3e2d01096fdf90d26319"
+    },
+    {
+      "group": "shopify",
+      "key": "payments.webp",
+      "source": "payments.webp",
+      "sourceSha256": "14548755635f20bf92d446514f2daee30c396971324fbfb1b19766ea1c61b187",
+      "frame": null,
+      "width": 345,
+      "height": 532,
+      "file": "payments.webp",
+      "bytes": 11414,
+      "sha256": "14548755635f20bf92d446514f2daee30c396971324fbfb1b19766ea1c61b187"
+    },
+    {
+      "group": "shopify",
+      "key": "other-providers.webp",
+      "source": "other-providers.webp",
+      "sourceSha256": "018a5b0c0a4e98420f8bf5a548644ded6a4569e39be129b269e056b339bfb740",
+      "frame": null,
+      "width": 640,
+      "file": "previews/other-providers-preview-other-providers-webp-640.webp",
+      "bytes": 25344,
+      "sha256": "6b2511839b58fd68bd1670059597351018f30883a8712d89e2d737df86ec7ca6"
+    },
+    {
+      "group": "shopify",
+      "key": "other-providers.webp",
+      "source": "other-providers.webp",
+      "sourceSha256": "018a5b0c0a4e98420f8bf5a548644ded6a4569e39be129b269e056b339bfb740",
+      "frame": null,
+      "width": 915,
+      "height": 565,
+      "file": "other-providers.webp",
+      "bytes": 31734,
+      "sha256": "018a5b0c0a4e98420f8bf5a548644ded6a4569e39be129b269e056b339bfb740"
+    },
+    {
+      "group": "shopify",
+      "key": "choose-cybersource.webp",
+      "source": "choose-cybersource.webp",
+      "sourceSha256": "b801140dacd865098c48c493d3aba511379776d6444ba2f4462cff0b3b6af178",
+      "frame": null,
+      "width": 813,
+      "height": 525,
+      "file": "choose-cybersource.webp",
+      "bytes": 26796,
+      "sha256": "b801140dacd865098c48c493d3aba511379776d6444ba2f4462cff0b3b6af178"
+    },
+    {
+      "group": "shopify",
+      "key": "install.webp",
+      "source": "install.webp",
+      "sourceSha256": "cce69e05153fe86404d4cf6df77015b0e9792e8c4346085fff41986c88a2a1a1",
+      "frame": null,
+      "width": 640,
+      "file": "previews/install-preview-install-webp-640.webp",
+      "bytes": 14738,
+      "sha256": "51a9b0a3834b048ad91614837837160d147a3eebdd8eabcf147a195a526cd290"
+    },
+    {
+      "group": "shopify",
+      "key": "install.webp",
+      "source": "install.webp",
+      "sourceSha256": "cce69e05153fe86404d4cf6df77015b0e9792e8c4346085fff41986c88a2a1a1",
+      "frame": null,
+      "width": 1227,
+      "height": 333,
+      "file": "install.webp",
+      "bytes": 26914,
+      "sha256": "cce69e05153fe86404d4cf6df77015b0e9792e8c4346085fff41986c88a2a1a1"
+    },
+    {
+      "group": "shopify",
+      "key": "permissions.webp",
+      "source": "permissions.webp",
+      "sourceSha256": "74e4d09a39211d88c06b447309e774b13bb3c481911aaf48b5daa8c3b1b15090",
+      "frame": null,
+      "width": 637,
+      "height": 440,
+      "file": "permissions.webp",
+      "bytes": 15984,
+      "sha256": "74e4d09a39211d88c06b447309e774b13bb3c481911aaf48b5daa8c3b1b15090"
+    },
+    {
+      "group": "shopify",
+      "key": "business-center.webp",
+      "source": "business-center.webp",
+      "sourceSha256": "bb58d098e632472b1642041cd9e779b6726497ad13af744213772fcbd0cee88d",
+      "frame": null,
+      "width": 500,
+      "height": 764,
+      "file": "business-center.webp",
+      "bytes": 25876,
+      "sha256": "bb58d098e632472b1642041cd9e779b6726497ad13af744213772fcbd0cee88d"
+    },
+    {
+      "group": "shopify",
+      "key": "agreement.webp",
+      "source": "agreement.webp",
+      "sourceSha256": "7f9a60ab985007e40e0afe4360eedb291169c8fc83d37ab35aa64d1f5cedbd6c",
+      "frame": null,
+      "width": 640,
+      "file": "previews/agreement-preview-agreement-webp-640.webp",
+      "bytes": 28910,
+      "sha256": "5d63eccf405fbedbab380cbdbf177c81b6814cacb4c60bee2660d3b57649824a"
+    },
+    {
+      "group": "shopify",
+      "key": "agreement.webp",
+      "source": "agreement.webp",
+      "sourceSha256": "7f9a60ab985007e40e0afe4360eedb291169c8fc83d37ab35aa64d1f5cedbd6c",
+      "frame": null,
+      "width": 1430,
+      "height": 785,
+      "file": "agreement.webp",
+      "bytes": 61320,
+      "sha256": "7f9a60ab985007e40e0afe4360eedb291169c8fc83d37ab35aa64d1f5cedbd6c"
+    },
+    {
+      "group": "shopify",
+      "key": "activate.webp",
+      "source": "activate.webp",
+      "sourceSha256": "21fb4603ae816be42492a00c195069cea9727c967ead20b27e3a272ffee9ceb9",
+      "frame": null,
+      "width": 640,
+      "file": "previews/activate-preview-activate-webp-640.webp",
+      "bytes": 27082,
+      "sha256": "1e3ef682ac36f6c304fb4228229c9f995f4a2dccbac4179980e34c6cbf6f785b"
+    },
+    {
+      "group": "shopify",
+      "key": "activate.webp",
+      "source": "activate.webp",
+      "sourceSha256": "21fb4603ae816be42492a00c195069cea9727c967ead20b27e3a272ffee9ceb9",
+      "frame": null,
+      "width": 911,
+      "height": 661,
+      "file": "activate.webp",
+      "bytes": 43404,
+      "sha256": "21fb4603ae816be42492a00c195069cea9727c967ead20b27e3a272ffee9ceb9"
+    },
+    {
+      "group": "shopify",
+      "key": "active.webp",
+      "source": "active.webp",
+      "sourceSha256": "8156eeaa124882a58f4982d1c5f571e3fc8e43417bbbe1acec847400f0a5d0d7",
+      "frame": null,
+      "width": 640,
+      "file": "previews/active-preview-active-webp-640.webp",
+      "bytes": 29100,
+      "sha256": "ce34c4008553b836e5de5f75179a4fbe62f17f1d84fb7f0520cd607f2f2bd6d1"
+    },
+    {
+      "group": "shopify",
+      "key": "active.webp",
+      "source": "active.webp",
+      "sourceSha256": "8156eeaa124882a58f4982d1c5f571e3fc8e43417bbbe1acec847400f0a5d0d7",
+      "frame": null,
+      "width": 883,
+      "height": 657,
+      "file": "active.webp",
+      "bytes": 46016,
+      "sha256": "8156eeaa124882a58f4982d1c5f571e3fc8e43417bbbe1acec847400f0a5d0d7"
+    }
+  ]
+}

@@ -25,14 +25,14 @@ for (const [group, images] of Object.entries(groups)) {
     const type = file.endsWith(".svg") ? "image/svg+xml" : file.endsWith(".jpg") ? "image/jpeg" : "image/png";
     return `.brand-image-${name} { --brand-image: url("data:${type};base64,${bytes.toString("base64")}"); }`;
   });
-  writeFileSync(new URL(`src/ui/brand-images-${group}.css`, root),
+  writeFileSync(new URL(`src/shared/brand/brand-images-${group}.css`, root),
     "/* Generated from original public/brand assets. Regenerate: node tools/generate-inline-brand-images.mjs */\n" + lines.join("\n") + "\n");
 }
 
 // The portal mark uses the same embedded delivery as the site wordmark.
-const portalLogo = readFileSync(new URL("src/ui/assets/trolleys-portal-logo.png", root));
-writeFileSync(new URL("src/ui/brand-images-trolleys.css", root),
-  "/* Generated from src/ui/assets/trolleys-portal-logo.png. Regenerate: node tools/generate-inline-brand-images.mjs */\n" +
+const portalLogo = readFileSync(new URL("src/shared/brand/assets/trolleys-portal-logo.png", root));
+writeFileSync(new URL("src/shared/brand/brand-images-trolleys.css", root),
+  "/* Generated from src/shared/brand/assets/trolleys-portal-logo.png. Regenerate: node tools/generate-inline-brand-images.mjs */\n" +
   `.brand-image-trolleys { --brand-image: url("data:image/png;base64,${portalLogo.toString("base64")}"); }\n`);
 
 // Preserve public compatibility URLs while giving rendered artwork versioned cache keys.
@@ -59,7 +59,9 @@ const artwork = [
   "help/merchant-account/registration.jpg",
   "help/merchant-account/blank-registration.jpg",
 ];
-mkdirSync(new URL("src/ui/assets/", root), { recursive: true });
+
 for (const file of artwork) {
-  copyFileSync(new URL(`public/${file}`, root), new URL(`src/ui/assets/${file.split("/").at(-1)}`, root));
+  const destination = file.startsWith("brand/") ? "src/shared/brand/assets" : file.startsWith("help/merchant-account/") ? "src/features/resources/merchant-account-setup/assets" : file.startsWith("help/shopify/") ? "src/features/resources/integrations/shopify/assets" : "src/shared/ui/artwork/assets";
+  mkdirSync(new URL(`${destination}/`, root), { recursive: true });
+  copyFileSync(new URL(`public/${file}`, root), new URL(`${destination}/${file.split("/").at(-1)}`, root));
 }

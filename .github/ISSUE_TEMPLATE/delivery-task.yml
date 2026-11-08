@@ -10,6 +10,11 @@ body:
     validations:
       required: true
   - type: textarea
+    id: ownership
+    attributes:
+      label: Area and files
+      description: Name the owning website feature or engineering files and any shared-file coordination. Contributor management is separate from the public Developers section.
+  - type: textarea
     id: acceptance
     attributes:
       label: Acceptance and boundaries

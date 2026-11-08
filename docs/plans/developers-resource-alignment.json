@@ -1,0 +1,126 @@
+{
+  "date": "2026-11-08",
+  "status": "complete-local",
+  "scope": "Documentation consolidated within planned Developers pages; Merchant account setup moved to Resources",
+  "branch": "codex/developers-resource-alignment-20261108",
+  "baseCommit": "6c27b215debd78d9a453ae54a2cd1990a23a7f8d",
+  "sourceFingerprint": "a06059870f217930a4d14f3123e2159aa1b37758c3e5b5c89278a030399a8b27",
+  "publicationPerformed": false,
+  "mapping": {
+    "/developers/getting-started": [
+      "Integration requirements",
+      "Checkout integration"
+    ],
+    "/developers/api-reference": [
+      "Payment status",
+      "Refunds and disputes",
+      "Payouts and reconciliation"
+    ],
+    "/developers/webhooks": [
+      "Payment updates"
+    ],
+    "/developers/testing": [
+      "Launch preparation"
+    ],
+    "/developers/developer-tools": [
+      "Payment requests"
+    ],
+    "/developers/sdks": [
+      "Coming soon"
+    ],
+    "/developers/changelog": [
+      "Coming soon"
+    ],
+    "/developers/api-status": [
+      "Coming soon"
+    ],
+    "/resources/merchant-account-setup": [
+      "Existing illustrated account setup, sign in and email recovery instructions"
+    ]
+  },
+  "preservation": {
+    "originalGuidanceSections": 42,
+    "originalSectionContentAndPrerequisitesUnchanged": true,
+    "accountSpecificationPreparationLists": 4,
+    "oldDocumentationRedirects": 10,
+    "sectionBookmarksRetained": true,
+    "redirectQueriesForwarded": false,
+    "submittedBodiesReadOrForwarded": false,
+    "legalAndReferenceReleaseRecordsUnchanged": true,
+    "pricingVendorLinksLicencesAndReferenceDataUnchanged": true,
+    "newAccountPaymentOrApiRuntime": false
+  },
+  "inventory": {
+    "contentPages": 3751,
+    "searchEligibleUrls": 3731,
+    "noindexLegalAndPolicyPages": 12,
+    "noindexDevelopersPages": 8,
+    "coreRoutes": 45,
+    "referenceTemplates": 6
+  },
+  "validation": {
+    "commands": [
+      {
+        "command": "pnpm verify:public",
+        "exitCode": 0,
+        "log": "verify-public.log"
+      },
+      {
+        "command": "pnpm test:seo:production",
+        "exitCode": 0,
+        "log": "seo-production.log"
+      },
+      {
+        "command": "pnpm package:netlify",
+        "exitCode": 0,
+        "log": "package-netlify.log"
+      },
+      {
+        "command": "pnpm verify:package",
+        "exitCode": 0,
+        "log": "verify-package.log"
+      }
+    ],
+    "unitTestsPassed": 487,
+    "browserTestsPassed": 310,
+    "browserTestsSkipped": 1,
+    "skipReason": "Existing mobile wallet disclosure test skips desktop because the desktop layout starts open.",
+    "accessibilityTestsPassed": 153,
+    "responsiveCases": 90,
+    "responsiveEngines": [
+      "Chromium",
+      "WebKit"
+    ],
+    "responsiveWidths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "responsiveErrors": 0,
+    "staticLinks": {
+      "pages": 3751,
+      "linkOccurrences": 380388,
+      "distinctDestinations": 11792,
+      "errors": []
+    },
+    "securityChecksPassed": true,
+    "dependencyAudit": "No known vulnerabilities found",
+    "diffCheckPassed": true,
+    "cssBudgetsPreserved": true
+  },
+  "corrections": [
+    "Initial type and unit checks caught a route-list syntax error, stale imports, and old route/count expectations. These were corrected before the final complete run.",
+    "The managed-content guard initially rejected exact legacy documentation redirects. Known path-only redirects are now evaluated through the existing redirect handler; unknown paths and submitted requests remain denied.",
+    "The relocated account guide initially exceeded its existing CSS budget. Obsolete Documentation hub selectors were removed; the existing budget was not increased.",
+    "Three old navigation expectations caused six desktop/mobile failures in the earlier complete browser run. The tests now verify the checkout section destination, a real cross-page footer navigation and the expanded footer count.",
+    "Additional Safari refresh checks exposed unnecessary background Contact prefetch requests. Shared guide links now disable prefetch. The intermediate run was stopped for this fix, then the complete verification and 90 responsive cases passed on the final source."
+  ],
+  "remainingHostedChecks": [
+    "After separately authorized publication, verify exact documentation redirects and fragments on Netlify, including no query forwarding and rejection of submitted methods.",
+    "Verify hosted canonicals, sitemap, noindex Developers pages, assets, cache and security headers on desktop and mobile.",
+    "Verify source-only files including /tools/reference-release.json and /reference-release.json remain 404."
+  ],
+  "release": "Local source and production package prepared only. No commit, push, merge, deployment or remote setting change performed. Preserve the manual GitHub and Netlify release procedure."
+}

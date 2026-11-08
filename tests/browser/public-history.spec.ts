@@ -11,11 +11,11 @@ async function clickVisibleSectionLink(page: Page, fragment: string) {
 }
 
 for (const [route, fragment] of [
-  ["/software-partners", "#payment-experience"],
-  ["/help", "#cards"],
-  ["/privacy", "#legal-document-title"],
-  ["/guides/iso-20022", "#sets-p"],
-  ["/guides/iso-8583/messages", "#version-1993"],
+  ["/use-cases/software-platforms", "#payment-experience"],
+  ["/resources/help", "#cards"],
+  ["/company/privacy", "#legal-document-title"],
+  ["/resources/guides/iso-20022", "#sets-p"],
+  ["/resources/guides/iso-8583/messages", "#version-1993"],
 ] as const) {
   test(`native section history restores the ${route} document after shared navigation`, async ({ page }) => {
     await page.goto(route);
@@ -49,7 +49,7 @@ test("unhydrated pages preserve calculator, wallet and ISO reference behavior", 
     const merchant = header.getByRole("link", { name: "Merchant onboarding", exact: true });
     await expect(merchant).toBeVisible();
     await merchant.click();
-    await expect(page).toHaveURL(`${new URL(page.url()).origin}/merchant-onboarding`);
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}/services/merchant-onboarding`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await page.goto("/pricing#fees");
     const amount = page.locator("#payment-amount");
@@ -59,19 +59,19 @@ test("unhydrated pages preserve calculator, wallet and ISO reference behavior", 
     await expect(page.locator(".fee-result")).toContainText("$3.20");
     await expect(page.locator(".fee-result")).toContainText("$96.80");
 
-    await page.goto("/guides/iso-20022/payment-transaction-status/acsp");
+    await page.goto("/resources/guides/iso-20022/payment-transaction-status/acsp");
     await expect(page.locator("#definition")).toBeVisible();
     const peers = page.locator("#other-code-sets details");
     await peers.locator("summary").focus();
     await page.keyboard.press("Enter");
     await expect(peers).toHaveAttribute("open", "");
-    const groupStatus = peers.locator('a[href="/guides/iso-20022/payment-group-status/acsp"]');
+    const groupStatus = peers.locator('a[href="/resources/guides/iso-20022/payment-group-status/acsp"]');
     await expect(groupStatus).toBeVisible();
     await groupStatus.click();
     await expect(page).toHaveURL(/\/payment-group-status\/acsp$/);
     await expect(page.getByRole("complementary", {name:"Source and code identity"})).toContainText("ExternalPaymentGroupStatus1Code");
 
-    await page.goto("/credit-card-services#wallets");
+    await page.goto("/services/card-services#wallets");
     const wallet = page.locator(".wallet-guide-disclosure");
     await wallet.locator("summary").click();
     await expect(wallet).toHaveAttribute("open", "");
@@ -85,16 +85,16 @@ test("unhydrated pages preserve calculator, wallet and ISO reference behavior", 
 
 
 test("Help application guidance opens account setup at the beginning", async ({ page }) => {
-  await page.goto("/help");
+  await page.goto("/resources/help");
   await page.locator("#payments summary").filter({ hasText: "Can my business apply for a merchant account?" }).click();
   const setup = page.getByRole("link", { name: "merchant account setup", exact: true });
   await setup.scrollIntoViewIfNeeded();
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
   await setup.click();
-  await expect(page).toHaveURL(/\/merchant-onboarding$/);
+  await expect(page).toHaveURL(/\/services\/merchant-onboarding$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(1);
   await page.goBack();
-  await expect(page).toHaveURL(/\/help$/);
+  await expect(page).toHaveURL(/\/resources\/help$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Help center");
 });

@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { boundarySource, builtPageSources, edgeEntryFindings, forbiddenArtifact, forbiddenStatic, localCorePreviewPageSources, localPreviewPageSources, reviewedLegalPageSources, pendingLegalPageSources, publicHtmlFiles, publicationBlockers, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "../../tools/public-artifact-policy";
-import { PUBLIC_CONTENT_PATHS } from "../../src/shared/public-page-inventory";
+import { PUBLIC_CONTENT_PATHS } from "../../src/shared/site/public-page-inventory";
 
 describe("static public deployment boundary", () => {
   it("allows the reviewed sources and exact helpers without opening arbitrary guide routes", () => {
-    expect(publicPageSources).toHaveLength(52);
+    expect(publicPageSources).toHaveLength(51);
     expect(reviewedPublicAppModule("resources/shopify-gateway-integration/page.tsx")).toBe(true);
     expect(reviewedPublicAppModule("resources/woocommerce-gateway-integration/page.tsx")).toBe(true);
     expect(reviewedPublicAppModule("resources/not-reviewed/page.tsx")).toBe(false);
     expect(publicHtmlFiles).toEqual(PUBLIC_CONTENT_PATHS.map(path => path === "/" ? "index.html" : path.slice(1) + ".html"));
-    expect(publicHtmlFiles).toHaveLength(3752);
+    expect(publicHtmlFiles).toHaveLength(3751);
     for (const path of [...publicPageSources, "layout.tsx", "robots.ts", "sitemap.ts"]) expect(reviewedPublicAppModule(path), path).toBe(true);
     for (const path of ["guides/route.ts", "guides/unreviewed/page.tsx", "guides/payment-processing-fees/page.tsx", "guides/[slug]/page.tsx", "guides/[...slug]/page.tsx", "guides/stripe-alternatives/route.ts", "guides/stripe-alternatives/extra.tsx", "guides/stripe-alternatives/checkout/page.tsx", "guides/how-to-create-a-payment-link/route.ts", "guides/how-to-create-a-payment-link/extra.tsx", "guides/how-to-create-a-payment-link/checkout/page.tsx", "help/unreviewed.tsx", "api/route.ts", "login/page.tsx", "guides/booking-system-with-payment/page.tsx", "guides/countertop-payment-terminal/page.tsx", "guides/use-a-cash-register/page.tsx", "guides/charge-cards/unreviewed/page.tsx", "guides/[...browse]/page.tsx", "guides/sections/payment-processing-checkout/page.tsx", "guides/page/2/page.tsx"]) {
       expect(reviewedPublicAppModule(path), path).toBe(false);
@@ -17,7 +17,7 @@ describe("static public deployment boundary", () => {
   });
 
   it("admits only the approved documentation and use case sources and exports", () => {
-    expect(builtPageSources).toHaveLength(52);
+    expect(builtPageSources).toHaveLength(51);
     expect(reviewedLegalPageSources).toHaveLength(10);
     expect(localPreviewPageSources).toEqual([]);
     expect(publicationBlockers(localPreviewPageSources, false)).toEqual([]);
@@ -30,7 +30,7 @@ describe("static public deployment boundary", () => {
       expect(publicPageSources).toContain(page);
       expect(forbiddenStatic(page.replace("/page.tsx", ".html"))).toBe(false);
     }
-    for (const file of ["docs/private.html", "docs/checkout/record.json", "docs/checkout/__next.secret.txt", "DOCS.html", "software-partners/private.html", "online-businesses/private.txt"]) expect(forbiddenStatic(file), file).toBe(true);
+    for (const file of ["docs/private.html", "developers/getting-started/record.json", "developers/getting-started/__next.secret.txt", "DOCS.html", "software-partners/private.html", "online-businesses/private.txt"]) expect(forbiddenStatic(file), file).toBe(true);
   });
 
   it("keeps a new legal page pending without reopening the reviewed publication scope", () => {
@@ -43,7 +43,7 @@ describe("static public deployment boundary", () => {
 
   it("allows exactly the reviewed edge source without reopening retired runtime directories", () => {
     expect(publicSourcePath(boundarySource)).toBe(true);
-    expect(publicSourcePath("src/modules/public-site/metadata.ts")).toBe(true);
+    expect(publicSourcePath("src/features/metadata.ts")).toBe(true);
     for (const path of ["src/proxy.ts", "src/platform/database.ts", "src/modules/identity/session.ts", "netlify/functions/account.ts", "netlify/edge-functions/account.ts"]) {
       expect(publicSourcePath(path), path).toBe(false);
     }
@@ -54,7 +54,7 @@ describe("static public deployment boundary", () => {
       expect(forbiddenArtifact(path), path).toBe(true);
       expect(forbiddenArtifact(path.replaceAll("/", "\\")), `Windows path ${path}`).toBe(true);
     }
-    expect(forbiddenArtifact("src/shared/public-release.ts")).toBe(false);
+    expect(forbiddenArtifact("src/shared/site/public-release.ts")).toBe(false);
   });
 
   it("never publishes an account page, data file, source tree or server bundle as a static asset", () => {
@@ -62,7 +62,7 @@ describe("static public deployment boundary", () => {
       for (const suffix of ["", ".html", ".txt", "/index.html", "/record.json"]) expect(forbiddenStatic(`${family}${suffix}`)).toBe(true);
     }
     for (const path of ["records.db", "backup.SQL", "src/app/page.tsx", "node_modules/next/package.json", ".next/server/page.js", "functions/server.js", "server.zip", "edge.eszip", "review/guides/manifest.json", "artifacts/guides-review/site/index.html", "content/drafts/guide.json", "outputs/topic-map.csv", "tools/guide-review/build.mjs"]) expect(forbiddenStatic(path), path).toBe(true);
-    for (const path of [...publicHtmlFiles, ...publicHtmlFiles.map(file => file.replace(/\.html$/, ".txt")), "payment-acceptance-service.txt", "guides.txt", "404.html", "robots.txt", "sitemap.xml", "opengraph-image", "brand/networks/visa-blue.svg", "_next/static/chunks/app.js"]) expect(forbiddenStatic(path), path).toBe(false);
+    for (const path of [...publicHtmlFiles, ...publicHtmlFiles.map(file => file.replace(/\.html$/, ".txt")), "services/merchant-services.txt", "resources/guides.txt", "404.html", "robots.txt", "sitemap.xml", "opengraph-image", "brand/networks/visa-blue.svg", "_next/static/chunks/app.js"]) expect(forbiddenStatic(path), path).toBe(false);
   });
 
   it("requires one all-path edge boundary before cache, without method or path exclusions", () => {

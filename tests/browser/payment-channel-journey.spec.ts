@@ -21,7 +21,7 @@ async function browserStorage(page: Page) {
 
 test("payment requests explain the acceptance flow without duplicate actions", async ({ page }) => {
   const observed = await blockAccountActions(page);
-  await page.goto("/online-businesses#payment-channels");
+  await page.goto("/use-cases/online-businesses#payment-channels");
   const initialStorage = await browserStorage(page);
   const channels = page.locator("#payment-channels");
   await expect(channels.getByRole("heading", { name: /Send a payment request\s*when the order is ready\./ })).toBeVisible();
@@ -32,7 +32,7 @@ test("payment requests explain the acceptance flow without duplicate actions", a
   await expect(page.getByRole("tablist", { name: "Checkout layouts", exact: true })).toHaveCount(0);
   await expect(page.getByRole("tablist", { name: "Payment journey views", exact: true })).toBeVisible();
   await expect(channels.getByRole("link")).toHaveCount(1);
-  await expect(channels.getByRole("link", {name:"Use payment requests",exact:true})).toHaveAttribute("href", "/docs/payment-requests");
+  await expect(channels.getByRole("link", {name:"Use payment requests",exact:true})).toHaveAttribute("href", "/developers/developer-tools");
   await expect(channels.locator("details")).toHaveCount(0);
   await expect(channels).not.toContainText("What to include in a request");
   await expect(channels.locator("button, input, textarea, form, iframe")).toHaveCount(0);
@@ -43,7 +43,7 @@ test("payment requests explain the acceptance flow without duplicate actions", a
 
 test("fee estimates are local and leave payment operations unchanged", async ({ page }) => {
   const observed = await blockAccountActions(page);
-  await page.goto("/payment-acceptance-service");
+  await page.goto("/services/merchant-services");
   const initialStorage = await browserStorage(page);
   const estimate = page.locator(".fee-estimate");
   const operations = page.locator("#payment-operations");
@@ -52,7 +52,7 @@ test("fee estimates are local and leave payment operations unchanged", async ({ 
   await expect(page.locator('input[type="checkbox"]')).toHaveCount(0);
   await estimate.getByLabel("Payment amount USD").fill("480");
   await expect(estimate.locator(".fee-net")).toContainText("$465.78");
-  await page.goto("/payment-acceptance-service");
+  await page.goto("/services/merchant-services");
   expect(await operations.textContent()).toBe(operationsBefore);
   await page.goto("/pricing");
   expect(await browserStorage(page)).toEqual(initialStorage);
@@ -69,7 +69,7 @@ test("merchant operations and payment requests stay readable at narrow widths an
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of [320, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto("/payment-acceptance-service");
+    await page.goto("/services/merchant-services");
     for (const spaced of [false, true]) {
       if (spaced) await page.addStyleTag({ content: "body *{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}body p{margin-bottom:2em!important}" });
       for (const anchor of ["payouts", "refunds-and-disputes", "fees"]) {

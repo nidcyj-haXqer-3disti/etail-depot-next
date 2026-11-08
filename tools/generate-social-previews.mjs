@@ -3,8 +3,8 @@
 import { createRequire } from "node:module";
 import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { socialPreviews } from "../src/shared/social-preview.ts";
-import { socialPreviewArt } from "../src/ui/social-preview-art.ts";
+import { socialPreviews } from "../src/shared/seo/social-preview.ts";
+import { socialPreviewArt } from "../src/shared/seo/social-preview-art.ts";
 const { ImageResponse } = createRequire(import.meta.url)("next/og");
 const destination = new URL("../public/brand/social/", import.meta.url);
 await mkdir(destination, { recursive: true });

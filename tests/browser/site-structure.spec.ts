@@ -31,22 +31,22 @@ test("primary categories support keyboard, outside dismissal and service navigat
   if (await menu.isVisible()) await menu.click();
   await services.click();
   await nav.getByRole("link", { name: "Card services", exact: true }).click();
-  await expect(page).toHaveURL(/\/credit-card-services$/);
+  await expect(page).toHaveURL(/\/services\/card-services$/);
   await expect(page.getByRole("main")).toContainText("An inquiry is not an application.");
   await expect(nav.locator("details[open]")).toHaveCount(0);
   if (await menu.isVisible()) await menu.click();
   await nav.locator("summary").filter({hasText:/^Developers$/}).click();
-  await nav.getByRole("link", { name: "Documentation", exact: true }).click();
-  await expect(page).toHaveURL(/\/docs$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Documentation");
-  await page.goBack(); await expect(page).toHaveURL(/\/credit-card-services$/);
+  await nav.getByRole("link", { name: "Getting started", exact: true }).click();
+  await expect(page).toHaveURL(/\/developers\/getting-started$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Getting started");
+  await page.goBack(); await expect(page).toHaveURL(/\/services\/card-services$/);
 });
 
 test("platform visitors reach partnership terms through payment models without an extra platform section", async ({ page }) => {
   await page.goto("/");
   const header = page.getByRole("banner");
   const nav = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
-  for (const [label, route] of [["Software platforms", "/software-partners"]]) {
+  for (const [label, route] of [["Software platforms", "/use-cases/software-platforms"]]) {
     const toggle = header.getByRole("button", { name: "Menu", exact: true });
     if (await toggle.isVisible()) await toggle.click();
     const category = nav.locator("summary").filter({ hasText: /^Use cases$/ });
@@ -58,29 +58,30 @@ test("platform visitors reach partnership terms through payment models without a
     if (await toggle.isVisible()) await expect(toggle).toHaveAttribute("aria-expanded", "false");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   }
-  await expect(header.locator('a[href="/payment-partnerships"]')).toHaveCount(0);
-  await expect(page.getByRole("contentinfo").locator('a[href="/payment-partnerships"]')).toHaveCount(0);
+  await expect(header.locator('a[href="/use-cases/software-platforms/partnerships"]')).toHaveCount(0);
+  await expect(page.getByRole("contentinfo").locator('a[href="/use-cases/software-platforms/partnerships"]')).toHaveCount(0);
   await expect(page.locator(".ec-commercial-section")).toHaveCount(0);
   await expect(page.getByRole("navigation", { name: "On this page", exact: true }).getByRole("link", { name: "Partnership", exact: true })).toHaveCount(0);
   await page.getByRole("link", { name: "Account structure", exact: true }).click();
-  await expect(page).toHaveURL(/\/platform-payment-models$/);
+  await expect(page).toHaveURL(/\/use-cases\/software-platforms\/payment-models$/);
   await page.getByRole("main").getByRole("link", { name: "Reporting and commercial terms", exact: true }).click();
-  await expect(page).toHaveURL(/\/payment-partnerships$/);
+  await expect(page).toHaveURL(/\/use-cases\/software-platforms\/partnerships$/);
   await expect(nav.locator("summary").filter({ hasText: /^Use cases$/ })).toHaveClass("is-current");
 });
 
 test("Documentation connects tasks and keeps account access protected", async ({ page, request }) => {
-  const response = await page.goto("/docs");
+  const response = await page.goto("/developers/getting-started");
   expect(response?.status()).toBe(200);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/docs");
-  await page.locator(".docs-task-paths").getByRole("link", { name: "Set up an account", exact: true }).click();
-  await expect(page).toHaveURL(/\/docs\/merchant-onboarding$/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/developers/getting-started");
+  const resourceNav=await openMainNavigation(page,"Resources");
+  await resourceNav.getByRole("link",{name:"Merchant account setup",exact:true}).click();
+  await expect(page).toHaveURL(/\/resources\/merchant-account-setup$/);
   const portal = page.getByRole("main").getByRole("link", { name: "Start now", exact: true });
   await expect(portal).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
   await expect(portal).toHaveAttribute("referrerpolicy", "no-referrer");
   await expect(page.locator("form, iframe, input")).toHaveCount(0);
-  expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/docs");
+  expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/developers/getting-started");
 });
 
 test("Services, Use cases and Documentation remain usable without JavaScript", async ({ browser, baseURL }, testInfo) => {
@@ -92,15 +93,16 @@ test("Services, Use cases and Documentation remain usable without JavaScript", a
     await expect(nav).toBeVisible();
     await nav.locator("summary").filter({ hasText: /^Services$/ }).click();
     await nav.getByRole("link", { name: "Merchant onboarding", exact: true }).click();
-    await expect(page).toHaveURL(/\/merchant-onboarding$/);
+    await expect(page).toHaveURL(/\/services\/merchant-onboarding$/);
     await nav.locator("summary").filter({ hasText: /^Use cases$/ }).click();
     await nav.getByRole("link", { name: "Software platforms", exact: true }).click();
-    await expect(page).toHaveURL(/\/software-partners$/);
+    await expect(page).toHaveURL(/\/use-cases\/software-platforms$/);
     await nav.locator("summary").filter({hasText:/^Developers$/}).click();
-    await nav.getByRole("link", { name: "Documentation", exact: true }).click();
-    await expect(page).toHaveURL(/\/docs$/);
-    await page.locator(".docs-task-paths").getByRole("link", { name: "Launch preparation", exact: true }).click();
-    await expect(page).toHaveURL(/\/docs\/testing-and-launch$/);
+    await nav.getByRole("link", { name: "Getting started", exact: true }).click();
+    await expect(page).toHaveURL(/\/developers\/getting-started$/);
+    await nav.locator("summary").filter({hasText:/^Developers$/}).click();
+    await nav.getByRole("link",{name:"Testing",exact:true}).click();
+    await expect(page).toHaveURL(/\/developers\/testing$/);
     await expect(page.locator("#acceptance-tests")).toContainText("Invalid, repeated or delayed event");
     const guidance = page.locator("#customer-journey details");
     await expect(guidance.locator("p")).toBeHidden();
@@ -115,7 +117,7 @@ test("Services, Use cases and Documentation remain usable without JavaScript", a
 });
 
 test("online business use case owns the merchant walkthrough and preserves navigation and discovery boundaries", async ({ page, request }) => {
-  await page.goto("/payment-acceptance-service#customer-checkout");
+  await page.goto("/services/merchant-services#customer-checkout");
   await expect(page.locator(".payment-service-explorer, .payment-sharing-note")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "See the online payment experience", exact: true })).toHaveCount(0);
   const header = page.getByRole("banner");
@@ -124,25 +126,25 @@ test("online business use case owns the merchant walkthrough and preserves navig
   const navigation = header.getByRole("navigation", { name: "Main navigation" });
   if (await navigation.locator(".public-domain-use-cases").getAttribute("open") === null) await navigation.locator("summary").filter({hasText:/^Use cases$/}).click();
   await navigation.getByRole("link", { name: "Online businesses", exact: true }).click();
-  await expect(page).toHaveURL(/\/online-businesses$/);
+  await expect(page).toHaveURL(/\/use-cases\/online-businesses$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Online payments\.\s*Connected to your orders\./);
   await expect(page.locator(".payment-service-explorer")).toHaveCount(1);
   await expect(page.locator("#payment-channels")).toContainText("Payment requests");
   await expect(page.locator("#fees, #payment-operations")).toHaveCount(0);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/online-businesses");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/use-cases/online-businesses");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
-  expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/online-businesses");
+  expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/use-cases/online-businesses");
   await openFooterGroup(page, "Services");
-  await expect(page.getByRole("contentinfo").getByRole("link", { name: "Merchant onboarding", exact: true })).toHaveAttribute("href", "/merchant-onboarding");
+  await expect(page.getByRole("contentinfo").getByRole("link", { name: "Merchant onboarding", exact: true })).toHaveAttribute("href", "/services/merchant-onboarding");
   const service = page.locator(".online-business-actions").getByRole("link", { name: "Merchant services", exact: true });
-  await expect(service).toHaveAttribute("href", "/payment-acceptance-service");
+  await expect(service).toHaveAttribute("href", "/services/merchant-services");
   await page.getByRole("link", { name: "Connect online checkout", exact: true }).click();
-  await expect(page).toHaveURL(/\/docs\/checkout$/);
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page).toHaveURL(/\/developers\/getting-started#checkout$/);
+  await expect(page.locator("#checkout > h2")).toBeInViewport();
   await page.goBack();
-  await expect(page).toHaveURL(/\/online-businesses$/);
+  await expect(page).toHaveURL(/\/use-cases\/online-businesses$/);
   await page.goBack();
-  await expect(page).toHaveURL(/\/payment-acceptance-service#customer-checkout$/);
+  await expect(page).toHaveURL(/\/services\/merchant-services#customer-checkout$/);
 });
 
 test("existing commercial section URLs remain usable without JavaScript", async ({ browser, baseURL }, testInfo) => {
@@ -151,11 +153,11 @@ test("existing commercial section URLs remain usable without JavaScript", async 
   const page = await context.newPage();
   try {
     for (const [route, fragment] of [
-      ["/payment-acceptance-service", "#fees"],
-      ["/online-businesses", "#customer-checkout"],
-      ["/online-businesses", "#payment-channels"],
-      ["/software-partners", "#payment-experience"],
-      ["/software-partners", "#integration"],
+      ["/services/merchant-services", "#fees"],
+      ["/use-cases/online-businesses", "#customer-checkout"],
+      ["/use-cases/online-businesses", "#payment-channels"],
+      ["/use-cases/software-platforms", "#payment-experience"],
+      ["/use-cases/software-platforms", "#integration"],
     ]) {
       await page.goto(route + fragment);
       await expect(page).toHaveURL(new URL(route + fragment, baseURL).href);
@@ -168,7 +170,7 @@ test("existing commercial section URLs remain usable without JavaScript", async 
 
 test("online journey tabs keep the next chapter stable and inactive controls out of the focus order", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("/online-businesses");
+  await page.goto("/use-cases/online-businesses");
   await page.evaluate(() => document.fonts.ready);
   const explorer = page.locator(".payment-service-explorer");
   const views = explorer.getByRole("tablist", { name: "Payment journey views", exact: true });
@@ -189,10 +191,10 @@ test("online journey tabs keep the next chapter stable and inactive controls out
 
 const industryPaths = ["commerce-marketplaces", "freight-platforms", "travel-platforms", "legal-software"];
 test("four industry cases share one page with useful workflows and no standalone pages", async ({page, request}) => {
-  await page.goto("/software-partners?tracking=private");
+  await page.goto("/use-cases/software-platforms?tracking=private");
   await expect(page.locator(".industry-cases > article")).toHaveCount(4);
-  await expect(page.locator('a[href^="/use-cases/"]')).toHaveCount(0);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/software-partners");
+  for (const slug of industryPaths) await expect(page.locator(`a[href^="/use-cases/${slug}"]`)).toHaveCount(0);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/use-cases/software-platforms");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   await expect(page.locator("main form, main input, main iframe")).toHaveCount(0);
   await expect(page.locator("main")).not.toContainText(/Cybersource|Infinicept|SDK|prototype|illustrative|roadmap/i);
@@ -214,16 +216,16 @@ test("four industry cases share one page with useful workflows and no standalone
   await expect(page.locator("#commerce-marketplaces .ec-industry-scene")).toBeVisible();
   const data = await page.locator('script[type="application/ld+json"]').textContent();
   const entries = JSON.parse(data!)["@graph"][2].itemListElement;
-  expect(entries.map((item: {url:string})=>item.url)).toEqual(industryPaths.map(slug=>`https://etaildepot.com/software-partners#${slug}`));
+  expect(entries.map((item: {url:string})=>item.url)).toEqual(industryPaths.map(slug=>`https://etaildepot.com/use-cases/software-platforms#${slug}`));
   expect(data).not.toContain("tracking");
-  expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/use-cases/");
+  expect(await (await request.get("/sitemap.xml")).text()).not.toContain("<loc>");
 });
 
 test("all four industry cases remain readable without JavaScript", async ({browser, baseURL}, testInfo) => {
   const context = await browser.newContext({baseURL,javaScriptEnabled:false,reducedMotion:"reduce",viewport:{width:testInfo.project.name === "mobile" ? 320 : 1440,height:900}});
   const page = await context.newPage();
   try {
-    await page.goto("/software-partners");
+    await page.goto("/use-cases/software-platforms");
     for (const slug of industryPaths) {
       const card = page.locator(`#${slug}`);
       await expect(card.getByRole("heading",{level:3})).toBeVisible();
@@ -260,16 +262,16 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   const navigation = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
   const directory = page.locator(".public-footer-navigation");
   await expect(directory.getByRole("navigation")).toHaveCount(5);
-  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(25);
+  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(28);
   const destinations = await directory.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")));
   expect(new Set(destinations).size).toBe(destinations.length);
-  await expect(navigation.locator('a[href^="/docs"]')).toHaveCount(6);
+  await expect(navigation.locator('a[href^="/developers/"]')).toHaveCount(8);
   if (await toggle.isVisible()) await toggle.click();
   await navigation.locator("summary").filter({ hasText: /^Services$/ }).click();
   await navigation.getByRole("link", { name: "Merchant onboarding", exact: true }).click();
-  await expect(page).toHaveURL(/\/merchant-onboarding$/);
+  await expect(page).toHaveURL(/\/services\/merchant-onboarding$/);
 
-  for (const [label, route] of [["Refunds", "/refunds-and-disputes"], ["Payouts", "/payouts-and-reconciliation"]]) {
+  for (const [label, route] of [["Refunds", "/services/refunds"], ["Payouts", "/services/payouts"]]) {
     await page.goto("/");
     await openFooterGroup(page, "Services");
     await directory.getByRole("link", { name: label, exact: true }).click();
@@ -283,13 +285,13 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   await openFooterGroup(page, "Use cases");
   await directory.getByRole("link", { name: "Software platforms", exact: true }).click();
   await page.getByRole("main").getByRole("link", { name: "Explore developer integration", exact: true }).click();
-  await expect(page).toHaveURL(/\/docs#developer-integration$/);
-  await expect(page.locator("#developer-integration")).toBeInViewport();
+  await expect(page).toHaveURL(/\/developers\/getting-started$/);
+  await expect(page.getByRole("heading",{level:1})).toBeInViewport();
   await expect(navigation.locator("summary").filter({ hasText: /^Developers$/ })).toHaveClass("is-current");
 
-  await page.goto("/contact");
+  await page.goto("/company/contact");
   await expect(navigation.locator("summary.is-current")).toHaveCount(0);
-  await expect(header.getByRole("link", { name: "Contact sales", exact: true, includeHidden: true })).toHaveAttribute("href", "/contact");
+  await expect(header.getByRole("link", { name: "Contact sales", exact: true, includeHidden: true })).toHaveAttribute("href", "/company/contact");
   await expect(directory.locator('a[href="/pricing"]')).toHaveCount(0);
   if (await toggle.isVisible()) await toggle.click();
   const pricing = navigation.locator(':scope > a[href="/pricing"]');
@@ -308,14 +310,14 @@ test("service links reach dedicated pages and industry links reach platform sect
   const header = page.getByRole("banner");
   const nav = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
   const targets = [
-    ["Services", "Payouts", "/payouts-and-reconciliation"],
-    ["Services", "Reconciliation", "/reconciliation"],
-    ["Services", "Refunds", "/refunds-and-disputes"],
-    ["Services", "Disputes", "/disputes"],
-    ["Use cases", "Commerce marketplaces", "/software-partners#commerce-marketplaces"],
-    ["Use cases", "Freight platforms", "/software-partners#freight-platforms"],
-    ["Use cases", "Travel platforms", "/software-partners#travel-platforms"],
-    ["Use cases", "Legal software", "/software-partners#legal-software"],
+    ["Services", "Payouts", "/services/payouts"],
+    ["Services", "Reconciliation", "/services/reconciliation"],
+    ["Services", "Refunds", "/services/refunds"],
+    ["Services", "Disputes", "/services/disputes"],
+    ["Use cases", "Commerce marketplaces", "/use-cases/software-platforms#commerce-marketplaces"],
+    ["Use cases", "Freight platforms", "/use-cases/software-platforms#freight-platforms"],
+    ["Use cases", "Travel platforms", "/use-cases/software-platforms#travel-platforms"],
+    ["Use cases", "Legal software", "/use-cases/software-platforms#legal-software"],
   ];
   for (const [group, label, href] of targets) {
     const menu = header.getByRole("button", { name: "Menu", exact: true });
@@ -338,7 +340,7 @@ test("service links reach dedicated pages and industry links reach platform sect
 
 test("footer groups work with a keyboard and adapt to screen size", async ({ page, browserName }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/docs");
+  await page.goto("/developers/getting-started");
   const directory = page.locator(".public-footer-navigation");
   await expect(directory).toHaveAttribute("data-compact", "true");
   await expect(directory.locator("details[open]")).toHaveCount(0);
@@ -366,11 +368,11 @@ test("footer groups work with a keyboard and adapt to screen size", async ({ pag
   await expect(merchant).toBeHidden();
   await expect(services).toBeFocused();
   const developers = await openFooterGroup(page, "Developers");
-  await developers.getByRole("link", { name: "Checkout integration", exact: true }).click();
-  await expect(page).toHaveURL(/\/docs\/checkout$/);
+  await developers.getByRole("link", { name: "Testing", exact: true }).click();
+  await expect(page).toHaveURL(/\/developers\/testing$/);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "false");
-  await expect(directory.getByRole("link")).toHaveCount(25);
+  await expect(directory.getByRole("link")).toHaveCount(28);
   await expect(directory.locator("summary")).toHaveCount(0);
   await page.setViewportSize({ width: 320, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "true");
@@ -423,11 +425,11 @@ test("the complete footer remains usable without JavaScript", async ({ browser }
           await summary.click();
           destinations += await directory.getByRole("link").count();
         }
-        expect(destinations).toBe(25);
+        expect(destinations).toBe(28);
         await directory.locator("summary").filter({ hasText: /^Services$/ }).click();
-      } else await expect(directory.getByRole("link")).toHaveCount(25);
+      } else await expect(directory.getByRole("link")).toHaveCount(28);
       await directory.getByRole("link", { name: "Payouts", exact: true }).click();
-      await expect(page).toHaveURL(/\/payouts-and-reconciliation$/);
+      await expect(page).toHaveURL(/\/services\/payouts$/);
       await expect(page.getByRole("heading", {level:1})).toBeInViewport();
     } finally { await context.close(); }
   }
@@ -436,7 +438,7 @@ test("the complete footer remains usable without JavaScript", async ({ browser }
 
 test("phone industries expand by intent and retain bookmarked workflows", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/software-partners#industries");
+  await page.goto("/use-cases/software-platforms#industries");
   const cards = page.locator(".industry-cases > article > details");
   await expect(cards).toHaveCount(4);
   await expect(page.locator(".industry-cases > article > details[open]")).toHaveCount(0);
@@ -450,7 +452,7 @@ test("phone industries expand by intent and retain bookmarked workflows", async 
   await expect(page.locator(".industry-cases > article > details[open]")).toHaveCount(4);
   await page.setViewportSize({ width: 320, height: 844 });
   await expect(freight).toHaveAttribute("open", "");
-  await page.goto("/software-partners#legal-software");
+  await page.goto("/use-cases/software-platforms#legal-software");
   await expect(page.locator("#legal-software > details")).toHaveAttribute("open", "");
   await expect(page.locator("#legal-software h3")).toBeInViewport();
   await expect(page.locator("#legal-software .ec-industry-scope")).toBeVisible();
@@ -483,7 +485,7 @@ test("phone footer is compact before JavaScript loads and does not change height
  const scriptsReady = new Promise<void>(resolve => { releaseScripts = resolve; });
  await page.route("**/*.js", async route => { await scriptsReady; await route.continue(); });
  try {
-  await page.goto("/docs/merchant-onboarding#registration-email", { waitUntil: "commit" });
+  await page.goto("/resources/merchant-account-setup#registration-email", { waitUntil: "commit" });
   const footer = page.locator(".public-footer-navigation");
   const services = footer.locator("summary").filter({ hasText: /^Services$/ });
   await expect(services).toBeVisible();

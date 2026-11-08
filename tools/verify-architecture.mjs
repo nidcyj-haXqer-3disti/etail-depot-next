@@ -8,10 +8,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { boundarySource, builtPageSources, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, forbiddenLocalReviewStatic, localReviewHtmlFiles, publicationBlockers, localCorePreviewPageSources, localPreviewPageSources, reviewedLegalPageSources, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "./public-artifact-policy.ts";
-import { STANDARD_REFERENCE_PATHS } from "../src/shared/standard-reference-paths.ts";
-import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
+import { STANDARD_REFERENCE_PATHS } from "../src/shared/site/standard-reference-paths.ts";
+import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/site/public-release.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { verifyPlatformEmail, verifyPlatformEmailBundle } from "./netlify-email-compat.ts";
+
+import { verifyFilePublication } from "./verify-file-publication.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 verifyReferenceRelease(root);
@@ -35,7 +37,7 @@ function sourceChecks(filename, source) {
       const specifier = node.moduleSpecifier;
       if (specifier && ts.isStringLiteral(specifier)) {
         const name = specifier.text;
-        if (filename === boundarySource && !["../../src/shared/public-routes.ts", "../../src/shared/public-release.ts"].includes(name)) fail(filename, "UNREVIEWED_EDGE_RUNTIME_IMPORT");
+        if (filename === boundarySource && !["../../src/shared/site/public-routes.ts", "../../src/shared/site/public-release.ts"].includes(name)) fail(filename, "UNREVIEWED_EDGE_RUNTIME_IMPORT");
         if (!name.startsWith(".") && !name.startsWith("@/") && !["next", "react", "react-dom"].some(pkg => name === pkg || name.startsWith(`${pkg}/`))) fail(filename, "NON_PUBLIC_RUNTIME_IMPORT");
         if (name === "next/headers") fail(filename, "PRIVATE_REQUEST_STATE_IMPORT");
         if (name.startsWith("@/") && !publicSourcePath(path.posix.normalize(`src/${name.slice(2)}`))) fail(filename, "PRIVATE_SOURCE_IMPORT");
@@ -57,11 +59,11 @@ function sourceChecks(filename, source) {
   inspect(tree);
 }
 
-assert.equal(publicPageSources.length, 52, "The candidate contains forty six core sources and six reference templates.");
+assert.equal(publicPageSources.length, 51, "The candidate contains forty five core sources and six reference templates.");
 assert.equal(new Set(publicPageSources).size, publicPageSources.length, "Reviewed page paths must be unique.");
-assert.equal(publicHtmlFiles.length, 3752);
-assert.deepEqual(localCorePreviewPageSources, ["software-partners/page.tsx", "docs/page.tsx", "online-businesses/page.tsx", "docs/merchant-onboarding/page.tsx", "docs/integration-access/page.tsx", "docs/checkout/page.tsx", "docs/payment-requests/page.tsx", "docs/payment-status/page.tsx", "docs/refunds-and-disputes/page.tsx", "docs/payouts/page.tsx", "docs/webhooks/page.tsx", "docs/testing-and-launch/page.tsx"], "Only the exact reviewed non-guide local preview pages may be added.");
-assert.equal(builtPageSources.length, 52, "The four industry use cases are sections of Software platforms.");
+assert.equal(publicHtmlFiles.length, 3751);
+assert.deepEqual(localCorePreviewPageSources, ["use-cases/software-platforms/page.tsx", "use-cases/online-businesses/page.tsx", "developers/getting-started/page.tsx", "developers/api-reference/page.tsx", "developers/sdks/page.tsx", "developers/webhooks/page.tsx", "developers/testing/page.tsx", "developers/developer-tools/page.tsx", "developers/changelog/page.tsx", "developers/api-status/page.tsx"], "Only the exact reviewed public information pages may be added.");
+assert.equal(builtPageSources.length, 51, "The four industry use cases are sections of Software platforms.");
 assert.equal(reviewedLegalPageSources.length, 10, "Only the ten reviewed legal sources are admitted.");
 assert.equal(localPreviewPageSources.length, 0, "Unreviewed legal pages must not join the publication candidate.");
 assert.equal(STANDARD_REFERENCE_PATHS.length, 3706, "Only the exact reviewed ISO reference inventory is included.");
@@ -88,6 +90,7 @@ if (process.argv.includes("--self-test")) {
   process.exit(0);
 }
 
+verifyFilePublication(root);
 const targets = JSON.parse(readFileSync(path.join(root, "project-targets.json"), "utf8"));
 assert.equal(targets.project_key, "ETAIL_DEPOT_NEXT_GREENFIELD_2026");
 assert.equal(targets.github.repository_id, 1361184741);

@@ -5,7 +5,7 @@ import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, wr
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { bundle, validateManifest } from "@netlify/edge-bundler";
-import { canonicalOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
+import { canonicalOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/site/public-release.ts";
 import { publicSecurityHeaders } from "../netlify/edge-functions/public-boundary.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { clearPublicPackageOutputs } from "./public-package-cleanup.ts";

@@ -1,0 +1,42 @@
+/* Scoped to the owning page family. Keep selector order and responsive states intact. */
+.cw-docs.documentation-page{background:#fff;--docs-ink:#193c33;--docs-muted:#526b5c;--docs-line:#d7e1d2;--docs-tint:#f5f7ef}
+.cw-docs .docs-workspace{padding-top:24px;gap:34px}
+.cw-docs .docs-navigation{padding-top:20px}
+.cw-docs .docs-nav-group{margin-top:26px}
+.cw-docs .docs-nav-group p{font-size:12px;color:#526b5c;letter-spacing:.02em}
+.cw-docs.documentation-page .docs-navigation a[aria-current="page"]{background:#eaf0e4;box-shadow:inset 2px 0 #315f46;color:#193c33;font-weight:500}
+.cw-docs .docs-navigation a{font-size:13px;padding-block:10px}
+.cw-docs.documentation-page .docs-article-heading{padding-bottom:25px;border-bottom:0}
+.cw-docs.documentation-page .docs-article-heading h1{font-size:var(--public-reading-title-size);line-height:1.12;max-width:24ch}
+.cw-docs .docs-article-heading>p{font-size:17px;line-height:1.75}
+.cw-docs .docs-context{gap:8px 22px;padding:0}
+.cw-docs.documentation-page .docs-prerequisites{padding:22px 24px;background:#f5f7ef;border:1px solid #d7e1d2;border-radius:8px;margin:28px 0 40px}
+.cw-docs .docs-section{margin-top:44px}
+.cw-docs .docs-section h2{font-size:28px;line-height:1.25;letter-spacing:-.025em}
+.cw-docs .docs-section>p{font-size:16px;line-height:1.8}
+.cw-docs .docs-diagram,.cw-docs .docs-sequence{background:#f5f7ef;border-color:#d3dfce;border-radius:10px;box-shadow:none}
+.cw-docs .docs-diagram-heading{background:#eaf0e3;border-color:#d3dfce;padding:21px 24px}
+.cw-docs .docs-diagram-heading>span{font-size:15px;font-weight:500}
+.cw-docs .docs-diagram li{border-color:#d7e1d2;border-radius:7px}
+.cw-docs .docs-sequence-number,.cw-docs .docs-workflow-number{background:#193c33;color:#f3f7ef;border-color:#193c33}
+.cw-docs .docs-table thead th{background:#f5f7ef}
+.cw-docs .docs-table caption{background:#eaf0e3;font-weight:500}
+.cw-docs .docs-toc{margin-top:24px}
+.cw-docs .docs-toc a{line-height:1.6}
+@media(max-width:1000px){.cw-docs .docs-navigation{padding-top:0}.cw-docs .docs-workspace{padding-top:32px}}
+@media(max-width:680px){.cw-docs.documentation-page .docs-article-heading h1{font-size:var(--public-reading-title-size)}.cw-docs.documentation-page .docs-prerequisites{padding:22px 20px}.cw-docs .docs-section h2{font-size:26px}.cw-docs .docs-diagram-heading{padding:20px}}
+@media(max-width:359px){.cw-docs.documentation-page .docs-article-heading h1{font-size:var(--public-reading-title-size)}}
+@media(forced-colors:active){.cw-docs .docs-sequence-number,.cw-docs .docs-workflow-number{background:Canvas;color:CanvasText;border:1px solid CanvasText}}
+@media(max-width:680px){
+ .cw-docs .docs-workspace{padding-top:24px;gap:18px;}
+ .cw-docs.documentation-page .docs-article-heading{padding-bottom:12px;}
+ .cw-docs .docs-article-heading h1{margin-bottom:16px;}
+ .cw-docs .docs-article-heading>p{font-size:16px;line-height:1.65;margin-bottom:16px;}
+ .cw-docs.documentation-page .docs-prerequisites{margin-block:18px 28px;}
+ .cw-docs .docs-mobile-toc{margin-bottom:28px;}
+ .cw-docs .docs-section{margin-top:34px;}
+}
+@media(max-width:680px){
+ .cw-docs .docs-navigation a{font-size:15px;min-height:48px;padding-block:12px;line-height:1.6}
+ .cw-docs .docs-nav-group p{font-size:13px}
+}

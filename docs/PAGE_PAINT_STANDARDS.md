@@ -62,7 +62,7 @@ Preserve `data-scroll-behavior="smooth"` on the root HTML element while global C
 | Responsive footer before hydration and navigation | `tests/browser/site-structure.spec.ts` |
 | Browser history and native section links | `tests/browser/public-history.spec.ts` |
 
-The 6 November findings and completed checks are recorded in `CURRENT_WORK_CONTEXT.md` and `planning/STATUS.md`. This standard changes implementation and review practice, not publication authorization or the website's public content.
+The 6 November findings and completed checks are preserved in [the historical work context](../archive/project-history/docs/CURRENT_WORK_CONTEXT.md) and [status log](../archive/project-history/planning/STATUS.md). Current status is in [CURRENT_WORK_CONTEXT.md](CURRENT_WORK_CONTEXT.md). This standard changes implementation and review practice, not publication authorization or the website's public content.
 
 ## Startup traffic and performance measurement
 

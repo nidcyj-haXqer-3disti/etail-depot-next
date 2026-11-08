@@ -1,14 +1,14 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import manifest from "../../tools/guide-image-previews.json";
+import manifest from "../../tools/assets/guide-image-previews.json";
 
 const digest = (value: Buffer) => createHash("sha256").update(value).digest("hex");
 
 test("guide previews remain tied to the approved source images", () => {
   for (const item of manifest.receipts) {
-    const source = readFileSync(new URL(`../../src/ui/assets/${item.source}`, import.meta.url));
-    const preview = readFileSync(new URL(`../../src/ui/assets/${item.file}`, import.meta.url));
+    const source = readFileSync(new URL(`../../src/features/resources/integrations/${item.group}/assets/${item.source}`, import.meta.url));
+    const preview = readFileSync(new URL(`../../src/features/resources/integrations/${item.group}/assets/${item.file}`, import.meta.url));
     expect(digest(source), item.source).toBe(item.sourceSha256);
     expect(digest(preview), item.file).toBe(item.sha256);
     expect(preview.length, item.file).toBe(item.bytes);

@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("merchant services explain the lifecycle, pricing and safe account handoff", async ({ page }) => {
-  await page.goto("/payment-acceptance-service");
+  await page.goto("/services/merchant-services");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Accept card\s*and ACH payments\./);
   const fees = page.locator("#fees");
   for (const [container, name] of [[page.locator(".merchant-hero"), "Start now"]] as const) {
@@ -38,11 +38,11 @@ test("merchant services explain the lifecycle, pricing and safe account handoff"
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/pricing#fees$/);
   await expect(page.locator(".fee-estimate")).toBeVisible();
-  await page.goto("/help#payments");
+  await page.goto("/resources/help#payments");
   const setup = page.locator("#payments details").filter({ hasText: "Can my business apply for a merchant account?" });
   await setup.locator("summary").click();
   await expect(setup).toContainText("Payments can start once the account is approved and set up");
-  await expect(setup.getByRole("link", { name: "merchant account setup", exact: true })).toHaveAttribute("href", "/merchant-onboarding");
+  await expect(setup.getByRole("link", { name: "merchant account setup", exact: true })).toHaveAttribute("href", "/services/merchant-onboarding");
   const wallets = page.locator("#payments details").filter({ hasText: "Can customers pay by ACH, Apple Pay or Google Pay?" });
   await wallets.locator("summary").click();
   await expect(wallets).toContainText("checkout options for your account during setup");
@@ -52,7 +52,7 @@ test("merchant services explain the lifecycle, pricing and safe account handoff"
 test("domestic card fee breakdown reconciles and recovers invalid input without submitting data", async ({ page }) => {
   const mutations: string[] = [];
   page.on("request", request => { if (!["GET", "HEAD", "OPTIONS"].includes(request.method())) mutations.push(request.url()); });
-  await page.goto("/payment-acceptance-service");
+  await page.goto("/services/merchant-services");
   await page.goto("/pricing");
   const offer = page.locator(".pricing-rate");
   await expect(offer.getByRole("heading", { name: "Online card payments", exact: true })).toBeVisible();
@@ -98,7 +98,7 @@ test("domestic card fee breakdown reconciles and recovers invalid input without 
     await expect(amount).toHaveAttribute("aria-describedby", "fee-estimate-note");
     await expect(estimate.locator("dl dd")).toHaveText([...figures]);
   }
-  await page.goto("/payment-acceptance-service");
+  await page.goto("/services/merchant-services");
   const payouts = page.locator("#payment-operations");
   await expect(payouts).toContainText("A settled payment does not confirm that funds have reached your bank");
   await expect(payouts).toContainText("First payouts, reviews, holds, reserves and bank processing can affect timing");
@@ -107,7 +107,7 @@ test("domestic card fee breakdown reconciles and recovers invalid input without 
 });
 
 test("cards separate the deposit from debt and keep material terms outside disclosures", async ({ page }) => {
-  await page.goto("/credit-card-services");
+  await page.goto("/services/card-services");
   const facts = page.locator("#card-details");
   await expect(facts).toContainText("$200");
   await expect(facts).toContainText("$0");
@@ -119,7 +119,7 @@ test("cards separate the deposit from debt and keep material terms outside discl
   await expect(page.locator(".secured-credit-art")).toBeVisible();
   const inquiry = page.locator("[data-service-actions]").getByRole("link", { name: "Ask about card services", exact: true });
   await expect(inquiry).toBeVisible();
-  await expect(inquiry).toHaveAttribute("href", "/contact#cards");
+  await expect(inquiry).toHaveAttribute("href", "/company/contact#cards");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Secured credit");
   await expect(page.locator("main")).not.toContainText("Applications are not open");
   const preview = page.getByRole("region", { name: "Take your eligible card into your wallet.", exact: true });

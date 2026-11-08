@@ -1,11 +1,11 @@
 {
   "reviewed": "2026-11-05",
   "scope": {
-    "corePages": 46,
+    "corePages": 45,
     "iso20022Pages": 3455,
     "independent8583Pages": 251,
-    "contentPages": 3752,
-    "sitemapPages": 3740
+    "contentPages": 3751,
+    "sitemapPages": 3731
   },
   "iso20022": {
     "basis": "Published Financial Repository policy, retaining source attribution and contributor conditions",
@@ -24,38 +24,44 @@
     "excluded": "The previous reproduced ISO 8583 tables and edition routes. No ISO republication permission is asserted."
   },
   "files": {
-    "src/modules/public-site/iso20022-data.json": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
-    "src/modules/public-site/iso8583-independent-data.json": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
-    "src/shared/standard-reference-paths.ts": "8a9859adb7cf77a4ace61b641a9f8eae9dc77c6aa837069644c643932913a270",
+    "src/features/resources/references/iso-20022/data/iso20022-data.json": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
+    "src/features/resources/references/iso-8583/data/iso8583-independent-data.json": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
+    "src/shared/site/standard-reference-paths.ts": "816e7c4463ed71b11fa72051fec2eaa74dbad97b6f2355ad2d4b98a18ac1fb47",
     "public/licenses/iso20022-reference-NOTICE.txt": "2125d0188bbc870725f39c4240f168e173bc9dc14c77e2cfd6a7df37f1cf3586",
     "public/licenses/iso8583-reference-NOTICE.txt": "e63e5ebbd1dc6215baefd4ea69b111bb69d6afed418f25e33ea4c6c9bed98971",
     "public/licenses/pyiso8583-MIT.txt": "804badb01a7e2e71ddd21947faaef6823de4511da46fd97b7e91197570cc9faf",
     "public/licenses/moov-iso8583-Apache-2.0.txt": "3c96c0da3de9587c2062f25bc7efccba795f81dbf1b08dc71652c856e88b01a8"
   },
-  "scopeBasis": "The user authorized customer facing publication preparation for the ten United States merchant legal routes on 5 November 2026 after targeted corrections. Account specific timing, billing and processing arrangements remain governed by accepted account terms. Website publication does not establish merchant acceptance, provider approval or activation. All twelve legal and website policy pages remain noindex. One Shopify gateway integration resource requested on 5 November 2026 adds one content page and one search eligible URL, bringing the totals to 3,751 and 3,739. Reference data, licence hashes and legal publication records are unchanged. Push, merge and deployment require separate authorization. The WooCommerce integration guide requested for local review on 7 November 2026 adds one content page and one eligible URL: 3,752 and 3,740. Reference data and legal content hashes are unchanged.",
+  "scopeBasis": "The user authorized customer facing publication preparation for the ten United States merchant legal routes on 5 November 2026 after targeted corrections. Account specific timing, billing and processing arrangements remain governed by accepted account terms. Website publication does not establish merchant acceptance, provider approval or activation. All twelve legal and website policy pages remain noindex. One Shopify gateway integration resource requested on 5 November 2026 adds one content page and one search eligible URL, bringing the totals to 3,751 and 3,739. Reference data, licence hashes and legal publication records are unchanged. Push, merge and deployment require separate authorization. The WooCommerce integration guide requested for local review on 7 November 2026 adds one content page and one eligible URL: 3,752 and 3,740. Reference data and legal content hashes are unchanged. On 8 November 2026 the user authorized local consolidation of documentation into eight Developers pages and Merchant account setup under Resources. The ten former documentation routes redirect to nine current pages. All eight planned Developers pages remain noindex while Etail APIs and tools are coming soon. Current totals: 3,751 content pages and 3,731 sitemap URLs. This does not authorize publication. On 8 November 2026 the user authorized local category URL migration: Services, Use cases, Resources and Company routes move under their category prefixes. The eight Developers routes retain their addresses. Counts, indexing eligibility and source licensing scope are unchanged.",
   "legalPublication": {
     "reviewed": "2026-11-05",
     "basis": "Explicit user instruction to correct the legal pages and remove the local publication hold; customer facing publication only.",
     "paths": [
-      "/legal",
-      "/legal/merchant-services",
-      "/legal/fees",
-      "/legal/payouts-and-reserves",
-      "/legal/acceptable-use",
-      "/legal/software-platforms",
-      "/legal/acquirer-disclosure",
-      "/legal/merchant-privacy",
-      "/legal/data-processing",
-      "/legal/security-policy"
+      "/company/legal",
+      "/company/legal/merchant-services",
+      "/company/legal/fees",
+      "/company/legal/payouts-and-reserves",
+      "/company/legal/acceptable-use",
+      "/company/legal/software-platforms",
+      "/company/legal/acquirer-disclosure",
+      "/company/legal/merchant-privacy",
+      "/company/legal/data-processing",
+      "/company/legal/security-policy"
     ],
     "files": {
-      "src/app/legal/page.tsx": "3b61c478d723d627cb1322dd433ec8881646b64743b5b5e8130af39b406a3a34",
-      "src/modules/public-site/legal-center.ts": "9dfac72f6a8660256d1429715dcdae4a10429941e8c69464601b5dde50ccf5d7",
-      "src/modules/public-site/legal-metadata.ts": "dc9cef410aa0aa620a41ee06540a6dc5aa83524dfd53197a24ec391d2d45bd7b",
-      "src/modules/public-site/merchant-legal-content.json": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152",
-      "src/shared/legal-paths.ts": "0835df2e7cdbb8f75f1974221d0d0407be7ff1a549670faaff5414ebfe1da30d",
-      "src/shared/legal-identity.ts": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77",
-      "src/ui/legal-service-document.tsx": "c7a56884b382dfc03a6771b01a5382725322ae7d358a6a968a0d1d05a60c2c34"
+      "src/app/company/legal/page.tsx": "41464521ef455da86503c177d891410bc9773ad39f0a098f324fe4174e52a5be",
+      "src/features/company/legal/legal-center/content.ts": "9dfac72f6a8660256d1429715dcdae4a10429941e8c69464601b5dde50ccf5d7",
+      "src/features/company/legal/metadata.ts": "4ede62a356ebec9b62858ea84a34d411978213efd09f0f242aa19e256f244f9d",
+      "src/features/company/legal/merchant-legal-content.json": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152",
+      "src/shared/site/legal-paths.ts": "d7081622c31c2338bec2dfc6a664556b5214bb55eed517e0cdc9be2c10d8e97f",
+      "src/shared/site/legal-identity.ts": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77",
+      "src/features/company/legal/components/legal-service-document.tsx": "8205de98e8d3c65bd7c496d9ab56a7a16f7554a92d441946b0d13081ff7d8258",
+      "src/features/company/legal/legal-center/page-content.tsx": "a3cfbbc463c708e4d59a693d7ff5e002d851971a06b138744e2a56b22e696daa",
+      "src/features/company/legal/legal-center/metadata.ts": "8cccbc88c64a3941a24744acee8c683895f52d372487fa5b53abcef00dbce354"
+    },
+    "urlMigration": {
+      "reviewed": "2026-11-08",
+      "basis": "User approved category URL migration steps 1 through 4. Only route wrappers, metadata addresses and displayed internal links changed. The merchant contract JSON and legal identity bytes are unchanged. This is not a revision of contractual provisions or publication authorization."
     }
   }
 }

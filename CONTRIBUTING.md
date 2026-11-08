@@ -1,47 +1,42 @@
-# Contributing to Etail Depot
+# Contributing to the public website
 
-Thank you for helping improve the Etail Depot public website. Useful contributions include reproducible bug fixes, accessibility improvements, focused visual refinements, tests and clearer documentation.
+Read the [README](README.md), [current work context](docs/CURRENT_WORK_CONTEXT.md), [repository guide](docs/REPOSITORY_GUIDE.md) and [source precedence](docs/SOURCE_PRECEDENCE.md). Archived specifications do not authorize restoring retired account or payment systems.
 
-## Before you start
+## Choose the work area
 
-Read the [README](README.md), [current work context](docs/CURRENT_WORK_CONTEXT.md) and [public architecture](docs/PUBLIC_SITE_ARCHITECTURE.md). This repository serves the existing public website. Older requirements and archived account code are historical; they do not expand its scope.
+A branch is an independent copy of the whole repository, not a special folder assigned to one person. Agree the outcome and affected files before starting. Use the business feature that owns the page; use shared folders only for behavior genuinely shared across pages.
 
-For substantial changes to product behavior, commercial wording, dependencies or architecture, open an issue to agree the approach first. Keep approved offers, legal disclosures, product availability, original logos and service destinations intact unless the maintainer has approved the specific change.
+| Work | Primary location |
+| --- | --- |
+| Home, a service, a use case, Pricing, a resource or Company page | Its folder in `src/features/` and existing route wrapper in `src/app/` |
+| Header, footer, logos, common UI or site facts | `src/shared/` |
+| Browser/unit checks, generators, packaging, CI or hosting support | `tests/`, `tools/`, `.github/` or `netlify/` |
+| Instructions and current project records | `docs/` |
 
-## Make a change
+The public Developers section is a customer-facing product area. Managing the project team belongs here and in engineering documentation. No Etail API or SDK is added by assigning an engineering task.
 
-1. Fork the repository and clone your fork. Existing collaborators may work on a feature branch in the upstream repository.
-2. Install the exact Node and pnpm versions and follow the [local setup](README.md#quick-start).
-3. Create a descriptive branch, for example `git switch -c codex/improve-help-spacing`.
-4. Make a focused change. Keep unrelated files and generated outputs out of the commit.
-5. Run the relevant checks and inspect any affected pages.
-6. Push your branch and open a pull request against `nidcyj-haXqer-3disti/etail-depot-next:main`.
+## Branch and review workflow
 
-Use `pnpm-lock.yaml` as the only dependency lockfile. Do not commit `.env` files, credentials, customer records, `node_modules`, build output or local review artifacts. Do not modify archived migrations, connect old databases or run retired account tools.
+1. Agree the scope in an issue or task. For a substantial behavior, dependency, commercial or architecture change, obtain the relevant maintainer decision first.
+2. Start a descriptive feature branch from the agreed base. Use `codex/` for agent branches; for example, `codex/services-refunds-copy` or `codex/engineering-build-checks`.
+3. External contributors use a fork. Existing collaborators can use a feature branch in this repository. Each developer uses their own checkout or worktree.
+4. Keep changes focused. Shared tools and the lockfile belong to the project, not to an individual developer. Personal scripts and review captures stay in ignored local folders.
+5. Coordinate edits to shared navigation, design tokens, pricing, legal sources, the lockfile and release checks. If two branches touch the same lines, review the conflict together; never discard the other change just to complete a merge.
+6. Update the branch against its agreed base without rewriting shared history. Recheck the combined result. Separate files can still have incompatible assumptions.
+7. Review the exact diff, push only when authorized, and open a pull request against this repository's `main` branch. Use the [GitHub delivery procedure](docs/GITHUB_DELIVERY.md).
 
-## Verify your work
+Do not invent team members or CODEOWNERS entries. Assign a real maintainer/reviewer in the issue or PR. Changing GitHub permissions or branch protections is a separate settings action.
 
-For an application change, run the full sequence before requesting final review:
+## Verify the change
 
-```sh
-pnpm exec playwright install chromium
-pnpm verify
-```
+Use the pinned Node and pnpm versions and one lockfile. For application changes, run `pnpm verify`; [test and evidence requirements](docs/TEST_AND_EVIDENCE.md) describe the gates. For documentation-only changes, verify linked paths, instructions and formatting, and report which application checks were not rerun. A release candidate still needs all four required release commands.
 
-Stop your own development/preview server first; ports 3100 and 3101 must be free. The [README checks](README.md#checks) explain the individual gates and Linux browser prerequisites. For a documentation-only change, check the instructions, linked paths and formatting; accurately report which application checks were not run. Maintainers still run the required release checks for a release candidate.
+For UI work, follow the [page paint standard](docs/PAGE_PAINT_STANDARDS.md), test affected desktop and phone flows, and inspect keyboard navigation, focus, wrapping and overflow. Add a meaningful regression only when it covers a real behavior or failure. Do not weaken assertions to make a build pass.
 
-For UI changes, inspect the existing design at 1440px, 390px and 320px widths, and check keyboard navigation, focus states, wrapping and overflow. Include comparable before/after screenshots when they help review the change. Do not add a test that only repeats the implementation; cover the behavior or regression that matters.
+Keep actual failures and successful reruns visible. CI must belong to the exact proposed source; a previous passing branch does not prove a new merge is correct.
 
-GitHub checks are bound to the upstream repository and run on pull requests targeting its `main` branch. Workflows running inside a fork do not satisfy that binding. Run checks locally and submit the upstream pull request; do not change repository IDs or release controls to make fork-local Actions pass. A maintainer may need to approve a new contributor's workflow run.
+## Keep publication boundaries clear
 
-## Write a useful pull request
+Do not commit environment credentials, customer records, unredacted account captures, generated website output or local review files. [File publication policy](docs/FILE_PUBLICATION_POLICY.md) separates public source from public website assets. Do not edit archived migrations, run old provisioning scripts or reconnect a retired database.
 
-Explain the problem, the resulting behavior and how you verified it. Include the related issue, relevant screenshots and any remaining limitations. Keep actual failures and successful reruns visible; do not describe a skipped check as passed.
-
-Use a feature branch and request maintainer review. Do not push feature changes directly to `main` or rewrite shared history. Repository write permission allows merging, but does not replace review or the release process. CI and local packaging do not publish the site; production deployment remains a separate authorized maintainer action.
-
-## Keep support information private
-
-Public issues and pull requests must not contain account details, identity documents, payment information or credentials. Product questions belong in the [Help center](https://etaildepot.com/help). Report a potential security vulnerability privately to [compliance@etaildepot.com](mailto:compliance@etaildepot.com).
-
-The repository does not currently have a repository-wide open-source license. See the [license and asset note](README.md#license-and-assets) before reusing code or brand assets.
+A reviewed PR merge and a production deployment are separate actions. Follow the user's applicable authorization and the [manual deployment runbook](docs/NETLIFY_DEPLOYMENT.md). Product questions belong in the [Help center](https://etaildepot.com/resources/help); potential vulnerabilities go privately to [compliance@etaildepot.com](mailto:compliance@etaildepot.com).

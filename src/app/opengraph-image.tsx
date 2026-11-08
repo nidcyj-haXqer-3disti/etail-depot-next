@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
-import { publicIndexingEnabled, publicSocialImage } from "@/modules/public-site/metadata";
-import { socialPreviewArt } from "@/ui/social-preview-art";
+import { publicIndexingEnabled, publicSocialImage } from "@/shared/seo/metadata";
+import { socialPreviewArt } from "@/shared/seo/social-preview-art";
 
 export const alt = publicSocialImage.alt;
 export const size = { width: 1200, height: 630 };

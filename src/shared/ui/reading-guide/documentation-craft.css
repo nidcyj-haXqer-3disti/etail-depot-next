@@ -1,0 +1,25 @@
+/* Workflow diagrams share the product pages' ink, paper and sage surfaces. */
+.public-main .cw-docs .docs-diagram,.public-main .cw-docs .docs-sequence{border-radius:14px;border:1px solid #d8e2cf;box-shadow:0 16px 35px -28px #20463845;overflow:hidden;background:#eff4e8}
+.public-main .cw-docs .docs-diagram-heading{padding:23px 26px;background:#204638;color:#f6faef;border:0}
+.public-main .cw-docs .docs-diagram-heading>.icon{color:#d6e7c3}
+.public-main .cw-docs .docs-diagram-heading>span{color:#f6faef;font-weight:500}
+.public-main .cw-docs .docs-diagram:not(.docs-workflow) ol{padding:26px;gap:18px;background:#eff4e8}
+.public-main .cw-docs .docs-diagram:not(.docs-workflow) li{padding:22px;border-radius:10px;border-color:#d8e2cf;box-shadow:0 12px 28px -25px #20463850}
+.public-main .cw-docs .docs-diagram-owner{font-size:12px;letter-spacing:.015em;color:#526b5c}
+.public-main .cw-docs .docs-diagram-record{font-size:13px;line-height:1.65}
+.public-main .cw-docs .docs-workflow ol,.public-main .cw-docs .docs-sequence ol{padding:6px 26px;background:#fff}
+.public-main .cw-docs .docs-workflow li,.public-main .cw-docs .docs-sequence li{padding-block:24px}
+.public-main .cw-docs .docs-workflow-number,.public-main .cw-docs .docs-sequence-number{background:#edf3e3;border:1px solid #c9d8b8;color:#315e48}
+.public-main .cw-docs .docs-sequence-transfer{color:#315e48;font-size:12px}
+.public-main .cw-docs .docs-sequence-action p,.public-main .cw-docs .docs-workflow p{font-size:14px;line-height:1.75}
+.public-main .cw-docs .docs-workflow strong{font-weight:500}
+.public-main .cw-docs .docs-diagram figcaption,.public-main .cw-docs .docs-sequence figcaption{background:#f6f8f1;font-size:13px;padding:20px 26px}
+.public-main .cw-docs .docs-integration-preparation{padding:0;background:#f6f8f1;border-radius:14px;overflow:hidden;gap:0;border:1px solid #dce5d3}
+.public-main .cw-docs .docs-integration-preparation>div{padding:25px}
+.public-main .cw-docs .docs-integration-preparation .docs-assigned-materials{background:#edf3e3}
+.public-main .cw-docs .docs-integration-preparation li{font-size:14px}
+@media(max-width:680px){.public-main .cw-docs .docs-diagram-owner,.public-main .cw-docs .docs-sequence-transfer{font-size:13px}.public-main .cw-docs .docs-diagram-record{font-size:14px}.public-main .cw-docs .docs-sequence-action p,.public-main .cw-docs .docs-workflow p{font-size:15px;line-height:1.65}.public-main .cw-docs .docs-diagram-heading{padding:20px}.public-main .cw-docs .docs-diagram:not(.docs-workflow) ol{padding:18px;gap:14px}.public-main .cw-docs .docs-diagram:not(.docs-workflow) li{padding:20px}.public-main .cw-docs .docs-workflow ol,.public-main .cw-docs .docs-sequence ol{padding:2px 20px}.public-main .cw-docs .docs-workflow li,.public-main .cw-docs .docs-sequence li{padding-block:22px}.public-main .cw-docs .docs-diagram figcaption,.public-main .cw-docs .docs-sequence figcaption{padding:18px 20px}.public-main .cw-docs .docs-integration-preparation>div{padding:22px}}
+@media(forced-colors:active){.public-main .cw-docs .docs-diagram-heading{background:Canvas;color:CanvasText;border-bottom:1px solid CanvasText}.public-main .cw-docs .docs-diagram-heading>span{color:CanvasText}}/* Section access precedes preparation on smaller reading layouts. */
+
+
+@media(max-width:1250px){.public-main .cw-docs .docs-mobile-toc{margin:22px 0 20px;border:1px solid #d7e1d0;border-radius:10px;background:#f6f8f2}.public-main .cw-docs .docs-mobile-toc summary{min-height:52px;padding:15px 18px;font-weight:500}.public-main .cw-docs .docs-mobile-toc nav{padding:0 18px 12px}.public-main .cw-docs .docs-mobile-toc a{min-height:44px;padding:11px 0}.public-main .cw-docs .docs-prerequisites{margin-top:20px}}

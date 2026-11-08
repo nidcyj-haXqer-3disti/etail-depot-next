@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { ISO8583_PATH, REFERENCE_SOURCES, REFERENCE_SECTIONS, MESSAGE_TYPES, DATA_FIELDS, SOURCE_NOTES, referencePath, referenceEntry, referenceSection, referenceIdentity, sourceUrl, messageDigits, messageExplanation, bitmapPosition, iso8583Metadata, iso8583JsonLd } from "../../src/modules/public-site/iso8583-reference";
-import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
-import { canonicalOrigin, privateRobots, publicSitemap } from "../../src/modules/public-site/metadata";
+import { ISO8583_PATH, REFERENCE_SOURCES, REFERENCE_SECTIONS, MESSAGE_TYPES, DATA_FIELDS, SOURCE_NOTES, referencePath, referenceEntry, referenceSection, referenceIdentity, sourceUrl, messageDigits, messageExplanation, bitmapPosition, iso8583Metadata, iso8583JsonLd } from "../../src/features/resources/references/iso-8583/reference";
+import { STANDARD_REFERENCE_PATHS } from "../../src/shared/site/standard-reference-paths";
+import { canonicalOrigin, privateRobots, publicSitemap } from "../../src/features/metadata";
 import { forbiddenStatic } from "../../tools/public-artifact-policy";
 
 const messages = REFERENCE_SECTIONS[0], fields = REFERENCE_SECTIONS[1];
@@ -51,7 +51,7 @@ describe("Independent ISO 8583 implementation reference", () => {
     expect(readFileSync("public/licenses/iso8583-reference-NOTICE.txt","utf8")).toContain("Modifications:");
     expect(SOURCE_NOTES.some(x=>x.note.includes("2007")&&x.note.includes("2003"))).toBe(true);
     for(const entry of [...MESSAGE_TYPES,...DATA_FIELDS]) expect(sourceUrl(entry)).toMatch(/^https:\/\/github.com\/.+\/blob\/[a-f0-9]{40}\/.+#L[0-9]+-L[0-9]+$/);
-    for(const path of ["src/modules/public-site/iso8583-data.json","src/modules/public-site/iso8583-source-notes.json","src/app/guides/iso-8583/2023"]) expect(existsSync(path)).toBe(false);
+    for(const path of ["src/modules/public-site/iso8583-data.json","src/modules/public-site/iso8583-source-notes.json","src/app/resources/guides/iso-8583/2023"]) expect(existsSync(path)).toBe(false);
   });
   it("gives all pages unique titles, canonical URLs, precise citations and noindex metadata", () => {
     const titles=new Set<string>();

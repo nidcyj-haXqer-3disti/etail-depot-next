@@ -1,40 +1,31 @@
-import { describe, expect, it } from "vitest";
-import { documentationPages, documentationPath, documentationPaths, documentationServiceLinks } from "../../src/modules/public-site/documentation-catalog";
-import { documentationArticles } from "../../src/modules/public-site/documentation-content";
-import { documentationJsonLd, publicPageModified, SERVICE_PAGES, servicePageMetadata } from "../../src/modules/public-site/metadata";
-import { isPublicContentPath } from "../../src/shared/public-page-inventory";
+import { expect,test } from "vitest";
+import { DEVELOPER_NAVIGATION,DEVELOPER_PATHS,DOCUMENTATION_REDIRECTS } from "../../src/shared/site/developer-paths";
+import { developerJsonLd,developerMetadata } from "../../src/features/developers/metadata";
+import { isPublicContentPath,isIndexablePath } from "../../src/shared/site/public-page-inventory";
+import { publicPageRedirect,managedContentRoute } from "../../src/shared/site/public-routes";
+import { publicNavigationGroups,publicFooterGroups } from "../../src/shared/site/site-navigation";
 
-describe("documentation discovery", () => {
-  it("keeps all nine topics aligned across the introduction, metadata and structured data", () => {
-    expect(documentationPages).toHaveLength(9);
-    for (const topic of documentationPages) {
-      const path = documentationPath(topic.slug);
-      const graph = JSON.parse(documentationJsonLd(topic.slug))["@graph"];
-      const page = graph.find((node: { "@type": string }) => node["@type"] === "WebPage");
-      expect(SERVICE_PAGES[path]).toEqual({ title: `${topic.title} documentation`, description: documentationArticles[topic.slug].introduction });
-      expect(servicePageMetadata(path).alternates?.canonical).toBe(page.url);
-      expect(page.description).toBe(topic.description);
-      expect(page.dateModified).toBe(publicPageModified(path));
-      expect(isPublicContentPath(documentationServiceLinks[topic.slug].href.split("#")[0])).toBe(true);
-    }
-  });
+test("the eight planned Developer pages share exact menu and footer destinations",()=>{
+ expect(DEVELOPER_NAVIGATION.map(page=>page.label)).toEqual(["Getting started","API reference","SDKs","Webhooks","Testing","Developer tools","Changelog","API status"]);
+ expect(publicNavigationGroups.find(group=>group.id==="developers")?.sections[0].links).toEqual(DEVELOPER_NAVIGATION);
+ expect(publicFooterGroups.find(group=>group.label==="Developers")?.links).toEqual(DEVELOPER_NAVIGATION);
+ for(const page of DEVELOPER_NAVIGATION){
+  expect(isPublicContentPath(page.href)).toBe(true);expect(isIndexablePath(page.href)).toBe(false);
+  const schema=JSON.parse(developerJsonLd(page.slug));
+  expect(schema.url).toBe(`https://etaildepot.com${page.href}`);
+  expect(developerMetadata(page.slug).alternates?.canonical).toBe(schema.url);
+ }
+ expect(isPublicContentPath("/docs")).toBe(false);
+ expect(isIndexablePath("/resources/merchant-account-setup")).toBe(true);
+});
 
-  it("describes the exact nine visible topics without duplicating the refunds and disputes article", () => {
-    const graph = JSON.parse(documentationJsonLd())["@graph"];
-    const list = graph.find((node: { "@type": string }) => node["@type"] === "ItemList");
-    const visible = documentationPaths.flatMap(group => group.tasks.flatMap(task => task.links.map(link => documentationPath(link.slug))));
-    expect(list.numberOfItems).toBe(9);
-    const urls: string[] = list.itemListElement.map((item: { url: string }) => new URL(item.url).pathname);
-    expect(new Set(urls)).toEqual(new Set(visible));
-    expect(urls).toHaveLength(new Set(urls).size);
-  });
-
-  it("keeps documentation metadata distinct from the commercial service pages", () => {
-    for (const topic of documentationPages) {
-      const servicePath = documentationServiceLinks[topic.slug].href.split("#")[0];
-      const metadata = servicePageMetadata(documentationPath(topic.slug));
-      expect(metadata.alternates?.canonical).not.toBe(`https://etaildepot.com${servicePath}`);
-      expect(metadata.robots).toMatchObject({ index: false, follow: false });
-    }
-  });
+test("old documentation pages redirect only known document aliases to current pages",()=>{
+ expect(Object.keys(DOCUMENTATION_REDIRECTS)).toHaveLength(10);
+ for(const [old,destination] of Object.entries(DOCUMENTATION_REDIRECTS)){
+  expect(isPublicContentPath(old)).toBe(false);expect(isPublicContentPath(destination)).toBe(true);
+  for(const suffix of ["","/",".html","/index.html"])expect(publicPageRedirect(old+suffix)).toBe(destination);
+  for(const suffix of ["/api",".txt","/__next._full.txt","/unknown"]){expect(publicPageRedirect(old+suffix)).toBeNull();expect(managedContentRoute(old+suffix)).toBe(true);}
+ }
+ for(const path of DEVELOPER_PATHS)expect(publicPageRedirect(path)).toBeNull();
+ for(const path of ["/developers/unknown","/developers/api-reference/secret","/developers%2Fsecret"]){expect(managedContentRoute(path)).toBe(true);expect(isPublicContentPath(path)).toBe(false);}
 });
