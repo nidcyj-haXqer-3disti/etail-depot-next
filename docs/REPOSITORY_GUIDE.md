@@ -58,6 +58,38 @@ A feature keeps the content and visual implementation that belong to it. Use exi
 
 Public Developers is reserved for future Etail developer products. That future feature is not implemented in this restructure. Existing documentation explains vendor-assisted integration and remains Resources. The navigation and published URLs are unchanged.
 
+## Business areas and public addresses
+
+The navigation label, public address and source folder serve different purposes. A label helps a customer choose; `src/app/` owns the address; the feature folder owns its content and implementation. Preserve the existing addresses when moving source files.
+
+| Business area | Current public addresses | Owning feature |
+| --- | --- | --- |
+| Home | `/` | `src/features/home/` |
+| Merchant onboarding | `/merchant-onboarding` | `src/features/services/merchant-onboarding/` |
+| Payment methods and ACH | `/payment-methods`, `/ach-payments` | `src/features/services/payment-methods/`, `src/features/services/ach-payments/` |
+| Payouts and reconciliation | `/payouts-and-reconciliation`, `/reconciliation` | `src/features/services/payouts/`, `src/features/services/reconciliation/` |
+| Refunds and disputes | `/refunds-and-disputes`, `/disputes` | `src/features/services/refunds/`, `src/features/services/disputes/` |
+| Card services | `/credit-card-services` | `src/features/services/card-services/` |
+| Service overview and model | `/payment-acceptance-service`, `/payment-facilitator` | `src/features/services/overview/`, `src/features/services/service-model/` |
+| Online businesses | `/online-businesses` | `src/features/use-cases/online-businesses/` |
+| Software platforms and industries | `/software-partners` and its four industry anchors | `src/features/use-cases/software-platforms/` |
+| Platform partnerships and models | `/payment-partnerships`, `/platform-payment-models` | `src/features/use-cases/software-platforms/partnerships/`, `src/features/use-cases/software-platforms/payment-models/` |
+| Switch merchant services | `/switch-payment-providers` | `src/features/use-cases/switch-merchant-services/` |
+| Merchant account setup | `/docs/merchant-onboarding` | `src/features/resources/merchant-account-setup/` |
+| Current vendor integration documentation | `/docs` and its other topic addresses | `src/features/resources/documentation/` |
+| Shopify and WooCommerce guides | `/resources/shopify-gateway-integration`, `/resources/woocommerce-gateway-integration` | `src/features/resources/integrations/shopify/`, `src/features/resources/integrations/woocommerce/` |
+| Help and guide directory | `/help`, `/guides` | `src/features/resources/help/`, `src/features/resources/guides/` |
+| Payment code references | `/guides/iso-20022` and `/guides/iso-8583`, including their generated reference addresses | `src/features/resources/references/` |
+| About, Contact and Trust | `/company`, `/contact`, `/trust` | `src/features/company/about/`, `src/features/company/contact/`, `src/features/company/trust/` |
+| Legal, Terms and Privacy | `/legal`, its merchant legal documents, `/terms`, `/privacy` | `src/features/company/legal/` |
+| Pricing | `/pricing` | `src/features/pricing/` |
+
+The current Developers menu still points to vendor integration documentation under `/docs`. Its source is owned by Resources. Future Etail APIs or SDKs remain a separate, unimplemented product area. Merchant account setup is an exact Resources menu destination even though its URL also begins with `/docs`; the header must use the most specific matching destination.
+
+The nine merchant legal document routes share the approved [legal content](../src/features/company/legal/merchant-legal-content.json) and [renderer](../src/features/company/legal/components/legal-service-document.tsx). They do not need nine duplicate implementation folders. Likewise, reference URLs are generated from the reviewed data; there is not one source file per reference value. The [route inventory](../src/shared/site/public-page-inventory.ts) remains the authoritative address list.
+
+The repository's `docs/` folder contains contributor instructions. It is not the source of the customer `/docs` website. Those page wrappers are in `src/app/docs/`, with implementation in Resources. Neither engineering instructions nor archive records are copied to the public website.
+
 ## Engineering support
 
 ```text

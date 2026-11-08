@@ -29,7 +29,9 @@ test("all documentation tasks have working sections, unique canonicals and local
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content',/noindex/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href',`https://etaildepot.com${path}`);
   expect(sitemap).not.toContain(path);
-  const navigation=await openMainNavigation(page, "Developers");
+  const group = item.slug === "merchant-onboarding" ? "Resources" : "Developers";
+  const navigation=await openMainNavigation(page, group);
+  await expect(navigation.locator("summary.is-current")).toHaveText(group);
   const direct = ["merchant-onboarding", "integration-access", "checkout", "webhooks", "testing-and-launch"].includes(item.slug);
   const current = navigation.locator("a[aria-current]");
   await expect(current).toHaveCount(1);

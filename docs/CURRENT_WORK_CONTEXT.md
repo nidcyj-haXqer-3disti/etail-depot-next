@@ -14,7 +14,7 @@ Updated 8 November 2026. The user authorized a further audit of all five stages 
 | 4. Engineering instructions and reviewed history | Complete | [Stage 4 receipt](plans/repository-stage4.json) |
 | 5. Combined verification and release preparation | Complete locally | [Stage 5 receipt](plans/repository-stage5.json) |
 
-The active branch is `codex/restructure-audit-20261108`, based on completed Stage 5 commit `640c6ad428c5f7ccc4d456e472a88c61d5b646b3`. The last published baseline verified in Stage 1 is commit `e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5`, Netlify deploy `6aef58f5c8e79bce7be0b5b3`. Stage 5 read-only GitHub and Netlify checks confirmed that both main and the current published deploy still point to this baseline. No remote settings were changed.
+The active branch is `codex/association-review-20261108`, based on the completed audit commit `a7f4d1f706a9d54dfad6c83683b9dc87db79fd10`. The last published baseline verified in Stage 1 is commit `e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5`, Netlify deploy `6aef58f5c8e79bce7be0b5b3`. Stage 5 read-only GitHub and Netlify checks confirmed that both main and the current published deploy still point to this baseline. No remote settings were changed.
 
 The earlier working copy, including the unpublished future Developers feature, remains separate and unchanged. Do not copy it wholesale into this migration.
 
@@ -26,23 +26,27 @@ The earlier working copy, including the unpublished future Developers feature, r
 - Only the public website and approved vendor links run here. No merchant authentication, account application, payment processing, API, KYC, ledger or database runtime may be added.
 - Sign in and registration use the fixed Welcome URL in [hosted services](../src/shared/site/hosted-services.ts), without forwarded input or referrers. Card applications remain closed.
 
+## Current association review
+
+The [folder, URL and ownership review](plans/repository-association-review.json) is complete locally. The current [repository guide](REPOSITORY_GUIDE.md) maps business areas to addresses and actual implementation folders.
+
+One existing navigation mismatch was corrected: `/docs/merchant-onboarding` is listed under Resources, but the broader `/docs` match highlighted Developers. The header now uses the most specific matching destination. Menu labels, public URLs, content and artwork remain unchanged. Six empty retired source directories were removed locally; no tracked files were deleted.
+
+All 3,752 public URLs map to 52 current route modules and their feature owners. The scan checked 156,211 internal link occurrences, 11,830 distinct local destinations including anchors, and 114 referenced local assets without missing targets. Shared merchant legal content and generated references do not require a separate source folder or file for every URL. Existing Developers navigation still leads to vendor documentation under Resources; future Etail APIs/SDKs remain outside this scope.
+
 ## Verification state
 
-The [additional five-stage audit](plans/repository-audit.json) is complete locally. No unresolved restructuring defects were found, and no application code changes were needed. Only engineering audit records changed.
+All four release commands passed on this follow-up: 452 unit checks, 322 Chromium desktop/mobile checks, 156 accessibility checks, production SEO, packaging and package verification. One existing desktop skip covers a mobile-only scenario. Two focused WebKit checks passed. The corrected menu was verified at 320, 390, 768, 1024 and 1280 pixels, including refresh. The dependency audit reported no known vulnerabilities. The first supplementary WebKit run used the wrong build context; its unchanged preview assertion passed after rebuilding the preview. Production SEO and packaging were then restored and verified again, with the initial failure retained in the receipt.
 
-All four required release commands passed again: 449 unit checks, 322 Chromium desktop/mobile checks, 156 accessibility checks, production SEO for 3,740 sitemap URLs, packaging and package verification. One existing desktop skip covers a mobile-only scenario. The dependency audit reported no known vulnerabilities.
+The targeted unit checks reproduced the old mismatch before the correction. All 3,752 page outputs retain their content, semantic structure, metadata, links and anchors; compiled classes/scripts are excluded from that comparison, and the intentional menu highlight change is checked separately. The import graph has 1,016 resolved local edges, no unexpected missing imports and no runtime cycles. Current documentation links and shared tool/CI/Netlify connections resolve.
 
-All 779 original files are accounted for. The separate earlier working copy retains its 800 files and 153 absent-path records. Exact-case dependency checks found 1,015 resolved local imports, no unexpected missing imports and no runtime cycles. The generated Emails vendor import was verified against its pinned hash. The two old service adapters are documented replacements, not missing files.
+Source, build and package fingerprint: `a436d2c137503ef8536f6154579af41e754e50fa5be18af92b7a71a45c96542d`. Production retains 3,740 sitemap URLs, 12 noindex legal/policy pages and 18,945 packaged static files, one public Edge boundary and the existing protected Emails handler. No push, PR, merge or deployment occurred.
 
-All 3,752 freshly rebuilt pages match the pre-restructure baseline in the same preview context. Production indexing and preview protections passed separately. Original artwork, approved legal/reference content, database history, dependencies and hosting rules are preserved. Guide previews and brand/social-image generators reproduce their existing outputs. The active documentation links resolve.
-
-The previous Stage 5 comparison of 86 representative views and 76 WebKit checks remains evidence for the unchanged application fingerprint; those were not counted as fresh runs in this audit. The new Chromium and accessibility checks include first access, refresh, navigation, guide reading and mobile behavior. The receipts distinguish local evidence from the remaining hosted checks.
-
-Source, build and package fingerprint: `870ca5d021acc29ded6360937f6c9927223e678712d5d410f960e2d45348c3d7`. The production package contains 18,945 static files, one public Edge boundary and the existing protected Emails handler. No push, PR, merge or deployment occurred.
+The earlier [five-stage audit](plans/repository-audit.json) and Stage 5 visual comparisons remain evidence for their recorded pre-fix candidate. They are not presented as new visual tests of this follow-up. External provider operation and hosted behavior of the next deployment remain separate checks.
 
 ## Next work
 
-The five local restructure stages are complete. The prepared PR and release procedure are ready for publication authorization. After authorization, use the exact reviewed candidate, pass upstream CI, review/merge and manually deploy through the existing Netlify Git build. Recheck hosted behavior after publication; local checks do not replace it.
+The five local restructure stages and the association follow-up are complete. The updated local PR description and release procedure are ready for publication authorization. After authorization, use the exact reviewed candidate, pass upstream CI, review/merge and manually deploy through the existing Netlify Git build. Recheck hosted behavior after publication; local checks do not replace it.
 
 The older SEO plans, product research and platform backlogs are historical. Search performance must be assessed from current evidence if requested. Magento/Adobe Commerce, custom-site integration guides, new APIs/SDKs and the unpublished Developers feature are separate future scopes; no completion or publication is implied here.
 

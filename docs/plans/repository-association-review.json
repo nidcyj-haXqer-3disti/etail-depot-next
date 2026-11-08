@@ -1,0 +1,137 @@
+{
+  "scope": "Current folders, URLs, business ownership, navigation and technical connections",
+  "status": "complete-local",
+  "date": "2026-11-08",
+  "branch": "codex/association-review-20261108",
+  "baseCommit": "a7f4d1f706a9d54dfad6c83683b9dc87db79fd10",
+  "sourceFingerprint": "a436d2c137503ef8536f6154579af41e754e50fa5be18af92b7a71a45c96542d",
+  "publicationPerformed": false,
+  "fix": {
+    "problem": "Merchant account setup was listed under Resources but /docs prefix matching highlighted Developers.",
+    "correction": "Choose the longest matching menu destination; preserve existing addresses and menu labels.",
+    "regression": "Two targeted assertions reproduced the old mismatch. All three unit checks and the strengthened desktop/mobile documentation checks pass after the fix.",
+    "publicFile": "src/shared/site/site-navigation.ts"
+  },
+  "folderCleanup": {
+    "removedOnlyEmptyLocalDirectories": [
+      "src/ui/assets/guide-previews",
+      "src/ui/generated",
+      "src/ui/assets",
+      "src/ui",
+      "src/modules/public-site",
+      "src/modules"
+    ],
+    "trackedFilesDeleted": 0
+  },
+  "businessOwnership": {
+    "contentUrls": 3752,
+    "routeModules": 52,
+    "featureCounts": {
+      "home": 1,
+      "services": 10,
+      "resources": 3720,
+      "company": 15,
+      "use-cases": 5,
+      "pricing": 1
+    },
+    "legalImplementation": "Nine merchant legal document routes share approved company/legal content and renderer.",
+    "developers": "Existing menu continues to link to vendor documentation owned by Resources. Future Etail developer products remain unimplemented."
+  },
+  "linkChecks": {
+    "pages": 3752,
+    "localLinkOccurrences": 156211,
+    "uniqueLocalDestinations": 11830,
+    "uniqueAssets": 114,
+    "externalDestinations": 178
+  },
+  "technicalChecks": {
+    "resolvedImportEdges": 1016,
+    "runtimeCycles": 0,
+    "unexpectedUnresolvedImports": 0,
+    "packageToolConnections": 12,
+    "sameReleaseCommandsInCI": true,
+    "manualNetlifyDeploymentPreserved": true,
+    "merchantPortalHandoffUnchanged": true,
+    "documentationLinks": 151
+  },
+  "validation": {
+    "commands": [
+      {
+        "command": "pnpm verify:public",
+        "exitCode": 0,
+        "log": "verify-public.log"
+      },
+      {
+        "command": "pnpm test:seo:production",
+        "exitCode": 0,
+        "log": "seo-production.log"
+      },
+      {
+        "command": "pnpm package:netlify",
+        "exitCode": 0,
+        "log": "package-netlify.log"
+      },
+      {
+        "command": "pnpm verify:package",
+        "exitCode": 0,
+        "log": "verify-package.log"
+      }
+    ],
+    "finalContextChecks": [
+      {
+        "command": "pnpm build",
+        "exitCode": 0,
+        "log": "webkit-preview-build.log"
+      },
+      {
+        "command": "pnpm exec playwright test --config=<local-audit-output>/webkit.config.ts tests/browser/documentation.spec.ts --grep all documentation tasks",
+        "exitCode": 0,
+        "log": "webkit.log"
+      },
+      {
+        "command": "pnpm test:seo:production",
+        "exitCode": 0,
+        "log": "seo-production-restored.log"
+      },
+      {
+        "command": "pnpm package:netlify",
+        "exitCode": 0,
+        "log": "package-netlify-restored.log"
+      },
+      {
+        "command": "pnpm verify:package",
+        "exitCode": 0,
+        "log": "verify-package-restored.log"
+      }
+    ],
+    "unitPassed": 452,
+    "chromiumPassed": 322,
+    "existingDesktopSkip": 1,
+    "accessibilityPassed": 156,
+    "focusedWebkitPassed": 2,
+    "navigationViewports": [
+      320,
+      390,
+      768,
+      1024,
+      1280
+    ],
+    "contentOutputComparison": 3752,
+    "outputComparisonScope": "Ignore compiled CSS classes, React-generated IDs, non-JSON scripts and stylesheet/preload links. Preserve content, structured data, semantic elements, stable anchors, link destinations, metadata and image references.",
+    "productionSitemapUrls": 3740,
+    "packageStaticFiles": 18945,
+    "dependencyAudit": "No known vulnerabilities found"
+  },
+  "verificationCorrection": "The first supplementary WebKit run used a production export with a preview-only robots assertion. Its failure log was retained. The unchanged assertion passed after a proper preview build; production SEO and packaging were then rebuilt and verified again.",
+  "unresolvedFindings": [],
+  "remainingReleaseChecks": [
+    "Applicable authorization to publish this candidate",
+    "Exact-commit GitHub CI and review/merge",
+    "Manual Netlify Git deployment followed by hosted verification"
+  ],
+  "limits": [
+    "Internal route, anchor and local asset associations were checked; the audit did not verify availability or account operation of all external provider URLs.",
+    "No push, merge, deployment or remote setting changes occurred.",
+    "Previous Stage 5 visual comparisons remain evidence for their own recorded pre-fix candidate; the new menu views and regressions cover this correction."
+  ]
+}

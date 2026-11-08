@@ -89,8 +89,18 @@ export const publicFooterGroups = [
 export function publicDomainForPath(pathname: string): string | undefined {
   if (pathname === "/payment-acceptance-service") return "services";
   if (["/platform-payment-models", "/payment-partnerships"].includes(pathname)) return "use-cases";
-  return publicNavigationGroups.find(group => group.sections.some(section => section.links.some(link => {
-    const path = link.href.split("#")[0];
-    return pathname === path || pathname.startsWith(`${path}/`);
-  })))?.id;
+  // A specific destination can belong to a different group than its URL parent.
+  // Merchant account setup is a Resource even though its address starts with /docs.
+  let match: { id: string; path: string } | undefined;
+  for (const group of publicNavigationGroups) {
+    for (const section of group.sections) {
+      for (const link of section.links) {
+        const path = link.href.split("#")[0];
+        if ((pathname === path || pathname.startsWith(`${path}/`)) && (!match || path.length > match.path.length)) {
+          match = { id: group.id, path };
+        }
+      }
+    }
+  }
+  return match?.id;
 }

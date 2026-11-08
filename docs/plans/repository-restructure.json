@@ -27,7 +27,8 @@
     "stage3": "repository-stage3.json",
     "stage4": "repository-stage4.json",
     "stage5": "repository-stage5.json",
-    "audit": "repository-audit.json"
+    "audit": "repository-audit.json",
+    "associationReview": "repository-association-review.json"
   },
   "categories": {
     "website": [
@@ -234,12 +235,18 @@
       }
     }
   ],
-  "activeBranch": "codex/restructure-audit-20261108",
+  "activeBranch": "codex/association-review-20261108",
   "audit": {
     "date": "2026-11-08",
     "status": "complete-local",
     "unresolvedFindings": 0,
     "applicationChanged": false,
+    "publicationPerformed": false
+  },
+  "associationFollowup": {
+    "date": "2026-11-08",
+    "status": "complete-local",
+    "correction": "Resources menu context for merchant account setup",
     "publicationPerformed": false
   }
 }
