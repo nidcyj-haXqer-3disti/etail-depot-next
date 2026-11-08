@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { reviewedLegalPageSources } from "./public-artifact-policy.ts";
-import { PUBLIC_CONTENT_PATHS, INDEXABLE_PUBLIC_PATHS } from "../src/shared/public-page-inventory.ts";
+import { PUBLIC_CONTENT_PATHS, INDEXABLE_PUBLIC_PATHS } from "../src/shared/site/public-page-inventory.ts";
 /** Fail closed when source data, provenance notices or the frozen inventory changes. */
 export function verifyReferenceRelease(root) {
   const receipt = JSON.parse(readFileSync(path.join(root, "tools/reference-release.json"), "utf8"));

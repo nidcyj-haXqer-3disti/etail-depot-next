@@ -1,6 +1,6 @@
 import { LEGAL_CENTER_PATHS } from "../../src/shared/legal-paths";
-import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
-import { RESOURCE_PATHS } from "../../src/shared/resource-paths";
+import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
+import { RESOURCE_PATHS } from "../../src/shared/site/resource-paths";
 import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
 import { documentationPages, documentationPath } from "../../src/modules/public-site/documentation-catalog";
 import { shopifySetupSteps } from "../../src/modules/public-site/shopify-guide-content";

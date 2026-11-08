@@ -1,4 +1,4 @@
-import { productFacts } from "@/shared/product-facts";
+import { productFacts } from "@/shared/site/product-facts";
 
 /** One domestic online card payment, calculated in cents with half-up rounding. */
 export function estimateDomesticCardFee(amount: string) {

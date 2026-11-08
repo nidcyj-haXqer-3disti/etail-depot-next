@@ -9,9 +9,11 @@ import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { boundarySource, builtPageSources, edgeEntryFindings, edgeHandler, forbiddenArtifact, forbiddenStatic, forbiddenLocalReviewStatic, localReviewHtmlFiles, publicationBlockers, localCorePreviewPageSources, localPreviewPageSources, reviewedLegalPageSources, publicHtmlFiles, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "./public-artifact-policy.ts";
 import { STANDARD_REFERENCE_PATHS } from "../src/shared/standard-reference-paths.ts";
-import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
+import { isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../src/shared/site/public-release.ts";
 import { publicSourceFingerprint } from "./public-source.mjs";
 import { verifyPlatformEmail, verifyPlatformEmailBundle } from "./netlify-email-compat.ts";
+
+import { verifyFilePublication } from "./verify-file-publication.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 verifyReferenceRelease(root);
@@ -35,7 +37,7 @@ function sourceChecks(filename, source) {
       const specifier = node.moduleSpecifier;
       if (specifier && ts.isStringLiteral(specifier)) {
         const name = specifier.text;
-        if (filename === boundarySource && !["../../src/shared/public-routes.ts", "../../src/shared/public-release.ts"].includes(name)) fail(filename, "UNREVIEWED_EDGE_RUNTIME_IMPORT");
+        if (filename === boundarySource && !["../../src/shared/site/public-routes.ts", "../../src/shared/site/public-release.ts"].includes(name)) fail(filename, "UNREVIEWED_EDGE_RUNTIME_IMPORT");
         if (!name.startsWith(".") && !name.startsWith("@/") && !["next", "react", "react-dom"].some(pkg => name === pkg || name.startsWith(`${pkg}/`))) fail(filename, "NON_PUBLIC_RUNTIME_IMPORT");
         if (name === "next/headers") fail(filename, "PRIVATE_REQUEST_STATE_IMPORT");
         if (name.startsWith("@/") && !publicSourcePath(path.posix.normalize(`src/${name.slice(2)}`))) fail(filename, "PRIVATE_SOURCE_IMPORT");
@@ -88,6 +90,7 @@ if (process.argv.includes("--self-test")) {
   process.exit(0);
 }
 
+verifyFilePublication(root);
 const targets = JSON.parse(readFileSync(path.join(root, "project-targets.json"), "utf8"));
 assert.equal(targets.project_key, "ETAIL_DEPOT_NEXT_GREENFIELD_2026");
 assert.equal(targets.github.repository_id, 1361184741);

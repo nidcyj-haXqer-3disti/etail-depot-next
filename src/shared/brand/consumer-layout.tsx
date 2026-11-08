@@ -1,6 +1,6 @@
-import { applePay, googlePay } from "./artwork-assets";
+import { applePay, googlePay } from "../ui/artwork/artwork-assets";
 import Image from "next/image";
-import { Icon } from "./icon";
+import { Icon } from "../ui/icon";
 import { NetworkBrands } from "./network-brands";
 import "./consumer-site.css";
 

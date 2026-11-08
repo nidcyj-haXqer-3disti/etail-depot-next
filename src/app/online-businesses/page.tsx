@@ -1,22 +1,22 @@
 import "@/ui/site-artwork-polish-online.css";
-import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
+import { merchantAccountGuidance } from "@/shared/site/merchant-account-guidance";
 import Link from "next/link";
-import { PaymentPortalLink } from "@/ui/service-entry";
-import { ServiceBreadcrumbStructuredData } from "@/ui/service-context";
-import "@/ui/connected-services.css";
+import { PaymentPortalLink } from "@/shared/ui/merchant-portal-link";
+import { ServiceBreadcrumbStructuredData } from "@/shared/seo/service-context";
+import "@/shared/styles/connected-services.css";
 import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { Shell } from "@/ui/shell";
+import { Shell } from "@/shared/layout/shell";
 import { PaymentLinkArt } from "@/ui/payment-link-art";
 import { PaymentServiceExplorer } from "@/ui/payment-service-explorer";
-import "@/ui/public-site.css";
-import "@/ui/consumer-site.css";
+import "@/shared/styles/public-site.css";
+import "@/shared/brand/consumer-site.css";
 import "@/ui/payment-page.css";
-import "@/ui/service-blueprint.css";
+import "@/shared/styles/service-blueprint.css";
 import "@/ui/online-business-page.css";
-import "@/ui/enterprise-support.css";
-import "@/ui/attention-pages.css";
+import "@/shared/styles/enterprise-support.css";
+import "@/shared/styles/attention-pages.css";
 
-import "@/ui/service-craft.css";
+import "@/shared/styles/service-craft.css";
 
 export const metadata = servicePageMetadata("/online-businesses");
 

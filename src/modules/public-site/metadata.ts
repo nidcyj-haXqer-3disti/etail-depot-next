@@ -1,17 +1,17 @@
 import { documentationPages, documentationPaths, documentationPath, documentationMetadata, type DocumentationSlug } from "./documentation-catalog";
 import { COMMERCIAL_PAGES } from "./commercial-content";
-import { industryUseCaseNavigation } from "@/shared/industry-use-cases";
+import { industryUseCaseNavigation } from "@/shared/site/industry-use-cases";
 import type { Metadata, MetadataRoute } from "next";
-import { INDEXABLE_PUBLIC_PATHS, isIndexablePath } from "@/shared/public-page-inventory";
-import { socialPreviewImage } from "@/shared/social-preview";
-import { CORE_PAGE_MODIFIED, publicPageModified } from "@/shared/public-page-revisions";
-export { publicPageModified } from "@/shared/public-page-revisions";
-import { serviceLabels } from "@/shared/service-language";
-import { productFacts } from "@/shared/product-facts";
-import { cardProduct } from "@/shared/card-product";
+import { INDEXABLE_PUBLIC_PATHS, isIndexablePath } from "@/shared/site/public-page-inventory";
+import { socialPreviewImage } from "@/shared/seo/social-preview";
+import { CORE_PAGE_MODIFIED, publicPageModified } from "@/shared/site/public-page-revisions";
+export { publicPageModified } from "@/shared/site/public-page-revisions";
+import { serviceLabels } from "@/shared/site/service-language";
+import { productFacts } from "@/shared/site/product-facts";
+import { cardProduct } from "@/shared/site/card-product";
 import { legalIdentity, publicCompanyDescription } from "@/shared/legal-identity";
-import { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
-export { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/public-release";
+import { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/site/public-release";
+export { canonicalOrigin, PUBLIC_INDEXING_APPROVAL, isApprovedSearchRelease } from "@/shared/site/public-release";
 
 const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts.cards.monthlyFeeDollars
   ? `$${productFacts.cards.annualFeeDollars} annual and monthly fees`

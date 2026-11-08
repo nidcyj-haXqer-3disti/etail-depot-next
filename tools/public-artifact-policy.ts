@@ -1,9 +1,10 @@
+import { sourceOnlyStaticFile } from "./file-publication-policy.ts";
 /** Pure deployment-boundary detectors, shared by packaging checks and adversarial tests. */
 import { LEGAL_CENTER_PATHS } from "../src/shared/legal-paths.ts";
-import { RESOURCE_PATHS } from "../src/shared/resource-paths.ts";
-import { COMMERCIAL_PATHS } from "../src/shared/commercial-paths.ts";
-import { PUBLIC_CONTENT_PATHS, publicExportFile } from "../src/shared/public-page-inventory.ts";
-import { managedContentRoute, retiredArticleRoute } from "../src/shared/public-routes.ts";
+import { RESOURCE_PATHS } from "../src/shared/site/resource-paths.ts";
+import { COMMERCIAL_PATHS } from "../src/shared/site/commercial-paths.ts";
+import { PUBLIC_CONTENT_PATHS, publicExportFile } from "../src/shared/site/public-page-inventory.ts";
+import { managedContentRoute, retiredArticleRoute } from "../src/shared/site/public-routes.ts";
 
 export const retiredFamilies = ["api", "checkout", "pay", "payments", "cardholder-services", "cards", "merchant-services", "merchants", "login", "profile", "security", "shared-access", "invitations", "operations", "money-accounts", "accounts", "services"] as const;
 export const boundarySource = "netlify/edge-functions/public-boundary.ts";
@@ -50,8 +51,19 @@ export function reviewedPublicAppModule(appPath: string): boolean {
   return publicAppModules.has(appPath);
 }
 
+const reviewedFeatureSources = new Set<string>([
+  "src/features/services/ach-payments/artwork.tsx",
+  "src/features/services/ach-payments/content.ts",
+  "src/features/services/ach-payments/metadata.ts",
+  "src/features/services/ach-payments/page-content.tsx",
+  "src/features/services/shared/artwork-primitives.tsx",
+  "src/features/services/shared/content-types.ts",
+  "src/features/services/shared/service-detail-layout.tsx",
+  "src/features/services/shared/service-detail.module.css"
+]);
+
 export function publicSourcePath(filename: string): boolean {
-  return filename === boundarySource || filename.startsWith("src/app/") || filename.startsWith("src/ui/") ||
+  return reviewedFeatureSources.has(filename) || reviewedFeatureSources.has(`${filename}.ts`) || reviewedFeatureSources.has(`${filename}.tsx`) || filename === boundarySource || filename.startsWith("src/app/") || filename.startsWith("src/ui/") ||
     filename.startsWith("src/shared/") || filename.startsWith("src/modules/public-site/");
 }
 
@@ -67,7 +79,7 @@ export function forbiddenArtifact(filename: string): boolean {
 
 export function forbiddenStatic(filename: string): boolean {
   const normalized = filename.replaceAll("\\", "/");
-  return forbiddenArtifact(normalized) || /(?:^|\/)(?:src|review|artifacts|content|outputs|tools|node_modules|\.next|functions|functions-internal)(?:\/|$)/.test(normalized) ||
+  return sourceOnlyStaticFile(normalized) || forbiddenArtifact(normalized) || /(?:^|\/)(?:src|review|artifacts|content|outputs|tools|node_modules|\.next|functions|functions-internal)(?:\/|$)/.test(normalized) ||
     (managedContentRoute(`/${normalized}`) && (!publicExportFile(normalized) || normalized !== filename)) || retiredArticleRoute(`/${normalized}`) ||
     /\.(?:sql|sqlite|sqlite3|db|dump|zip|eszip)$/i.test(normalized) ||
     retiredFamilies.some(family => normalized === family || normalized.startsWith(`${family}/`) || normalized === `${family}.html` || normalized === `${family}.txt`);

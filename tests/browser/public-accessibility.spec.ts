@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import {expect,test,type Page} from "@playwright/test";
 import {openMainNavigation} from "./public-header";
 
-import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
+import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
 
 const publicRoutes = ["/resources/woocommerce-gateway-integration", "/resources/shopify-gateway-integration", ...LEGAL_CENTER_PATHS, ...COMMERCIAL_PATHS, "/", "/docs", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch", "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
 

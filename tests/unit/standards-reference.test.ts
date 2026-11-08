@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
-import { PUBLIC_CONTENT_PATHS, INDEXABLE_PUBLIC_PATHS, publicDocumentPath, publicPayloadPath } from "../../src/shared/public-page-inventory";
+import { PUBLIC_CONTENT_PATHS, INDEXABLE_PUBLIC_PATHS, publicDocumentPath, publicPayloadPath } from "../../src/shared/site/public-page-inventory";
 import { handlePublicRequest } from "../../netlify/edge-functions/public-boundary";
-import { PUBLIC_INDEXING_APPROVAL, canonicalOrigin } from "../../src/shared/public-release";
+import { PUBLIC_INDEXING_APPROVAL, canonicalOrigin } from "../../src/shared/site/public-release";
 import { forbiddenStatic } from "../../tools/public-artifact-policy";
 const production = { NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production", ETAIL_PUBLIC_ORIGIN: canonicalOrigin };
 describe("frozen release inventory", () => {

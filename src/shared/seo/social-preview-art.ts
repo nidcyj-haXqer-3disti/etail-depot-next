@@ -1,6 +1,6 @@
 import { createElement as h, type CSSProperties } from "react";
-import { brandWordmark } from "../shared/brand-wordmark.ts";
-import { socialPreviews, type SocialPreviewKey } from "../shared/social-preview.ts";
+import { brandWordmark } from "../brand/brand-wordmark.ts";
+import { socialPreviews, type SocialPreviewKey } from "./social-preview.ts";
 
 /** Original code artwork rendered to static PNGs. No external assets or account records. */
 export function socialPreviewArt(key: SocialPreviewKey) {

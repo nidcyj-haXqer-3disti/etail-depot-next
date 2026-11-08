@@ -1,15 +1,15 @@
 "use client";
 
-import { applePay, googlePay } from "./artwork-assets";
+import { applePay, googlePay } from "../shared/ui/artwork/artwork-assets";
 
 import Image from "next/image";
-import { BrandImage } from "./brand-image";
-import "./brand-images-ledgix.css";
+import { BrandImage } from "../shared/brand/brand-image";
+import "../shared/brand/brand-images-ledgix.css";
 import { useId, useState } from "react";
 import type { KeyboardEvent } from "react";
-import { useClientReady } from "./use-client-ready";
-import { Icon } from "./icon";
-import { NetworkMark } from "./network-brands";
+import { useClientReady } from "../shared/ui/use-client-ready";
+import { Icon } from "../shared/ui/icon";
+import { NetworkMark } from "../shared/brand/network-brands";
 import "./wallet-card-art.css";
 
 const wallets = ["Apple Wallet", "Google Wallet"] as const;

@@ -1,4 +1,4 @@
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import styles from "./platform-journey-art.module.css";
 
 const stages = [

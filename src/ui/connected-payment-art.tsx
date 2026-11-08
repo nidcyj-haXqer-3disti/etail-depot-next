@@ -1,5 +1,5 @@
-import "./site-artwork-polish.css";
-import { Icon } from "./icon";
+import "../shared/styles/site-artwork-polish.css";
+import { Icon } from "../shared/ui/icon";
 import { PlatformRecordArt } from "./service-workflow-art";
 
 export function MerchantOperationsArt() {

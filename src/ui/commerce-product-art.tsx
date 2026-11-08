@@ -1,4 +1,4 @@
-import { commerceProduct } from "./artwork-assets";
+import { commerceProduct } from "../shared/ui/artwork/artwork-assets";
 import Image from "next/image";
 import "./commerce-product-art.css";
 

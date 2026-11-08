@@ -1,5 +1,5 @@
 import type { CommercialPage } from "@/modules/public-site/commercial-content";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import { BankPaymentArt } from "./service-workflow-art";
 import { PlatformAccountArt } from "./platform-account-art";
 import "./payment-decision-art.css";

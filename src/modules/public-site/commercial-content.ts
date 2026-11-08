@@ -1,19 +1,9 @@
-import { merchantAccountGuidance } from "./merchant-account-content";
-import { hostedServices } from "@/shared/hosted-services";
+import { merchantAccountGuidance } from "../../shared/site/merchant-account-guidance";
+import { hostedServices } from "@/shared/site/hosted-services";
 import { SERVICE_DETAIL_PAGES } from "./service-detail-content";
 /** Public decision pages. Account specifications remain in the assigned integration documentation. */
-export interface CommercialPage {
-  label: string;
-  title: string;
-  description: string;
-  heading: string;
-  intro: string;
-  action: { label: string; href: string };
-  secondaryAction?: { label: string; href: string };
-  note?: string;
-  art: { layout?: "ach" | "transition" | "platform"; title: string; caption: string; steps: readonly { title: string; detail: string }[] };
-  sections: readonly { id?: string; title: string; intro?: string; layout?: "steps" | "methods"; records?: readonly { label: string; detail: string }[]; items: readonly { id?: string; title: string; text: string; href?: string }[] }[];
-}
+import type { CommercialPage } from "@/shared/ui/page-content-types";
+export type { CommercialPage } from "@/shared/ui/page-content-types";
 
 export const COMMERCIAL_PAGES = {
   "/merchant-onboarding": SERVICE_DETAIL_PAGES["/merchant-onboarding"],

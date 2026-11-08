@@ -1,7 +1,7 @@
 import { LEGAL_CENTER_PATHS } from "../../src/shared/legal-paths";
 import { describe, expect, it, vi } from "vitest";
-import { managedContentRoute, retiredRoute } from "../../src/shared/public-routes";
-import { canonicalOrigin, defaultOrigin, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release";
+import { managedContentRoute, retiredRoute } from "../../src/shared/site/public-routes";
+import { canonicalOrigin, defaultOrigin, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/site/public-release";
 import { config, handlePublicRequest, publicSecurityHeaders, type PublicBoundaryContext } from "../../netlify/edge-functions/public-boundary";
 
 const production = {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ISO20022_PATH, ISO20022_RELEASE, ISO20022_SETS, ISO20022_SOURCE, ISO20022_WORKBOOK, codeHeading, codePeers, codeReplacement, codeUsageRestriction, isoJsonLd, sourceDate, sourceName, type IsoCode, type IsoCodeSet } from "@/modules/public-site/iso20022-reference";
-import { Shell } from "./shell";
+import { Shell } from "../shared/layout/shell";
 import { ReferenceTableFilter } from "./reference-table-filter";
 import { ReferenceIndex } from "./reference-index";
 import { PaymentStatusContext } from "./iso20022-status-context";

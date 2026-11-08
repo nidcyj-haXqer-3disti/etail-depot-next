@@ -1,5 +1,11 @@
 # Public site architecture
 
+## 8 November 2026: Repository restructure, Stage 2
+
+The user authorized Stage 2 preparation on codex/restructure-stage2-20261108. Stage 1 verified published commit e9e44fb and preserved the earlier working copy. The exact baseline has 3,752 content pages and 3,740 sitemap URLs, as recorded in tools/reference-release.json. The earlier 3,751/3,739 totals predate WooCommerce. See docs/plans/repository-restructure.json for the five stages and complete file/URL map.
+
+Stage 2 organizes shared code and extracts the ACH payments pilot without changing public content, routes or capabilities. The previous unpublished Developers feature remains separate. Three temporary forwarding modules preserve imports in protected legal sources until their Stage 3 review. Verification is complete: all four release commands passed locally, with 448 unit checks, 322 desktop/mobile journeys, 156 accessibility checks and 76 additional WebKit checks. One existing desktop skip covers a mobile-only scenario. All 3,752 exported pages match the baseline content and metadata; all 25 recorded screenshots are pixel-identical. The exact source and package fingerprint is 4abe6cef97438a3fb7f09d6399773420dc9cf25d69c1ce45cefb522ddc8df5d2. Stage 2 completion and the 77-file move receipt are recorded in docs/plans/repository-stage2.json. Stage 3 remains pending. Earlier release authorizations apply to their named completed releases; this restructure has not been authorized for push, merge or deployment.
+
 ## 5 November 2026: Reviewed merchant legal and website release
 
 The user authorized pushing and deploying the reviewed local candidate on 5 November 2026. This supersedes earlier preparation only status. Publication follows the existing PR checks and manual Netlify Git build process.

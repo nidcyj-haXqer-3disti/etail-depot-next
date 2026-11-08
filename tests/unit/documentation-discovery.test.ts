@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { documentationPages, documentationPath, documentationPaths, documentationServiceLinks } from "../../src/modules/public-site/documentation-catalog";
 import { documentationArticles } from "../../src/modules/public-site/documentation-content";
 import { documentationJsonLd, publicPageModified, SERVICE_PAGES, servicePageMetadata } from "../../src/modules/public-site/metadata";
-import { isPublicContentPath } from "../../src/shared/public-page-inventory";
+import { isPublicContentPath } from "../../src/shared/site/public-page-inventory";
 
 describe("documentation discovery", () => {
   it("keeps all nine topics aligned across the introduction, metadata and structured data", () => {

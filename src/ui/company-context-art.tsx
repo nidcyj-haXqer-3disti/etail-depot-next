@@ -1,7 +1,7 @@
-import { brandSymbol } from "./artwork-assets";
+import { brandSymbol } from "../shared/ui/artwork/artwork-assets";
 import Image from "next/image";
 import { legalIdentity } from "@/shared/legal-identity";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import styles from "./company-reference-art.module.css";
 
 export function CompanyContextArt({ kind }: { kind: "company" | "trust" | "facilitator" }) {

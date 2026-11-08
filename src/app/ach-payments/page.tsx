@@ -1,5 +1,2 @@
-import { servicePageMetadata } from "@/modules/public-site/metadata";
-import { ServiceDetailPage } from "@/ui/service-detail-page";
-
-export const metadata = servicePageMetadata("/ach-payments");
-export default function Page() { return <ServiceDetailPage path="/ach-payments" />; }
+export { achPaymentsMetadata as metadata } from "@/features/services/ach-payments/metadata";
+export { AchPaymentsPage as default } from "@/features/services/ach-payments/page-content";

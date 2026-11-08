@@ -6,7 +6,7 @@ import path from "node:path";
 import { crc32, inflateRawSync } from "node:zlib";
 import ts from "typescript";
 import { forbiddenArtifact } from "./public-artifact-policy.ts";
-import { type Environment, PUBLIC_INDEXING_APPROVAL } from "../src/shared/public-release.ts";
+import { type Environment, PUBLIC_INDEXING_APPROVAL } from "../src/shared/site/public-release.ts";
 
 export const platformEmailApproval = Object.freeze({
   package: "@netlify/plugin-emails",

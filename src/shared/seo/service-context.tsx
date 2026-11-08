@@ -1,4 +1,4 @@
-import { canonicalOrigin } from "@/shared/public-release";
+import { canonicalOrigin } from "@/shared/site/public-release";
 
 const contexts = {
   "/merchant-onboarding": ["Merchant onboarding", "merchant"],

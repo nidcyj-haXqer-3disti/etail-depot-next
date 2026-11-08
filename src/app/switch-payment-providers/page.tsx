@@ -1,4 +1,4 @@
-import "@/ui/brand-images-symbol.css";
+import "@/shared/brand/brand-images-symbol.css";
 import { servicePageMetadata } from "@/modules/public-site/metadata";
 import { CommercialPage } from "@/ui/commercial-page";
 

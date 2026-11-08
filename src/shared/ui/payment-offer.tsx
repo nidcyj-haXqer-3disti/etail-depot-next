@@ -1,8 +1,8 @@
-import "./site-artwork-polish-pricing.css";
-import { productFacts } from "@/shared/product-facts";
-import { PaymentFeeEstimate } from "./payment-fee-estimate";
+import "../../ui/site-artwork-polish-pricing.css";
+import { productFacts } from "@/shared/site/product-facts";
+import { PaymentFeeEstimate } from "../../ui/payment-fee-estimate";
 import { Icon } from "./icon";
-import "./product-confidence.css";
+import "../styles/product-confidence.css";
 
 export function PaymentOffer() {
   const fees = productFacts.payments;

@@ -1,6 +1,6 @@
 import { publicPageMetadata, publicPageJsonLd } from "@/modules/public-site/metadata";
 import { GuideDirectory } from "@/ui/guide-directory";
-import { Shell } from "@/ui/shell";
+import { Shell } from "@/shared/layout/shell";
 
 export const metadata = publicPageMetadata("/guides");
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Shell } from "./shell";
+import { Shell } from "../shared/layout/shell";
 import "./legal-document.css";
 
 export type LegalSection = {

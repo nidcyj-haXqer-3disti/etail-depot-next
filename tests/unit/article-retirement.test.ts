@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { existsSync, readdirSync } from "node:fs";
-import { RETIRED_ARTICLE_PATHS } from "../../src/shared/retired-article-paths";
-import { retiredArticleRoute } from "../../src/shared/public-routes";
+import { RETIRED_ARTICLE_PATHS } from "../../src/shared/site/retired-article-paths";
+import { retiredArticleRoute } from "../../src/shared/site/public-routes";
 import { STANDARD_REFERENCE_PATHS } from "../../src/shared/standard-reference-paths";
 import { handlePublicRequest } from "../../netlify/edge-functions/public-boundary";
 import { PUBLIC_PAGES, publicPageJsonLd } from "../../src/modules/public-site/metadata";

@@ -1,4 +1,4 @@
-import { legalIdentity } from "./legal-identity";
+import { legalIdentity } from "../legal-identity";
 
 /** Both account intents begin with email entry at the hosted welcome page. */
 const merchantWelcomeUrl = "https://merchantapp.io/etaildepot/UserAccount/Login";

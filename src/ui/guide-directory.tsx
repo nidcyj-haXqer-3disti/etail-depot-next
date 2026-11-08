@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import { StandardsCollections } from "./standards-collections";
 import "./guide-directory.css";
 import "./enterprise-support-guides.css";

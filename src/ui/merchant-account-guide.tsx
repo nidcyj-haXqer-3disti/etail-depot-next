@@ -2,9 +2,9 @@ import Image from "next/image";
 import welcome from "./assets/welcome.jpg";
 import registration from "./assets/registration.jpg";
 import blankRegistration from "./assets/blank-registration.jpg";
-import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
+import { merchantAccountGuidance } from "@/shared/site/merchant-account-guidance";
 import { MerchantApplicationArt } from "./merchant-application-art";
-import { PaymentPortalLink } from "./service-entry";
+import { PaymentPortalLink } from "../shared/ui/merchant-portal-link";
 import styles from "./merchant-account-guide.module.css";
 
 function AccountScreenshot({ screen }: { screen: "welcome" | "registration" | "blank" }) {

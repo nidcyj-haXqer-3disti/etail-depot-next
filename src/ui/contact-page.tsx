@@ -1,20 +1,20 @@
 import "./site-artwork-polish-company.css";
-import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
+import { merchantAccountGuidance } from "@/shared/site/merchant-account-guidance";
 import { COMMERCIAL_PAGES } from "@/modules/public-site/commercial-content";
 import { legalIdentity } from "@/shared/legal-identity";
-import { hostedServices } from "@/shared/hosted-services";
-import { Shell } from "./shell";
-import { CommercialStructuredData } from "./commercial-structured-data";
-import { Icon } from "./icon";
-import { PaymentPortalLink } from "./service-entry";
+import { hostedServices } from "@/shared/site/hosted-services";
+import { Shell } from "../shared/layout/shell";
+import { CommercialStructuredData } from "../shared/seo/commercial-structured-data";
+import { Icon } from "../shared/ui/icon";
+import { PaymentPortalLink } from "../shared/ui/merchant-portal-link";
 import { ContactHero } from "./contact-hero";
 import contactStyles from "./contact-enquiries.module.css";
-import "./connected-resources.css";
-import "./public-site.css";
-import "./brand-pages.css";
-import "./commercial-pages.css";
-import "./company-context.css";
-import "./enterprise-support.css";
+import "../shared/styles/connected-resources.css";
+import "../shared/styles/public-site.css";
+import "../shared/styles/brand-pages.css";
+import "../shared/styles/commercial-pages.css";
+import "../shared/styles/company-context.css";
+import "../shared/styles/enterprise-support.css";
 
 function ContactOptions() {
   const contacts = [

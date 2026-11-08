@@ -1,5 +1,5 @@
 import { type WooCommerceStep } from "@/modules/public-site/woocommerce-guide-content";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import styles from "./integration-guide.module.css";
 const destinations = {
   wordpress: { icon: "layers", name: "WordPress admin", url: "https://wordpress.com/log-in", display: "wordpress.com/log-in" },

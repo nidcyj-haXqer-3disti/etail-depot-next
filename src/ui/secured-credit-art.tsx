@@ -1,6 +1,6 @@
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import { LedgixCardFace } from "./wallet-card-art";
-import { productFacts } from "@/shared/product-facts";
+import { productFacts } from "@/shared/site/product-facts";
 import { formatUsdCents } from "@/modules/public-site/fee-estimate";
 import "./secured-credit-art.css";
 

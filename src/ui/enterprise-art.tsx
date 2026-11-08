@@ -1,4 +1,4 @@
-import "./site-artwork-polish.css";
+import "../shared/styles/site-artwork-polish.css";
 import { AccountProfileArt } from "./service-workflow-art";
 
 export function AccountSetupArt() {

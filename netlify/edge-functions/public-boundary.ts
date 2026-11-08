@@ -1,5 +1,5 @@
-import { retiredArticleRoute, managedContentRoute, publicDocumentPath, publicPayloadPath, publicPageRedirect, retiredRoute } from "../../src/shared/public-routes.ts";
-import { canonicalOrigin, defaultOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/public-release.ts";
+import { retiredArticleRoute, managedContentRoute, publicDocumentPath, publicPayloadPath, publicPageRedirect, retiredRoute } from "../../src/shared/site/public-routes.ts";
+import { canonicalOrigin, defaultOrigin, isApprovedSearchRelease, PUBLIC_INDEXING_APPROVAL } from "../../src/shared/site/public-release.ts";
 
 type Environment = Readonly<Record<string, string | undefined>>;
 

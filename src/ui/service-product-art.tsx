@@ -1,8 +1,8 @@
-import { applePay, googlePay } from "./artwork-assets";
+import { applePay, googlePay } from "../shared/ui/artwork/artwork-assets";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { CommercialPage } from "@/modules/public-site/commercial-content";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import s from "./service-product-art.module.css";
 
 type Kind = "onboarding" | "methods" | "payouts" | "adjustments" | "ach";

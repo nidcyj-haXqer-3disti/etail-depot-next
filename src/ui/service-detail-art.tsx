@@ -1,17 +1,12 @@
+import { AchPaymentsArt } from "@/features/services/ach-payments/artwork";
+import { Label, Node, Connector } from "@/features/services/shared/artwork-primitives";
 import type { ReactNode } from "react";
 import type { ServiceKind } from "@/modules/public-site/service-detail-content";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import { MerchantApplicationArt } from "./merchant-application-art";
 import { PaymentChoiceArt, ReconciliationMatchArt } from "./merchant-record-art";
-import s from "./service-detail.module.css";
+import s from "../features/services/shared/service-detail.module.css";
 
-function Label({ icon, children }: { icon: string; children: ReactNode }) {
-  return <span className={s.artLabel}><Icon name={icon} />{children}</span>;
-}
-function Node({ icon, title, detail }: { icon: string; title: string; detail?: string }) {
-  return <div className={s.node}><span className={s.nodeIcon}><Icon name={icon} /></span><div><strong>{title}</strong>{detail && <span>{detail}</span>}</div></div>;
-}
-function Connector() { return <span className={s.connector} aria-hidden="true"><Icon name="arrow" /></span>; }
 function Record({ label, value }: { label: string; value: string }) {
   return <div className={s.record}><span>{label}</span><strong>{value}</strong></div>;
 }
@@ -23,16 +18,11 @@ type ServiceDetailArtProps = { title: string; caption: string } & (
 );
 
 export function ServiceDetailArt({ kind, title, caption, cardFace }: ServiceDetailArtProps) {
+  if (kind === "ach") return <AchPaymentsArt title={title} caption={caption} />;
   if (kind === "onboarding") return <MerchantApplicationArt title={title} caption={caption} />;
   return <figure className={s.art} data-service-workflow={kind} aria-label={title}>
     <div className={kind === "refunds" ? `${s.scene} ${s.refunds}` : s.scene}>
       {kind === "methods" && <PaymentChoiceArt />}
-      {kind === "ach" && <>
-        <div className={s.sceneHeading}><Label icon="bank">ACH payment</Label><strong>Permission. Validation. Payment.</strong></div>
-        <div className={s.permissionPair}><Node icon="document" title="Authorization" detail="Customer permission" /><Node icon="shield" title="Account validation" detail="Required bank checks" /></div>
-        <div className={s.bankFlow}><Node icon="bank" title="Customer bank" detail="US bank account" /><Connector /><div className={s.processing}><span className={s.processingMark} aria-hidden="true" /><strong>Processing</strong><span>Follow the payment record</span></div></div>
-        <div className={s.branch}><div><span>Payment result</span><strong>Completed</strong></div><div><span>If returned</span><strong>Review the reason</strong></div></div>
-      </>}
       {kind === "payouts" && <>
         <div className={s.sceneHeading}><Label icon="document">Payout breakdown</Label><strong>From activity to deposit.</strong></div>
         <div className={s.payoutPaper}><Record label="Included payments" value="Eligible activity" /><Record label="Fees" value="Processing charges" /><Record label="Adjustments" value="Refunds, disputes, reserves" /><div className={s.payoutTotal}><Icon name="layers" /><strong>Payout amount</strong></div></div>

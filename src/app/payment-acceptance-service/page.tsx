@@ -1,17 +1,17 @@
-import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
+import { merchantAccountGuidance } from "@/shared/site/merchant-account-guidance";
 import Link from "next/link";
 import { AttentionHero } from "@/ui/attention-hero";
-import "@/ui/attention-pages.css";
-import { Shell } from "@/ui/shell";
+import "@/shared/styles/attention-pages.css";
+import { Shell } from "@/shared/layout/shell";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
-import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
+import { PublicPageStructuredData } from "@/shared/seo/structured-data";
 import { AccountSetupArt, PayoutRecordArt } from "@/ui/enterprise-art";
-import "@/ui/enterprise-pages.css";
-import "@/ui/connected-pilots.css";
+import "@/shared/styles/enterprise-pages.css";
+import "@/shared/styles/connected-pilots.css";
 import { MerchantOperationsArt } from "@/ui/connected-payment-art";
-import { productFacts } from "@/shared/product-facts";
-import { PaymentPortalLink } from "@/ui/service-entry";
-import { ConsumerNetworks } from "@/ui/consumer-layout";
+import { productFacts } from "@/shared/site/product-facts";
+import { PaymentPortalLink } from "@/shared/ui/merchant-portal-link";
+import { ConsumerNetworks } from "@/shared/brand/consumer-layout";
 
 export const metadata = publicPageMetadata("/payment-acceptance-service");
 

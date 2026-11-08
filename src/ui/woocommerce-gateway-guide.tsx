@@ -4,8 +4,8 @@ import { woocommerceGuidePath, woocommerceSetupSteps, wooExample } from "@/modul
 import { WooCommerceStepLocation } from "./woocommerce-guide-panels";
 import { WooCommerceApiWalkthrough, WooCommerceCertificateDownload, WooCommerceCertificateSettings } from "./woocommerce-connection-walkthrough";
 import { WooCommerceFileTransfer } from "./woocommerce-file-transfer";
-import { Shell } from "./shell";
-import { TrolleysBrand } from "./trolleys-brand";
+import { Shell } from "../shared/layout/shell";
+import { TrolleysBrand } from "../shared/brand/trolleys-brand";
 import { ShopifyCredentialsEmailArt } from "./shopify-credentials-email-art";
 import { WooCommerceGuideScreenshot } from "./woocommerce-guide-screenshot";
 import styles from "./shopify-gateway-guide.module.css";

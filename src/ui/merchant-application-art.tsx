@@ -1,5 +1,5 @@
-import { TrolleysBrand } from "./trolleys-brand";
-import { Icon } from "./icon";
+import { TrolleysBrand } from "../shared/brand/trolleys-brand";
+import { Icon } from "../shared/ui/icon";
 import s from "./merchant-application-art.module.css";
 
 /** Static illustration of the observed portal. No merchant records or working controls. */

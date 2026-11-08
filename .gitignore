@@ -11,6 +11,16 @@ playwright-report/
 test-results/
 artifacts/
 .local/
+.private/
+# Private credentials and original transfer files stay outside source.
+*.p12
+*.pfx
+*.pem
+*.key
+*.jks
+*.keystore
+*.bak
+*.orig
 .env
 .env.*
 !.env.example

@@ -1,8 +1,8 @@
 import { CommerceProductArt } from "./commerce-product-art";
-import { productFacts } from "@/shared/product-facts";
-import { serviceExample } from "@/modules/public-site/service-model";
+import { productFacts } from "@/shared/site/product-facts";
+import { serviceExample } from "@/shared/ui/artwork/service-example";
 import { PaymentArtworkHeader } from "./payment-artwork-header";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import "./merchant-journey-art.css";
 
 function amount(cents: number) {

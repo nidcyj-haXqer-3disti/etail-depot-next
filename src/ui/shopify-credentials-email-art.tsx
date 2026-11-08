@@ -1,4 +1,4 @@
-import { TrolleysBrand, TrolleysSymbol } from "./trolleys-brand";
+import { TrolleysBrand, TrolleysSymbol } from "../shared/brand/trolleys-brand";
 import guideStyles from "./shopify-gateway-guide.module.css";
 import styles from "./shopify-credentials-email-art.module.css";
 

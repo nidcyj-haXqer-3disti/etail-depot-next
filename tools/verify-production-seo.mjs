@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { LEGAL_DOCUMENT_PATHS } from "../src/shared/legal-paths.ts";
-import { socialPreviewImage } from "../src/shared/social-preview.ts";
-import { publicPageModified } from "../src/shared/public-page-revisions.ts";
-import { INDEXABLE_PUBLIC_PATHS } from "../src/shared/public-page-inventory.ts";
-import { RETIRED_ARTICLE_PATHS } from "../src/shared/retired-article-paths.ts";
+import { socialPreviewImage } from "../src/shared/seo/social-preview.ts";
+import { publicPageModified } from "../src/shared/site/public-page-revisions.ts";
+import { INDEXABLE_PUBLIC_PATHS } from "../src/shared/site/public-page-inventory.ts";
+import { RETIRED_ARTICLE_PATHS } from "../src/shared/site/retired-article-paths.ts";
 /** Compile and inspect the approved public search release locally; never publish or contact a provider. */
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";

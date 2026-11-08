@@ -1,7 +1,7 @@
-import { BrandImage } from "./brand-image";
+import { BrandImage } from "../shared/brand/brand-image";
 import type { ReactNode } from "react";
-import { Icon } from "./icon";
-import styles from "./attention-system.module.css";
+import { Icon } from "../shared/ui/icon";
+import styles from "../shared/styles/attention-system.module.css";
 
 type HeroProps = {
   id: string;

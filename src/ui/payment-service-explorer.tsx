@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { CommerceProductArt } from "./commerce-product-art";
-import { serviceExample } from "@/modules/public-site/service-model";
+import { serviceExample } from "@/shared/ui/artwork/service-example";
 import { MerchantOnboardingArt, MerchantPayoutArt } from "./merchant-journey-art";
 import { UnifiedCheckoutPreview } from "./unified-checkout-preview";
 import "./payment-service-explorer.css";

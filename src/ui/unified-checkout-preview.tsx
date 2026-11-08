@@ -1,15 +1,15 @@
 "use client";
 
-import { applePay, googlePay } from "./artwork-assets";
+import { applePay, googlePay } from "../shared/ui/artwork/artwork-assets";
 
 import Image from "next/image";
 import { useId, useRef, useState, useSyncExternalStore } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
-import { serviceExample } from "@/modules/public-site/service-model";
+import { serviceExample } from "@/shared/ui/artwork/service-example";
 import { PaymentArtworkHeader } from "./payment-artwork-header";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import { CommerceProductArt } from "./commerce-product-art";
-import { NetworkMark } from "./network-brands";
+import { NetworkMark } from "../shared/brand/network-brands";
 import "./unified-checkout-preview.css";
 
 const methods = ["Card", "Bank payment"] as const;

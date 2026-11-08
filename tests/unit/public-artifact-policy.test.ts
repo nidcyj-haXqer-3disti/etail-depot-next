@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { boundarySource, builtPageSources, edgeEntryFindings, forbiddenArtifact, forbiddenStatic, localCorePreviewPageSources, localPreviewPageSources, reviewedLegalPageSources, pendingLegalPageSources, publicHtmlFiles, publicationBlockers, publicPageSources, publicSourcePath, retiredFamilies, reviewedPublicAppModule } from "../../tools/public-artifact-policy";
-import { PUBLIC_CONTENT_PATHS } from "../../src/shared/public-page-inventory";
+import { PUBLIC_CONTENT_PATHS } from "../../src/shared/site/public-page-inventory";
 
 describe("static public deployment boundary", () => {
   it("allows the reviewed sources and exact helpers without opening arbitrary guide routes", () => {
@@ -54,7 +54,7 @@ describe("static public deployment boundary", () => {
       expect(forbiddenArtifact(path), path).toBe(true);
       expect(forbiddenArtifact(path.replaceAll("/", "\\")), `Windows path ${path}`).toBe(true);
     }
-    expect(forbiddenArtifact("src/shared/public-release.ts")).toBe(false);
+    expect(forbiddenArtifact("src/shared/site/public-release.ts")).toBe(false);
   });
 
   it("never publishes an account page, data file, source tree or server bundle as a static asset", () => {

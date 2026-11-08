@@ -1,9 +1,9 @@
-import { publicNavigationGroups, publicFooterGroups } from "../../src/shared/site-navigation";
+import { publicNavigationGroups, publicFooterGroups } from "../../src/shared/site/site-navigation";
 import { describe, it, expect } from "vitest";
-import { COMMERCIAL_PATHS } from "../../src/shared/commercial-paths";
+import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
 import { COMMERCIAL_PAGES } from "../../src/modules/public-site/commercial-content";
-import { INDEXABLE_PUBLIC_PATHS, publicDocumentPath, publicPayloadPath } from "../../src/shared/public-page-inventory";
-import { managedContentRoute } from "../../src/shared/public-routes";
+import { INDEXABLE_PUBLIC_PATHS, publicDocumentPath, publicPayloadPath } from "../../src/shared/site/public-page-inventory";
+import { managedContentRoute } from "../../src/shared/site/public-routes";
 import { servicePageMetadata } from "../../src/modules/public-site/metadata";
 import { forbiddenStatic } from "../../tools/public-artifact-policy";
 

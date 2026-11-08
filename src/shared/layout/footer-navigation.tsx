@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useLayoutEffect, useRef, useSyncExternalStore } from "react";
-import { publicFooterGroups } from "@/shared/site-navigation";
+import { publicFooterGroups } from "@/shared/site/site-navigation";
 
 const compactQuery = "(max-width: 959px)";
 const getCompact = () => window.matchMedia(compactQuery).matches;

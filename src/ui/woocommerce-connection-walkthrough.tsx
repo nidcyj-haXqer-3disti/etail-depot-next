@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { wooExample } from "@/modules/public-site/woocommerce-guide-content";
 import { WooCommerceGuideScreenshot } from "./woocommerce-guide-screenshot";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import woo from "./integration-guide.module.css";
 
 function PhotoAction({ title, where, children, photo }: {

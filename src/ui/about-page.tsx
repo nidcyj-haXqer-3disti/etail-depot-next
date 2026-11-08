@@ -1,5 +1,5 @@
-import { Shell } from "./shell";
-import { CommercialStructuredData } from "./commercial-structured-data";
+import { Shell } from "../shared/layout/shell";
+import { CommercialStructuredData } from "../shared/seo/commercial-structured-data";
 import Link from "next/link";
 import { COMMERCIAL_PAGES, type CommercialPage } from "@/modules/public-site/commercial-content";
 import { legalIdentity } from "@/shared/legal-identity";

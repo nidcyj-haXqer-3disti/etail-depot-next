@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useClientReady } from "./use-client-ready";
+import { useClientReady } from "../shared/ui/use-client-ready";
 import { estimateDomesticCardFee, formatUsdCents } from "@/modules/public-site/fee-estimate";
-import { productFacts } from "@/shared/product-facts";
+import { productFacts } from "@/shared/site/product-facts";
 
 export function PaymentFeeEstimate() {
   const ready = useClientReady();

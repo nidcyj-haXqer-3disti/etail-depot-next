@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { publicNavigationGroups, publicNavigationLinks, publicDomainForPath } from "@/shared/site-navigation";
+import { publicNavigationGroups, publicNavigationLinks, publicDomainForPath } from "@/shared/site/site-navigation";
 
 export function PublicNavigation({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();

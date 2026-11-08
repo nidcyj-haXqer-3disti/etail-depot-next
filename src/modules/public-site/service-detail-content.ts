@@ -1,12 +1,9 @@
-import { merchantAccountGuidance } from "./merchant-account-content";
-import { hostedServices } from "@/shared/hosted-services";
-import type { CommercialPage } from "./commercial-content";
+import { achPaymentsContent } from "@/features/services/ach-payments/content";
+import { merchantAccountGuidance } from "../../shared/site/merchant-account-guidance";
+import { hostedServices } from "@/shared/site/hosted-services";
 
-export type ServiceKind = "onboarding" | "methods" | "ach" | "payouts" | "reconciliation" | "refunds" | "disputes";
-export interface ServiceDetailContent extends CommercialPage {
-  kind: ServiceKind;
-  workflow: { title: string; intro: string; steps: readonly { title: string; detail: string }[]; note: string };
-}
+export type { ServiceKind, ServiceDetailContent } from "@/features/services/shared/content-types";
+import type { ServiceDetailContent } from "@/features/services/shared/content-types";
 
 /** Service explanations and decision points. Provider features are not product entitlement. */
 export const SERVICE_DETAIL_PAGES = {
@@ -172,85 +169,7 @@ export const SERVICE_DETAIL_PAGES = {
       "note": "A pending or interrupted payment needs a status check before another attempt. ACH has separate return and payout terms."
     }
   },
-  "/ach-payments": {
-    "kind": "ach",
-    "label": "ACH payments",
-    "title": "ACH Payments for Business Invoices and Orders",
-    "description": "Accept authorized US bank payments for invoices and orders. Follow ACH processing, returns and the records needed to match payments to deposits.",
-    "heading": "Accept payments from US bank accounts.",
-    "intro": "Offer ACH for invoices and orders. Connect customer authorization, bank account validation and payment status to the amount being collected.",
-    "action": {
-      "label": "Discuss ACH for your business",
-      "href": "/contact#payment-review"
-    },
-    "note": "ACH availability, fees, limits and payout terms depend on your account.",
-    "art": {
-      "title": "ACH authorization and bank validation lead to processing, with separate completion and return outcomes",
-      "caption": "A submitted bank payment can still be pending or returned. Follow its recorded status.",
-      "steps": []
-    },
-    "sections": [
-      {
-        "id": "ach-use-cases",
-        "title": "Bank payments with a clear record.",
-        "items": [
-          {
-            "title": "Payment authorization",
-            "text": "Record customer permission for the amount, purpose and payment arrangement."
-          },
-          {
-            "title": "Account validation",
-            "text": "Complete the bank account checks required for your payment channel and account setup."
-          },
-          {
-            "title": "Invoice reference",
-            "text": "Keep the payment connected to the invoice or order it is intended to cover."
-          }
-        ]
-      },
-      {
-        "id": "ach-returns",
-        "title": "Track bank payments after submission.",
-        "items": [
-          {
-            "title": "Processing",
-            "text": "A submitted payment is not a guarantee of funds. Set fulfillment and invoice updates accordingly."
-          },
-          {
-            "title": "Returned payment",
-            "text": "Read the return reason before retrying. Another attempt may require corrected details or new authorization."
-          },
-          {
-            "title": "Deposit and reporting",
-            "text": "Match the payment and later adjustments to the payout report, then check the bank deposit."
-          }
-        ]
-      }
-    ],
-    "workflow": {
-      "title": "From authorization to payment status.",
-      "intro": "Bank payments continue processing after the customer leaves checkout.",
-      "steps": [
-        {
-          "title": "Get authorization",
-          "detail": "Retain the customer’s permission for the debit."
-        },
-        {
-          "title": "Validate the account",
-          "detail": "Use the required validation method before submission."
-        },
-        {
-          "title": "Submit the payment",
-          "detail": "Keep its reference with the invoice and authorization."
-        },
-        {
-          "title": "Follow the result",
-          "detail": "Track processing, completion and any later return or payout adjustment."
-        }
-      ],
-      "note": "For consumer debits authorized online, account validation applies to first use of an account number and subsequent changes. Ask the integration team for the method required for your setup."
-    }
-  },
+  "/ach-payments": achPaymentsContent,
   "/payouts-and-reconciliation": {
     "kind": "payouts",
     "label": "Payouts",

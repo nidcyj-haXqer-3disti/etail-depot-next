@@ -1,6 +1,6 @@
-import { brandSymbol } from "./artwork-assets";
+import { brandSymbol } from "../shared/ui/artwork/artwork-assets";
 import Image from "next/image";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import styles from "./platform-account-art.module.css";
 
 export function PlatformAccountArt({ title, caption }: { title: string; caption: string }) {

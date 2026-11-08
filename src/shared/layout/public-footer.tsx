@@ -1,7 +1,7 @@
-import { BrandImage } from "./brand-image";
-import "./brand-images-etail.css";
+import { BrandImage } from "../brand/brand-image";
+import "../brand/brand-images-etail.css";
 import Link from "next/link";
-import { PaymentPortalLink } from "./service-entry";
+import { PaymentPortalLink } from "../ui/merchant-portal-link";
 import { FooterNavigation } from "./footer-navigation";
 import { legalIdentity } from "@/shared/legal-identity";
 

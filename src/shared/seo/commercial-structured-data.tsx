@@ -1,5 +1,5 @@
 import { COMMERCIAL_PAGES, type CommercialPath } from "@/modules/public-site/commercial-content";
-import { canonicalOrigin } from "@/shared/public-release";
+import { canonicalOrigin } from "@/shared/site/public-release";
 import { publicPageModified } from "@/modules/public-site/metadata";
 import { serviceBreadcrumb, type ServiceContextPath } from "./service-context";
 import { companyBreadcrumbData, type CompanyContextPath } from "./resource-context";

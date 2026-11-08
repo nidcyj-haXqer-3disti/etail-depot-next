@@ -22,7 +22,8 @@
   "branch": "codex/restructure-stage1-20261108",
   "records": {
     "fileMap": "repository-file-map.json",
-    "routeMap": "repository-route-map.json"
+    "routeMap": "repository-route-map.json",
+    "stage2": "repository-stage2.json"
   },
   "categories": {
     "website": [
@@ -123,7 +124,7 @@
     {
       "number": 2,
       "name": "Shared foundation and one service pilot",
-      "status": "planned",
+      "status": "complete",
       "deliverables": [
         "Review and selectively port publication safeguards from previous work.",
         "Establish shared layout, brand, UI, site configuration and SEO ownership.",
@@ -134,7 +135,15 @@
         "Preserve existing render output, URLs, loading behavior and vendor handoffs.",
         "Pass affected static, unit, browser, accessibility and build checks.",
         "Compare the pilot and shared header/footer on desktop and mobile."
-      ]
+      ],
+      "completion": {
+        "sourceFingerprint": "4abe6cef97438a3fb7f09d6399773420dc9cf25d69c1ce45cefb522ddc8df5d2",
+        "movedFiles": 77,
+        "pilot": "/ach-payments",
+        "exportedPagesMatched": 3752,
+        "pixelIdenticalObservations": 25,
+        "publicationPerformed": false
+      }
     },
     {
       "number": 3,
@@ -189,5 +198,6 @@
         "After authorized publication, verify the exact deployed commit and hosted routes, headers, cache, sitemap and source-file 404s."
       ]
     }
-  ]
+  ],
+  "activeBranch": "codex/restructure-stage2-20261108"
 }

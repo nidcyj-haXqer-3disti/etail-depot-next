@@ -1,8 +1,8 @@
-import { brandSymbol } from "./artwork-assets";
+import { brandSymbol } from "../shared/ui/artwork/artwork-assets";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import type { CommercialPage, CommercialPath } from "@/modules/public-site/commercial-content";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import styles from "./service-operation-art.module.css";
 import { ServiceProductArt } from "./service-product-art";
 

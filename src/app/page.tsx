@@ -1,11 +1,11 @@
-import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
+import { merchantAccountGuidance } from "@/shared/site/merchant-account-guidance";
 import Link from "next/link";
-import { PaymentPortalLink } from "@/ui/service-entry";
-import { Shell } from "@/ui/shell";
-import { Icon } from "@/ui/icon";
+import { PaymentPortalLink } from "@/shared/ui/merchant-portal-link";
+import { Shell } from "@/shared/layout/shell";
+import { Icon } from "@/shared/ui/icon";
 import { HomeCompanyArt } from "@/ui/home-company-art";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
-import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
+import { PublicPageStructuredData } from "@/shared/seo/structured-data";
 import styles from "@/ui/home-overview.module.css";
 
 export const metadata = publicPageMetadata("/");

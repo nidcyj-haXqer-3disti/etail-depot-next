@@ -1,5 +1,5 @@
-import { BrandImage } from "./brand-image";
-import { Icon } from "./icon";
+import { BrandImage } from "../shared/brand/brand-image";
+import { Icon } from "../shared/ui/icon";
 import s from "./merchant-record-art.module.css";
 
 /** Opening marks arrive with this page's stylesheet, retaining their exact source proportions. */

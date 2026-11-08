@@ -1,27 +1,27 @@
 import "./site-artwork-polish-company.css";
 import type { ServiceDetailPath } from "@/modules/public-site/service-detail-content";
-import { CommercialStructuredData } from "./commercial-structured-data";
+import { CommercialStructuredData } from "../shared/seo/commercial-structured-data";
 import Link from "next/link";
-import { hostedServices } from "@/shared/hosted-services";
+import { hostedServices } from "@/shared/site/hosted-services";
 import { COMMERCIAL_PAGES, type CommercialPage as PageContent, type CommercialPath } from "@/modules/public-site/commercial-content";
-import { Shell } from "./shell";
-import { Icon } from "./icon";
-import { PaymentPortalLink } from "./service-entry";
-import { PaymentOffer } from "./payment-offer";
+import { Shell } from "../shared/layout/shell";
+import { Icon } from "../shared/ui/icon";
+import { PaymentPortalLink } from "../shared/ui/merchant-portal-link";
+import { PaymentOffer } from "../shared/ui/payment-offer";
 import { AttentionHero, AttentionArt } from "./attention-hero";
-import "./attention-pages.css";
+import "../shared/styles/attention-pages.css";
 import { PaymentDecisionArt } from "./payment-decision-art";
 import { ServiceWorkflowArt, workflowArtPaths } from "./service-workflow-art";
-import "./connected-services.css";
-import "./connected-resources.css";
+import "../shared/styles/connected-services.css";
+import "../shared/styles/connected-resources.css";
 import { CompanyContextArt } from "./company-context-art";
-import "./public-site.css";
-import "./brand-pages.css";
-import "./commercial-pages.css";
-import "./service-purpose.css";
-import "./service-craft.css";
-import "./company-context.css";
-import "./enterprise-support.css";
+import "../shared/styles/public-site.css";
+import "../shared/styles/brand-pages.css";
+import "../shared/styles/commercial-pages.css";
+import "../shared/styles/service-purpose.css";
+import "../shared/styles/service-craft.css";
+import "../shared/styles/company-context.css";
+import "../shared/styles/enterprise-support.css";
 
 const artworkIcons: Record<CommercialPath, readonly string[]> = {
   "/merchant-onboarding": ["business", "document", "document", "check"],

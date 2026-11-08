@@ -1,6 +1,6 @@
-import { BrandImage } from "./brand-image";
-import "./brand-images-symbol.css";
-import { Icon } from "./icon";
+import { BrandImage } from "../shared/brand/brand-image";
+import "../shared/brand/brand-images-symbol.css";
+import { Icon } from "../shared/ui/icon";
 import styles from "./home-overview.module.css";
 
 /** A service relationship illustration, with no transaction or account state. */

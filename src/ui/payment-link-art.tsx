@@ -1,6 +1,6 @@
-import { serviceExample } from "@/modules/public-site/service-model";
+import { serviceExample } from "@/shared/ui/artwork/service-example";
 import { CommerceProductArt } from "./commerce-product-art";
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import "./payment-link-art.css";
 
 /** Static acceptance flow; no payable link, encoded QR or payment action. */

@@ -1,4 +1,4 @@
-import { discoverMark } from "./artwork-assets";
+import { discoverMark } from "../ui/artwork/artwork-assets";
 import Image from "next/image";
 import { BrandImage } from "./brand-image";
 import "./brand-images-networks.css";

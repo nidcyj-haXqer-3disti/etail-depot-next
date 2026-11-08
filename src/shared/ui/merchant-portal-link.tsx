@@ -1,7 +1,7 @@
-import { merchantAccountGuidance } from "@/modules/public-site/merchant-account-content";
+import { merchantAccountGuidance } from "@/shared/site/merchant-account-guidance";
 import { useId } from "react";
-import { hostedServices } from "@/shared/hosted-services";
-import styles from "./service-entry.module.css";
+import { hostedServices } from "@/shared/site/hosted-services";
+import styles from "./merchant-portal-link.module.css";
 
 /** Account handoffs use fixed destinations without visitor input or a referrer. */
 export function PaymentPortalLink({ intent, className = "button primary", children, showArrow = intent === "register" }: { intent: "sign-in" | "register"; className?: string; children?: React.ReactNode; showArrow?: boolean }) {

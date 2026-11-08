@@ -1,5 +1,5 @@
-import { serviceExample } from "@/modules/public-site/service-model";
-import { Icon } from "./icon";
+import { serviceExample } from "@/shared/ui/artwork/service-example";
+import { Icon } from "../shared/ui/icon";
 import "./payment-artwork.css";
 
 /** Shared visual identity for the read-only merchant experience. */

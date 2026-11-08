@@ -1,4 +1,4 @@
-import targets from "../../project-targets.json" with { type: "json" };
+import targets from "../../../project-targets.json" with { type: "json" };
 
 function boundCanonicalOrigin(): string {
   const raw = targets.netlify.canonical_origin;

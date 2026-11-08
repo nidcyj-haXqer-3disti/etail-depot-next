@@ -2,7 +2,7 @@ import { legalPageMetadata } from "@/modules/public-site/legal-metadata";
 import Link from "next/link";
 import { legalIdentity } from "@/shared/legal-identity";
 import { LegalDocument, type LegalSection } from "@/ui/legal-document";
-import { LegalContacts } from "@/ui/legal-identity";
+import { LegalContacts } from "@/shared/site/legal-identity";
 
 export const metadata = legalPageMetadata("/privacy");
 

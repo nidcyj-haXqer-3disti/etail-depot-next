@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BrandImage } from "./brand-image";
-import "./brand-images-etail.css";
+import { BrandImage } from "../brand/brand-image";
+import "../brand/brand-images-etail.css";
 import Link from "next/link";
 import { PublicNavigation } from "./public-navigation";
-import { PaymentPortalLink } from "./service-entry";
-import { Icon } from "./icon";
+import { PaymentPortalLink } from "../ui/merchant-portal-link";
+import { Icon } from "../ui/icon";
 
 export function PublicHeader() {
   const [open, setOpen] = useState(false);

@@ -1,22 +1,22 @@
 import Link from "next/link";
-import "@/ui/connected-services.css";
+import "@/shared/styles/connected-services.css";
 import { publicPageMetadata } from "@/modules/public-site/metadata";
-import { PublicPageStructuredData } from "@/modules/public-site/structured-data";
-import { cardProduct } from "@/shared/card-product";
-import { productFacts } from "@/shared/product-facts";
-import { Shell } from "@/ui/shell";
-import { Icon } from "@/ui/icon";
+import { PublicPageStructuredData } from "@/shared/seo/structured-data";
+import { cardProduct } from "@/shared/site/card-product";
+import { productFacts } from "@/shared/site/product-facts";
+import { Shell } from "@/shared/layout/shell";
+import { Icon } from "@/shared/ui/icon";
 import { ServiceDetailHero } from "@/ui/service-detail-page";
 import { ServiceDetailArt } from "@/ui/service-detail-art";
 import { LedgixCardFace, WalletCardArt } from "@/ui/wallet-card-art";
 import { WalletGuide } from "@/ui/wallet-guide";
 import { SecuredCreditArt } from "@/ui/secured-credit-art";
-import "@/ui/public-site.css";
+import "@/shared/styles/public-site.css";
 import "@/ui/card-services.css";
-import "@/ui/service-blueprint.css";
-import "@/ui/enterprise-support.css";
+import "@/shared/styles/service-blueprint.css";
+import "@/shared/styles/enterprise-support.css";
 
-import "@/ui/service-craft.css";
+import "@/shared/styles/service-craft.css";
 
 export const metadata = publicPageMetadata("/credit-card-services");
 export default function CardServicesPage() {

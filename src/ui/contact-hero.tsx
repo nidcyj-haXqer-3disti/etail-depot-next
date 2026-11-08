@@ -1,4 +1,4 @@
-import { brandSymbol } from "./artwork-assets";
+import { brandSymbol } from "../shared/ui/artwork/artwork-assets";
 import { preload } from "react-dom";
 import styles from "./contact-hero.module.css";
 

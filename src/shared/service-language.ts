@@ -1,5 +1,2 @@
-/** Primary public service labels. Product features and transaction terms stay descriptive. */
-export const serviceLabels = {
-  payments: "Merchant services",
-  cards: "Card services",
-} as const;
+// Temporary import bridge for a protected legal source. Remove during the Stage 3 receipt review.
+export * from "./site/service-language";

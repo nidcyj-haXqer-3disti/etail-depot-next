@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ISO8583_PATH, REFERENCE_SOURCES, REFERENCE_SECTIONS, MESSAGE_TYPES, DATA_FIELDS, FIELD_GROUPS, SOURCE_NOTES, referencePath, referenceSource, sourceUrl, isMessage, messageDigits, messageExplanation, relatedMessages, fieldExplanation, bitmapPosition, formatBytes, formatProfile, iso8583JsonLd, type ReferenceSection, type ReferenceEntry, type MessageType, type DataField } from "@/modules/public-site/iso8583-reference";
-import { Shell } from "./shell";
+import { Shell } from "../shared/layout/shell";
 import { ReferenceTableFilter } from "./reference-table-filter";
 import { ReferenceIndex } from "./reference-index";
 import "./standards-reference.css";

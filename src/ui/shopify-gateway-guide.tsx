@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { shopifyGuidePath, shopifySetupSteps } from "@/modules/public-site/shopify-guide-content";
-import { Shell } from "./shell";
+import { Shell } from "../shared/layout/shell";
 import { ShopifyGuideScreenshot } from "./shopify-guide-screenshot";
 import { ShopifyCredentialsEmailArt } from "./shopify-credentials-email-art";
 import { ShopifyVerificationArt } from "./shopify-verification-art";
 import { IntegrationGuideStepState } from "./integration-guide-step-state";
-import { TrolleysBrand } from "./trolleys-brand";
-import { Icon } from "./icon";
+import { TrolleysBrand } from "../shared/brand/trolleys-brand";
+import { Icon } from "../shared/ui/icon";
 import styles from "./shopify-gateway-guide.module.css";
 import guide from "./integration-guide.module.css";
 

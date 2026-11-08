@@ -1,4 +1,4 @@
-import { Icon } from "./icon";
+import { Icon } from "../shared/ui/icon";
 import type { DocRow } from "@/modules/public-site/documentation-content";
 
 const diagrams = {

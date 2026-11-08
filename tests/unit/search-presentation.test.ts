@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { socialPreviewImage, socialPreviewKey, socialPreviews } from "../../src/shared/social-preview";
+import { socialPreviewImage, socialPreviewKey, socialPreviews } from "../../src/shared/seo/social-preview";
 import { canonicalOrigin, publicPageJsonLd, publicPageMetadata, publicPageModified, PUBLIC_PAGES, servicePageMetadata } from "../../src/modules/public-site/metadata";
 import { documentationPages, documentationPath } from "../../src/modules/public-site/documentation-catalog";
 
