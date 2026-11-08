@@ -25,7 +25,8 @@
     "routeMap": "repository-route-map.json",
     "stage2": "repository-stage2.json",
     "stage3": "repository-stage3.json",
-    "stage4": "repository-stage4.json"
+    "stage4": "repository-stage4.json",
+    "stage5": "repository-stage5.json"
   },
   "categories": {
     "website": [
@@ -207,7 +208,7 @@
     {
       "number": 5,
       "name": "Full verification and release preparation",
-      "status": "planned",
+      "status": "complete",
       "deliverables": [
         "Review the exact final diff and verify that structural work did not change approved behavior.",
         "Compare desktop/mobile first access, refresh, anchor navigation, images and menus.",
@@ -219,8 +220,18 @@
         "Preserve production indexing guards, preview noindex and empty preview sitemap.",
         "Package only the approved website, one edge boundary and the pinned authenticated Emails handler.",
         "After authorized publication, verify the exact deployed commit and hosted routes, headers, cache, sitemap and source-file 404s."
-      ]
+      ],
+      "completion": {
+        "sourceFingerprint": "870ca5d021acc29ded6360937f6c9927223e678712d5d410f960e2d45348c3d7",
+        "generatedPagesMatched": 3752,
+        "pixelIdenticalViews": 86,
+        "additionalWebKitChecks": 76,
+        "sourceBuildPackageIdentical": true,
+        "remoteBaselineUnchanged": true,
+        "releasePreparationComplete": true,
+        "publicationPerformed": false
+      }
     }
   ],
-  "activeBranch": "codex/restructure-stage4-20261108"
+  "activeBranch": "codex/restructure-stage5-20261108"
 }
