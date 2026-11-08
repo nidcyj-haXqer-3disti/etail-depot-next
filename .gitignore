@@ -24,7 +24,7 @@ artifacts/
 .env
 .env.*
 !.env.example
-!templates/.env.example
+!archive/retired-platform/templates/.env.example
 *.log
 *.tsbuildinfo
 .DS_Store

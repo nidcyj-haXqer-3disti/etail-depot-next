@@ -1,0 +1,2045 @@
+{
+  "stage": 4,
+  "status": "complete",
+  "date": "2026-11-08",
+  "branch": "codex/restructure-stage4-20261108",
+  "baseCommit": "c5b665269de561ff3b544f60f13e40d875c5e208",
+  "scope": "Engineering instructions, reviewed history and generator support paths. Public website source, runtime configuration and deployed service remain unchanged.",
+  "moves": {
+    "00_START_HERE.md": "archive/bootstrap/00_START_HERE.md",
+    "01_PASTE_IN_CODEX.md": "archive/bootstrap/01_PASTE_IN_CODEX.md",
+    "02_MASTER_BUILD_PROMPT.md": "archive/bootstrap/02_MASTER_BUILD_PROMPT.md",
+    "HANDOFF_VALIDATION.md": "archive/bootstrap/HANDOFF_VALIDATION.md",
+    "PACKAGE_MANIFEST.json": "archive/bootstrap/PACKAGE_MANIFEST.json",
+    "assets/brand/README.md": "archive/retired-platform/assets/brand/README.md",
+    "assets/brand/logo.png": "archive/retired-platform/assets/brand/logo.png",
+    "assets/brand/symbol.png": "archive/retired-platform/assets/brand/symbol.png",
+    "contracts/acceptance-cases.json": "archive/retired-platform/contracts/acceptance-cases.json",
+    "contracts/api-surface.json": "archive/retired-platform/contracts/api-surface.json",
+    "contracts/capability-example.json": "archive/retired-platform/contracts/capability-example.json",
+    "contracts/commercial-rules.json": "archive/retired-platform/contracts/commercial-rules.json",
+    "contracts/generated/foundation-openapi.json": "archive/retired-platform/contracts/generated/foundation-openapi.json",
+    "contracts/merchant-channel-design.json": "archive/retired-platform/contracts/merchant-channel-design.json",
+    "contracts/regression-fixtures.json": "archive/retired-platform/contracts/regression-fixtures.json",
+    "contracts/service-hierarchy.json": "archive/retired-platform/contracts/service-hierarchy.json",
+    "contracts/workflow-states.json": "archive/retired-platform/contracts/workflow-states.json",
+    "docs/ACTIVE_SANDBOX_BUILD.md": "archive/project-history/docs/ACTIVE_SANDBOX_BUILD.md",
+    "docs/ADVANCED_PUBLIC_PRODUCT_PLAN.md": "archive/project-history/docs/ADVANCED_PUBLIC_PRODUCT_PLAN.md",
+    "docs/ALL_PAGES_PRESENTATION_REVIEW.md": "archive/project-history/docs/ALL_PAGES_PRESENTATION_REVIEW.md",
+    "docs/AMEX_EXPERIENCE_CORRECTION.md": "archive/project-history/docs/AMEX_EXPERIENCE_CORRECTION.md",
+    "docs/AMEX_WORKFLOW_ASSESSMENT.md": "archive/project-history/docs/AMEX_WORKFLOW_ASSESSMENT.md",
+    "docs/BANKING_RECOGNITION_EXPERIENCE.md": "archive/project-history/docs/BANKING_RECOGNITION_EXPERIENCE.md",
+    "docs/CARDHOLDER_EXPERIENCE_REDESIGN.md": "archive/project-history/docs/CARDHOLDER_EXPERIENCE_REDESIGN.md",
+    "docs/CARDHOLDER_REDESIGN_EVIDENCE.md": "archive/project-history/docs/CARDHOLDER_REDESIGN_EVIDENCE.md",
+    "docs/CARD_DETAILS_EXPERIENCE.md": "archive/project-history/docs/CARD_DETAILS_EXPERIENCE.md",
+    "docs/CHECKOUT_NAVIGATION_FIX.md": "archive/project-history/docs/CHECKOUT_NAVIGATION_FIX.md",
+    "docs/COHESIVE_PUBLIC_PRODUCTS.md": "archive/project-history/docs/COHESIVE_PUBLIC_PRODUCTS.md",
+    "docs/COHESIVE_SERVICE_EXPERIENCE.md": "archive/project-history/docs/COHESIVE_SERVICE_EXPERIENCE.md",
+    "docs/COHESIVE_SERVICE_EXPERIENCE_EVIDENCE.md": "archive/project-history/docs/COHESIVE_SERVICE_EXPERIENCE_EVIDENCE.md",
+    "docs/CONCISE_SERVICE_COPY.md": "archive/project-history/docs/CONCISE_SERVICE_COPY.md",
+    "docs/CONNECTED_SANDBOX_EVIDENCE.md": "archive/project-history/docs/CONNECTED_SANDBOX_EVIDENCE.md",
+    "docs/CONSOLIDATED_SERVICE_EVIDENCE.md": "archive/project-history/docs/CONSOLIDATED_SERVICE_EVIDENCE.md",
+    "docs/CONSOLIDATED_SERVICE_WORKFLOWS.md": "archive/project-history/docs/CONSOLIDATED_SERVICE_WORKFLOWS.md",
+    "docs/CONSUMER_ENTRY_REDESIGN.md": "archive/project-history/docs/CONSUMER_ENTRY_REDESIGN.md",
+    "docs/CONSUMER_FINALIZATION.md": "archive/project-history/docs/CONSUMER_FINALIZATION.md",
+    "docs/CONSUMER_SEARCH.md": "archive/project-history/docs/CONSUMER_SEARCH.md",
+    "docs/CUSTOMER_EXPERIENCE_REASSESSMENT.md": "archive/project-history/docs/CUSTOMER_EXPERIENCE_REASSESSMENT.md",
+    "docs/CUSTOMER_LANGUAGE_EVIDENCE.md": "archive/project-history/docs/CUSTOMER_LANGUAGE_EVIDENCE.md",
+    "docs/CUSTOMER_VALIDATION_SCRIPT.md": "archive/project-history/docs/CUSTOMER_VALIDATION_SCRIPT.md",
+    "docs/DATABASE_AND_DOMAIN.md": "archive/project-history/docs/DATABASE_AND_DOMAIN.md",
+    "docs/DECISIONS.md": "archive/project-history/docs/DECISIONS.md",
+    "docs/DEPLOYMENT_ERROR_RATE_REVIEW.md": "archive/project-history/docs/DEPLOYMENT_ERROR_RATE_REVIEW.md",
+    "docs/DESIGN_WALKTHROUGH.md": "archive/project-history/docs/DESIGN_WALKTHROUGH.md",
+    "docs/DIGITAL_WALLET_CARD.md": "archive/project-history/docs/DIGITAL_WALLET_CARD.md",
+    "docs/DISPUTE_READINESS_MARKETING.md": "archive/project-history/docs/DISPUTE_READINESS_MARKETING.md",
+    "docs/DNS_DEPLOYMENT_HANDOFF.md": "archive/project-history/docs/DNS_DEPLOYMENT_HANDOFF.md",
+    "docs/EMAIL_ACCESS.md": "archive/project-history/docs/EMAIL_ACCESS.md",
+    "docs/EMAIL_ACCESS_RELIABILITY.md": "archive/project-history/docs/EMAIL_ACCESS_RELIABILITY.md",
+    "docs/EXPERIENCE_ARCHITECTURE.md": "archive/project-history/docs/EXPERIENCE_ARCHITECTURE.md",
+    "docs/EXPERIENCE_EVIDENCE.md": "archive/project-history/docs/EXPERIENCE_EVIDENCE.md",
+    "docs/EXPERIENCE_EXPANSION_EVIDENCE.md": "archive/project-history/docs/EXPERIENCE_EXPANSION_EVIDENCE.md",
+    "docs/FAMILY_BUSINESS_STYLE_EVIDENCE.md": "archive/project-history/docs/FAMILY_BUSINESS_STYLE_EVIDENCE.md",
+    "docs/FOCUSED_PRODUCT_PAGES.md": "archive/project-history/docs/FOCUSED_PRODUCT_PAGES.md",
+    "docs/FOUNDATION_EVIDENCE.md": "archive/project-history/docs/FOUNDATION_EVIDENCE.md",
+    "docs/FRESH_PREPAID_REBUILD.md": "archive/project-history/docs/FRESH_PREPAID_REBUILD.md",
+    "docs/FRESH_TWO_SERVICE_BUILD.md": "archive/project-history/docs/FRESH_TWO_SERVICE_BUILD.md",
+    "docs/FRESH_TWO_SERVICE_EVIDENCE.md": "archive/project-history/docs/FRESH_TWO_SERVICE_EVIDENCE.md",
+    "docs/GITHUB_PLAN.md": "archive/project-history/docs/GITHUB_PLAN.md",
+    "docs/HOSTED_EMAIL_DEPLOYMENT.md": "archive/project-history/docs/HOSTED_EMAIL_DEPLOYMENT.md",
+    "docs/HOSTED_SANDBOX_PRODUCT.md": "archive/project-history/docs/HOSTED_SANDBOX_PRODUCT.md",
+    "docs/LEDGIX_TROLLEYS_LEGAL.md": "archive/project-history/docs/LEDGIX_TROLLEYS_LEGAL.md",
+    "docs/MARKETING_ARTWORK_DIRECTION.md": "archive/project-history/docs/MARKETING_ARTWORK_DIRECTION.md",
+    "docs/MARKETING_REFRESH.md": "archive/project-history/docs/MARKETING_REFRESH.md",
+    "docs/MERCHANT_CHANNEL_EVIDENCE.md": "archive/project-history/docs/MERCHANT_CHANNEL_EVIDENCE.md",
+    "docs/MERCHANT_EXPERIENCE_REDESIGN.md": "archive/project-history/docs/MERCHANT_EXPERIENCE_REDESIGN.md",
+    "docs/MERCHANT_HIERARCHY_AND_CHANNELS.md": "archive/project-history/docs/MERCHANT_HIERARCHY_AND_CHANNELS.md",
+    "docs/MERCHANT_REDESIGN_EVIDENCE.md": "archive/project-history/docs/MERCHANT_REDESIGN_EVIDENCE.md",
+    "docs/MINIMAL_SERVICE_OVERVIEWS.md": "archive/project-history/docs/MINIMAL_SERVICE_OVERVIEWS.md",
+    "docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md": "archive/project-history/docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md",
+    "docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS_EVIDENCE.md": "archive/project-history/docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS_EVIDENCE.md",
+    "docs/OPERATIONAL_TRUST_REVIEW.md": "archive/project-history/docs/OPERATIONAL_TRUST_REVIEW.md",
+    "docs/OPERATIONS_ECONOMICS_PARTNERS.md": "archive/project-history/docs/OPERATIONS_ECONOMICS_PARTNERS.md",
+    "docs/OWNER_CARDS_TERMINALS_DESIGN.md": "archive/project-history/docs/OWNER_CARDS_TERMINALS_DESIGN.md",
+    "docs/OWNER_CARDS_TERMINALS_EVIDENCE.md": "archive/project-history/docs/OWNER_CARDS_TERMINALS_EVIDENCE.md",
+    "docs/PAYFAC_DISCOVERY_MEASUREMENT.md": "archive/project-history/docs/PAYFAC_DISCOVERY_MEASUREMENT.md",
+    "docs/PAYMENTS_VALUE_EXPERIENCE.md": "archive/project-history/docs/PAYMENTS_VALUE_EXPERIENCE.md",
+    "docs/PAYMENT_ADDON_VALUE_DESIGN.md": "archive/project-history/docs/PAYMENT_ADDON_VALUE_DESIGN.md",
+    "docs/PAYMENT_DOCUMENTS_IMPLEMENTATION.md": "archive/project-history/docs/PAYMENT_DOCUMENTS_IMPLEMENTATION.md",
+    "docs/PAYMENT_EVIDENCE_FRAMEWORK.md": "archive/project-history/docs/PAYMENT_EVIDENCE_FRAMEWORK.md",
+    "docs/PAYMENT_MEDIA_GALLERY.md": "archive/project-history/docs/PAYMENT_MEDIA_GALLERY.md",
+    "docs/PAYMENT_PAGE_REBUILD.md": "archive/project-history/docs/PAYMENT_PAGE_REBUILD.md",
+    "docs/PAYMENT_TRANSACTION_DETAILS.md": "archive/project-history/docs/PAYMENT_TRANSACTION_DETAILS.md",
+    "docs/PRACTICAL_DASHBOARD_REVIEW.md": "archive/project-history/docs/PRACTICAL_DASHBOARD_REVIEW.md",
+    "docs/PREPAID_REBUILD_EVIDENCE.md": "archive/project-history/docs/PREPAID_REBUILD_EVIDENCE.md",
+    "docs/PRIVACY_TERMS_REVIEW.md": "archive/project-history/docs/PRIVACY_TERMS_REVIEW.md",
+    "docs/PRODUCT.md": "archive/project-history/docs/PRODUCT.md",
+    "docs/PRODUCTION_UI_CLEANUP.md": "archive/project-history/docs/PRODUCTION_UI_CLEANUP.md",
+    "docs/PRODUCT_CONFIDENCE_IMPLEMENTATION.md": "archive/project-history/docs/PRODUCT_CONFIDENCE_IMPLEMENTATION.md",
+    "docs/PRODUCT_DESIGN_ASSESSMENT.md": "archive/project-history/docs/PRODUCT_DESIGN_ASSESSMENT.md",
+    "docs/PRODUCT_HEADER_DESIGN.md": "archive/project-history/docs/PRODUCT_HEADER_DESIGN.md",
+    "docs/PRODUCT_MARKETING_USE_CASES.md": "archive/project-history/docs/PRODUCT_MARKETING_USE_CASES.md",
+    "docs/PRODUCT_POSITIONING.md": "archive/project-history/docs/PRODUCT_POSITIONING.md",
+    "docs/PRODUCT_TECHNICAL_DESIGN.md": "archive/project-history/docs/PRODUCT_TECHNICAL_DESIGN.md",
+    "docs/PROVIDER_HOSTED_PUBLIC_JOURNEY.md": "archive/project-history/docs/PROVIDER_HOSTED_PUBLIC_JOURNEY.md",
+    "docs/PROVIDER_SERVICE_DASHBOARDS.md": "archive/project-history/docs/PROVIDER_SERVICE_DASHBOARDS.md",
+    "docs/PUBLIC_CHROME_ALIGNMENT.md": "archive/project-history/docs/PUBLIC_CHROME_ALIGNMENT.md",
+    "docs/PUBLIC_DETAIL_POLISH.md": "archive/project-history/docs/PUBLIC_DETAIL_POLISH.md",
+    "docs/PUBLIC_EXPERIENCE_REFINEMENT.md": "archive/project-history/docs/PUBLIC_EXPERIENCE_REFINEMENT.md",
+    "docs/PUBLIC_FOOTER_DESIGN.md": "archive/project-history/docs/PUBLIC_FOOTER_DESIGN.md",
+    "docs/PUBLIC_FOOTER_MICRO_REVIEW.md": "archive/project-history/docs/PUBLIC_FOOTER_MICRO_REVIEW.md",
+    "docs/PUBLIC_PAYMENT_JOURNEY.md": "archive/project-history/docs/PUBLIC_PAYMENT_JOURNEY.md",
+    "docs/PUBLIC_PRODUCT_PROPOSAL.md": "archive/project-history/docs/PUBLIC_PRODUCT_PROPOSAL.md",
+    "docs/PUBLIC_PRODUCT_STORYTELLING.md": "archive/project-history/docs/PUBLIC_PRODUCT_STORYTELLING.md",
+    "docs/PUBLIC_VISUAL_BALANCE.md": "archive/project-history/docs/PUBLIC_VISUAL_BALANCE.md",
+    "docs/REFINED_CONSUMER_LANDING.md": "archive/project-history/docs/REFINED_CONSUMER_LANDING.md",
+    "docs/RELEASE_READINESS_REVIEW.md": "archive/project-history/docs/RELEASE_READINESS_REVIEW.md",
+    "docs/RESEARCH_NOTES.md": "archive/project-history/docs/RESEARCH_NOTES.md",
+    "docs/SANDBOX_JOURNEY_REFINEMENT.md": "archive/project-history/docs/SANDBOX_JOURNEY_REFINEMENT.md",
+    "docs/SECURED_CARD_EXPERIENCE_DESIGN.md": "archive/project-history/docs/SECURED_CARD_EXPERIENCE_DESIGN.md",
+    "docs/SECURED_CARD_PRODUCT_COPY.md": "archive/project-history/docs/SECURED_CARD_PRODUCT_COPY.md",
+    "docs/SELLER_ENTRY_EVIDENCE.md": "archive/project-history/docs/SELLER_ENTRY_EVIDENCE.md",
+    "docs/SELLER_ENTRY_EXPERIENCE.md": "archive/project-history/docs/SELLER_ENTRY_EXPERIENCE.md",
+    "docs/SELLER_MERCHANT_HOME_EVIDENCE.md": "archive/project-history/docs/SELLER_MERCHANT_HOME_EVIDENCE.md",
+    "docs/SERVICE_CONSOLIDATION.md": "archive/project-history/docs/SERVICE_CONSOLIDATION.md",
+    "docs/SERVICE_DASHBOARD_CLARITY.md": "archive/project-history/docs/SERVICE_DASHBOARD_CLARITY.md",
+    "docs/SERVICE_DASHBOARD_DESIGN.md": "archive/project-history/docs/SERVICE_DASHBOARD_DESIGN.md",
+    "docs/SERVICE_DASHBOARD_EVIDENCE.md": "archive/project-history/docs/SERVICE_DASHBOARD_EVIDENCE.md",
+    "docs/SERVICE_EXPERIENCE_CLEANUP.md": "archive/project-history/docs/SERVICE_EXPERIENCE_CLEANUP.md",
+    "docs/SERVICE_JOURNEY_AUDIT.md": "archive/project-history/docs/SERVICE_JOURNEY_AUDIT.md",
+    "docs/SERVICE_MENU_EVIDENCE.md": "archive/project-history/docs/SERVICE_MENU_EVIDENCE.md",
+    "docs/SERVICE_MENU_HIERARCHY.md": "archive/project-history/docs/SERVICE_MENU_HIERARCHY.md",
+    "docs/SIGN_IN_SESSION_FIX.md": "archive/project-history/docs/SIGN_IN_SESSION_FIX.md",
+    "docs/SIMPLER_DASHBOARD_EVIDENCE.md": "archive/project-history/docs/SIMPLER_DASHBOARD_EVIDENCE.md",
+    "docs/SIMPLE_SERVICE_WORKSPACES.md": "archive/project-history/docs/SIMPLE_SERVICE_WORKSPACES.md",
+    "docs/SYSTEM_MAP.md": "archive/project-history/docs/SYSTEM_MAP.md",
+    "docs/THREE_ACCOUNT_SANDBOX_DESIGN.md": "archive/project-history/docs/THREE_ACCOUNT_SANDBOX_DESIGN.md",
+    "docs/THREE_ACCOUNT_SANDBOX_EVIDENCE.md": "archive/project-history/docs/THREE_ACCOUNT_SANDBOX_EVIDENCE.md",
+    "docs/TROLLEYS_ECONOMIC_PROPOSAL.md": "archive/project-history/docs/TROLLEYS_ECONOMIC_PROPOSAL.md",
+    "docs/TROLLEYS_MEMBERSHIP_PRICING.md": "archive/project-history/docs/TROLLEYS_MEMBERSHIP_PRICING.md",
+    "docs/TROLLEYS_SALE_RECORDS.md": "archive/project-history/docs/TROLLEYS_SALE_RECORDS.md",
+    "docs/TWO_SERVICE_DESIGN.md": "archive/project-history/docs/TWO_SERVICE_DESIGN.md",
+    "docs/TWO_SERVICE_EVIDENCE.md": "archive/project-history/docs/TWO_SERVICE_EVIDENCE.md",
+    "docs/UNIFIED_RESOURCE_WORKSPACES.md": "archive/project-history/docs/UNIFIED_RESOURCE_WORKSPACES.md",
+    "docs/UNIFIED_RESOURCE_WORKSPACES_EVIDENCE.md": "archive/project-history/docs/UNIFIED_RESOURCE_WORKSPACES_EVIDENCE.md",
+    "docs/UX_CONTRACT.md": "archive/project-history/docs/UX_CONTRACT.md",
+    "docs/WALLET_SETUP_GUIDE.md": "archive/project-history/docs/WALLET_SETUP_GUIDE.md",
+    "docs/WEBSITE_LEGAL_REFRESH.md": "archive/project-history/docs/WEBSITE_LEGAL_REFRESH.md",
+    "docs/WORKFLOWS.md": "archive/project-history/docs/WORKFLOWS.md",
+    "docs/artwork/d117-assets.json": "archive/project-history/docs/artwork/d117-assets.json",
+    "docs/evidence/foundation-afda1e3.json": "archive/project-history/docs/evidence/foundation-afda1e3.json",
+    "docs/payment-documents/EVIDENCE_MATRIX.md": "archive/project-history/docs/payment-documents/EVIDENCE_MATRIX.md",
+    "docs/payment-documents/INVOICE_TEMPLATE.md": "archive/project-history/docs/payment-documents/INVOICE_TEMPLATE.md",
+    "docs/payment-documents/PAYMENT_RECEIPT_TEMPLATE.md": "archive/project-history/docs/payment-documents/PAYMENT_RECEIPT_TEMPLATE.md",
+    "docs/payment-documents/README.md": "archive/project-history/docs/payment-documents/README.md",
+    "docs/payment-documents/TRANSACTION_AGREEMENT_TEMPLATE.md": "archive/project-history/docs/payment-documents/TRANSACTION_AGREEMENT_TEMPLATE.md",
+    "docs/payment-documents/VENDOR_HANDOFF.md": "archive/project-history/docs/payment-documents/VENDOR_HANDOFF.md",
+    "docs/research/VIDEO_PLANNING_REVIEW.md": "archive/project-history/docs/research/VIDEO_PLANNING_REVIEW.md",
+    "docs/research/acquiring/MERCHANT_HIERARCHY_REFERENCE.md": "archive/project-history/docs/research/acquiring/MERCHANT_HIERARCHY_REFERENCE.md",
+    "docs/research/amex/ACCOUNT_CONTROL_360.md": "archive/project-history/docs/research/amex/ACCOUNT_CONTROL_360.md",
+    "docs/research/amex/ARCHITECTURE_AND_MANAGEMENT.md": "archive/project-history/docs/research/amex/ARCHITECTURE_AND_MANAGEMENT.md",
+    "docs/research/amex/ARCHITECTURE_BLUEPRINT.md": "archive/project-history/docs/research/amex/ARCHITECTURE_BLUEPRINT.md",
+    "docs/research/amex/ARCHITECTURE_VALIDATION.md": "archive/project-history/docs/research/amex/ARCHITECTURE_VALIDATION.md",
+    "docs/research/amex/BUSINESS_360_REVIEW.md": "archive/project-history/docs/research/amex/BUSINESS_360_REVIEW.md",
+    "docs/research/amex/BUSINESS_360_VALIDATION.md": "archive/project-history/docs/research/amex/BUSINESS_360_VALIDATION.md",
+    "docs/research/amex/CARDHOLDER_DASHBOARD_ROLES.md": "archive/project-history/docs/research/amex/CARDHOLDER_DASHBOARD_ROLES.md",
+    "docs/research/amex/COMPARISON_CATALOG.md": "archive/project-history/docs/research/amex/COMPARISON_CATALOG.md",
+    "docs/research/amex/ENGINEERING_AND_PATENTS.md": "archive/project-history/docs/research/amex/ENGINEERING_AND_PATENTS.md",
+    "docs/research/amex/FRONTEND_EXPERIENCE.md": "archive/project-history/docs/research/amex/FRONTEND_EXPERIENCE.md",
+    "docs/research/amex/ISSUING_360.md": "archive/project-history/docs/research/amex/ISSUING_360.md",
+    "docs/research/amex/ISSUING_AND_CONSUMER.md": "archive/project-history/docs/research/amex/ISSUING_AND_CONSUMER.md",
+    "docs/research/amex/MARKETING_POSITIONING_2026_09_10.md": "archive/project-history/docs/research/amex/MARKETING_POSITIONING_2026_09_10.md",
+    "docs/research/amex/MERCHANT_360.md": "archive/project-history/docs/research/amex/MERCHANT_360.md",
+    "docs/research/amex/MERCHANT_AND_OPERATIONS.md": "archive/project-history/docs/research/amex/MERCHANT_AND_OPERATIONS.md",
+    "docs/research/amex/MERCHANT_DASHBOARD_ROLES.md": "archive/project-history/docs/research/amex/MERCHANT_DASHBOARD_ROLES.md",
+    "docs/research/amex/MERCHANT_MARKETING_FIT_2026_09_10.md": "archive/project-history/docs/research/amex/MERCHANT_MARKETING_FIT_2026_09_10.md",
+    "docs/research/amex/OPEN_SOURCE_COMPONENTS.md": "archive/project-history/docs/research/amex/OPEN_SOURCE_COMPONENTS.md",
+    "docs/research/amex/PAYMENTS_DATA_ARCHITECTURE.md": "archive/project-history/docs/research/amex/PAYMENTS_DATA_ARCHITECTURE.md",
+    "docs/research/amex/PLATFORM_ARCHITECTURE.md": "archive/project-history/docs/research/amex/PLATFORM_ARCHITECTURE.md",
+    "docs/research/amex/README.md": "archive/project-history/docs/research/amex/README.md",
+    "docs/research/amex/REVIEWER_WALKTHROUGHS.md": "archive/project-history/docs/research/amex/REVIEWER_WALKTHROUGHS.md",
+    "docs/research/amex/THREE_ACCOUNT_CARD_EXPERIENCE.md": "archive/project-history/docs/research/amex/THREE_ACCOUNT_CARD_EXPERIENCE.md",
+    "docs/research/amex/THREE_ACCOUNT_MERCHANT_REDESIGN.md": "archive/project-history/docs/research/amex/THREE_ACCOUNT_MERCHANT_REDESIGN.md",
+    "docs/research/amex/VALIDATION.md": "archive/project-history/docs/research/amex/VALIDATION.md",
+    "docs/research/amex/VENDOR_SYSTEMS.md": "archive/project-history/docs/research/amex/VENDOR_SYSTEMS.md",
+    "docs/research/amex/account-control-360-checks.json": "archive/project-history/docs/research/amex/account-control-360-checks.json",
+    "docs/research/amex/account-control-360-sources.json": "archive/project-history/docs/research/amex/account-control-360-sources.json",
+    "docs/research/amex/architecture-sources.json": "archive/project-history/docs/research/amex/architecture-sources.json",
+    "docs/research/amex/business-360-sources.json": "archive/project-history/docs/research/amex/business-360-sources.json",
+    "docs/research/amex/cross-domain-360-checks.json": "archive/project-history/docs/research/amex/cross-domain-360-checks.json",
+    "docs/research/amex/engineering-patent-sources.json": "archive/project-history/docs/research/amex/engineering-patent-sources.json",
+    "docs/research/amex/issuing-360-checks.json": "archive/project-history/docs/research/amex/issuing-360-checks.json",
+    "docs/research/amex/issuing-360-sources.json": "archive/project-history/docs/research/amex/issuing-360-sources.json",
+    "docs/research/amex/issuing-sources.json": "archive/project-history/docs/research/amex/issuing-sources.json",
+    "docs/research/amex/merchant-360-checks.json": "archive/project-history/docs/research/amex/merchant-360-checks.json",
+    "docs/research/amex/merchant-360-sources.json": "archive/project-history/docs/research/amex/merchant-360-sources.json",
+    "docs/research/amex/merchant-sources.json": "archive/project-history/docs/research/amex/merchant-sources.json",
+    "docs/research/amex/opensource-sources.json": "archive/project-history/docs/research/amex/opensource-sources.json",
+    "docs/research/amex/payments-data-sources.json": "archive/project-history/docs/research/amex/payments-data-sources.json",
+    "docs/research/amex/platform-sources.json": "archive/project-history/docs/research/amex/platform-sources.json",
+    "docs/research/amex/vendor-systems-sources.json": "archive/project-history/docs/research/amex/vendor-systems-sources.json",
+    "docs/research/d131-cards-benchmark.md": "archive/project-history/docs/research/d131-cards-benchmark.md",
+    "docs/research/d131-market-demand.md": "archive/project-history/docs/research/d131-market-demand.md",
+    "docs/research/d131-payments-benchmark.md": "archive/project-history/docs/research/d131-payments-benchmark.md",
+    "docs/research/d131-ux-benchmark.md": "archive/project-history/docs/research/d131-ux-benchmark.md",
+    "docs/research/d134-court-lessons.md": "archive/project-history/docs/research/d134-court-lessons.md",
+    "docs/research/d134-network-evidence.md": "archive/project-history/docs/research/d134-network-evidence.md",
+    "docs/research/d134-product-model.md": "archive/project-history/docs/research/d134-product-model.md",
+    "docs/research/d137-order-insight.md": "archive/project-history/docs/research/d137-order-insight.md",
+    "docs/research/d153-trolleys-two-step.md": "archive/project-history/docs/research/d153-trolleys-two-step.md",
+    "docs/research/d155-competitor-pricing.md": "archive/project-history/docs/research/d155-competitor-pricing.md",
+    "docs/research/d155-economics-model.py": "archive/project-history/docs/research/d155-economics-model.py",
+    "docs/research/d155-market-demand.md": "archive/project-history/docs/research/d155-market-demand.md",
+    "docs/research/d84-secured-card-reference.md": "archive/project-history/docs/research/d84-secured-card-reference.md",
+    "planning/DELIVERY_PLAN.md": "archive/project-history/planning/DELIVERY_PLAN.md",
+    "planning/EXPERIENCE_GAP_AUDIT.md": "archive/project-history/planning/EXPERIENCE_GAP_AUDIT.md",
+    "planning/TRACEABILITY.md": "archive/project-history/planning/TRACEABILITY.md",
+    "planning/amex-architecture-gates.json": "archive/project-history/planning/amex-architecture-gates.json",
+    "planning/amex-comparison.json": "archive/project-history/planning/amex-comparison.json",
+    "planning/backlog.csv": "archive/project-history/planning/backlog.csv",
+    "planning/backlog.json": "archive/project-history/planning/backlog.json",
+    "planning/merchant-channel-verification.json": "archive/project-history/planning/merchant-channel-verification.json",
+    "planning/search-ai-execution.json": "archive/project-history/planning/search-ai-execution.json",
+    "planning/search-growth.json": "archive/project-history/planning/search-growth.json",
+    "prompts/01_FOUNDATION_AND_ACCOUNTS.md": "archive/retired-platform/prompts/01_FOUNDATION_AND_ACCOUNTS.md",
+    "prompts/02_CANONICAL_CARDS.md": "archive/retired-platform/prompts/02_CANONICAL_CARDS.md",
+    "prompts/03_ISSUING_AND_SIMULATION.md": "archive/retired-platform/prompts/03_ISSUING_AND_SIMULATION.md",
+    "prompts/04_ACQUIRING_AND_DELEGATION.md": "archive/retired-platform/prompts/04_ACQUIRING_AND_DELEGATION.md",
+    "prompts/05_OPERATIONS_ECONOMICS_PARTNERS.md": "archive/retired-platform/prompts/05_OPERATIONS_ECONOMICS_PARTNERS.md",
+    "prompts/06_HARDEN_AND_DEPLOY_NEW_SITE.md": "archive/retired-platform/prompts/06_HARDEN_AND_DEPLOY_NEW_SITE.md",
+    "prompts/07_RESUME_WITHOUT_RESTARTING.md": "archive/retired-platform/prompts/07_RESUME_WITHOUT_RESTARTING.md",
+    "sources/inventory.json": "archive/retired-platform/sources/inventory.json",
+    "sources/original/Account_First_Redesign_Reference.md": "archive/retired-platform/sources/original/Account_First_Redesign_Reference.md",
+    "sources/original/Master_AI_Agent_Prompt_Netlify_Member_Commerce_Platform.md": "archive/retired-platform/sources/original/Master_AI_Agent_Prompt_Netlify_Member_Commerce_Platform.md",
+    "sources/original/Select_Premier_Customer_Service_Lifecycle.xlsx": "archive/retired-platform/sources/original/Select_Premier_Customer_Service_Lifecycle.xlsx",
+    "sources/original/Select_Premier_Management_Enterprise_Cost_Model.xlsx": "archive/retired-platform/sources/original/Select_Premier_Management_Enterprise_Cost_Model.xlsx",
+    "sources/workbook-extract.json": "archive/retired-platform/sources/workbook-extract.json",
+    "templates/.env.example": "archive/retired-platform/templates/.env.example",
+    "templates/ci.yml.example": "archive/retired-platform/templates/ci.yml.example",
+    "templates/deployment-receipt.json": "archive/retired-platform/templates/deployment-receipt.json",
+    "templates/netlify.toml.example": "archive/retired-platform/templates/netlify.toml.example",
+    "templates/release-checklist.md": "archive/retired-platform/templates/release-checklist.md",
+    "planning/STATUS.md": "archive/project-history/planning/STATUS.md",
+    "docs/SOURCE_PRECEDENCE_HISTORY.md": "archive/project-history/docs/SOURCE_PRECEDENCE_HISTORY.md",
+    "docs/OPEN_SOURCE_ASSESSMENT.md": "archive/project-history/docs/OPEN_SOURCE_ASSESSMENT.md",
+    "tools/guide-image-sources.mjs": "tools/assets/guide-image-sources.mjs",
+    "tools/guide-image-previews.json": "tools/assets/guide-image-previews.json"
+  },
+  "historicalSnapshots": {
+    "docs/CURRENT_WORK_CONTEXT.md": "archive/project-history/docs/CURRENT_WORK_CONTEXT.md",
+    "docs/PUBLIC_SITE_ARCHITECTURE.md": "archive/project-history/docs/PUBLIC_SITE_ARCHITECTURE.md",
+    "docs/ACCEPTANCE_TESTS.md": "archive/project-history/docs/ACCEPTANCE_TESTS.md",
+    "docs/ACCESS_POLICY.md": "archive/project-history/docs/ACCESS_POLICY.md",
+    "docs/CUSTOMER_LANGUAGE.md": "archive/project-history/docs/CUSTOMER_LANGUAGE.md",
+    "docs/GITHUB_DELIVERY.md": "archive/project-history/docs/GITHUB_DELIVERY.md",
+    "docs/NETWORK_BRAND_ASSETS.md": "archive/project-history/docs/NETWORK_BRAND_ASSETS.md",
+    "docs/SECURITY_AND_IDENTITY.md": "archive/project-history/docs/SECURITY_AND_IDENTITY.md",
+    "docs/TEST_AND_EVIDENCE.md": "archive/project-history/docs/TEST_AND_EVIDENCE.md"
+  },
+  "preservedEntries": [
+    {
+      "source": "00_START_HERE.md",
+      "target": "archive/bootstrap/00_START_HERE.md",
+      "operation": "move",
+      "sha256": "5c45a064b1c2e7020142888c37d984034a2b6110960b2a3a2539c33c0afd7cee",
+      "bytes": 1058
+    },
+    {
+      "source": "01_PASTE_IN_CODEX.md",
+      "target": "archive/bootstrap/01_PASTE_IN_CODEX.md",
+      "operation": "move",
+      "sha256": "98bdab823f7d35e129004726b680fec40d661d11f84418e3b86931de8351b10d",
+      "bytes": 551
+    },
+    {
+      "source": "02_MASTER_BUILD_PROMPT.md",
+      "target": "archive/bootstrap/02_MASTER_BUILD_PROMPT.md",
+      "operation": "move",
+      "sha256": "e7f22b1dc371f2f7f47f8637ad5f738bf9c5cb73a269a92af2877d8c6d52f97b",
+      "bytes": 13223
+    },
+    {
+      "source": "HANDOFF_VALIDATION.md",
+      "target": "archive/bootstrap/HANDOFF_VALIDATION.md",
+      "operation": "move",
+      "sha256": "68a5ecf615cc9848a3afd8923a3adbd2b45ad34a5332d698c5d2a9c2083e2e4f",
+      "bytes": 2907
+    },
+    {
+      "source": "PACKAGE_MANIFEST.json",
+      "target": "archive/bootstrap/PACKAGE_MANIFEST.json",
+      "operation": "move",
+      "sha256": "c415fbbb00147b6f3621da61343f690576a0a462b5e6f75e01ef788a1313f943",
+      "bytes": 6619
+    },
+    {
+      "source": "assets/brand/README.md",
+      "target": "archive/retired-platform/assets/brand/README.md",
+      "operation": "move",
+      "sha256": "5a136ad4ba6663245f8ceb5b6bddd62319e750d6befc05b911e95224e9415982",
+      "bytes": 597
+    },
+    {
+      "source": "assets/brand/logo.png",
+      "target": "archive/retired-platform/assets/brand/logo.png",
+      "operation": "move",
+      "sha256": "ffe24b1b4b5b32b0eafb827a70596ab1186910ffe327f4173125034d732ec13f",
+      "bytes": 12814
+    },
+    {
+      "source": "assets/brand/symbol.png",
+      "target": "archive/retired-platform/assets/brand/symbol.png",
+      "operation": "move",
+      "sha256": "57e55c1ca83664eca556cd1c39b0c03b955e85ede51713d5b37a2f50822f7530",
+      "bytes": 13185
+    },
+    {
+      "source": "contracts/acceptance-cases.json",
+      "target": "archive/retired-platform/contracts/acceptance-cases.json",
+      "operation": "move",
+      "sha256": "3efa09ae9cfa90e0fdc24211cd3fb830ef6cb62e3a8317554d3bb4c1ab2be796",
+      "bytes": 19214
+    },
+    {
+      "source": "contracts/api-surface.json",
+      "target": "archive/retired-platform/contracts/api-surface.json",
+      "operation": "move",
+      "sha256": "62684072065f204e1c68a17f7b97b72aadc063ba96e8f4a2f872ab45f8204655",
+      "bytes": 30712
+    },
+    {
+      "source": "contracts/capability-example.json",
+      "target": "archive/retired-platform/contracts/capability-example.json",
+      "operation": "move",
+      "sha256": "8919dad309aae4026d360e3f004870eee4acb7a3934bbd8d008e45ac6aac045f",
+      "bytes": 776
+    },
+    {
+      "source": "contracts/commercial-rules.json",
+      "target": "archive/retired-platform/contracts/commercial-rules.json",
+      "operation": "move",
+      "sha256": "c6f9ad0ea0db08bd4400144db37bec5651b37c201d24777826872b29abbc2306",
+      "bytes": 2082
+    },
+    {
+      "source": "contracts/generated/foundation-openapi.json",
+      "target": "archive/retired-platform/contracts/generated/foundation-openapi.json",
+      "operation": "move",
+      "sha256": "10e26b14f55fee07b8d4d69c8676e4bf7dfb252f509a555a36a2a2f091301fdf",
+      "bytes": 1377988
+    },
+    {
+      "source": "contracts/merchant-channel-design.json",
+      "target": "archive/retired-platform/contracts/merchant-channel-design.json",
+      "operation": "move",
+      "sha256": "fe4a9592fffb66c9a4ddca5951cffcf183a75d7105624ff32f293252af9ad3bc",
+      "bytes": 31011
+    },
+    {
+      "source": "contracts/regression-fixtures.json",
+      "target": "archive/retired-platform/contracts/regression-fixtures.json",
+      "operation": "move",
+      "sha256": "b0aeb7513df501a07bd1b4fff548b23ce00311f838a60f8816913592dbb52d58",
+      "bytes": 2160
+    },
+    {
+      "source": "contracts/service-hierarchy.json",
+      "target": "archive/retired-platform/contracts/service-hierarchy.json",
+      "operation": "move",
+      "sha256": "f8cd2991d9dd9fc6b12df4c32f1146fbb56dcef12a0a721ec9a39029754a7011",
+      "bytes": 3310
+    },
+    {
+      "source": "contracts/workflow-states.json",
+      "target": "archive/retired-platform/contracts/workflow-states.json",
+      "operation": "move",
+      "sha256": "162c42db07ae13f7fca6ea6a82c2e68968f801bcb8031f3606759570f5842fb5",
+      "bytes": 962
+    },
+    {
+      "source": "docs/ACTIVE_SANDBOX_BUILD.md",
+      "target": "archive/project-history/docs/ACTIVE_SANDBOX_BUILD.md",
+      "operation": "move",
+      "sha256": "58b8282fb4d120af9a3c29331ff5512d595b5d960093a747ef83becf46893141",
+      "bytes": 8608
+    },
+    {
+      "source": "docs/ADVANCED_PUBLIC_PRODUCT_PLAN.md",
+      "target": "archive/project-history/docs/ADVANCED_PUBLIC_PRODUCT_PLAN.md",
+      "operation": "move",
+      "sha256": "fd0a523753d8a3c4c075750f05b6b544941f8761f55adc78ae62ab2956bd9be8",
+      "bytes": 23597
+    },
+    {
+      "source": "docs/ALL_PAGES_PRESENTATION_REVIEW.md",
+      "target": "archive/project-history/docs/ALL_PAGES_PRESENTATION_REVIEW.md",
+      "operation": "move",
+      "sha256": "82c1ffa40635dca0a2b333032ce87eab3d22c2fdd0a662cacc2c72fbdf20286b",
+      "bytes": 9819
+    },
+    {
+      "source": "docs/AMEX_EXPERIENCE_CORRECTION.md",
+      "target": "archive/project-history/docs/AMEX_EXPERIENCE_CORRECTION.md",
+      "operation": "move",
+      "sha256": "f81942eb9e3ed4e61ca8690662957ce2f9c87647ccda57f4d4f8e37147877858",
+      "bytes": 12025
+    },
+    {
+      "source": "docs/AMEX_WORKFLOW_ASSESSMENT.md",
+      "target": "archive/project-history/docs/AMEX_WORKFLOW_ASSESSMENT.md",
+      "operation": "move",
+      "sha256": "30377adbea7e24261d94b8e5216e6c65892d062059645c05c7b72bd1b28d8fc6",
+      "bytes": 7477
+    },
+    {
+      "source": "docs/BANKING_RECOGNITION_EXPERIENCE.md",
+      "target": "archive/project-history/docs/BANKING_RECOGNITION_EXPERIENCE.md",
+      "operation": "move",
+      "sha256": "372f6baf2d383d9cdfd2b8cdf423f392b7672dc30e224df3c3dc170cd080265d",
+      "bytes": 3495
+    },
+    {
+      "source": "docs/CARDHOLDER_EXPERIENCE_REDESIGN.md",
+      "target": "archive/project-history/docs/CARDHOLDER_EXPERIENCE_REDESIGN.md",
+      "operation": "move",
+      "sha256": "8f90f024b9c0679ebdac7993d84f5ca7c7a85ba6522953e536fdcf2003ff1d4d",
+      "bytes": 5276
+    },
+    {
+      "source": "docs/CARDHOLDER_REDESIGN_EVIDENCE.md",
+      "target": "archive/project-history/docs/CARDHOLDER_REDESIGN_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "f145d9257949f9d5bbd462b57ebd251e9d78eb7f8ce6743fd39abacf3c3d2643",
+      "bytes": 6419
+    },
+    {
+      "source": "docs/CARD_DETAILS_EXPERIENCE.md",
+      "target": "archive/project-history/docs/CARD_DETAILS_EXPERIENCE.md",
+      "operation": "move",
+      "sha256": "68c0f3555064eea04c2ae67346dee9ad21fa007cd7b3ef909084a2d085308578",
+      "bytes": 2394
+    },
+    {
+      "source": "docs/CHECKOUT_NAVIGATION_FIX.md",
+      "target": "archive/project-history/docs/CHECKOUT_NAVIGATION_FIX.md",
+      "operation": "move",
+      "sha256": "128abe67c74f8ba81f2da7d9127e1f02bf427f621d0877cff29f96b739072f54",
+      "bytes": 3729
+    },
+    {
+      "source": "docs/COHESIVE_PUBLIC_PRODUCTS.md",
+      "target": "archive/project-history/docs/COHESIVE_PUBLIC_PRODUCTS.md",
+      "operation": "move",
+      "sha256": "6209368cf65b4018accf43b45e40292d68ae627a975b5162bdd36cd2b6dab547",
+      "bytes": 7724
+    },
+    {
+      "source": "docs/COHESIVE_SERVICE_EXPERIENCE.md",
+      "target": "archive/project-history/docs/COHESIVE_SERVICE_EXPERIENCE.md",
+      "operation": "move",
+      "sha256": "e9174738a1a86c607bd5dac8fc371f329b2dce5f99f9eec37f9558cad4c86ee6",
+      "bytes": 5344
+    },
+    {
+      "source": "docs/COHESIVE_SERVICE_EXPERIENCE_EVIDENCE.md",
+      "target": "archive/project-history/docs/COHESIVE_SERVICE_EXPERIENCE_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "3180c579e0c15220ed4dcb84d93197f964bd6f1142b5a373ac32efebd5c0e4d9",
+      "bytes": 19617
+    },
+    {
+      "source": "docs/CONCISE_SERVICE_COPY.md",
+      "target": "archive/project-history/docs/CONCISE_SERVICE_COPY.md",
+      "operation": "move",
+      "sha256": "823277fa4b5eb28b612773a34372da80327a332a0054632af8f271dab6808307",
+      "bytes": 3450
+    },
+    {
+      "source": "docs/CONNECTED_SANDBOX_EVIDENCE.md",
+      "target": "archive/project-history/docs/CONNECTED_SANDBOX_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "d6765081d6e71eb33755e81ade22bba941ff8f9bbf0102adc4ca07a2c9414baf",
+      "bytes": 9235
+    },
+    {
+      "source": "docs/CONSOLIDATED_SERVICE_EVIDENCE.md",
+      "target": "archive/project-history/docs/CONSOLIDATED_SERVICE_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "a10394341e282715b172862b6b6de16bdb23bc341d9f5ae464a20b28ddbf3cdd",
+      "bytes": 7321
+    },
+    {
+      "source": "docs/CONSOLIDATED_SERVICE_WORKFLOWS.md",
+      "target": "archive/project-history/docs/CONSOLIDATED_SERVICE_WORKFLOWS.md",
+      "operation": "move",
+      "sha256": "b4bbe8900a15fb620841b57ceeadeabea09c92a8d007332ea910c66f54e141c6",
+      "bytes": 6158
+    },
+    {
+      "source": "docs/CONSUMER_ENTRY_REDESIGN.md",
+      "target": "archive/project-history/docs/CONSUMER_ENTRY_REDESIGN.md",
+      "operation": "move",
+      "sha256": "eed936602b2b1e4aa1a95826981c2e3dfa15aff0077c4264c54c3383a2eb9a6e",
+      "bytes": 10619
+    },
+    {
+      "source": "docs/CONSUMER_FINALIZATION.md",
+      "target": "archive/project-history/docs/CONSUMER_FINALIZATION.md",
+      "operation": "move",
+      "sha256": "4c9c27b7d1fa5e775eccea1a9171250814c359baf8f41b75a2211e45d3d0edc5",
+      "bytes": 5782
+    },
+    {
+      "source": "docs/CONSUMER_SEARCH.md",
+      "target": "archive/project-history/docs/CONSUMER_SEARCH.md",
+      "operation": "move",
+      "sha256": "caedcbcdad814e355c425bcd6e12c088e3dd26d56f6994dd34f85b2ecbeb2835",
+      "bytes": 9494
+    },
+    {
+      "source": "docs/CUSTOMER_EXPERIENCE_REASSESSMENT.md",
+      "target": "archive/project-history/docs/CUSTOMER_EXPERIENCE_REASSESSMENT.md",
+      "operation": "move",
+      "sha256": "90f7451424337de755248fd74ea207089c8e688a47b5dbb2bcccf6f1f3d9d572",
+      "bytes": 4811
+    },
+    {
+      "source": "docs/CUSTOMER_LANGUAGE_EVIDENCE.md",
+      "target": "archive/project-history/docs/CUSTOMER_LANGUAGE_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "e09998848914975c084cd5d774a923e3f23e9f3ac9465010bc4bdbdf44d86595",
+      "bytes": 7831
+    },
+    {
+      "source": "docs/CUSTOMER_VALIDATION_SCRIPT.md",
+      "target": "archive/project-history/docs/CUSTOMER_VALIDATION_SCRIPT.md",
+      "operation": "move",
+      "sha256": "a2b9ff2676979bb1b2a82f6a023c697c2a993b4e532325a4f96b89a2b2d519c1",
+      "bytes": 3693
+    },
+    {
+      "source": "docs/DATABASE_AND_DOMAIN.md",
+      "target": "archive/project-history/docs/DATABASE_AND_DOMAIN.md",
+      "operation": "move",
+      "sha256": "0e32593dfd1b5950a145122f4b1260db84544e264aa3ba4cf8a2263a01e82fb8",
+      "bytes": 23242
+    },
+    {
+      "source": "docs/DECISIONS.md",
+      "target": "archive/project-history/docs/DECISIONS.md",
+      "operation": "move",
+      "sha256": "1c50d5307c66a40c5e136b5fd251c6b3508a2abfddab5be2d8b29d046298b2c0",
+      "bytes": 50739
+    },
+    {
+      "source": "docs/DEPLOYMENT_ERROR_RATE_REVIEW.md",
+      "target": "archive/project-history/docs/DEPLOYMENT_ERROR_RATE_REVIEW.md",
+      "operation": "move",
+      "sha256": "6e0ccff5b7d22e6f10d9e3dfe0d47aacca2e1448c1b8f060348f71a1c76acab1",
+      "bytes": 4419
+    },
+    {
+      "source": "docs/DESIGN_WALKTHROUGH.md",
+      "target": "archive/project-history/docs/DESIGN_WALKTHROUGH.md",
+      "operation": "move",
+      "sha256": "0c6a129b579135d471224dee9a0962783b5d2b212738cc6cf5177671a88a1ecf",
+      "bytes": 14944
+    },
+    {
+      "source": "docs/DIGITAL_WALLET_CARD.md",
+      "target": "archive/project-history/docs/DIGITAL_WALLET_CARD.md",
+      "operation": "move",
+      "sha256": "4516f0ae016d188eee3861ab6f7e51ac09190e43305c245e9dbb957ed8845cc6",
+      "bytes": 4938
+    },
+    {
+      "source": "docs/DISPUTE_READINESS_MARKETING.md",
+      "target": "archive/project-history/docs/DISPUTE_READINESS_MARKETING.md",
+      "operation": "move",
+      "sha256": "9e21fc03d3d3ead74b29ebb9c538630a8c897d57c52002e25144c74c385e1c84",
+      "bytes": 3700
+    },
+    {
+      "source": "docs/DNS_DEPLOYMENT_HANDOFF.md",
+      "target": "archive/project-history/docs/DNS_DEPLOYMENT_HANDOFF.md",
+      "operation": "move",
+      "sha256": "df81205e52f1dbe09bc4259b938bb80d91f5060bbaff9abf8cd166028275d1da",
+      "bytes": 16722
+    },
+    {
+      "source": "docs/EMAIL_ACCESS.md",
+      "target": "archive/project-history/docs/EMAIL_ACCESS.md",
+      "operation": "move",
+      "sha256": "359043eb28bd34f1726af636e4d4a0cfe4f312e24062fdfe93ba2601f618a706",
+      "bytes": 13852
+    },
+    {
+      "source": "docs/EMAIL_ACCESS_RELIABILITY.md",
+      "target": "archive/project-history/docs/EMAIL_ACCESS_RELIABILITY.md",
+      "operation": "move",
+      "sha256": "7d67861a99a9de4ee7e839432004d9018114d3295d567d57566ea871ce241880",
+      "bytes": 5567
+    },
+    {
+      "source": "docs/EXPERIENCE_ARCHITECTURE.md",
+      "target": "archive/project-history/docs/EXPERIENCE_ARCHITECTURE.md",
+      "operation": "move",
+      "sha256": "6b90cd2350aa5766b10f6c6e8f7efbf7684e41eb108f5dc6072adb74e37bcb9b",
+      "bytes": 8117
+    },
+    {
+      "source": "docs/EXPERIENCE_EVIDENCE.md",
+      "target": "archive/project-history/docs/EXPERIENCE_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "8a725c202c52b7d2e7ad478a9fd4ce3de22ac3447e5a793e01a8bc4c459ffae9",
+      "bytes": 7116
+    },
+    {
+      "source": "docs/EXPERIENCE_EXPANSION_EVIDENCE.md",
+      "target": "archive/project-history/docs/EXPERIENCE_EXPANSION_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "1cc3d7fbfdc3b6fea7b433fff14a0ca4ed2e6213a22f4ab7623b7e0dd3a0826b",
+      "bytes": 8943
+    },
+    {
+      "source": "docs/FAMILY_BUSINESS_STYLE_EVIDENCE.md",
+      "target": "archive/project-history/docs/FAMILY_BUSINESS_STYLE_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "a1b761b1564fb6f4e864d499b8bb47cfb2dcc74dcc9204ea2faec193028e77ea",
+      "bytes": 4976
+    },
+    {
+      "source": "docs/FOCUSED_PRODUCT_PAGES.md",
+      "target": "archive/project-history/docs/FOCUSED_PRODUCT_PAGES.md",
+      "operation": "move",
+      "sha256": "cacdf672b598db45c79d85aeb441d3b03bf798d9b4a1a8eb81372c1e57bf3ec1",
+      "bytes": 2138
+    },
+    {
+      "source": "docs/FOUNDATION_EVIDENCE.md",
+      "target": "archive/project-history/docs/FOUNDATION_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "1aeba825fad67a06ec9ee2a42de48dae7079b42aac263549a61f153f26ef173a",
+      "bytes": 6852
+    },
+    {
+      "source": "docs/FRESH_PREPAID_REBUILD.md",
+      "target": "archive/project-history/docs/FRESH_PREPAID_REBUILD.md",
+      "operation": "move",
+      "sha256": "12153996b503882e79959a8f350c36500856abeb499f93b9c8664442265faf97",
+      "bytes": 12420
+    },
+    {
+      "source": "docs/FRESH_TWO_SERVICE_BUILD.md",
+      "target": "archive/project-history/docs/FRESH_TWO_SERVICE_BUILD.md",
+      "operation": "move",
+      "sha256": "31baf7b6dc759ae2e8e0e0a37075f7aebc784b00cad4647058a7ce9a1094d4c7",
+      "bytes": 5527
+    },
+    {
+      "source": "docs/FRESH_TWO_SERVICE_EVIDENCE.md",
+      "target": "archive/project-history/docs/FRESH_TWO_SERVICE_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "5b2800d62cf0e536f5ad64da7704b0eca7e341c8839966acb0bad7bc14cdb4b0",
+      "bytes": 11324
+    },
+    {
+      "source": "docs/GITHUB_PLAN.md",
+      "target": "archive/project-history/docs/GITHUB_PLAN.md",
+      "operation": "move",
+      "sha256": "f60216e0c1fb29847749a21d7033118f3db02da8ce39a48b224ab3c03b666bb0",
+      "bytes": 7387
+    },
+    {
+      "source": "docs/HOSTED_EMAIL_DEPLOYMENT.md",
+      "target": "archive/project-history/docs/HOSTED_EMAIL_DEPLOYMENT.md",
+      "operation": "move",
+      "sha256": "b9986e3ac5a06817959fb937a5a10f9f0a1c0f7c9b1e1479b87355bd10580488",
+      "bytes": 4039
+    },
+    {
+      "source": "docs/HOSTED_SANDBOX_PRODUCT.md",
+      "target": "archive/project-history/docs/HOSTED_SANDBOX_PRODUCT.md",
+      "operation": "move",
+      "sha256": "601dcf2f0b2860713d4aebe63f27c56f6372db4ef666d4c17829afcb7df8356d",
+      "bytes": 8606
+    },
+    {
+      "source": "docs/LEDGIX_TROLLEYS_LEGAL.md",
+      "target": "archive/project-history/docs/LEDGIX_TROLLEYS_LEGAL.md",
+      "operation": "move",
+      "sha256": "1b8e75cf92af38083759458267d0de8576eb69d50f37fc629b645e2ae2f2f7fc",
+      "bytes": 6560
+    },
+    {
+      "source": "docs/MARKETING_ARTWORK_DIRECTION.md",
+      "target": "archive/project-history/docs/MARKETING_ARTWORK_DIRECTION.md",
+      "operation": "move",
+      "sha256": "bd9c1c73fc9966c623e88ad7290728de91fa5d8287d6750cf6b0880f277fe30c",
+      "bytes": 3138
+    },
+    {
+      "source": "docs/MARKETING_REFRESH.md",
+      "target": "archive/project-history/docs/MARKETING_REFRESH.md",
+      "operation": "move",
+      "sha256": "ad2761ba42598d00f32ec94527bf6c92855d1572218341c4b39ef6cf0a383884",
+      "bytes": 8999
+    },
+    {
+      "source": "docs/MERCHANT_CHANNEL_EVIDENCE.md",
+      "target": "archive/project-history/docs/MERCHANT_CHANNEL_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "8379992e54c36bfb02ebbc249cf602f2c33894268b1e2cec9e38083f529a24af",
+      "bytes": 14538
+    },
+    {
+      "source": "docs/MERCHANT_EXPERIENCE_REDESIGN.md",
+      "target": "archive/project-history/docs/MERCHANT_EXPERIENCE_REDESIGN.md",
+      "operation": "move",
+      "sha256": "c7a7beca35f167223d475e9f19c05578f219c76e5a274229f51708573655421b",
+      "bytes": 6272
+    },
+    {
+      "source": "docs/MERCHANT_HIERARCHY_AND_CHANNELS.md",
+      "target": "archive/project-history/docs/MERCHANT_HIERARCHY_AND_CHANNELS.md",
+      "operation": "move",
+      "sha256": "cd1fc1eeb9ca10e7f8ea2cbe95189bb2f253e21797504d06ef971b67d412430c",
+      "bytes": 47753
+    },
+    {
+      "source": "docs/MERCHANT_REDESIGN_EVIDENCE.md",
+      "target": "archive/project-history/docs/MERCHANT_REDESIGN_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "7bcda6ce250a551faca3099087c6faa3b794f3392a8733095d48dd63e2296f1a",
+      "bytes": 7576
+    },
+    {
+      "source": "docs/MINIMAL_SERVICE_OVERVIEWS.md",
+      "target": "archive/project-history/docs/MINIMAL_SERVICE_OVERVIEWS.md",
+      "operation": "move",
+      "sha256": "938d02c1372de3befb353c31667349514d1a46c69829c0af4b2f259c50ada386",
+      "bytes": 6686
+    },
+    {
+      "source": "docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md",
+      "target": "archive/project-history/docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS.md",
+      "operation": "move",
+      "sha256": "59df22d50db28dc80031bf63b58b5d455f511f947df516c828d2ddd670337c62",
+      "bytes": 11171
+    },
+    {
+      "source": "docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS_EVIDENCE.md",
+      "target": "archive/project-history/docs/NETWORK_CARDS_AND_RESOURCE_INVITATIONS_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "20cc9f8b109191762ceab99f064a1da2f82fd8ae59d043f2de14994992be582b",
+      "bytes": 8177
+    },
+    {
+      "source": "docs/OPERATIONAL_TRUST_REVIEW.md",
+      "target": "archive/project-history/docs/OPERATIONAL_TRUST_REVIEW.md",
+      "operation": "move",
+      "sha256": "a7d85f99bf826d92f6790567a68e78ddddbdfe9908f7b32bd203fed2d31129f0",
+      "bytes": 7546
+    },
+    {
+      "source": "docs/OPERATIONS_ECONOMICS_PARTNERS.md",
+      "target": "archive/project-history/docs/OPERATIONS_ECONOMICS_PARTNERS.md",
+      "operation": "move",
+      "sha256": "82e6e994216e5584e9b3a8b4a511a417456768bae0cf75356b9c456c13824331",
+      "bytes": 4942
+    },
+    {
+      "source": "docs/OWNER_CARDS_TERMINALS_DESIGN.md",
+      "target": "archive/project-history/docs/OWNER_CARDS_TERMINALS_DESIGN.md",
+      "operation": "move",
+      "sha256": "3990873b9768ffa234522694784f8a073eaf75bb59e9d3e5b04c5a18a4bb9004",
+      "bytes": 11305
+    },
+    {
+      "source": "docs/OWNER_CARDS_TERMINALS_EVIDENCE.md",
+      "target": "archive/project-history/docs/OWNER_CARDS_TERMINALS_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "66b6833ee6b2dcb1ee146701cccda05054c24df64d9abff312f3abdcaf4861dc",
+      "bytes": 9949
+    },
+    {
+      "source": "docs/PAYFAC_DISCOVERY_MEASUREMENT.md",
+      "target": "archive/project-history/docs/PAYFAC_DISCOVERY_MEASUREMENT.md",
+      "operation": "move",
+      "sha256": "866d5ce90f2cf72ea3d311ab378efddf38c029ab289e68434dd12f92cf3bfd02",
+      "bytes": 9002
+    },
+    {
+      "source": "docs/PAYMENTS_VALUE_EXPERIENCE.md",
+      "target": "archive/project-history/docs/PAYMENTS_VALUE_EXPERIENCE.md",
+      "operation": "move",
+      "sha256": "90e7142c2eb4b14deff44822a0759c18a6e8133e98de50aab0bb4f0d0f680639",
+      "bytes": 3058
+    },
+    {
+      "source": "docs/PAYMENT_ADDON_VALUE_DESIGN.md",
+      "target": "archive/project-history/docs/PAYMENT_ADDON_VALUE_DESIGN.md",
+      "operation": "move",
+      "sha256": "f89ccf5b5e6dfc9ad6450d6d0fcbeab23067ce65f35648d464ea0f3931442a2f",
+      "bytes": 13321
+    },
+    {
+      "source": "docs/PAYMENT_DOCUMENTS_IMPLEMENTATION.md",
+      "target": "archive/project-history/docs/PAYMENT_DOCUMENTS_IMPLEMENTATION.md",
+      "operation": "move",
+      "sha256": "d176b2edb9f525e13c18b407900a1f10584448a6d1961ceebefc40e3e554176e",
+      "bytes": 5408
+    },
+    {
+      "source": "docs/PAYMENT_EVIDENCE_FRAMEWORK.md",
+      "target": "archive/project-history/docs/PAYMENT_EVIDENCE_FRAMEWORK.md",
+      "operation": "move",
+      "sha256": "aaeee52befe4baf67fcd1af410d9faaf5e665d374b7e5c6494029819e651b385",
+      "bytes": 16644
+    },
+    {
+      "source": "docs/PAYMENT_MEDIA_GALLERY.md",
+      "target": "archive/project-history/docs/PAYMENT_MEDIA_GALLERY.md",
+      "operation": "move",
+      "sha256": "64d95205e2b357d543cf632f36849856209912cf3b44cad6cd7bdd13f070e265",
+      "bytes": 1970
+    },
+    {
+      "source": "docs/PAYMENT_PAGE_REBUILD.md",
+      "target": "archive/project-history/docs/PAYMENT_PAGE_REBUILD.md",
+      "operation": "move",
+      "sha256": "ef2e208fe221fcbb4213557bf42dcf6303c7db9666579ba90aad1a622350c292",
+      "bytes": 5103
+    },
+    {
+      "source": "docs/PAYMENT_TRANSACTION_DETAILS.md",
+      "target": "archive/project-history/docs/PAYMENT_TRANSACTION_DETAILS.md",
+      "operation": "move",
+      "sha256": "9688598eecdefc03d91968743b4a5173d0e4c7be86644b5802e9a58e03b3d978",
+      "bytes": 4965
+    },
+    {
+      "source": "docs/PRACTICAL_DASHBOARD_REVIEW.md",
+      "target": "archive/project-history/docs/PRACTICAL_DASHBOARD_REVIEW.md",
+      "operation": "move",
+      "sha256": "55974a121f40a44901bccb564c7489e5d63dfc0ce68cb95aaf5e843c47e9ab26",
+      "bytes": 11083
+    },
+    {
+      "source": "docs/PREPAID_REBUILD_EVIDENCE.md",
+      "target": "archive/project-history/docs/PREPAID_REBUILD_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "afe27d9b81480069d367d75d6b186d4b8e805a8ab5e55da1285ad7cf184e9478",
+      "bytes": 13225
+    },
+    {
+      "source": "docs/PRIVACY_TERMS_REVIEW.md",
+      "target": "archive/project-history/docs/PRIVACY_TERMS_REVIEW.md",
+      "operation": "move",
+      "sha256": "011378b43462b7efd407b481e30383d7e332ba628f96eaa426fe9eebe6536a37",
+      "bytes": 8708
+    },
+    {
+      "source": "docs/PRODUCT.md",
+      "target": "archive/project-history/docs/PRODUCT.md",
+      "operation": "move",
+      "sha256": "6b4a43b7d767eeddbafe8e3ad4191bd7dd81f3718ebd014ba27959f661464ca7",
+      "bytes": 10516
+    },
+    {
+      "source": "docs/PRODUCTION_UI_CLEANUP.md",
+      "target": "archive/project-history/docs/PRODUCTION_UI_CLEANUP.md",
+      "operation": "move",
+      "sha256": "b886fbd1450586be149db27b97ac617aeb576b9d9ca0a3c4fd56cb6f0750774d",
+      "bytes": 6849
+    },
+    {
+      "source": "docs/PRODUCT_CONFIDENCE_IMPLEMENTATION.md",
+      "target": "archive/project-history/docs/PRODUCT_CONFIDENCE_IMPLEMENTATION.md",
+      "operation": "move",
+      "sha256": "8800cd06a217c443b8dacf2c4a6b96e57a436832ac2beb60b71c61788ddd23d9",
+      "bytes": 6358
+    },
+    {
+      "source": "docs/PRODUCT_DESIGN_ASSESSMENT.md",
+      "target": "archive/project-history/docs/PRODUCT_DESIGN_ASSESSMENT.md",
+      "operation": "move",
+      "sha256": "e06d3f37d515d3c4a084bf6d15f60a10efafe8f7867b9af696495bd078a67d80",
+      "bytes": 10085
+    },
+    {
+      "source": "docs/PRODUCT_HEADER_DESIGN.md",
+      "target": "archive/project-history/docs/PRODUCT_HEADER_DESIGN.md",
+      "operation": "move",
+      "sha256": "ddd2b22a30e3bae6dcd5b2093f5418c83a19731c312ba6ae71a54f51b63de4b4",
+      "bytes": 3234
+    },
+    {
+      "source": "docs/PRODUCT_MARKETING_USE_CASES.md",
+      "target": "archive/project-history/docs/PRODUCT_MARKETING_USE_CASES.md",
+      "operation": "move",
+      "sha256": "bd920e5e484d730c17a0e4cdd8ee09fb42040fd68001b9958a6f2b95ad623f6b",
+      "bytes": 14196
+    },
+    {
+      "source": "docs/PRODUCT_POSITIONING.md",
+      "target": "archive/project-history/docs/PRODUCT_POSITIONING.md",
+      "operation": "move",
+      "sha256": "d742733d99537cff131d00564b62f953b066aab32c30bab82a9bd26da55184f4",
+      "bytes": 3323
+    },
+    {
+      "source": "docs/PRODUCT_TECHNICAL_DESIGN.md",
+      "target": "archive/project-history/docs/PRODUCT_TECHNICAL_DESIGN.md",
+      "operation": "move",
+      "sha256": "c07cff66993900c189b21d914d4cdaa0cc2ede1a3bfb78149cd0368725d9fafe",
+      "bytes": 23491
+    },
+    {
+      "source": "docs/PROVIDER_HOSTED_PUBLIC_JOURNEY.md",
+      "target": "archive/project-history/docs/PROVIDER_HOSTED_PUBLIC_JOURNEY.md",
+      "operation": "move",
+      "sha256": "f4a20e00c0524d10523d909bcef4eb78fd1946e57ed50f6381fe34148909e40d",
+      "bytes": 13851
+    },
+    {
+      "source": "docs/PROVIDER_SERVICE_DASHBOARDS.md",
+      "target": "archive/project-history/docs/PROVIDER_SERVICE_DASHBOARDS.md",
+      "operation": "move",
+      "sha256": "ce65b2945adae478a01ef673c99843e5ec43ed8003fbab077dd620a22ab96e8e",
+      "bytes": 3948
+    },
+    {
+      "source": "docs/PUBLIC_CHROME_ALIGNMENT.md",
+      "target": "archive/project-history/docs/PUBLIC_CHROME_ALIGNMENT.md",
+      "operation": "move",
+      "sha256": "649129b89eb6018d8ed6cdfb71b817c27c7eb2b383d53d0fdddb1d0c44ac44b9",
+      "bytes": 2496
+    },
+    {
+      "source": "docs/PUBLIC_DETAIL_POLISH.md",
+      "target": "archive/project-history/docs/PUBLIC_DETAIL_POLISH.md",
+      "operation": "move",
+      "sha256": "351884149a75e668fcc324f9feaec296dbf2cfa65af9bccd1fb90eee21393343",
+      "bytes": 9261
+    },
+    {
+      "source": "docs/PUBLIC_EXPERIENCE_REFINEMENT.md",
+      "target": "archive/project-history/docs/PUBLIC_EXPERIENCE_REFINEMENT.md",
+      "operation": "move",
+      "sha256": "e29570cd07ff4151ad2590f26ab458a915d77c798e00200df53988a01e0714de",
+      "bytes": 6595
+    },
+    {
+      "source": "docs/PUBLIC_FOOTER_DESIGN.md",
+      "target": "archive/project-history/docs/PUBLIC_FOOTER_DESIGN.md",
+      "operation": "move",
+      "sha256": "aebfed8780e8875eea2cf96c7a8f9a4f50b747a0fee84f225a881f933d575fb1",
+      "bytes": 2783
+    },
+    {
+      "source": "docs/PUBLIC_FOOTER_MICRO_REVIEW.md",
+      "target": "archive/project-history/docs/PUBLIC_FOOTER_MICRO_REVIEW.md",
+      "operation": "move",
+      "sha256": "612e5e7f0fc8b5167468ee1b369d809e08d73a51d4cacec4b4bf5c09621df56f",
+      "bytes": 2382
+    },
+    {
+      "source": "docs/PUBLIC_PAYMENT_JOURNEY.md",
+      "target": "archive/project-history/docs/PUBLIC_PAYMENT_JOURNEY.md",
+      "operation": "move",
+      "sha256": "db6d761568b150abd468242959ef8f6274c8478429c864e5f339aa2d223eedec",
+      "bytes": 2565
+    },
+    {
+      "source": "docs/PUBLIC_PRODUCT_PROPOSAL.md",
+      "target": "archive/project-history/docs/PUBLIC_PRODUCT_PROPOSAL.md",
+      "operation": "move",
+      "sha256": "ec4937fcefc4932ead4bccf0231414cd618a5c27affbd2393eed6911fd6e1d1c",
+      "bytes": 10285
+    },
+    {
+      "source": "docs/PUBLIC_PRODUCT_STORYTELLING.md",
+      "target": "archive/project-history/docs/PUBLIC_PRODUCT_STORYTELLING.md",
+      "operation": "move",
+      "sha256": "f8c3c211f7ef2d926f01fc092dba32a76710fbbdaef8092f436e7fdbcc3048c6",
+      "bytes": 4117
+    },
+    {
+      "source": "docs/PUBLIC_VISUAL_BALANCE.md",
+      "target": "archive/project-history/docs/PUBLIC_VISUAL_BALANCE.md",
+      "operation": "move",
+      "sha256": "e40f5b77a8f55a5edac4558437febaa5c68bfa65267405819477035e33245e69",
+      "bytes": 7860
+    },
+    {
+      "source": "docs/REFINED_CONSUMER_LANDING.md",
+      "target": "archive/project-history/docs/REFINED_CONSUMER_LANDING.md",
+      "operation": "move",
+      "sha256": "b2a1fa5a1f1cf972522bd9188eca3c442a52c447ea087abe78ff298cbb6e2131",
+      "bytes": 4578
+    },
+    {
+      "source": "docs/RELEASE_READINESS_REVIEW.md",
+      "target": "archive/project-history/docs/RELEASE_READINESS_REVIEW.md",
+      "operation": "move",
+      "sha256": "1476d880eaf018563bfa2557b28f24adcd7021392d1f4aaae2eacd76023a686c",
+      "bytes": 45469
+    },
+    {
+      "source": "docs/RESEARCH_NOTES.md",
+      "target": "archive/project-history/docs/RESEARCH_NOTES.md",
+      "operation": "move",
+      "sha256": "9f222ae710542ffa543267cfca6d236d8d1ffbe6909dc16eaf51dcc4d21c1755",
+      "bytes": 6962
+    },
+    {
+      "source": "docs/SANDBOX_JOURNEY_REFINEMENT.md",
+      "target": "archive/project-history/docs/SANDBOX_JOURNEY_REFINEMENT.md",
+      "operation": "move",
+      "sha256": "0399f3d3e993b91f56259543371377f2d68c2736a35476cc683eaae290176a3b",
+      "bytes": 9965
+    },
+    {
+      "source": "docs/SECURED_CARD_EXPERIENCE_DESIGN.md",
+      "target": "archive/project-history/docs/SECURED_CARD_EXPERIENCE_DESIGN.md",
+      "operation": "move",
+      "sha256": "5bd03d9c59c46519f625ee97bd04856745e2ff029e72f160523645f72952901c",
+      "bytes": 16000
+    },
+    {
+      "source": "docs/SECURED_CARD_PRODUCT_COPY.md",
+      "target": "archive/project-history/docs/SECURED_CARD_PRODUCT_COPY.md",
+      "operation": "move",
+      "sha256": "2f8084b93157a6ef2b70a6e824b661c6045ea5f7fe191e656f335502ec1a7b46",
+      "bytes": 3351
+    },
+    {
+      "source": "docs/SELLER_ENTRY_EVIDENCE.md",
+      "target": "archive/project-history/docs/SELLER_ENTRY_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "0ea5ed55c107113dcf53139af5b09338bc697817a427c3129ff905ff205a791d",
+      "bytes": 10546
+    },
+    {
+      "source": "docs/SELLER_ENTRY_EXPERIENCE.md",
+      "target": "archive/project-history/docs/SELLER_ENTRY_EXPERIENCE.md",
+      "operation": "move",
+      "sha256": "9e4b8c9e14ab43b43525a8944a2e380baf7c737b9d6ea0e12a4d4f5a48605a78",
+      "bytes": 17001
+    },
+    {
+      "source": "docs/SELLER_MERCHANT_HOME_EVIDENCE.md",
+      "target": "archive/project-history/docs/SELLER_MERCHANT_HOME_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "9fd8283fcf137190f8af46805894201b27ec0734edaf92466fde39c8406fb10d",
+      "bytes": 6424
+    },
+    {
+      "source": "docs/SERVICE_CONSOLIDATION.md",
+      "target": "archive/project-history/docs/SERVICE_CONSOLIDATION.md",
+      "operation": "move",
+      "sha256": "dee64410ca961e31f2c6382c73caec8255a4e6ec1d52a93dbe23e170562ca2a7",
+      "bytes": 8553
+    },
+    {
+      "source": "docs/SERVICE_DASHBOARD_CLARITY.md",
+      "target": "archive/project-history/docs/SERVICE_DASHBOARD_CLARITY.md",
+      "operation": "move",
+      "sha256": "62747bb577999d713504020f89f21621639ea66103a31b0f8c919eaaede3aac9",
+      "bytes": 11413
+    },
+    {
+      "source": "docs/SERVICE_DASHBOARD_DESIGN.md",
+      "target": "archive/project-history/docs/SERVICE_DASHBOARD_DESIGN.md",
+      "operation": "move",
+      "sha256": "3218b0ba3e154c3d67ab0d3f75554bea391b42d567607247f6899207bea43a72",
+      "bytes": 12861
+    },
+    {
+      "source": "docs/SERVICE_DASHBOARD_EVIDENCE.md",
+      "target": "archive/project-history/docs/SERVICE_DASHBOARD_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "5c06d4adf586037613a7300d8d92cfa4ccb46ffa4df1ed8d67a5997d5686a7ca",
+      "bytes": 8199
+    },
+    {
+      "source": "docs/SERVICE_EXPERIENCE_CLEANUP.md",
+      "target": "archive/project-history/docs/SERVICE_EXPERIENCE_CLEANUP.md",
+      "operation": "move",
+      "sha256": "2d9d70135b9587b70dcdd7280748c67c03ff484e49708dfe1cc6fab5e1762cdc",
+      "bytes": 10803
+    },
+    {
+      "source": "docs/SERVICE_JOURNEY_AUDIT.md",
+      "target": "archive/project-history/docs/SERVICE_JOURNEY_AUDIT.md",
+      "operation": "move",
+      "sha256": "01af8b130572da42b022f01ffb7eb0ecd5f7cb5bf99b90dcab5340652003e0e6",
+      "bytes": 10309
+    },
+    {
+      "source": "docs/SERVICE_MENU_EVIDENCE.md",
+      "target": "archive/project-history/docs/SERVICE_MENU_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "9a743515b759bd37742e695a05db8e39a32727deb25a051638c4f725e0211069",
+      "bytes": 6251
+    },
+    {
+      "source": "docs/SERVICE_MENU_HIERARCHY.md",
+      "target": "archive/project-history/docs/SERVICE_MENU_HIERARCHY.md",
+      "operation": "move",
+      "sha256": "af91e4306c41d81f6f013fcd3fc71d75cf229dea7b91070db8738e4a35681701",
+      "bytes": 4876
+    },
+    {
+      "source": "docs/SIGN_IN_SESSION_FIX.md",
+      "target": "archive/project-history/docs/SIGN_IN_SESSION_FIX.md",
+      "operation": "move",
+      "sha256": "57b924bf7c32bdfdcaab9737133150e76647f15bb63702854b8c695a020582aa",
+      "bytes": 4369
+    },
+    {
+      "source": "docs/SIMPLER_DASHBOARD_EVIDENCE.md",
+      "target": "archive/project-history/docs/SIMPLER_DASHBOARD_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "feb45af478c6cda9f8d748f96d4d2da24a57eb0a55ee9f92a3b4f33e41d5976b",
+      "bytes": 9284
+    },
+    {
+      "source": "docs/SIMPLE_SERVICE_WORKSPACES.md",
+      "target": "archive/project-history/docs/SIMPLE_SERVICE_WORKSPACES.md",
+      "operation": "move",
+      "sha256": "32942165846ec17917b3cca5c844f93021ac3ae6545a292bc91d34947054a4b9",
+      "bytes": 5765
+    },
+    {
+      "source": "docs/SYSTEM_MAP.md",
+      "target": "archive/project-history/docs/SYSTEM_MAP.md",
+      "operation": "move",
+      "sha256": "12f11b2e9c5920cb4f78aa5739a838453179d1c906e4203f2739c54d8203f21c",
+      "bytes": 3982
+    },
+    {
+      "source": "docs/THREE_ACCOUNT_SANDBOX_DESIGN.md",
+      "target": "archive/project-history/docs/THREE_ACCOUNT_SANDBOX_DESIGN.md",
+      "operation": "move",
+      "sha256": "92fd7df9ab0f2b40b21cf472da96febfd1b356fa3187b355d8fd0b104e24cfe4",
+      "bytes": 24513
+    },
+    {
+      "source": "docs/THREE_ACCOUNT_SANDBOX_EVIDENCE.md",
+      "target": "archive/project-history/docs/THREE_ACCOUNT_SANDBOX_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "dad3048dfb7b401f23ff9d3dfefc7f4bd7b98a01c4af27c9421e5577f85a91ac",
+      "bytes": 13997
+    },
+    {
+      "source": "docs/TROLLEYS_ECONOMIC_PROPOSAL.md",
+      "target": "archive/project-history/docs/TROLLEYS_ECONOMIC_PROPOSAL.md",
+      "operation": "move",
+      "sha256": "b185d77a035d80fd28ecc22b2fc85176e34099ad88fbdcd2d6e106923c254141",
+      "bytes": 19712
+    },
+    {
+      "source": "docs/TROLLEYS_MEMBERSHIP_PRICING.md",
+      "target": "archive/project-history/docs/TROLLEYS_MEMBERSHIP_PRICING.md",
+      "operation": "move",
+      "sha256": "309cd22a9549bd571633835d678dd1e9cb367a8091907be2c85617985031773f",
+      "bytes": 8372
+    },
+    {
+      "source": "docs/TROLLEYS_SALE_RECORDS.md",
+      "target": "archive/project-history/docs/TROLLEYS_SALE_RECORDS.md",
+      "operation": "move",
+      "sha256": "63938f168e0167ef89b867b51a3f3b818bba82e80031476c36cf9007af56db2a",
+      "bytes": 4206
+    },
+    {
+      "source": "docs/TWO_SERVICE_DESIGN.md",
+      "target": "archive/project-history/docs/TWO_SERVICE_DESIGN.md",
+      "operation": "move",
+      "sha256": "c6aba0142fbfab9ec98bf2847a65ff350986eb0795adaf77d638d1bde2836b43",
+      "bytes": 11158
+    },
+    {
+      "source": "docs/TWO_SERVICE_EVIDENCE.md",
+      "target": "archive/project-history/docs/TWO_SERVICE_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "9d799e91d547c5ff87080a5ab30bb0f1ffc6e65b3d366c1358e81254b90d1a13",
+      "bytes": 13192
+    },
+    {
+      "source": "docs/UNIFIED_RESOURCE_WORKSPACES.md",
+      "target": "archive/project-history/docs/UNIFIED_RESOURCE_WORKSPACES.md",
+      "operation": "move",
+      "sha256": "47f3e54d246594468bb6cb1acf9efb5343cdd46ae1e2fe35019161c0cbcc5adb",
+      "bytes": 7699
+    },
+    {
+      "source": "docs/UNIFIED_RESOURCE_WORKSPACES_EVIDENCE.md",
+      "target": "archive/project-history/docs/UNIFIED_RESOURCE_WORKSPACES_EVIDENCE.md",
+      "operation": "move",
+      "sha256": "343298caed29a87bccf4458aa3a486e2bc01beeedeccc479d103aea7af2a8a29",
+      "bytes": 9380
+    },
+    {
+      "source": "docs/UX_CONTRACT.md",
+      "target": "archive/project-history/docs/UX_CONTRACT.md",
+      "operation": "move",
+      "sha256": "966060e01cbad78d0983a2cb559747dbded5c3b1f46e221fe11d4742ab8c2811",
+      "bytes": 12920
+    },
+    {
+      "source": "docs/WALLET_SETUP_GUIDE.md",
+      "target": "archive/project-history/docs/WALLET_SETUP_GUIDE.md",
+      "operation": "move",
+      "sha256": "a6fd3b3a22ef41408742a3ceab8cb6f55a98bb72df9fa02c495a3d783c7d14a6",
+      "bytes": 7707
+    },
+    {
+      "source": "docs/WEBSITE_LEGAL_REFRESH.md",
+      "target": "archive/project-history/docs/WEBSITE_LEGAL_REFRESH.md",
+      "operation": "move",
+      "sha256": "153bfde18e4b4cb0e92096b402d6ffb7353cd11cb3f82cb026a3e24e667a043f",
+      "bytes": 11013
+    },
+    {
+      "source": "docs/WORKFLOWS.md",
+      "target": "archive/project-history/docs/WORKFLOWS.md",
+      "operation": "move",
+      "sha256": "4558c7dd7f128aba1a1a60b89fc8536fa98d15e9317f0e514b9e279970216e5e",
+      "bytes": 14881
+    },
+    {
+      "source": "docs/artwork/d117-assets.json",
+      "target": "archive/project-history/docs/artwork/d117-assets.json",
+      "operation": "move",
+      "sha256": "7b620e4bd409cab8c8625158073a35b10442994e75e09c9457aa9e2634570117",
+      "bytes": 3799
+    },
+    {
+      "source": "docs/evidence/foundation-afda1e3.json",
+      "target": "archive/project-history/docs/evidence/foundation-afda1e3.json",
+      "operation": "move",
+      "sha256": "798b308d336f271337aabe8ab74cae6c18a21b11dfd24600f4cdd4ea306ee208",
+      "bytes": 2858
+    },
+    {
+      "source": "docs/payment-documents/EVIDENCE_MATRIX.md",
+      "target": "archive/project-history/docs/payment-documents/EVIDENCE_MATRIX.md",
+      "operation": "move",
+      "sha256": "b2b955f568f91c84f78c43e5e75d51ce4fea244feb6ba610017651e47cec4b58",
+      "bytes": 6715
+    },
+    {
+      "source": "docs/payment-documents/INVOICE_TEMPLATE.md",
+      "target": "archive/project-history/docs/payment-documents/INVOICE_TEMPLATE.md",
+      "operation": "move",
+      "sha256": "99d8fe940a9d4ea41fbee8e330b8c6d0110850116698c5e5877082e4457ce98f",
+      "bytes": 4739
+    },
+    {
+      "source": "docs/payment-documents/PAYMENT_RECEIPT_TEMPLATE.md",
+      "target": "archive/project-history/docs/payment-documents/PAYMENT_RECEIPT_TEMPLATE.md",
+      "operation": "move",
+      "sha256": "08e9d6ee67e8e6566fe773ef6ed6c0832db16f517d7b73093324b4eb9609e589",
+      "bytes": 5176
+    },
+    {
+      "source": "docs/payment-documents/README.md",
+      "target": "archive/project-history/docs/payment-documents/README.md",
+      "operation": "move",
+      "sha256": "58e730ee28ce38b39b1b02f54fce6396cd3aa7dfe83ec002311a2c5d81793cdf",
+      "bytes": 8939
+    },
+    {
+      "source": "docs/payment-documents/TRANSACTION_AGREEMENT_TEMPLATE.md",
+      "target": "archive/project-history/docs/payment-documents/TRANSACTION_AGREEMENT_TEMPLATE.md",
+      "operation": "move",
+      "sha256": "724f6139df31a79204131707b1852c01a1dce0fb7e017a2d260f9a8d51a6e229",
+      "bytes": 7010
+    },
+    {
+      "source": "docs/payment-documents/VENDOR_HANDOFF.md",
+      "target": "archive/project-history/docs/payment-documents/VENDOR_HANDOFF.md",
+      "operation": "move",
+      "sha256": "ae3ef92dd64c1a17c057c166b6b21e4c8b472ecf32066c7d1bb59f13e6da9d64",
+      "bytes": 11843
+    },
+    {
+      "source": "docs/research/VIDEO_PLANNING_REVIEW.md",
+      "target": "archive/project-history/docs/research/VIDEO_PLANNING_REVIEW.md",
+      "operation": "move",
+      "sha256": "c771f3ad18746fe300fca93752456cc993434067cb47073e60e50d3393f78b67",
+      "bytes": 4998
+    },
+    {
+      "source": "docs/research/acquiring/MERCHANT_HIERARCHY_REFERENCE.md",
+      "target": "archive/project-history/docs/research/acquiring/MERCHANT_HIERARCHY_REFERENCE.md",
+      "operation": "move",
+      "sha256": "eebf69317b4f90e02de7001890dddd14918bce10af65ae5d63932b4d3df1276b",
+      "bytes": 22284
+    },
+    {
+      "source": "docs/research/amex/ACCOUNT_CONTROL_360.md",
+      "target": "archive/project-history/docs/research/amex/ACCOUNT_CONTROL_360.md",
+      "operation": "move",
+      "sha256": "85fb4ed35d3cbd8d998243c0d85970f4ddf3cace4fe34f6d99731ff4968789d8",
+      "bytes": 19869
+    },
+    {
+      "source": "docs/research/amex/ARCHITECTURE_AND_MANAGEMENT.md",
+      "target": "archive/project-history/docs/research/amex/ARCHITECTURE_AND_MANAGEMENT.md",
+      "operation": "move",
+      "sha256": "0daa3bbfd15fdde31e90b0f3474aa80601fca4008db922b3b8c6ee00380516b5",
+      "bytes": 22601
+    },
+    {
+      "source": "docs/research/amex/ARCHITECTURE_BLUEPRINT.md",
+      "target": "archive/project-history/docs/research/amex/ARCHITECTURE_BLUEPRINT.md",
+      "operation": "move",
+      "sha256": "d42a9f9721a3242b76af3ab11125d6395346dea4a04cf771b750f8f0dea87941",
+      "bytes": 14359
+    },
+    {
+      "source": "docs/research/amex/ARCHITECTURE_VALIDATION.md",
+      "target": "archive/project-history/docs/research/amex/ARCHITECTURE_VALIDATION.md",
+      "operation": "move",
+      "sha256": "7969f7216223aba8a4e434fca929c9b87f3e408cf6ba99cca928682720ff09db",
+      "bytes": 5396
+    },
+    {
+      "source": "docs/research/amex/BUSINESS_360_REVIEW.md",
+      "target": "archive/project-history/docs/research/amex/BUSINESS_360_REVIEW.md",
+      "operation": "move",
+      "sha256": "1a5a9cd2f0d61468f95fbdf43d9305026aead139f4cdf75824ba51a0786f1da9",
+      "bytes": 18697
+    },
+    {
+      "source": "docs/research/amex/BUSINESS_360_VALIDATION.md",
+      "target": "archive/project-history/docs/research/amex/BUSINESS_360_VALIDATION.md",
+      "operation": "move",
+      "sha256": "36c2611f7e44a4ffbbe355f4cfda576f92e336747db37a388db599cd9d65ca5a",
+      "bytes": 5006
+    },
+    {
+      "source": "docs/research/amex/CARDHOLDER_DASHBOARD_ROLES.md",
+      "target": "archive/project-history/docs/research/amex/CARDHOLDER_DASHBOARD_ROLES.md",
+      "operation": "move",
+      "sha256": "f8a5c4c18ed9b5795c9bd9143ba2ea81a502373e36dc977771edfcfdc8484e0a",
+      "bytes": 26543
+    },
+    {
+      "source": "docs/research/amex/COMPARISON_CATALOG.md",
+      "target": "archive/project-history/docs/research/amex/COMPARISON_CATALOG.md",
+      "operation": "move",
+      "sha256": "c1b2567a6d98e564b6079ec1911ba633dca1f1f58bc41b44693fa59577096994",
+      "bytes": 21737
+    },
+    {
+      "source": "docs/research/amex/ENGINEERING_AND_PATENTS.md",
+      "target": "archive/project-history/docs/research/amex/ENGINEERING_AND_PATENTS.md",
+      "operation": "move",
+      "sha256": "fb993360e438340c41e9aa48d588c874be7621f3a1448c1fcd0c2f7737e98627",
+      "bytes": 20055
+    },
+    {
+      "source": "docs/research/amex/FRONTEND_EXPERIENCE.md",
+      "target": "archive/project-history/docs/research/amex/FRONTEND_EXPERIENCE.md",
+      "operation": "move",
+      "sha256": "e9d296156341c9fe1a68a88fa62511eebe146c2908d7d6084cc14d5c582a1f45",
+      "bytes": 12345
+    },
+    {
+      "source": "docs/research/amex/ISSUING_360.md",
+      "target": "archive/project-history/docs/research/amex/ISSUING_360.md",
+      "operation": "move",
+      "sha256": "a336b7c014e3197b47373e2318517b624317582e1f3f0b2d77b4ca535a8979d6",
+      "bytes": 13762
+    },
+    {
+      "source": "docs/research/amex/ISSUING_AND_CONSUMER.md",
+      "target": "archive/project-history/docs/research/amex/ISSUING_AND_CONSUMER.md",
+      "operation": "move",
+      "sha256": "e88d039424cc43b94b0f54cdf14967fb7f0e1ab647099498f8e423918fc67824",
+      "bytes": 19693
+    },
+    {
+      "source": "docs/research/amex/MARKETING_POSITIONING_2026_09_10.md",
+      "target": "archive/project-history/docs/research/amex/MARKETING_POSITIONING_2026_09_10.md",
+      "operation": "move",
+      "sha256": "11ce4754b06c26bcc3f5769a68449aa1dbff5cd269d83f6c20981d3c653402b7",
+      "bytes": 7224
+    },
+    {
+      "source": "docs/research/amex/MERCHANT_360.md",
+      "target": "archive/project-history/docs/research/amex/MERCHANT_360.md",
+      "operation": "move",
+      "sha256": "8ae048f08eeb43cdc9d70e9ebf6dc6149eebe93e7f75a79a322c8c2cc3971f4b",
+      "bytes": 14596
+    },
+    {
+      "source": "docs/research/amex/MERCHANT_AND_OPERATIONS.md",
+      "target": "archive/project-history/docs/research/amex/MERCHANT_AND_OPERATIONS.md",
+      "operation": "move",
+      "sha256": "69cb0236436c3e42b939cac99c6d74f69029c6fc14b5ab90970020c81286fa72",
+      "bytes": 29140
+    },
+    {
+      "source": "docs/research/amex/MERCHANT_DASHBOARD_ROLES.md",
+      "target": "archive/project-history/docs/research/amex/MERCHANT_DASHBOARD_ROLES.md",
+      "operation": "move",
+      "sha256": "7473c1fe65e19ab44fe671e2feee2543f284a09908f0c01edfc70f5b27ca402a",
+      "bytes": 13336
+    },
+    {
+      "source": "docs/research/amex/MERCHANT_MARKETING_FIT_2026_09_10.md",
+      "target": "archive/project-history/docs/research/amex/MERCHANT_MARKETING_FIT_2026_09_10.md",
+      "operation": "move",
+      "sha256": "598db320dea07070fb8328997e6d3da000b0c33c30099b167a4800247347eeac",
+      "bytes": 8046
+    },
+    {
+      "source": "docs/research/amex/OPEN_SOURCE_COMPONENTS.md",
+      "target": "archive/project-history/docs/research/amex/OPEN_SOURCE_COMPONENTS.md",
+      "operation": "move",
+      "sha256": "079a8ed4750a91059aee5d91628b70c4d2ae23eb734faef75cd14cf11c117c0e",
+      "bytes": 32275
+    },
+    {
+      "source": "docs/research/amex/PAYMENTS_DATA_ARCHITECTURE.md",
+      "target": "archive/project-history/docs/research/amex/PAYMENTS_DATA_ARCHITECTURE.md",
+      "operation": "move",
+      "sha256": "99b7052a5b2c221aefe96ee3abe4004e4c16ec8e6bb41c88852bb42547c7d921",
+      "bytes": 17195
+    },
+    {
+      "source": "docs/research/amex/PLATFORM_ARCHITECTURE.md",
+      "target": "archive/project-history/docs/research/amex/PLATFORM_ARCHITECTURE.md",
+      "operation": "move",
+      "sha256": "11df2527843a96e9bf171f502b575c24e1f5dd0d92fde1b8ef7874e4e24545f7",
+      "bytes": 15518
+    },
+    {
+      "source": "docs/research/amex/README.md",
+      "target": "archive/project-history/docs/research/amex/README.md",
+      "operation": "move",
+      "sha256": "e7652f6bc8e636e05836395a38dcab25882e1cc45de0a9e56115d3acfe3f71f8",
+      "bytes": 17680
+    },
+    {
+      "source": "docs/research/amex/REVIEWER_WALKTHROUGHS.md",
+      "target": "archive/project-history/docs/research/amex/REVIEWER_WALKTHROUGHS.md",
+      "operation": "move",
+      "sha256": "c92067b9a63800bafe61e5fd9b5a60ac2bf42b3e5cdc491ba1d5ec5c19c5c887",
+      "bytes": 5799
+    },
+    {
+      "source": "docs/research/amex/THREE_ACCOUNT_CARD_EXPERIENCE.md",
+      "target": "archive/project-history/docs/research/amex/THREE_ACCOUNT_CARD_EXPERIENCE.md",
+      "operation": "move",
+      "sha256": "b84742dc7d9929b92f44e96c7bc91efd600139b7f1b42260cba02102cc196867",
+      "bytes": 17574
+    },
+    {
+      "source": "docs/research/amex/THREE_ACCOUNT_MERCHANT_REDESIGN.md",
+      "target": "archive/project-history/docs/research/amex/THREE_ACCOUNT_MERCHANT_REDESIGN.md",
+      "operation": "move",
+      "sha256": "84eb9b0e9ab2e60163bba185f87f76df8e7d9bffcb5212df8546d60a6f7e6065",
+      "bytes": 14533
+    },
+    {
+      "source": "docs/research/amex/VALIDATION.md",
+      "target": "archive/project-history/docs/research/amex/VALIDATION.md",
+      "operation": "move",
+      "sha256": "4c56eddd0e421b5f0eb52c8f152ccdeff0b90fbfb9b318cba38cdea4b21692e2",
+      "bytes": 3555
+    },
+    {
+      "source": "docs/research/amex/VENDOR_SYSTEMS.md",
+      "target": "archive/project-history/docs/research/amex/VENDOR_SYSTEMS.md",
+      "operation": "move",
+      "sha256": "5ad41c6db6afa6c8b66a8f3ce687530e87248110c132793bb69973115e210da6",
+      "bytes": 20634
+    },
+    {
+      "source": "docs/research/amex/account-control-360-checks.json",
+      "target": "archive/project-history/docs/research/amex/account-control-360-checks.json",
+      "operation": "move",
+      "sha256": "187fc1c7e80394e5e23ce90b95bc4e4778827054e8287fd286bf4e5b4c24806f",
+      "bytes": 30678
+    },
+    {
+      "source": "docs/research/amex/account-control-360-sources.json",
+      "target": "archive/project-history/docs/research/amex/account-control-360-sources.json",
+      "operation": "move",
+      "sha256": "af4701db9075e96250560d0bc3a9a0c81fa324ac91c7cc71e22987f2e0a7dbb7",
+      "bytes": 13726
+    },
+    {
+      "source": "docs/research/amex/architecture-sources.json",
+      "target": "archive/project-history/docs/research/amex/architecture-sources.json",
+      "operation": "move",
+      "sha256": "f35270f3b629895e077cca238ae0c7f9800681b6987b73527ca77e24e5a8029e",
+      "bytes": 8150
+    },
+    {
+      "source": "docs/research/amex/business-360-sources.json",
+      "target": "archive/project-history/docs/research/amex/business-360-sources.json",
+      "operation": "move",
+      "sha256": "cdf5f7fd4fd46a8b504c454572254660246288d4ee8969abab2fcc1dbe2e4dbd",
+      "bytes": 5983
+    },
+    {
+      "source": "docs/research/amex/cross-domain-360-checks.json",
+      "target": "archive/project-history/docs/research/amex/cross-domain-360-checks.json",
+      "operation": "move",
+      "sha256": "5434ce833068aac981177eb97886dcb406e887224cc4f5cf63156da597e7ff1e",
+      "bytes": 17029
+    },
+    {
+      "source": "docs/research/amex/engineering-patent-sources.json",
+      "target": "archive/project-history/docs/research/amex/engineering-patent-sources.json",
+      "operation": "move",
+      "sha256": "7d93ed9c71cc4a90d5a94fe7b5eba49c22618c9625d4475f073a20501b4654f3",
+      "bytes": 11100
+    },
+    {
+      "source": "docs/research/amex/issuing-360-checks.json",
+      "target": "archive/project-history/docs/research/amex/issuing-360-checks.json",
+      "operation": "move",
+      "sha256": "d0beb17546845e358322e9055d296bbd6a3929e42871652dc053ff7e0653c8a2",
+      "bytes": 40294
+    },
+    {
+      "source": "docs/research/amex/issuing-360-sources.json",
+      "target": "archive/project-history/docs/research/amex/issuing-360-sources.json",
+      "operation": "move",
+      "sha256": "3132f866805539bbd7fe9218fa68e5496fb6959e238c017c6e0b458e57849572",
+      "bytes": 15032
+    },
+    {
+      "source": "docs/research/amex/issuing-sources.json",
+      "target": "archive/project-history/docs/research/amex/issuing-sources.json",
+      "operation": "move",
+      "sha256": "0f20e50d4dbbd0bd628cbaf8dd46d5e6c4586a3681c4d5c2a1fb5b9a8b53e9ad",
+      "bytes": 15486
+    },
+    {
+      "source": "docs/research/amex/merchant-360-checks.json",
+      "target": "archive/project-history/docs/research/amex/merchant-360-checks.json",
+      "operation": "move",
+      "sha256": "e908ee9b40b34b0eeaeb2530ba21da556d4d12eebe14ac7b0c1f7c4add129cb0",
+      "bytes": 34151
+    },
+    {
+      "source": "docs/research/amex/merchant-360-sources.json",
+      "target": "archive/project-history/docs/research/amex/merchant-360-sources.json",
+      "operation": "move",
+      "sha256": "ddb99976b69a0f32545b667121e5a1f381ad8239fdc246cfcee806837712ded9",
+      "bytes": 4695
+    },
+    {
+      "source": "docs/research/amex/merchant-sources.json",
+      "target": "archive/project-history/docs/research/amex/merchant-sources.json",
+      "operation": "move",
+      "sha256": "f3d1d29fba5f047cfd0f8246b287d23efaaa2f7e01893bd5ee0f8af50837e57a",
+      "bytes": 19766
+    },
+    {
+      "source": "docs/research/amex/opensource-sources.json",
+      "target": "archive/project-history/docs/research/amex/opensource-sources.json",
+      "operation": "move",
+      "sha256": "c2e9dbb15dc91536b0ac2cb8a9ddae94d4e491460fc1546d871c3bccb6b98aca",
+      "bytes": 45317
+    },
+    {
+      "source": "docs/research/amex/payments-data-sources.json",
+      "target": "archive/project-history/docs/research/amex/payments-data-sources.json",
+      "operation": "move",
+      "sha256": "408d02f33ce6537119e001d8afb6c0c2e0dd641419d9e8b5cc01e8c7b8c88256",
+      "bytes": 13756
+    },
+    {
+      "source": "docs/research/amex/platform-sources.json",
+      "target": "archive/project-history/docs/research/amex/platform-sources.json",
+      "operation": "move",
+      "sha256": "6b7cdd37971f4f44eeea898f0d108e22efb4dda392aca68e9b9bc4b1c1979836",
+      "bytes": 7947
+    },
+    {
+      "source": "docs/research/amex/vendor-systems-sources.json",
+      "target": "archive/project-history/docs/research/amex/vendor-systems-sources.json",
+      "operation": "move",
+      "sha256": "b6a205734bdd770048a8c4a176655b03c39fec7ca5159f4c9d783cd6aeb2b840",
+      "bytes": 14544
+    },
+    {
+      "source": "docs/research/d131-cards-benchmark.md",
+      "target": "archive/project-history/docs/research/d131-cards-benchmark.md",
+      "operation": "move",
+      "sha256": "5cb3b476b620629ccda0c6db55e13e1a73acf289dd0ccf77e84e1e2f6ec79f4a",
+      "bytes": 13219
+    },
+    {
+      "source": "docs/research/d131-market-demand.md",
+      "target": "archive/project-history/docs/research/d131-market-demand.md",
+      "operation": "move",
+      "sha256": "72b445b3ff26b59e6fbcf7506406ec6a7a57ff4f2258d8e73c0bbb47a8a8d8b6",
+      "bytes": 4990
+    },
+    {
+      "source": "docs/research/d131-payments-benchmark.md",
+      "target": "archive/project-history/docs/research/d131-payments-benchmark.md",
+      "operation": "move",
+      "sha256": "381b4948ae7379a2da937e1727b69d05c06c3cad798cd895bdf123d8dc89e9a7",
+      "bytes": 10393
+    },
+    {
+      "source": "docs/research/d131-ux-benchmark.md",
+      "target": "archive/project-history/docs/research/d131-ux-benchmark.md",
+      "operation": "move",
+      "sha256": "d71dc8591c50f6a18900fc9c96d919a011e78b08144ca4c0e6213aa63e5d0d7a",
+      "bytes": 14225
+    },
+    {
+      "source": "docs/research/d134-court-lessons.md",
+      "target": "archive/project-history/docs/research/d134-court-lessons.md",
+      "operation": "move",
+      "sha256": "9a9f6655f11c831fa2519a891922b29276ccda3f855390a7752cac8cac1c5191",
+      "bytes": 10379
+    },
+    {
+      "source": "docs/research/d134-network-evidence.md",
+      "target": "archive/project-history/docs/research/d134-network-evidence.md",
+      "operation": "move",
+      "sha256": "506f2ba9d6cb3d30a1976cc5d6b0d4f0015ad8ee0d252df8122fb9d40926dd1c",
+      "bytes": 11572
+    },
+    {
+      "source": "docs/research/d134-product-model.md",
+      "target": "archive/project-history/docs/research/d134-product-model.md",
+      "operation": "move",
+      "sha256": "ec7c9de9087a242257609341bb71002099aeadc3f80f92be66bdf473339968d3",
+      "bytes": 11006
+    },
+    {
+      "source": "docs/research/d137-order-insight.md",
+      "target": "archive/project-history/docs/research/d137-order-insight.md",
+      "operation": "move",
+      "sha256": "99bb8e20ca29a2f8c31120a3ba2da4fd28997ddf1d373161586f8b3641fbe192",
+      "bytes": 14872
+    },
+    {
+      "source": "docs/research/d153-trolleys-two-step.md",
+      "target": "archive/project-history/docs/research/d153-trolleys-two-step.md",
+      "operation": "move",
+      "sha256": "ca399ec8941ac06eafff6e6cbba5d21c015ba24fb736b676bc83947d1310c987",
+      "bytes": 8249
+    },
+    {
+      "source": "docs/research/d155-competitor-pricing.md",
+      "target": "archive/project-history/docs/research/d155-competitor-pricing.md",
+      "operation": "move",
+      "sha256": "f2ec63a6e901baad7a985abb6fa57d5aecb087c4ed0e32c1080f9b067b332f4b",
+      "bytes": 8692
+    },
+    {
+      "source": "docs/research/d155-economics-model.py",
+      "target": "archive/project-history/docs/research/d155-economics-model.py",
+      "operation": "move",
+      "sha256": "695a6c9192996303f2a14f6db82c529641c336d02915c2e78d75265b70a1ae5d",
+      "bytes": 4057
+    },
+    {
+      "source": "docs/research/d155-market-demand.md",
+      "target": "archive/project-history/docs/research/d155-market-demand.md",
+      "operation": "move",
+      "sha256": "f7c20f6722af8b079aecf7dcd9b4f50a7b2f83f77e8f8527db76080df2dcf826",
+      "bytes": 11171
+    },
+    {
+      "source": "docs/research/d84-secured-card-reference.md",
+      "target": "archive/project-history/docs/research/d84-secured-card-reference.md",
+      "operation": "move",
+      "sha256": "7cb5192999b0d2c83eb6793b1d47465def798852001c22eb832f3e90ff1fc4c5",
+      "bytes": 14510
+    },
+    {
+      "source": "planning/DELIVERY_PLAN.md",
+      "target": "archive/project-history/planning/DELIVERY_PLAN.md",
+      "operation": "move",
+      "sha256": "633e16d0de39944ca613051d73b1dc27f0e30b984e9b1655dd97f9c08d192c89",
+      "bytes": 51023
+    },
+    {
+      "source": "planning/EXPERIENCE_GAP_AUDIT.md",
+      "target": "archive/project-history/planning/EXPERIENCE_GAP_AUDIT.md",
+      "operation": "move",
+      "sha256": "d29a0ca8d68f920bba4907493791682d9f889c0398c188a7d9b112c0312c5c44",
+      "bytes": 30966
+    },
+    {
+      "source": "planning/TRACEABILITY.md",
+      "target": "archive/project-history/planning/TRACEABILITY.md",
+      "operation": "move",
+      "sha256": "19fa534fe892519045246af7d0640d14c642eac80c9c280ccea28845a5587a46",
+      "bytes": 18840
+    },
+    {
+      "source": "planning/amex-architecture-gates.json",
+      "target": "archive/project-history/planning/amex-architecture-gates.json",
+      "operation": "move",
+      "sha256": "16d42284ed12181e0484fbbb633aae6810433c4a97289087792788460530b44e",
+      "bytes": 7870
+    },
+    {
+      "source": "planning/amex-comparison.json",
+      "target": "archive/project-history/planning/amex-comparison.json",
+      "operation": "move",
+      "sha256": "db52941818f18a77fd827b680ee157bb36c7e13a7b7e1e9474f80c076cdcaa31",
+      "bytes": 48113
+    },
+    {
+      "source": "planning/backlog.csv",
+      "target": "archive/project-history/planning/backlog.csv",
+      "operation": "move",
+      "sha256": "fa58afc6d2f98859761ffd77840b9f9c57f57a5e96cb507c48a3a785b3ce8b58",
+      "bytes": 4615
+    },
+    {
+      "source": "planning/backlog.json",
+      "target": "archive/project-history/planning/backlog.json",
+      "operation": "move",
+      "sha256": "35ffb5a2f90f052d01006de0795a2a3c93331bedbd41ad5973fd53352ca6a07e",
+      "bytes": 28449
+    },
+    {
+      "source": "planning/merchant-channel-verification.json",
+      "target": "archive/project-history/planning/merchant-channel-verification.json",
+      "operation": "move",
+      "sha256": "e4906b50ddaa9a1186449c6cfebb378119d554d393c66329e90e1c4c28b2e101",
+      "bytes": 80198
+    },
+    {
+      "source": "planning/search-ai-execution.json",
+      "target": "archive/project-history/planning/search-ai-execution.json",
+      "operation": "move",
+      "sha256": "77d43b1c4fa3b92282b30b92fa1320ecad994c5fbf70d0aa6fd4ff7672caa74b",
+      "bytes": 12596
+    },
+    {
+      "source": "planning/search-growth.json",
+      "target": "archive/project-history/planning/search-growth.json",
+      "operation": "move",
+      "sha256": "8b8ef8b056c3a801537cd445173435ccd8f0f9ae4c5cfc92b4718cf1c8ba40e2",
+      "bytes": 19573
+    },
+    {
+      "source": "prompts/01_FOUNDATION_AND_ACCOUNTS.md",
+      "target": "archive/retired-platform/prompts/01_FOUNDATION_AND_ACCOUNTS.md",
+      "operation": "move",
+      "sha256": "6bd32d3a336c6b0e2a84611a0895c98aae6c162ae9b155d7b682d5fe03628226",
+      "bytes": 1084
+    },
+    {
+      "source": "prompts/02_CANONICAL_CARDS.md",
+      "target": "archive/retired-platform/prompts/02_CANONICAL_CARDS.md",
+      "operation": "move",
+      "sha256": "0456521638b82a30aa439b40b116cdcb12825ea9205a9e7cd1cb9ade15a03525",
+      "bytes": 1171
+    },
+    {
+      "source": "prompts/03_ISSUING_AND_SIMULATION.md",
+      "target": "archive/retired-platform/prompts/03_ISSUING_AND_SIMULATION.md",
+      "operation": "move",
+      "sha256": "4bf624f8f620facb7acc91a4f59deb16c5484f876110013637f4d9c083ecedbe",
+      "bytes": 1052
+    },
+    {
+      "source": "prompts/04_ACQUIRING_AND_DELEGATION.md",
+      "target": "archive/retired-platform/prompts/04_ACQUIRING_AND_DELEGATION.md",
+      "operation": "move",
+      "sha256": "9c38486abd51bda1ced7d23860ea754f6be6c344974d7d14b915864101699be0",
+      "bytes": 992
+    },
+    {
+      "source": "prompts/05_OPERATIONS_ECONOMICS_PARTNERS.md",
+      "target": "archive/retired-platform/prompts/05_OPERATIONS_ECONOMICS_PARTNERS.md",
+      "operation": "move",
+      "sha256": "3c710c8b660e3cc9fdd4cf390854f57663217ddc5b50a4426e8177eb20464dd6",
+      "bytes": 1014
+    },
+    {
+      "source": "prompts/06_HARDEN_AND_DEPLOY_NEW_SITE.md",
+      "target": "archive/retired-platform/prompts/06_HARDEN_AND_DEPLOY_NEW_SITE.md",
+      "operation": "move",
+      "sha256": "9701faa77b201d57780e70e319fd43b80d7a2782cba92ed85ade4b6676f10caa",
+      "bytes": 1176
+    },
+    {
+      "source": "prompts/07_RESUME_WITHOUT_RESTARTING.md",
+      "target": "archive/retired-platform/prompts/07_RESUME_WITHOUT_RESTARTING.md",
+      "operation": "move",
+      "sha256": "df57053894b000f88ce82b05399cce62084bd5391aa2d39adab07f1a3ca12a34",
+      "bytes": 874
+    },
+    {
+      "source": "sources/inventory.json",
+      "target": "archive/retired-platform/sources/inventory.json",
+      "operation": "move",
+      "sha256": "12c4b6be3c45ad590e0e419202a9ee403445c1fba06cdfe791c18fccf6cf8ef8",
+      "bytes": 3710
+    },
+    {
+      "source": "sources/original/Account_First_Redesign_Reference.md",
+      "target": "archive/retired-platform/sources/original/Account_First_Redesign_Reference.md",
+      "operation": "move",
+      "sha256": "be1ba9a3d1a485de0c9ea9fe4200b785742390a2f0c68ff42ac8976d2e465e9a",
+      "bytes": 40495
+    },
+    {
+      "source": "sources/original/Master_AI_Agent_Prompt_Netlify_Member_Commerce_Platform.md",
+      "target": "archive/retired-platform/sources/original/Master_AI_Agent_Prompt_Netlify_Member_Commerce_Platform.md",
+      "operation": "move",
+      "sha256": "cf5ce3fa2d8673aba2145ffd2b81986244263b797a149b63a1ad694509f985fc",
+      "bytes": 59609
+    },
+    {
+      "source": "sources/original/Select_Premier_Customer_Service_Lifecycle.xlsx",
+      "target": "archive/retired-platform/sources/original/Select_Premier_Customer_Service_Lifecycle.xlsx",
+      "operation": "move",
+      "sha256": "642b0fbe9e7ae2ceab83a45060a7590d393a6d171dd6263797a3f53b1302fdb9",
+      "bytes": 29289
+    },
+    {
+      "source": "sources/original/Select_Premier_Management_Enterprise_Cost_Model.xlsx",
+      "target": "archive/retired-platform/sources/original/Select_Premier_Management_Enterprise_Cost_Model.xlsx",
+      "operation": "move",
+      "sha256": "f9b8b2b1578f74c15806513ee2a27b3bc827eb8c282fdd150cc0a7bc1e22237a",
+      "bytes": 125005
+    },
+    {
+      "source": "sources/workbook-extract.json",
+      "target": "archive/retired-platform/sources/workbook-extract.json",
+      "operation": "move",
+      "sha256": "87b17afd6418815c9f752feccf36d19f8661fa494965c351ed272e109e77527d",
+      "bytes": 685424
+    },
+    {
+      "source": "templates/.env.example",
+      "target": "archive/retired-platform/templates/.env.example",
+      "operation": "move",
+      "sha256": "cf2885f724ae919d40dd27fe24bdb7c9228c10881420e2a926e83aa81b24dd77",
+      "bytes": 868
+    },
+    {
+      "source": "templates/ci.yml.example",
+      "target": "archive/retired-platform/templates/ci.yml.example",
+      "operation": "move",
+      "sha256": "8bf17a9a8d8f4241d9533ec251963bf6c22d95e55b4d2290bf555f8e34875c7c",
+      "bytes": 2387
+    },
+    {
+      "source": "templates/deployment-receipt.json",
+      "target": "archive/retired-platform/templates/deployment-receipt.json",
+      "operation": "move",
+      "sha256": "1eac81618e5c103d2649a40fe1ccaad4a5042d3186688d77766d4642352869a0",
+      "bytes": 1961
+    },
+    {
+      "source": "templates/netlify.toml.example",
+      "target": "archive/retired-platform/templates/netlify.toml.example",
+      "operation": "move",
+      "sha256": "5c8ef705df1274da433f1f10e4fde309e583f9187edba0f8134a118e22ca90f4",
+      "bytes": 817
+    },
+    {
+      "source": "templates/release-checklist.md",
+      "target": "archive/retired-platform/templates/release-checklist.md",
+      "operation": "move",
+      "sha256": "f8f3e8060cd77a3f004c05bdbf1164ee1a29021b0abc21f088c937494671b257",
+      "bytes": 1566
+    },
+    {
+      "source": "planning/STATUS.md",
+      "target": "archive/project-history/planning/STATUS.md",
+      "operation": "move",
+      "sha256": "dff771dfd560f451f2683544ce9ab82e9848dd7d2100cb6b898a6af2f83bfa6f",
+      "bytes": 312302
+    },
+    {
+      "source": "docs/SOURCE_PRECEDENCE_HISTORY.md",
+      "target": "archive/project-history/docs/SOURCE_PRECEDENCE_HISTORY.md",
+      "operation": "move",
+      "sha256": "b38311b121c85b86399580494330c90a287db383c4db19b263f5fa89367cf131",
+      "bytes": 14582
+    },
+    {
+      "source": "docs/OPEN_SOURCE_ASSESSMENT.md",
+      "target": "archive/project-history/docs/OPEN_SOURCE_ASSESSMENT.md",
+      "operation": "move",
+      "sha256": "ba2d6ad6eafa7301acaf82a214f8e1f36df627f398847931a385ce0352def048",
+      "bytes": 19420
+    },
+    {
+      "source": "tools/guide-image-sources.mjs",
+      "target": "tools/assets/guide-image-sources.mjs",
+      "operation": "move",
+      "sha256": "edaa236613be906405c9a94774151c7c9a646df0e7d38fe9cec81b6e5acb3da5",
+      "bytes": 1864
+    },
+    {
+      "source": "tools/guide-image-previews.json",
+      "target": "tools/assets/guide-image-previews.json",
+      "operation": "move",
+      "sha256": "ac078b8d4ad33a77466540899b23c68a3375211fcaa8f5a1cb67d6f5adaeb159",
+      "bytes": 23047
+    },
+    {
+      "source": "docs/CURRENT_WORK_CONTEXT.md",
+      "target": "archive/project-history/docs/CURRENT_WORK_CONTEXT.md",
+      "operation": "snapshot",
+      "sha256": "f43883b4edf94898bb083e2c00151bfbe465c317c0d77329754081d6dad20a01",
+      "bytes": 258160
+    },
+    {
+      "source": "docs/PUBLIC_SITE_ARCHITECTURE.md",
+      "target": "archive/project-history/docs/PUBLIC_SITE_ARCHITECTURE.md",
+      "operation": "snapshot",
+      "sha256": "7c5eb62731c9d7a102a84c73edae11642371c11d5f5d015e125d19703ff08a73",
+      "bytes": 55362
+    },
+    {
+      "source": "docs/ACCEPTANCE_TESTS.md",
+      "target": "archive/project-history/docs/ACCEPTANCE_TESTS.md",
+      "operation": "snapshot",
+      "sha256": "758824b61422abf861d08cd810716591bd1ee932cd203dd99b551c7302a38938",
+      "bytes": 13780
+    },
+    {
+      "source": "docs/ACCESS_POLICY.md",
+      "target": "archive/project-history/docs/ACCESS_POLICY.md",
+      "operation": "snapshot",
+      "sha256": "610a273448655a7de6a381fdf5dcf2fce6625bd6f80a093ddca868795f760c65",
+      "bytes": 14642
+    },
+    {
+      "source": "docs/CUSTOMER_LANGUAGE.md",
+      "target": "archive/project-history/docs/CUSTOMER_LANGUAGE.md",
+      "operation": "snapshot",
+      "sha256": "fe1b9b15d5eaccae3e8bc897b3f2d56e9bac8689816fe287c0339392d4ed1cf6",
+      "bytes": 4346
+    },
+    {
+      "source": "docs/GITHUB_DELIVERY.md",
+      "target": "archive/project-history/docs/GITHUB_DELIVERY.md",
+      "operation": "snapshot",
+      "sha256": "c997f22f37c6128b3fc14e8eb4c959b051179a5d282a38f2081fe9392698fa93",
+      "bytes": 3153
+    },
+    {
+      "source": "docs/NETWORK_BRAND_ASSETS.md",
+      "target": "archive/project-history/docs/NETWORK_BRAND_ASSETS.md",
+      "operation": "snapshot",
+      "sha256": "04ad47fd7061ccbcbcae3c28f08c0aedd7ba746540912319372cbd809fe2521b",
+      "bytes": 8016
+    },
+    {
+      "source": "docs/SECURITY_AND_IDENTITY.md",
+      "target": "archive/project-history/docs/SECURITY_AND_IDENTITY.md",
+      "operation": "snapshot",
+      "sha256": "8da536ca06f651634b37954cac60cb6b5686db7e8c93b7d2e1b6aed10f5b87ff",
+      "bytes": 7399
+    },
+    {
+      "source": "docs/TEST_AND_EVIDENCE.md",
+      "target": "archive/project-history/docs/TEST_AND_EVIDENCE.md",
+      "operation": "snapshot",
+      "sha256": "68271dbfe459204734004ed139ca58570c332b3752834d1d501c82674c9dac50",
+      "bytes": 6813
+    }
+  ],
+  "sensitivityReview": {
+    "existingTrackedFilesOnly": true,
+    "privateMaterialImported": false,
+    "credentialSignatureFindings": 0
+  },
+  "scopeAdjustments": [
+    "The old source-precedence chronology remains only in the archive; CURRENT_WORK_CONTEXT.md is the single current status source.",
+    "The obsolete dependency research report is archived; DEPENDENCIES_AND_LICENSING.md records active dependency and reuse boundaries.",
+    "Old instructions with useful filenames are replaced with current public-site guidance; their full originals are preserved as separate history snapshots.",
+    "Framework configuration, CI command behavior, Netlify settings, dependency versions and build-check manifest location remain unchanged.",
+    "Historical root names remain forbidden static-file cases in publication checks; this is deliberate, not a live dependency on removed files."
+  ],
+  "checks": {
+    "requiredCommands": "verify:public, test:seo:production, package:netlify and verify:package passed locally",
+    "unitTests": 449,
+    "desktopMobileJourneys": 322,
+    "existingSkippedDesktopMobileOnlyCase": 1,
+    "accessibilityChecks": 156,
+    "productionSitemapUrls": 3740,
+    "generatedPagesMatched": 3752,
+    "packageStaticFiles": 18945,
+    "guidePreviewEntriesReproduced": 53,
+    "bytePreservedMovesAndSnapshots": 246,
+    "unchangedDatabaseArchiveFiles": 74,
+    "immutableWebsiteAndConfigFiles": 484,
+    "activeMarkdownLinksResolved": 138,
+    "activeInstructionDocumentsAudited": 20,
+    "networkAssetHashesVerified": 5,
+    "dependencyAudit": "No known vulnerabilities found",
+    "websiteSourceChanges": 0,
+    "newPublicCapabilities": 0,
+    "sourceBuildPackageIdentity": "identical",
+    "localReviewReport": {
+      "desktopWidth": 1440,
+      "mobileWidth": 390,
+      "overflow": false,
+      "resolvedFileLinks": 4
+    }
+  },
+  "publicationPerformed": false,
+  "nextStage": "Stage 5: combined final verification and release preparation; publication requires applicable authorization.",
+  "sourceFingerprint": "870ca5d021acc29ded6360937f6c9927223e678712d5d410f960e2d45348c3d7",
+  "organization": {
+    "topLevelDocsBefore": 138,
+    "topLevelDocsAfter": 16,
+    "historicalFilesArchived": 244,
+    "generatorDataFilesGrouped": 2,
+    "singleCurrentStatus": "docs/CURRENT_WORK_CONTEXT.md",
+    "archiveReadme": "archive/README.md"
+  },
+  "correctionsAndLimits": [
+    "The initial documentation-path scan flagged the explicitly absent future Developers folder. Reworded the explanation so all listed implementation paths resolve; no future feature was created.",
+    "Removed a historical capture-directory claim from active brand documentation; original provenance and its recorded hashes remain.",
+    "Historical documents retain original-context links and dates. Active instructions are relinked; history is not rewritten.",
+    "Application source, public assets, hosting configuration, CI workflow, runtime dependencies and the release manifest are byte-identical to Stage 3. Full Chromium checks ran again; additional WebKit/screenshots were not repeated for this engineering-only stage.",
+    "No remote GitHub or Netlify settings, hosted verification, push, merge or deployment occurred.",
+    "The first local HTML-report layout check could not resolve the standalone playwright import. Reused the installed @playwright/test package and verified the report at 1440px and 390px. Application verification was unaffected."
+  ],
+  "remainingWork": [
+    "Stage 5: review the combined restructure candidate and final release checks.",
+    "Prepare a reviewable PR/release record; publish only under applicable authorization.",
+    "After authorized publication, verify exact deployed identity, hosted pages, assets, sitemap, headers and source-only 404s."
+  ]
+}

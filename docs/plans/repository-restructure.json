@@ -24,7 +24,8 @@
     "fileMap": "repository-file-map.json",
     "routeMap": "repository-route-map.json",
     "stage2": "repository-stage2.json",
-    "stage3": "repository-stage3.json"
+    "stage3": "repository-stage3.json",
+    "stage4": "repository-stage4.json"
   },
   "categories": {
     "website": [
@@ -177,7 +178,7 @@
     {
       "number": 4,
       "name": "Engineering instructions and reviewed history",
-      "status": "planned",
+      "status": "complete",
       "deliverables": [
         "Consolidate current project instructions; distinguish current decisions from old records.",
         "Review stale relative documentation links and update moved file references.",
@@ -190,7 +191,18 @@
         "No dangling active tool, CI, configuration or documentation references.",
         "No private working records, original screenshots, secrets or generated review artifacts in public source or the deploy package.",
         "No root build/publish directory, Git deployment workflow, domain or runtime change."
-      ]
+      ],
+      "completion": {
+        "sourceFingerprint": "870ca5d021acc29ded6360937f6c9927223e678712d5d410f960e2d45348c3d7",
+        "historyFilesArchived": 244,
+        "generatorDataFilesGrouped": 2,
+        "activeTopLevelDocuments": 16,
+        "activeDocumentationLinksResolved": 138,
+        "unchangedDatabaseArchiveFiles": 74,
+        "unchangedWebsiteAndConfigFiles": 484,
+        "generatedPagesMatched": 3752,
+        "publicationPerformed": false
+      }
     },
     {
       "number": 5,
@@ -210,5 +222,5 @@
       ]
     }
   ],
-  "activeBranch": "codex/restructure-stage3-20261108"
+  "activeBranch": "codex/restructure-stage4-20261108"
 }

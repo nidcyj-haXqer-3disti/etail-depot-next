@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import manifest from "../../tools/guide-image-previews.json";
+import manifest from "../../tools/assets/guide-image-previews.json";
 
 const digest = (value: Buffer) => createHash("sha256").update(value).digest("hex");
 

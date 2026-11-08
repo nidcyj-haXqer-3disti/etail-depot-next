@@ -28,4 +28,6 @@ Unknown new file locations require a deliberate update to `tools/file-publicatio
 
 ## Existing records
 
-Tracked historical documentation, contracts and archived development records remain repository-only. This policy neither republishes them on the website nor changes their existing public Git history. Keep archived migrations unchanged. New confidential material belongs outside the tracked documentation folders.
+Reviewed historical records now live under `archive/bootstrap/`, `archive/project-history/` and `archive/retired-platform/`. The existing `archive/database/` remains unchanged. These records remain repository-only. This policy neither republishes them on the website nor changes their existing public Git history. Keep archived migrations unchanged. New confidential material belongs outside the tracked documentation folders.
+
+Current file ownership is documented in [REPOSITORY_GUIDE.md](REPOSITORY_GUIDE.md). The preserved empty credential template is allowed only at its exact reviewed archive path; populated environment files remain private. Archived instructions are not an active setup guide.

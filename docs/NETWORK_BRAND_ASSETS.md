@@ -1,4 +1,4 @@
-# D97 — authentic card-network artwork
+# Brand asset provenance
 
 20 September 2026. The user requests real card-network marks in place of text approximations. This presentation change uses artwork published by the networks and served from `public/brand/networks/`. Original source bytes are copied without redrawing, recoloring, tracing, filtering or changing the artwork’s proportions. Blue and white Visa marks are separate official variants.
 
@@ -19,7 +19,7 @@ Keep the supplied canvas and clear space. The white variant is used on dark card
 
 ### Mastercard
 
-Source page: [Mastercard Developers](https://developer.mastercard.com/). Its current developer-site JavaScript references the [official Mastercard circles SVG](https://developer.mastercard.com/img/logo_mastercard_circles.svg).
+Source page: [Mastercard Developers](https://developer.mastercard.com/). Its developer-site JavaScript at the recorded review references the [official Mastercard circles SVG](https://developer.mastercard.com/img/logo_mastercard_circles.svg).
 
 Local asset: `public/brand/networks/mastercard.svg`, viewBox `0 0 126 82.8`. The transparent SVG preserves the original colored symbol and replaces the initially considered 114-pixel developer-site PNG. The PNG is not the final application asset.
 
@@ -51,25 +51,12 @@ c54acb431126b02f6f21433f327386a4cd637ef846267cc2cad712c47d3ce162  american-expre
 58b4e184ad6f0cb180124a62eaf94ff9d692a1939b65532d8c5e265e3486bebc  discover.jpg
 ```
 
-Source captures remain in `artifacts/d97-checks/source-assets/`. Public assets are served locally rather than hotlinked, so displaying a mark does not request the visitor’s browser to contact a network website.
+Public assets are served locally rather than hotlinked, so displaying a mark does not request the visitor’s browser to contact a network website. Original research captures are local evidence, not required repository inputs.
 
-## Shared presentation and boundaries
+## Current implementation
 
-`src/ui/network-brands.tsx` owns `NetworkMark` and `NetworkBrands`; `network-brands.css` owns their sizing and spacing. Image alternatives identify each network. Decorative duplicates within already-labeled artwork use empty alternatives.
+Shared marks live in [network-brands.tsx](../src/shared/brand/network-brands.tsx), [brand-image.tsx](../src/shared/brand/brand-image.tsx) and their styles in `src/shared/brand/`. [The brand generator](../tools/generate-inline-brand-images.mjs) maintains embedded assets. Preserve exact bytes and aspect ratios, including fractional SVG view boxes. Follow [the page paint standard](PAGE_PAINT_STANDARDS.md).
 
-Coverage includes the homepage acceptance strip; the checkout portion of all seven public payment-channel illustrations; the shared channel presentations used by terminal/channel tools; merchant account settings; and Visa marks in public Ledgix artwork, the card list and card-detail artwork. Original text labels and CSS approximations are replaced at those presentation points. This does not copy a provider dashboard or introduce new checkout behavior.
+Etail logo originals were supplied by the user and are preserved with their [original note](../archive/retired-platform/assets/brand/README.md). Current approved public copies remain in `public/brand/`; shared component assets remain in `src/shared/brand/assets/`. Trolleys attribution uses the shared brand component. No new brand artwork or permission is established by this reorganization.
 
-Asset provenance establishes where artwork came from, not Etail’s network approval, brand authorization, sponsorship or program activation. The existing, operator-confirmed payment-method descriptions remain the product source. No financial commands, real-money guard, provider integration, permissions, database schema, customer records, domains or deployment are changed by this slice.
-
-## Verification
-
-Local verification is complete on `codex/authentic-network-marks`, based on D96 commit `b08ea54`. Commands ran with the pinned Node 24.19.0 runtime and pnpm 11.19.0; browser suites used the isolated test database. The preserved preview database was only verified on preview startup, without migration or seeding.
-
-- `pnpm lint`, `pnpm typecheck`, `pnpm test:architecture` and the final `pnpm build`: exit 0. Final changed-component lint and `git diff --check` also pass.
-- Final affected public, cardholder experience, merchant channel and merchant settings suites: **64 desktop/mobile/accessibility cases pass**. After the visual-only two-column compact-grid correction, **26 affected channel/settings/public accessibility cases pass again**.
-- Responsive capture: **28 channel states** across 320, 390, 768 and 1440px, with all four named images loaded, no horizontal overflow, no accessibility violations and no runtime/image errors. Sixteen screenshots cover acceptance rows, Text/Invoice panels and card illustrations. Manual review includes phone, tablet and desktop layouts. Compact groups use two balanced rows; the acceptance strip uses four columns where space permits.
-- `artifacts/d97-checks/assets.json` records final hashes and static SVG checks (no scripts, external resources or event handlers). Independent source review confirmed image dimensions/imports, accessible/decorative alternatives, narrowly removed imitation styles and unchanged application behavior.
-
-Logs: `artifacts/d97-checks/{lint,lint-final,typecheck,architecture,build-final-layout,browser-final,browser-final-layout,visual-final}.log`; screenshots and capture results: `artifacts/d97-checks/visual/`. The initial capture falsely flagged HTTP304 cache responses despite successful image loading; its receipt remains in `visual-initial.log` / `visual-initial-results.json`. The capture helper now accepts304 while continuing to assert decoded image dimensions and no actual failed responses. Final capture passes. The original 3+1 desktop logo wrap prompted the two-column correction above.
-
-The completed preview runs at http://127.0.0.1:3100/. No push, deployment, provider activation or data change is included; D86 remains the hosted baseline.
+Network provenance does not establish Etail sponsorship, program activation or approval. Public capability wording comes from approved company facts, not from displaying a logo. The earlier asset-verification results are preserved in [the dated record](../archive/project-history/docs/NETWORK_BRAND_ASSETS.md); they are not new verification results.

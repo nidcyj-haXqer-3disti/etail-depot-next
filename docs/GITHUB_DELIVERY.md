@@ -1,25 +1,23 @@
-# GitHub delivery — 2026-09-10
+# GitHub review and merge
 
-The requested code is published in private repository [nidcyj-haXqer-3disti/etail-depot-next](https://github.com/nidcyj-haXqer-3disti/etail-depot-next), stable ID1361184741. [Draft PR#1](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/pull/1) targets main from `feature/fresh-two-services`. It is not merged.
+The target is [nidcyj-haXqer-3disti/etail-depot-next](https://github.com/nidcyj-haXqer-3disti/etail-depot-next), repository ID `1361184741`, as bound in [project-targets.json](../project-targets.json). Current release authorization is recorded in [CURRENT_WORK_CONTEXT.md](CURRENT_WORK_CONTEXT.md).
 
-## Source integrity
+## Before a push
 
-The repository was empty and was initialized with only its bound project marker at `b60f47d71a9dd9e695401915bde544c84a190122`. The feature contains the complete working source, specifications, migrations, lockfile and executable checks. Local Git lacked authentication, so the connected GitHub Git Data API uploaded committed bytes instead of rewriting local history or copying source through a generated workflow.
+Review the exact diff and file placement. Use a feature branch, preserve unrelated work, and follow [CONTRIBUTING.md](../CONTRIBUTING.md). Private working material must stay outside Git. A passing check is not permission to upload or publish a candidate outside the authorized scope.
 
-| Verified boundary | Value |
-| --- | --- |
-| Tested local application commit | `7f9382da530e6d64eb938d3622a569499a0fa5dd` |
-| Remote application snapshot | `fc6b48c2b6366a560a0c9ca4c348f2e0ba7f028c` |
-| Identical local/remote tree | `69ad12bf537cf56bfde40cf6707decc84e250eb3` |
-| Tracked files, with exact modes | 475 |
-| Large/binary blob hashes checked individually | 21 unique objects |
+Run the applicable local checks and record failures and corrections. Release candidates require the four commands in [TEST_AND_EVIDENCE.md](TEST_AND_EVIDENCE.md). Do not use force push or push feature changes directly to `main`.
 
-All smaller text files were uploaded with exact UTF-8 contents; the final remote tree hash matched the local committed tree. A GET of the remote Git commit confirmed its tree and marker-only parent. The remote and local commit IDs differ because GitHub created a snapshot commit with its own parent/author metadata. File contents and executable modes match exactly. Subsequent publication documentation changes do not alter the application tested above; their own uploaded tree is verified separately.
+## Pull request and integration
 
-Ignored `.local`, database recovery, environment credentials, artifacts, dependencies and build output were not exported. Authorized requirements/workbooks are tracked specifications, not legacy application runtime. Existing local source history and recovery archives are intact.
+Open a focused PR against this repository's `main`. Explain the resulting change, affected business or engineering files and validation. Assign the actual maintainer/reviewer; do not invent owners.
 
-## Verification and release state
+[The existing workflow](../.github/workflows/foundation.yml) checks the exact repository ID, commit, pinned runtime and disabled financial release before running the required checks. A fork-local workflow does not satisfy the upstream identity binding. A maintainer may need to approve a new contributor's upstream workflow run.
 
-[Consumer delivery evidence](CONSUMER_FINALIZATION.md) records401 local domain/database/contract passes, all56 browser cases across the full/focused runs,15 final visual states and production packaging. GitHub runs the real workflow on the feature/PR; [the initial application PR run](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/actions/runs/34432044409) preserves the independent Ubuntu/PostgreSQL execution. Subsequent exact-head workflow results are available in the PR checks. Local sanitized receipts retain the final observed run IDs, states and source hashes. A queued/running remote check is not represented by local test counts as a remote pass.
+When another change lands on the base branch, inspect the combined diff and resolve conflicts deliberately. Different files can still depend on the same navigation facts, shared styling or build behavior. Revalidate the combined candidate. Check the exact PR/merge source that will be published, not a stale successful run. A synthetic PR merge commit may differ from the feature head; record the identity and relationship.
 
-Netlify check `6aa21eb41829fa00085f975f`, explicitly read back for site `cbbb6c24-9dbc-43a2-9234-e4357b5b5280`, was canceled during change checking by the existing publication hold. Its API state was `error`, reason `Canceled build due to no content change`, and `published_at` was null; the GitHub status reported success for the skipped preview. No website release occurred. Indexing, real-money execution and old-project access remain disabled or excluded as previously recorded.
+Merge only under applicable authorization after review and passing checks. Do not bypass protection settings, change CI to manufacture success or infer deployment approval from repository write access. This procedure does not configure branch protections or team permissions.
+
+## After merge
+
+Merging source and publishing the website are separate actions. Follow the existing [manual Netlify Git-build procedure](NETLIFY_DEPLOYMENT.md) only with release authorization. Record the deployed commit and hosted checks separately. The original 2026-09-10 GitHub delivery receipt is preserved in [history](../archive/project-history/docs/GITHUB_DELIVERY.md).

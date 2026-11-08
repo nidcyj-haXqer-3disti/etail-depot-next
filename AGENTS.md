@@ -1,10 +1,10 @@
 # Etail Depot public website
 
-Read `project-targets.json`, `docs/CURRENT_WORK_CONTEXT.md`, `docs/SOURCE_PRECEDENCE.md`, `docs/PUBLIC_SITE_ARCHITECTURE.md` and `planning/STATUS.md` before changes.
+Read `project-targets.json`, `docs/CURRENT_WORK_CONTEXT.md`, `docs/SOURCE_PRECEDENCE.md`, `docs/PUBLIC_SITE_ARCHITECTURE.md` and `docs/REPOSITORY_GUIDE.md` before changes.
 
 ## Scope
 
-Only the public website and approved vendor links are active. The current candidate has 3,751 exact content pages and 3,739 search eligible URLs. Preparation is authorized; pushing, merging and deploying need applicable release authorization. Do not infer publication from a passing local check.
+Only the public website and approved vendor links are active. The exact page inventory and approved legal/reference scope are recorded in `tools/reference-release.json`. Preparation is authorized; pushing, merging and deploying need applicable release authorization. Do not infer publication from a passing local check.
 
 Preserve one Shell, header, footer and design system. Read `docs/PAGE_PAINT_STANDARDS.md` before changes affecting artwork or page loading. Preserve pricing, eligibility and source notes. Use plain language and avoid dash punctuation in authored public prose. Technical identifiers, URLs, licence notices, addresses and mathematical notation keep their required characters.
 

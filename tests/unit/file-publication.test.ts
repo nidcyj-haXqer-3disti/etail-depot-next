@@ -49,6 +49,8 @@ describe("source and website publication destinations", () => {
   it("does not treat credential samples or a known directory as permission for real credential files", () => {
     expect(fileDestination(".env.example")).toBe("repository-only");
     expect(fileDestination("templates/.env.example")).toBe("repository-only");
+    expect(fileDestination("archive/retired-platform/templates/.env.example")).toBe("repository-only");
+    expect(fileDestination("archive/retired-platform/templates/.env.production")).toBe("local-only");
     for (const name of [".env.production", "tools/store.p12", "public/help/store.pfx", ".local/review.json", "outputs/screenshot.png", "docs/content/research.md"]) {
       expect(fileDestination(name), name).toBe("local-only");
     }

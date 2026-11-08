@@ -39,7 +39,7 @@ function localFile(name: string): boolean {
 export function fileDestination(filename: string): FileDestination {
   const name = normalizedPath(filename);
   if (!name) return "unclassified";
-  if (name === ".env.example" || name === "templates/.env.example") return "repository-only";
+  if (name === ".env.example" || name === "templates/.env.example" || name === "archive/retired-platform/templates/.env.example") return "repository-only";
   if (localFile(name)) return "local-only";
   const directory = name.split("/")[0];
   if (directory === "src" || directory === "public") return "website-input";

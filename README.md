@@ -1,22 +1,20 @@
 # Etail Depot
 
-The customer-facing website for **Etail Depot US, Inc.**, introducing **Merchant services**, **Card services** and payment partnerships for software platforms.
+The public website for Etail Depot US, Inc. It explains merchant services, software platform use cases, card services, pricing and account setup.
 
-[Website](https://etaildepot.com) · [Merchant services](https://etaildepot.com/payment-acceptance-service) · [Card services](https://etaildepot.com/credit-card-services) · [Guides](https://etaildepot.com/guides) · [Help](https://etaildepot.com/help)
+[Website](https://etaildepot.com) · [Services](https://etaildepot.com/payment-acceptance-service) · [Resources](https://etaildepot.com/guides) · [Help](https://etaildepot.com/help)
 
-## About the project
+## Project boundary
 
-The website introduces Merchant services for US businesses and software platforms, Card services, documentation and standards references. It explains the services, pricing, account conditions and where to get help. Card pages provide information and inquiry routes only.
+This repository runs the public website. Merchant sign in and registration open the fixed [Trolleys Welcome page](https://merchantapp.io/etaildepot/UserAccount/Login), where visitors enter their email. The vendor service handles account access and applications. This website does not implement merchant authentication, account processing, payments, KYC, a ledger or a database. Card applications remain closed; card pages provide information and inquiry routes.
 
-This repository contains the public website: product pages, interactive illustrations, help, merchant guides, legal notices and fixed links to the services. It does not run customer accounts, card issuance or payment processing. Trolleys account access is handled separately at [trolleys.ai](https://trolleys.ai); Ledgix inquiries go to [ledgix@etaildepot.com](mailto:ledgix@etaildepot.com).
+The website uses Next.js, React and TypeScript, exports static pages, and runs on the existing Netlify project with one shared request boundary. The enabled Netlify Emails extension retains its pinned authenticated handler; public pages do not call it.
 
-Guides contains ISO 20022 external code references and an independent ISO 8583 implementation reference. The candidate includes 3,740 content pages: 34 core pages, 3,455 ISO 20022 references and 251 independent 8583 references. The previous article library is retired. Source notices and implementation limits remain visible.
-
-Built with **Next.js, React and TypeScript**, exported as static pages and served on Netlify with a shared Edge request boundary. See the [architecture](docs/PUBLIC_SITE_ARCHITECTURE.md) for implementation details and [current status](planning/STATUS.md) for verified release information.
+Read the [current status](docs/CURRENT_WORK_CONTEXT.md), [architecture](docs/PUBLIC_SITE_ARCHITECTURE.md) and [repository guide](docs/REPOSITORY_GUIDE.md) before making changes. [project-targets.json](project-targets.json) identifies the only permitted repository and site.
 
 ## Quick start
 
-Install **Node.js 24.19.0**, **pnpm 11.19.0** and Git. Dependency versions are pinned in [package.json](package.json) and [pnpm-lock.yaml](pnpm-lock.yaml).
+Use Node.js **24.19.0**, pnpm **11.19.0** and the existing lockfile.
 
 ```sh
 git clone https://github.com/nidcyj-haXqer-3disti/etail-depot-next.git
@@ -26,73 +24,58 @@ pnpm build
 pnpm preview
 ```
 
-Open [http://127.0.0.1:3100](http://127.0.0.1:3100). Local setup needs no production credentials, database, service account or environment file.
+Open [the local preview](http://127.0.0.1:3100). No production credentials, environment file, database or vendor account is needed. For automatic UI reloads, stop the preview and run `pnpm dev --port 3100`. The built preview exercises the request boundary; development mode is for editing. See [local setup](docs/LOCAL_AND_CODEX_SETUP.md).
 
-For UI development with automatic reloads:
+## Repository guide
 
-```sh
-pnpm dev --port 3100
-```
+| Area | Location | Purpose |
+| --- | --- | --- |
+| Website | `src/app/` | Existing URL routes and thin page wrappers |
+| Website | `src/features/` | Home, Services, Use cases, Resources, Company and Pricing content, metadata, components and artwork |
+| Website | `src/shared/` | One Shell, header, footer, brand system, shared UI, site facts and SEO helpers |
+| Website | `public/` | Reviewed publicly served assets and licence notices |
+| Engineering | `.github/`, `tools/`, `tests/`, `netlify/`, `patches/` | Team workflow, shared build tools, checks and hosting support |
+| Engineering | `docs/` | Current instructions, architecture and approved migration records |
+| Engineering | `archive/` | Preserved prior plans, retired platform specifications and immutable database history |
+| Private workspace | Ignored local folders | Credentials, original account captures and review artifacts; never GitHub or website content |
 
-Stop the preview before starting the development server on the same port. The built preview exercises hosting, redirects and search headers; development mode is for UI work. Local previews remain excluded from search indexing.
-
-## Contributing
-
-Contributions are welcome through pull requests. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the fork and branch workflow, checks and review expectations. Start with an issue for a substantial product or architecture change so its scope can be agreed before implementation.
-
-Public access allows anyone to fork the repository and propose changes. Merging requires repository write access; changes should go through review. A merge or a passing local check does not authorize a production deployment.
+Public **Developers** is a website navigation area. Future Etail API or SDK content is a separate product decision. It does not contain instructions for the engineers working on this repository. Existing vendor setup and integration guidance belongs to Resources. Contributor instructions live in [CONTRIBUTING.md](CONTRIBUTING.md) and engineering documentation.
 
 ## Checks
 
-Stop your local development or preview server and keep ports **3100 and 3101** free. Install the test browser, then run the complete verification sequence:
+Keep ports **3100 and 3101** free. Install Chromium, then run the complete sequence:
 
 ```sh
 pnpm exec playwright install chromium
 pnpm verify
 ```
 
-On Linux, Playwright may also require system libraries; use `pnpm exec playwright install --with-deps chromium` when needed. Dependency auditing and first-time bundling require network access.
+Linux may require `pnpm exec playwright install --with-deps chromium`. Dependency auditing and first-time bundling require network access.
 
 | Command | Purpose |
 | --- | --- |
-| `pnpm verify:public` | Lint, types, unit tests, architecture, build, browser journeys, accessibility and security checks |
-| `pnpm test:seo:production` | Check production metadata and indexing safeguards using a local server |
-| `pnpm package:netlify` | Build and package a local production-review candidate |
-| `pnpm verify:package` | Verify package contents, source identity and hosting boundaries |
+| `pnpm test:publication` | Check source, repository-only and private file placement |
+| `pnpm verify:public` | Lint, types, unit tests, architecture, build, browser journeys, accessibility and security |
+| `pnpm test:seo:production` | Verify production metadata, the exact sitemap and negative hosting contexts locally |
+| `pnpm package:netlify` | Build the local production-review package |
+| `pnpm verify:package` | Verify source identity, file inventory and runtime boundaries |
 
-`pnpm verify` runs all four commands in order. None uploads or deploys the website. The [GitHub workflow](.github/workflows/foundation.yml) runs these checks for pull requests against this repository's `main` branch.
+`pnpm verify` runs the four release commands in order. None deploys. The [GitHub workflow](.github/workflows/foundation.yml) runs these checks on the exact candidate. See [acceptance criteria](docs/ACCEPTANCE_TESTS.md) and [evidence requirements](docs/TEST_AND_EVIDENCE.md).
 
-## Repository guide
+## Contributing and releases
 
-| Path | Purpose |
-| --- | --- |
-| `src/app` | 32 core pages and six reference templates, plus metadata, robots, sitemap and 404 |
-| `src/ui` | Shared layout, navigation, artwork and interface components |
-| `src/shared`, `src/modules/public-site` | Product details, safe service links, metadata and illustrative calculations |
-| `public`, `assets/brand` | Original brand, card-network, wallet and other visual assets |
-| `netlify` | Edge request boundary, protected platform email compatibility and release checks |
-| `tests`, `tools`, `patches` | Automated checks, build/preview tooling and a documented dependency patch |
-| `docs`, `planning` | Architecture, decisions, current work and release evidence |
-| `archive/database`, `sources`, `contracts` | Preserved schema, requirements and research history; not active application services |
+Use a focused feature branch and a reviewed pull request. [CONTRIBUTING.md](CONTRIBUTING.md) explains file ownership, collaboration, conflict resolution and checks. Do not push feature changes directly to `main` or rewrite shared history.
 
-## Scope and releases
+The exact page counts, reference sources and approved legal scope are recorded in [tools/reference-release.json](tools/reference-release.json). This build-check file is public GitHub source, but must return 404 on the website. [File publication policy](docs/FILE_PUBLICATION_POLICY.md) explains this distinction.
 
-The active application is a public information website. Historical account code and database schemas are retained for reference; they are not setup instructions, customer-data backups or permission to reconnect retired services. The existing protected Netlify Emails handler is a platform compatibility exception; website pages do not call it.
-
-Preserve approved product wording, pricing, availability, authentic logos and the shared design. Service links use fixed destinations and must not forward customer identifiers, query strings, fragments or referrers. The Guides hub opens the two reference collections. Services, Platforms, Resources and Company share one navigation model. Pricing is a direct header link. Private research and unsupported reference routes are excluded.
-
-The candidate is prepared locally. Exactly 3,738 nonlegal URLs are eligible for the sitemap under the recorded production site, origin and environment guard. Local previews, legal pages, navigation payloads and errors remain noindex. Publication requires the reviewed PR and manual release process; passing local checks does not establish indexing or rankings.
-
-Release targets are bound in [project-targets.json](project-targets.json). Deployment is a separate maintainer operation under the [deployment runbook](docs/NETLIFY_DEPLOYMENT.md). Use the [current work context](docs/CURRENT_WORK_CONTEXT.md) and [source precedence](docs/SOURCE_PRECEDENCE.md) before acting on older documents. Coding agents must also follow [AGENTS.md](AGENTS.md).
+Current release status has one home: [docs/CURRENT_WORK_CONTEXT.md](docs/CURRENT_WORK_CONTEXT.md). Old release approvals and test counts in the archive are historical. A passing local check, PR merge or package does not authorize deployment. Follow the [manual Netlify runbook](docs/NETLIFY_DEPLOYMENT.md) when publication is explicitly authorized.
 
 ## Support and security
 
-- **Website bugs:** [open an issue](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/issues) with the affected page, reproduction steps and browser/viewport details. Remove personal information from screenshots.
-- **Product or account questions:** use the [Help center](https://etaildepot.com/help), rather than a public GitHub issue.
-- **Potential security vulnerabilities:** contact [compliance@etaildepot.com](mailto:compliance@etaildepot.com) privately. Do not post credentials, customer information or sensitive exploit details in public issues or pull requests.
+- Website bugs: [open an issue](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/issues) with the page, reproduction steps and browser/viewport. Remove private details from screenshots.
+- Product and account questions: use the [Help center](https://etaildepot.com/help).
+- Potential vulnerabilities: contact [compliance@etaildepot.com](mailto:compliance@etaildepot.com) privately. Do not post credentials, customer records or sensitive exploit details publicly.
 
 ## License and assets
 
-No repository-wide open-source license has been selected. Public visibility is not a license announcement. For licensing or reuse questions, contact [compliance@etaildepot.com](mailto:compliance@etaildepot.com). Preserve the existing notices and attribution for dependencies and third-party brand assets.
-
-The independent 8583 collection includes identified MIT and Apache 2.0 contributions with notices in `public/licenses`. ISO 20022 repository information has its own recorded reuse basis. These source specific terms do not grant a licence to the rest of this repository or to purchased ISO standards.
+No repository-wide open-source licence has been selected. Public visibility does not grant a licence. Existing dependency, reference-data and asset notices retain their own scope. See [dependency and licensing policy](docs/DEPENDENCIES_AND_LICENSING.md) and [brand asset provenance](docs/NETWORK_BRAND_ASSETS.md).

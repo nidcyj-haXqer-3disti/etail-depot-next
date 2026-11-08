@@ -1,53 +1,33 @@
-# Test strategy and evidence contract
+# Testing and evidence
 
-> **Original test inventory and historical implementation baseline.** Use [Product and technical design](PRODUCT_TECHNICAL_DESIGN.md) and [Delivery plan](../planning/DELIVERY_PLAN.md) for the current two-service scenarios and acceptance sequence. The initial handoff status and Personal/Household/Seller scripts below are historical requirements, not today's model or test results.
->
-> Evidence integrity, security, privacy, financial invariants, release approval and commercial obligations remain required. This notice changes model/status authority only; it does not waive tests or convert preserved plans and old counts into current completion evidence.
+[Acceptance criteria](ACCEPTANCE_TESTS.md) define the public behaviors to preserve. This document explains how to validate a candidate and record its limits. It does not restore the retired platform's database, financial or identity test suites.
 
-## What has and has not been tested
+## Commands
 
-The supplied Python tests validate the handoff's structure, target restrictions, fixture arithmetic and planning helper with mocked GitHub responses. They do not compile a new application, create a remote repository, exercise PostgreSQL, send an email, create a card, or deploy to Netlify. Every application acceptance case starts `not-implemented`.
+Use pinned Node and pnpm, the frozen lockfile and the existing Playwright configuration. Keep ports 3100 and 3101 free.
 
-## Required implementation test layers
+| Command | Scope |
+| --- | --- |
+| `pnpm lint`, `pnpm typecheck`, `pnpm test:unit` | Source quality, types and behavioral units |
+| `pnpm test:architecture`, `pnpm test:publication` | Allowed runtime, dependencies and source/asset placement |
+| `pnpm build` then `pnpm test:e2e` | Current static preview with Chromium desktop/mobile journeys |
+| `pnpm test:a11y` | Existing automated accessibility suite |
+| `pnpm test:security` | Credential/exposure checks and dependency audit |
+| `pnpm test:seo:production` | Exact approved indexing context, sitemap and negative hosting contexts |
+| `pnpm package:netlify`, `pnpm verify:package` | Local package, source identity and exact deployment boundary |
 
-| Layer | Required examples | Evidence |
-|---|---|---|
-| Domain unit | exact fees, plan changes, cap attribution, state transitions, policy composition | Test names/counts and failures/skips, exact commit |
-| Real PostgreSQL | empty-schema migrations, constraints, transaction rollback, scoped queries, journal integrity | Database engine/version, migration hashes, seeded fictional IDs |
-| Concurrency | shared backing, limits, payout/pledge race, duplicate card requests/events, retries after timeout | Two or more overlapping transactions, asserted persisted totals |
-| Provider contracts | mock issuance/payment/Identity/storage adapters, errors, delayed events, idempotent reconciliation | Request/response contracts with secrets redacted |
-| API | authentication, resource scope, body/path mismatch, method/content type, validation, idempotency, negative origins | Real server requests with response codes and sanitized errors |
-| Architecture | single card form/command/lifecycle, centralized authorization, no client financial writers | Static dependency checks plus behavioral route/component tests |
-| Browser | desktop/mobile new member, delegated cardholder, Household guardian, Seller payments, manager/operator | Playwright against real built server and PostgreSQL; screenshots and persisted state |
-| Accessibility | keyboard/dialogs, labels, errors, status announcements, focus, contrast, zoom | Automated report plus unresolved/manual items; no blanket certification |
-| Security | tenant isolation, SSRF, secrets scanning, session revocation, rate limits, permission changes, webhooks | Both allowed and denied paths; dependency audit findings triaged |
-| Hosting | Netlify framework adapter, functions, new DB/Identity/Blobs, protected previews, external HTTPS origin | Exact published commit/site/deploy/DB branch plus real hosted probes |
-| Human usability | account selection, finding Add card, explaining backing/obligation, finding a refund | Observations and user feedback, not a claim derived from green tests |
+For release candidates run, in order: `pnpm verify:public`, `pnpm test:seo:production`, `pnpm package:netlify`, `pnpm verify:package`. `pnpm verify` is their combined entry point. None publishes. GitHub uses the same required sequence.
 
-## Core scenario scripts
+Use additional WebKit and responsive/loading checks when the changed behavior needs them. WebKit is additional local coverage, not part of the current Chromium CI projects. Do not describe it as an actual iPhone or Safari-device test. The [paint standard](PAGE_PAINT_STANDARDS.md) specifies cold visits, refresh, delayed assets, split document delivery, early clicks and saved links.
 
-**Personal:** new verified fictional-profile member -> select plan with simulated fee -> select explicit account -> start and persist card request -> complete missing requirements -> add $100 collateral -> issue one card -> one practice-purchase action for $10 -> normal mock events complete it -> available $90, collateral $100, obligation $10 -> reload -> repayment/refund tests. Do not use an existing happy-path seed to stand in for signup.
+For documentation-only edits, check file destinations, linked paths, code examples and formatting. For moves, compare the original bytes, every active consumer and the resulting import/reference graph. Run broader application checks when tooling or packaging inputs change.
 
-**Household:** owner invites adult; other email cannot accept; intended adult can accept scoped assignment; Personal history stays private. Guardian creates funded supervised access; a $10 allocation never becomes independent credit. Revoking access invalidates next protected request. Resource visibility includes documents, aggregates, exports and notifications.
+## Record what happened
 
-**Seller:** named seller approval -> one payment request -> guest payment -> settlement -> reserve -> partial refund/dispute -> eligible payout. Reusable links accept separate payments; partial invoices cannot over-collect through a race. Available proceeds cannot be paid out and pledged for spending twice.
+Record the exact branch/commit or source fingerprint, commands, exit statuses, failures, corrections, reruns, test counts and skips. Include routes, viewport widths, browser engine and network conditions for UI work. Keep unredacted captures and detailed local artifacts out of Git. A sanitized source receipt can record hashes and results without embedding private originals.
 
-**Cards uniqueness:** two simultaneous submits of the same saved request and a new transport key create one provider operation and at most one card. Independent requests are allowed where policy permits. Provider timeout remains pending until reconciled. Changing target account/cardholder or request digest is not an idempotent replay.
+Preserve the distinction between static checks over all generated URLs and browser checks over selected routes. A screenshot after load does not prove first-paint behavior. Automated accessibility does not establish complete accessibility; a simulated walkthrough is not human user research. Laboratory timings are not field performance.
 
-**Backed authorization:** overlap $80 and $30 against $100 shared backing. At most $100 total is approved. Repeat across two cards and two people. Freeze blocks new authorization, but a valid late settlement is accounted for rather than discarded to preserve an artificial invariant.
+Do not count older evidence as a new run, hide failures with blanket skips, or weaken a reproduced regression. A previous green CI run does not verify changed source. A PR merge, package or ready deployment does not establish merchant activation, successful payments or account-term acceptance.
 
-## Evidence rules
-
-Record command, exit code, run URL when available, exact source SHA, runtime/dependency lock hash, database/migration identity, fixture/simulator mode, test counts, and date. Preserve an artifact hash when downloading CI evidence. A PR synthetic merge SHA may differ from its branch SHA; verify the source tree and record both.
-
-Never reuse historical app test counts, screenshots, reports or deployment receipts as evidence for the new app. No `continue-on-error` on required checks, blanket skip, fake success output, or a green checkbox inferred from a build starting.
-
-An HTTP 422 from a deliberately empty login request proves it reached validation; it is not a successful login. A ready deployment proves publication, not email delivery or tenant privacy. A migration log proves schema operations, not all workflows. A SMTP accepted response does not prove inbox placement.
-
-Do not record actual email tokens, passwords, session cookies, raw provider credentials or customer personal data in screenshots/trace artifacts. A real hosted login must use an approved tester-controlled mailbox; do not fetch the user's email or impersonate them without explicit authorization.
-
-## Release thresholds
-
-All required cases in `contracts/acceptance-cases.json` must have evidence or be explicitly blocked before a full-completion claim. Security/money/privacy blockers block public release; do not label them optional polish. Inaccessible provider capabilities are transparently unsupported, not simulated to resemble live capabilities.
-
-CI can test the isolated application first; hosted checks remain separate. The final report names all failed, skipped, manual and untested items. Required user feedback must include the question: **Can the tester find exactly one way to create a card in the selected account without being told which screen is the new one?**
+Hosted checks follow an authorized [manual release](NETLIFY_DEPLOYMENT.md) and are reported separately. The former platform test specification is retained in [history](../archive/project-history/docs/TEST_AND_EVIDENCE.md).
