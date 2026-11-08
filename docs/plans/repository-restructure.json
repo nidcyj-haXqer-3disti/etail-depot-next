@@ -26,7 +26,8 @@
     "stage2": "repository-stage2.json",
     "stage3": "repository-stage3.json",
     "stage4": "repository-stage4.json",
-    "stage5": "repository-stage5.json"
+    "stage5": "repository-stage5.json",
+    "audit": "repository-audit.json"
   },
   "categories": {
     "website": [
@@ -233,5 +234,12 @@
       }
     }
   ],
-  "activeBranch": "codex/restructure-stage5-20261108"
+  "activeBranch": "codex/restructure-audit-20261108",
+  "audit": {
+    "date": "2026-11-08",
+    "status": "complete-local",
+    "unresolvedFindings": 0,
+    "applicationChanged": false,
+    "publicationPerformed": false
+  }
 }

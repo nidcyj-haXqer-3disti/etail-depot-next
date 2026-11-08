@@ -1,0 +1,137 @@
+{
+  "scope": "Independent local audit of all five completed repository-restructure stages",
+  "status": "complete-local",
+  "date": "2026-11-08",
+  "branch": "codex/restructure-audit-20261108",
+  "baseCommit": "640c6ad428c5f7ccc4d456e472a88c61d5b646b3",
+  "publishedBaseline": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+  "sourceFingerprint": "870ca5d021acc29ded6360937f6c9927223e678712d5d410f960e2d45348c3d7",
+  "applicationChanged": false,
+  "publicationPerformed": false,
+  "result": "No unresolved restructuring defects found. Only engineering audit records were updated.",
+  "originalFiles": {
+    "total": 779,
+    "disposition": {
+      "unchanged": 162,
+      "modified": 185,
+      "moved intact": 430,
+      "documented adapter replacement": 2
+    },
+    "unexplainedMissingFiles": 0
+  },
+  "previousWorkingCopy": {
+    "checkedPaths": 953,
+    "preservedExistingFiles": 800,
+    "preservedAbsentPaths": 153,
+    "findings": []
+  },
+  "dependencies": {
+    "modules": 330,
+    "resolvedLocalImportEdges": 1015,
+    "caseMismatches": 0,
+    "unexpectedUnresolvedImports": 0,
+    "runtimeCycles": 0,
+    "generatedImport": "The email wrapper imports vendor.cjs only in the generated function directory; its bytes match the reviewed handler SHA256."
+  },
+  "sourceReview": {
+    "modifiedCodeFiles": 159,
+    "importsOnly": 101,
+    "nonImportChangesReviewed": 58,
+    "newSourceFiles": 99,
+    "removedAdapters": "The two original service-detail selector/adapter files were replaced in Stage 3; no original file is unaccounted for."
+  },
+  "preservation": {
+    "baselineCommit": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+    "baselineExport": "Stage 1 export retained before Stage 2; original published website source bytes identical",
+    "unchangedPublicFiles": 39,
+    "unchangedDatabaseHistoryFiles": 74,
+    "unchangedConfigAndPatchFiles": 13,
+    "identicalSourceAssets": 75,
+    "protectedLegalAndReferenceFiles": 14,
+    "unchangedRouteEntries": 54,
+    "unchangedPublishedScopeAndLicences": true,
+    "edgeLogicUnchanged": true,
+    "dependenciesAndExistingScriptsUnchanged": true,
+    "publicationCheckAdded": "node tools/verify-file-publication.mjs"
+  },
+  "generatedOutput": {
+    "pagesCompared": 3752,
+    "pagesMatched": 3752,
+    "context": "Both original and audit exports use preview indexing. Production indexing is validated separately.",
+    "comparison": "Ignore compiled CSS classes, React-generated IDs, non-JSON scripts and stylesheet/preload links. Preserve content, structured data, semantic elements, stable anchors, link destinations, metadata and image references.",
+    "contentExpressionsUnchanged": 23,
+    "publicAssetBytesUnchanged": 39,
+    "sourceAssetBytesUnchanged": 75
+  },
+  "generators": {
+    "guidePreviewEntries": 53,
+    "inlineBrandOutputs": "Reproduced byte-for-byte in an isolated fixture",
+    "socialPreviewImages": 9,
+    "socialOutputs": "Reproduced byte-for-byte in an isolated fixture"
+  },
+  "documentation": {
+    "archivedOrGroupedFilesPreserved": 246,
+    "databaseHistoryFilesUnchanged": 74,
+    "activeDocuments": 20,
+    "activeLocalLinksResolved": 139
+  },
+  "freshVerification": {
+    "commands": [
+      {
+        "command": "pnpm verify:public",
+        "exitCode": 0
+      },
+      {
+        "command": "pnpm test:seo:production",
+        "exitCode": 0,
+        "log": "seo-production.log"
+      },
+      {
+        "command": "pnpm package:netlify",
+        "exitCode": 0,
+        "log": "package-netlify.log"
+      },
+      {
+        "command": "pnpm verify:package",
+        "exitCode": 0,
+        "log": "verify-package.log"
+      }
+    ],
+    "unitPassed": 449,
+    "chromiumPassed": 322,
+    "chromiumSkipped": 1,
+    "skipReason": "Existing desktop skip for a mobile-only scenario",
+    "accessibilityPassed": 156,
+    "indexableUrls": 3740,
+    "noindexLegalAndPolicyPages": 12,
+    "packageStaticFiles": 18945,
+    "dependencyAudit": "No known vulnerabilities found"
+  },
+  "priorVisualEvidence": {
+    "record": "repository-stage5.json",
+    "sameApplicationFingerprint": true,
+    "pixelIdenticalViews": 86,
+    "webkitPassed": 76,
+    "repeatedThisAudit": false,
+    "reason": "Application, asset, test and build inputs are unchanged. Fresh Chromium and accessibility runs and the all-page output comparison provide the new audit evidence."
+  },
+  "unresolvedFindings": [],
+  "remainingReleaseWork": [
+    "Obtain authorization to push this candidate and open the prepared PR.",
+    "Run the bound GitHub workflow on the exact candidate; review and revalidate if main changes.",
+    "Merge under applicable authorization, then manually trigger the bound Netlify Git build with the existing Emails plugin and final artifact verifier.",
+    "Confirm deployed commit and ready status, then check hosted core pages, assets, mobile navigation/refresh, sitemap, canonical/indexing protections, compression/cache/security headers and source-file 404s."
+  ],
+  "limits": [
+    "Local checks do not guarantee zero defects in every environment.",
+    "No GitHub CI run or hosted validation of this unpublished candidate occurred.",
+    "The audit verifies preservation of existing legal/reference text, not legal adequacy or provider-system behavior."
+  ],
+  "evidenceLogs": {
+    "verify-public.log": "eddb8563b30af81dac8d70f2c2c3c16a6544c8ca5963a50fa75fb7490c117fd9",
+    "seo-production.log": "5805f3474f024899fcee061a3becd26bb584b971ff297294b202a0259d2778b5",
+    "package-netlify.log": "6c6620063d86acc51e2da96ea024d426bc7577d60ffcb95ef4bcd4e1f7384444",
+    "verify-package.log": "ab3cbd41053fc8f8bb309589e758633eace462e4626bc664c30400fe7df5dcb0",
+    "guide-generator.log": "93662cd969814754b6a118e5c2f7658da7663660ee7c7a22635a0cd161747bdd"
+  }
+}
