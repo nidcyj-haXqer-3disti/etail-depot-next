@@ -9,7 +9,7 @@ export const refundsContent = {
     "intro": "Find the transaction, confirm the amount still eligible to return and follow the result. Keep the refund linked to the original order.",
     "action": {
       "label": "Explore refund guidance",
-      "href": "/docs/refunds-and-disputes#refund-payment"
+      "href": "/developers/api-reference#refund-payment"
     },
     "art": {
       "title": "A card payment status determines whether a reversal, void or refund is available",
@@ -50,7 +50,7 @@ export const refundsContent = {
           {
             "title": "Payment already disputed",
             "text": "Follow the dispute instructions before issuing a refund. Returning funds does not automatically close the case.",
-            "href": "/disputes"
+            "href": "/services/disputes"
           }
         ]
       }

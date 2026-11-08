@@ -1,11 +1,11 @@
-import { LEGAL_CENTER_PATHS } from "../../src/shared/site/legal-paths";
+import { CORE_PUBLIC_PATHS } from "../../src/shared/site/public-page-inventory";
 import AxeBuilder from "@axe-core/playwright";
 import {expect,test,type Page} from "@playwright/test";
 import {openMainNavigation} from "./public-header";
 
-import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
 
-const publicRoutes = ["/resources/woocommerce-gateway-integration", "/resources/shopify-gateway-integration", ...LEGAL_CENTER_PATHS, ...COMMERCIAL_PATHS, "/", "/docs", "/docs/merchant-onboarding", "/docs/integration-access", "/docs/checkout", "/docs/payment-requests", "/docs/payment-status", "/docs/refunds-and-disputes", "/docs/payouts", "/docs/webhooks", "/docs/testing-and-launch", "/software-partners", "/online-businesses", "/credit-card-services", "/payment-acceptance-service", "/help", "/privacy", "/terms", "/guides"];
+
+const publicRoutes = CORE_PUBLIC_PATHS;
 
 for (const width of [1440,390,320]) {
   for(const route of publicRoutes) {
@@ -26,11 +26,11 @@ for (const width of [1440,390,320]) {
       expect(brokenImages).toEqual([]);
       const question=page.locator("main summary:visible:not(.wallet-guide-disclosure > summary)").first();
       if(await question.count())await question.click();
-      if(route==="/credit-card-services"){
+      if(route==="/services/card-services"){
         if(width<851)await page.locator(".wallet-guide-disclosure summary").click();
         await expect(page.locator(".wallet-card-art")).toBeVisible();
       }
-      if(route==="/online-businesses"){
+      if(route==="/use-cases/online-businesses"){
         await expect(page.locator(".payment-service-explorer")).toBeVisible();
         await expect(page.getByRole("tablist",{name:"Payment journey views",exact:true}).getByRole("tab",{name:"Checkout",exact:true})).toHaveAttribute("aria-selected","true");
       }
@@ -39,10 +39,10 @@ for (const width of [1440,390,320]) {
       expect(result.incomplete.filter(({id})=>id==="aria-prohibited-attr").map(({id,nodes})=>({id,nodes:nodes.map(node=>node.target)}))).toEqual([]);
       expect(await page.evaluate(()=>Math.max(document.body.scrollWidth,document.documentElement.scrollWidth)-innerWidth)).toBeLessThanOrEqual(1);
       expect(errors).toEqual([]);
-      if (["/payment-methods", "/docs/integration-access", "/software-partners"].includes(route) && width !== 320) {
+      if (["/services/payment-methods", "/developers/getting-started", "/use-cases/software-platforms"].includes(route) && width !== 320) {
         await page.screenshot({path:testInfo.outputPath(`${route.slice(1).replaceAll("/","_")}-${width}.png`),fullPage:true});
       }
-      if (route === "/payouts-and-reconciliation" && width === 1440) await page.locator("#reconciliation").screenshot({path:testInfo.outputPath("reconciliation-section-desktop.png")});
+      if (route === "/services/payouts" && width === 1440) await page.locator("#reconciliation").screenshot({path:testInfo.outputPath("reconciliation-section-desktop.png")});
       const nav=await openMainNavigation(page);
       if(width<960){
         const expandedResult=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21a","wcag21aa","wcag22aa"]).analyze();
@@ -67,7 +67,7 @@ async function expectAccessible(page: Page) {
 for(const width of [1440,320]){
   test(`payment checkout, records and payout remain keyboard accessible at ${width}px`,async({page})=>{
     await page.setViewportSize({width,height:900});
-    await page.goto("/online-businesses");
+    await page.goto("/use-cases/online-businesses");
     await page.evaluate(()=>document.fonts.ready);
     const explorer=page.locator(".payment-service-explorer");
     const views=explorer.getByRole("tablist",{name:"Payment journey views",exact:true});
@@ -172,7 +172,7 @@ for(const width of [1440,320]){
     await amount.fill("100");
     await expect(amount).toHaveAttribute("aria-invalid", "false");
     await expectAccessible(page);
-    await page.goto("/payment-acceptance-service");
+    await page.goto("/services/merchant-services");
     await expect(page.locator("#payment-operations .ec-scope")).toBeVisible();
     await expect(page.locator("#payment-operations .ec-scope")).toContainText("First payouts, reviews, holds, reserves and bank processing can affect timing.");
     for(const disclosure of [
@@ -195,7 +195,7 @@ for(const width of [1440,320]){
 
   test(`both wallet guides and their steps remain keyboard accessible at ${width}px`,async({page})=>{
     await page.setViewportSize({width,height:900});
-    await page.goto("/credit-card-services");
+    await page.goto("/services/card-services");
     await page.evaluate(()=>document.fonts.ready);
     const disclosure=page.locator(".wallet-guide-disclosure");
     const summary=disclosure.locator("summary");
@@ -242,7 +242,7 @@ for (const width of [1440, 390, 320]) {
   test(`ISO 20022 collection, table and code remain accessible at ${width}px`, async ({ page }) => {
     test.setTimeout(60_000);
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/guides/iso-20022");
+    await page.goto("/resources/guides/iso-20022");
     const alphabet = page.getByRole("navigation", {name:"Code sets by first letter"});
     await alphabet.getByRole("link", {name:"P", exact:true}).focus();
     await page.keyboard.press("Enter");
@@ -250,17 +250,17 @@ for (const width of [1440, 390, 320]) {
     await expect(page.locator("#sets-p")).toBeInViewport();
     await expectAccessible(page);
     // Purpose is the largest registered-code table in this release.
-    const purpose = page.locator('main a[href="/guides/iso-20022/purpose"]');
+    const purpose = page.locator('main a[href="/resources/guides/iso-20022/purpose"]');
     await purpose.focus(); await page.keyboard.press("Enter");
     await expect(page.getByRole("table")).toHaveCount(1);
     await expect(page.getByRole("columnheader")).toHaveText(["Code", "Published name and definition"]);
     await expect(page.locator("tbody tr")).toHaveCount(366);
     await expectAccessible(page);
-    await page.goto("/guides/iso-20022/payment-transaction-status/acsp");
+    await page.goto("/resources/guides/iso-20022/payment-transaction-status/acsp");
     const peers = page.locator("#other-code-sets details");
     await peers.locator("summary").focus(); await page.keyboard.press("Enter");
     await expect(peers).toHaveAttribute("open", "");
-    await expect(peers.locator('a[href="/guides/iso-20022/payment-group-status/acsp"]')).toBeVisible();
+    await expect(peers.locator('a[href="/resources/guides/iso-20022/payment-group-status/acsp"]')).toBeVisible();
     await expectAccessible(page);
     await page.keyboard.press("Space");
     await expect(peers).not.toHaveAttribute("open");
@@ -270,9 +270,9 @@ for (const width of [1440, 390, 320]) {
   test(`ISO 8583 tables, code identity and source notes remain accessible at ${width}px`, async ({ page }) => {
     test.setTimeout(60_000);
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/guides/iso-8583");
+    await page.goto("/resources/guides/iso-8583");
     await expectAccessible(page);
-    const fields = page.locator('main a[href="/guides/iso-8583/fields"]');
+    const fields = page.locator('main a[href="/resources/guides/iso-8583/fields"]');
     await fields.focus(); await page.keyboard.press("Enter");
     await expect(page.getByRole("table").first().getByRole("columnheader")).toHaveText(["Field", "Profile label", "ASCII container"]);
     const note = page.locator(".reference-notes");
@@ -285,7 +285,7 @@ for (const width of [1440, 390, 320]) {
     await expect(page.getByRole("heading", {level:1})).toContainText("39");
     await expect(page.getByRole("complementary", {name:"Reference scope and sources"})).toContainText("default_ascii");
     await expectAccessible(page);
-    for (const path of ["/guides/iso-8583/encoding", "/guides/iso-8583/messages", "/guides/iso-8583/messages/2100"]) {
+    for (const path of ["/resources/guides/iso-8583/encoding", "/resources/guides/iso-8583/messages", "/resources/guides/iso-8583/messages/2100"]) {
       await page.goto(path);
       await expectAccessible(page);
     }
@@ -295,7 +295,7 @@ for (const width of [1440, 390, 320]) {
 for (const width of [1440, 960, 390, 320]) {
   test(`navigation disclosures are accessible at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/guides/iso-8583/messages/2100");
+    await page.goto("/resources/guides/iso-8583/messages/2100");
     const menu = page.getByRole("banner").getByRole("button", { name: "Menu", exact: true });
     if (await menu.isVisible()) await menu.click();
     const nav = page.getByRole("navigation", { name: "Main navigation" });
@@ -343,10 +343,10 @@ for (const javaScriptEnabled of [true, false]) {
       } else {
         await expect(checkout.getByRole("group", {name: "Card details", exact: true})).toContainText("Card number");
       }
-      await page.goto(`${baseURL}/payment-acceptance-service`);
+      await page.goto(`${baseURL}/services/merchant-services`);
       await expect(page.locator("#refunds-and-disputes")).toContainText("Manage a refund");
       expect(await page.locator(".cw-workbench").textContent()).toContain("Designer sneaker");
-      await page.goto(`${baseURL}/software-partners`);
+      await page.goto(`${baseURL}/use-cases/software-platforms`);
       await expect(page.locator("#integration")).toContainText("Account structure");
       const platformArt = page.locator("[data-attention-art=platform]");
       await expect(platformArt).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records.*Access and account structure depend on the approved integration/);

@@ -37,7 +37,7 @@ export function ShopifyGatewayGuide() {
     "@context": "https://schema.org", "@type": "TechArticle",
     headline: "Connect Shopify to Cybersource", description: "A screenshot guide to installing and activating Cybersource for your Shopify checkout with Trolleys, powered by Etail Depot.",
     url: `https://etaildepot.com${shopifyGuidePath}`, dateModified: "2026-11-07", inLanguage: "en-US",
-    author: { "@type": "Organization", name: "Etail Depot", url: "https://etaildepot.com/company" },
+    author: { "@type": "Organization", name: "Etail Depot", url: "https://etaildepot.com/company/about" },
     publisher: { "@type": "Organization", name: "Etail Depot", url: "https://etaildepot.com" },
   };
   return <Shell><article data-integration-guide className={`${styles.page} ${guide.page}`}>
@@ -71,7 +71,7 @@ export function ShopifyGatewayGuide() {
             <div><dt>Cybersource account email</dt><dd>The email from Trolleys with your Organization ID, Username and password setup instructions.</dd></div>
             <div><dt>Your payment settings</dt><dd>The cards, currencies, payment capture and 3D Secure settings confirmed by Trolleys for your store.</dd></div>
           </dl>
-          <p className={styles.note}><strong>Need help?</strong> <Link prefetch={false} href="/contact#account-support">Contact Trolleys support.</Link></p>
+          <p className={styles.note}><strong>Need help?</strong> <Link prefetch={false} href="/company/contact#account-support">Contact Trolleys support.</Link></p>
         </section>
         <section id="setup">
           <h2>Follow one step at a time</h2>

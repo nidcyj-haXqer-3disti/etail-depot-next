@@ -1,12 +1,12 @@
 import { servicePageMetadata } from "@/shared/seo/metadata";
 
 export const pageDetails = { title: "Merchant Services for Software Platforms", description: "Merchant accounts, credit card processing, checkout and reporting for software platforms, with guidance on integration and merchant eligibility." } as const;
-export const metadata = servicePageMetadata("/software-partners", pageDetails);
+export const metadata = servicePageMetadata("/use-cases/software-platforms", pageDetails);
 
 import { industryUseCaseNavigation } from "@/shared/site/industry-use-cases";
 import { canonicalOrigin, publicPageModified } from "@/shared/seo/metadata";
-export function platformPageJsonLd(path: "/software-partners"): string {
-  const overviewPath = "/software-partners";
+export function platformPageJsonLd(path: "/use-cases/software-platforms"): string {
+  const overviewPath = "/use-cases/software-platforms";
   if (path !== overviewPath) throw new Error("Unknown software platform page.");
   const page = pageDetails;
   const url = new URL(path, canonicalOrigin).href;

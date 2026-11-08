@@ -1,8 +1,7 @@
-import { documentationMetadata } from "@/features/resources/documentation/catalog";
-import type { DocArticle } from "@/features/resources/documentation/types";
+import type { DocArticle } from "@/shared/ui/reading-guide/types";
 
 export const merchantOnboardingArticle: DocArticle = {
-    "introduction": documentationMetadata["/docs/merchant-onboarding"].description,
+    "introduction": "Enter your email on Trolleys Welcome before choosing Register or Sign In. Follow the illustrated steps to create or access your merchant account.",
     "prerequisites": [],
     "sections": [
       { "id": "create-account", "title": "Create your merchant login", "illustratedGuide": "registration" },

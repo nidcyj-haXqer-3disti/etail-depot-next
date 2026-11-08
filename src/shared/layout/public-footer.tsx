@@ -22,7 +22,7 @@ export function PublicFooter() {
         <div className="public-footer-utilities">
           <PaymentPortalLink intent="sign-in" className="public-footer-sign-in" />
           <nav className="public-footer-legal" aria-label="Footer legal">
-            <Link prefetch={false} href="/privacy">Privacy</Link><Link prefetch={false} href="/terms">Terms</Link>
+            <Link prefetch={false} href="/company/privacy">Privacy</Link><Link prefetch={false} href="/company/terms">Terms</Link>
           </nav>
         </div>
       </div>

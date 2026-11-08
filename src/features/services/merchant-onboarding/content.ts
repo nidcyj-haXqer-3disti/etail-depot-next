@@ -15,7 +15,7 @@ export const merchantOnboardingContent = {
     },
     "secondaryAction": {
       "label": "Discuss your business first",
-      "href": "/contact#payment-review"
+      "href": "/company/contact#payment-review"
     },
     "note": `${merchantAccountGuidance.application} Account approval and setup are required.`,
     "art": {

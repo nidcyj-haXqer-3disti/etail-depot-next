@@ -38,7 +38,7 @@ export function AboutPageContent({ page }: { page: CommercialPage }) {
       <header className={styles.intro}><h1>{page.heading}</h1><p>{page.intro}</p></header>
       <div className={styles.story}>{page.sections[0].items.map(item => <p key={item.title}>{item.text}</p>)}</div>
       <section className={styles.identity} aria-label="Company and account information">
-        <p>{legalIdentity.company} operates as a <Link href="/payment-facilitator">nonbank payment facilitator</Link>. We are not a bank. Merchant accounts require review and approval. Card services have separate eligibility requirements, credit limits and account terms.</p>
+        <p>{legalIdentity.company} operates as a <Link href="/services/payment-facilitator">nonbank payment facilitator</Link>. We are not a bank. Merchant accounts require review and approval. Card services have separate eligibility requirements, credit limits and account terms.</p>
       </section>
       <div className={styles.contact}><p>For business and partnership inquiries, <Link href={page.action.href}>{page.action.label.toLowerCase()}</Link>.</p></div>
     </div>
@@ -46,5 +46,5 @@ export function AboutPageContent({ page }: { page: CommercialPage }) {
 }
 
 export function AboutPage() {
-  return <Shell><CommercialStructuredData page={aboutContent} path="/company" /><AboutPageContent page={aboutContent} /></Shell>;
+  return <Shell><CommercialStructuredData page={aboutContent} path="/company/about" /><AboutPageContent page={aboutContent} /></Shell>;
 }

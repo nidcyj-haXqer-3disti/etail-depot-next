@@ -41,5 +41,5 @@ function ContactOptions() {
 
 export function ContactPage() {
   const page = contactContent;
-  return <Shell><CommercialStructuredData page={contactContent} path="/contact" /><div className="brand-page commercial-page enterprise-support company-context cw-company company-context-contact"><ContactHero heading={page.heading} intro={page.intro} /><ContactOptions /></div></Shell>;
+  return <Shell><CommercialStructuredData page={contactContent} path="/company/contact" /><div className="brand-page commercial-page enterprise-support company-context cw-company company-context-contact"><ContactHero heading={page.heading} intro={page.intro} /><ContactOptions /></div></Shell>;
 }

@@ -9,7 +9,7 @@ export function GuideDirectory() {
   return <div className="guides-directory page-container cw-guides">
     <header className="guides-directory-heading"><h1>Guides</h1><p className="guides-directory-intro">Set up your merchant account, connect your store and look up payment codes.</p></header>
     <section className="guides-setup" aria-label="Setup guides">
-      <Link href="/docs/merchant-onboarding" className="guides-setup-card">
+      <Link href="/resources/merchant-account-setup" className="guides-setup-card">
         <Icon name="business" /><h2>Merchant account setup</h2>
         <p>Enter your email, create a login or return to your application.</p>
         <span className="guides-setup-format">Step by step with screenshots</span>

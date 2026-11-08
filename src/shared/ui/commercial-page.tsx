@@ -19,9 +19,9 @@ import "../styles/company-context.css";
 import "../styles/enterprise-support.css";
 
 export function CommercialPage({ path, page, hero, artwork, offer, source }: { path: string; page: PageContent; hero?: ReactNode; artwork?: ReactNode; offer?: ReactNode; source?: ReactNode }) {
-  const attention = path === "/switch-payment-providers" ? " attention-site attention-provider" : path === "/pricing" ? " attention-site attention-pricing" : "";
-  const refined = !["/trust", "/payment-facilitator"].includes(path);
-  const contextKind = path === "/trust" ? "trust" : path === "/payment-facilitator" ? "facilitator" : undefined;
+  const attention = path === "/use-cases/switch-merchant-services" ? " attention-site attention-provider" : path === "/pricing" ? " attention-site attention-pricing" : "";
+  const refined = !["/company/security", "/services/payment-facilitator"].includes(path);
+  const contextKind = path === "/company/security" ? "trust" : path === "/services/payment-facilitator" ? "facilitator" : undefined;
   return <Shell><CommercialStructuredData path={path} page={page} /><div className={`brand-page commercial-page enterprise-support${attention}${refined ? ` service-craft cw-commercial${page.art.layout || path === "/pricing" ? " service-craft-wide" : ""}` : ` company-context cw-company company-context-${contextKind ?? "contact"}`}`}>
     {hero ?? <section className="commercial-hero"><div className="container">
       <div className="commercial-hero-copy"><div>{page.label !== page.heading.replace(/\.$/, "") && <p className="eyebrow">{page.label}</p>}<h1>{page.heading}</h1></div><div><p className="commercial-lead">{page.intro}</p>

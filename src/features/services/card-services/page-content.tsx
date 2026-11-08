@@ -23,7 +23,7 @@ export default function CardServicesPage() {
   return <Shell><PublicPageStructuredData json={pageJsonLd()} /><div className="consumer-page consumer-product consumer-cards service-blueprint card-craft enterprise-support cw-cards">
     <ServiceDetailHero label="Card services" title="Secured credit for your digital wallet."
       intro={<>A virtual {cardProduct.creditType} backed by your security deposit. Use it with Apple&nbsp;Wallet or Google&nbsp;Wallet, where supported.</>}
-      actions={<Link className="button primary" href="/contact#cards">Ask about card services</Link>}
+      actions={<Link className="button primary" href="/company/contact#cards">Ask about card services</Link>}
       note="An inquiry is not an application."
       artwork={<CardServicesArt cardFace={<LedgixCardFace />} title="A virtual secured credit card backed by a separate security deposit" caption="Your deposit backs the account. Repay purchases separately under your cardholder agreement." />}
     />

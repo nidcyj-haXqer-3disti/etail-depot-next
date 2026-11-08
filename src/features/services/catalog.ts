@@ -8,13 +8,13 @@ import { refundsContent } from "@/features/services/refunds/content";
 import { disputesContent } from "@/features/services/disputes/content";
 
 export const SERVICE_DETAIL_PAGES = {
-  "/merchant-onboarding": merchantOnboardingContent,
-  "/payment-methods": paymentMethodsContent,
-  "/ach-payments": achPaymentsContent,
-  "/payouts-and-reconciliation": payoutsContent,
-  "/reconciliation": reconciliationContent,
-  "/refunds-and-disputes": refundsContent,
-  "/disputes": disputesContent,
+  "/services/merchant-onboarding": merchantOnboardingContent,
+  "/services/payment-methods": paymentMethodsContent,
+  "/services/ach-payments": achPaymentsContent,
+  "/services/payouts": payoutsContent,
+  "/services/reconciliation": reconciliationContent,
+  "/services/refunds": refundsContent,
+  "/services/disputes": disputesContent,
 } as const;
 
 export type ServiceDetailPath = keyof typeof SERVICE_DETAIL_PAGES;

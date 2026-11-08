@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { expectCompleteGuidePaint } from "./guide-rendering";
 
 test("page families do not paint an incomplete header during document delivery", async ({ page, request, baseURL }) => {
-  for (const path of ["/", "/payment-methods", "/legal/merchant-services", "/guides/iso-20022/purpose"]) {
+  for (const path of ["/", "/services/payment-methods", "/company/legal/merchant-services", "/resources/guides/iso-20022/purpose"]) {
     await expectCompleteGuidePaint(page, request, baseURL, path, "", "h1");
   }
 });
@@ -13,7 +13,7 @@ test("responsive artwork keeps its initial layout while application scripts arri
   const held = new Promise<void>(resolve => { release = resolve; });
   await page.route("**/*.js", async route => { await held; await route.continue(); });
   try {
-    await page.goto(mobile ? "/software-partners#industries" : "/credit-card-services#wallets", { waitUntil: "commit" });
+    await page.goto(mobile ? "/use-cases/software-platforms#industries" : "/services/card-services#wallets", { waitUntil: "commit" });
     await page.waitForFunction(() => [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
     const artwork = page.locator(mobile ? ".industry-cases" : ".wallet-guide-disclosure");
     if (mobile) await expect(artwork.locator("article > details[open]")).toHaveCount(0);
@@ -30,7 +30,7 @@ test("reference filters reserve their final layout before becoming interactive",
   const held = new Promise<void>(resolve => { release = resolve; });
   await page.route("**/*.js", async route => { await held; await route.continue(); });
   try {
-    await page.goto("/guides/iso-20022/purpose", { waitUntil: "commit" });
+    await page.goto("/resources/guides/iso-20022/purpose", { waitUntil: "commit" });
     const input = page.getByRole("searchbox", { name: "Filter this code set" });
     await expect(input).toBeVisible(); await expect(input).toBeDisabled();
     const status = page.getByRole("status"); await expect(status).toHaveText("All 366 codes");
@@ -48,7 +48,7 @@ test("a responsive artwork choice made before hydration is preserved", async ({ 
   const held = new Promise<void>(resolve => { release = resolve; });
   await page.route("**/*.js", async route => { await held; await route.continue(); });
   try {
-    await page.goto(mobile ? "/software-partners#industries" : "/credit-card-services#wallets", { waitUntil: "commit" });
+    await page.goto(mobile ? "/use-cases/software-platforms#industries" : "/services/card-services#wallets", { waitUntil: "commit" });
     const details = page.locator(mobile ? "#freight-platforms > details" : ".wallet-guide-disclosure");
     if (mobile) await expect(details).not.toHaveAttribute("open");
     else await expect(details).toHaveAttribute("open", "");
@@ -67,7 +67,7 @@ test("payment logos keep their geometry before the image responses arrive", asyn
   const held = new Promise<void>(resolve => { release = resolve; });
   await page.route(/\.(png|svg|webp|jpe?g)(\?.*)?$/, async route => { await held; await route.continue(); });
   try {
-    await page.goto("/payment-methods", { waitUntil: "commit" });
+    await page.goto("/services/payment-methods", { waitUntil: "commit" });
     await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
       [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet) &&
       document.querySelector(".public-footer-navigation")?.getAttribute("data-compact") != null);
@@ -86,7 +86,7 @@ test("payment logos keep their geometry before the image responses arrive", asyn
 
 
 test("shared navigation does not download unselected pages during startup", async ({ page }) => {
-  for (const path of ["/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", "/docs/merchant-onboarding"]) {
+  for (const path of ["/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", "/resources/merchant-account-setup"]) {
     const prefetched: string[] = [];
     const record = (request: import("@playwright/test").Request) => {
       if (request.headers()["next-router-prefetch"] === "1") prefetched.push(new URL(request.url()).pathname);
@@ -100,7 +100,7 @@ test("shared navigation does not download unselected pages during startup", asyn
   }
   if (page.viewportSize()!.width < 960) await page.getByRole("button", { name: "Menu", exact: true }).click();
   await page.locator("header").getByRole("link", { name: "Contact sales", exact: true }).click();
-  await expect(page).toHaveURL(/\/contact$/);
+  await expect(page).toHaveURL(/\/company\/contact$/);
   await expect(page.locator("h1")).toBeVisible();
 });
 
@@ -268,9 +268,11 @@ test("first visits keep render-blocking CSS within page-family budgets", async (
     ["/", 74_000],
     ["/resources/shopify-gateway-integration", 108_000],
     ["/resources/woocommerce-gateway-integration", 108_000],
-    ["/docs/merchant-onboarding", 125_000],
-    ["/help", 55_000],
-    ["/guides/iso-20022/purpose", 65_000],
+    ["/resources/merchant-account-setup", 125_000],
+    ["/developers/getting-started", 85_000],
+    ["/developers/api-reference", 85_000],
+    ["/resources/help", 55_000],
+    ["/resources/guides/iso-20022/purpose", 65_000],
   ] as const) {
     await page.goto(path);
     const stylesheets = await page.locator('link[rel="stylesheet"]').evaluateAll(links =>
@@ -288,7 +290,7 @@ test("first visits keep render-blocking CSS within page-family budgets", async (
 
 
 test("opening artwork symbols paint without a separate image response or hydration", async ({ page }) => {
-  for (const path of ["/", "/software-partners", "/switch-payment-providers"]) {
+  for (const path of ["/", "/use-cases/software-platforms", "/use-cases/switch-merchant-services"]) {
     let release = () => {};
     const held = new Promise<void>(resolve => { release = resolve; });
     await page.route(/(?:\/symbol\.[^/]+\.png|\.js)(\?.*)?$/, async route => { await held; await route.continue(); });

@@ -9,7 +9,7 @@ export const payoutsContent = {
     "intro": "See the payments and adjustments behind each payout. Follow the amount from your account records to the deposit at your bank.",
     "action": {
       "label": "Discuss your payout setup",
-      "href": "/contact#payment-review"
+      "href": "/company/contact#payment-review"
     },
     "note": "Payout schedules, reserves, reviews and bank processing depend on your account terms.",
     "art": {
@@ -43,7 +43,7 @@ export const payoutsContent = {
           {
             "title": "Not yet received",
             "text": "Check the payout status, schedule and bank holidays. Contact merchant support with the payout reference if it is overdue.",
-            "href": "/contact#account-support"
+            "href": "/company/contact#account-support"
           },
           {
             "title": "Failed or returned",
@@ -52,7 +52,7 @@ export const payoutsContent = {
           {
             "title": "A different amount",
             "text": "Compare included transactions and adjustments with the bank credit before closing the period.",
-            "href": "/reconciliation"
+            "href": "/services/reconciliation"
           }
         ]
       }

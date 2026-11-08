@@ -6,8 +6,8 @@ const cardFeesDescription = productFacts.cards.annualFeeDollars === productFacts
 import { publicPageMetadata } from "@/shared/seo/metadata";
 
 export const pageDetails = { title: "Card Services: Ledgix Secured Credit Card", description: `${cardProduct.name}: virtual ${cardProduct.creditType}, $${productFacts.cards.minimumDepositDollars} minimum deposit, ${cardFeesDescription}. ${productFacts.cards.repayment}.` } as const;
-export const metadata = publicPageMetadata("/credit-card-services", pageDetails);
+export const metadata = publicPageMetadata("/services/card-services", pageDetails);
 import { publicPageJsonLd } from "@/shared/seo/structured-data-builders";
 import { pageDetails as homeDetails } from "@/features/home/metadata";
 import { serviceLabels } from "@/shared/site/service-language";
-export const pageJsonLd = () => publicPageJsonLd("/credit-card-services", pageDetails, homeDetails.description, serviceLabels.cards);
+export const pageJsonLd = () => publicPageJsonLd("/services/card-services", pageDetails, homeDetails.description, serviceLabels.cards);

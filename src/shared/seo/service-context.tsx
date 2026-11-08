@@ -1,25 +1,25 @@
 import { canonicalOrigin } from "@/shared/site/public-release";
 
 const contexts = {
-  "/merchant-onboarding": ["Merchant onboarding", "merchant"],
-  "/payment-methods": ["Payment methods", "merchant"],
-  "/ach-payments": ["ACH payments", "merchant"],
-  "/payouts-and-reconciliation": ["Payouts", "merchant"],
-  "/refunds-and-disputes": ["Refunds", "merchant"],
-  "/reconciliation": ["Reconciliation", "merchant"],
-  "/disputes": ["Disputes", "merchant"],
+  "/services/merchant-onboarding": ["Merchant onboarding", "merchant"],
+  "/services/payment-methods": ["Payment methods", "merchant"],
+  "/services/ach-payments": ["ACH payments", "merchant"],
+  "/services/payouts": ["Payouts", "merchant"],
+  "/services/refunds": ["Refunds", "merchant"],
+  "/services/reconciliation": ["Reconciliation", "merchant"],
+  "/services/disputes": ["Disputes", "merchant"],
   "/pricing": ["Pricing", "merchant"],
-  "/online-businesses": ["Online businesses", "merchant"],
-  "/credit-card-services": ["Card services", "home"],
-  "/platform-payment-models": ["Payment models", "platform"],
-  "/payment-partnerships": ["Payment partnerships", "platform"],
-  "/switch-payment-providers": ["Switch merchant services", "merchant"],
+  "/use-cases/online-businesses": ["Online businesses", "merchant"],
+  "/services/card-services": ["Card services", "home"],
+  "/use-cases/software-platforms/payment-models": ["Payment models", "platform"],
+  "/use-cases/software-platforms/partnerships": ["Payment partnerships", "platform"],
+  "/use-cases/switch-merchant-services": ["Switch merchant services", "merchant"],
 } as const;
 export type ServiceContextPath = keyof typeof contexts;
 export function serviceBreadcrumb(path: ServiceContextPath) {
   const [label, domain] = contexts[path];
   const items = [{ name: "Etail Depot", href: "/" }];
-  if (domain !== "home") items.push(domain === "platform" ? { name: "Software platforms", href: "/software-partners" } : { name: "Merchant services", href: "/payment-acceptance-service" });
+  if (domain !== "home") items.push(domain === "platform" ? { name: "Software platforms", href: "/use-cases/software-platforms" } : { name: "Merchant services", href: "/services/merchant-services" });
   items.push({ name: label, href: path });
   return { "@type": "BreadcrumbList", "@id": `${canonicalOrigin}${path}#breadcrumb`, itemListElement: items.map((item, index) => ({ "@type": "ListItem", position: index + 1, name: item.name, item: canonicalOrigin + (item.href === "/" ? "/" : item.href) })) };
 }

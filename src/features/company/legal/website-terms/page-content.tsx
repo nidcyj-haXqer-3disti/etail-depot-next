@@ -6,7 +6,7 @@ const sections: LegalSection[] = [
   {
     id: "scope", title: "About these terms", content: <>
       <p>Etail Depot US, Inc. (“Etail Depot”, “we” or “us”) operates this website. These terms cover your use of its pages, Guides, documentation and interactive tools. References to “you” include a business you are authorized to represent.</p>
-      <p>Our <Link href="/privacy">Website Privacy Policy</Link> explains how we handle information when you browse or contact us. Service agreements and policies are listed in <Link href="/legal">Legal</Link>.</p>
+      <p>Our <Link href="/company/privacy">Website Privacy Policy</Link> explains how we handle information when you browse or contact us. Service agreements and policies are listed in <Link href="/company/legal">Legal</Link>.</p>
     </>,
   },
   {
@@ -43,8 +43,8 @@ const sections: LegalSection[] = [
     id: "payments", title: "External websites and service agreements", content: <>
       <span id="availability" />
       <p id="login">Account access and applications take place through separate service websites. Request the account agreement and privacy notice for the service you use. Following a link does not open an account, transfer an existing account or guarantee approval.</p>
-      <p id="dispute-prevention">Merchant services are subject to the agreement and fee schedule accepted for your account. See <Link href="/legal/merchant-services">Merchant Services Terms</Link> and the schedules identified for your account. These website terms do not set account fees, settlement arrangements or refund and dispute procedures.</p>
-      <p id="cards">Card eligibility, fees, repayment and deposit arrangements belong to the card agreement and <Link href="/credit-card-services#card-details">card service disclosures</Link>. These website terms do not create a credit facility, deposit account or deposit insurance coverage. Etail Depot is not a bank.</p>
+      <p id="dispute-prevention">Merchant services are subject to the agreement and fee schedule accepted for your account. See <Link href="/company/legal/merchant-services">Merchant Services Terms</Link> and the schedules identified for your account. These website terms do not set account fees, settlement arrangements or refund and dispute procedures.</p>
+      <p id="cards">Card eligibility, fees, repayment and deposit arrangements belong to the card agreement and <Link href="/services/card-services#card-details">card service disclosures</Link>. These website terms do not create a credit facility, deposit account or deposit insurance coverage. Etail Depot is not a bank.</p>
     </>,
   },
   {

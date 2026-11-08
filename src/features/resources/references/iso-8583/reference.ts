@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import snapshot from "./data/iso8583-independent-data.json";
 import { canonicalOrigin, pageRobots, publicPageModified, socialImageForPage } from "@/shared/seo/metadata";
 
-export const ISO8583_PATH = "/guides/iso-8583";
+export const ISO8583_PATH = "/resources/guides/iso-8583";
 export const REFERENCE_SOURCES = snapshot.sources;
 export const MESSAGE_TYPES = snapshot.messages;
 export const DATA_FIELDS = snapshot.fields;
@@ -138,7 +138,7 @@ export function iso8583Metadata(section?: ReferenceSection, entry?: ReferenceEnt
 }
 export function iso8583JsonLd(section?: ReferenceSection, entry?: ReferenceEntry) {
   const x = referenceIdentity(section, entry), url = canonicalOrigin + x.path;
-  const crumbs = [{ name: "Guides", path: "/guides" }, { name: "ISO 8583", path: ISO8583_PATH }];
+  const crumbs = [{ name: "Guides", path: "/resources/guides" }, { name: "ISO 8583", path: ISO8583_PATH }];
   if (section) crumbs.push({ name: section.title, path: referencePath(section) });
   if (entry) crumbs.push({ name: entry.code, path: x.path });
   const citations = entry ? [sourceUrl(entry)] : REFERENCE_SOURCES.map(source => source.url);

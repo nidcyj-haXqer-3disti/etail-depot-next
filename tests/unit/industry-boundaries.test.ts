@@ -15,12 +15,13 @@ describe("industry use cases share the Software platforms page", () => {
     vi.stubEnv("SITE_ID", PUBLIC_INDEXING_APPROVAL.siteId); vi.stubEnv("CONTEXT", "production");
     try {
       expect(localPreviewPageSources.every(page => page.startsWith("legal/"))).toBe(true);
-      expect(localReviewHtmlFiles).toHaveLength(3752);
-      expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3740);
+      expect(localReviewHtmlFiles).toHaveLength(3751);
+      expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3731);
       const sitemap = publicSitemap();
-      expect(sitemap).toHaveLength(3740);
-      expect(sitemap.filter(item => item.url.includes("/use-cases/") || item.url.includes("#"))).toEqual([]);
-      expect(sitemap.find(item => item.url === `${canonicalOrigin}/software-partners`)?.lastModified).toBe("2026-11-05");
+      expect(sitemap).toHaveLength(3731);
+      expect(sitemap.filter(item => item.url.includes("#"))).toEqual([]);
+      expect(sitemap.filter(item => item.url.includes("/use-cases/"))).toHaveLength(5);
+      expect(sitemap.find(item => item.url === `${canonicalOrigin}/use-cases/software-platforms`)?.lastModified).toBe("2026-11-05");
       for (const slug of removed) {
         const route = `/use-cases/${slug}`;
         expect(PUBLIC_CONTENT_PATHS).not.toContain(route);
@@ -43,7 +44,7 @@ describe("industry use cases share the Software platforms page", () => {
     }
   });
   it("describes the visible sections without inventing extra pages or offers", () => {
-    const graph = JSON.parse(platformPageJsonLd("/software-partners"))["@graph"];
+    const graph = JSON.parse(platformPageJsonLd("/use-cases/software-platforms"))["@graph"];
     expect(graph.map((node: { "@type": string }) => node["@type"])).toEqual(["WebPage", "BreadcrumbList", "ItemList"]);
     const list = graph[2];
     expect(list.numberOfItems).toBe(4);

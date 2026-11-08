@@ -5,7 +5,7 @@ export const switchMerchantServicesContent = {
     description: "Stripe application declined or account closed? Discuss merchant services and credit card processing with Etail. New accounts require review and approval.",
     heading: "Declined by Stripe? Let’s look at your business.",
     intro: "Merchant services for businesses declined, restricted or no longer supported by their provider.",
-    action: { label: "Discuss your business", href: "/contact#payment-review" },
+    action: { label: "Discuss your business", href: "/company/contact#payment-review" },
     note: "New accounts require review and approval. Etail Depot is independent of Stripe.",
     art: { layout: "transition", title: "Your next payment setup starts with a review.", caption: "Changing providers does not transfer an existing account, release held funds or close outstanding refunds and disputes.", steps: [
       { title: "Current provider", detail: "Existing payments and open obligations" },

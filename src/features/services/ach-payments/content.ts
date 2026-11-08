@@ -9,7 +9,7 @@ export const achPaymentsContent = {
     "intro": "Offer ACH for invoices and orders. Connect customer authorization, bank account validation and payment status to the amount being collected.",
     "action": {
       "label": "Discuss ACH for your business",
-      "href": "/contact#payment-review"
+      "href": "/company/contact#payment-review"
     },
     "note": "ACH availability, fees, limits and payout terms depend on your account.",
     "art": {

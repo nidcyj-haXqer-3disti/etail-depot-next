@@ -2,4 +2,4 @@ import { servicePageMetadata } from "@/shared/seo/metadata";
 import { switchMerchantServicesContent } from "./content";
 
 export const pageDetails = switchMerchantServicesContent;
-export const metadata = servicePageMetadata("/switch-payment-providers", pageDetails);
+export const metadata = servicePageMetadata("/use-cases/switch-merchant-services", pageDetails);

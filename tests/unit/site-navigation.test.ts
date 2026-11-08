@@ -14,18 +14,18 @@ describe("public navigation ownership", () => {
   });
 
   it("keeps the more specific resource destination ahead of the documentation parent", () => {
-    expect(publicDomainForPath("/docs/merchant-onboarding")).toBe("resources");
-    expect(publicDomainForPath("/docs/merchant-onboarding/example")).toBe("resources");
-    expect(publicDomainForPath("/docs/payment-status")).toBe("developers");
-    expect(publicDomainForPath("/guides/iso-8583/fields/39")).toBe("resources");
-    expect(publicDomainForPath("/docs-other")).toBeUndefined();
+    expect(publicDomainForPath("/resources/merchant-account-setup")).toBe("resources");
+    expect(publicDomainForPath("/resources/merchant-account-setup/example")).toBe("resources");
+    expect(publicDomainForPath("/developers/api-reference")).toBe("developers");
+    expect(publicDomainForPath("/resources/guides/iso-8583/fields/39")).toBe("resources");
+    expect(publicDomainForPath("/developers/getting-started-other")).toBeUndefined();
   });
 
   it("preserves supporting service and use-case contexts without inventing menu entries", () => {
-    expect(publicDomainForPath("/payment-acceptance-service")).toBe("services");
-    expect(publicDomainForPath("/platform-payment-models")).toBe("use-cases");
-    expect(publicDomainForPath("/payment-partnerships")).toBe("use-cases");
-    for (const pathname of ["/", "/pricing", "/company", "/legal", "/missing-page"]) {
+    expect(publicDomainForPath("/services/merchant-services")).toBe("services");
+    expect(publicDomainForPath("/use-cases/software-platforms/payment-models")).toBe("use-cases");
+    expect(publicDomainForPath("/use-cases/software-platforms/partnerships")).toBe("use-cases");
+    for (const pathname of ["/", "/pricing", "/company/about", "/company/legal", "/missing-page"]) {
       expect(publicDomainForPath(pathname), pathname).toBeUndefined();
     }
   });

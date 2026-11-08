@@ -6,9 +6,9 @@ import { companyBreadcrumbData, type CompanyContextPath } from "./resource-conte
 
 export function CommercialStructuredData({ path, page }: { path: string; page: Pick<CommercialPage, "title" | "description"> }) {
   const url = canonicalOrigin + path;
-  const refined = !["/company", "/trust", "/contact", "/payment-facilitator"].includes(path);
+  const refined = !["/company/about", "/company/security", "/company/contact", "/services/payment-facilitator"].includes(path);
   const jsonLd = { "@context": "https://schema.org", "@graph": [
-    { "@type": path === "/company" ? "AboutPage" : path === "/contact" ? "ContactPage" : "WebPage", "@id": `${url}#webpage`, url, name: page.title, description: page.description, inLanguage: "en-US", dateModified: publicPageModified(path), isPartOf: { "@id": `${canonicalOrigin}/#website` }, publisher: { "@id": `${canonicalOrigin}/#organization` }, breadcrumb: { "@id": `${url}#breadcrumb` } },
+    { "@type": path === "/company/about" ? "AboutPage" : path === "/company/contact" ? "ContactPage" : "WebPage", "@id": `${url}#webpage`, url, name: page.title, description: page.description, inLanguage: "en-US", dateModified: publicPageModified(path), isPartOf: { "@id": `${canonicalOrigin}/#website` }, publisher: { "@id": `${canonicalOrigin}/#organization` }, breadcrumb: { "@id": `${url}#breadcrumb` } },
     ...(refined ? [serviceBreadcrumb(path as ServiceContextPath)] : [companyBreadcrumbData(path as CompanyContextPath)]),
   ] };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />;

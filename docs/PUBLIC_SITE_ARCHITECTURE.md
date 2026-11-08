@@ -17,13 +17,13 @@ The website explains Etail's services and directs visitors to approved vendor se
 
 See the [repository guide](REPOSITORY_GUIDE.md) for feature folders and engineering ownership. A route composes its owning feature. Shared code must not import feature-owned business content. Whole-site registries are used for checks; runtime pages import their own content. Tests enforce these boundaries.
 
-Existing vendor documentation and merchant integration guides belong to Resources. Public Developers navigation is preserved. An Etail API or SDK feature is a future product scope, distinct from management of this project's developers.
+Existing integration guidance is grouped within the eight public Developers pages. Merchant account setup, platform integration guides, Help and references belong to Resources. Etail APIs, SDKs and other developer products remain Coming soon; no implementation or availability is implied. Project contributor management stays in engineering support.
 
 ## Rendering and interactions
 
 Next.js exports static HTML. The existing shared Shell, header, footer, mobile menu and design tokens serve all page families. Feature-owned illustrations and client components provide explanatory interaction, copy controls, local fee estimates, guide disclosures and filters. They do not submit merchant applications or financial transactions.
 
-Preserve established URLs and section anchors even when folder or navigation names differ. Services have dedicated pages. Platform industries remain sections of Software platforms. Documentation and reference pages retain their reading navigation; do not add redundant breadcrumb or section-navigation layers to commercial pages.
+Preserve established URLs and section anchors unless a move is explicitly approved. The approved category migration uses `/services`, `/use-cases`, `/developers`, `/resources` and `/company` page families. Home and Pricing stay unchanged. Exact redirects cover former flat addresses, documentation and reference pages, retaining original section anchors. The [complete map](plans/category-url-map.json) lists every former and current content address. Services have dedicated pages. Platform industries remain sections of Software platforms. Documentation and reference pages retain their reading navigation; do not add redundant breadcrumb or section-navigation layers to commercial pages.
 
 Follow the [page paint standard](PAGE_PAINT_STANDARDS.md). Preserve the document-ready marker, responsive layout before hydration, versioned image imports, appropriate loading priority, brand aspect ratios, navigation history and native fallbacks. A completed screenshot alone does not verify first paint.
 
@@ -37,7 +37,7 @@ No local account application, checkout processor, KYC, ledger, database adapter,
 
 [The page inventory](../src/shared/site/public-page-inventory.ts), [reference paths](../src/shared/site/standard-reference-paths.ts), [artifact policy](../tools/public-artifact-policy.ts) and [release receipt](../tools/reference-release.json) define the exact approved page set. New routes or reference data need scope and source review; unknown reference values do not become pages.
 
-Production indexing requires the exact approved site, canonical origin and trusted deployment/environment context. Preview and unapproved contexts remain noindex with an empty sitemap. The 12 legal and website policy pages are noindex and outside the production sitemap. Preserve the recorded reference licences and exclude the retired reproduced ISO tables.
+Production indexing requires the exact approved site, canonical origin and trusted deployment/environment context. Preview and unapproved contexts remain noindex with an empty sitemap. The 12 legal and website policy pages and eight unfinished Developers pages are noindex and outside the production sitemap. Preserve the recorded reference licences and exclude the retired reproduced ISO tables.
 
 [Page revisions](../src/shared/site/public-page-revisions.ts) record meaningful content changes. Do not advance dates for a rebuild, source-folder migration or cosmetic review. Structured data, canonicals and sitemap entries must describe the same approved routes.
 
@@ -45,7 +45,7 @@ Production indexing requires the exact approved site, canonical origin and trust
 
 Use pinned Node and pnpm with one lockfile. [The build wrapper](../tools/build-public-site.mjs) validates source scope and records input identity. [Packaging](../tools/package-public-site.mjs) copies only the verified export to `.netlify/static/`, bundles one public Edge boundary, and preserves the pinned authenticated Emails handler. It never publishes.
 
-[The Edge boundary](../netlify/edge-functions/public-boundary.ts) enforces public routing, preview protections, security headers and retirement behavior. Retired routes are read only; they must not read or forward submitted bodies. Keep the enabled Netlify Emails extension and all settings. Its existing authenticated POST handler is the sole server-function exception; public pages do not call it.
+[The Edge boundary](../netlify/edge-functions/public-boundary.ts) enforces public routing, preview protections, security headers and retirement behavior. Only exact approved public service exports are exempt from the historical `/services/*` account retirement rule. Other retired routes are read only; they must not read or forward submitted bodies. Keep the enabled Netlify Emails extension and all settings. Its existing authenticated POST handler is the sole server-function exception; public pages do not call it.
 
 The [manual Netlify process](NETLIFY_DEPLOYMENT.md) retains the existing project, domain, root build command and publish directory. Do not deploy the repository root, revive an old backend, change DNS/Identity/database resources or bypass the final package verifier.
 

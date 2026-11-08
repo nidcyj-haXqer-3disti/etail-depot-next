@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { DEVELOPER_PATHS } from "../src/shared/site/developer-paths.ts";
 import { LEGAL_DOCUMENT_PATHS } from "../src/shared/site/legal-paths.ts";
 import { socialPreviewImage } from "../src/shared/seo/social-preview.ts";
 import { publicPageModified } from "../src/shared/site/public-page-revisions.ts";
@@ -24,11 +25,11 @@ assert.equal(targets.release.real_money_allowed, false);
 
 const canonicalOrigin = targets.netlify.canonical_origin;
 const guidePaths = [];
-const standardPaths = ["/guides/iso-20022", "/guides/iso-8583"];
-const coreSchemaPaths = ["/", "/credit-card-services", "/payment-acceptance-service", "/help", "/guides"];
+const standardPaths = ["/resources/guides/iso-20022", "/resources/guides/iso-8583"];
+const coreSchemaPaths = ["/", "/services/card-services", "/services/merchant-services", "/resources/help", "/resources/guides"];
 const publicPaths = INDEXABLE_PUBLIC_PATHS;
 assert.equal(guidePaths.length, 0);
-assert.equal(new Set(publicPaths).size, 3740, "Only the exact reviewed nonlegal pages are eligible for search.");
+assert.equal(new Set(publicPaths).size, 3731, "Only the exact reviewed nonlegal pages are eligible for search.");
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -144,7 +145,7 @@ function checkSchema(html, route, description) {
     assert.equal(matches.length, 1, `${route}: expected one ${type} schema node.`);
     return matches[0];
   };
-  const organization = node("Organization"), website = node("WebSite"), page = node(route === "/guides" ? "CollectionPage" : "WebPage");
+  const organization = node("Organization"), website = node("WebSite"), page = node(route === "/resources/guides" ? "CollectionPage" : "WebPage");
   assert.equal(organization.name, "Etail Depot");
   assert.equal(organization.legalName, "Etail Depot US, Inc.");
   assert.equal(organization.url, `${canonicalOrigin}/`);
@@ -155,9 +156,9 @@ function checkSchema(html, route, description) {
   assert.equal(page.url, new URL(route, canonicalOrigin).href);
   assert.equal(page.description, description);
   assert.equal(page.isPartOf?.["@id"], website["@id"]);
-  if (route === "/guides") {
+  if (route === "/resources/guides") {
     const list = node("ItemList");
-    const directoryPaths = ["/docs/merchant-onboarding", "/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", ...standardPaths];
+    const directoryPaths = ["/resources/merchant-account-setup", "/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", ...standardPaths];
     assert.equal(page.mainEntity?.["@id"], list["@id"]);
     assert.equal(list.numberOfItems, directoryPaths.length);
     assert.deepEqual(list.itemListElement.map(item => item.url).sort(), directoryPaths.map(path => new URL(path, canonicalOrigin).href).sort());
@@ -170,7 +171,7 @@ function checkSchema(html, route, description) {
       assert.equal(crumb.position, index + 1);
       assert.ok(typeof crumb.name === "string" && crumb.name.trim());
       const item = typeof crumb.item === "string" ? crumb.item : crumb.item?.["@id"];
-      const expectedPath = index === 0 ? "/" : guidePaths.includes(route) && index === 1 ? "/guides" : route;
+      const expectedPath = index === 0 ? "/" : guidePaths.includes(route) && index === 1 ? "/resources/guides" : route;
       assert.equal(item, new URL(expectedPath, canonicalOrigin).href);
     }
   }
@@ -201,7 +202,7 @@ function checkCrawlablePageGraph(documents) {
     }
   }
   assert.deepEqual([...reached].sort(), [...paths].sort(), "Every sitemap page must be discoverable from Home through initial-HTML links.");
-  const guideLinks = graph.get("/guides");
+  const guideLinks = graph.get("/resources/guides");
   for (const route of standardPaths) assert.ok(guideLinks.has(route), `${route}: collection is missing from the Guides HTML.`);
   console.log(`Discovery graph passed: ${reached.size} canonical pages are reachable from Home; both reference collections are linked in the Guides HTML.`);
 }
@@ -230,7 +231,7 @@ async function verifyResponses() {
     assert.deepEqual(metadata.metaValues("property", "og:image"), [socialPreviewImage(route, canonicalOrigin).url]);
     assert.deepEqual(metadata.metaValues("name", "twitter:image"), [socialPreviewImage(route, canonicalOrigin).url]);
     if (coreSchemaPaths.includes(route)) checkSchema(html, route, description[0]);
-    else if (route.startsWith("/guides/")) {
+    else if (route.startsWith("/resources/guides/")) {
       const nodes = schemaNodes(html);
       const pages = nodes.filter(node => ["WebPage", "CollectionPage"].includes(node["@type"]));
       assert.equal(pages.length, 1, `${route}: one reference page schema is required.`);
@@ -243,7 +244,7 @@ async function verifyResponses() {
   assert.equal(descriptions.size, publicPaths.length, "Public descriptions must be distinct.");
   checkCrawlablePageGraph(documents);
 
-  for (const [oldPath, destination] of [["/card-services", "/credit-card-services"], ["/payment-services", "/payment-acceptance-service"]]) {
+  for (const [oldPath, destination] of [["/card-services", "/services/card-services"], ["/payment-services", "/services/merchant-services"]]) {
     for (const suffix of ["", "/", ".html", "/index.html"]) {
       for (const method of ["GET", "HEAD"]) {
         const response = await localFetch(`${oldPath}${suffix}?token=synthetic-test`, { method });
@@ -316,9 +317,9 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of [...LEGAL_DOCUMENT_PATHS, "/legal/unreviewed", "/production-seo-missing-page", "/guides/unreviewed-missing-page", "/guides/payment-processing-fees", "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal", "/guides/use-a-cash-register", "/guides/unreviewed-charge-cards", "/guides/sections/payment-processing-checkout", "/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
+  for (const route of [...LEGAL_DOCUMENT_PATHS, ...DEVELOPER_PATHS, "/company/legal/unreviewed", "/production-seo-missing-page", "/resources/guides/unreviewed-missing-page", "/legal/unreviewed", "/resources/guides/payment-processing-fees", "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal", "/resources/guides/use-a-cash-register", "/resources/guides/unreviewed-charge-cards", "/resources/guides/sections/payment-processing-checkout", "/resources/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
     const response = await localFetch(route);
-    assert.equal(response.status, LEGAL_DOCUMENT_PATHS.includes(route) ? 200 : 404, `${route}: unexpected status.`);
+    assert.equal(response.status, [...LEGAL_DOCUMENT_PATHS,...DEVELOPER_PATHS].includes(route) ? 200 : 404, `${route}: unexpected status.`);
     const body = await response.text();
     const metadata = /<head[\s>]/i.test(body) ? documentMetadata(body, route) : { metaValues: () => [] };
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
@@ -334,7 +335,7 @@ async function verifyResponses() {
       await response.arrayBuffer();
     }
   }
-  for (const route of [...LEGAL_DOCUMENT_PATHS.flatMap(path => [`${path}.html`, `${path}.txt`]), "/payment-acceptance-service.txt", "/guides.txt", ...guidePaths.map(route => `${route}.txt`)]) {
+  for (const route of [...LEGAL_DOCUMENT_PATHS.flatMap(path => [`${path}.html`, `${path}.txt`]), "/services/merchant-services.txt", "/resources/guides.txt", ...guidePaths.map(route => `${route}.txt`)]) {
     const response = await localFetch(route);
     assert.equal(response.status, 200);
     assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: raw payloads and legal aliases must remain noindex.`);
@@ -353,7 +354,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: 3740 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: 3731 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {
@@ -375,7 +376,7 @@ try {
   ]) {
     const privateServer = startNext([previewScript, "--port", String(port)], environment);
     await waitForServer(privateServer);
-    for (const route of [...publicPaths, "/card-services", "/payment-services", "/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/opengraph-image", "/production-seo-missing-page"]) {
+    for (const route of [...publicPaths, "/card-services", "/payment-services", "/company/privacy", "/company/terms", "/robots.txt", "/sitemap.xml", "/opengraph-image", "/production-seo-missing-page"]) {
       const response = await localFetch(route);
       assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), `${route}: preview/wrong-site response must remain noindex.`);
       if (route === "/sitemap.xml") assert.doesNotMatch(await response.text(), /<loc>/);

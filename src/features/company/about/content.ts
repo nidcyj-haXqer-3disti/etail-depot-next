@@ -5,7 +5,7 @@ export const aboutContent = {
     description: "Etail Depot provides merchant services for US businesses and software platforms, from account setup and card and ACH acceptance to everyday account operations.",
     heading: "About Etail Depot",
     intro: "Etail Depot provides merchant services for US businesses and the software platforms they use.",
-    action: { label: "Contact our team", href: "/contact" },
+    action: { label: "Contact our team", href: "/company/contact" },
     art: { title: "Connected services", caption: "", steps: [] },
     sections: [{ title: "Our company", items: [
       { title: "Purpose", text: "Accepting a payment is one part of running a business. Merchants also need an account that fits their activity, a checkout that works for their customers and clear records of what happened after a sale." },

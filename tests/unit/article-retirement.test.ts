@@ -9,14 +9,14 @@ import { builtPageSources, forbiddenLocalReviewStatic, forbiddenStatic } from ".
 
 describe("article retirement without changing ISO references", () => {
   it("keeps only the hub and two standards families in the Guides source tree", () => {
-    expect(readdirSync("src/app/guides").sort()).toEqual(["iso-20022", "iso-8583", "page.tsx"]);
+    expect(readdirSync("src/app/resources/guides").sort()).toEqual(["iso-20022", "iso-8583", "page.tsx"]);
     expect(existsSync("src/modules/public-site/local-guide-content")).toBe(false);
     expect(existsSync("src/modules/public-site/guide-catalog.ts")).toBe(false);
     expect(existsSync("src/shared/local-guide-paths.ts")).toBe(false);
     expect(STANDARD_REFERENCE_PATHS).toHaveLength(3706);
     expect(STANDARD_REFERENCE_PATHS.every(path => !retiredArticleRoute(path))).toBe(true);
-    expect(STANDARD_REFERENCE_PATHS).toContain("/guides/iso-8583/messages/2100");
-    expect(builtPageSources).toHaveLength(52);
+    expect(STANDARD_REFERENCE_PATHS).toContain("/resources/guides/iso-8583/messages/2100");
+    expect(builtPageSources).toHaveLength(51);
     for (const path of RETIRED_ARTICLE_PATHS) {
       expect(builtPageSources as readonly string[]).not.toContain(`${path.slice(1)}/page.tsx`);
       expect(Object.hasOwn(PUBLIC_PAGES, path)).toBe(false);
@@ -26,14 +26,14 @@ describe("article retirement without changing ISO references", () => {
   });
 
   it("lists the three setup guides and two ISO collections in the hub schema", () => {
-    const graph = JSON.parse(publicPageJsonLd("/guides"))["@graph"];
+    const graph = JSON.parse(publicPageJsonLd("/resources/guides"))["@graph"];
     const list = graph.find((item: { "@type": string }) => item["@type"] === "ItemList");
     expect(list.numberOfItems).toBe(5);
     expect(list.itemListElement.map((item: { url: string }) => item.url)).toEqual([
-      "https://etaildepot.com/docs/merchant-onboarding",
+      "https://etaildepot.com/resources/merchant-account-setup",
       "https://etaildepot.com/resources/shopify-gateway-integration",
       "https://etaildepot.com/resources/woocommerce-gateway-integration",
-      "https://etaildepot.com/guides/iso-20022", "https://etaildepot.com/guides/iso-8583",
+      "https://etaildepot.com/resources/guides/iso-20022", "https://etaildepot.com/resources/guides/iso-8583",
     ]);
   });
 
@@ -62,6 +62,6 @@ describe("article retirement without changing ISO references", () => {
     expect(retiredArticleRoute("/GUIDES/STRIPE-ALTERNATIVES")).toBe(true);
     expect(retiredArticleRoute("/guides/stripe%252dalternatives.html")).toBe(true);
     expect(retiredArticleRoute("//guides//stripe-alternatives.txt")).toBe(true);
-    for (const path of ["/guides", "/guides/iso-8583", "/guides/iso-20022", "/guides/create-an-invoice", "/guides/stripe-alternatives-other", "/guides/%ZZ"]) expect(retiredArticleRoute(path)).toBe(false);
+    for (const path of ["/resources/guides", "/resources/guides/iso-8583", "/resources/guides/iso-20022", "/resources/guides/create-an-invoice", "/resources/guides/stripe-alternatives-other", "/resources/guides/%ZZ"]) expect(retiredArticleRoute(path)).toBe(false);
   });
 });

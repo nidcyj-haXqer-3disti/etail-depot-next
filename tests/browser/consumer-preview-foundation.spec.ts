@@ -1,10 +1,11 @@
+import { isPublicContentPath } from "../../src/shared/site/public-page-inventory";
 import {expect,test} from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
 import { expectDecodedBrandMarks } from "./brand-marks";
 import {closeMainNavigation, openMainNavigation} from "./public-header";
 
 
-for (const path of ["/", "/software-partners", "/payment-acceptance-service", "/credit-card-services", "/help", "/privacy", "/terms"]) {
+for (const path of ["/", "/use-cases/software-platforms", "/services/merchant-services", "/services/card-services", "/resources/help", "/company/privacy", "/company/terms"]) {
   test(`small brand marks render without separate downloads on ${path}`, async ({ page }) => {
     let releaseResources = () => {};
     let resourcesReady = Promise.resolve();
@@ -36,8 +37,8 @@ for (const path of ["/", "/software-partners", "/payment-acceptance-service", "/
 }
 
 for (const {name,path,selector} of [
-  {name:"merchant",path:"/payment-acceptance-service",selector:".consumer-networks"},
-  {name:"online business",path:"/online-businesses",selector:".unified-preview-networks"},
+  {name:"merchant",path:"/services/merchant-services",selector:".consumer-networks"},
+  {name:"online business",path:"/use-cases/online-businesses",selector:".unified-preview-networks"},
 ]) {
 test(`${name} network logos load with page styles and eager Discover delivery on a cold refresh`, async ({ page }) => {
   let releaseResources = () => {};
@@ -81,7 +82,7 @@ test("home presents Etail brand artwork and local product discovery without acco
   });
   await page.goto("/");
   const initialStorage=await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}));
-  await expect(page.locator('main .ec-company-section, main a[href="/company"]')).toHaveCount(0);
+  await expect(page.locator('main .ec-company-section, main a[href="/company/about"]')).toHaveCount(0);
   const hero=page.locator(".ec-home-hero");
   const art=hero.locator("[data-company-art]");
   await expect(art).toBeVisible();
@@ -106,22 +107,22 @@ test("home presents Etail brand artwork and local product discovery without acco
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
   await expect(hero.getByRole("link",{name:"Start now",exact:true})).toHaveAttribute("href","https://merchantapp.io/etaildepot/UserAccount/Login");
   await page.locator("#services").getByRole("link",{name:"Explore merchant services",exact:true}).click();
-  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
+  await expect(page).toHaveURL(/\/services\/merchant-services$/);
   await expect(page.getByRole("heading",{level:1})).toBeVisible();
   await page.goto("/");
   const partnerLink=page.locator("#services").getByRole("link",{name:"Explore software platforms",exact:true});
-  await expect(partnerLink).toHaveAttribute("href","/software-partners");
+  await expect(partnerLink).toHaveAttribute("href","/use-cases/software-platforms");
   await partnerLink.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/software-partners$/);
+  await expect(page).toHaveURL(/\/use-cases\/software-platforms$/);
   await page.goto("/");
   await expect(page.locator("#card-services")).not.toContainText("Applications are not open");
   const cardLink=page.locator("#services").getByRole("link",{name:"Explore card services",exact:true});
-  await expect(cardLink).toHaveAttribute("href","/credit-card-services");
+  await expect(cardLink).toHaveAttribute("href","/services/card-services");
   await cardLink.click();
-  await expect(page).toHaveURL(/\/credit-card-services$/);
+  await expect(page).toHaveURL(/\/services\/card-services$/);
   await expect(page.locator("[data-service-note]")).toHaveText("An inquiry is not an application.");
-  await expect(page.locator("main").getByRole("link",{name:"Ask about card services",exact:true}).first()).toHaveAttribute("href","/contact#cards");
+  await expect(page.locator("main").getByRole("link",{name:"Ask about card services",exact:true}).first()).toHaveAttribute("href","/company/contact#cards");
   expect(await page.evaluate(()=>({local:{...localStorage},session:{...sessionStorage}}))).toEqual(initialStorage);
   expect(unexpected).toEqual([]);expect(errors).toEqual([]);
 });
@@ -137,12 +138,12 @@ test("software partners can review the payment experience and reach the fixed in
       await route.abort();
     } else await route.continue();
   });
-  const response = await page.goto("/software-partners?partner_probe=private#visit");
+  const response = await page.goto("/use-cases/software-platforms?partner_probe=private#visit");
   expect(response?.status()).toBe(200);
   const initialStorage = await page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage } }));
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Merchant services for your software.");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/software-partners");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/use-cases/software-platforms");
   await expect(page.locator("main form,main input,main textarea,main select,main iframe,main [contenteditable=true]")).toHaveCount(0);
   await expect(page.locator("main")).not.toContainText(/\b(proposed|roadmap|sandbox|simulation)\b/i);
   const experience = page.locator("#payment-experience");
@@ -161,11 +162,11 @@ test("software partners can review the payment experience and reach the fixed in
   expect(box!.width).toBeGreaterThan(200);
   expect(box!.x).toBeGreaterThanOrEqual(0);
   expect(box!.x + box!.width).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
-  const localInquiry = page.locator('.ec-platform-hero a[href="/contact#platforms"]');
+  const localInquiry = page.locator('.ec-platform-hero a[href="/company/contact#platforms"]');
   await expect(localInquiry).toHaveAccessibleName("Discuss your platform");
   await localInquiry.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/contact#platforms$/);
+  await expect(page).toHaveURL(/\/company\/contact#platforms$/);
   const contact = page.locator("#platforms");
   await expect(contact).toBeInViewport();
   const email = page.locator('[data-merchant-contact] a[href^="mailto:"]');
@@ -173,9 +174,9 @@ test("software partners can review the payment experience and reach the fixed in
   await expect(email).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
   await expect(page.locator('[data-merchant-contact] a[href^="mailto:"]')).toHaveCount(1);
   await page.goBack();
-  await expect(page).toHaveURL(/\/software-partners\?partner_probe=private#visit$/);
+  await expect(page).toHaveURL(/\/use-cases\/software-platforms\?partner_probe=private#visit$/);
   await page.goForward();
-  await expect(page).toHaveURL(/\/contact#platforms$/);
+  await expect(page).toHaveURL(/\/company\/contact#platforms$/);
   await expect(contact).toBeInViewport();
   expect(await page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage } }))).toEqual(initialStorage);
   expect(await page.evaluate(() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth)).toBeLessThanOrEqual(1);
@@ -187,7 +188,7 @@ test("software partner content and inquiry remain usable without JavaScript", as
   const context = await browser.newContext({ javaScriptEnabled: false, reducedMotion: "reduce", baseURL, viewport });
   const page = await context.newPage();
   try {
-    const response = await page.goto("/software-partners");
+    const response = await page.goto("/use-cases/software-platforms");
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Merchant services for your software.");
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
@@ -203,11 +204,11 @@ test("software partner content and inquiry remain usable without JavaScript", as
     await expect(art.locator("a,button,input,form,textarea,select,[tabindex],[role=button]")).toHaveCount(0);
     await expect(art).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records to merchant account setup, checkout and reporting/);
     await expect(page.locator(".faq, .public-faq-section")).toHaveCount(0);
-    const inquiry = page.locator('.ec-platform-hero a[href="/contact#platforms"]');
+    const inquiry = page.locator('.ec-platform-hero a[href="/company/contact#platforms"]');
     await expect(inquiry).toHaveAccessibleName("Discuss your platform");
     await inquiry.focus();
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/\/contact#platforms$/);
+    await expect(page).toHaveURL(/\/company\/contact#platforms$/);
     await expect(page.locator("#platforms")).toBeInViewport();
     await expect(page.locator('[data-merchant-contact] a[href^="mailto:"]')).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
     expect(await page.evaluate(() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth)).toBeLessThanOrEqual(1);
@@ -230,14 +231,14 @@ test("public service discovery explains eligibility and card inquiries without l
       await route.abort();
     }else await route.continue();
   });
-  for(const path of ["/","/software-partners","/credit-card-services","/payment-acceptance-service","/pricing","/help"]){
+  for(const path of ["/","/use-cases/software-platforms","/services/card-services","/services/merchant-services","/pricing","/resources/help"]){
     await page.goto(path);
     const mainNavigation=await openMainNavigation(page);
-    await expect(mainNavigation.locator("a")).toHaveCount(26);
-    for(const [name,href] of [["Merchant onboarding","/merchant-onboarding"],["Software platforms","/software-partners"],["Online businesses","/online-businesses"],["Card services","/credit-card-services"],["Documentation","/docs"],["Guides","/guides"],["Pricing","/pricing"]]){
+    await expect(mainNavigation.locator("a")).toHaveCount(29);
+    for(const [name,href] of [["Merchant onboarding","/services/merchant-onboarding"],["Software platforms","/use-cases/software-platforms"],["Online businesses","/use-cases/online-businesses"],["Card services","/services/card-services"],["Getting started","/developers/getting-started"],["Guides","/resources/guides"],["Pricing","/pricing"]]){
       await expect(mainNavigation.getByRole("link",{name,exact:true,includeHidden:true})).toHaveAttribute("href",href);
     }
-    await expect(page.getByRole("banner").getByRole("link",{name:"Help center",exact:true,includeHidden:true})).toHaveAttribute("href","/help");
+    await expect(page.getByRole("banner").getByRole("link",{name:"Help center",exact:true,includeHidden:true})).toHaveAttribute("href","/resources/help");
     await closeMainNavigation(page);
     await expect(page.getByRole("heading",{level:1})).toBeVisible();
     await expect(page.locator(".sandbox-badge, .service-availability")).toHaveCount(0);
@@ -251,30 +252,30 @@ test("public service discovery explains eligibility and card inquiries without l
     await expect(page.getByRole("region",{name:"Cards dashboard",exact:true})).toHaveCount(0);
     await expect(page.getByRole("region",{name:"Payments dashboard",exact:true})).toHaveCount(0);
     const localAccountLinks=await page.locator("a[href]").evaluateAll(links=>links.map(link=>new URL(link.getAttribute("href")!,location.href)).filter(url=>url.origin===location.origin&&/^\/(?:login|services|profile|cardholder-services|merchant-services|money-accounts)(?:\/|$)/.test(url.pathname)).map(url=>url.pathname));
-    expect(localAccountLinks).toEqual([]);
+    expect(localAccountLinks.filter(path => !isPublicContentPath(path))).toEqual([]);
     const portalLinks=page.locator('a[href^="https://merchantapp.io/etaildepot/"]');
     expect(await portalLinks.count()).toBeGreaterThan(0);
-    if(path==="/credit-card-services") await expect(page.locator('main a[href="https://merchantapp.io/etaildepot/UserAccount/Login"]')).toHaveCount(0);
+    if(path==="/services/card-services") await expect(page.locator('main a[href="https://merchantapp.io/etaildepot/UserAccount/Login"]')).toHaveCount(0);
     for(const link of await portalLinks.all()){
       await expect(link).toHaveAttribute("referrerpolicy","no-referrer");
       await expect(link).toHaveAttribute("rel",/\bnoreferrer\b/);
     }
     const footer=page.getByRole("contentinfo");
     await openFooterGroup(page, "Services");
-    const productPage=path==="/credit-card-services"||path==="/payment-acceptance-service";
-    await expect(footer.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Merchant onboarding",exact:true})).toHaveAttribute("href","/merchant-onboarding");
-    await expect(footer.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Card services",exact:true,includeHidden:true})).toHaveAttribute("href","/credit-card-services");
+    const productPage=path==="/services/card-services"||path==="/services/merchant-services";
+    await expect(footer.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Merchant onboarding",exact:true})).toHaveAttribute("href","/services/merchant-onboarding");
+    await expect(footer.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Card services",exact:true,includeHidden:true})).toHaveAttribute("href","/services/card-services");
     await openFooterGroup(page, "Use cases");
-    await expect(footer.getByRole("navigation",{name:"Footer use cases"}).getByRole("link",{name:"Software platforms",exact:true})).toHaveAttribute("href","/software-partners");
+    await expect(footer.getByRole("navigation",{name:"Footer use cases"}).getByRole("link",{name:"Software platforms",exact:true})).toHaveAttribute("href","/use-cases/software-platforms");
     await openFooterGroup(page, "Developers");
-    await expect(footer.getByRole("navigation",{name:"Footer developers"}).getByRole("link",{name:"Documentation",exact:true})).toHaveAttribute("href","/docs");
+    await expect(footer.getByRole("navigation",{name:"Footer developers"}).getByRole("link",{name:"Getting started",exact:true})).toHaveAttribute("href","/developers/getting-started");
     await openFooterGroup(page, "Resources");
     const resourceLinks = footer.getByRole("navigation", {name:"Footer resources"}).getByRole("link");
     await expect(resourceLinks).toHaveText(["Merchant account setup", "Shopify integration", "WooCommerce integration", "Guides", "Help center"]);
-    for (const [index, href] of ["/docs/merchant-onboarding", "/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", "/guides", "/help"].entries()) await expect(resourceLinks.nth(index)).toHaveAttribute("href", href);
+    for (const [index, href] of ["/resources/merchant-account-setup", "/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", "/resources/guides", "/resources/help"].entries()) await expect(resourceLinks.nth(index)).toHaveAttribute("href", href);
     await expect(footer.locator(".public-footer-company")).toHaveText(`© ${new Date().getUTCFullYear()} Etail Depot US, Inc. All rights reserved.`);
     if(productPage){
-      await expect(page.locator("main")).not.toContainText(path==="/credit-card-services"?"Trolleys":"Ledgix",{useInnerText:true});
+      await expect(page.locator("main")).not.toContainText(path==="/services/card-services"?"Trolleys":"Ledgix",{useInnerText:true});
       await expect(page.locator(".consumer-final")).toHaveCount(0);
     }
     if(path==="/"){
@@ -286,24 +287,24 @@ test("public service discovery explains eligibility and card inquiries without l
       await expect(page.getByRole("tablist")).toHaveCount(0);
       const serviceAreas=page.locator("#services");
       await expect(serviceAreas.getByRole("heading",{level:2})).toHaveText(["Merchant services","Software platforms","Card services"]);
-      for (const [name,href] of [["Explore merchant services","/payment-acceptance-service"],["Explore software platforms","/software-partners"],["Explore card services","/credit-card-services"]]) await expect(serviceAreas.getByRole("link",{name,exact:true})).toHaveAttribute("href",href);
+      for (const [name,href] of [["Explore merchant services","/services/merchant-services"],["Explore software platforms","/use-cases/software-platforms"],["Explore card services","/services/card-services"]]) await expect(serviceAreas.getByRole("link",{name,exact:true})).toHaveAttribute("href",href);
       await expect(serviceAreas.locator("button,input,form,textarea,select")).toHaveCount(0);
       await expect(page.locator("#card-services")).not.toContainText("Applications are not open");
       await expect(payments).toContainText("Merchant accounts require approval.");
       await openFooterGroup(page, "Services");
-      await expect(footer.getByRole("link",{name:"Card services",exact:true})).toHaveAttribute("href","/credit-card-services");
-    }else if(path==="/credit-card-services"){
+      await expect(footer.getByRole("link",{name:"Card services",exact:true})).toHaveAttribute("href","/services/card-services");
+    }else if(path==="/services/card-services"){
       await expect(page.getByRole("banner").getByRole("link",{name:"Sign in to Trolleys",exact:true,includeHidden:true})).toHaveAttribute("href","https://merchantapp.io/etaildepot/UserAccount/Login");
       await expect(page.locator("[data-service-note]")).toBeVisible();
       await expect(page.locator("[data-service-note]")).toHaveText("An inquiry is not an application.");
       const cardContacts = page.locator("main").getByRole("link", { name: "Ask about card services", exact: true });
       expect(await cardContacts.count()).toBeGreaterThan(0);
       for (const contact of await cardContacts.all()) {
-        await expect(contact).toHaveAttribute("href", "/contact#cards");
+        await expect(contact).toHaveAttribute("href", "/company/contact#cards");
       }
       await expect(page.locator("[data-service-note]")).toContainText("An inquiry is not an application.");
       await expect(page.locator("main").getByRole("link",{name:/apply|create|sign in/i})).toHaveCount(0);
-    }else if(path==="/payment-acceptance-service"){
+    }else if(path==="/services/merchant-services"){
       await expect(page.locator(".merchant-hero")).toContainText("Credit card processing and ACH for US businesses in USD, with account setup, online checkout and payment reporting.");
       await expect(page.locator(".merchant-hero [data-attention-copy]")).toContainText("Account approval and setup apply.");
       await expect(page.locator(".cw-merchant-art")).toBeVisible();
@@ -319,13 +320,13 @@ test("public service discovery explains eligibility and card inquiries without l
   const merchantNavigationLink=page.getByRole("navigation",{name:"Footer services"}).getByRole("link",{name:"Merchant onboarding",exact:true});
   await merchantNavigationLink.focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/merchant-onboarding$/);
+  await expect(page).toHaveURL(/\/services\/merchant-onboarding$/);
   await page.getByRole("banner").getByRole("link", { name: "Etail Depot home", exact: true }).click();
   await page.locator("main").getByRole("link", { name: "Explore merchant services", exact: true }).click();
-  await expect(page).toHaveURL(/\/payment-acceptance-service$/);
+  await expect(page).toHaveURL(/\/services\/merchant-services$/);
   const useCaseNavigation = await openMainNavigation(page, "Use cases");
   await useCaseNavigation.getByRole("link",{name:"Online businesses",exact:true}).click();
-  await expect(page).toHaveURL(/\/online-businesses$/);
+  await expect(page).toHaveURL(/\/use-cases\/online-businesses$/);
   const explorer=page.locator(".payment-service-explorer");
   const views=explorer.getByRole("tablist",{name:"Payment journey views",exact:true});
   await expect(views.getByRole("tab")).toHaveText(["Onboarding","Checkout","Card record","Card payout"]);
@@ -341,18 +342,18 @@ test("public service discovery explains eligibility and card inquiries without l
   await expect(explorer.getByRole("tabpanel",{name:"Card payout",exact:true})).toBeVisible();
   await expect(explorer.locator("a,input,form,textarea,select,iframe")).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
-  await expect(page.locator(".online-business-actions").getByRole("link",{name:"Merchant services",exact:true})).toHaveAttribute("href", "/payment-acceptance-service");
+  await expect(page.locator(".online-business-actions").getByRole("link",{name:"Merchant services",exact:true})).toHaveAttribute("href", "/services/merchant-services");
   const navigation=await openMainNavigation(page);
   await expect(navigation.getByRole("link",{name:"Online businesses",exact:true,includeHidden:true})).toHaveAttribute("aria-current","page");
   await expect(page.locator(".online-business-copy")).toContainText("Connect checkout and hosted payment requests to your orders, with cards, wallets and ACH enabled for your account.");
   await expect(page.locator(".online-business-note")).toContainText("Account approval and setup apply.");
   await navigation.getByRole("link",{name:"Card services",exact:true}).focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/credit-card-services$/);
+  await expect(page).toHaveURL(/\/services\/card-services$/);
   await openMainNavigation(page);
   await expect(page.getByRole("navigation",{name:"Main navigation"}).getByRole("link",{name:"Card services",exact:true,includeHidden:true})).toHaveAttribute("aria-current","page");
   await closeMainNavigation(page);
-  await expect(page.locator("[data-service-actions]").getByRole("link", { name: "Ask about card services", exact: true })).toHaveAttribute("href", "/contact#cards");
+  await expect(page.locator("[data-service-actions]").getByRole("link", { name: "Ask about card services", exact: true })).toHaveAttribute("href", "/company/contact#cards");
   await expect(page.locator("[data-service-note]")).toHaveText("An inquiry is not an application.");
   expect(changes).toEqual([]);expect(privateReads).toEqual([]);expect(errors).toEqual([]);
 });
@@ -375,18 +376,18 @@ test("payment entry points hand off to the welcome page without queries or refer
   });
   const entries=[
     {path:"/",scope:"header",label:"Sign in to Trolleys"},
-    {path:"/software-partners",scope:"header",label:"Sign in to Trolleys"},
-    {path:"/credit-card-services",scope:"header",label:"Sign in to Trolleys"},
-    {path:"/payment-acceptance-service",scope:".merchant-hero",label:"Start now"},
-    {path:"/help",scope:"#payments",label:"Sign in to Trolleys"},
+    {path:"/use-cases/software-platforms",scope:"header",label:"Sign in to Trolleys"},
+    {path:"/services/card-services",scope:"header",label:"Sign in to Trolleys"},
+    {path:"/services/merchant-services",scope:".merchant-hero",label:"Start now"},
+    {path:"/resources/help",scope:"#payments",label:"Sign in to Trolleys"},
     {path:"/",scope:"footer",label:"Sign in to Trolleys"},
     {path:"/",scope:".ec-home-hero",label:"Start now"},
-    {path:"/merchant-onboarding",scope:"[data-service-actions]",label:"Start now"},
-    {path:"/online-businesses",scope:".online-business-actions",label:"Start now"},
+    {path:"/services/merchant-onboarding",scope:"[data-service-actions]",label:"Start now"},
+    {path:"/use-cases/online-businesses",scope:".online-business-actions",label:"Start now"},
     {path:"/pricing",scope:".commercial-action",label:"Start now"},
-    {path:"/contact",scope:"#merchant-application",label:"Start now"},
-    {path:"/docs/merchant-onboarding",scope:"#create-account",label:"Start now"},
-    {path:"/docs/merchant-onboarding",scope:"#sign-in",label:"Sign in to Trolleys"},
+    {path:"/company/contact",scope:"#merchant-application",label:"Start now"},
+    {path:"/resources/merchant-account-setup",scope:"#create-account",label:"Start now"},
+    {path:"/resources/merchant-account-setup",scope:"#sign-in",label:"Sign in to Trolleys"},
     ...(isMobile ? [{path:"/",scope:"header",label:"Start now"}] : []),
   ];
   for(const [index,entry] of entries.entries()){
@@ -419,20 +420,20 @@ test("opening artwork symbols use embedded styles or early image requests on fir
     if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
     await route.continue();
   });
-  for (const path of ["/", "/software-partners", "/switch-payment-providers", "/merchant-onboarding", "/payment-partnerships", "/platform-payment-models", "/payment-facilitator", "/contact"]) {
-    const embedded = ["/", "/software-partners", "/switch-payment-providers"].includes(path);
-    symbolName = path === "/merchant-onboarding" ? "trolleys-portal-logo" : "symbol";
+  for (const path of ["/", "/use-cases/software-platforms", "/use-cases/switch-merchant-services", "/services/merchant-onboarding", "/use-cases/software-platforms/partnerships", "/use-cases/software-platforms/payment-models", "/services/payment-facilitator", "/company/contact"]) {
+    const embedded = ["/", "/use-cases/software-platforms", "/use-cases/switch-merchant-services"].includes(path);
+    symbolName = path === "/services/merchant-onboarding" ? "trolleys-portal-logo" : "symbol";
     for (const refresh of [false, true]) {
       symbolRequested = false;
       resourcesReady = new Promise<void>(resolve => { releaseResources = resolve; });
       try {
         if (refresh) await page.reload({ waitUntil: "commit" });
         else await page.goto(path, { waitUntil: "commit" });
-        if (!embedded && path !== "/merchant-onboarding") await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
+        if (!embedded && path !== "/services/merchant-onboarding") await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
       } finally { releaseResources(); }
       await page.waitForLoadState("load");
       const preloads = page.locator(`head link[rel="preload"][as="image"][href*="/${symbolName}."]`);
-      if (path === "/merchant-onboarding") {
+      if (path === "/services/merchant-onboarding") {
         expect(symbolRequested).toBe(false);
         await expect(page.locator("main .brand-image-trolleys")).toHaveCSS("content", /url\("data:image\/png;base64,/);
         await expect(preloads).toHaveCount(0);

@@ -8,9 +8,9 @@ const production = { NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH
 describe("frozen release inventory", () => {
   it("includes exactly the reviewed pages and legal exclusions", () => {
     expect(new Set(STANDARD_REFERENCE_PATHS).size).toBe(3706);
-    expect(new Set(PUBLIC_CONTENT_PATHS).size).toBe(3752);
-    expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3740);
-    expect(INDEXABLE_PUBLIC_PATHS).not.toContain("/privacy"); expect(INDEXABLE_PUBLIC_PATHS).not.toContain("/terms");
+    expect(new Set(PUBLIC_CONTENT_PATHS).size).toBe(3751);
+    expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3731);
+    expect(INDEXABLE_PUBLIC_PATHS).not.toContain("/company/privacy"); expect(INDEXABLE_PUBLIC_PATHS).not.toContain("/company/terms");
     for (const path of STANDARD_REFERENCE_PATHS) {
       expect(publicDocumentPath(path)).toBe(path);
       expect(publicPayloadPath(path + ".txt")).toBe(path);
@@ -25,7 +25,7 @@ describe("frozen release inventory", () => {
     }
   });
   it("denies unsupported tables, edition paths, encodings and invented payloads", async () => {
-    for (const path of ["/guides/iso-8583/2023/messages/2100", "/guides/iso-8583/messages/9999", "/guides/iso-8583/fields/999", "/guides/iso-20022/unknown", "/guides/%69so-8583/messages/2100", "/GUIDES/ISO-20022", "/guides/iso-8583/messages/2100/__next.secret.txt"]) {
+    for (const path of ["/resources/guides/iso-8583/2023/messages/2100", "/resources/guides/iso-8583/messages/9999", "/resources/guides/iso-8583/fields/999", "/resources/guides/iso-20022/unknown", "/resources/guides/%69so-8583/messages/2100", "/GUIDES/ISO-20022", "/resources/guides/iso-8583/messages/2100/__next.secret.txt"]) {
       let downstream = false;
       const response = await handlePublicRequest(new Request(canonicalOrigin + path), { next: async () => { downstream = true; return new Response("unexpected"); }, deploy: { context: "production" }, site: { id: PUBLIC_INDEXING_APPROVAL.siteId } }, production);
       expect(response.status, path).toBe(404); expect(downstream).toBe(false);

@@ -1,2 +1,2 @@
 import { legalPageMetadata } from "@/features/company/legal/metadata";
-export const metadata = legalPageMetadata("/terms");
+export const metadata = legalPageMetadata("/company/terms");

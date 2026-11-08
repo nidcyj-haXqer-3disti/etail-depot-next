@@ -9,7 +9,7 @@ export const disputesContent = {
     "intro": "Understand the claim, decide whether to accept or challenge it, and respond before the deadline. Follow the outcome and its effect on your account.",
     "action": {
       "label": "Explore dispute guidance",
-      "href": "/docs/refunds-and-disputes#dispute-case"
+      "href": "/developers/api-reference#dispute-case"
     },
     "art": {
       "title": "A dispute notice leads to accepting the claim or challenging it with relevant evidence before the deadline",

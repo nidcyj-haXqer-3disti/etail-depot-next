@@ -1,3 +1,4 @@
+import { DEVELOPER_PATHS } from "../src/shared/site/developer-paths.ts";
 import { sourceOnlyStaticFile } from "./file-publication-policy.ts";
 /** Pure deployment-boundary detectors, shared by packaging checks and adversarial tests. */
 import { LEGAL_CENTER_PATHS } from "../src/shared/site/legal-paths.ts";
@@ -13,28 +14,28 @@ export const edgeHandler = "public-boundary";
 /** Exact reviewed pages: adding a guide never opens the rest of its route family. */
 const retainedCorePageSources = [
   "page.tsx",
-  "credit-card-services/page.tsx",
-  "payment-acceptance-service/page.tsx",
-  "help/page.tsx",
-  "privacy/page.tsx",
-  "terms/page.tsx",
-  "guides/page.tsx",
+  "services/card-services/page.tsx",
+  "services/merchant-services/page.tsx",
+  "resources/help/page.tsx",
+  "company/privacy/page.tsx",
+  "company/terms/page.tsx",
+  "resources/guides/page.tsx",
 ] as const;
 export const publicHtmlFiles = PUBLIC_CONTENT_PATHS.map(path => path === "/" ? "index.html" : `${path.slice(1)}.html`);
 /** Local source/export permission is separate from the published-page allowlist. */
-export const localCorePreviewPageSources = ["software-partners/page.tsx", "docs/page.tsx", "online-businesses/page.tsx", "docs/merchant-onboarding/page.tsx", "docs/integration-access/page.tsx", "docs/checkout/page.tsx", "docs/payment-requests/page.tsx", "docs/payment-status/page.tsx", "docs/refunds-and-disputes/page.tsx", "docs/payouts/page.tsx", "docs/webhooks/page.tsx", "docs/testing-and-launch/page.tsx"] as const;
+export const localCorePreviewPageSources = ["use-cases/software-platforms/page.tsx", "use-cases/online-businesses/page.tsx", ...DEVELOPER_PATHS.map(path=>`${path.slice(1)}/page.tsx`)] as const;
 export const localStandardPageSources = [
-  "guides/iso-20022/page.tsx", "guides/iso-20022/[set]/page.tsx", "guides/iso-20022/[set]/[code]/page.tsx",
-  "guides/iso-8583/page.tsx", "guides/iso-8583/[table]/page.tsx", "guides/iso-8583/[table]/[code]/page.tsx",
+  "resources/guides/iso-20022/page.tsx", "resources/guides/iso-20022/[set]/page.tsx", "resources/guides/iso-20022/[set]/[code]/page.tsx",
+  "resources/guides/iso-8583/page.tsx", "resources/guides/iso-8583/[table]/page.tsx", "resources/guides/iso-8583/[table]/[code]/page.tsx",
 ] as const;
 export const commercialPageSources = COMMERCIAL_PATHS.map(path => `${path.slice(1)}/page.tsx`);
 export const publicPageSources = [...RESOURCE_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...LEGAL_CENTER_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...commercialPageSources, ...retainedCorePageSources, ...localCorePreviewPageSources, ...localStandardPageSources];
 /** Customer facing publication scope authorized on 5 November 2026. Account acceptance remains separate. */
 export const reviewedLegalPageSources: readonly string[] = [
-  "legal/page.tsx", "legal/merchant-services/page.tsx", "legal/fees/page.tsx",
-  "legal/payouts-and-reserves/page.tsx", "legal/acceptable-use/page.tsx",
-  "legal/software-platforms/page.tsx", "legal/acquirer-disclosure/page.tsx",
-  "legal/merchant-privacy/page.tsx", "legal/data-processing/page.tsx", "legal/security-policy/page.tsx",
+  "company/legal/page.tsx", "company/legal/merchant-services/page.tsx", "company/legal/fees/page.tsx",
+  "company/legal/payouts-and-reserves/page.tsx", "company/legal/acceptable-use/page.tsx",
+  "company/legal/software-platforms/page.tsx", "company/legal/acquirer-disclosure/page.tsx",
+  "company/legal/merchant-privacy/page.tsx", "company/legal/data-processing/page.tsx", "company/legal/security-policy/page.tsx",
 ];
 /** A future legal page is not approved merely because it joins the route inventory. */
 export function pendingLegalPageSources(sources: readonly string[]): string[] {
@@ -52,6 +53,19 @@ export function reviewedPublicAppModule(appPath: string): boolean {
 }
 
 const reviewedFeatureSources = new Set<string>([
+  "src/features/developers/guidance/checkout.ts",
+  "src/features/developers/guidance/integration-access.ts",
+  "src/features/developers/guidance/payment-requests.ts",
+  "src/features/developers/guidance/payment-status.ts",
+  "src/features/developers/guidance/payouts.ts",
+  "src/features/developers/guidance/refunds-and-disputes.ts",
+  "src/features/developers/guidance/testing-and-launch.ts",
+  "src/features/developers/guidance/webhooks.ts",
+  "src/features/developers/metadata.ts",
+  "src/features/developers/navigation.tsx",
+  "src/features/developers/page-content.tsx",
+  "src/features/resources/merchant-account-setup/page-content.tsx",
+
   "src/features/commercial-catalog.ts",
   "src/features/company/about/about-page.module.css",
   "src/features/company/about/about-page.tsx",
@@ -93,34 +107,6 @@ const reviewedFeatureSources = new Set<string>([
   "src/features/resources/components/guide-preview-image.tsx",
   "src/features/resources/components/integration-guide-step-state.tsx",
   "src/features/resources/components/integration-guide.module.css",
-  "src/features/resources/documentation/articles.ts",
-  "src/features/resources/documentation/catalog.ts",
-  "src/features/resources/documentation/checkout/content.ts",
-  "src/features/resources/documentation/checkout/metadata.ts",
-  "src/features/resources/documentation/connected-resources-documentation.css",
-  "src/features/resources/documentation/documentation-craft.css",
-  "src/features/resources/documentation/documentation-diagrams.tsx",
-  "src/features/resources/documentation/documentation-navigation.tsx",
-  "src/features/resources/documentation/documentation.css",
-  "src/features/resources/documentation/documentation.tsx",
-  "src/features/resources/documentation/enterprise-support-documentation.css",
-  "src/features/resources/documentation/integration-access/content.ts",
-  "src/features/resources/documentation/integration-access/metadata.ts",
-  "src/features/resources/documentation/metadata.ts",
-  "src/features/resources/documentation/payment-requests/content.ts",
-  "src/features/resources/documentation/payment-requests/metadata.ts",
-  "src/features/resources/documentation/payment-status/content.ts",
-  "src/features/resources/documentation/payment-status/metadata.ts",
-  "src/features/resources/documentation/payouts/content.ts",
-  "src/features/resources/documentation/payouts/metadata.ts",
-  "src/features/resources/documentation/refunds-and-disputes/content.ts",
-  "src/features/resources/documentation/refunds-and-disputes/metadata.ts",
-  "src/features/resources/documentation/site-artwork-polish-documentation.css",
-  "src/features/resources/documentation/testing-and-launch/content.ts",
-  "src/features/resources/documentation/testing-and-launch/metadata.ts",
-  "src/features/resources/documentation/types.ts",
-  "src/features/resources/documentation/webhooks/content.ts",
-  "src/features/resources/documentation/webhooks/metadata.ts",
   "src/features/resources/guides/connected-resources-guides.css",
   "src/features/resources/guides/enterprise-support-guides.css",
   "src/features/resources/guides/guide-directory.css",
@@ -354,7 +340,7 @@ export function forbiddenStatic(filename: string): boolean {
   return sourceOnlyStaticFile(normalized) || forbiddenArtifact(normalized) || /(?:^|\/)(?:src|review|artifacts|content|outputs|tools|node_modules|\.next|functions|functions-internal)(?:\/|$)/.test(normalized) ||
     (managedContentRoute(`/${normalized}`) && (!publicExportFile(normalized) || normalized !== filename)) || retiredArticleRoute(`/${normalized}`) ||
     /\.(?:sql|sqlite|sqlite3|db|dump|zip|eszip)$/i.test(normalized) ||
-    retiredFamilies.some(family => normalized === family || normalized.startsWith(`${family}/`) || normalized === `${family}.html` || normalized === `${family}.txt`);
+    retiredFamilies.some(family => (normalized === family || normalized.startsWith(`${family}/`) || normalized === `${family}.html` || normalized === `${family}.txt`) && !(family === "services" && publicExportFile(normalized)));
 }
 
 /** All requests pass the single public boundary so deployment-context search protection cannot be bypassed. */

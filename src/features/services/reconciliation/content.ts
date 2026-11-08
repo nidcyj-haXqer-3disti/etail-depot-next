@@ -9,7 +9,7 @@ export const reconciliationContent = {
     "intro": "Match payments and adjustments to the payout report, then match the payout to your bank. Separate timing differences from amounts that need investigation.",
     "action": {
       "label": "Explore reconciliation guidance",
-      "href": "/docs/payouts"
+      "href": "/developers/api-reference#payouts"
     },
     "art": {
       "title": "Match payment activity to the payout, then the payout to the bank statement; investigate remaining differences",

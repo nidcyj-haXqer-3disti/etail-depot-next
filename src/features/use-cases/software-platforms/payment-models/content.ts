@@ -5,7 +5,7 @@ export const paymentModelsContent = {
     description: "Compare merchant account relationships for software platforms and marketplaces, including checkout, reporting and payment support.",
     heading: "Match the account to the selling business.",
     intro: "Connect each sale to the right business, merchant account and payment records. Start with who sells and who receives payment.",
-    action: { label: "Discuss your platform", href: "/contact#platforms" },
+    action: { label: "Discuss your platform", href: "/company/contact#platforms" },
     note: "Account structure, supported payment flows and commercial terms are agreed for each partnership.",
     art: { layout: "platform", title: "Your software and the merchant account.", caption: "A software connection does not by itself authorize the platform to hold, split or distribute customer funds.", steps: [
       { title: "The selling business", detail: "Customer agreement and merchant account" },
@@ -21,7 +21,7 @@ export const paymentModelsContent = {
       { title: "Merchant accounts, support and reporting.", items: [
         { title: "Merchant onboarding and ownership", text: "Each merchant applies for its account and accepts the merchant agreement. Your platform’s access to account information and payment actions depends on the permissions approved for your integration." },
         { title: "Customer experience and support", text: "Customers should know which business they are paying and where to ask for help. Connect checkout to the purchase, and make it clear which team handles order questions, refunds and disputes." },
-        { title: "Reporting and commercial terms", href: "/payment-partnerships", text: "Keep merchant, order and payment references together in your reports. Your agreement sets out processing charges, any platform fees and responsibility for adjustments. Revenue sharing, funds control and data portability require their own terms." },
+        { title: "Reporting and commercial terms", href: "/use-cases/software-platforms/partnerships", text: "Keep merchant, order and payment references together in your reports. Your agreement sets out processing charges, any platform fees and responsibility for adjustments. Revenue sharing, funds control and data portability require their own terms." },
       ] },
     ],
   } as const satisfies CommercialPage;

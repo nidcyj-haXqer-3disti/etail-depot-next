@@ -9,8 +9,8 @@ export function verifyReferenceRelease(root) {
   const receipt = JSON.parse(readFileSync(path.join(root, "tools/reference-release.json"), "utf8"));
   assert.equal(receipt.scope.contentPages, PUBLIC_CONTENT_PATHS.length);
   assert.equal(receipt.scope.sitemapPages, INDEXABLE_PUBLIC_PATHS.length);
-  assert.equal(PUBLIC_CONTENT_PATHS.filter(p => p.startsWith("/guides/iso-20022")).length, receipt.scope.iso20022Pages);
-  assert.equal(PUBLIC_CONTENT_PATHS.filter(p => p.startsWith("/guides/iso-8583")).length, receipt.scope.independent8583Pages);
+  assert.equal(PUBLIC_CONTENT_PATHS.filter(p => p.startsWith("/resources/guides/iso-20022")).length, receipt.scope.iso20022Pages);
+  assert.equal(PUBLIC_CONTENT_PATHS.filter(p => p.startsWith("/resources/guides/iso-8583")).length, receipt.scope.independent8583Pages);
   assert.equal(existsSync(path.join(root, "src/modules/public-site/iso8583-data.json")), false, "Reproduced ISO tables are not part of this release.");
   for (const [file, expected] of Object.entries(receipt.files)) {
     assert.equal(createHash("sha256").update(readFileSync(path.join(root, file))).digest("hex"), expected, `${file}: reference source or notice changed; review and record the new source before packaging.`);
@@ -19,7 +19,7 @@ export function verifyReferenceRelease(root) {
   assert(legal?.reviewed && legal?.basis, "Legal publication requires an explicit review record.");
   assert.deepEqual(legal.paths.map(route => `${route.slice(1)}/page.tsx`).sort(), [...reviewedLegalPageSources].sort(), "Legal publication paths must match the reviewed source allowlist.");
   const requiredLegalFiles = [
-    "src/app/legal/page.tsx",
+    "src/app/company/legal/page.tsx",
     "src/features/company/legal/legal-center/page-content.tsx",
     "src/features/company/legal/legal-center/metadata.ts",
     "src/features/company/legal/legal-center/content.ts",

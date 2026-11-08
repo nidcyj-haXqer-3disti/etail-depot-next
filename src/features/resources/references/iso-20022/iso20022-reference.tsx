@@ -12,7 +12,7 @@ import "../components/connected-resources-reference.css";
 type Props = { set?: IsoCodeSet; code?: IsoCode };
 function SourceLink({ children }: { children: React.ReactNode }) { return <a href={ISO20022_SOURCE} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">{children} <span aria-hidden="true">↗</span></a>; }
 function Crumbs({ set, code }: Props) {
-  return <nav className="sr-crumbs" aria-label="Breadcrumb"><Link href="/guides" prefetch={false}>Guides</Link><span aria-hidden="true">/</span>{set ? <Link href={ISO20022_PATH} prefetch={false}>ISO 20022</Link> : <span aria-current="page">ISO 20022</span>}{set && <><span aria-hidden="true">/</span>{code ? <Link href={set.path} prefetch={false}>{set.title}</Link> : <span aria-current="page">{set.title}</span>}</>}{code && <><span aria-hidden="true">/</span><span aria-current="page">{code.code}</span></>}</nav>;
+  return <nav className="sr-crumbs" aria-label="Breadcrumb"><Link href="/resources/guides" prefetch={false}>Guides</Link><span aria-hidden="true">/</span>{set ? <Link href={ISO20022_PATH} prefetch={false}>ISO 20022</Link> : <span aria-current="page">ISO 20022</span>}{set && <><span aria-hidden="true">/</span>{code ? <Link href={set.path} prefetch={false}>{set.title}</Link> : <span aria-current="page">{set.title}</span>}</>}{code && <><span aria-hidden="true">/</span><span aria-current="page">{code.code}</span></>}</nav>;
 }
 function ReplacementValue({ set, code }: { set: IsoCodeSet; code: IsoCode }) {
   const replacement = codeReplacement(set, code);

@@ -16,21 +16,21 @@ import { reconciliationContent } from "@/features/services/reconciliation/conten
 import { disputesContent } from "@/features/services/disputes/content";
 
 export const COMMERCIAL_PAGES = {
-  "/merchant-onboarding": merchantOnboardingContent,
-  "/payment-methods": paymentMethodsContent,
-  "/payouts-and-reconciliation": payoutsContent,
-  "/refunds-and-disputes": refundsContent,
+  "/services/merchant-onboarding": merchantOnboardingContent,
+  "/services/payment-methods": paymentMethodsContent,
+  "/services/payouts": payoutsContent,
+  "/services/refunds": refundsContent,
   "/pricing": pricingContent,
-  "/payment-partnerships": partnershipsContent,
-  "/payment-facilitator": serviceModelContent,
-  "/company": aboutContent,
-  "/trust": trustContent,
-  "/contact": contactContent,
-  "/ach-payments": achPaymentsContent,
-  "/switch-payment-providers": switchMerchantServicesContent,
-  "/platform-payment-models": paymentModelsContent,
-  "/reconciliation": reconciliationContent,
-  "/disputes": disputesContent,
+  "/use-cases/software-platforms/partnerships": partnershipsContent,
+  "/services/payment-facilitator": serviceModelContent,
+  "/company/about": aboutContent,
+  "/company/security": trustContent,
+  "/company/contact": contactContent,
+  "/services/ach-payments": achPaymentsContent,
+  "/use-cases/switch-merchant-services": switchMerchantServicesContent,
+  "/use-cases/software-platforms/payment-models": paymentModelsContent,
+  "/services/reconciliation": reconciliationContent,
+  "/services/disputes": disputesContent,
 } as const;
 
 export type CommercialPath = keyof typeof COMMERCIAL_PAGES;

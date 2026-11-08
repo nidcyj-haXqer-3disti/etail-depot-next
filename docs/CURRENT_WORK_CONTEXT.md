@@ -1,55 +1,35 @@
 # Current work context
 
-This is the single current status record. Update this document for active scope and release status; retain detailed evidence in the relevant receipt. Historical logs are in [archive/project-history](../archive/project-history/).
+Updated 9 November 2026. The five repository restructure stages and subsequent Developers and Resources alignment are complete. Their immutable evidence remains in `docs/plans/`. All five category URL migration stages are now complete locally.
 
-## Repository restructure
+## Active scope
 
-Updated 8 November 2026. The user authorized a further audit of all five stages of the [five-stage plan](plans/repository-restructure.json). This is local preparation only. No push, merge, deployment or remote settings change is authorized for this restructure.
+Branch: `codex/url-category-alignment-20261108`, based on association review commit `6c27b215debd78d9a453ae54a2cd1990a23a7f8d`, retaining the preceding Developers alignment changes.
 
-| Stage | State | Record |
-| --- | --- | --- |
-| 1. Baseline and migration map | Complete | [File map](plans/repository-file-map.json), [URL map](plans/repository-route-map.json) |
-| 2. Shared foundation and ACH pilot | Complete | [Stage 2 receipt](plans/repository-stage2.json) |
-| 3. Remaining business features | Complete | [Stage 3 receipt](plans/repository-stage3.json) |
-| 4. Engineering instructions and reviewed history | Complete | [Stage 4 receipt](plans/repository-stage4.json) |
-| 5. Combined verification and release preparation | Complete locally | [Stage 5 receipt](plans/repository-stage5.json) |
+1. Map every existing public page to its final category address.
+2. Move page wrappers and update navigation and authored links, preserving section anchors.
+3. Update metadata, structured data and sitemap to final addresses.
+4. Redirect former addresses directly to the corresponding final page.
+5. Test the complete migration against the exact candidate before publication.
 
-The active branch is `codex/association-review-20261108`, based on the completed audit commit `a7f4d1f706a9d54dfad6c83683b9dc87db79fd10`. The last published baseline verified in Stage 1 is commit `e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5`, Netlify deploy `6aef58f5c8e79bce7be0b5b3`. Stage 5 read-only GitHub and Netlify checks confirmed that both main and the current published deploy still point to this baseline. No remote settings were changed.
+The complete mapping is in [category-url-map.json](plans/category-url-map.json). There are 3,738 moved addresses and 13 unchanged addresses. Services, Use cases, Developers, Resources and Company use their respective URL families. Home and Pricing remain unchanged. No category overview pages are added.
 
-The earlier working copy, including the unpublished future Developers feature, remains separate and unchanged. Do not copy it wholesale into this migration.
+All former `/docs` pages remain redirect only. Merchant account setup belongs to `/resources/merchant-account-setup`. Existing guidance remains within the eight planned Developers pages. All eight mark Etail API products as unavailable; none creates a financial or account runtime.
 
-## Active website
+The candidate still has 3,751 content pages and 3,731 search eligible URLs. Twelve legal/policy pages and eight unfinished Developers pages remain noindex. Frozen reference data, licensing, legal provisions, company identity, asset URLs and approved vendor destinations are unchanged. Exact new service documents are exempted from historical account-route retirement; unknown or operational service paths remain closed.
 
-- Exact scope: 3,752 content pages and 3,740 search-eligible URLs, recorded in [the release manifest](../tools/reference-release.json). The 12 legal/policy pages remain noindex and excluded from the sitemap.
-- Page routes, content, pricing, eligibility, artwork, reference data, source notices and merchant handoffs remain unchanged by the restructure.
-- Existing public areas are Home, Services, Use cases, Developers navigation, Resources, Pricing and Company. Vendor integration guidance currently belongs to Resources. Future Etail developer products require their own approval.
-- Only the public website and approved vendor links run here. No merchant authentication, account application, payment processing, API, KYC, ledger or database runtime may be added.
-- Sign in and registration use the fixed Welcome URL in [hosted services](../src/shared/site/hosted-services.ts), without forwarded input or referrers. Card applications remain closed.
+## Verification and release
 
-## Current association review
+Local implementation and all five migration stages are complete. The [category alignment receipt](plans/category-url-alignment.json) records stages 1 through 4. The [Stage 5 receipt](plans/category-url-stage5.json) records a fresh run of all four release-preparation commands against the unchanged final source fingerprint. That run passed 491 unit tests, 310 desktop/mobile tests and 153 accessibility tests, with one expected desktop skip. Source security and dependency checks passed. No runtime or presentation changes were needed during Stage 5.
 
-The [folder, URL and ownership review](plans/repository-association-review.json) is complete locally. The current [repository guide](REPOSITORY_GUIDE.md) maps business areas to addresses and actual implementation folders.
+All 380,388 internal link occurrences across 3,751 exported pages resolve. All 3,750 legacy addresses passed 11,250 actual local HTTP requests to direct final destinations. An additional 127,501 assertions covered URL variants, GET/HEAD redirects, rejected submitted bodies and approved production, former production origin, preview and wrong-site contexts. Chromium and WebKit passed 48 migration journey checks at phone and desktop widths, including bookmarks, refresh, header/footer navigation and browser Back. The earlier 72 responsive page/width checks remain recorded in the stages 1 through 4 receipt.
 
-One existing navigation mismatch was corrected: `/docs/merchant-onboarding` is listed under Resources, but the broader `/docs` match highlighted Developers. The header now uses the most specific matching destination. Menu labels, public URLs, content and artwork remain unchanged. Six empty retired source directories were removed locally; no tracked files were deleted.
+The production sitemap has exactly 3,731 URLs; preview and unapproved contexts remain noindex with an empty sitemap. Source, export and package fingerprints match. The local package retains 3,751 content pages, one Edge boundary and the protected email handler. Repository-only files remain outside website output. Local Stage 5 evidence and screenshots are in `outputs/url-migration-stage5-20261109/` in the original checkout, outside the published website.
 
-All 3,752 public URLs map to 52 current route modules and their feature owners. The scan checked 156,211 internal link occurrences, 11,830 distinct local destinations including anchors, and 114 referenced local assets without missing targets. Shared merchant legal content and generated references do not require a separate source folder or file for every URL. Existing Developers navigation still leads to vendor documentation under Resources; future Etail APIs/SDKs remain outside this scope.
+Last verified published baseline: `e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5`, Netlify deploy `6aef58f5c8e79bce7be0b5b3`. On 9 November 2026, the user authorized committing and pushing this feature branch, opening a pull request against `main`, and checking its GitHub CI result. Merge, production deployment and remote protection changes are outside this step. Hosted redirects, cache and headers remain part of a separately authorized release. Preserve the existing manual publication procedure.
 
-## Verification state
-
-All four release commands passed on this follow-up: 452 unit checks, 322 Chromium desktop/mobile checks, 156 accessibility checks, production SEO, packaging and package verification. One existing desktop skip covers a mobile-only scenario. Two focused WebKit checks passed. The corrected menu was verified at 320, 390, 768, 1024 and 1280 pixels, including refresh. The dependency audit reported no known vulnerabilities. The first supplementary WebKit run used the wrong build context; its unchanged preview assertion passed after rebuilding the preview. Production SEO and packaging were then restored and verified again, with the initial failure retained in the receipt.
-
-The targeted unit checks reproduced the old mismatch before the correction. All 3,752 page outputs retain their content, semantic structure, metadata, links and anchors; compiled classes/scripts are excluded from that comparison, and the intentional menu highlight change is checked separately. The import graph has 1,016 resolved local edges, no unexpected missing imports and no runtime cycles. Current documentation links and shared tool/CI/Netlify connections resolve.
-
-Source, build and package fingerprint: `a436d2c137503ef8536f6154579af41e754e50fa5be18af92b7a71a45c96542d`. Production retains 3,740 sitemap URLs, 12 noindex legal/policy pages and 18,945 packaged static files, one public Edge boundary and the existing protected Emails handler. No push, PR, merge or deployment occurred.
-
-The earlier [five-stage audit](plans/repository-audit.json) and Stage 5 visual comparisons remain evidence for their recorded pre-fix candidate. They are not presented as new visual tests of this follow-up. External provider operation and hosted behavior of the next deployment remain separate checks.
-
-## Next work
-
-The five local restructure stages and the association follow-up are complete. The updated local PR description and release procedure are ready for publication authorization. After authorization, use the exact reviewed candidate, pass upstream CI, review/merge and manually deploy through the existing Netlify Git build. Recheck hosted behavior after publication; local checks do not replace it.
-
-The older SEO plans, product research and platform backlogs are historical. Search performance must be assessed from current evidence if requested. Magento/Adobe Commerce, custom-site integration guides, new APIs/SDKs and the unpublished Developers feature are separate future scopes; no completion or publication is implied here.
+The final GitHub audit verified the 902-file candidate, unchanged remote baseline, clean publication boundary and unchanged Stage 5 runtime fingerprint. The contributor Help link was corrected to `/resources/help`. Fresh architecture, source-publication and package checks passed. The existing `main` workflow passed, but the candidate must pass its own `public-website` check before merge. `main` currently has no protection or ruleset; enabling protection remains a separate recommendation.
 
 ## Operating instructions
 
-Use [source precedence](SOURCE_PRECEDENCE.md), [architecture](PUBLIC_SITE_ARCHITECTURE.md), [contributor workflow](../CONTRIBUTING.md), [page paint rules](PAGE_PAINT_STANDARDS.md), [file publication policy](FILE_PUBLICATION_POLICY.md) and the [Netlify runbook](NETLIFY_DEPLOYMENT.md). Exact allowed and denied targets remain in [project-targets.json](../project-targets.json).
+Use [source precedence](SOURCE_PRECEDENCE.md), [architecture](PUBLIC_SITE_ARCHITECTURE.md), [repository guide](REPOSITORY_GUIDE.md), [contributor workflow](../CONTRIBUTING.md), [page paint rules](PAGE_PAINT_STANDARDS.md), [file publication policy](FILE_PUBLICATION_POLICY.md) and [Netlify runbook](NETLIFY_DEPLOYMENT.md). Exact permitted and denied targets remain in `project-targets.json`.

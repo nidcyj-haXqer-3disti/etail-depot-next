@@ -10,7 +10,7 @@ const sections: LegalSection[] = [
       <h3>This website</h3>
       <p>This policy covers information handled when you browse this website or contact Etail Depot about merchant services, card services or a software partnership. The website provides service information, Guides, payment standards references, documentation and interactive tools. Account registration, card management and payment processing take place through the relevant product service.</p>
       <h3>Privacy for your account</h3>
-      <p>Merchant applications, identity verification, payment transactions and card account records are outside the scope of this website policy. Request the privacy notice for the relevant service before providing personal or financial information. See our <Link href="/legal/merchant-privacy">Merchant privacy notice</Link> for information handled in that service. This website policy does not replace a service privacy notice or change our responsibilities for information we handle.</p>
+      <p>Merchant applications, identity verification, payment transactions and card account records are outside the scope of this website policy. Request the privacy notice for the relevant service before providing personal or financial information. See our <Link href="/company/legal/merchant-privacy">Merchant privacy notice</Link> for information handled in that service. This website policy does not replace a service privacy notice or change our responsibilities for information we handle.</p>
     </>,
   },
   {

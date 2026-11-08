@@ -1,3 +1,4 @@
+import { currentPublicHref } from "@/shared/site/page-url-migrations";
 import Link from "next/link";
 import content from "@/features/company/legal/merchant-legal-content.json";
 import { legalDocuments, type LegalDocumentSlug } from "@/features/company/legal/legal-center/content";
@@ -37,7 +38,7 @@ export function LegalServiceDocument({ slug }: { slug: LegalDocumentSlug }) {
       {section.table && <Schedule type={section.table} />}
       {section.record && <dl className="legal-record-list">{section.record.map(item => <div key={item.label}><dt>{item.label}</dt><dd>{item.description}</dd></div>)}</dl>}
       {section.bullets && <ul>{section.bullets.map(item => <li key={item}>{item}</li>)}</ul>}
-      {section.links && <ul className="legal-related-links">{section.links.map(link => <li key={link.href}>{link.href.startsWith("/") ? <Link href={link.href}>{link.label}</Link> : <a href={link.href} {...(link.href.startsWith("https:") ? { rel: "external noreferrer", referrerPolicy: "no-referrer" as const } : {})}>{link.label}</a>}</li>)}</ul>}
+      {section.links && <ul className="legal-related-links">{section.links.map(link => <li key={link.href}>{link.href.startsWith("/") ? <Link href={currentPublicHref(link.href)}>{link.label}</Link> : <a href={link.href} {...(link.href.startsWith("https:") ? { rel: "external noreferrer", referrerPolicy: "no-referrer" as const } : {})}>{link.label}</a>}</li>)}</ul>}
     </>,
   }));
   const updated = ["merchant-services", "fees", "payouts-and-reserves", "acceptable-use", "software-platforms", "acquirer-disclosure", "data-processing", "merchant-privacy"].includes(slug) ? "November 5, 2026" : "November 4, 2026";

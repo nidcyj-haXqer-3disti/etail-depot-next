@@ -9,7 +9,7 @@ export const paymentMethodsContent = {
     "intro": "Accept cards, digital wallets and ACH through the methods enabled for your account. Give customers a familiar way to pay and keep each payment connected to the order.",
     "action": {
       "label": "Explore online checkout",
-      "href": "/online-businesses#customer-checkout"
+      "href": "/use-cases/online-businesses#customer-checkout"
     },
     "note": "Methods depend on account setup. Wallet availability also depends on the customer’s card and device.",
     "art": {

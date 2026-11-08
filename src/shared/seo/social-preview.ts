@@ -13,16 +13,16 @@ export const socialPreviews = {
 } as const;
 export type SocialPreviewKey = keyof typeof socialPreviews;
 export function socialPreviewKey(path: string): SocialPreviewKey {
-  if (path === "/company") return "company";
-  if (path === "/guides/iso-20022" || path.startsWith("/guides/iso-20022/")) return "iso20022";
-  if (path === "/guides/iso-8583" || path.startsWith("/guides/iso-8583/")) return "iso8583";
-  if (path === "/guides") return "references";
+  if (path === "/company/about") return "company";
+  if (path === "/resources/guides/iso-20022" || path.startsWith("/resources/guides/iso-20022/")) return "iso20022";
+  if (path === "/resources/guides/iso-8583" || path.startsWith("/resources/guides/iso-8583/")) return "iso8583";
+  if (path === "/resources/guides") return "references";
   if (path === "/resources/shopify-gateway-integration" || path === "/resources/woocommerce-gateway-integration") return "documentation";
-  if (path === "/docs" || path.startsWith("/docs/")) return "documentation";
-  if (path === "/credit-card-services") return "cards";
-  if (path === "/switch-payment-providers") return "provider";
-  if (["/software-partners", "/platform-payment-models", "/payment-partnerships"].includes(path)) return "platforms";
-  if (["/payment-acceptance-service", "/online-businesses", "/payment-methods", "/merchant-onboarding", "/payouts-and-reconciliation", "/refunds-and-disputes", "/ach-payments", "/reconciliation", "/disputes", "/pricing"].includes(path)) return "merchant";
+  if (path.startsWith("/developers/") || path === "/resources/merchant-account-setup") return "documentation";
+  if (path === "/services/card-services") return "cards";
+  if (path === "/use-cases/switch-merchant-services") return "provider";
+  if (["/use-cases/software-platforms", "/use-cases/software-platforms/payment-models", "/use-cases/software-platforms/partnerships"].includes(path)) return "platforms";
+  if (["/services/merchant-services", "/use-cases/online-businesses", "/services/payment-methods", "/services/merchant-onboarding", "/services/payouts", "/services/refunds", "/services/ach-payments", "/services/reconciliation", "/services/disputes", "/pricing"].includes(path)) return "merchant";
   return "brand";
 }
 export function socialPreviewImage(path: string, origin: string) {

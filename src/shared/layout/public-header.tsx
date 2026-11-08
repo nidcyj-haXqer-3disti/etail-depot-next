@@ -135,7 +135,7 @@ export function PublicHeader() {
         <div className="header-actions">
           <PaymentPortalLink intent="register" className="header-start-now" />
           <PaymentPortalLink intent="sign-in" className="header-sign-in" showArrow />
-          <Link prefetch={false} href="/contact" className="header-contact header-contact-primary" onClick={closeMenu}>Contact sales</Link>
+          <Link prefetch={false} href="/company/contact" className="header-contact header-contact-primary" onClick={closeMenu}>Contact sales</Link>
         </div>
       </div>
     </div>

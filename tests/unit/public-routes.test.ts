@@ -8,33 +8,36 @@ const production = {
   NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production",
   ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
-const guidePaths = ["/guides"] as const;
+const guidePaths = ["/resources/guides"] as const;
 function context(response = new Response("public page"), changes: Partial<PublicBoundaryContext> = {}) {
   return { site: { id: PUBLIC_INDEXING_APPROVAL.siteId }, deploy: { context: "production" }, next: vi.fn(async () => response), ...changes };
 }
 const retiredDestinations = [
-  ["/login", "/help#access"], ["/cardholder-services/cards/old-id", "/credit-card-services#main-content"],
-  ["/cards/old-id", "/credit-card-services#main-content"], ["/merchant-services/terminals/old-id", "/payment-acceptance-service#main-content"],
-  ["/merchants/old-id", "/payment-acceptance-service#main-content"], ["/profile", "/help#access"], ["/security", "/help#access"],
-  ["/shared-access/old-id", "/help#access"], ["/invitations/old-id", "/help#access"], ["/money-accounts/old-id", "/#main-content"],
-  ["/accounts/old-id", "/#main-content"], ["/services", "/#main-content"], ["/operations", "/help#main-content"],
+  ["/login", "/resources/help#access"], ["/cardholder-services/cards/old-id", "/services/card-services#main-content"],
+  ["/cards/old-id", "/services/card-services#main-content"], ["/merchant-services/terminals/old-id", "/services/merchant-services#main-content"],
+  ["/merchants/old-id", "/services/merchant-services#main-content"], ["/profile", "/resources/help#access"], ["/security", "/resources/help#access"],
+  ["/shared-access/old-id", "/resources/help#access"], ["/invitations/old-id", "/resources/help#access"], ["/money-accounts/old-id", "/#main-content"],
+  ["/accounts/old-id", "/#main-content"], ["/services", "/#main-content"], ["/operations", "/resources/help#main-content"],
 ] as const;
 
 const movedPublicPages = [
-  ["/card-services", "/credit-card-services"],
-  ["/payment-services", "/payment-acceptance-service"],
+  ["/docs", "/developers/getting-started"],
+  ["/docs/checkout", "/developers/getting-started"],
+  ["/docs/merchant-onboarding", "/resources/merchant-account-setup"],
+  ["/card-services", "/services/card-services"],
+  ["/payment-services", "/services/merchant-services"],
 ] as const;
 const publicAliases = movedPublicPages.flatMap(([oldPath, destination]) =>
   [oldPath, `${oldPath}/`, `${oldPath}.html`, `${oldPath}/index.html`].map(path => [path, destination] as const),
 );
 
-describe.each(["software-partners", "docs", "online-businesses"])("reviewed %s boundary", root => {
+describe.each(["use-cases/software-platforms", "resources/merchant-account-setup", "developers/getting-started", "use-cases/online-businesses"])("reviewed %s boundary", root => {
   it.each(["GET", "HEAD"])("serves approved %s documents and keeps aliases and payloads private", async method => {
     for (const suffix of ["", "/", ".html", "/index.html", ".txt", "/__next._tree.txt"]) {
       const path = `/${root}${suffix}`, next = context(new Response(method === "HEAD" ? null : "page"));
       const response = await handlePublicRequest(new Request(canonicalOrigin + path, { method }), next, production);
       expect(response.status).toBe(200);
-      expect(response.headers.has("x-robots-tag")).toBe(suffix !== "");
+      expect(response.headers.has("x-robots-tag")).toBe(suffix !== "" || root.startsWith("developers/"));
       expect(next.next).toHaveBeenCalledTimes(1);
     }
   });
@@ -64,7 +67,7 @@ describe.each(["software-partners", "docs", "online-businesses"])("reviewed %s b
 
 describe("production domain migration", () => {
   it.each(["GET", "HEAD"])("redirects %s from the exact production subdomain without carrying query inputs", async method => {
-    for (const path of ["/", "/credit-card-services", "/payment-acceptance-service", "/help", ...guidePaths, "/privacy", "/terms", "/robots.txt", "/sitemap.xml", "/brand/logo.png", "/missing"]) {
+    for (const path of ["/", "/services/card-services", "/services/merchant-services", "/resources/help", ...guidePaths, "/company/privacy", "/company/terms", "/robots.txt", "/sitemap.xml", "/brand/logo.png", "/missing"]) {
       const next = context();
       const response = await handlePublicRequest(new Request(`${defaultOrigin}${path}?token=private&next=https://other.invalid#fees`, { method }), next, production);
       expect(response.status).toBe(308);
@@ -197,7 +200,7 @@ describe("renamed public product pages", () => {
       expect(response.headers.get("location")).toBe(`${canonicalOrigin}${destination}`);
       // No replacement fragment: the browser can retain an existing public section bookmark.
       expect(new URL(response.headers.get("location")!).hash).toBe("");
-      expect(response.headers.has("x-robots-tag")).toBe(false);
+      expect(response.headers.has("x-robots-tag")).toBe(destination.startsWith("/developers/"));
       expect(response.headers.has("set-cookie")).toBe(false);
       expect(await response.text()).toBe("");
       expect(next.next).not.toHaveBeenCalled();
@@ -236,12 +239,12 @@ describe("renamed public product pages", () => {
   });
 
   it.each(movedPublicPages)("does not redirect children or lookalikes of %s", async oldPath => {
-    for (const path of [`${oldPath}/missing`, `${oldPath}/index.html/extra`, `${oldPath}//`, `${oldPath}.txt`, `${oldPath}.html/`, `${oldPath}-other`, `${oldPath}%2Findex.html`, oldPath.replace("services", "%73ervices")]) {
+    for (const path of [`${oldPath}/missing`, `${oldPath}/index.html/extra`, `${oldPath}//`, `${oldPath}.txt`, `${oldPath}.html/`, `${oldPath}-other`, `${oldPath}%2Findex.html`, oldPath.replace("/", "/%2F")]) {
       const next = context(new Response("Not found", { status: 404 }));
       const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), next, production);
       expect(response.status).toBe(404);
       expect(response.headers.has("location")).toBe(false);
-      expect(next.next).toHaveBeenCalledTimes(1);
+      expect(next.next).toHaveBeenCalledTimes(managedContentRoute(path) ? 0 : 1);
     }
   });
 });
@@ -269,7 +272,7 @@ describe("retired application boundary", () => {
       expect(response.status).toBe(410);
       expect(response.headers.has("location")).toBe(false);
       expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
-      expect(await response.text()).toBe(method === "HEAD" ? "" : "This service link is no longer available. Visit /help for support.");
+      expect(await response.text()).toBe(method === "HEAD" ? "" : "This service link is no longer available. Visit /resources/help for support.");
       expect(next.next).not.toHaveBeenCalled();
       expect(request.bodyUsed).toBe(false);
     }
@@ -285,7 +288,7 @@ describe("retired application boundary", () => {
       expect(request.bodyUsed).toBe(false);
     }
   });
-  it.each(["/", "/credit-card-services", "/payment-acceptance-service", "/help", ...guidePaths, "/privacy", "/terms", "/apiary", "/constructor", "/__proto__"])("does not capture public or unrelated route %s", path => {
+  it.each(["/", "/services/card-services", "/services/merchant-services", "/resources/help", ...guidePaths, "/company/privacy", "/company/terms", "/apiary", "/constructor", "/__proto__"])("does not capture public or unrelated route %s", path => {
     expect(retiredRoute(path)).toBeNull();
   });
 });
@@ -294,7 +297,7 @@ describe("public Edge search and security policy", () => {
   it("matches all routes and methods and fails closed rather than bypassing policy", () => {
     expect(config).toEqual({ pattern: "^/.*$", onError: "fail" });
   });
-  it.each(["/payment-acceptance-service", ...guidePaths])("keeps the %s response and security headers on the approved production site", async path => {
+  it.each(["/services/merchant-services", ...guidePaths])("keeps the %s response and security headers on the approved production site", async path => {
     const next = context(new Response("unchanged public HTML", { headers: { "Content-Type": "text/html", ETag: '"public"' } }));
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), next, production);
     expect(await response.text()).toBe("unchanged public HTML");
@@ -323,15 +326,15 @@ describe("public Edge search and security policy", () => {
       }
     }
   });
-  it.each(["/privacy", "/privacy/", "/privacy.html", "/terms", "/terms/index.html", ...LEGAL_CENTER_PATHS.flatMap(path => [path, `${path}/`, `${path}.html`, `${path}.txt`, `${path}/index.html`])])("keeps the legal page %s private in production", async path => {
+  it.each(["/company/privacy", "/company/privacy/", "/company/privacy.html", "/company/terms", "/company/terms/index.html", ...LEGAL_CENTER_PATHS.flatMap(path => [path, `${path}/`, `${path}.html`, `${path}.txt`, `${path}/index.html`])])("keeps the legal page %s private in production", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });
-  it.each(["/privacy.txt", "/terms.txt", "/index.txt", "/payment-acceptance-service.txt", ...guidePaths.map(path => `${path}.txt`)])("does not index the raw navigation payload %s", async path => {
+  it.each(["/company/privacy.txt", "/company/terms.txt", "/index.txt", "/services/merchant-services.txt", ...guidePaths.map(path => `${path}.txt`)])("does not index the raw navigation payload %s", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(), production);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
   });
-  it.each(["/missing", "/guides/unreviewed", "/guides/payment-processing-fees", "/guides/how-to-create-a-payment-link/unreviewed", "/guides/booking-system-with-payment", "/guides/countertop-payment-terminal", "/guides/use-a-cash-register", "/guides/charge-cards", "/guides/sections/payment-processing-checkout", "/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"])("keeps missing page %s private and preserves its 404 status", async path => {
+  it.each(["/missing", "/resources/guides/unreviewed", "/resources/guides/payment-processing-fees", "/resources/guides/how-to-create-a-payment-link/unreviewed", "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal", "/resources/guides/use-a-cash-register", "/resources/guides/charge-cards", "/resources/guides/sections/payment-processing-checkout", "/resources/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"])("keeps missing page %s private and preserves its 404 status", async path => {
     const response = await handlePublicRequest(new Request(`${canonicalOrigin}${path}`), context(new Response("Not found", { status: 404 })), production);
     expect(response.status).toBe(404);
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
@@ -363,11 +366,11 @@ describe("public response revalidation", () => {
   it.each(["GET", "HEAD"])("preserves body-free 304 responses and security policy for approved %s requests", async method => {
     for (const [path, noindex] of [
       ["/", false], ["/resources/shopify-gateway-integration", false],
-      ["/resources/woocommerce-gateway-integration", false], ["/docs/merchant-onboarding", false],
+      ["/resources/woocommerce-gateway-integration", false], ["/resources/merchant-account-setup", false],
       ["/_next/static/chunks/example.css", false], ["/_next/static/media/example.webp", false],
       ["/robots.txt", false], ["/sitemap.xml", false],
-      ["/legal/merchant-services", true], ["/privacy", true], ["/terms", true],
-      ["/docs.html", true], ["/docs.txt", true],
+      ["/company/legal/merchant-services", true], ["/company/privacy", true], ["/company/terms", true],
+      ["/developers/getting-started.html", true], ["/developers/getting-started.txt", true],
     ] as const) {
       const next = context(new Response(null, { status: 304, headers: deliveryHeaders }));
       const response = await handlePublicRequest(new Request(canonicalOrigin + path, { method, headers: validators }), next, production);
@@ -436,7 +439,7 @@ describe("public response revalidation", () => {
       [canonicalOrigin, "/login", {}, 307],
       [canonicalOrigin, "/api/checkout", {}, 410],
       [canonicalOrigin, "/card-services", {}, 308],
-      [canonicalOrigin, "/docs/unreviewed", {}, 404],
+      [canonicalOrigin, "/developers/getting-started/unreviewed", {}, 404],
       [defaultOrigin, "/", {}, 308],
       [canonicalOrigin, "/sitemap.xml", { deploy: { context: "deploy-preview" } }, 200],
       [canonicalOrigin, "/robots.txt", { deploy: { context: "deploy-preview" } }, 200],

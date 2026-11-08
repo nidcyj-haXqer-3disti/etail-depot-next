@@ -7,7 +7,7 @@ import styles from "./service-operation-art.module.css";
 import { ServiceProductArt } from "./service-product-art";
 
 type Artwork = CommercialPage["art"];
-export const workflowArtPaths = ["/merchant-onboarding", "/payment-methods", "/payouts-and-reconciliation", "/refunds-and-disputes", "/payment-partnerships"] as const;
+export const workflowArtPaths = ["/services/merchant-onboarding", "/services/payment-methods", "/services/payouts", "/services/refunds", "/use-cases/software-platforms/partnerships"] as const;
 
 function Mark({ priority = false }: { priority?: boolean }) {
   return <span className={styles.mark}><Image src={brandSymbol} alt="" width={36} height={22} unoptimized preload={priority} loading={priority ? undefined : "eager"} /></span>;
@@ -22,7 +22,7 @@ function Frame({ art, icon, kind, children }: { art: Artwork; icon: string; kind
   </figure>;
 }
 export function ServiceWorkflowArt({ path, art }: { path: CommercialPath; art: Artwork }) {
-  const kinds = { "/merchant-onboarding": "onboarding", "/payment-methods": "methods", "/payouts-and-reconciliation": "payouts", "/refunds-and-disputes": "adjustments" } as const;
+  const kinds = { "/services/merchant-onboarding": "onboarding", "/services/payment-methods": "methods", "/services/payouts": "payouts", "/services/refunds": "adjustments" } as const;
   if (path in kinds) return <ServiceProductArt kind={kinds[path as keyof typeof kinds]} art={art} />;
   return <Frame art={art} icon="layers" kind="partnerships">
     <div className={styles.body}><div className={styles.platform}><Icon name="layers"/><span>Your software</span><strong>The purchase experience</strong><span>Orders, invoices and bookings</span></div><div className={styles.branch}>

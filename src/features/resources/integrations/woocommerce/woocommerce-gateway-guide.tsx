@@ -21,7 +21,7 @@ export function WooCommerceGatewayGuide() {
     "@context": "https://schema.org", "@type": "TechArticle", headline: "Set up your WooCommerce checkout",
     description: "Set up WooCommerce card payments on WordPress.com with Trolleys, powered by Etail Depot. Follow account, certificate upload and checkout steps.",
     url: `https://etaildepot.com${woocommerceGuidePath}`, dateModified: "2026-11-07", inLanguage: "en-US",
-    author: { "@type": "Organization", name: "Etail Depot", url: "https://etaildepot.com/company" },
+    author: { "@type": "Organization", name: "Etail Depot", url: "https://etaildepot.com/company/about" },
     publisher: { "@type": "Organization", name: "Etail Depot", url: "https://etaildepot.com" },
   };
   return <Shell><article data-integration-guide className={`${styles.page} ${woo.page}`}>
@@ -46,7 +46,7 @@ export function WooCommerceGatewayGuide() {
             <div><dt>Cybersource account email</dt><dd>The email from Trolleys with your Organization ID, Username and password setup instructions.</dd></div>
             <div><dt>Mac or Windows computer</dt><dd>Follow the guide to download Cyberduck and upload your .p12 security file.</dd></div>
           </dl>
-          <p className={styles.note}><strong>Need help?</strong> <Link prefetch={false} href="/contact#account-support">Contact Trolleys support.</Link></p>
+          <p className={styles.note}><strong>Need help?</strong> <Link prefetch={false} href="/company/contact#account-support">Contact Trolleys support.</Link></p>
         </section>
         <section id="setup"><h2>Follow one step at a time</h2>
           <ol className={woo.steps}>{woocommerceSetupSteps.map((step,index)=><li key={step.id}>

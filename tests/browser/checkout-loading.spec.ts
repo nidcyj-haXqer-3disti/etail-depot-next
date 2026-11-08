@@ -15,7 +15,7 @@ for (const width of [320, 390, 1440]) {
       await route.continue();
     });
     try {
-      await page.goto("/online-businesses#customer-checkout", { waitUntil: "commit" });
+      await page.goto("/use-cases/online-businesses#customer-checkout", { waitUntil: "commit" });
       const explorer = page.locator(".payment-service-explorer");
       const checkout = explorer.getByRole("tabpanel", { name: "Checkout", exact: true });
       await expect(checkout).toBeVisible();
@@ -58,7 +58,7 @@ for (const width of [320, 390, 1440]) {
     const context = await browser.newContext({ baseURL, viewport: { width, height: 900 } });
     const page = await context.newPage();
     try {
-      await page.goto("/online-businesses#customer-checkout");
+      await page.goto("/use-cases/online-businesses#customer-checkout");
       const explorer = page.locator(".payment-service-explorer");
       const views = explorer.getByRole("tablist", { name: "Payment journey views", exact: true });
       await views.getByRole("tab", { name: "Checkout", exact: true }).focus();
@@ -95,7 +95,7 @@ for (const width of [320, 390, 1440]) {
     const context = await browser.newContext({ baseURL, javaScriptEnabled: false, viewport: { width, height: 900 } });
     const page = await context.newPage();
     try {
-      await page.goto("/online-businesses");
+      await page.goto("/use-cases/online-businesses");
       const explorer = page.locator(".payment-service-explorer");
       await expect(explorer.getByRole("tablist", { name: "Payment journey views", includeHidden: true })).toBeHidden();
       for (const title of ["Set up your merchant account.", "Let customers choose how to pay.", "Match the card payment to the order.", "Reconcile your card payout."]) {

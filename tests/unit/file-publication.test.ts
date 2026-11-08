@@ -31,7 +31,7 @@ describe("source and website publication destinations", () => {
     for (const name of ["tools/reference-release.json", "reference-release.json", "downloads/reference-release.json", "docs/reference-release.json", "tools\\reference-release.json", "downloads/Reference-Release.JSON"]) {
       expect(forbiddenStatic(name), name).toBe(true);
     }
-    expect(fileDestination("src/app/docs/page.tsx")).toBe("website-input");
+    expect(fileDestination("src/app/developers/getting-started/page.tsx")).toBe("website-input");
     expect(fileDestination("public/help/shopify/settings.webp")).toBe("website-input");
     expect(fileDestination("tests/unit/example.test.ts")).toBe("repository-only");
     expect(fileDestination("docs/FILE_PUBLICATION_POLICY.md")).toBe("repository-only");
@@ -41,7 +41,7 @@ describe("source and website publication destinations", () => {
     for (const name of ["package.json", "downloads/project-targets.json", "docs/CURRENT_WORK_CONTEXT.md", "planning/STATUS.md", ".github/workflows/check.yml", "tests/sample.json", "_next/static/app.js.map", "downloads/store.p12", "private.key", "__MACOSX/._capture.png", "../../reference-release.json", "/tools/reference-release.json"]) {
       expect(forbiddenStatic(name), name).toBe(true);
     }
-    for (const name of ["index.html", "docs.html", "docs/merchant-onboarding.html", "help/shopify/settings.webp", "licenses/moov-iso8583-Apache-2.0.txt", "_next/static/chunks/app.js"]) {
+    for (const name of ["index.html", "developers/getting-started.html", "resources/merchant-account-setup.html", "help/shopify/settings.webp", "licenses/moov-iso8583-Apache-2.0.txt", "_next/static/chunks/app.js"]) {
       expect(forbiddenStatic(name), name).toBe(false);
     }
   });
@@ -59,7 +59,7 @@ describe("source and website publication destinations", () => {
 
   it("reports new source files and fails an unknown new location without reading file contents", () => {
     const f = fixture();
-    f.write("tools/reference-release.json", '{"scope":{"contentPages":3752}}');
+    f.write("tools/reference-release.json", '{"scope":{"contentPages":3751}}');
     f.write("public/brand/logo.svg");
     f.write("unknown/report.txt", "do not include contents in the report");
     const report = inspectFilePublication(f.root);

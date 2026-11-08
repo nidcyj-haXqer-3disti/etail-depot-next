@@ -2,7 +2,7 @@
 
 The public website for Etail Depot US, Inc. It explains merchant services, software platform use cases, card services, pricing and account setup.
 
-[Website](https://etaildepot.com) · [Services](https://etaildepot.com/payment-acceptance-service) · [Resources](https://etaildepot.com/guides) · [Help](https://etaildepot.com/help)
+[Website](https://etaildepot.com) · [Services](https://etaildepot.com/services/merchant-services) · [Resources](https://etaildepot.com/resources/guides) · [Help](https://etaildepot.com/resources/help)
 
 ## Project boundary
 
@@ -31,7 +31,7 @@ Open [the local preview](http://127.0.0.1:3100). No production credentials, envi
 | Area | Location | Purpose |
 | --- | --- | --- |
 | Website | `src/app/` | Existing URL routes and thin page wrappers |
-| Website | `src/features/` | Home, Services, Use cases, Resources, Company and Pricing content, metadata, components and artwork |
+| Website | `src/features/` | Home, Services, Use cases, Developers, Resources, Company and Pricing content, metadata, components and artwork |
 | Website | `src/shared/` | One Shell, header, footer, brand system, shared UI, site facts and SEO helpers |
 | Website | `public/` | Reviewed publicly served assets and licence notices |
 | Engineering | `.github/`, `tools/`, `tests/`, `netlify/`, `patches/` | Team workflow, shared build tools, checks and hosting support |
@@ -39,7 +39,7 @@ Open [the local preview](http://127.0.0.1:3100). No production credentials, envi
 | Engineering | `archive/` | Preserved prior plans, retired platform specifications and immutable database history |
 | Private workspace | Ignored local folders | Credentials, original account captures and review artifacts; never GitHub or website content |
 
-Public **Developers** is a website navigation area. Future Etail API or SDK content is a separate product decision. It does not contain instructions for the engineers working on this repository. Existing vendor setup and integration guidance belongs to Resources. Contributor instructions live in [CONTRIBUTING.md](CONTRIBUTING.md) and engineering documentation.
+Public **Developers** is a website navigation area. Its eight pages include existing integration guidance and clearly mark unavailable Etail API products as Coming soon. It does not contain instructions for the engineers working on this repository. Merchant setup and platform integration guides belong to Resources. Contributor instructions live in [CONTRIBUTING.md](CONTRIBUTING.md) and engineering documentation.
 
 ## Checks
 
@@ -73,7 +73,7 @@ Current release status has one home: [docs/CURRENT_WORK_CONTEXT.md](docs/CURRENT
 ## Support and security
 
 - Website bugs: [open an issue](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/issues) with the page, reproduction steps and browser/viewport. Remove private details from screenshots.
-- Product and account questions: use the [Help center](https://etaildepot.com/help).
+- Product and account questions: use the [Help center](https://etaildepot.com/resources/help).
 - Potential vulnerabilities: contact [compliance@etaildepot.com](mailto:compliance@etaildepot.com) privately. Do not post credentials, customer records or sensitive exploit details publicly.
 
 ## License and assets

@@ -12,7 +12,7 @@ import "../components/connected-resources-reference.css";
 type Props = { section?: ReferenceSection; entry?: ReferenceEntry };
 function SourceLink({ href, children }: { href: string; children: React.ReactNode }) { return <a href={href} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">{children}<span aria-hidden="true"> ↗</span></a>; }
 function Breadcrumb({ section, entry }: Props) {
-  return <nav className="sr-crumbs" aria-label="Breadcrumb"><Link href="/guides" prefetch={false}>Guides</Link><span aria-hidden="true">/</span>{section ? <Link href={ISO8583_PATH} prefetch={false}>ISO 8583</Link> : <span aria-current="page">ISO 8583</span>}{section && <><span aria-hidden="true">/</span>{entry ? <Link href={referencePath(section)} prefetch={false}>{section.title}</Link> : <span aria-current="page">{section.title}</span>}</>}{entry && <><span aria-hidden="true">/</span><span aria-current="page">{entry.code}</span></>}</nav>;
+  return <nav className="sr-crumbs" aria-label="Breadcrumb"><Link href="/resources/guides" prefetch={false}>Guides</Link><span aria-hidden="true">/</span>{section ? <Link href={ISO8583_PATH} prefetch={false}>ISO 8583</Link> : <span aria-current="page">ISO 8583</span>}{section && <><span aria-hidden="true">/</span>{entry ? <Link href={referencePath(section)} prefetch={false}>{section.title}</Link> : <span aria-current="page">{section.title}</span>}</>}{entry && <><span aria-hidden="true">/</span><span aria-current="page">{entry.code}</span></>}</nav>;
 }
 function SourceDetails({ section, entry }: Props) {
   const sources = entry ? [referenceSource(entry.source)] : section?.slug === "messages" ? [referenceSource("moov")] : section ? [referenceSource("pyiso8583")] : REFERENCE_SOURCES;

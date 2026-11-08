@@ -39,4 +39,4 @@ Keep actual failures and successful reruns visible. CI must belong to the exact 
 
 Do not commit environment credentials, customer records, unredacted account captures, generated website output or local review files. [File publication policy](docs/FILE_PUBLICATION_POLICY.md) separates public source from public website assets. Do not edit archived migrations, run old provisioning scripts or reconnect a retired database.
 
-A reviewed PR merge and a production deployment are separate actions. Follow the user's applicable authorization and the [manual deployment runbook](docs/NETLIFY_DEPLOYMENT.md). Product questions belong in the [Help center](https://etaildepot.com/help); potential vulnerabilities go privately to [compliance@etaildepot.com](mailto:compliance@etaildepot.com).
+A reviewed PR merge and a production deployment are separate actions. Follow the user's applicable authorization and the [manual deployment runbook](docs/NETLIFY_DEPLOYMENT.md). Product questions belong in the [Help center](https://etaildepot.com/resources/help); potential vulnerabilities go privately to [compliance@etaildepot.com](mailto:compliance@etaildepot.com).

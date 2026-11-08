@@ -53,8 +53,8 @@ export function sourceOnlyStaticFile(filename: string): boolean {
   if (!name) return true;
   if (localFile(name)) return true;
   const segments = name.toLowerCase().split("/");
-  // /docs contains real customer documentation routes, never the repository's Markdown files.
-  if (segments.slice(0, -1).some(part => repositoryDirectories.has(part) && !["docs", "assets"].includes(part))) return true;
+  // Repository documentation is source only; customer reading pages live under Developers and Resources.
+  if (segments.slice(0, -1).some(part => repositoryDirectories.has(part) && part !== "assets")) return true;
   if (segments.some(part => part === "src" || part === "public")) return true;
   const leaf = segments.at(-1)!;
   return sourceOnlyNames.has(leaf) || /\.(?:md|mdx|tsx?|mts|cts|map|toml|ya?ml|sh|py)$/i.test(leaf);

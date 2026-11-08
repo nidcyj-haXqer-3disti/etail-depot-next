@@ -5,7 +5,7 @@ export const trustContent = {
     description: "Understand account access, payment data responsibilities and privacy at Etail Depot. Find documentation and contacts for merchant services, card services and integrations.",
     heading: "Security and privacy.",
     intro: "Understand account access, payment data responsibilities and the documents that apply to your service.",
-    action: { label: "Contact compliance", href: "/contact#compliance" },
+    action: { label: "Contact compliance", href: "/company/contact#compliance" },
     art: { title: "Know what applies to your service", caption: "Security requirements depend on how you accept payments and what data your systems handle.", steps: [
       { title: "Account access", detail: "Authorized users · account support" }, { title: "Payment data", detail: "Checkout · integration responsibilities" }, { title: "Privacy", detail: "Personal information · service notices" },
     ] },

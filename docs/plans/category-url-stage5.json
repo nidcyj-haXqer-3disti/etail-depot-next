@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-09",
+  "stage": 5,
+  "purpose": "Test the complete category URL migration before publication.",
+  "branch": "codex/url-category-alignment-20261108",
+  "baseCommit": "6c27b215debd78d9a453ae54a2cd1990a23a7f8d",
+  "predecessorReceipt": "docs/plans/category-url-alignment.json",
+  "urlMap": "docs/plans/category-url-map.json",
+  "status": "passed",
+  "publicationPerformed": false,
+  "runtimeChangesDuringStage5": false,
+  "sourceFingerprint": "7c1f04949ef81b2c5d75baae995b216b468924ffaca92c0a4a0e8a3f2e2d7b3b",
+  "scope": {
+    "contentPages": 3751,
+    "searchEligiblePages": 3731,
+    "noindexPages": 20,
+    "movedContentPages": 3738,
+    "formerDocumentationRedirects": 10,
+    "additionalLegacyAliases": 2
+  },
+  "commands": {
+    "pnpm verify:public": "passed",
+    "pnpm test:seo:production": "passed",
+    "pnpm package:netlify": "passed",
+    "pnpm verify:package": "passed"
+  },
+  "verification": {
+    "unitTests": 491,
+    "desktopAndMobileTests": 310,
+    "expectedDesktopSkip": 1,
+    "accessibilityTests": 153,
+    "security": "passed",
+    "dependencyAudit": "No known vulnerabilities found",
+    "internalLinks": {
+      "pages": 3751,
+      "linkOccurrences": 380388,
+      "distinctDestinations": 11792,
+      "errors": []
+    },
+    "httpRedirects": {
+      "moves": 3750,
+      "requests": 11250,
+      "errors": []
+    },
+    "redirectContexts": {
+      "status": "passed",
+      "source": "current local Edge implementation",
+      "movedAddresses": 3750,
+      "contexts": [
+        "canonical production",
+        "former production origin",
+        "preview",
+        "wrong site"
+      ],
+      "htmlAliasesPerAddress": 4,
+      "redirectMethods": [
+        "GET",
+        "HEAD"
+      ],
+      "submittedBodiesRejected": 3750,
+      "finalPagesChecked": 3751,
+      "checks": 127501,
+      "errors": []
+    },
+    "browserMigration": {
+      "cases": 48,
+      "engines": [
+        "Chromium",
+        "WebKit"
+      ],
+      "widths": [
+        390,
+        1440
+      ],
+      "errors": []
+    },
+    "sourceIntegrity": {
+      "sourceFingerprint": "7c1f04949ef81b2c5d75baae995b216b468924ffaca92c0a4a0e8a3f2e2d7b3b",
+      "unchangedSinceStages1To4": true,
+      "protectedInputs": [
+        {
+          "path": "src/features/resources/references/iso-20022/data/iso20022-data.json",
+          "expected": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
+          "actual": "8345f4a2b504ed3e9c5bcf4607214edb52811ac8bc87e65d1217ccf77e93ed36",
+          "unchanged": true
+        },
+        {
+          "path": "src/features/resources/references/iso-8583/data/iso8583-independent-data.json",
+          "expected": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
+          "actual": "f7202c0d2f8dd5b5f99bab27dcd066331aa7f77de4dc045e897054613bd55c9e",
+          "unchanged": true
+        },
+        {
+          "path": "src/features/company/legal/merchant-legal-content.json",
+          "expected": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152",
+          "actual": "41a129f9d410544a2b6c92695ae29261395a0e0897c6197d11572939f25f3152",
+          "unchanged": true
+        },
+        {
+          "path": "src/shared/site/legal-identity.ts",
+          "expected": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77",
+          "actual": "ade3208779cfc0eb9f157811c189efcd8aaba009c08bf3a4f21d1cba878bfe77",
+          "unchanged": true
+        },
+        {
+          "path": "src/shared/site/hosted-services.ts",
+          "expected": "c678fb7fc9fde26ec1900b55263db884f8704d25ec5f9b48af40d3f82f5980ac",
+          "actual": "c678fb7fc9fde26ec1900b55263db884f8704d25ec5f9b48af40d3f82f5980ac",
+          "unchanged": true
+        },
+        {
+          "path": "netlify.toml",
+          "expected": "49ac0da185ed74e45bfb093660df6507079d0e2353aa334cd8eb7e266ae8bc13",
+          "actual": "49ac0da185ed74e45bfb093660df6507079d0e2353aa334cd8eb7e266ae8bc13",
+          "unchanged": true
+        },
+        {
+          "path": "package.json",
+          "expected": "b51a6a120b177d055bf91a5cdecda879eed8972549ce16a85c890270f19f7407",
+          "actual": "b51a6a120b177d055bf91a5cdecda879eed8972549ce16a85c890270f19f7407",
+          "unchanged": true
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "expected": "2083c273e3a8fa61757390ee95850312c7ddbfc3171df45f9f688b34b7e5b561",
+          "actual": "2083c273e3a8fa61757390ee95850312c7ddbfc3171df45f9f688b34b7e5b561",
+          "unchanged": true
+        }
+      ]
+    },
+    "package": {
+      "contentPages": 3751,
+      "staticFiles": 18939,
+      "websiteInputs": 536,
+      "repositoryOnlyFiles": 443,
+      "publicEdgeFunctions": 1,
+      "protectedEmailHandlerPreserved": true
+    },
+    "privateFileBoundary": {
+      "checks": [
+        {
+          "path": "/tools/reference-release.json",
+          "status": 404
+        },
+        {
+          "path": "/reference-release.json",
+          "status": 404
+        },
+        {
+          "path": "/docs/plans/category-url-stage5.json",
+          "status": 404
+        },
+        {
+          "path": "/docs/CURRENT_WORK_CONTEXT.md",
+          "status": 404
+        }
+      ],
+      "errors": []
+    }
+  },
+  "sourceAndPackageMatch": true,
+  "failures": [],
+  "corrections": [],
+  "evidenceDirectory": "outputs/url-migration-stage5-20261109/",
+  "remainingHostedChecks": [
+    "Separate release authorization is required before push, merge or deploy.",
+    "Verify actual Netlify redirects, CDN cache behavior and search/security headers after an authorized deployment.",
+    "Confirm repository-only URLs still return 404 on the deployed website."
+  ],
+  "auditToolCorrections": [
+    "The supplementary file-boundary probe initially used the Playwright status() method on a native Fetch response. It was corrected to the status property and passed all four local 404 checks. No website source changed."
+  ]
+}

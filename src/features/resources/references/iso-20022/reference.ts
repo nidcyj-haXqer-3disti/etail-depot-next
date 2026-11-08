@@ -3,7 +3,7 @@ import snapshot from "./data/iso20022-data.json";
 import { canonicalOrigin, pageRobots, publicPageModified, socialImageForPage } from "@/shared/seo/metadata";
 
 export const ISO20022_SOURCE = "https://www.iso20022.org/catalogue/additional-content-messages/external-code-sets";
-export const ISO20022_PATH = "/guides/iso-20022";
+export const ISO20022_PATH = "/resources/guides/iso-20022";
 export const ISO20022_RELEASE = snapshot.release;
 export const ISO20022_WORKBOOK = snapshot.sourceFile;
 export interface SourceReference { source_id: string; locator: string; sha256: string }
@@ -19,7 +19,7 @@ export interface IsoCodeSet {
   messages: { message_name: string; message_id: string; locator: string }[];
   obsolete: { code: string; source_name: string; locator: string }[];
 }
-export const ISO20022_SETS: readonly IsoCodeSet[] = snapshot.sets;
+export const ISO20022_SETS: readonly IsoCodeSet[] = snapshot.sets.map(set => ({ ...set, path: `/resources${set.path}`, codes: set.codes.map(code => ({ ...code, path: `/resources${code.path}` })) }));
 const bySlug = new Map(ISO20022_SETS.map(set => [set.slug, set]));
 export function isoCodeSet(slug: string) { return bySlug.get(slug); }
 export function isoCode(set: IsoCodeSet, slug: string) { return set.codes.find(code => code.path.split("/").at(-1) === slug); }
@@ -62,7 +62,7 @@ export function isoMetadata(set?: IsoCodeSet, code?: IsoCode): Metadata {
 }
 export function isoJsonLd(set?: IsoCodeSet, code?: IsoCode) {
   const entry = isoIdentity(set, code), url = canonicalOrigin + entry.path;
-  const crumbs = [{ name: "Guides", path: "/guides" }, { name: "ISO 20022", path: ISO20022_PATH }];
+  const crumbs = [{ name: "Guides", path: "/resources/guides" }, { name: "ISO 20022", path: ISO20022_PATH }];
   if (set) crumbs.push({ name: set.title, path: set.path });
   if (code) crumbs.push({ name: code.code, path: code.path });
   return JSON.stringify({ "@context": "https://schema.org", "@graph": [

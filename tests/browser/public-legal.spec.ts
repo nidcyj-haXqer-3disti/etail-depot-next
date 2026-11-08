@@ -9,11 +9,11 @@ test("merchant legal center connects every document without retired marketplace 
   await page.goto("/");
   const company = await openFooterGroup(page, "Company");
   await company.getByRole("link", { name: "Legal", exact: true }).click();
-  await expect(page).toHaveURL(/\/legal$/);
+  await expect(page).toHaveURL(/\/company\/legal$/);
   await expect(page.getByRole("region", { name: "Merchant services", exact: true }).getByRole("link")).toHaveCount(6);
   await expect(page.getByRole("region", { name: "Privacy and security", exact: true }).getByRole("link")).toHaveCount(3);
   const destinations = await page.locator(".legal-center-links > a").evaluateAll(links => links.map(link => link.getAttribute("href")));
-  expect(destinations.sort()).toEqual(LEGAL_DOCUMENT_PATHS.filter(path => path !== "/legal").sort());
+  expect(destinations.sort()).toEqual(LEGAL_DOCUMENT_PATHS.filter(path => path !== "/company/legal").sort());
   for (const route of LEGAL_DOCUMENT_PATHS) {
     const response = await page.goto(route);
     expect(response?.status()).toBe(200);
@@ -30,7 +30,7 @@ test("merchant legal center connects every document without retired marketplace 
 });
 
 test("merchant terms require acceptance and retain financial and legal boundaries", async ({ page }) => {
-  await page.goto("/legal/merchant-services");
+  await page.goto("/company/legal/merchant-services");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Merchant Services Terms");
   await expect(page.locator("#scope + div")).toContainText("does not accept this merchant agreement or activate processing");
   await expect(page.locator("#scope + div a")).toHaveAttribute("href", "#business-disputes");
@@ -47,18 +47,18 @@ test("merchant terms require acceptance and retain financial and legal boundarie
   await expect(businessDisputes).toContainText("only business parties that expressly accept it");
   await expect(page.locator("#retailer-agreement")).toHaveCount(1);
   await expect(page.locator("#dispute-prevention")).toHaveCount(1);
-  await expect(page.locator('#website-service-disclosures + div a[href="/legal/fees"]')).toBeVisible();
-  await page.goto("/legal/software-platforms");
+  await expect(page.locator('#website-service-disclosures + div a[href="/company/legal/fees"]')).toBeVisible();
+  await page.goto("/company/legal/software-platforms");
   const platformGeneralTerms = page.locator("#general-terms + div");
   await expect(platformGeneralTerms).toContainText("District of Columbia law, arbitration in Washington, DC");
   await expect(platformGeneralTerms).toContainText("using the version supplied with the accepted Platform Service Order");
   await platformGeneralTerms.getByRole("link", { name: "Business dispute provisions", exact: true }).click();
-  await expect(page).toHaveURL(/\/legal\/merchant-services#business-disputes$/);
+  await expect(page).toHaveURL(/\/company\/legal\/merchant-services#business-disputes$/);
   await expect(page.locator("#business-disputes")).toBeInViewport();
 });
 
 test("fee and funding schedules distinguish approved prices from conditional account timing", async ({ page }) => {
-  await page.goto("/legal/fees");
+  await page.goto("/company/legal/fees");
   await expect(page.locator(".legal-rate-list > div")).toHaveCount(9);
   await expect(page.locator(".legal-rate-list")).toContainText("2.9% + 30¢");
   await expect(page.locator(".legal-rate-list")).toContainText("$35");
@@ -69,7 +69,7 @@ test("fee and funding schedules distinguish approved prices from conditional acc
   await expect(page.locator("#other-methods + div")).toContainText("ACH and other enabled methods have separate fees");
   await expect(page.locator("#statements + div")).toContainText("statement period, availability date and delivery method");
   await expect(page.locator("#statements + div")).not.toContainText("You receive a calendar month statement");
-  await page.goto("/legal/payouts-and-reserves");
+  await page.goto("/company/legal/payouts-and-reserves");
   await expect(page.locator("#scope + div")).toContainText("confirmed by the responsible funding provider");
   await expect(page.locator(".legal-rate-list > div")).toHaveCount(5);
   await expect(page.locator("#schedule + div")).toContainText("Your accepted account terms identify");
@@ -80,24 +80,24 @@ test("fee and funding schedules distinguish approved prices from conditional acc
 });
 
 test("privacy, data and acquirer documents describe their distinct responsibilities", async ({ page }) => {
-  await page.goto("/legal/merchant-privacy");
+  await page.goto("/company/legal/merchant-privacy");
   await expect(page.locator("#information + div")).toContainText("application documents, owner identity information and bank information");
   await expect(page.locator("#rights + div")).toContainText("without signing in");
   await expect(page.locator("#sharing + div")).toContainText("may handle information independently under their own privacy notices");
-  await page.goto("/legal/data-processing");
+  await page.goto("/company/legal/data-processing");
   await expect(page.locator("#scope + div")).toContainText("expressly incorporates them into an accepted Service Order");
   await expect(page.locator("#providers + div")).toContainText("must identify the countries in which information may be stored or accessed");
   await expect(page.locator("#security + div")).toContainText("without undue delay");
-  await page.goto("/legal/acquirer-disclosure");
+  await page.goto("/company/legal/acquirer-disclosure");
   await expect(page.locator("main")).toContainText("Fifth Third Bank");
   await expect(page.locator("#provider-terms + div")).toContainText("it is not the bank’s contract");
-  await page.goto("/legal/security-policy");
+  await page.goto("/company/legal/security-policy");
   await expect(page.locator("#payment-data + div")).toContainText("after authorization, even if encrypted");
   await expect(page.locator("main")).not.toContainText("PCI DSS 3.2.1");
 });
 
 test("retired marketplace legal routes are absent and remain outside search discovery", async ({ request }) => {
-  for (const route of RETIRED_LEGAL_PATHS) {
+  for (const route of [...RETIRED_LEGAL_PATHS, ...RETIRED_LEGAL_PATHS.map(path => `/company${path}`)]) {
     for (const suffix of ["", "/", ".html", ".txt", "/index.html"]) {
       const response = await request.get(route + suffix);
       expect(response.status()).toBe(404);
@@ -113,7 +113,7 @@ test.describe("legal documents without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
   test("read every document and follow the fee and arbitration sections", async ({ page }) => {
     for (const document of legalDocuments) {
-      await page.goto(`/legal/${document.slug}`);
+      await page.goto(`/company/legal/${document.slug}`);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(document.title);
       const sections = page.locator(".legal-document-section > h2");
       const targets = await sections.evaluateAll(headings => headings.map(heading => heading.id));
@@ -125,14 +125,14 @@ test.describe("legal documents without JavaScript", () => {
       await page.getByRole("link", { name: "Back to top", exact: true }).click();
       await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
     }
-    await page.goto("/legal/merchant-services");
+    await page.goto("/company/legal/merchant-services");
     await page.getByRole("link", { name: "Business dispute provisions", exact: true }).click();
     await expect(page.getByRole("heading", { name: "16. Business disputes and arbitration", exact: true })).toBeInViewport();
     const company = page.getByRole("navigation", { name: "Footer company" });
     const group = company.locator("details");
     if (await group.count() && await group.getAttribute("open") === null) await group.locator("summary").click();
     await company.getByRole("link", { name: "Legal", exact: true }).click();
-    await page.locator('.legal-center-links a[href="/legal/fees"]').click();
+    await page.locator('.legal-center-links a[href="/company/legal/fees"]').click();
     await expect(page.locator(".legal-rate-list")).toBeVisible();
   });
 });
@@ -140,14 +140,14 @@ test.describe("legal documents without JavaScript", () => {
 
 test("account records remain readable without application fields", async ({ page }) => {
   const records = [
-    ["/legal/merchant-services", "service-order"],
-    ["/legal/fees", "billing-record"],
-    ["/legal/payouts-and-reserves", "funding-record"],
-    ["/legal/payouts-and-reserves", "reserve-notice"],
-    ["/legal/software-platforms", "merchant-authorization"],
-    ["/legal/software-platforms", "platform-order"],
-    ["/legal/data-processing", "processing-record"],
-    ["/legal/merchant-privacy", "collection"],
+    ["/company/legal/merchant-services", "service-order"],
+    ["/company/legal/fees", "billing-record"],
+    ["/company/legal/payouts-and-reserves", "funding-record"],
+    ["/company/legal/payouts-and-reserves", "reserve-notice"],
+    ["/company/legal/software-platforms", "merchant-authorization"],
+    ["/company/legal/software-platforms", "platform-order"],
+    ["/company/legal/data-processing", "processing-record"],
+    ["/company/legal/merchant-privacy", "collection"],
   ];
   for (const [route, section] of records) {
     await page.goto(`${route}#${section}`);

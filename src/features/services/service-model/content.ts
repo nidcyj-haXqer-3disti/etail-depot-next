@@ -5,7 +5,7 @@ export const serviceModelContent = {
     description: "Understand Etail’s payment facilitator role and how merchants, acquiring partners, card networks and issuers participate in a card payment.",
     heading: "The payment facilitator behind your merchant service.",
     intro: "Etail Depot provides merchant onboarding, payment acceptance and account support through its acquiring relationships.",
-    action: { label: "Explore merchant services", href: "/payment-acceptance-service" },
+    action: { label: "Explore merchant services", href: "/services/merchant-services" },
     art: { title: "The merchant service relationship", caption: "Card messages and settlement follow the applicable network, acquiring and account arrangements.", steps: [
       { title: "Merchant", detail: "Sells goods or services to customers" }, { title: "Etail Depot", detail: "Payment facilitator · merchant service" }, { title: "Acquiring partner", detail: "Acquiring relationship · network rules" },
     ] },

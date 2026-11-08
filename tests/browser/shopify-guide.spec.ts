@@ -39,8 +39,8 @@ test("Shopify guide is discoverable and its screenshots can be enlarged with the
     const href = await link.getAttribute("href");
     await expect(page.locator(href!)).toHaveCount(1);
   }
-  await expect(page.locator('main a[href="/contact#account-support"]')).toHaveCount(1);
-  const support = await page.request.get("/contact");
+  await expect(page.locator('main a[href="/company/contact#account-support"]')).toHaveCount(1);
+  const support = await page.request.get("/company/contact");
   expect(await support.text()).toContain('id="account-support"');
 });
 
