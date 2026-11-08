@@ -2,5 +2,3 @@
 .docs-coming-soon { display:inline-flex; margin:0 0 20px; padding:5px 12px; border-radius:24px; background:#e7f4f0; color:#165446; font-size:13px; font-weight:600; }
 .docs-article-heading .docs-availability { margin:0 0 24px; color:var(--docs-muted); font-size:15px; line-height:1.7; }
 @media(max-width:1250px){.docs-workspace.docs-workspace-resource {grid-template-columns:minmax(0,820px);}}
-
-.docs-related-links{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 24px}.docs-related-links a{display:flex;align-items:center;min-height:44px;padding-block:10px;font-size:15px;text-underline-offset:4px}.docs-related-links li{scroll-margin-top:24px}@media(max-width:680px){.docs-related-links{grid-template-columns:1fr}}

@@ -2,22 +2,28 @@
 export type FileDestination = "website-input" | "repository-only" | "local-only" | "unclassified";
 
 const repositoryDirectories = new Set([
-  ".github", "tools", "tests", "netlify", "patches", "docs", "planning",
-  "archive", "assets", "contracts", "prompts", "sources", "templates",
+  ".github", "tools", "tests", "netlify", "patches", "docs", "archive",
 ]);
 const repositoryFiles = new Set([
-  ".env.example", ".gitignore", ".npmrc", ".nvmrc", "00_START_HERE.md",
-  "01_PASTE_IN_CODEX.md", "02_MASTER_BUILD_PROMPT.md", "AGENTS.md", "CONTRIBUTING.md",
-  "HANDOFF_VALIDATION.md", "PACKAGE_MANIFEST.json", "README.md", "eslint.config.mjs",
+  ".env.example", ".gitignore", ".npmrc", ".nvmrc", "AGENTS.md", "CONTRIBUTING.md",
+  "README.md", "eslint.config.mjs",
   "netlify.toml", "next-env.d.ts", "next.config.ts", "package.json", "playwright.config.ts",
   "pnpm-lock.yaml", "pnpm-workspace.yaml", "project-targets.json", "tsconfig.json", "vitest.config.ts",
 ]);
+// Retired locations stay blocked in website output without accepting them as new source.
+const sourceOnlyDirectories = new Set([
+  ...repositoryDirectories, "planning", "assets", "contracts", "prompts", "sources", "templates",
+]);
+const retiredRootFiles = [
+  "00_START_HERE.md", "01_PASTE_IN_CODEX.md", "02_MASTER_BUILD_PROMPT.md",
+  "HANDOFF_VALIDATION.md", "PACKAGE_MANIFEST.json",
+];
 const localDirectories = new Set([
   ".git", ".local", ".private", ".next", ".netlify", ".pnpm-store", "node_modules",
   "out", "dist", "coverage", "outputs", "artifacts", "playwright-report", "test-results",
-  "__pycache__", "__macosx",
+  "local-work", "input", "output", "tmp", "__pycache__", "__macosx",
 ]);
-const sourceOnlyNames = new Set([...repositoryFiles, "reference-release.json", "public-build.json"].map(name => name.toLowerCase()));
+const sourceOnlyNames = new Set([...repositoryFiles, ...retiredRootFiles, "reference-release.json", "public-build.json"].map(name => name.toLowerCase()));
 
 function normalizedPath(filename: string): string | null {
   const name = filename.replaceAll("\\", "/");
@@ -39,7 +45,7 @@ function localFile(name: string): boolean {
 export function fileDestination(filename: string): FileDestination {
   const name = normalizedPath(filename);
   if (!name) return "unclassified";
-  if (name === ".env.example" || name === "templates/.env.example" || name === "archive/retired-platform/templates/.env.example") return "repository-only";
+  if (name === ".env.example") return "repository-only";
   if (localFile(name)) return "local-only";
   const directory = name.split("/")[0];
   if (directory === "src" || directory === "public") return "website-input";
@@ -54,7 +60,7 @@ export function sourceOnlyStaticFile(filename: string): boolean {
   if (localFile(name)) return true;
   const segments = name.toLowerCase().split("/");
   // Repository documentation is source only; customer reading pages live under Developers and Resources.
-  if (segments.slice(0, -1).some(part => repositoryDirectories.has(part) && part !== "assets")) return true;
+  if (segments.slice(0, -1).some(part => sourceOnlyDirectories.has(part) && part !== "assets")) return true;
   if (segments.some(part => part === "src" || part === "public")) return true;
   const leaf = segments.at(-1)!;
   return sourceOnlyNames.has(leaf) || /\.(?:md|mdx|tsx?|mts|cts|map|toml|ya?ml|sh|py)$/i.test(leaf);

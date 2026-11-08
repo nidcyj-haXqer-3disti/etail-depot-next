@@ -25,14 +25,11 @@ describe("article retirement without changing ISO references", () => {
     }
   });
 
-  it("lists the three setup guides and two ISO collections in the hub schema", () => {
+  it("lists only the two ISO collections in the Guides schema", () => {
     const graph = JSON.parse(publicPageJsonLd("/resources/guides"))["@graph"];
     const list = graph.find((item: { "@type": string }) => item["@type"] === "ItemList");
-    expect(list.numberOfItems).toBe(5);
+    expect(list.numberOfItems).toBe(2);
     expect(list.itemListElement.map((item: { url: string }) => item.url)).toEqual([
-      "https://etaildepot.com/resources/merchant-account-setup",
-      "https://etaildepot.com/resources/shopify-gateway-integration",
-      "https://etaildepot.com/resources/woocommerce-gateway-integration",
       "https://etaildepot.com/resources/guides/iso-20022", "https://etaildepot.com/resources/guides/iso-8583",
     ]);
   });

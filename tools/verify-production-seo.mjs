@@ -158,10 +158,9 @@ function checkSchema(html, route, description) {
   assert.equal(page.isPartOf?.["@id"], website["@id"]);
   if (route === "/resources/guides") {
     const list = node("ItemList");
-    const directoryPaths = ["/resources/merchant-account-setup", "/resources/shopify-gateway-integration", "/resources/woocommerce-gateway-integration", ...standardPaths];
     assert.equal(page.mainEntity?.["@id"], list["@id"]);
-    assert.equal(list.numberOfItems, directoryPaths.length);
-    assert.deepEqual(list.itemListElement.map(item => item.url).sort(), directoryPaths.map(path => new URL(path, canonicalOrigin).href).sort());
+    assert.equal(list.numberOfItems, standardPaths.length);
+    assert.deepEqual(list.itemListElement.map(item => item.url).sort(), standardPaths.map(path => new URL(path, canonicalOrigin).href).sort());
   }
   if (route !== "/") {
     const crumbs = node("BreadcrumbList").itemListElement;

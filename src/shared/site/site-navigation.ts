@@ -1,4 +1,4 @@
-import { DEVELOPER_NAVIGATION } from "./developer-paths";
+import { DEVELOPER_NAVIGATION, DEVELOPER_PAGES } from "./developer-paths";
 import { serviceLabels } from "./service-language";
 
 /** Public information architecture; these are local information pages, not account routes. */
@@ -83,7 +83,9 @@ export const publicFooterGroups = [
 ] as const;
 
 export function publicDomainForPath(pathname: string): string | undefined {
-  if (pathname === "/services/merchant-services") return "services";
+  if (["/services/merchant-services", "/services/payment-facilitator"].includes(pathname)) return "services";
+  // Published pages retain their category even when omitted from the menu.
+  if (DEVELOPER_PAGES.some(page => page.href === pathname)) return "developers";
   if (["/use-cases/software-platforms/payment-models", "/use-cases/software-platforms/partnerships"].includes(pathname)) return "use-cases";
   // A specific destination can belong to a different group than its URL parent.
   let match: { id: string; path: string } | undefined;

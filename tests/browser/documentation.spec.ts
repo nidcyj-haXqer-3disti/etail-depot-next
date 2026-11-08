@@ -17,6 +17,7 @@ test("the consolidated pages retain navigation, accessible sections and exact me
   await expect(page.getByRole("navigation",{name:"Breadcrumb",exact:true})).toHaveCount(0);
   await expect(page.getByText("Browse topics",{exact:true})).toHaveCount(0);
   if(item.group==="Developers")await expect(page.locator('.docs-coming-soon')).toHaveText("Coming soon");
+  await expect(page.locator('a[href="/developers/sdks"], a[href="/developers/changelog"], a[href="/developers/api-status"]')).toHaveCount(0);
   const nav=await openMainNavigation(page,item.group);
   await expect(nav.locator('a[aria-current="page"]')).toHaveAttribute("href",item.href);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
@@ -33,10 +34,18 @@ test("legacy links redirect without forwarding input and retain existing section
  }
 });
 
-test("former documentation overview bookmarks reach the relevant guidance",async({page})=>{
- for(const [anchor,href] of [["getting-started","/resources/merchant-account-setup"],["payment-records","/developers/api-reference#payment-status"],["payouts","/developers/api-reference#payouts"],["webhooks","/developers/webhooks"]]){
-  await page.goto('/docs#'+anchor);await expect(page.locator('#'+anchor)).toBeInViewport();await expect(page.locator('#'+anchor+' a')).toHaveAttribute('href',href);
+test("former overview bookmarks open the introduction without a second guide directory",async({page})=>{
+ for(const anchor of ["related-guides","topics","merchant-operations","getting-started","payment-requests","payment-records","refunds-and-disputes","payouts","webhooks","testing-and-launch"]){
+  await page.goto('/docs#'+anchor);
+  await expect(page).toHaveURL(url=>url.pathname==='/developers/getting-started'&&url.hash==='#'+anchor);
+  await expect(page.locator('#'+anchor)).toBeAttached();
+  await expect(page.locator('#integration-access > h2')).toBeInViewport();
  }
+ await expect(page.getByRole('heading',{name:'More guides',exact:true})).toHaveCount(0);
+ await expect(page.locator('.docs-related-links')).toHaveCount(0);
+ const nav=await openMainNavigation(page,"Resources");
+ await nav.getByRole('link',{name:'Merchant account setup',exact:true}).click();
+ await expect(page).toHaveURL(/\/resources\/merchant-account-setup$/);
 });
 
 test("Developers navigation and browser Back retain a clear reading path",async({page})=>{
@@ -53,6 +62,13 @@ test("existing guidance stays distinct from unavailable Etail APIs",async({page}
   await expect(page.locator('.docs-availability')).toContainText('Etail APIs and tools are not available yet.');
   await expect(page.locator('.docs-article')).not.toContainText(/ORD-1048|tx_demo|sk_test|transientToken|example API|mocked/i);
   await expect(page.locator('.docs-article pre,main form,main iframe')).toHaveCount(0);
+ }
+ for(const slug of ['sdks','changelog','api-status']){
+  await page.goto('/developers/'+slug);
+  const notice=page.locator('.docs-availability');
+  await expect(notice.getByRole('link',{name:'Shopify',exact:true})).toHaveAttribute('href','/resources/shopify-gateway-integration');
+  await expect(notice.getByRole('link',{name:'WooCommerce',exact:true})).toHaveAttribute('href','/resources/woocommerce-gateway-integration');
+  await expect(notice.locator('a[href="/resources/guides"]')).toHaveCount(0);
  }
 });
 
@@ -209,9 +225,12 @@ test("Help separates returning account access from new registration", async ({ p
 });
 
 
-test("Guides leads to email first account setup and blank email recovery", async ({page}) => {
+test("Guides shows references while Resources leads to email first account setup", async ({page}) => {
  await page.goto('/resources/guides');
- await page.getByRole('main').getByRole('link',{name:/Merchant account setup/}).click();
+ await expect(page.getByRole('main').getByRole('link')).toHaveCount(2);
+ await expect(page.getByRole('main').getByRole('heading',{level:2})).toHaveText(['ISO 20022','ISO 8583']);
+ const nav=await openMainNavigation(page,'Resources');
+ await nav.getByRole('link',{name:'Merchant account setup',exact:true}).click();
  await expect(page).toHaveURL(/\/resources\/merchant-account-setup$/);
  await expect(page.locator('#create-account')).toContainText('Enter your email in the Email field, then choose Register');
  await expect(page.locator('#create-account')).toContainText('If Welcome says your email is already registered, choose Sign In.');

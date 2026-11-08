@@ -36,10 +36,10 @@ Open [the local preview](http://127.0.0.1:3100). No production credentials, envi
 | Website | `public/` | Reviewed publicly served assets and licence notices |
 | Engineering | `.github/`, `tools/`, `tests/`, `netlify/`, `patches/` | Team workflow, shared build tools, checks and hosting support |
 | Engineering | `docs/` | Current instructions, architecture and approved migration records |
-| Engineering | `archive/` | Preserved prior plans, retired platform specifications and immutable database history |
-| Private workspace | Ignored local folders | Credentials, original account captures and review artifacts; never GitHub or website content |
+| Engineering | `archive/` | Selected technical history, provenance, retired specifications and immutable database records |
+| Private workspace | External `local-work/input/` and `local-work/output/`; ignored tool state | Supplied documents and generated working files stay local. Credentials use approved private storage. |
 
-Public **Developers** is a website navigation area. Its eight pages include existing integration guidance and clearly mark unavailable Etail API products as Coming soon. It does not contain instructions for the engineers working on this repository. Merchant setup and platform integration guides belong to Resources. Contributor instructions live in [CONTRIBUTING.md](CONTRIBUTING.md) and engineering documentation.
+Public **Developers** is a website navigation area. Its five navigation entries contain existing integration guidance and clearly mark unavailable Etail API products as Coming soon. SDKs, Changelog and API status retain their published addresses but are excluded from navigation. It does not contain instructions for the engineers working on this repository. Merchant setup and platform integration guides belong to Resources. Contributor instructions live in [CONTRIBUTING.md](CONTRIBUTING.md) and engineering documentation.
 
 ## Checks
 
@@ -64,7 +64,7 @@ Linux may require `pnpm exec playwright install --with-deps chromium`. Dependenc
 
 ## Contributing and releases
 
-Use a focused feature branch and a reviewed pull request. [CONTRIBUTING.md](CONTRIBUTING.md) explains file ownership, collaboration, conflict resolution and checks. Do not push feature changes directly to `main` or rewrite shared history.
+Use a focused feature branch and a reviewed pull request. [CONTRIBUTING.md](CONTRIBUTING.md) provides the step-by-step workflow for human and AI-assisted contributors, with copyable task briefs, Git commands, an AI prompt, page-change examples and a two-developer example. The [detailed folder map](docs/REPOSITORY_GUIDE.md) labels business ownership, technical support and private workspace, with the current routes, features and root files. Both guides include diagrams showing separate task branches, review, authorized release, private working material and the external merchant portal. Do not push feature changes directly to `main` or rewrite shared history.
 
 The exact page counts, reference sources and approved legal scope are recorded in [tools/reference-release.json](tools/reference-release.json). This build-check file is public GitHub source, but must return 404 on the website. [File publication policy](docs/FILE_PUBLICATION_POLICY.md) explains this distinction.
 

@@ -36,7 +36,6 @@ function ArticleSection({section,illustration}:{section:DocSection;illustration?
   {section.details&&<div className="docs-details">{section.details.map(item=><details key={item.title}><summary>{item.title}<span aria-hidden="true">+</span></summary><p>{item.text}</p></details>)}</div>}
   {section.outcome&&<div className="docs-outcome"><Icon name="check"/><div><strong>What to confirm</strong><p>{section.outcome}</p></div></div>}
   {section.link&&<DocumentationLink {...section.link}/>}
-  {section.links&&<ul className="docs-related-links">{section.links.map(link=><li key={link.id} id={link.id}><Link prefetch={false} href={link.href}>{link.label}</Link></li>)}</ul>}
  </section>;
 }
 

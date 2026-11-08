@@ -3,7 +3,6 @@ export type DocTable = { caption: string; headers: string[]; rows: string[][]; c
 export type DocSection = {
  prerequisites?:string[];
  aliases?:string[];
- links?:{id:string;label:string;href:string}[];
   id: string; title: string; paragraphs?: string[]; steps?: DocRow[]; rows?: DocRow[];
   note?: { title: string; text: string };
   flow?: "onboarding" | "checkout" | "records" | "payouts" | "events" | "requests" | "access" | "launch" | "recovery" | "disputes";

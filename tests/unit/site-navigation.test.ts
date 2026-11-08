@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { DEVELOPER_PAGES } from "../../src/shared/site/developer-paths";
 import { publicDomainForPath, publicNavigationGroups } from "../../src/shared/site/site-navigation";
 
 describe("public navigation ownership", () => {
@@ -16,13 +17,15 @@ describe("public navigation ownership", () => {
   it("keeps the more specific resource destination ahead of the documentation parent", () => {
     expect(publicDomainForPath("/resources/merchant-account-setup")).toBe("resources");
     expect(publicDomainForPath("/resources/merchant-account-setup/example")).toBe("resources");
-    expect(publicDomainForPath("/developers/api-reference")).toBe("developers");
+    for (const page of DEVELOPER_PAGES) expect(publicDomainForPath(page.href), page.label).toBe("developers");
+    expect(publicDomainForPath("/developers/sdks-other")).toBeUndefined();
     expect(publicDomainForPath("/resources/guides/iso-8583/fields/39")).toBe("resources");
     expect(publicDomainForPath("/developers/getting-started-other")).toBeUndefined();
   });
 
   it("preserves supporting service and use-case contexts without inventing menu entries", () => {
     expect(publicDomainForPath("/services/merchant-services")).toBe("services");
+    expect(publicDomainForPath("/services/payment-facilitator")).toBe("services");
     expect(publicDomainForPath("/use-cases/software-platforms/payment-models")).toBe("use-cases");
     expect(publicDomainForPath("/use-cases/software-platforms/partnerships")).toBe("use-cases");
     for (const pathname of ["/", "/pricing", "/company/about", "/company/legal", "/missing-page"]) {

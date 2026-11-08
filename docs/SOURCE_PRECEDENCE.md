@@ -6,7 +6,7 @@
 4. Use current source, the exact route inventory, pinned data, licence notices and [release receipt](../tools/reference-release.json) for the candidate's capabilities and publication scope.
 5. Use the current engineering runbooks for implementation and checks. [The repository guide](REPOSITORY_GUIDE.md) indexes them.
 
-The [archive](../archive/README.md) preserves dated decisions, old prompts, prior evidence and retired platform specifications. Those files may say “current,” “mandatory” or “publish,” but these statements belong to their recorded stage. They do not restore account processing, databases, APIs, article libraries or excluded reference tables.
+The [archive](../archive/README.md) preserves selected technical decisions, release evidence, provenance and retired platform specifications. Those files may say “current,” “mandatory” or “publish,” but these statements belong to their recorded stage. They do not restore account processing, databases, APIs, article libraries or excluded reference tables.
 
 Source provenance, reuse permission and implemented capability are separate questions. Do not infer Etail product support from a provider's generic documentation or from an archived proposal. Keep pricing, eligibility, limitations and licence notices accurate.
 

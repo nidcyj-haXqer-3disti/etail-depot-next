@@ -208,7 +208,7 @@ describe("reviewed public metadata", () => {
   it("keeps reviewed page revision dates stable as the build clock advances", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
-    expect(PUBLIC_PAGE_MODIFIED["/resources/guides"]).toBe("2026-11-07");
+    expect(PUBLIC_PAGE_MODIFIED["/resources/guides"]).toBe("2026-11-09");
     expect(PUBLIC_PAGE_MODIFIED["/services/merchant-services"]).toBe("2026-11-05");
     expect(PUBLIC_PAGE_MODIFIED["/resources/help"]).toBe("2026-11-05");
     expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-05");
@@ -261,10 +261,10 @@ describe("public structured data", () => {
     const collection = graph.find((node: { "@type": string }) => node["@type"] === "CollectionPage");
     const list = graph.find((node: { "@type": string }) => node["@type"] === "ItemList");
     expect(collection.mainEntity).toEqual({ "@id": list["@id"] });
-    expect(list.numberOfItems).toBe(5);
-    expect(list.itemListElement.map((item: { url: string }) => item.url)).toEqual([`${canonicalOrigin}/resources/merchant-account-setup`, `${canonicalOrigin}/resources/shopify-gateway-integration`, `${canonicalOrigin}/resources/woocommerce-gateway-integration`, `${canonicalOrigin}/resources/guides/iso-20022`, `${canonicalOrigin}/resources/guides/iso-8583`]);
-    expect(list.itemListElement.map((item: { name: string }) => item.name)).toEqual(["Merchant account setup", "Shopify integration", "WooCommerce integration", "ISO 20022", "ISO 8583"]);
-    expect(new Set(list.itemListElement.map((item: { url: string }) => item.url)).size).toBe(5);
+    expect(list.numberOfItems).toBe(2);
+    expect(list.itemListElement.map((item: { url: string }) => item.url)).toEqual([`${canonicalOrigin}/resources/guides/iso-20022`, `${canonicalOrigin}/resources/guides/iso-8583`]);
+    expect(list.itemListElement.map((item: { name: string }) => item.name)).toEqual(["ISO 20022", "ISO 8583"]);
+    expect(new Set(list.itemListElement.map((item: { url: string }) => item.url)).size).toBe(2);
     expect(JSON.stringify(graph)).not.toMatch(/SearchAction|aggregateRating|FAQPage/);
   });
 

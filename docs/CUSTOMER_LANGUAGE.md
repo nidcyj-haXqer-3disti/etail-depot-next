@@ -20,4 +20,4 @@ Avoid dash punctuation in authored public prose. Technical identifiers, URLs, li
 
 Check headings, body text, action labels, alt text, artwork labels and metadata together. Preserve meaningful distinctions and required conditions while removing repeated or vague language. Do not claim Stripe parity, legal certification, guaranteed search ranking or measured usability from screenshots or automated checks.
 
-Current public content belongs to `src/features/`. The earlier account-platform vocabulary is retained in [history](../archive/project-history/docs/CUSTOMER_LANGUAGE.md); it is not the current customer language standard.
+Current public content belongs to `src/features/`. The earlier account-platform vocabulary is retained in [history](https://github.com/nidcyj-haXqer-3disti/etail-depot-next/blob/b62ff7e5e033313a77eb53e6a1110e6d427e946c/archive/project-history/docs/CUSTOMER_LANGUAGE.md); it is not the current customer language standard.
