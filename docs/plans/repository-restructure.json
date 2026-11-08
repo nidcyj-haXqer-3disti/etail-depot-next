@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Engineering migration plan; not public website content.",
+  "dated": "2026-11-08",
+  "scope": "Restructure the existing repository without redesigning or changing public capabilities.",
+  "baseline": {
+    "checkedAt": "2026-11-08T09:25:43.678Z",
+    "repository": "nidcyj-haXqer-3disti/etail-depot-next",
+    "main": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+    "tree": "7952e85ea535b903b792c432dd59bcd7e425acb3",
+    "mainProtected": false,
+    "deployment": {
+      "id": "6aef58f5c8e79bce7be0b5b3",
+      "siteId": "cbbb6c24-9dbc-43a2-9234-e4357b5b5280",
+      "commit": "e9e44fbebfde0f0ae6a7b5383c3400dfa632b1a5",
+      "state": "ready",
+      "publishedAt": "2026-11-07T17:01:07.129Z",
+      "url": "https://etaildepot.com",
+      "context": "production"
+    }
+  },
+  "branch": "codex/restructure-stage1-20261108",
+  "records": {
+    "fileMap": "repository-file-map.json",
+    "routeMap": "repository-route-map.json"
+  },
+  "categories": {
+    "website": [
+      "src/app",
+      "src/features",
+      "src/shared",
+      "public"
+    ],
+    "engineering": [
+      ".github",
+      "tools",
+      "tests",
+      "netlify",
+      "docs",
+      "archive",
+      "root framework and package configuration"
+    ],
+    "privateWorkspace": [
+      ".local",
+      "outputs",
+      "private originals and credentials outside tracked source"
+    ]
+  },
+  "featureFamilies": [
+    "home",
+    "services",
+    "use-cases",
+    "developers",
+    "resources",
+    "company",
+    "pricing"
+  ],
+  "invariants": [
+    "Keep existing public URLs and anchors.",
+    "One business feature owns its content, presentation and artwork.",
+    "Shared presentation must not import feature-owned business content.",
+    "Preserve all archive/database files unchanged.",
+    "Keep tools/reference-release.json and build/package/verify entry points in place.",
+    "Preserve original image pixels, logo payloads, CSS order and loading behavior.",
+    "Source path allowlists must be updated in the same review as moved paths.",
+    "Protected legal/reference changes need explicit path/receipt review.",
+    "No new backend, API runtime, database or local authentication.",
+    "Keep exact vendor Welcome URL and no-referrer behavior.",
+    "Preserve one shared Shell, header, footer and design system.",
+    "Keep the same GitHub repository, Netlify project and canonical domain.",
+    "Merchant access uses https://merchantapp.io/etaildepot/UserAccount/Login with no forwarded visitor input or referrers.",
+    "Preserve closed card applications, approved pricing, eligibility and provider limitations.",
+    "Preserve the enabled Emails extension and its pinned authenticated POST handler.",
+    "Do not alter denied resources, DNS, Identity, database history or unrelated email settings.",
+    "Retirement routing remains read only and never reads or forwards submitted bodies.",
+    "Use pinned Node and pnpm with one lockfile; no dependency upgrades for this migration.",
+    "Publishing source to public GitHub is separate from publishing compiled website content.",
+    "Local verification is not authorization to push, merge or deploy."
+  ],
+  "localWorkReconciliation": {
+    "publishedFiles": {
+      "samePathIdentical": 522,
+      "samePathModified": 91,
+      "movedIdentical": 113,
+      "movedAndModified": 53,
+      "missing": 0
+    },
+    "unpublishedAdditions": {
+      "publicationSafeguards": 4,
+      "projectRecords": 2,
+      "developersFeature": 15
+    },
+    "handling": "The previous working copy is preserved separately. Do not copy it wholesale or include its eight unpublished Developers routes in a structure-only migration."
+  },
+  "verificationLimits": [
+    "Stage 1 performs read-only source, dependency, live route and sitemap verification.",
+    "No application source is changed, built or packaged in Stage 1.",
+    "Full visual/loading and release verification will run against the changed source in later stages."
+  ],
+  "stages": [
+    {
+      "number": 1,
+      "name": "Baseline and complete migration map",
+      "status": "complete",
+      "deliverables": [
+        "Preserve previous work without overwriting it.",
+        "Verify the GitHub commit against the published Netlify deployment.",
+        "Start a migration branch from the published commit.",
+        "Map every published file, dependency, route and protected source.",
+        "Separate unpublished additions from the structural migration."
+      ],
+      "completion": {
+        "publishedFilesMapped": 779,
+        "previousLocalFilesPreserved": 800,
+        "unpublishedAdditionsSeparated": 21,
+        "fixedLivePagesChecked": 48,
+        "publicContentPages": 3752,
+        "sitemapUrls": 3740,
+        "protectedFilesVerified": 14,
+        "unexpectedUnresolvedImports": 0
+      }
+    },
+    {
+      "number": 2,
+      "name": "Shared foundation and one service pilot",
+      "status": "planned",
+      "deliverables": [
+        "Review and selectively port publication safeguards from previous work.",
+        "Establish shared layout, brand, UI, site configuration and SEO ownership.",
+        "Move one contained service feature, ACH payments, with its content and artwork.",
+        "Update all affected imports, source allowlists and checks in the same change."
+      ],
+      "gate": [
+        "Preserve existing render output, URLs, loading behavior and vendor handoffs.",
+        "Pass affected static, unit, browser, accessibility and build checks.",
+        "Compare the pilot and shared header/footer on desktop and mobile."
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Remaining business features",
+      "status": "planned",
+      "deliverables": [
+        "Migrate remaining Services, Home, Use cases, Pricing, Resources and Company in reviewed batches.",
+        "Keep current vendor setup and integration guides under Resources.",
+        "Reserve public Developers for future Etail developer products; do not silently publish the separate coming-soon feature.",
+        "Review legal/reference path changes and receipt updates explicitly.",
+        "Relink image generators without changing pixels or reintroducing delayed first paint."
+      ],
+      "gate": [
+        "Retain all 3752 public page addresses and stable anchors.",
+        "Retain all 3740 sitemap entries and the 12 noindex legal/policy pages.",
+        "Compare route output, authored copy, metadata, artwork, interactions and responsive layouts.",
+        "Preserve frozen reference data, licence notices and approved legal provisions."
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Engineering instructions and reviewed history",
+      "status": "planned",
+      "deliverables": [
+        "Consolidate current project instructions; distinguish current decisions from old records.",
+        "Review stale relative documentation links and update moved file references.",
+        "Archive only reviewed public historical records after dependency and sensitivity review.",
+        "Keep tools/reference-release.json and build, package and verification entry points stable.",
+        "Keep archive/database byte-for-byte unchanged.",
+        "Keep contributor workflow separate from public Developers content."
+      ],
+      "gate": [
+        "No dangling active tool, CI, configuration or documentation references.",
+        "No private working records, original screenshots, secrets or generated review artifacts in public source or the deploy package.",
+        "No root build/publish directory, Git deployment workflow, domain or runtime change."
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Full verification and release preparation",
+      "status": "planned",
+      "deliverables": [
+        "Review the exact final diff and verify that structural work did not change approved behavior.",
+        "Compare desktop/mobile first access, refresh, anchor navigation, images and menus.",
+        "Run pnpm verify:public, pnpm test:seo:production, pnpm package:netlify and pnpm verify:package.",
+        "Record package/source identity, remaining hosted checks and a rollback reference.",
+        "Prepare the reviewed PR and release notes; obtain applicable publication authorization separately."
+      ],
+      "gate": [
+        "Preserve production indexing guards, preview noindex and empty preview sitemap.",
+        "Package only the approved website, one edge boundary and the pinned authenticated Emails handler.",
+        "After authorized publication, verify the exact deployed commit and hosted routes, headers, cache, sitemap and source-file 404s."
+      ]
+    }
+  ]
+}
