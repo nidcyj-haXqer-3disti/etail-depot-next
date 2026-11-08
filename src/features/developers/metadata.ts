@@ -1,5 +1,5 @@
 import { servicePageMetadata,canonicalOrigin,publicPageModified } from "@/shared/seo/metadata";
-import { DEVELOPER_NAVIGATION,type DeveloperSlug } from "@/shared/site/developer-paths";
+import { DEVELOPER_PAGES,type DeveloperSlug } from "@/shared/site/developer-paths";
 const descriptions = {
   "getting-started": "Prepare your existing merchant integration: account access, checkout and payment results.",
   "api-reference": "Understand payment statuses, refunds, disputes and payouts for your existing merchant integration.",
@@ -10,7 +10,7 @@ const descriptions = {
   "changelog": "Updates to Etail APIs and developer tools will be published here.",
   "api-status": "Availability and incident updates will appear here when Etail API services launch."
 } as const;
-export const developerPageDetails = Object.fromEntries(DEVELOPER_NAVIGATION.map(page=>[page.href,{title:page.label,description:descriptions[page.slug]}])) as Record<`/developers/${DeveloperSlug}`,{title:string;description:string}>;
+export const developerPageDetails = Object.fromEntries(DEVELOPER_PAGES.map(page=>[page.href,{title:page.label,description:descriptions[page.slug]}])) as Record<`/developers/${DeveloperSlug}`,{title:string;description:string}>;
 export function developerMetadata(slug:DeveloperSlug){return servicePageMetadata(`/developers/${slug}`,developerPageDetails[`/developers/${slug}`]);}
 export function developerJsonLd(slug:DeveloperSlug){
  const path=`/developers/${slug}`;const details=developerPageDetails[path as keyof typeof developerPageDetails];const url=canonicalOrigin+path;

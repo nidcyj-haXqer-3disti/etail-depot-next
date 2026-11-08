@@ -234,7 +234,7 @@ test("public service discovery explains eligibility and card inquiries without l
   for(const path of ["/","/use-cases/software-platforms","/services/card-services","/services/merchant-services","/pricing","/resources/help"]){
     await page.goto(path);
     const mainNavigation=await openMainNavigation(page);
-    await expect(mainNavigation.locator("a")).toHaveCount(29);
+    await expect(mainNavigation.locator("a")).toHaveCount(26);
     for(const [name,href] of [["Merchant onboarding","/services/merchant-onboarding"],["Software platforms","/use-cases/software-platforms"],["Online businesses","/use-cases/online-businesses"],["Card services","/services/card-services"],["Getting started","/developers/getting-started"],["Guides","/resources/guides"],["Pricing","/pricing"]]){
       await expect(mainNavigation.getByRole("link",{name,exact:true,includeHidden:true})).toHaveAttribute("href",href);
     }

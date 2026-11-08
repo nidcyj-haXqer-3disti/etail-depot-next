@@ -24,7 +24,6 @@ artifacts/
 .env
 .env.*
 !.env.example
-!archive/retired-platform/templates/.env.example
 *.log
 *.tsbuildinfo
 .DS_Store
@@ -44,3 +43,11 @@ __pycache__/
 /planning/connected-workflows-stage*.json
 /planning/final-production-review-*.json
 /planning/qa-consolidation-*.json
+
+# Private workspace and compatibility shortcuts (also ignore symlinks).
+/local-work
+/input
+/output
+/outputs
+/artifacts
+/tmp

@@ -55,7 +55,7 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.locator("a")).toHaveCount(29);
+    await expect(navigation.locator("a")).toHaveCount(26);
     for (const [label, destination] of [["Software platforms", "/use-cases/software-platforms"], ["Online businesses", "/use-cases/online-businesses"], ["Merchant onboarding", "/services/merchant-onboarding"], ["Card services", "/services/card-services"], ["Getting started", "/developers/getting-started"], ["Guides", "/resources/guides"], ["Pricing", "/pricing"]]) {
       await expect(navigation.getByRole("link", { name: label, exact: true, includeHidden: true })).toHaveAttribute("href", destination);
     }

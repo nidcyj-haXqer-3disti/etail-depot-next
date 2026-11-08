@@ -59,7 +59,8 @@ test("WooCommerce guide is discoverable and screenshots support keyboard enlarge
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();
   await page.goto("/resources/guides");
-  await page.getByRole("link", { name: /WooCommerce integration Connect your payment plugin/ }).click();
+  const resources = await openMainNavigation(page, "Resources");
+  await resources.getByRole("link", { name: "WooCommerce integration", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`${path}$`));
 });
 

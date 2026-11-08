@@ -262,10 +262,10 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   const navigation = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
   const directory = page.locator(".public-footer-navigation");
   await expect(directory.getByRole("navigation")).toHaveCount(5);
-  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(28);
+  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(25);
   const destinations = await directory.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")));
   expect(new Set(destinations).size).toBe(destinations.length);
-  await expect(navigation.locator('a[href^="/developers/"]')).toHaveCount(8);
+  await expect(navigation.locator('a[href^="/developers/"]')).toHaveCount(5);
   if (await toggle.isVisible()) await toggle.click();
   await navigation.locator("summary").filter({ hasText: /^Services$/ }).click();
   await navigation.getByRole("link", { name: "Merchant onboarding", exact: true }).click();
@@ -288,6 +288,18 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   await expect(page).toHaveURL(/\/developers\/getting-started$/);
   await expect(page.getByRole("heading",{level:1})).toBeInViewport();
   await expect(navigation.locator("summary").filter({ hasText: /^Developers$/ })).toHaveClass("is-current");
+
+  for (const [route, category] of [
+    ["/developers/sdks", "Developers"],
+    ["/developers/changelog", "Developers"],
+    ["/developers/api-status", "Developers"],
+    ["/services/payment-facilitator", "Services"],
+  ]) {
+    await page.goto(route);
+    await expect(navigation.locator("summary.is-current")).toHaveText(category);
+    await expect(navigation.locator(`a[href="${route}"]`)).toHaveCount(0);
+    await expect(directory.locator(`a[href="${route}"]`)).toHaveCount(0);
+  }
 
   await page.goto("/company/contact");
   await expect(navigation.locator("summary.is-current")).toHaveCount(0);
@@ -372,7 +384,7 @@ test("footer groups work with a keyboard and adapt to screen size", async ({ pag
   await expect(page).toHaveURL(/\/developers\/testing$/);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "false");
-  await expect(directory.getByRole("link")).toHaveCount(28);
+  await expect(directory.getByRole("link")).toHaveCount(25);
   await expect(directory.locator("summary")).toHaveCount(0);
   await page.setViewportSize({ width: 320, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "true");
@@ -425,9 +437,9 @@ test("the complete footer remains usable without JavaScript", async ({ browser }
           await summary.click();
           destinations += await directory.getByRole("link").count();
         }
-        expect(destinations).toBe(28);
+        expect(destinations).toBe(25);
         await directory.locator("summary").filter({ hasText: /^Services$/ }).click();
-      } else await expect(directory.getByRole("link")).toHaveCount(28);
+      } else await expect(directory.getByRole("link")).toHaveCount(25);
       await directory.getByRole("link", { name: "Payouts", exact: true }).click();
       await expect(page).toHaveURL(/\/services\/payouts$/);
       await expect(page.getByRole("heading", {level:1})).toBeInViewport();

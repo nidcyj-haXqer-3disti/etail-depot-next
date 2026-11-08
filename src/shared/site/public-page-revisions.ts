@@ -5,14 +5,14 @@ import { CORE_PUBLIC_PATHS, isPublicContentPath } from "./public-page-inventory.
  * Every core route must be recorded explicitly; no inherited or guessed dates.
  */
 export const CORE_PAGE_MODIFIED = {
-  "/developers/getting-started": "2026-11-08",
+  "/developers/getting-started": "2026-11-09",
   "/developers/api-reference": "2026-11-08",
-  "/developers/sdks": "2026-11-08",
+  "/developers/sdks": "2026-11-09",
   "/developers/webhooks": "2026-11-08",
   "/developers/testing": "2026-11-08",
   "/developers/developer-tools": "2026-11-08",
-  "/developers/changelog": "2026-11-08",
-  "/developers/api-status": "2026-11-08",
+  "/developers/changelog": "2026-11-09",
+  "/developers/api-status": "2026-11-09",
   "/resources/merchant-account-setup": "2026-11-08",
   "/": "2026-11-05",
   "/services/merchant-services": "2026-11-05",
@@ -35,7 +35,7 @@ export const CORE_PAGE_MODIFIED = {
   "/services/payment-facilitator": "2026-11-05",
   "/company/contact": "2026-11-05",
   "/resources/help": "2026-11-05",
-  "/resources/guides": "2026-11-07",
+  "/resources/guides": "2026-11-09",
   "/resources/woocommerce-gateway-integration": "2026-11-07",
   "/resources/shopify-gateway-integration": "2026-11-07",
   "/company/privacy": "2026-11-04",

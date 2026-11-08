@@ -1,15 +1,15 @@
 import { expect,test } from "vitest";
-import { DEVELOPER_NAVIGATION,DEVELOPER_PATHS,DOCUMENTATION_REDIRECTS } from "../../src/shared/site/developer-paths";
+import { DEVELOPER_NAVIGATION,DEVELOPER_PAGES,DEVELOPER_PATHS,DOCUMENTATION_REDIRECTS } from "../../src/shared/site/developer-paths";
 import { developerJsonLd,developerMetadata } from "../../src/features/developers/metadata";
 import { isPublicContentPath,isIndexablePath } from "../../src/shared/site/public-page-inventory";
 import { publicPageRedirect,managedContentRoute } from "../../src/shared/site/public-routes";
 import { publicNavigationGroups,publicFooterGroups } from "../../src/shared/site/site-navigation";
 
-test("the eight planned Developer pages share exact menu and footer destinations",()=>{
- expect(DEVELOPER_NAVIGATION.map(page=>page.label)).toEqual(["Getting started","API reference","SDKs","Webhooks","Testing","Developer tools","Changelog","API status"]);
+test("the five Developer navigation links share destinations while published pages retain metadata",()=>{
+ expect(DEVELOPER_NAVIGATION.map(page=>page.label)).toEqual(["Getting started","API reference","Webhooks","Testing","Developer tools"]);
  expect(publicNavigationGroups.find(group=>group.id==="developers")?.sections[0].links).toEqual(DEVELOPER_NAVIGATION);
  expect(publicFooterGroups.find(group=>group.label==="Developers")?.links).toEqual(DEVELOPER_NAVIGATION);
- for(const page of DEVELOPER_NAVIGATION){
+ for(const page of DEVELOPER_PAGES){
   expect(isPublicContentPath(page.href)).toBe(true);expect(isIndexablePath(page.href)).toBe(false);
   const schema=JSON.parse(developerJsonLd(page.slug));
   expect(schema.url).toBe(`https://etaildepot.com${page.href}`);

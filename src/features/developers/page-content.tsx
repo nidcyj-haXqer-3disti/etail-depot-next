@@ -11,15 +11,11 @@ export function DeveloperPage({slug,topics=[]}:{slug:DeveloperSlug;topics?:Devel
   {id:topic.id,title:topic.title,paragraphs:[topic.article.introduction],prerequisites:topic.article.prerequisites,aliases:topic.id==="checkout"?["checkout-setup"]:topic.id==="integration-access"?["developer-integration"]:undefined},
   ...topic.article.sections,
  ]);
- if(slug==="getting-started")sections.push({id:"related-guides",title:"More guides",aliases:["topics","merchant-operations"],links:[
-  {id:"getting-started",label:"Merchant account setup",href:"/resources/merchant-account-setup"},
-  {id:"payment-requests",label:"Payment requests",href:"/developers/developer-tools#payment-requests"},
-  {id:"payment-records",label:"Payment status",href:"/developers/api-reference#payment-status"},
-  {id:"refunds-and-disputes",label:"Refunds and disputes",href:"/developers/api-reference#refunds-and-disputes"},
-  {id:"payouts",label:"Payouts and reconciliation",href:"/developers/api-reference#payouts"},
-  {id:"webhooks",label:"Webhooks",href:"/developers/webhooks"},
-  {id:"testing-and-launch",label:"Testing",href:"/developers/testing"},
- ]});
+ // Keep former overview bookmarks at the introduction without a second guide directory.
+ if(slug==="getting-started"&&sections[0])sections[0].aliases=[...(sections[0].aliases??[]),
+  "related-guides","topics","merchant-operations","getting-started","payment-requests",
+  "payment-records","refunds-and-disputes","payouts","webhooks","testing-and-launch",
+ ];
  return <ReadingGuide title={details.title} article={{introduction:details.description,prerequisites:[],sections}} jsonLd={developerJsonLd(slug)} navigation={<DeveloperNavigation current={slug}/>} contents={topics.map(({id,title})=>({id,title}))}
- heading={<span className="docs-coming-soon">Coming soon</span>} notice={<p className="docs-availability">{topics.length>0?<>Etail APIs and tools are not available yet. This guidance is for existing merchant connections.</>:<>For an existing store, follow our <Link prefetch={false} href="/resources/guides">integration guides</Link>.</>}</p>}/>;
+ heading={<span className="docs-coming-soon">Coming soon</span>} notice={<p className="docs-availability">{topics.length>0?<>Etail APIs and tools are not available yet. This guidance is for existing merchant connections.</>:<>Connect your store with our <Link prefetch={false} href="/resources/shopify-gateway-integration">Shopify</Link> or <Link prefetch={false} href="/resources/woocommerce-gateway-integration">WooCommerce</Link> guide.</>}</p>}/>;
 }

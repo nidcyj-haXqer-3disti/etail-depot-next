@@ -17,7 +17,7 @@ The website explains Etail's services and directs visitors to approved vendor se
 
 See the [repository guide](REPOSITORY_GUIDE.md) for feature folders and engineering ownership. A route composes its owning feature. Shared code must not import feature-owned business content. Whole-site registries are used for checks; runtime pages import their own content. Tests enforce these boundaries.
 
-Existing integration guidance is grouped within the eight public Developers pages. Merchant account setup, platform integration guides, Help and references belong to Resources. Etail APIs, SDKs and other developer products remain Coming soon; no implementation or availability is implied. Project contributor management stays in engineering support.
+Existing integration guidance is grouped within the five listed Developers pages. SDKs, Changelog and API status retain their published addresses and noindex metadata but are omitted from the header, footer and developer sidebar. Merchant account setup, platform integration guides, Help and references belong to Resources. Etail APIs, SDKs and other developer products remain Coming soon; no implementation or availability is implied. Project contributor management stays in engineering support.
 
 ## Rendering and interactions
 
