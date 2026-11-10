@@ -1,5 +1,17 @@
 # Current work context
 
+## 11 November 2026: Caption cleanup publication authorized
+
+The user explicitly requested “now push and depoly” for the eight-path caption cleanup on `codex/remove-artwork-captions-20261111`. This authorizes publishing the reviewed changes to the bound GitHub repository, completing the required PR checks, merging the exact reviewed source and deploying through the existing manual Netlify Git build. Scope remains the removal of illustration wording and the related caption assertion, with the account, pricing, example-data, reference and hosting boundaries preserved. The final commit, checks, deployment and hosted read-back are recorded in private `local-work/output/caption-publication-20261111/`. This paragraph records authorization, not completion.
+
+## 11 November 2026: Remove artwork illustration labels
+
+On `codex/remove-artwork-captions-20261111`, based on published PR #70 commit `54aa1fa2e633a87bfb5b17dbe6a44b2f582bf875`, the user requested removal of small labels such as “Application portal illustration.” The Merchant onboarding artwork now omits that caption and its empty spacing. Payouts and the shared Shopify/WooCommerce email artwork use shorter captions without illustration wording. The Shopify verification label and related accessible descriptions are simplified. Account instructions, example-data qualifications, fees, approval conditions, imagery, routes and loading behavior remain. The existing commercial-page test now expects no caption on the onboarding figure while retaining the captions on the other service pages.
+
+The optimized build and TypeScript checks, focused lint, architecture/publication verification and whitespace review pass. All 12 selected existing desktop/mobile service and guide cases pass, including keyboard enlargement and responsive steps. A scan of all 3,753 generated HTML files, including utility pages, found no remaining illustration, illustrated or illustrative wording in rendered copy or accessible labels. Desktop and mobile preview inspection confirmed the removed caption and intact artwork. No source or test failure occurred. Private before-copies, logs, diff and screenshot evidence are in `local-work/output/artwork-caption-cleanup-20261111/`.
+
+This edit is local and uncommitted. No push, merge or deployment was performed. Full release-candidate checks and hosted read-back remain for publication. The prior PR #70 production release and its subsequent main CI completed successfully; their private release receipt records the exact deploy.
+
 ## 11 November 2026: Publication authorized
 
 The user explicitly requested “now push and deploy” for the prepared 85-path candidate on `codex/pr69-targeted-improvements-20261110`. This authorizes publishing the reviewed source to the bound GitHub repository, completing its pull request and required checks, merging the reviewed result and deploying through the bound site's existing manual Netlify Git build. All repository, privacy, reference, vendor-link and disabled-financial-runtime boundaries remain in force.

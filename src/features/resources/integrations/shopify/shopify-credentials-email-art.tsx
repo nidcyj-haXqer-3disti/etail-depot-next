@@ -39,6 +39,6 @@ export function ShopifyCredentialsEmailArt({ store = "Shopify", exampleValues }:
         </div>
       </div>
     </div>
-    <figcaption>{exampleValues ? "Illustrated email with fictional account details. Use the details sent to you." : "Illustrated email. Your message may look different."}</figcaption>
+    <figcaption>{exampleValues ? "Account details are examples. Use the details sent to you." : "Your message may look different."}</figcaption>
   </figure>;
 }

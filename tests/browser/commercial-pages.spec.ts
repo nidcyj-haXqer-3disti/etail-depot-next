@@ -206,7 +206,8 @@ test("eight service pages have distinct artwork and usable primary journeys", as
     await page.goto(path);
     const artwork = page.locator(`[data-service-workflow="${kind}"]`);
     await expect(artwork).toBeVisible();
-    await expect(artwork.locator("figcaption")).toBeVisible();
+    if (kind === "onboarding") await expect(artwork.locator("figcaption")).toHaveCount(0);
+    else await expect(artwork.locator("figcaption")).toBeVisible();
     await expect(artwork.locator("input,button,a,form")).toHaveCount(0);
     await expect(page.locator("[data-service-actions] a").first()).toBeVisible();
     if (kind !== "cards") await expect(page.locator("#service-workflow-title")).toBeVisible();

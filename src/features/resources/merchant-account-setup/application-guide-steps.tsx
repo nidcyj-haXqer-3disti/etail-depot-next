@@ -7,7 +7,7 @@ import s from "./application-guide-steps.module.css";
 
 /** Static illustrations of the observed application. No customer data or working fields. */
 function Screen({ title, step, children, caption }: { title: string; step?: number; children: ReactNode; caption: string }) {
-  return <figure className={s.figure} aria-label={`${title} illustration`}>
+  return <figure className={s.figure} aria-label={title}>
     <div className={s.stage} aria-hidden="true">
       <div className={s.screen}>
         <div className={s.bar}><TrolleysBrand compact inverse /><span className={s.account}><Icon name="person" /></span></div>

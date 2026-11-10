@@ -34,6 +34,6 @@ export function MerchantApplicationArt({ title, caption }: { title: string; capt
         <div className={s.field}><span>Business Website</span><div className={s.blank}><i /></div></div>
       </div>
     </div>
-    <figcaption>{caption}</figcaption>
+    {caption && <figcaption>{caption}</figcaption>}
   </figure>;
 }
