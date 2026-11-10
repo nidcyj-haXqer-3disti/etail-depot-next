@@ -1,0 +1,24 @@
+.flow{justify-self:center;display:grid;place-items:center;flex:none;width:18px;height:30px;color:#668958}
+.motion .flow svg{display:block;width:16px;height:30px;overflow:visible}
+.flow[data-flow-direction="right"]{width:30px;height:18px}
+.motion .flow[data-flow-direction="right"] svg{transform:rotate(-90deg)}
+.motion .flow[data-flow-direction="up"] svg{transform:rotate(180deg)}
+.flow circle{opacity:0}
+.motion [data-motion-part="match-check"]{display:flex}
+@media(prefers-reduced-motion:no-preference) and (forced-colors:none){
+  .motion [data-motion-part="flow"]{animation:flow-travel 3.4s linear infinite;animation-play-state:paused}
+  .motion [data-motion-part="bank-mark"]{animation:bank-emphasis 6.8s ease-in-out infinite;animation-play-state:paused}
+  .motion [data-motion-part="match-dot"]{animation:match-emphasis 8s ease-in-out infinite;animation-play-state:paused}
+  .motion [data-motion-part="match-dot"][data-motion-step="2"]{animation-delay:2.8s}
+  .motion [data-motion-part="match-check"]{animation:bank-emphasis 8s ease-in-out 4.6s infinite;animation-play-state:paused}
+  .motion [data-motion-part="evidence"]{animation:record-lift 9s ease-in-out infinite;animation-play-state:paused}
+  .motion [data-motion-part="evidence"][data-motion-step="2"]{animation-delay:2s}
+  .motion [data-motion-part="evidence"][data-motion-step="3"]{animation-delay:4s}
+  .motion [data-motion-part="processing"]{animation:processing-turn 4.8s linear infinite;animation-play-state:paused}
+  .motion[data-service-motion="on"] [data-motion-part]{animation-play-state:running}
+}
+@keyframes flow-travel{0%{transform:translateY(0);opacity:0}15%{opacity:1}80%{opacity:1}100%{transform:translateY(18px);opacity:0}}
+@keyframes bank-emphasis{0%,40%,100%{transform:scale(1)}55%{transform:scale(1.07)}70%{transform:scale(1)}}
+@keyframes match-emphasis{0%,8%,48%,100%{transform:scale(1)}22%,34%{transform:scale(1.65)}}
+@keyframes record-lift{0%,7%,32%,100%{transform:translateY(0)}15%,22%{transform:translateY(-3px)}}
+@keyframes processing-turn{to{transform:rotate(360deg)}}

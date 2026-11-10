@@ -85,6 +85,12 @@
 .public-footer-services ul { grid-template-rows: repeat(4,auto); grid-auto-flow: column; grid-template-columns: 1.1fr 1fr; column-gap: 24px; }
 .public-footer-group li { min-width: 0; }
 .public-footer-group a { display: flex; align-items: flex-start; width: fit-content; max-width: 100%; min-width: 44px; min-height: 44px; padding-block: 10px; color: var(--public-muted); font-size: 14px; line-height: 1.5; text-decoration: none; overflow-wrap: anywhere; }
+.public-footer-guide-ending { white-space: nowrap; }
+.public-footer-guide-brand { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; margin-left: 5px; vertical-align: 3px; }
+.public-footer-guide-brand-trolleys { border-radius: 4px; background: #161329; }
+.public-footer-guide-brand-trolleys .public-footer-guide-mark { width: 9.24px; }
+.public-footer-guide-brand-woocommerce { width: 26px; }
+.public-footer-guide-mark { display: block; width: 100%; height: auto; }
 .public-footer-group a:hover, .public-footer-legal a:hover { color: var(--public-ink); text-decoration: underline; text-underline-offset: 4px; }
 .public-footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px 32px; padding-top: 16px; border-top: 1px solid var(--public-line); color: var(--public-muted); font-size: 12px; line-height: 1.75; }
 .public-footer-identity { display: flex; align-items: center; gap: 24px; min-width: 0; }

@@ -1,6 +1,6 @@
 # Repository guide
 
-This map describes the current local candidate, based on GitHub `main` commit `b62ff7e5e033313a77eb53e6a1110e6d427e946c`. The selective archive trim on 9 November 2026 is included below and has not yet been published. See [current work context](CURRENT_WORK_CONTEXT.md) for task and release status.
+This map describes the maintained repository structure, including the selective archive trim. See [current work context](CURRENT_WORK_CONTEXT.md) for the exact candidate, task and release status.
 
 ## How the project is categorized
 

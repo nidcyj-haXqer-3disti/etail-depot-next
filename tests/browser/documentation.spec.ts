@@ -184,7 +184,7 @@ test("account screenshot instructions work without JavaScript at desktop and pho
   await expect(signIn.getByRole('link',{name:'Sign in to Trolleys',exact:true})).toHaveAttribute('href','https://merchantapp.io/etaildepot/UserAccount/Login');
   await expect(signIn).toContainText('continue the existing application');
   const guide=page.locator('#create-account');
-  await expect(guide.getByRole('heading',{level:3})).toHaveText(['Enter your email on Welcome','Create your password','Continue your business application']);
+  await expect(guide.getByRole('heading',{level:3})).toHaveText(['Enter your email on Welcome','Create your password','Complete your company profile','Add owners and contacts','Enter your bank details','Review and submit','Check your application status']);
   for(const image of await page.locator('#create-account figure img,#registration-email img').all()) {
    await image.scrollIntoViewIfNeeded();
    await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth === 1280)).toBe(true);
@@ -269,7 +269,7 @@ test("account guide screenshots start before layout on direct links and refresh"
   } finally { releaseResources(); }
   await page.waitForLoadState("load");
   expect(logoRequested, "The small logo must be embedded, with no separate image request").toBe(false);
-  await expect(page.locator("main .brand-image-trolleys")).toHaveCount(2);
+  await expect(page.locator("main .brand-image-trolleys")).toHaveCount(9);
   for (const logo of await page.locator("main .brand-image-trolleys").all()) {
    await expect(logo).toHaveCSS("content", /url\("data:image\/png;base64,/);
   }
@@ -295,4 +295,28 @@ test("account guide screenshots start before layout on direct links and refresh"
 
 test("Refresh does not paint a partial account guide while its HTML is arriving", async ({ page, baseURL, request }) => {
  await expectCompleteGuidePaint(page, request, baseURL, "/resources/merchant-account-setup", "#registration-email", "#registration-email h2");
+});
+
+
+test("merchant setup explains the complete application and a separate additional DBA", async ({page}) => {
+ await page.goto('/resources/merchant-account-setup#bank-details');
+ await expect(page.locator('#bank-details h3')).toBeInViewport();
+ await page.reload();
+ await expect(page.locator('#bank-details h3')).toBeInViewport();
+ await expect(page.locator('#bank-details')).toContainText('not your debit card number');
+ await expect(page.locator('#owners-and-contacts')).toContainText('without +1');
+ await expect(page.locator('#application-submitted')).toContainText('Additional checks can take longer.');
+ await expect(page.locator('#application-submitted')).toContainText('Wait for account approval');
+ const extra=page.locator('#additional-mid');
+ await expect(extra.getByRole('heading',{level:3})).toHaveText(['Choose + Location','Enter the new DBA','Review and follow its status']);
+ await expect(extra).toContainText('same LLC or corporation');
+ await expect(extra).toContainText('Wait for the additional MID to be approved');
+ await expect(extra.getByRole('figure')).toHaveCount(3);
+ await expect(page.locator('main input,main form,main iframe')).toHaveCount(0);
+ await page.goto('/resources/merchant-account-setup#application-review');
+ const help=page.locator('#application-review details');
+ await help.locator('summary').click();
+ await expect(help).toHaveAttribute('open','');
+ await expect(help).toContainText('Billing descriptor');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
 });

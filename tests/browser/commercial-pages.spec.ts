@@ -15,7 +15,14 @@ test("commercial pages have distinct decisions, exact canonicals and direct prim
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(page.locator("main form")).toHaveCount(0);
-    await expect(page.locator("main")).not.toContainText(/Cybersource|Infinicept|prototype|illustrative|TODO/i);
+    await expect(page.locator("main")).not.toContainText(/Cybersource|Infinicept|prototype|TODO/i);
+    // Artwork captions identify example data; marketing prose must not read like a draft.
+    const marketingCopy = await page.locator("main").evaluate(main => {
+      const copy = main.cloneNode(true) as HTMLElement;
+      copy.querySelectorAll("figcaption").forEach(caption => caption.remove());
+      return copy.textContent;
+    });
+    expect(marketingCopy).not.toMatch(/illustrative/i);
     await expect(page.getByRole("navigation", { name: "Related information", exact: true })).toHaveCount(0);
     const action = path === "/company/contact" ? page.locator("#payment-review a") : path === "/company/about" ? page.getByRole("main").getByRole("link", { name: "contact our team", exact: true }) : page.locator(isServiceDetailPath(path) ? "[data-service-actions] a" : ".commercial-action a").first();
     await expect(action).toBeVisible();

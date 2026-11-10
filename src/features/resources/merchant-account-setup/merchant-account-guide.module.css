@@ -30,10 +30,10 @@
  .stepHeading span, .guide .approval { border:1px solid CanvasText; }
 }
 
-.stepCopy,.applicationArt{min-width:0}
+.stepCopy{min-width:0}
 .recovery{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
 .guide a:not([class]),.guide .hint a{color:var(--docs-ink);text-decoration:underline;text-underline-offset:3px}
 .guide a:focus-visible{outline:3px solid #256c57;outline-offset:4px}
 .bookmark{display:block;scroll-margin-top:100px}
-@container(max-width:600px){.steps>li{grid-template-columns:1fr;gap:16px}.steps .figure{margin:0}.steps{gap:40px}.stepHeading h3{font-size:19px}.applicationArt{max-width:480px}}
+@container(max-width:600px){.steps>li{grid-template-columns:1fr;gap:16px}.steps .figure{margin:0}.steps{gap:40px}.stepHeading h3{font-size:19px}}
 @media(max-width:1250px){.recovery{grid-template-columns:1fr}.recovery .figure{max-width:400px}}

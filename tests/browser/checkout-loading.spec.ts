@@ -27,7 +27,15 @@ for (const width of [320, 390, 1440]) {
         const styles = [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')];
         return styles.length > 0 && styles.every(style => style.sheet !== null);
       });
-      await page.evaluate(() => document.fonts.ready);
+      // Explicit font loads also settle WebKit while application scripts remain held.
+      await page.evaluate(async () => {
+        const family = getComputedStyle(document.querySelector(".unified-preview")!).fontFamily;
+        await Promise.all([document.fonts.load(`400 16px ${family}`), document.fonts.load(`500 20px ${family}`)]);
+      });
+      await expect(checkout).toContainText("alex.morgan@example.com");
+      await expect(checkout).toContainText("Alex Morgan");
+      await expect(checkout).toContainText("PAY10482");
+      await expect(checkout).toContainText("Chalk / Teal · US 9 · Qty 1");
       const geometry = () => page.evaluate(() => Object.fromEntries([
         ".payment-service-explorer", ".pse-tabs", ".unified-preview",
         ".unified-preview-screen-nav", ".unified-preview-layout", ".unified-preview-methods",
@@ -47,6 +55,9 @@ for (const width of [320, 390, 1440]) {
           expect(Math.abs(after[selector]![dimension] - before[selector]![dimension]), `${selector} ${dimension}`).toBeLessThanOrEqual(1);
         }
       }
+      await page.reload();
+      await expect(checkout).toContainText("PAY10482");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
       expect(errors).toEqual([]);
     } finally {
       release();

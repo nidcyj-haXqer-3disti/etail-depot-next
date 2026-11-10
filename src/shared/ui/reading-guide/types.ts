@@ -7,7 +7,7 @@ export type DocSection = {
   note?: { title: string; text: string };
   flow?: "onboarding" | "checkout" | "records" | "payouts" | "events" | "requests" | "access" | "launch" | "recovery" | "disputes";
   table?: DocTable; outcome?: string;
-  illustratedGuide?: "sign-in" | "registration" | "email-recovery";
+  illustratedGuide?: "sign-in" | "registration" | "email-recovery" | "additional-location";
   details?: DocRow[]; link?: { label: string; href: string };
 };
 export type DocArticle = { introduction: string; prerequisites: string[]; sections: DocSection[] };

@@ -13,8 +13,8 @@ export const payoutsContent = {
     },
     "note": "Payout schedules, reserves, reviews and bank processing depend on your account terms.",
     "art": {
-      "title": "Eligible payment activity, fees and account adjustments form a payout, which is matched to the bank deposit",
-      "caption": "A payout report and a posted bank deposit are separate records.",
+      "title": "Illustrative payout: three card sales total $432.00, less $13.43 in processing fees and no other adjustments, leaving $418.57. The bank record shows the same $418.57 credit and reference P1048.",
+      "caption": "Illustrative completed payout. Fees and bank details are examples. Confirm the credit with your bank.",
       "steps": []
     },
     "sections": [

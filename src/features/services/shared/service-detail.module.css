@@ -62,3 +62,12 @@
 .cardFace{box-shadow:0 20px 32px -22px #193c3366,0 2px 6px #193c330a}
 .cardRecords>.node{gap:15px}
 @container(max-width:440px){.sceneHeading{padding-bottom:24px}.refundRoutes>div{grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr)}.payoutTotal{min-height:72px}.cardRecords>.node{gap:13px}}
+
+/* Keep copy aligned when neighbouring service headings wrap. */
+@media(min-width:601px){
+ .benefits>div{display:grid;grid-template-rows:subgrid;grid-row:span 2;row-gap:0}
+ .flowSteps>li{display:grid;grid-template-rows:subgrid;grid-row:span 3;row-gap:0}
+}
+@media(min-width:601px) and (max-width:959px){
+ .detail dl>div{display:grid;grid-template-rows:subgrid;grid-row:span 2;row-gap:0}
+}

@@ -49,9 +49,9 @@ export function MerchantOnboardingArt() {
           <div className="mja-content-heading"><h4>Application summary</h4><span className="mja-status"><span aria-hidden="true" />In review</span></div>
           <section className="onboarding-business" aria-label="Business information required for an application">
             <div className="onboarding-profile"><EcommerceStorefrontArt /><div className="onboarding-profile-copy"><p>Business profile</p><h5>{serviceExample.business}</h5><span>Ecommerce retailer</span></div></div>
-            <dl className="onboarding-fields"><div><dt>Business location</dt><dd>United States</dd></div><div><dt>Sales channel</dt><dd>Ecommerce website</dd></div></dl>
+            <dl className="onboarding-fields"><div><dt>Business location</dt><dd>United States</dd></div><div><dt>Website</dt><dd>yourstore.example.com</dd></div><div><dt>Average card order</dt><dd>{amount(serviceExample.amountCents)}</dd></div><div><dt>Monthly card volume</dt><dd>$25,000.00</dd></div></dl>
           </section>
-          <div className="onboarding-submissions"><div><Icon name="person" /><div><h5>Owners and representative</h5><p>Submitted for review</p></div></div><div><Icon name="bank" /><div><h5>Bank account</h5><p>Submitted for verification</p></div></div></div>
+          <div className="onboarding-submissions"><div><Icon name="person" /><div><h5>Owners and representative</h5><p>Submitted for review</p></div></div><div><Icon name="bank" /><div><h5>Bank account</h5><p>Business checking •••• 9016</p><p>Submitted for verification</p></div></div></div>
           <div className="onboarding-next"><span className="onboarding-next-icon"><Icon name="document" /></span><div><h5>What happens next</h5><p>Your application is reviewed. If more information is needed, you’ll be asked to provide it. Account setup follows approval.</p></div></div>
         </div>
       </div>
@@ -75,6 +75,7 @@ export function MerchantPayoutArt() {
         </div>
         <aside className="payout-deposit" aria-label="Bank receipt is a separate confirmation">
           <p className="mja-small-heading">To your bank</p><h4>Track your payout.</h4>
+          <div className="payout-bank-destination"><Icon name="bank" /><div><strong>Business checking</strong><span>Account ending 9016</span></div></div>
           <ol className="payout-trail">
             <li className="payout-trail-complete"><span className="payout-trail-mark" aria-hidden="true"><Icon name="check" /></span><div><strong>Capture</strong><span>Payment recorded against {serviceExample.orderReference}.</span></div></li>
             <li><span className="payout-trail-mark" aria-hidden="true">2</span><div><strong>Settlement</strong><span>Funds move between the issuing and acquiring sides.</span></div></li>

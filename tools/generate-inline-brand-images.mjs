@@ -1,4 +1,5 @@
 /** Keep small, frequently visible marks available with the page, without altering the originals. */
+import { createRequire } from "node:module";
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const root = new URL("../", import.meta.url);
@@ -28,6 +29,32 @@ for (const [group, images] of Object.entries(groups)) {
   writeFileSync(new URL(`src/shared/brand/brand-images-${group}.css`, root),
     "/* Generated from original public/brand assets. Regenerate: node tools/generate-inline-brand-images.mjs */\n" + lines.join("\n") + "\n");
 }
+
+// Extract the existing portal-symbol window for a 14px mark at up to 3x density.
+const require = createRequire(import.meta.url);
+const sharp = createRequire(require.resolve("next/package.json"))("sharp");
+const portalSymbol = await sharp(new URL("src/shared/brand/assets/trolleys-portal-logo.png", root).pathname)
+  .extract({ left: 127, top: 25, width: 66, height: 50 }).resize(28, 21)
+  .png({ palette: true, colours: 64 }).toBuffer();
+writeFileSync(new URL("src/shared/brand/brand-images-platforms.css", root),
+  "/* Generated from src/shared/brand/assets/trolleys-portal-logo.png. Regenerate: node tools/generate-inline-brand-images.mjs */\n" +
+  `.brand-image-trolleys-symbol { --brand-image: url("data:image/png;base64,${portalSymbol.toString("base64")}"); }\n`);
+
+// Native SVG keeps the original vector paths crisp without additional image requests.
+const platformMarks = { shopify: "shopify-bag.svg", woocommerce: "woocommerce.svg" };
+const vectorBranches = Object.entries(platformMarks).map(([name, file]) => {
+  const original = readFileSync(new URL(`src/shared/brand/assets/${file}`, root), "utf8");
+  const viewBox = original.match(/viewBox="([^"]+)"/)[1];
+  const fills = Object.fromEntries([...original.matchAll(/\.(st\d+)\{[^}]*?fill:(#[A-Fa-f0-9]+);?[^}]*\}/g)].map(match => [match[1], match[2]]));
+  const paths = [...original.matchAll(/<path class="([^"]+)" d="([^"]+)"\s*\/>/g)].map(match =>
+    `<path fill="${fills[match[1]]}" d="${match[2].replace(/\s+/g, " ").trim()}" />`).join("\n      ");
+  if (!paths || paths.includes('fill="undefined"')) throw new Error(`Unrecognized platform artwork: ${file}`);
+  return `  if (brand === "${name}") return <svg viewBox="${viewBox}" className={className} aria-hidden="true" focusable="false">\n      ${paths}\n    </svg>;`;
+});
+writeFileSync(new URL("src/shared/brand/platform-marks.tsx", root),
+  '/** Original platform paths. Regenerate with tools/generate-inline-brand-images.mjs. */\n' +
+  'export function PlatformMark({ brand, className }: { brand: "shopify" | "woocommerce"; className: string }) {\n' +
+  vectorBranches.join("\n") + '\n  return null;\n}\n');
 
 // The portal mark uses the same embedded delivery as the site wordmark.
 const portalLogo = readFileSync(new URL("src/shared/brand/assets/trolleys-portal-logo.png", root));

@@ -21,7 +21,7 @@ describe("industry use cases share the Software platforms page", () => {
       expect(sitemap).toHaveLength(3731);
       expect(sitemap.filter(item => item.url.includes("#"))).toEqual([]);
       expect(sitemap.filter(item => item.url.includes("/use-cases/"))).toHaveLength(5);
-      expect(sitemap.find(item => item.url === `${canonicalOrigin}/use-cases/software-platforms`)?.lastModified).toBe("2026-11-05");
+      expect(sitemap.find(item => item.url === `${canonicalOrigin}/use-cases/software-platforms`)?.lastModified).toBe("2026-11-11");
       for (const slug of removed) {
         const route = `/use-cases/${slug}`;
         expect(PUBLIC_CONTENT_PATHS).not.toContain(route);

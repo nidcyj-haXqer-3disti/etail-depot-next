@@ -203,7 +203,7 @@ test("software partner preview stays out of indexing and offers contact rather t
   await expect(contact).toHaveAttribute("href", "/company/contact#platforms");
   await expect(page.locator("main form")).toHaveCount(0);
   await expect(page.locator("main")).toContainText("Merchant approval is required.");
-  await expect(page.locator("main")).toContainText("Review business details and complete account setup after approval.");
+  await expect(page.locator("#payment-experience")).toContainText("After account approval and setup, follow each purchase through the merchant’s payment records to the bank deposit.");
   await expect(page.locator("main")).toContainText("Payment methods depend on account setup.");
   const sitemap = await page.request.get("/sitemap.xml");
   expect(sitemap.ok()).toBeTruthy();

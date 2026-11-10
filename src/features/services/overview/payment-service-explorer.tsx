@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { NetworkMark } from "@/shared/brand/network-brands";
 import { CommerceProductArt } from "./commerce-product-art";
 import { serviceExample } from "@/shared/ui/artwork/service-example";
 import { MerchantOnboardingArt, MerchantPayoutArt } from "./merchant-journey-art";
@@ -57,12 +58,12 @@ export function PaymentServiceExplorer() {
         <h3 className="pse-view-title">Match the card payment to the order.</h3>
         <div className="pse-record-layout">
           <div className="pse-record">
-            <div className="pse-record-heading"><p className="pse-label">{serviceExample.business}</p><p className="pse-record-amount">{amount(serviceExample.amountCents)} <span>{serviceExample.currency}</span></p></div>
-            <div className="pse-record-product"><span className="commerce-product-thumbnail"><CommerceProductArt /></span><div><p className="pse-record-description">{serviceExample.description}</p><p className="pse-product-detail">1 pair · Chalk / Teal</p></div></div>
-            <dl className="pse-facts"><div><dt>Order reference</dt><dd>{serviceExample.orderReference}</dd></div><div><dt>Payment method</dt><dd>Card</dd></div></dl>
+            <div className="pse-record-heading"><div><p className="pse-label">Payment details</p><p className="pse-record-reference">{serviceExample.paymentReference} <span>Captured</span></p></div><p className="pse-record-amount">{amount(serviceExample.amountCents)} <span>{serviceExample.currency}</span></p></div>
+            <div className="pse-record-product"><span className="commerce-product-thumbnail"><CommerceProductArt /></span><div><p className="pse-record-description">{serviceExample.description}</p><p className="pse-product-detail">{serviceExample.productDetail}</p></div></div>
+            <dl className="pse-facts"><div><dt>Order reference</dt><dd>{serviceExample.orderReference}</dd></div><div><dt>Customer</dt><dd>{serviceExample.customer}</dd></div><div><dt>Payment method</dt><dd>Card <span className="pse-card-detail"><NetworkMark network="visa" />•••• 4242</span></dd></div><div><dt>Authorization code</dt><dd>{serviceExample.authorizationCode}</dd></div></dl>
             <ol className="pse-stages">
-              <li><span className="pse-stage-index" aria-hidden="true">01</span><div><p><strong>Authorization</strong><span>Approved</span></p><p>The issuer approves the payment request.</p></div></li>
-              <li><span className="pse-stage-index" aria-hidden="true">02</span><div><p><strong>Capture</strong><span>Captured</span></p><p>The approved payment is submitted for processing.</p></div></li>
+              <li><span className="pse-stage-index" aria-hidden="true">01</span><div><p><strong>Authorization</strong><span>Approved</span></p><p>{amount(serviceExample.amountCents)} approved · Code {serviceExample.authorizationCode}</p></div></li>
+              <li><span className="pse-stage-index" aria-hidden="true">02</span><div><p><strong>Capture</strong><span>Captured</span></p><p>{amount(serviceExample.amountCents)} captured · Order {serviceExample.orderReference}</p></div></li>
             </ol>
             <p className="pse-record-note">Capture does not confirm that money has reached the merchant’s bank.</p>
           </div>

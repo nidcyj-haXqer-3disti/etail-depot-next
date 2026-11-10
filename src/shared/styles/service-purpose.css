@@ -47,6 +47,3 @@ html:has(.service-purpose-records) {scroll-behavior:auto;}
 .public-main .platforms.cw-pilot .industry-cases .ec-industry-scene>.ec-record-line:last-child {margin-top:auto}
 .public-main .platforms.cw-pilot .industry-cases .ec-industry-copy>p:not(.ec-industry-scope) {font-size:17px;line-height:1.65;color:#315e48;margin-top:14px}
 @media(max-width:680px){.public-main .platforms.cw-pilot .industry-cases .ec-industry-scene{min-height:250px}.public-main .platforms.cw-pilot .industry-cases .ec-industry-copy>p:not(.ec-industry-scope){font-size:16px}}
-@media(min-width:960px){
- .public-main .platforms.cw-pilot .industry-cases>article{display:grid;grid-template-rows:subgrid;grid-row:span 2;row-gap:0}
-}
