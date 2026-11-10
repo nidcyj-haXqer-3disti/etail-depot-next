@@ -20,7 +20,7 @@ export const merchantOnboardingContent = {
     "note": `${merchantAccountGuidance.application} Account approval and setup are required.`,
     "art": {
       "title": "Trolleys merchant application portal. Continue an incomplete application and begin with Company Profile.",
-      "caption": "Application portal illustration",
+      "caption": "",
       "steps": []
     },
     "sections": [

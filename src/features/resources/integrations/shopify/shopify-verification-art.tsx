@@ -8,9 +8,9 @@ function Check() {
 export function ShopifyVerificationArt() {
   return <figure className={guideStyles.figure} data-shopify-artwork="integration-verification">
     <div className={styles.frame}>
-      <div className={styles.exampleLabel}>Illustrated example <span>Payment captured</span></div>
+      <div className={styles.exampleLabel}><span>Payment captured</span></div>
 
-      <div className={styles.shopify} role="group" aria-label="Illustrated Shopify order and payment details">
+      <div className={styles.shopify} role="group" aria-label="Shopify order and payment details">
         <div className={styles.shopifyBar}>
           <span className={styles.brand}>Shopify</span><span>Orders</span>
           <svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="4.5" /><path d="m11 11 4 4" /></svg>
@@ -45,7 +45,7 @@ export function ShopifyVerificationArt() {
         <span>Same payment ID, amount and currency</span>
       </div>
 
-      <div className={styles.cybersource} role="group" aria-label="Illustrated Cybersource transaction details">
+      <div className={styles.cybersource} role="group" aria-label="Cybersource transaction details">
         <div className={styles.cybersourceBar}><strong>Cybersource</strong><span>Business Center</span></div>
         <div className={styles.transactionBody}>
           <div className={styles.location}>Transaction Management <span aria-hidden="true">›</span> Transactions</div>
