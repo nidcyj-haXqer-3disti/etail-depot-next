@@ -196,14 +196,12 @@ test("four industry cases share one page with useful workflows and no standalone
   for (const slug of industryPaths) await expect(page.locator(`a[href^="/use-cases/${slug}"]`)).toHaveCount(0);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/use-cases/software-platforms");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
-  await expect(page.locator("main form, main input, main iframe")).toHaveCount(0);
+  await expect(page.locator("main form, main input:not([data-example-selector]), main iframe")).toHaveCount(0);
   await expect(page.locator("main")).not.toContainText(/Cybersource|Infinicept|SDK|prototype|illustrative|roadmap/i);
   for (const slug of industryPaths) {
     const card = page.locator(`#${slug}`);
     await expect(card.getByRole("heading", {level:3})).toBeVisible();
     await expect(card.locator(".platform-case-steps li")).toHaveCount(4);
-    const disclosure = card.locator(":scope > details");
-    if (await disclosure.getAttribute("open") === null) await disclosure.locator(":scope > summary").click();
     await card.locator(".platform-case-details > summary").focus(); await page.keyboard.press("Enter");
     await expect(card.locator(".platform-case-details")).toHaveAttribute("open", "");
     await expect(card.locator(".platform-case-scope")).toBeVisible();
@@ -213,7 +211,7 @@ test("four industry cases share one page with useful workflows and no standalone
   }
   await expect(page.locator("main")).not.toContainText(/debt collection|collection account|receivable/i);
   await expect(page.locator('a[href*="collection-software"], #collection-software')).toHaveCount(0);
-  await expect(page.locator("#commerce-marketplaces .ec-industry-scene")).toBeVisible();
+  await expect(page.locator('#commerce-marketplaces [data-platform-scene="commerce"]')).toBeVisible();
   const data = await page.locator('script[type="application/ld+json"]').textContent();
   const entries = JSON.parse(data!)["@graph"][2].itemListElement;
   expect(entries.map((item: {url:string})=>item.url)).toEqual(industryPaths.map(slug=>`https://etaildepot.com/use-cases/software-platforms#${slug}`));
@@ -284,7 +282,12 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   await page.goto("/");
   await openFooterGroup(page, "Use cases");
   await directory.getByRole("link", { name: "Software platforms", exact: true }).click();
-  await page.getByRole("main").getByRole("link", { name: "Explore developer integration", exact: true }).click();
+  await page.getByRole("main").getByRole("link", { name: "Discuss your integration", exact: true }).click();
+  await expect(page).toHaveURL(/\/company\/contact#platforms$/);
+  await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  if (await toggle.isVisible()) await toggle.click();
+  await navigation.locator("summary").filter({ hasText: /^Developers$/ }).click();
+  await navigation.getByRole("link", { name: "Getting started", exact: true }).click();
   await expect(page).toHaveURL(/\/developers\/getting-started$/);
   await expect(page.getByRole("heading",{level:1})).toBeInViewport();
   await expect(navigation.locator("summary").filter({ hasText: /^Developers$/ })).toHaveClass("is-current");
@@ -448,24 +451,39 @@ test("the complete footer remains usable without JavaScript", async ({ browser }
 });
 
 
-test("phone industries expand by intent and retain bookmarked workflows", async ({ page }) => {
+test("platform use cases show their scenes directly and retain one native requirements disclosure", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/use-cases/software-platforms#industries");
-  const cards = page.locator(".industry-cases > article > details");
+  const cards = page.locator(".industry-cases > article");
   await expect(cards).toHaveCount(4);
-  await expect(page.locator(".industry-cases > article > details[open]")).toHaveCount(0);
-  const freight = page.locator("#freight-platforms > details");
-  await freight.locator(":scope > summary").focus(); await page.keyboard.press("Enter");
-  await expect(freight).toHaveAttribute("open", "");
+  await expect(cards.locator("details details")).toHaveCount(0);
+  await expect(cards.locator("[data-platform-scene]")).toHaveCount(4);
+  await expect(cards.locator(".platform-case-details[open]")).toHaveCount(0);
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const card of await cards.all()) {
+      const gap = await card.evaluate(element => {
+        const scene = element.querySelector("[data-platform-scene]")!.getBoundingClientRect();
+        const copy = element.querySelector(".ec-industry-copy")!.getBoundingClientRect();
+        return copy.top - scene.bottom;
+      });
+      expect(gap).toBeGreaterThanOrEqual(-1);
+    }
+    const product = await page.locator('[data-platform-scene="commerce"] svg').boundingBox();
+    expect(product!.width).toBeGreaterThan(80);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const freight = page.locator("#freight-platforms");
   await expect(freight.locator(".ec-industry-scope")).toBeVisible();
-  await freight.locator(".platform-case-details summary").click();
+  await freight.locator(".platform-case-details summary").focus(); await page.keyboard.press("Enter");
   await expect(freight.locator(".platform-case-steps li")).toHaveCount(4);
+  await expect(freight.locator(".platform-case-details")).toHaveAttribute("open", "");
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await expect(page.locator(".industry-cases > article > details[open]")).toHaveCount(4);
   await page.setViewportSize({ width: 320, height: 844 });
-  await expect(freight).toHaveAttribute("open", "");
+  await expect(freight.locator(".platform-case-details")).toHaveAttribute("open", "");
+  // A saved bookmark starts a new document, independently of the preceding resize exercise.
+  await page.goto("/");
   await page.goto("/use-cases/software-platforms#legal-software");
-  await expect(page.locator("#legal-software > details")).toHaveAttribute("open", "");
   await expect(page.locator("#legal-software h3")).toBeInViewport();
   await expect(page.locator("#legal-software .ec-industry-scope")).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -510,4 +528,65 @@ test("phone footer is compact before JavaScript loads and does not change height
   await services.click();
   await expect(footer.getByRole("link", { name: "Payouts", exact: true })).toBeVisible();
  } finally { releaseScripts(); }
+});
+
+test("footer guide brands paint before scripts and keep link labels and layout stable", async ({ page }) => {
+  const failures: string[] = [];
+  page.on("pageerror", error => failures.push(error.message));
+  let releaseScripts = () => {};
+  const scriptsReady = new Promise<void>(resolve => { releaseScripts = resolve; });
+  await page.route("**/*.js", async route => { await scriptsReady; await route.continue(); });
+  try {
+    await page.goto("/company/contact", { waitUntil: "commit" });
+    const directory = page.locator(".public-footer-navigation");
+    const group = page.locator('.public-footer-group[aria-label="Footer resources"]:visible');
+    const compact = await page.evaluate(() => matchMedia("(max-width: 959px)").matches);
+    await expect(group).toBeVisible();
+    if (compact) await group.locator("summary").click();
+    await page.evaluate(async () => {
+      const family = getComputedStyle(document.querySelector(".public-footer-group a")!).fontFamily;
+      await document.fonts.load(`400 14px ${family}`);
+    });
+    const labels = ["Merchant account setup", "Shopify integration", "WooCommerce integration"];
+    for (const label of labels) {
+      const link = group.getByRole("link", { name: label, exact: true });
+      await expect(link.locator(".public-footer-guide-brand")).toBeVisible();
+      if (label === "Merchant account setup") await expect(link.locator(".inline-brand-image")).toHaveCSS("content", /data:image\/png;base64/);
+      else await expect(link.locator("svg path").first()).toBeVisible();
+    }
+    await expect(group.locator(".public-footer-guide-brand")).toHaveCount(3);
+    await expect(group.locator("img")).toHaveCount(0);
+    const geometry = () => group.locator("a").evaluateAll(links => links.map(link => {
+      const rect = link.getBoundingClientRect();
+      const top = link.closest("nav")!.getBoundingClientRect().top;
+      return { top: rect.top - top, width: rect.width, height: rect.height };
+    }));
+    const before = await geometry();
+    releaseScripts();
+    await page.waitForLoadState("load");
+    await expect(directory).toHaveAttribute("data-compact", String(compact));
+    if (compact) await expect(group.locator("details")).toHaveAttribute("open", "");
+    expect(await geometry()).toEqual(before);
+    for (const width of [320, 390, 768, 960, 1024, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const resources = await openFooterGroup(page, "Resources");
+      for (const label of labels) {
+        const link = resources.getByRole("link", { name: label, exact: true });
+        const bounds = await link.boundingBox();
+        const mark = await link.locator(".public-footer-guide-brand").boundingBox();
+        expect(bounds).not.toBeNull(); expect(mark).not.toBeNull();
+        expect(bounds!.height).toBeGreaterThanOrEqual(44);
+        expect(mark!.width).toBeLessThanOrEqual(26);
+        expect(mark!.height).toBe(14);
+        expect(mark!.x + mark!.width).toBeLessThanOrEqual(bounds!.x + bounds!.width + 1);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+    await page.reload();
+    const refreshed = await openFooterGroup(page, "Resources");
+    await expect(refreshed.locator(".public-footer-guide-brand")).toHaveCount(3);
+    await refreshed.getByRole("link", { name: "Shopify integration", exact: true }).click();
+    await expect(page).toHaveURL(/\/resources\/shopify-gateway-integration$/);
+    expect(failures).toEqual([]);
+  } finally { releaseScripts(); }
 });

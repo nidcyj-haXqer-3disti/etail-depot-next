@@ -25,13 +25,6 @@
 .public-main .ec-reconcile-band p {font-size:13px;line-height:1.65;}
 .public-main .ec-journey-marker {border-radius:12px;background:#edf3e6;border:1px solid #cfddc5;}
 .public-main .ec-journey-marker svg {width:26px;height:26px;color:#315e48;}
-.public-main .ec-industry-scene {border:1px solid #cfddc5;border-radius:14px;box-shadow:0 16px 32px -27px #193c3345;background:#f2f6ec;}
-.public-main .ec-industry-scene .ec-scene-kicker {font-size:13px;line-height:1.6;color:#315e48;}
-.public-main .ec-industry-scene .ec-scene-kicker > svg {width:24px;height:24px;}
-.public-main .ec-industry-scene .ec-record-line {font-size:13px;line-height:1.6;}
-.public-main .ec-route-display {border-block:1px solid #d3dfca;padding-block:26px;}
-.public-main .ec-route-display strong {font-size:23px;}
-.public-main .ec-booking-display strong,.public-main .ec-matter-display strong {font-size:27px;line-height:1.2;}
 @media(max-width:700px) {
  .public-main .attention-site.cw-pilot .cw-merchant-art{padding:20px;}
  .public-main .cw-pilot .ec-reconciliation-art{padding:20px;}
@@ -43,7 +36,6 @@
  .public-main .cw-payment-focus > div > strong{font-size:32px;}
  .public-main .cw-payment-fields{padding-inline:20px;}
  .public-main .cw-pilot .ec-reconciliation-art{padding:16px;}
- .public-main .ec-route-display strong{font-size:20px;}
 }
 @media(forced-colors:active) {
  .public-main .cw-workbench .cw-payment-focus{background:Canvas;color:CanvasText;border:1px solid CanvasText;}
@@ -56,8 +48,3 @@
 .public-main .attention-site.cw-pilot .ec-reconciliation-art .ec-report-top>span:last-child{font-size:12px;line-height:1.5;text-align:right}
 .public-main .attention-site.cw-pilot .ec-reconciliation-art .ec-record-caption{font-size:12px;line-height:1.65}
 .public-main .attention-site.cw-pilot .ec-reconciliation-art .ec-reconcile-band p{font-size:13px;line-height:1.6}
-.public-main .ec-industry-scene .ec-record-line{align-items:baseline;gap:16px}
-.public-main .ec-industry-scene .ec-record-line>strong{text-align:right;max-width:60%}
-.public-main .ec-industry-scene .ec-scene-kicker{gap:12px}
-.public-main .ec-industry-scene :is(.ec-route-display,.ec-booking-display,.ec-matter-display){font-variant-numeric:tabular-nums}
-.public-main .ec-route-display>svg{flex:none;align-self:center}

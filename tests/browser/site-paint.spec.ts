@@ -7,6 +7,171 @@ test("page families do not paint an incomplete header during document delivery",
   }
 });
 
+test("payout amounts and bank credit paint together before application scripts", async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/*.js", async route => { await held; await route.continue(); });
+  try {
+    await page.goto("/services/payouts", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+      [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+    await page.evaluate(() => document.fonts.ready);
+    const artwork = page.locator('[data-service-workflow="payouts"]');
+    await expect(artwork.getByText("$418.57", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("+$418.57", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("Reference P1048", { exact: true })).toHaveCount(2);
+    await expect(artwork.locator("img, input, button, form")).toHaveCount(0);
+    const geometry = () => artwork.evaluate(el => {
+      const box = el.getBoundingClientRect();
+      return { width: box.width, height: box.height };
+    });
+    const before = await geometry();
+    release(); await page.waitForLoadState("load");
+    expect(await geometry()).toEqual(before);
+    await page.reload();
+    expect(await geometry()).toEqual(before);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  } finally { release(); }
+});
+
+test("refund amount and pending status paint together before application scripts", async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/*.js", async route => { await held; await route.continue(); });
+  try {
+    await page.goto("/services/refunds", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+      [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+    await page.evaluate(() => document.fonts.ready);
+    const artwork = page.locator('[data-service-workflow="refunds"]');
+    await expect(artwork.getByText("$150.00", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("Pending", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("RF1048", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("Sale balance if completed", { exact: true })).toBeVisible();
+    await expect(artwork.locator("img, input, button, form")).toHaveCount(0);
+    const geometry = () => artwork.evaluate(el => {
+      const box = el.getBoundingClientRect();
+      return { width: box.width, height: box.height };
+    });
+    const before = await geometry();
+    release(); await page.waitForLoadState("load");
+    expect(await geometry()).toEqual(before);
+    await page.reload();
+    expect(await geometry()).toEqual(before);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    await page.getByRole("link", { name: "Talk with our team", exact: true }).click();
+    await expect(page).toHaveURL(/\/company\/contact#payment-review$/);
+    await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  } finally { release(); }
+});
+
+test("dispute deadline and response state paint together before application scripts", async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/*.js", async route => { await held; await route.continue(); });
+  try {
+    await page.goto("/services/disputes", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+      [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+    await page.evaluate(() => document.fonts.ready);
+    const artwork = page.locator('[data-service-workflow="disputes"]');
+    await expect(artwork.getByText("$240.00", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("18 Nov 2026", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("Response needed", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("Not submitted", { exact: true })).toBeVisible();
+    await expect(artwork.locator("img, input, button, form")).toHaveCount(0);
+    const geometry = () => artwork.evaluate(el => {
+      const box = el.getBoundingClientRect();
+      return { width: box.width, height: box.height };
+    });
+    const before = await geometry();
+    release(); await page.waitForLoadState("load");
+    expect(await geometry()).toEqual(before);
+    await page.reload();
+    expect(await geometry()).toEqual(before);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    await page.getByRole("link", { name: "Talk with our team", exact: true }).click();
+    await expect(page).toHaveURL(/\/company\/contact#payment-review$/);
+    await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  } finally { release(); }
+});
+
+test("merchant and gateway reports paint together before application scripts", async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/*.js", async route => { await held; await route.continue(); });
+  try {
+    await page.goto("/services/reconciliation", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+      [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+    await page.evaluate(() => document.fonts.ready);
+    const artwork = page.locator('[data-service-workflow="reconciliation"]');
+    await expect(artwork.getByText("Merchant account", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("Gateway account", { exact: true })).toBeVisible();
+    await expect(artwork.getByText("$2,640.00", { exact: true })).toHaveCount(2);
+    await expect(artwork.getByText("$1,860.00", { exact: true })).toHaveCount(2);
+    await expect(artwork.getByText("$780.00", { exact: true })).toHaveCount(2);
+    await expect(artwork.getByText("Total sales", { exact: true })).toHaveCount(2);
+    await expect(page.locator('[data-service-page="reconciliation"]')).not.toContainText(/bank|deposit|backoffice|automatic/i);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /merchant account and payment gateway reports/i);
+    await expect(artwork.getByText("$0.00", { exact: true })).toBeVisible();
+    await expect(artwork.locator("img, input, button, form")).toHaveCount(0);
+    const geometry = () => artwork.evaluate(el => {
+      const box = el.getBoundingClientRect();
+      return { width: box.width, height: box.height };
+    });
+    const before = await geometry();
+    release(); await page.waitForLoadState("load");
+    expect(await geometry()).toEqual(before);
+    await page.reload();
+    expect(await geometry()).toEqual(before);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    await page.getByRole("link", { name: "Talk with our team", exact: true }).click();
+    await expect(page).toHaveURL(/\/company\/contact#payment-review$/);
+    await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  } finally { release(); }
+});
+
+test("platform accounts and checkout-to-bank records keep their layout before scripts and on a saved-section refresh", async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/*.js", async route => { await held; await route.continue(); });
+  try {
+    await page.goto("/use-cases/software-platforms#payment-experience", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+      [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+    await page.evaluate(() => document.fonts.ready);
+    const accounts = page.locator("[data-platform-accounts]");
+    const journey = page.locator("[data-platform-journey]");
+    await expect(accounts.getByText("Cotton Retail LLC", { exact: true })).toBeVisible();
+    await expect(accounts.getByText("824630170002", { exact: true })).toBeVisible();
+    await expect(accounts.locator("[data-business-entry]")).toHaveCount(6);
+    await expect(accounts.locator("[data-business-industry]")).toHaveText([
+      "Retail", "Transport", "Travel services", "Legal services", "Retail", "Transport",
+    ]);
+    await expect(accounts.locator("[data-example-merchant-account]:visible")).toHaveCount(2);
+    await expect(accounts.locator("[data-example-merchant-account]").filter({ hasText: "Cotton Supply" })).toContainText("824630170001");
+    await expect(accounts.locator("[data-example-merchant-account]").filter({ hasText: "Cotton Bedding" })).toContainText("824630170002");
+    await expect(journey.locator("[data-journey-checkout]").getByText("$150.00", { exact: true })).toBeVisible();
+    await expect(journey.locator("[data-journey-records]").getByText("$418.57", { exact: true })).toBeVisible();
+    await expect(journey.locator("[data-journey-bank]").getByText("+$418.57", { exact: true })).toBeVisible();
+    await expect(journey.getByText("Posted", { exact: true })).toBeVisible();
+    await expect(journey.locator("button, input, form")).toHaveCount(0);
+    const geometry = () => page.locator("[data-platform-accounts], [data-platform-journey]").evaluateAll(nodes => nodes.map(el => {
+      const box = el.getBoundingClientRect();
+      return { width: box.width, height: box.height };
+    }));
+    const before = await geometry();
+    release(); await page.waitForLoadState("load");
+    expect(await geometry()).toEqual(before);
+    await page.reload();
+    expect(await geometry()).toEqual(before);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    await page.getByRole("link", { name: "Discuss your integration", exact: true }).click();
+    await expect(page).toHaveURL(/\/company\/contact#platforms$/);
+  } finally { release(); }
+});
+
 test("responsive artwork keeps its initial layout while application scripts arrive", async ({ page }) => {
   const mobile = page.viewportSize()!.width < 851;
   let release = () => {};
@@ -16,7 +181,10 @@ test("responsive artwork keeps its initial layout while application scripts arri
     await page.goto(mobile ? "/use-cases/software-platforms#industries" : "/services/card-services#wallets", { waitUntil: "commit" });
     await page.waitForFunction(() => [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
     const artwork = page.locator(mobile ? ".industry-cases" : ".wallet-guide-disclosure");
-    if (mobile) await expect(artwork.locator("article > details[open]")).toHaveCount(0);
+    if (mobile) {
+      await expect(artwork.locator("[data-platform-scene]")).toHaveCount(4);
+      await expect(artwork.locator(".platform-case-details[open]")).toHaveCount(0);
+    }
     else await expect(artwork).toHaveAttribute("open", "");
     const before = await artwork.evaluate(el => el.getBoundingClientRect().height);
     release(); await page.waitForLoadState("load");
@@ -49,7 +217,7 @@ test("a responsive artwork choice made before hydration is preserved", async ({ 
   await page.route("**/*.js", async route => { await held; await route.continue(); });
   try {
     await page.goto(mobile ? "/use-cases/software-platforms#industries" : "/services/card-services#wallets", { waitUntil: "commit" });
-    const details = page.locator(mobile ? "#freight-platforms > details" : ".wallet-guide-disclosure");
+    const details = page.locator(mobile ? "#freight-platforms .platform-case-details" : ".wallet-guide-disclosure");
     if (mobile) await expect(details).not.toHaveAttribute("open");
     else await expect(details).toHaveAttribute("open", "");
     await details.locator(":scope > summary").click();
@@ -313,3 +481,243 @@ test("opening artwork symbols paint without a separate image response or hydrati
     }
   }
 });
+
+
+test("all business examples are selectable without scripts and keep a stable account window", async ({ browser, baseURL }, testInfo) => {
+  const context = await browser.newContext({ baseURL, javaScriptEnabled: false, viewport: { width: testInfo.project.name === "mobile" ? 320 : 1440, height: 900 } });
+  const page = await context.newPage();
+  try {
+    await page.goto("/use-cases/software-platforms");
+    const art = page.locator("[data-platform-accounts]");
+    const height = await art.evaluate(e => e.getBoundingClientRect().height);
+    const ids: string[] = [];
+    for (const radio of await art.getByRole("radio").all()) {
+      await radio.check();
+      const panel = art.locator("[data-business-panel]:visible");
+      await expect(panel).toHaveCount(1);
+      const records = panel.locator("[data-example-merchant-account]");
+      expect(await records.count()).toBeGreaterThanOrEqual(2);
+      ids.push(...await records.locator("dl:last-child dd").allTextContents());
+      expect(await art.evaluate(e => e.getBoundingClientRect().height)).toBe(height);
+    }
+    expect(ids).toHaveLength(14);
+    expect(new Set(ids).size).toBe(14);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  } finally { await context.close(); }
+});
+
+test("account motion loops, resumes after selection and respects keyboard reading and reduced motion", async ({ page }) => {
+  await page.clock.install();
+  await page.goto("/use-cases/software-platforms");
+  const root = page.locator("[data-account-motion]");
+  await root.scrollIntoViewIfNeeded();
+  await expect(root).toHaveAttribute("data-motion-ready", "true");
+  await expect(root).toHaveAttribute("data-motion-visible", "true");
+  const art = page.locator("[data-platform-accounts]");
+  const height = await art.evaluate(e => e.getBoundingClientRect().height);
+  for (const kind of ["freight", "travel", "legal", "market", "logistics", "cotton"]) {
+    await page.clock.fastForward(6100);
+    await expect(root.locator(`input[value="${kind}"]`)).toBeChecked();
+    await expect(root.locator(`[data-business-panel="${kind}"]`)).toBeVisible();
+    expect(await art.evaluate(e => e.getBoundingClientRect().height)).toBe(height);
+  }
+  await page.locator("#industries h2").scrollIntoViewIfNeeded();
+  await expect(root).toHaveAttribute("data-motion-visible", "false");
+  await page.clock.fastForward(20000);
+  await expect(root.locator('input[value="cotton"]')).toBeChecked();
+  await root.scrollIntoViewIfNeeded();
+  await expect(root).toHaveAttribute("data-motion-visible", "true");
+  await art.getByRole("radio", { name: "Atlas Travel, 2 merchant accounts", exact: true }).check();
+  await page.clock.fastForward(11000);
+  await expect(root.locator('input[value="travel"]')).toBeChecked();
+  await page.clock.fastForward(1200);
+  await expect(root.locator('input[value="legal"]')).toBeChecked();
+  await art.getByRole("radio", { name: "Harrison Law, 2 merchant accounts", exact: true }).focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(root.locator('input[value="market"]')).toBeChecked();
+  await page.clock.fastForward(20000);
+  await expect(root.locator('input[value="market"]')).toBeChecked();
+  await page.locator("h1").click();
+  await page.clock.fastForward(6100);
+  await expect(root.locator('input[value="logistics"]')).toBeChecked();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.reload();
+  await root.scrollIntoViewIfNeeded();
+  await expect(root).toHaveAttribute("data-motion-ready", "true");
+  await page.clock.fastForward(20000);
+  await expect(root.locator('input[value="cotton"]')).toBeChecked();
+  await art.getByRole("radio", { name: "Harrison Law, 2 merchant accounts", exact: true }).check();
+  await expect(root.locator('[data-business-panel="legal"]')).toBeVisible();
+});
+
+
+test("industry artwork loops while visible and pauses offscreen without moving its records", async ({ page }) => {
+  await page.goto("/use-cases/software-platforms#industries");
+  const scene = page.locator('[data-platform-scene="freight"]');
+  await scene.scrollIntoViewIfNeeded();
+  await expect(scene).toHaveAttribute("data-motion", "on");
+  const motion = () => scene.evaluate(element => element.getAnimations({ subtree: true }).map(animation => ({
+    iterations: animation.effect!.getTiming().iterations,
+    state: animation.playState,
+  })));
+  await expect.poll(async () => (await motion()).filter(animation => animation.state === "running").length).toBeGreaterThan(0);
+  expect((await motion()).every(animation => animation.iterations === Infinity)).toBe(true);
+  const before = await scene.boundingBox();
+  await page.locator("h1").scrollIntoViewIfNeeded();
+  await expect(scene).toHaveAttribute("data-motion", "off");
+  expect((await motion()).every(animation => animation.state === "paused")).toBe(true);
+  await scene.scrollIntoViewIfNeeded();
+  await expect(scene).toHaveAttribute("data-motion", "on");
+  const after = await scene.boundingBox();
+  expect(after!.width).toBe(before!.width);
+  expect(after!.height).toBe(before!.height);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect.poll(async () => (await motion()).length).toBe(0);
+  await expect(scene).toContainText("$1,250.00");
+});
+
+
+test("homepage connection motion preserves first paint and loops only while visible", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: testInfo.project.name.includes("mobile") ? 320 : 1440, height: 900 });
+  let release = () => {};
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/*.js", async route => { await held; await route.continue(); });
+  try {
+    await page.goto("/", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+      [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+    // WebKit waits for document readiness here, so load the actual fonts while scripts are deliberately held.
+    await page.evaluate(async () => {
+      const family = getComputedStyle(document.querySelector("[data-company-art]")!).fontFamily;
+      await Promise.all([document.fonts.load(`400 16px ${family}`), document.fonts.load(`500 20px ${family}`)]);
+    });
+    const art = page.locator("[data-company-art]");
+    await expect(art).toBeVisible();
+    await expect(art.locator("[data-company-connection]")).toHaveCount(3);
+    await expect(art.locator("[data-home-service-panel]")).toHaveCount(3);
+    const geometry = () => art.evaluate(element => [element, ...element.querySelectorAll("[data-home-service-panel]")].map(node => {
+      const box = node.getBoundingClientRect(); return { width: box.width, height: box.height };
+    }));
+    const before = await geometry();
+    release(); await page.waitForLoadState("load");
+    await art.scrollIntoViewIfNeeded();
+    await expect(art).toHaveAttribute("data-motion", "on");
+    expect(await geometry()).toEqual(before);
+    const animations = () => art.evaluate(element => element.getAnimations({ subtree: true }).map(animation => ({
+      iterations: animation.effect!.getTiming().iterations, state: animation.playState,
+    })));
+    await expect.poll(async () => (await animations()).filter(animation => animation.state === "running").length).toBeGreaterThan(0);
+    expect((await animations()).every(animation => animation.iterations === Infinity)).toBe(true);
+    await page.locator("footer").scrollIntoViewIfNeeded();
+    await expect(art).toHaveAttribute("data-motion", "off");
+    expect((await animations()).every(animation => animation.state === "paused")).toBe(true);
+    await art.scrollIntoViewIfNeeded();
+    await expect(art).toHaveAttribute("data-motion", "on");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect.poll(async () => (await animations()).length).toBe(0);
+    await page.reload();
+    expect(await geometry()).toEqual(before);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  } finally { release(); }
+});
+
+test("pricing keeps its fee breakdown and early disclosure stable through hydration", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: testInfo.project.name.includes("mobile") ? 320 : 1440, height: 900 });
+  let release = () => {};
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.route("**/*.js", async route => { await held; await route.continue(); });
+  try {
+    await page.goto("/pricing#fees", { waitUntil: "commit" });
+    await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+      [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+    await page.evaluate(async () => {
+      const family = getComputedStyle(document.querySelector(".pricing-panel")!).fontFamily;
+      await Promise.all([document.fonts.load(`400 16px ${family}`), document.fonts.load(`500 20px ${family}`)]);
+    });
+    const amount = page.getByLabel("Payment amount USD");
+    await expect(amount).toBeDisabled();
+    await expect(page.locator(".fee-net dd")).toHaveText("$96.80");
+    await page.locator(".offer-details > summary").click();
+    await expect(page.locator(".fee-exceptions")).toBeVisible();
+    const geometry = () => page.locator(".pricing-panel, .pricing-rate, .fee-estimate, .offer-details").evaluateAll(elements => elements.map(element => {
+      const box = element.getBoundingClientRect();
+      return { x: box.x, y: box.y + scrollY, width: box.width, height: box.height };
+    }));
+    const before = await geometry();
+    release(); await page.waitForLoadState("load");
+    await expect(amount).toBeEnabled();
+    await expect(page.locator(".offer-details")).toHaveAttribute("open", "");
+    expect(await geometry()).toEqual(before);
+    for (const value of ["100000", "", "100"]) {
+      await amount.fill(value);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    }
+    await expect(page.locator(".fee-net dd")).toHaveText("$96.80");
+    await page.reload();
+    await expect(amount).toHaveValue("100");
+    await expect(page.locator(".fee-net dd")).toHaveText("$96.80");
+    expect(errors).toEqual([]);
+  } finally { release(); }
+});
+
+
+for (const [path, kind] of [
+  ["/services/payouts", "payouts"], ["/services/refunds", "refunds"],
+  ["/services/reconciliation", "reconciliation"], ["/services/disputes", "disputes"],
+  ["/services/ach-payments", "ach"],
+] as const) {
+  test(`${kind} artwork motion preserves first paint and respects visibility and reduced motion`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: testInfo.project.name.includes("mobile") ? 320 : 1440, height: 900 });
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    let release = () => {};
+    const held = new Promise<void>(resolve => { release = resolve; });
+    await page.route("**/*.js", async route => { await held; await route.continue(); });
+    try {
+      await page.goto(path, { waitUntil: "commit" });
+      await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+        [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+      await page.evaluate(async () => {
+        const family = getComputedStyle(document.querySelector("[data-service-motion]")!).fontFamily;
+        await Promise.all([document.fonts.load(`400 16px ${family}`), document.fonts.load(`500 20px ${family}`)]);
+      });
+      const art = page.locator(`[data-service-workflow="${kind}"]`);
+      await expect(art).toBeVisible();
+      await expect(art).toHaveAttribute("data-service-motion", "off");
+      const text = await art.innerText();
+      const geometry = () => art.evaluate(el => ({ width: el.getBoundingClientRect().width, height: el.getBoundingClientRect().height }));
+      const animations = () => art.evaluate(el => el.getAnimations({ subtree: true }).map(animation => ({
+        state: animation.playState, iterations: animation.effect!.getTiming().iterations,
+      })));
+      expect((await animations()).every(animation => animation.state === "paused")).toBe(true);
+      const before = await geometry();
+      release(); await page.waitForLoadState("load");
+      await art.scrollIntoViewIfNeeded();
+      await expect(art).toHaveAttribute("data-service-motion", "on");
+      await expect.poll(async () => (await animations()).filter(animation => animation.state === "running").length).toBeGreaterThan(0);
+      expect((await animations()).every(animation => animation.iterations === Infinity)).toBe(true);
+      expect(await geometry()).toEqual(before);
+      expect(await art.innerText()).toBe(text);
+      // Seeking ahead proves the loops continue and cannot change example values or statuses.
+      await art.evaluate(el => el.getAnimations({ subtree: true }).forEach(animation => { animation.currentTime = 30000; }));
+      expect((await animations()).every(animation => animation.state === "running")).toBe(true);
+      expect(await art.innerText()).toBe(text);
+      await page.locator("footer").scrollIntoViewIfNeeded();
+      await expect(art).toHaveAttribute("data-service-motion", "off");
+      expect((await animations()).every(animation => animation.state === "paused")).toBe(true);
+      await art.scrollIntoViewIfNeeded();
+      await expect(art).toHaveAttribute("data-service-motion", "on");
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await expect(art).toHaveAttribute("data-service-motion", "off");
+      await expect.poll(async () => (await animations()).length).toBe(0);
+      expect(await art.innerText()).toBe(text);
+      await page.reload();
+      expect(await geometry()).toEqual(before);
+      expect(await art.innerText()).toBe(text);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+      expect(errors).toEqual([]);
+    } finally { release(); }
+  });
+}

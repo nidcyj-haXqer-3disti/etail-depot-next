@@ -60,3 +60,16 @@ Shared marks live in [network-brands.tsx](../src/shared/brand/network-brands.tsx
 Etail logo originals were supplied by the user and are preserved with their [original note](../archive/retired-platform/assets/brand/README.md). Current approved public copies remain in `public/brand/`; shared component assets remain in `src/shared/brand/assets/`. Trolleys attribution uses the shared brand component. No new brand artwork or permission is established by this reorganization.
 
 Network provenance does not establish Etail sponsorship, program activation or approval. Public capability wording comes from approved company facts, not from displaying a logo. The earlier asset-verification results are preserved in [the dated record](../archive/project-history/docs/NETWORK_BRAND_ASSETS.md); they are not new verification results.
+
+## Footer guide marks, 11 November 2026
+
+The user requested small Trolleys, Shopify and WooCommerce marks beside the corresponding footer guide links. The Shopify and WooCommerce originals were restored from the preserved design work. Their recorded source archives are [Shopify shopping bag artwork](https://cdn.shopify.com/static/brand-assets/shopify-shopping-bag.zip) and [WooCommerce logo artwork](https://woocommerce.com/wp-content/uploads/2025/01/woo-logos.zip). This records the existing acquisition provenance, not a new permission or endorsement claim.
+
+| Original source file | SVG viewBox | SHA-256 |
+| --- | --- | --- |
+| `src/shared/brand/assets/shopify-bag.svg` | `0 0 109.5 124.5` | `4db7a16ed5734680c24ed2cee13f132f4c9592727014c2e21b1bdc21bf14faee` |
+| `src/shared/brand/assets/woocommerce.svg` | `0 0 183.6 47.5` | `3ec4eb7f7ba69184d499f83a93b5935be46c4ae23c41a38f62c8ae51b5de1dc0` |
+
+The shared generator preserves the original vector paths, colors and view boxes in `src/shared/brand/platform-marks.tsx`. For Trolleys, it extracts the existing symbol from `src/shared/brand/assets/trolleys-portal-logo.png` into the compact embedded asset in `brand-images-platforms.css`. The full original portal logo remains unchanged. These decorative marks accompany named links and do not replace their accessible labels. All three marks render with the initial page without a separate image request.
+
+A private regeneration check reproduced all 31 generated or copied brand/artwork files byte for byte. Source originals and the generator belong in GitHub; private capture and regeneration evidence stay in local-work. Keep these marks distinct from payment-network acceptance claims.

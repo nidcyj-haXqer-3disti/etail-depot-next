@@ -125,3 +125,7 @@
 .unified-preview-methods button:disabled { opacity: 1; cursor: wait; }
 .unified-preview:has(.unified-preview-no-script) .unified-preview-screen-nav,
 .unified-preview:has(.unified-preview-no-script) .unified-preview-methods { display: none; }
+
+/* Readable customer and order details, with the established three-screen layout. */
+.unified-preview-order-icon { height: 72px; }
+.unified-preview-receipt dd { overflow-wrap: anywhere; }

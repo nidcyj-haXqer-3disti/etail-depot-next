@@ -72,7 +72,7 @@ test("domestic card fee breakdown reconciles and recovers invalid input without 
   expect(rateContrast, "The actual card rate must remain readable against its pricing panel").toBeGreaterThanOrEqual(4.5);
   await expect(offer.locator(".pricing-account-fees dt")).toHaveText(["Monthly fee", "Setup fee"]);
   await expect(offer.locator(".pricing-account-fees dd")).toHaveText(["$0", "$0"]);
-  await expect(offer).toContainText("Payment links, QR sharing and basic payment receipts are included");
+  await expect(offer.getByRole("list", { name: "Included services" }).getByRole("listitem")).toHaveText(["Payment links", "QR sharing", "Basic payment receipts"]);
   const estimate = page.locator(".fee-estimate");
   await expect(estimate.locator("dl dt")).toHaveText(["2.9% of the payment", "Fixed fee", "Processing fee", "After card processing"]);
   await expect(estimate.locator("dl dd")).toHaveText(["$2.90", "$0.30", "$3.20", "$96.80"]);

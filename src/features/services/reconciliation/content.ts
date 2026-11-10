@@ -1,80 +1,80 @@
 import type { ServiceDetailContent } from "@/features/services/shared/content-types";
 
 export const reconciliationContent = {
-    "kind": "reconciliation",
-    "label": "Reconciliation",
-    "title": "Payment Reconciliation and Payout Reporting",
-    "description": "Connect transaction records, payout reports and bank deposits. Understand payment reconciliation and investigate timing, fees and account differences.",
-    "heading": "Know what makes up every deposit.",
-    "intro": "Match payments and adjustments to the payout report, then match the payout to your bank. Separate timing differences from amounts that need investigation.",
-    "action": {
-      "label": "Explore reconciliation guidance",
-      "href": "/developers/api-reference#payouts"
+  kind: "reconciliation",
+  label: "Reconciliation",
+  title: "Payment Reconciliation for Merchant and Gateway Accounts",
+  description: "Compare merchant account and payment gateway reports. Match sales totals and transaction references, understand differences and get support with payment reconciliation.",
+  heading: "Confidence in your payment records.",
+  intro: "Compare your merchant account reports with your payment gateway reports. Match sales, understand differences and get support when a payment needs a closer look.",
+  action: {
+    label: "Talk with our team",
+    href: "/company/contact#payment-review",
+  },
+  art: {
+    title: "Example merchant account and gateway account reports for October 2026 in USD. Both show 12 sales totaling $2,640.00: eight Visa sales totaling $1,860.00 and four Mastercard sales totaling $780.00. The sales total difference is $0.00.",
+    caption: "Example reports for the same business and period. Matching totals are a starting point; individual payment references confirm which records belong together.",
+    steps: [],
+  },
+  sections: [
+    {
+      id: "reconciliation",
+      title: "Two reports. A clearer view of your sales.",
+      items: [
+        {
+          title: "Compare your sales",
+          text: "See how the sales in your merchant account line up with those in your gateway account, by amount, count and card type.",
+        },
+        {
+          title: "Trace a payment",
+          text: "Use the payment reference to connect a gateway transaction with its record in your merchant account.",
+        },
+        {
+          title: "Get help with differences",
+          text: "Our team can help investigate an unmatched payment or explain why the two reports show different results.",
+        },
+      ],
     },
-    "art": {
-      "title": "Match payment activity to the payout, then the payout to the bank statement; investigate remaining differences",
-      "caption": "Compare the same merchant account, currency and reporting period.",
-      "steps": []
+    {
+      id: "differences",
+      title: "Understand why reports differ.",
+      items: [
+        {
+          title: "Reporting periods",
+          text: "Time zones, daily cutoffs and processing dates can put the same payment in different reporting periods.",
+        },
+        {
+          title: "Payment status",
+          text: "An approved payment may still be waiting for capture. Unsuccessful attempts and authorizations alone are not completed sales, and status labels can differ between accounts.",
+        },
+        {
+          title: "Refunds and fees",
+          text: "Compare sales with sales and refunds with refunds. A sales total before fees will differ from an amount after deductions.",
+        },
+      ],
     },
-    "sections": [
+  ],
+  workflow: {
+    title: "From sales totals to individual payments.",
+    intro: "Your merchant account and gateway account provide different views of the same payment activity.",
+    steps: [
       {
-        "id": "reconciliation",
-        "title": "Connect the records behind the balance.",
-        "items": [
-          {
-            "title": "Payment activity",
-            "text": "The original sale, fees, refunds and dispute adjustments."
-          },
-          {
-            "title": "Payout report",
-            "text": "The activity included in a payout and the resulting amount."
-          },
-          {
-            "title": "Bank statement",
-            "text": "The credit received, posting date and bank reference."
-          }
-        ]
+        title: "Choose the same business",
+        detail: "Select the corresponding merchant and gateway accounts, currency and reporting period.",
       },
       {
-        "id": "differences",
-        "title": "Understand differences in your records.",
-        "items": [
-          {
-            "title": "Different dates",
-            "text": "A sale, payout and bank credit may fall in different periods. Compare the relevant dates before treating a record as missing."
-          },
-          {
-            "title": "Changed amounts",
-            "text": "Look for refunds, dispute fees, reserve movements and adjustments to earlier payments."
-          },
-          {
-            "title": "Missing records",
-            "text": "Keep the account, payment and payout references together when requesting an investigation."
-          }
-        ]
-      }
+        title: "Compare the totals",
+        detail: "Check sales amounts and counts by card type. Compare refunds separately.",
+      },
+      {
+        title: "Match the payments",
+        detail: "Use the shared transaction reference, then check the amount, currency and processing date.",
+      },
+      {
+        title: "Resolve differences",
+        detail: "Review timing and status. Ask our team about records that remain unmatched.",
+      },
     ],
-    "workflow": {
-      "title": "Match sales to your bank deposit.",
-      "intro": "Start with one merchant account and currency, then follow the records through.",
-      "steps": [
-        {
-          "title": "Choose the account and period",
-          "detail": "Choose the account, currency and reporting period."
-        },
-        {
-          "title": "Match the activity",
-          "detail": "Total the payments, fees and adjustments included in the payout."
-        },
-        {
-          "title": "Match the deposit",
-          "detail": "Compare the payout amount and reference with the bank credit."
-        },
-        {
-          "title": "Investigate differences",
-          "detail": "Explain timing differences and investigate amounts that remain unmatched."
-        }
-      ],
-      "note": "An expected payout is not proof of bank receipt. Report fields and access depend on your account configuration."
-    }
-  } as const satisfies ServiceDetailContent;
+    note: "Available reports, reference fields and access depend on your account configuration.",
+  },
+} as const satisfies ServiceDetailContent;

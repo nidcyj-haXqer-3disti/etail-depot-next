@@ -24,7 +24,7 @@ export function ServiceDetailLayout({ path, page, artwork }: { path: Parameters<
   const featureIcons = {
     onboarding: ["business", "box", "card"], methods: ["card", "card", "bank"],
     ach: ["document", "shield", "link"], payouts: ["card", "layers", "bank"],
-    reconciliation: ["card", "document", "bank"], refunds: ["card", "arrow", "card"],
+    reconciliation: ["document", "link", "message"], refunds: ["card", "arrow", "card"],
     disputes: ["document", "link", "layers"],
   }[page.kind];
   return <Shell><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured).replace(/</g, "\\u003c") }} /><div className={s.page} data-service-page={page.kind}>

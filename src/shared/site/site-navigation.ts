@@ -23,7 +23,7 @@ export const merchantDetailNavigation = [
   { href: "/services/ach-payments", label: "ACH payments", description: "Bank payments, authorization and reconciliation." },
   { href: "/services/payouts", label: "Payouts", description: "Understand the activity behind your bank deposit." },
   { href: "/services/refunds", label: "Refunds", description: "Return funds against the original payment." },
-  { href: "/services/reconciliation", label: "Reconciliation", description: "Match transactions, payouts and bank records." },
+  { href: "/services/reconciliation", label: "Reconciliation", description: "Compare merchant account and gateway reports." },
   { href: "/services/disputes", label: "Disputes", description: "Review the claim and follow the case." },
 ] as const;
 

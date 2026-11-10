@@ -6,14 +6,14 @@ export const disputesContent = {
     "title": "Chargeback and Dispute Management for Merchants",
     "description": "Review a cardholder dispute, understand the response deadline and organize evidence from the original sale. Follow the case outcome and account adjustment.",
     "heading": "Manage chargebacks with a clear record.",
-    "intro": "Understand the claim, decide whether to accept or challenge it, and respond before the deadline. Follow the outcome and its effect on your account.",
+    "intro": "Keep the claim, deadline and supporting records with the original payment. Review your response and follow the case through its outcome.",
     "action": {
-      "label": "Explore dispute guidance",
-      "href": "/developers/api-reference#dispute-case"
+      "label": "Talk with our team",
+      "href": "/company/contact#payment-review"
     },
     "art": {
-      "title": "A dispute notice leads to accepting the claim or challenging it with relevant evidence before the deadline",
-      "caption": "Evidence supports a response. It does not guarantee a decision in the merchant’s favor.",
+      "title": "Example dispute D1046: $240 for order 1046, product not received, response due 18 November 2026. Supporting records are collected but not submitted.",
+      "caption": "Example case. Follow the deadline in your actual notice. Evidence does not guarantee a decision in your favor.",
       "steps": []
     },
     "sections": [

@@ -1,3 +1,4 @@
+import { expectReadOnlyPlatformExample } from "./platform-example";
 import { LEGAL_CENTER_PATHS } from "../../src/shared/site/legal-paths";
 import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
 import { RESOURCE_PATHS } from "../../src/shared/site/resource-paths";
@@ -65,6 +66,8 @@ test("public pages and every internal link resolve without account APIs or cooki
       await expect(page.locator('.fee-estimate input#payment-amount[type="text"]')).toHaveCount(1);
       await expect(page.locator('.fee-estimate input[type="checkbox"]')).toHaveCount(0);
       await expect(page.locator("select, textarea, [contenteditable=true]")).toHaveCount(0);
+    } else if (path === "/use-cases/software-platforms") {
+      await expectReadOnlyPlatformExample(page);
     } else if (path === "/resources/guides") {
       await expect(page.locator("input")).toHaveCount(0);
       await expect(page.locator("select, textarea, [contenteditable=true]")).toHaveCount(0);

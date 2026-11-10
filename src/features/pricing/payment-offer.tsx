@@ -17,7 +17,14 @@ export function PaymentOffer() {
           <div><dt>Monthly fee</dt><dd>${fees.monthlyFeeDollars}</dd></div>
           <div><dt>Setup fee</dt><dd>${fees.setupFeeDollars}</dd></div>
         </dl>
-        <div className="pricing-included"><Icon name="check" /><p>Payment links, QR sharing and basic payment receipts are included.</p></div>
+        <div className="pricing-included">
+          <p>Included</p>
+          <ul aria-label="Included services">
+            <li><Icon name="link" /><span>Payment links</span></li>
+            <li><Icon name="qr" /><span>QR sharing</span></li>
+            <li><Icon name="document" /><span>Basic payment receipts</span></li>
+          </ul>
+        </div>
         <p className="pricing-scope">Published offer for US businesses accepting payments in USD. Account approval applies. Your accepted fee schedule determines your charges.</p>
       </div>
       <PaymentFeeEstimate />
@@ -31,7 +38,9 @@ export function PaymentOffer() {
         <div><dt>Manual dispute response</dt><dd>${fees.disputeResponseFeeDollars}; returned if you win</dd></div>
       </dl>
       <div className="pricing-conditions">
+        <h3>When other charges apply</h3>
         <p>The additional fee for manual entry applies when you enter a customer’s card details. It does not apply when customers enter their own details at online checkout.</p>
+        <h3>Refunds and other costs</h3>
         <p>Original processing and currency conversion fees are not returned when a payment is refunded. Network charges and optional services may add costs. Sharing a link by text does not include a messaging subscription.</p>
       </div>
     <div className="payment-method-scope"><strong>ACH bank payments</strong><p>ACH has separate pricing and payout terms. Confirm the options for your account. The rate and calculator above apply to card payments.</p></div>

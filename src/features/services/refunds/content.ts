@@ -6,14 +6,14 @@ export const refundsContent = {
     "title": "Merchant Refunds and Payment Reversals",
     "description": "Manage a customer refund from the original payment. Choose the permitted action, avoid duplicate returns and follow the refund record through its outcome.",
     "heading": "Manage refunds from the original payment.",
-    "intro": "Find the transaction, confirm the amount still eligible to return and follow the result. Keep the refund linked to the original order.",
+    "intro": "Return all or part of an eligible payment. Keep the refund amount, reference and status linked to the original order.",
     "action": {
-      "label": "Explore refund guidance",
-      "href": "/developers/api-reference#refund-payment"
+      "label": "Talk with our team",
+      "href": "/company/contact#payment-review"
     },
     "art": {
-      "title": "A card payment status determines whether a reversal, void or refund is available",
-      "caption": "Available actions depend on payment status, processor support and account permissions.",
+      "title": "Example: a $150 settled card payment linked to a pending $75 partial refund, with a $75 sale balance if completed",
+      "caption": "Example figures. Available actions depend on payment status, processor support and account permissions.",
       "steps": []
     },
     "sections": [

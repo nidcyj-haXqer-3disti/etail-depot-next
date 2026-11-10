@@ -1,0 +1,32 @@
+.grid{align-items:stretch}.useCase{min-width:0;scroll-margin-top:100px}.caseTitle{font-size:23px;font-weight:500;letter-spacing:-.03em;line-height:1.3;margin:0 0 21px}
+.scene{position:relative;isolation:isolate;container-type:inline-size;overflow:hidden;height:325px;margin:0;border-radius:14px;color:#244b3b;font-variant-numeric:tabular-nums;background:#edf2e6}
+.sceneHeader{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:23px 26px 0;font-size:13px;line-height:1.4}.sceneHeader>span:last-child{font-size:11px;color:#506658}
+.paper{background:#fffef9;border:1px solid #dce2d4;border-radius:6px;box-shadow:0 13px 24px -17px #234b3c45;min-width:0}
+.kicker{display:block;font-size:11px;line-height:1.5;color:#526658}.recordTitle{display:block;font-size:17px;font-weight:500;line-height:1.4;letter-spacing:-.025em;margin:9px 0}.muted{display:block;color:#526658;font-size:12px;line-height:1.5}
+.total{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-top:1px solid #e0e6d8;padding-top:12px;margin-top:20px;font-size:11px}.total strong{font-size:20px;line-height:1.3;font-weight:500;letter-spacing:-.04em;white-space:nowrap}
+.recordChip{display:inline-block;background:#eff3e8;padding:7px 9px;border-radius:4px;font-size:10px;line-height:1.4;margin-top:14px;color:#3f604b}
+.reference{position:absolute;inset:auto 26px 23px;display:flex;align-items:center;justify-content:center;gap:13px;font-size:11px;line-height:1.5;color:#3f5b4c}.linkLine{height:1px;max-width:72px;flex:1;min-width:15px;background:#a7bc9f;position:relative}.linkLine:after{content:"";position:absolute;right:0;top:-2px;width:5px;height:5px;border-radius:50%;background:#577c5c}
+.commerceLayout{display:grid;grid-template-columns:.85fr 1.15fr;align-items:center;gap:8px;padding:16px 28px 0 12px}.scene .product{display:block;width:100%;height:auto;max-height:207px}.orderPaper{padding:16px 19px;transform:rotate(-2deg)}
+.freight{background:#edf3ef}.map{height:135px;position:relative;margin:12px 27px 0}.map>svg{width:100%;height:100%;position:absolute;inset:0}.origin,.destination{position:absolute;font-size:13px;line-height:1.4;font-weight:500}.origin{left:0;bottom:6px}.destination{right:0;top:0}.routeTag{position:absolute;left:43%;top:64px;font-size:10px;background:#f7faf5;padding:4px 8px;border-radius:4px;color:#3f604b}
+.invoiceStrip{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:4px 26px 0;padding:14px 18px}.invoiceStrip .recordTitle{font-size:14px;margin:4px 0 0}.amount{font-size:25px;line-height:1.2;letter-spacing:-.045em;font-weight:500}
+.travel{background:#f2efe4}.travelLayout{display:grid;grid-template-columns:1fr 1.1fr;gap:0;align-items:center;padding:12px 27px 0}.destinationArt{align-self:end;overflow:hidden;border-radius:80px 80px 0 0;margin-right:-14px}.destinationArt svg{display:block;width:100%;height:206px}.bookingPaper{position:relative;padding:19px 20px;transform:rotate(2deg)}.destinationTitle{display:block;font-weight:500;font-size:28px;line-height:1.15;letter-spacing:-.04em;margin:12px 0 8px}.bookingPaper .total{margin-top:13px;padding-top:10px}
+.legal{background:#edf0e8}.legalLayout{display:grid;grid-template-columns:.85fr 1.15fr;align-items:center;padding:18px 33px 0;gap:0}.matterFolder{padding:15px 18px 0;background:#ced8c1;border-radius:5px 14px 3px 3px;transform:rotate(-5deg);margin-right:-15px;height:195px;overflow:hidden}.matterFolder>span{font-size:10px;line-height:1.4;color:#3b5847;display:block;white-space:nowrap}.matterFolder svg{width:100%;height:160px;margin-top:10px;display:block}.legalPaper{position:relative;padding:22px 20px;transform:rotate(2deg)}.legalAmount{font-size:30px;line-height:1.3;letter-spacing:-.04em;display:block;font-weight:500;margin-top:12px}.legalPaper .recordChip{margin-top:18px}
+@media(min-width:681px){
+ .grid>.useCase{display:grid;grid-template-rows:subgrid;grid-row:span 5;row-gap:0}
+ .copy{display:grid;grid-template-rows:subgrid;grid-row:span 3;row-gap:0;align-items:start}
+}
+.copy>p:first-child{font-size:16px;line-height:1.65}.copy :global(.ec-industry-scope){font-size:12px;line-height:1.7}.copy :global(.platform-case-details)>summary{min-height:44px}
+@container(max-width:420px){
+  .sceneHeader{padding:19px 18px 0;font-size:12px}.sceneHeader>span:last-child{font-size:10px}.commerceLayout{padding:28px 18px 0 2px;grid-template-columns:.65fr 1.35fr;gap:0}.orderPaper{padding:16px 14px}.recordTitle{font-size:15px}.total{gap:7px;font-size:10px}.total strong{font-size:19px}.recordChip{font-size:10px;padding:6px}.reference{inset:auto 18px 22px;font-size:10px;gap:8px}.product{min-height:155px}.map{margin:24px 20px 0;height:125px}.invoiceStrip{margin:9px 18px 0;padding:13px}.amount{font-size:23px}.origin,.destination{font-size:12px}.travelLayout{padding:26px 18px 0;grid-template-columns:.7fr 1.3fr}.bookingPaper{padding:17px 15px}.destinationTitle{font-size:25px}.destinationArt svg{height:185px;width:180px;max-width:none;margin-left:-30px}.legalLayout{padding:27px 19px 0;grid-template-columns:.7fr 1.3fr}.legalPaper{padding:21px 14px}.matterFolder{padding:14px 11px 0}.matterFolder>span{font-size:9px}.legalAmount{font-size:27px}
+}
+@media(max-width:680px){.caseTitle{font-size:22px;margin-bottom:16px}.grid{row-gap:38px}.copy>p:first-child{font-size:15px}}
+@media(prefers-reduced-motion:no-preference){
+  .scene .linkLine:after{animation:link-travel 5s linear infinite;animation-play-state:paused}
+  .scene .route{animation:route-flow 4s linear infinite;animation-play-state:paused}
+  .scene .recordChip,.scene .bookingPaper .total{animation:record-emphasis 7s ease-in-out infinite;animation-play-state:paused}
+  .scene[data-motion="on"] .linkLine:after,.scene[data-motion="on"] .route,.scene[data-motion="on"] .recordChip,.scene[data-motion="on"] .bookingPaper .total{animation-play-state:running}
+}
+@keyframes link-travel{0%{transform:translateX(-35px);opacity:0}12%{opacity:1}88%{opacity:1}100%{transform:translateX(0);opacity:0}}
+@keyframes route-flow{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+@keyframes record-emphasis{0%,100%{background-color:#eff3e8}50%{background-color:#dce8d1}}
+@media(forced-colors:active){.scene,.paper{background:Canvas;color:CanvasText;border:1px solid CanvasText}.sceneHeader>span:last-child,.kicker,.muted,.reference,.recordChip{color:CanvasText}.linkLine,.linkLine:after{background:CanvasText}}

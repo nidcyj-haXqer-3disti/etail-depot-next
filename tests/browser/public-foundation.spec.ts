@@ -1,3 +1,4 @@
+import { expectReadOnlyPlatformExample } from "./platform-example";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
 import { expectDecodedBrandMark } from "./brand-marks";
@@ -434,8 +435,8 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
       expect(await symbol.evaluate(mark => getComputedStyle(mark).content.startsWith('url("data:image/png;base64,'))).toBe(true);
       await expectDecodedBrandMark(symbol);
     } else if (path === "/use-cases/software-platforms") {
-      await expect(art).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records.*Access and account structure depend on the approved integration/);
-      await expect(art).toContainText("Account setup");
+      await expect(art).toHaveAccessibleName(/Six businesses across retail, transportation, travel and legal services have fourteen merchant accounts/);
+      await expect(art).toContainText("Account structure and available views depend on your approved setup and permissions.");
     } else {
       await expect(art).toContainText("#10482");
       await expect(art).toContainText("$100.00");
@@ -448,7 +449,9 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
       await expect(payment).toContainText("Captured");
       await expect(payment).toContainText("Match the report to the bank deposit.");
     }
-    await expect(art.locator("form, input, textarea, select, button, a")).toHaveCount(0);
+    if (path === "/use-cases/software-platforms") await expectReadOnlyPlatformExample(page);
+    else await expect(art.locator("input")).toHaveCount(0);
+    await expect(art.locator("form, textarea, select, button, a")).toHaveCount(0);
     const bounds = (await art.boundingBox())!;
     expect(bounds.x).toBeGreaterThanOrEqual(0);
     expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
@@ -456,7 +459,7 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
       expect(await art.evaluate(node => node.scrollWidth > node.clientWidth + 1)).toBe(false);
     } else {
       // Every readable record and caption must remain fully contained.
-      for (const record of await art.locator("[data-art-record]").all()) {
+      for (const record of await art.locator("[data-art-record], [data-example-merchant-account]:visible").all()) {
         const recordBounds = (await record.boundingBox())!;
         expect(recordBounds.x).toBeGreaterThanOrEqual(bounds.x);
         expect(recordBounds.x + recordBounds.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);

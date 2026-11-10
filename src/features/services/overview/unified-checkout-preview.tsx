@@ -92,7 +92,7 @@ export function UnifiedCheckoutPreview({ showPreviewNotice = true }: { showPrevi
           <div className="unified-preview-screen-body">
             <div className="unified-preview-order">
               <span className="unified-preview-order-icon"><CommerceProductArt /></span>
-              <div><strong>{serviceExample.description}</strong><span>{serviceExample.orderReference}</span></div>
+              <div><strong>{serviceExample.description}</strong><span>{serviceExample.productDetail}</span><span>Order {serviceExample.orderReference}</span></div>
             </div>
             <dl className="unified-preview-total"><dt>Total</dt><dd>{amount}<span>{serviceExample.currency}</span></dd></dl>
             <p className="unified-preview-method-label">Choose how to pay</p>
@@ -116,18 +116,18 @@ export function UnifiedCheckoutPreview({ showPreviewNotice = true }: { showPrevi
         <div className="unified-preview-screen unified-preview-payment">
           <h4 className="unified-preview-screen-heading"><span aria-hidden="true">2</span>Payment details</h4>
           <div className="unified-preview-method-panel unified-preview-screen-body" id={`${id}-method-panel`} role={enhanced ? "tabpanel" : "group"} aria-labelledby={enhanced ? `${id}-method-${methods.indexOf(method)}` : undefined} aria-label={enhanced ? undefined : "Card details"} tabIndex={enhanced ? 0 : undefined}>
-            <dl className="unified-preview-contact"><div><dt>Email</dt><dd>••••@••••.com</dd></div></dl>
+            <dl className="unified-preview-contact"><div><dt>Email</dt><dd>{serviceExample.customerEmail}</dd></div></dl>
             <p className="unified-preview-detail-label">{method === "Card" ? "Card details" : "Bank account details"}</p>
             <dl className="unified-preview-fields">
               {method === "Card" ? <>
                 <CheckoutField label="Card number" wide><span className="unified-preview-masked">•••• •••• •••• 4242</span><Icon name="card" /></CheckoutField>
-                <CheckoutField label="Expiry">MM / YY</CheckoutField>
+                <CheckoutField label="Expiry">09 / 29</CheckoutField>
                 <CheckoutField label="Security code">•••</CheckoutField>
-                <CheckoutField label="Name on card" wide>•••• ••••••</CheckoutField>
+                <CheckoutField label="Name on card" wide>{serviceExample.customer}</CheckoutField>
                 <CheckoutField label="Country">United States</CheckoutField>
                 <CheckoutField label="ZIP code">10001</CheckoutField>
               </> : <>
-                <CheckoutField label="Account holder" wide>•••• ••••••</CheckoutField>
+                <CheckoutField label="Account holder" wide>{serviceExample.customer}</CheckoutField>
                 <CheckoutField label="Routing number" wide><span className="unified-preview-masked">•••••••••</span></CheckoutField>
                 <CheckoutField label="Account number" wide><span className="unified-preview-masked">•••••••• 1048</span></CheckoutField>
                 <CheckoutField label="Account type" wide>Checking</CheckoutField>
@@ -150,7 +150,8 @@ export function UnifiedCheckoutPreview({ showPreviewNotice = true }: { showPrevi
             </div>
             <dl className="unified-preview-receipt">
               <div><dt>Order</dt><dd>{serviceExample.orderReference}</dd></div>
-              <div><dt>For</dt><dd>{serviceExample.description}</dd></div>
+              <div><dt>Receipt for</dt><dd>{serviceExample.customer}</dd></div>
+              <div><dt>Payment reference</dt><dd>{serviceExample.paymentReference}</dd></div>
               <div className="unified-preview-receipt-method"><dt>Payment method</dt><dd>{method === "Card" ? <><NetworkMark network="visa" /><span>•••• 4242</span></> : <><Icon name="bank" /><span>Bank account •••• 1048</span></>}</dd></div>
               <div><dt>Status</dt><dd>{method === "Card" ? "Approved" : "Processing"}</dd></div>
             </dl>

@@ -1,0 +1,49 @@
+.scene { font-variant-numeric: tabular-nums; }
+.heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:22px; }
+.heading>span { font-size:11px; font-weight:500; letter-spacing:.08em; color:#526756; }
+.payment { background:#fff; border:1px solid #d8e3cc; border-radius:13px; padding:22px 24px; box-shadow:0 18px 35px -25px #173e3655; }
+.recordHeading { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.recordHeading>strong { font-size:18px; line-height:1.4; font-weight:500; letter-spacing:-.025em; }
+.settled { display:inline-flex; align-items:center; gap:4px; font-size:11px; line-height:1.5; color:#3b6245; }
+.settled svg { width:14px; height:14px; }
+.originalAmount { display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-top:22px; }
+.originalAmount>span { font-size:13px; line-height:1.5; color:#526756; }
+.originalAmount>strong { font-size:31px; line-height:1.15; letter-spacing:-.045em; font-weight:500; }
+.purchase { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-top:18px; font-size:13px; line-height:1.5; }
+.purchase small { display:block; color:#526756; font-size:11px; margin-top:4px; }
+.method { display:flex; gap:6px; align-items:center; font-size:11px; color:#526756; }
+.method svg { width:16px; height:16px; flex:none; }
+.connection { display:flex; justify-content:center; align-items:center; gap:8px; min-height:44px; color:#526756; font-size:11px; line-height:1.5; }
+.connection svg { width:16px; height:16px; flex:none; }
+.refund { padding:22px 24px; border-radius:13px 13px 0 0; background:#214636; color:#fff; }
+.pending { font-size:11px; line-height:1.5; color:#5c461e; background:#f5e9c6; border-radius:20px; padding:4px 10px; }
+.refundAmount { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-top:19px; }
+.refundAmount>strong { font-size:38px; line-height:1.15; letter-spacing:-.045em; font-weight:500; }
+.refundAmount>span { font-size:12px; color:#dbe8ce; }
+.refundDetails { display:grid; gap:7px; padding:0; margin:20px 0 0; font-size:12px; line-height:1.5; }
+.refundDetails>div { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+.refundDetails dt { color:#dbe8ce; }
+.refundDetails dd { margin:0; text-align:right; }
+.balance { display:flex; align-items:baseline; justify-content:space-between; gap:18px; padding:17px 24px; border:1px solid #d8e3cc; border-top:0; border-radius:0 0 13px 13px; background:#f7faf2; }
+.balance>span { color:#526756; font-size:12px; line-height:1.5; }
+.balance>strong { color:#183b30; font-size:21px; line-height:1.3; font-weight:500; letter-spacing:-.025em; white-space:nowrap; }
+.note { color:#526756; font-size:12px; line-height:1.6; margin:16px 2px 0; }
+@container(max-width:440px) {
+  .heading { gap:10px; }
+  .payment,.refund { padding:20px 18px; }
+  .recordHeading>strong { font-size:17px; }
+  .settled,.pending,.purchase small,.method,.connection { font-size:12px; }
+  .originalAmount { margin-top:18px; }
+  .originalAmount>strong { font-size:28px; }
+  .purchase { margin-top:14px; }
+  .refundAmount>strong { font-size:32px; }
+  .refundDetails { font-size:12px; gap:9px; }
+  .refundDetails>div { flex-wrap:wrap; gap:2px 12px; }
+  .refundDetails dd { text-align:left; }
+  .balance { padding:17px 18px; gap:12px; }
+  .note { font-size:13px; }
+}
+@media(forced-colors:active) {
+  .payment,.refund,.balance,.pending { background:Canvas; color:CanvasText; border:1px solid CanvasText; }
+  .settled,.originalAmount>span,.purchase small,.method,.connection,.refundAmount>span,.refundDetails dt,.balance>span,.balance>strong,.note { color:CanvasText; }
+}

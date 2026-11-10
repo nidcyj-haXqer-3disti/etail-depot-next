@@ -98,3 +98,63 @@ test("Help application guidance opens account setup at the beginning", async ({ 
   await expect(page).toHaveURL(/\/resources\/help$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Help center");
 });
+
+for (const [route, fragment] of [
+  ["/resources/merchant-account-setup", "#additional-mid"],
+  ["/resources/shopify-gateway-integration", "#check-your-email"],
+  ["/resources/woocommerce-gateway-integration", "#upload-certificate-cyberduck"],
+] as const) {
+  test(`guide Back navigation restores the departure position on ${route}`, async ({ page, isMobile }) => {
+    await page.goto(route + fragment);
+    await expect(page.locator(fragment)).toBeInViewport();
+    const logo = page.getByRole("banner").getByRole("link", { name: "Etail Depot home", exact: true });
+    if (!isMobile) {
+      await logo.scrollIntoViewIfNeeded();
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+    }
+    // Measure departure after the desktop logo is visible. Coordinate activation
+    // prevents a second automatic scroll from changing that measured position.
+    const box = await logo.boundingBox();
+    expect(box).not.toBeNull();
+    const before = await page.evaluate(() => window.scrollY);
+    if (isMobile) await page.touchscreen.tap(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    else await page.mouse.click(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}/`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+    await page.goBack();
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}${route}${fragment}`);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeCloseTo(before, 0);
+    await page.waitForTimeout(600);
+    expect(Math.abs(await page.evaluate(() => window.scrollY) - before)).toBeLessThanOrEqual(2);
+    if (isMobile) await expect(page.locator(fragment)).toBeInViewport();
+    else await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+    await page.goForward();
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}/`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+  });
+}
+
+for (const route of ["/pricing", "/resources/merchant-account-setup"]) {
+  test(`repeated Back and Forward keeps the latest reading position on ${route}`, async ({ page }) => {
+    await page.goto(route);
+    await page.getByRole("banner").getByRole("link", { name: "Etail Depot home", exact: true }).click();
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}/`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+    await page.goBack();
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}${route}`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+    // Native scrolling works in touch WebKit too, where wheel input is unsupported.
+    await page.evaluate(() => window.scrollBy({ top: 650, behavior: "instant" }));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
+    await page.waitForTimeout(350);
+    const reading = await page.evaluate(() => window.scrollY);
+    await page.goForward();
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}/`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+    await page.goBack();
+    await expect(page).toHaveURL(`${new URL(page.url()).origin}${route}`);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeCloseTo(reading, 0);
+    await page.waitForTimeout(500);
+    expect(Math.abs(await page.evaluate(() => window.scrollY) - reading)).toBeLessThanOrEqual(2);
+  });
+}

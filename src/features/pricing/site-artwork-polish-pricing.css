@@ -1,4 +1,62 @@
-/* Scoped to the owning page family. Keep selector order and responsive states intact. */
-.public-main .payment-offer-section :is(.payment-base-rate,.pricing-account-fees dd,.fee-result dd,.fee-input input){font-variant-numeric:tabular-nums}
-.public-main .payment-offer-section .fee-result dl>div{align-items:baseline;gap:20px}
-.public-main .payment-offer-section .fee-result dd{white-space:nowrap;text-align:right}
+/* Pricing owns these refinements; shared offers and rates remain unchanged. */
+.public-main .attention-pricing #fees.payment-offer-section { padding-top: 34px; }
+.public-main .attention-pricing .pricing-panel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.public-main .attention-pricing .pricing-rate,
+.public-main .attention-pricing .fee-estimate { padding: 38px; }
+.public-main .attention-pricing .pricing-rate { display: flex; flex-direction: column; }
+.public-main .attention-pricing .pricing-rate .payment-base-rate { margin: 28px 0 12px; font-size: clamp(42px, 4.5vw, 64px); font-variant-numeric: tabular-nums; }
+.public-main .attention-pricing .pricing-rate-basis { max-width: none; }
+.public-main .attention-pricing .pricing-account-fees { border-bottom: 0; margin-top: 28px; padding: 24px 0 0; }
+.public-main .attention-pricing .pricing-account-fees > div + div { border-left: 0; padding-left: 0; }
+.public-main .attention-pricing .pricing-account-fees dd { margin-top: 8px; font-size: 32px; font-variant-numeric: tabular-nums; }
+.public-main .attention-pricing .pricing-included { display: block; margin-top: 28px; }
+.public-main .attention-pricing .pricing-included > p { margin: 0 0 12px; font-size: 12px; }
+.public-main .attention-pricing .pricing-included ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.public-main .attention-pricing .pricing-included li { display: flex; align-items: center; gap: 12px; font-size: 14px; line-height: 1.5; }
+.public-main .attention-pricing .pricing-included .icon { width: 17px; height: 17px; flex-basis: 17px; margin: 0; }
+.public-main .attention-pricing .pricing-scope { margin-top: auto; padding-top: 28px; max-width: 54ch; line-height: 1.7; }
+.public-main .attention-pricing .fee-estimate { background: #fafbf7; }
+.public-main .attention-pricing .fee-input { min-height: 64px; background: #fff; border-color: #9caea3; border-radius: 8px; }
+.public-main .attention-pricing .fee-input input:focus-visible { outline: none; }
+.public-main .attention-pricing .fee-input input { padding-block: 15px; font-size: 28px; }
+.public-main .attention-pricing .fee-result { margin-top: 26px; min-height: 236px; }
+.public-main .attention-pricing .fee-result dl { gap: 14px; }
+.public-main .attention-pricing .fee-result dl > div { align-items: baseline; gap: 16px; }
+.public-main .attention-pricing .fee-result dd { white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
+.public-main .attention-pricing .fee-result .fee-total { padding-top: 18px; }
+.public-main .attention-pricing .fee-result .fee-total dd { font-size: 23px; }
+.public-main .attention-pricing .fee-result .fee-net { flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 6px; padding: 22px 18px; border: 0; border-radius: 8px; background: #e8f1e9; }
+.public-main .attention-pricing .fee-net dt { font-size: 13px; }
+.public-main .attention-pricing .fee-net dd { margin-left: auto; font-size: 36px; line-height: 1.2; letter-spacing: -.035em; }
+.public-main .attention-pricing .fee-estimate-note { margin-top: 16px; }
+.public-main .attention-pricing .offer-details { margin-top: 22px; }
+.public-main .attention-pricing .offer-details-body { padding: 12px 0 28px; gap: 32px 48px; }
+.public-main .attention-pricing .fee-exceptions { gap: 0; }
+.public-main .attention-pricing .fee-exceptions > div { padding: 14px 0; }
+.public-main .attention-pricing .fee-exceptions > div:first-child { padding-top: 0; }
+.public-main .attention-pricing .fee-exceptions > div + div { border-top: 1px solid #e4e9e2; }
+.public-main .attention-pricing .fee-exceptions dd { font-variant-numeric: tabular-nums; }
+.public-main .attention-pricing .pricing-conditions h3 { margin: 0 0 8px; color: var(--public-ink); font-size: 15px; line-height: 1.5; font-weight: 500; letter-spacing: 0; }
+.public-main .attention-pricing .pricing-conditions p + h3 { margin-top: 22px; }
+@media (max-width: 1100px) {
+  .public-main .attention-pricing .pricing-rate,
+  .public-main .attention-pricing .fee-estimate { padding: 28px; }
+}
+@media (max-width: 800px) {
+  .public-main .attention-pricing .pricing-panel { grid-template-columns: minmax(0, 1fr); }
+  .public-main .attention-pricing #fees.payment-offer-section { padding-top: 26px; }
+  .public-main .attention-pricing .pricing-scope { margin-top: 0; }
+}
+@media (max-width: 680px) {
+  .public-main .attention-pricing .pricing-rate,
+  .public-main .attention-pricing .fee-estimate { padding: 26px 22px; }
+  .public-main .attention-pricing .pricing-rate .payment-base-rate { font-size: clamp(38px, 10vw, 52px); }
+  .public-main .attention-pricing .fee-result { min-height: 256px; }
+  .public-main .attention-pricing .fee-result .fee-net { display: block; padding: 18px 16px; }
+  .public-main .attention-pricing .fee-net dd { margin-top: 8px; font-size: 34px; }
+}
+@media (max-width: 360px) {
+  .public-main .attention-pricing .pricing-rate,
+  .public-main .attention-pricing .fee-estimate { padding-inline: 18px; }
+  .public-main .attention-pricing .fee-net dd { font-size: 30px; }
+}

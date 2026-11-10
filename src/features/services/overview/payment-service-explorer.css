@@ -89,3 +89,10 @@
 .payment-service-explorer .pse-stage-index{align-self:start;margin-top:1px}
 .payment-service-explorer .pse-record-amount{font-feature-settings:"tnum"}
 .payment-service-explorer .pse-stages li>div>p:first-child{align-items:baseline}
+
+/* The same order continues into a readable merchant payment record. */
+.payment-service-explorer .pse-record-reference { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 6px 0 0; font-size: 17px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.payment-service-explorer .pse-record-reference > span { padding: 3px 9px; border-radius: 5px; background: #e5f3eb; color: #28513d; font-size: 12px; font-weight: 400; }
+.payment-service-explorer .pse-card-detail { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; vertical-align: middle; white-space: nowrap; font-size: 13px; }
+.payment-service-explorer .pse-card-detail .network-mark { width: 40px; }
+.payment-service-explorer .pse-facts dd { overflow-wrap: anywhere; }

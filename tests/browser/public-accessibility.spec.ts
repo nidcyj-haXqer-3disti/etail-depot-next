@@ -349,7 +349,7 @@ for (const javaScriptEnabled of [true, false]) {
       await page.goto(`${baseURL}/use-cases/software-platforms`);
       await expect(page.locator("#integration")).toContainText("Account structure");
       const platformArt = page.locator("[data-attention-art=platform]");
-      await expect(platformArt).toHaveAccessibleName(/Commerce, freight, travel and legal software connect their business records.*Access and account structure depend on the approved integration/);
+      await expect(platformArt).toHaveAccessibleName(/Six businesses across retail, transportation, travel and legal services have fourteen merchant accounts/);
       await expect(platformArt.getByRole("heading")).toHaveCount(0);
       if (javaScriptEnabled) await expectAccessible(page);
     } finally {

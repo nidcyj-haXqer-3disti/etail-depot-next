@@ -1,8 +1,27 @@
 "use client";
 
 import Link from "next/link";
+import { BrandImage } from "../brand/brand-image";
+import { PlatformMark } from "../brand/platform-marks";
+import "../brand/brand-images-platforms.css";
 import { useCallback, useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import { publicFooterGroups } from "@/shared/site/site-navigation";
+
+const guideBrands = {
+  "/resources/merchant-account-setup": "trolleys",
+  "/resources/shopify-gateway-integration": "shopify",
+  "/resources/woocommerce-gateway-integration": "woocommerce",
+} as const;
+
+function FooterLinkLabel({ href, label }: { href: string; label: string }) {
+  const brand = guideBrands[href as keyof typeof guideBrands];
+  if (!brand) return label;
+  const lastSpace = label.lastIndexOf(" ");
+  // Keep the small raised mark with the final word when a narrow column wraps.
+  return <span>{label.slice(0, lastSpace + 1)}<span className="public-footer-guide-ending">{label.slice(lastSpace + 1)}<span className={`public-footer-guide-brand public-footer-guide-brand-${brand}`} aria-hidden="true">
+    {brand === "trolleys" ? <BrandImage brand="trolleys-symbol" alt="" width={28} height={21} className="public-footer-guide-mark" /> : <PlatformMark brand={brand} className="public-footer-guide-mark" />}
+  </span></span></span>;
+}
 
 const compactQuery = "(max-width: 959px)";
 const getCompact = () => window.matchMedia(compactQuery).matches;
@@ -46,7 +65,7 @@ export function FooterNavigation() {
     {publicFooterGroups.flatMap(group => {
       const DestinationLink = group.label === "Services" ? "a" : Link;
       const links = <ul>{group.links.map(link =>
-        <li key={link.href}><DestinationLink {...(group.label === "Services" ? {} : { prefetch: false })} href={link.href}>{link.label}</DestinationLink></li>
+        <li key={link.href}><DestinationLink {...(group.label === "Services" ? {} : { prefetch: false })} href={link.href}><FooterLinkLabel href={link.href} label={link.label} /></DestinationLink></li>
       )}</ul>;
       return (compact === null ? [false, true] : [compact]).map(isCompact =>
         <nav className={`public-footer-group${group.label === "Services" ? " public-footer-services" : ""}`}

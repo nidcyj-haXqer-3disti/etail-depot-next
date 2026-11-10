@@ -3,7 +3,7 @@ import welcome from "./assets/welcome.jpg";
 import registration from "./assets/registration.jpg";
 import blankRegistration from "./assets/blank-registration.jpg";
 import { merchantAccountGuidance } from "@/shared/site/merchant-account-guidance";
-import { MerchantApplicationArt } from "../../services/merchant-onboarding/merchant-application-art";
+import { ApplicationGuideSteps } from "./application-guide-steps";
 import { PaymentPortalLink } from "../../../shared/ui/merchant-portal-link";
 import styles from "./merchant-account-guide.module.css";
 
@@ -75,17 +75,7 @@ export function MerchantAccountGuide({ kind }: { kind: "sign-in" | "registration
         </div>
         <AccountScreenshot screen="registration" />
       </li>
-      <li id="application-review">
-        <div className={styles.stepCopy}>
-          <span id="prepare" className={styles.bookmark} aria-hidden="true" />
-          <span id="platform-onboarding" className={styles.bookmark} aria-hidden="true" />
-          <div className={styles.stepHeading}><span aria-hidden="true">3</span><h3>Continue your business application</h3></div>
-          <p>Open your application or choose <strong>Continue</strong> beside one already started. Enter the requested business, ownership and bank details. Check the information and terms before submitting.</p>
-          <p className={styles.hint}>If asked to sign in again, use the same email and password.</p>
-          <p className={styles.approval} id="account-readiness">Creating a login is not approval to accept payments. Wait for account approval and confirmation that your payment setup is ready.</p>
-        </div>
-        <div className={styles.applicationArt}><MerchantApplicationArt title="Merchant application and company profile" caption="Illustration of the application area. Your account may show different options." /></div>
-      </li>
+      <ApplicationGuideSteps />
     </ol>
   </div>;
 }

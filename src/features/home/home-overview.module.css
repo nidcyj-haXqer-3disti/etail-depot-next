@@ -139,3 +139,26 @@
 .art .platformRecords{flex-wrap:wrap}
 @media(min-width:960px) and (max-width:1150px){.art .merchantPanel{width:46%}.art .platformPanel{width:46%}.art .platformRecords{gap:4px}.art .cardPanel{width:59%}}
 @media(max-width:619px){.art .merchantFunctions strong{font-size:13px}.art .merchantFunctions{gap:10px}.art .merchantFunctions small{line-height:1.55}.art .cardPanel{gap:16px}}
+
+/* Subtle continuous flow along the existing service connections. */
+.connectionFlow {stroke:#2d8a64;stroke-width:3;stroke-linecap:round;stroke-dasharray:9 91;}
+@media(prefers-reduced-motion:no-preference){
+ .connectionFlow {animation:home-connection-flow 5.4s linear infinite;animation-play-state:paused;}
+ .connectionFlow:nth-child(2){animation-duration:4.2s;animation-delay:-1.4s;}
+ .connectionFlow:nth-child(3){animation-duration:6.2s;animation-delay:-3.1s;}
+ .art[data-motion="on"] .connectionFlow{animation-play-state:running;}
+}
+@media(max-width:619px){
+ .artPanel:before {content:"";position:absolute;left:31px;top:-11px;width:1px;height:11px;background:#84a895;}
+ .artPanel:after {content:"";position:absolute;left:30px;top:-11px;width:3px;height:3px;border-radius:50%;background:#2d8a64;}
+}
+@media(max-width:619px) and (prefers-reduced-motion:no-preference){
+ .artPanel:after {animation:home-phone-connection 2.8s linear infinite;animation-play-state:paused;}
+ .platformPanel:after {animation-delay:-.9s;}
+ .cardPanel:after {animation-delay:-1.8s;}
+ .art[data-motion="on"] .artPanel:after {animation-play-state:running;}
+}
+@keyframes home-connection-flow{0%{stroke-dashoffset:0;opacity:0}8%,92%{opacity:.95}100%{stroke-dashoffset:-100;opacity:0}}
+@keyframes home-phone-connection{0%{transform:translateY(0);opacity:0}15%,85%{opacity:1}100%{transform:translateY(8px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.connectionFlows,.artPanel:after{display:none;}}
+@media(forced-colors:active){.connectionFlows,.artPanel:after{display:none;}.artPanel:before{background:CanvasText;}}

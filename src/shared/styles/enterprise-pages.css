@@ -63,24 +63,6 @@
 .enterprise-page .ec-industry-section{padding:78px 0;background:#f3f5ef}
 .enterprise-page .ec-industry-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:48px 42px;margin-top:46px}
 .enterprise-page .ec-industry-grid article{min-width:0}
-.enterprise-page .ec-industry-scene{background:#fff;min-height:235px;border-radius:8px;border:1px solid #d8e1d4;padding:24px 30px;box-shadow:0 5px 20px #193c3305}
-.enterprise-page .ec-scene-kicker{display:flex;align-items:center;gap:9px;color:#57735e;font-size:11px}
-.enterprise-page .ec-scene-kicker svg{width:20px;height:20px}
-.enterprise-page .ec-scene-commerce{display:flex;align-items:center;justify-content:space-between;gap:20px;height:135px}
-.enterprise-page .ec-scene-commerce img{width:170px;max-height:130px;object-fit:contain}
-.enterprise-page .ec-scene-commerce>div{display:flex;flex-direction:column;gap:10px}
-.enterprise-page .ec-scene-commerce span{font-size:12px;color:#536c59}
-.enterprise-page .ec-scene-commerce strong{font-size:26px;font-weight:500;letter-spacing:-.04em}
-.enterprise-page .ec-industry-scene .ec-record-line{font-size:12px;padding:9px 0}
-.enterprise-page .ec-route-display{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:32px 0 24px}
-.enterprise-page .ec-route-display div{display:flex;flex-direction:column;gap:9px}
-.enterprise-page .ec-route-display span{font-size:12px;color:#536c59}
-.enterprise-page .ec-route-display strong{font-size:19px;font-weight:500;letter-spacing:-.03em}
-.enterprise-page .ec-route-display svg{width:24px;color:#8da58c}
-.enterprise-page .ec-booking-display,.enterprise-page .ec-matter-display{padding:22px 0 14px}
-.enterprise-page .ec-booking-display span,.enterprise-page .ec-matter-display span{font-size:12px;color:#536c59}
-.enterprise-page .ec-booking-display strong,.enterprise-page .ec-matter-display strong{display:block;font-size:26px;letter-spacing:-.035em;font-weight:500;margin-top:10px}
-.enterprise-page .ec-booking-display p,.enterprise-page .ec-matter-display p{font-size:12px;margin-top:8px}
 .enterprise-page .ec-industry-copy{padding-top:25px}
 .enterprise-page .ec-industry-copy .ec-category{font-size:10px;margin-bottom:10px}
 .enterprise-page .ec-industry-copy h3{font-size:23px;max-width:400px}
@@ -171,7 +153,6 @@
 .enterprise-page h1,.enterprise-page .ec-platform-hero h1,.enterprise-page .ec-merchant-hero h1{font-size:var(--public-title-size)}
 .enterprise-page .ec-band-grid,.enterprise-page .ec-integration-section,.enterprise-page .ec-merchant-hero .ec-hero-grid,.enterprise-page .ec-setup-section,.enterprise-page .ec-accept-grid,.enterprise-page .ec-payout-section,.enterprise-page .ec-pricing-grid{gap:60px}
 .enterprise-page .ec-platform-hero .ec-hero-grid{gap:var(--public-content-gap)}
-.enterprise-page .ec-industry-scene{padding:22px}
 .enterprise-page .ec-refund-section{grid-template-columns:44px 1fr}
 .enterprise-page .ec-refund-section>.ec-concept-action{grid-column:2;max-width:none}
 }
@@ -185,11 +166,6 @@
 .enterprise-page .ec-section-copy{max-width:600px}
 .enterprise-page .ec-split-heading{gap:40px}
 .enterprise-page .ec-industry-grid{gap:34px 24px}
-.enterprise-page .ec-route-display strong{font-size:16px}
-.enterprise-page .ec-scene-commerce img{width:140px}
-.enterprise-page .ec-scene-commerce>div{gap:6px}
-.enterprise-page .ec-scene-commerce span{font-size:12px}
-.enterprise-page .ec-scene-commerce strong{font-size:23px}
 .enterprise-page .ec-platform-band{padding:65px 0}
 .enterprise-page .ec-business-art{max-width:600px;width:100%;margin:auto!important}
 .enterprise-page .ec-method-panel{padding:25px 0}
@@ -237,10 +213,6 @@
 .enterprise-page .ec-split-heading p{font-size:15px}
 .enterprise-page .ec-industry-section{padding:50px 0}
 .enterprise-page .ec-industry-grid{grid-template-columns:1fr;gap:35px;margin-top:32px}
-.enterprise-page .ec-industry-scene{padding:22px;min-height:220px}
-.enterprise-page .ec-scene-commerce img{width:150px}
-.enterprise-page .ec-scene-commerce span{font-size:12px}
-.enterprise-page .ec-route-display strong{font-size:20px}
 .enterprise-page .ec-industry-copy{padding-top:20px}
 .enterprise-page .ec-industry-copy h3{font-size:24px}
 .enterprise-page .ec-industry-copy>p{font-size:14px}
@@ -295,8 +267,6 @@
 .enterprise-page .ec-hero-actions{gap:4px}
 .enterprise-page .ec-method-marks{gap:24px}
 .enterprise-page .ec-record-line{font-size:11px}
-.enterprise-page .ec-scene-commerce img{width:120px}
-.enterprise-page .ec-route-display strong{font-size:17px}
 .enterprise-page .ec-price-figure>strong{font-size:58px}
 }
 
