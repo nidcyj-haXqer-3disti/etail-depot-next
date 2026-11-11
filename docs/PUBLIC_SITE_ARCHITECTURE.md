@@ -31,6 +31,8 @@ Follow the [page paint standard](PAGE_PAINT_STANDARDS.md). Preserve the document
 
 Merchant sign in and registration link only to `https://merchantapp.io/etaildepot/UserAccount/Login`. [The hosted-services module](../src/shared/site/hosted-services.ts) defines the fixed destination; [the shared portal link](../src/shared/ui/merchant-portal-link.tsx) preserves its no-referrer behavior. Do not forward visitor input, page queries or fragments.
 
+Sales appointments use one shared Calendly booking panel. Header and commercial sales actions open it directly without navigating to Contact; the general Contact page and account-support email remain separate. The optional public destination is configured only after the operator approves the provider setup. Calendly loads only after a sales action is selected. Native links work without JavaScript, and a null destination restores the established contact fallback. Scheduling stays with the provider and adds no Etail backend or database. Existing account and integration support uses a separate contact section. Follow the [sales booking runbook](SALES_BOOKING.md) for activation and verification.
+
 No local account application, checkout processor, KYC, ledger, database adapter, provider-key management or payment API is active. Card applications remain closed. Public illustrations use the approved examples and do not expose customer records. Archived schemas are historical definitions, not a data source.
 
 ## Routing and search

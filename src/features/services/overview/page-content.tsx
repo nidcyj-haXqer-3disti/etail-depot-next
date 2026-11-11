@@ -1,6 +1,7 @@
 import { pageJsonLd } from "./metadata";
 import { merchantAccountGuidance } from "@/shared/site/merchant-account-guidance";
 import Link from "next/link";
+import { SalesContactLink } from "@/shared/ui/sales-booking/sales-booking-link";
 import { AttentionHero } from "@/shared/ui/attention-hero";
 import "@/shared/styles/attention-pages.css";
 import { Shell } from "@/shared/layout/shell";
@@ -20,7 +21,7 @@ export default function Page() {
     <div className="enterprise-page merchant cw-pilot attention-site"><AttentionHero className="ec-merchant-hero merchant-hero" id="welcome-title" label="Merchant services"
       title={<>Accept card and{" "}<em>ACH payments.</em></>}
       intro="Credit card processing and ACH for US businesses in USD, with account setup, online checkout and payment reporting."
-      actions={<><PaymentPortalLink intent="register" /><Link className="text-link" href="/company/contact#payment-review">Discuss your business</Link></>}
+      actions={<><PaymentPortalLink intent="register" /><SalesContactLink className="text-link" href="/company/contact#payment-review">Discuss your business</SalesContactLink></>}
       note={`${merchantAccountGuidance.application} Account approval and setup apply.`}
       artwork={<MerchantOperationsArt />}
     /><section className="ec-container ec-setup-section" aria-labelledby="merchant-section-2-title"><span className="ec-anchor" id="merchant-service-path-title"></span><div className="ec-section-copy"><span className="ec-category">Account setup</span><h2 id="merchant-section-2-title">Set up your account.</h2><p className="ec-lead">Apply with your business and ownership details, review your account terms and complete setup after approval.</p><Link className="ec-concept-action ec-quiet" href="/services/merchant-onboarding">Prepare your application</Link></div><AccountSetupArt /></section>

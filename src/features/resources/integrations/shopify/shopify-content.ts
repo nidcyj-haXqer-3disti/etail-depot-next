@@ -120,7 +120,7 @@ export const shopifySetupSteps = [
     "width": 1430,
     "height": 785,
     "alt": "Onboarding Agreement showing the merchant mapping, Access Terms, optional Payer Authentication and Confirm.",
-    "caption": "The checkboxes shown are examples. Use the settings confirmed for your account."
+    "caption": "Use the settings confirmed for your account."
   },
   {
     "id": "activate-provider",

@@ -1,3 +1,4 @@
+import { exerciseSalesAction, salesActionHref } from "./sales-contact";
 import { expect, test } from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
 import { openMainNavigation } from "./public-header";
@@ -282,9 +283,8 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   await page.goto("/");
   await openFooterGroup(page, "Use cases");
   await directory.getByRole("link", { name: "Software platforms", exact: true }).click();
-  await page.getByRole("main").getByRole("link", { name: "Discuss your integration", exact: true }).click();
-  await expect(page).toHaveURL(/\/company\/contact#platforms$/);
-  await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+  await expect(page).toHaveURL(/\/use-cases\/software-platforms$/);
+  await exerciseSalesAction(page, page.getByRole("main").getByRole("link", { name: "Discuss your integration", exact: true }), "/company/contact#platforms");
   if (await toggle.isVisible()) await toggle.click();
   await navigation.locator("summary").filter({ hasText: /^Developers$/ }).click();
   await navigation.getByRole("link", { name: "Getting started", exact: true }).click();
@@ -306,7 +306,7 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
 
   await page.goto("/company/contact");
   await expect(navigation.locator("summary.is-current")).toHaveCount(0);
-  await expect(header.getByRole("link", { name: "Contact sales", exact: true, includeHidden: true })).toHaveAttribute("href", "/company/contact");
+  await expect(header.getByRole("link", { name: "Contact sales", exact: true, includeHidden: true })).toHaveAttribute("href", salesActionHref("/company/contact#payment-review"));
   await expect(directory.locator('a[href="/pricing"]')).toHaveCount(0);
   if (await toggle.isVisible()) await toggle.click();
   const pricing = navigation.locator(':scope > a[href="/pricing"]');

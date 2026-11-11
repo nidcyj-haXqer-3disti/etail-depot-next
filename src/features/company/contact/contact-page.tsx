@@ -9,6 +9,8 @@ import { CommercialStructuredData } from "../../../shared/seo/commercial-structu
 import { Icon } from "../../../shared/ui/icon";
 import { PaymentPortalLink } from "../../../shared/ui/merchant-portal-link";
 import { ContactHero } from "./contact-hero";
+import { SalesBookingLink } from "@/shared/ui/sales-booking/sales-booking-link";
+import { salesBookingUrl } from "@/shared/site/sales-booking-url";
 import contactStyles from "./contact-enquiries.module.css";
 import "../../../shared/styles/connected-resources.css";
 import "../../../shared/styles/public-site.css";
@@ -18,17 +20,28 @@ import "../../../shared/styles/company-context.css";
 import "../../../shared/styles/enterprise-support.css";
 
 function ContactOptions() {
+  const bookingUrl = salesBookingUrl(hostedServices.sales.bookingUrl);
   const contacts = [
     { id: "cards", title: "Card inquiries", text: "Ask about the secured credit card, deposits or wallet support. An inquiry is not an application.", email: hostedServices.cards.email, href: hostedServices.cards.contactHref },
     { id: "compliance", title: "Privacy and compliance", text: "Contact us about privacy, data rights or a compliance matter involving the service.", email: legalIdentity.complianceEmail, href: `mailto:${legalIdentity.complianceEmail}` },
   ];
   return <div id="contact-options" className={`commercial-contacts container ${contactStyles.directory}`}>
     <section id="payment-review" className={contactStyles.merchant} aria-labelledby="contact-merchant-title" data-merchant-contact>
-      {["platforms", "integration", "account-support"].map(id => <span key={id} id={id} className={contactStyles.bookmark} aria-hidden="true" />)}
+      <span id="platforms" className={contactStyles.bookmark} aria-hidden="true" />
       <div className={contactStyles.copy}>
-        <h2 id="contact-merchant-title">Merchant services</h2>
-        <p>Account eligibility, processing costs, software partnerships and integration documentation.</p>
-        <p className={contactStyles.support}>For account support, include the relevant transaction or payout reference.</p>
+        <h2 id="contact-merchant-title">Talk with our sales team</h2>
+        <p>Discuss card and ACH payments, processing costs or payments for your software platform.</p>
+      </div>
+      <div className={contactStyles.actions}>
+        {bookingUrl ? <SalesBookingLink url={bookingUrl} /> : <a className={contactStyles.email} href={hostedServices.payments.contactHref}><span>{hostedServices.payments.email}</span><Icon name="mail" /></a>}
+      </div>
+    </section>
+    <section id="account-support" className={contactStyles.accountSupport} aria-labelledby="contact-support-title">
+      <span id="integration" className={contactStyles.bookmark} aria-hidden="true" />
+      <div className={contactStyles.copy}>
+        <h2 id="contact-support-title">Account and integration support</h2>
+        <p>Get help with an existing merchant account, a payment, a payout or your store’s connection.</p>
+        <p className={contactStyles.detail}>For a payment or payout question, include its reference.</p>
       </div>
       <a className={contactStyles.email} href={hostedServices.payments.contactHref}><span>{hostedServices.payments.email}</span><Icon name="mail" /></a>
     </section>

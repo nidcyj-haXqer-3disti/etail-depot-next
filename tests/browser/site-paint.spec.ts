@@ -1,3 +1,4 @@
+import { exerciseSalesAction } from "./sales-contact";
 import { expect, test } from "@playwright/test";
 import { expectCompleteGuidePaint } from "./guide-rendering";
 
@@ -59,9 +60,7 @@ test("refund amount and pending status paint together before application scripts
     await page.reload();
     expect(await geometry()).toEqual(before);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
-    await page.getByRole("link", { name: "Talk with our team", exact: true }).click();
-    await expect(page).toHaveURL(/\/company\/contact#payment-review$/);
-    await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+    await exerciseSalesAction(page, page.getByRole("link", { name: "Talk with our team", exact: true }), "/company/contact#payment-review");
   } finally { release(); }
 });
 
@@ -90,9 +89,7 @@ test("dispute deadline and response state paint together before application scri
     await page.reload();
     expect(await geometry()).toEqual(before);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
-    await page.getByRole("link", { name: "Talk with our team", exact: true }).click();
-    await expect(page).toHaveURL(/\/company\/contact#payment-review$/);
-    await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+    await exerciseSalesAction(page, page.getByRole("link", { name: "Talk with our team", exact: true }), "/company/contact#payment-review");
   } finally { release(); }
 });
 
@@ -126,9 +123,7 @@ test("merchant and gateway reports paint together before application scripts", a
     await page.reload();
     expect(await geometry()).toEqual(before);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
-    await page.getByRole("link", { name: "Talk with our team", exact: true }).click();
-    await expect(page).toHaveURL(/\/company\/contact#payment-review$/);
-    await expect(page.locator("[data-merchant-contact]").getByRole("heading")).toHaveText("Merchant services");
+    await exerciseSalesAction(page, page.getByRole("link", { name: "Talk with our team", exact: true }), "/company/contact#payment-review");
   } finally { release(); }
 });
 
@@ -167,8 +162,7 @@ test("platform accounts and checkout-to-bank records keep their layout before sc
     await page.reload();
     expect(await geometry()).toEqual(before);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
-    await page.getByRole("link", { name: "Discuss your integration", exact: true }).click();
-    await expect(page).toHaveURL(/\/company\/contact#platforms$/);
+    await exerciseSalesAction(page, page.getByRole("link", { name: "Discuss your integration", exact: true }), "/company/contact#platforms");
   } finally { release(); }
 });
 
@@ -267,9 +261,7 @@ test("shared navigation does not download unselected pages during startup", asyn
     page.off("request", record);
   }
   if (page.viewportSize()!.width < 960) await page.getByRole("button", { name: "Menu", exact: true }).click();
-  await page.locator("header").getByRole("link", { name: "Contact sales", exact: true }).click();
-  await expect(page).toHaveURL(/\/company\/contact$/);
-  await expect(page.locator("h1")).toBeVisible();
+  await exerciseSalesAction(page, page.locator("header").getByRole("link", { name: "Contact sales", exact: true }), "/company/contact#payment-review");
 });
 
 
@@ -341,6 +333,7 @@ test("guide reload completion preserves a visitor's reading position", async ({ 
     await route.continue();
   });
   for (const guide of [
+    { path: "/resources/merchant-account-setup", step: "bank-details" },
     { path: "/resources/shopify-gateway-integration", step: "check-your-email" },
     { path: "/resources/woocommerce-gateway-integration", step: "enter-credentials" },
   ]) {
@@ -349,7 +342,7 @@ test("guide reload completion preserves a visitor's reading position", async ({ 
     try {
       await page.reload({ waitUntil: "commit" });
       await page.waitForLoadState("domcontentloaded");
-      await expect(page.locator(`#${guide.step} > summary`)).toBeInViewport();
+      await expect(page.locator(`#${guide.step} > summary, #${guide.step} h3`).first()).toBeInViewport();
       const initialPosition = await page.evaluate(() => scrollY);
       // Mobile WebKit does not expose wheel input; use native page scrolling.
       if (browserName === "webkit" && isMobile) await page.keyboard.press("PageDown");
@@ -431,16 +424,15 @@ test("first visits keep render-blocking CSS within page-family budgets", async (
   // Include the embedded logos. Budgets allow small additions but catch unrelated
   // page families being pulled into the shared Shell again.
   for (const [path, budget] of [
-    // Home now carries the exact 13,185-byte symbol in cached CSS (17,580 base64
-    // bytes) instead of a separate image response. Retain the former code allowance.
-    ["/", 74_000],
-    ["/resources/shopify-gateway-integration", 108_000],
-    ["/resources/woocommerce-gateway-integration", 108_000],
-    ["/resources/merchant-account-setup", 125_000],
-    ["/developers/getting-started", 85_000],
-    ["/developers/api-reference", 85_000],
-    ["/resources/help", 55_000],
-    ["/resources/guides/iso-20022/purpose", 65_000],
+    // Lossless embedded marks retain initial paint without the previous PNG cost.
+    ["/", 58_000],
+    ["/resources/shopify-gateway-integration", 82_000],
+    ["/resources/woocommerce-gateway-integration", 77_000],
+    ["/resources/merchant-account-setup", 99_000],
+    ["/developers/getting-started", 69_000],
+    ["/developers/api-reference", 69_000],
+    ["/resources/help", 46_000],
+    ["/resources/guides/iso-20022/purpose", 56_000],
   ] as const) {
     await page.goto(path);
     const stylesheets = await page.locator('link[rel="stylesheet"]').evaluateAll(links =>
@@ -468,7 +460,7 @@ test("opening artwork symbols paint without a separate image response or hydrati
         [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
       const marks = page.locator('[data-company-art] img[src*="/symbol."], [data-attention-art] img[src*="/symbol."], [data-company-art] .brand-image-symbol, [data-attention-art] .brand-image-symbol');
       await expect(marks).toHaveCount(1);
-      expect(await marks.evaluateAll(nodes => nodes.every(node => getComputedStyle(node).content.startsWith('url("data:image/png;base64,')))).toBe(true);
+      expect(await marks.evaluateAll(nodes => nodes.every(node => getComputedStyle(node).content.startsWith('url("data:image/webp;base64,')))).toBe(true);
       const geometry = () => marks.evaluateAll(nodes => nodes.map(node => {
         const box = node.getBoundingClientRect();
         return { width: box.width, height: box.height };
@@ -538,6 +530,9 @@ test("account motion loops, resumes after selection and respects keyboard readin
   await page.clock.fastForward(20000);
   await expect(root.locator('input[value="market"]')).toBeChecked();
   await page.locator("h1").click();
+  // On narrow screens the heading can scroll the artwork out of view.
+  await root.scrollIntoViewIfNeeded();
+  await expect(root).toHaveAttribute("data-motion-visible", "true");
   await page.clock.fastForward(6100);
   await expect(root.locator('input[value="logistics"]')).toBeChecked();
   await page.emulateMedia({ reducedMotion: "reduce" });

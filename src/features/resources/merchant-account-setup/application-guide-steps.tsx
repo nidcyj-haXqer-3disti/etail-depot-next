@@ -41,9 +41,9 @@ function Step({ number, id, title, children, artwork }: { number: number; id: st
 export function ApplicationGuideSteps() {
   return <>
     <Step number={3} id="application-review" title="Complete your company profile" artwork={
-      <Screen title="Company Profile" step={1} caption="Sales example: 200 orders at $75 each total $15,000. Use your own figures.">
+      <Screen title="Company Profile" step={1} caption="200 orders × $75 = $15,000 in monthly sales. Enter your own figures.">
         <Field label="Legal Business Name" value="Your legal business name" />
-        <span className={s.exampleLabel}>Example sales figures</span>
+        <span className={s.exampleLabel}>Sales figures</span>
         <Field label="Average Ticket" value="$75" emphasis />
         <Field label="Monthly Volume" value="$15,000" emphasis />
         <Field label="Estimated Highest Credit Card Order Amount" value="$500" emphasis />

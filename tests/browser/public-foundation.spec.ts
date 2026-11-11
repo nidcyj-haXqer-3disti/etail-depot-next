@@ -1,3 +1,4 @@
+import { exerciseSalesAction, salesActionHref } from "./sales-contact";
 import { expectReadOnlyPlatformExample } from "./platform-example";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
@@ -166,7 +167,7 @@ test("legal documents are reachable without sign-in and retain their search visi
   await page.goto("/");
   await page.getByRole("navigation", { name: "Footer legal" }).getByRole("link", { name: "Privacy", exact: true }).click();
   await expect(page).toHaveURL(/\/company\/privacy$/);
-  for (const [path, title] of [["/company/privacy", "Website Privacy Policy"], ["/company/terms", "Website Terms of Use"]]) {
+  for (const [path, title, updated] of [["/company/privacy", "Website Privacy Policy", "November 11, 2026"], ["/company/terms", "Website Terms of Use", "November 4, 2026"]]) {
     const searchTitle = `${path === "/company/terms" ? "Website Terms of Use" : title} | Etail Depot`;
     if (path === "/company/terms") await page.getByRole("navigation", { name: "Footer legal" }).getByRole("link", { name: "Terms", exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`${path}$`));
@@ -174,7 +175,7 @@ test("legal documents are reachable without sign-in and retain their search visi
     await expect(page.getByRole("complementary", { name: "Review status" })).toHaveCount(0);
     await expect(page).toHaveTitle(searchTitle);
     expect(await page.title()).not.toMatch(/draft|review/i);
-    await expect(page.locator(".legal-document-date")).toHaveText("Last updated November 4, 2026");
+    await expect(page.locator(".legal-document-date")).toHaveText(`Last updated ${updated}`);
     if (path === "/company/privacy") {
       await expect(page.locator("main")).not.toContainText("Order Insight");
       await expect(page.getByRole("link", { name: "Merchant privacy notice", exact: true })).toHaveAttribute("href", "/company/legal/merchant-privacy");
@@ -260,7 +261,7 @@ test("a new visitor can review payment eligibility and card inquiries without a 
   await expect(page.locator(".merchant-hero")).toContainText("Credit card processing and ACH for US businesses in USD, with account setup, online checkout and payment reporting.");
   await expect(page.locator(".merchant-hero .ec-hero-actions a").first()).toHaveText("Start now");
   await expect(page.locator(".merchant-hero .ec-hero-actions a").first()).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
-  await expect(page.locator(".merchant-hero").getByRole("link", { name: "Discuss your business", exact: true })).toHaveAttribute("href", "/company/contact#payment-review");
+  await expect(page.locator(".merchant-hero").getByRole("link", { name: "Discuss your business", exact: true })).toHaveAttribute("href", salesActionHref("/company/contact#payment-review"));
   await expectLoadedNetworkMarks(page.getByLabel("Accepted card networks", {exact:true}));
   await expect(page.locator(".merchant-hero")).toContainText("Account approval and setup apply.");
   const paymentEntry = page.locator(".merchant-hero").getByRole("link",{name:"Start now",exact:true});
@@ -432,11 +433,11 @@ test("payment artwork and original checkout marks fit a 320px screen", async ({p
       const symbol = art.locator('.brand-image-symbol');
       await expect(symbol).toHaveCount(1);
       await expect(symbol).toHaveCSS("aspect-ratio", "800 / 484");
-      expect(await symbol.evaluate(mark => getComputedStyle(mark).content.startsWith('url("data:image/png;base64,'))).toBe(true);
+      expect(await symbol.evaluate(mark => getComputedStyle(mark).content.startsWith('url("data:image/webp;base64,'))).toBe(true);
       await expectDecodedBrandMark(symbol);
     } else if (path === "/use-cases/software-platforms") {
-      await expect(art).toHaveAccessibleName(/Six businesses across retail, transportation, travel and legal services have fourteen merchant accounts/);
-      await expect(art).toContainText("Account structure and available views depend on your approved setup and permissions.");
+      await expect(art).toHaveAccessibleName(/Businesses and their merchant accounts/);
+      await expect(art).toContainText("Account structure and views depend on your approved setup and permissions.");
     } else {
       await expect(art).toContainText("#10482");
       await expect(art).toContainText("$100.00");
@@ -778,8 +779,7 @@ test("mobile menu presents one level, keeps actions reachable and restores the p
   await toggle.click();
   await expect(back).toBeHidden();
   await expect(platforms).toBeVisible();
-  await header.getByRole("link", { name: "Contact sales", exact: true }).click();
-  await expect(page).toHaveURL(/\/company\/contact$/);
+  await exerciseSalesAction(page, header.getByRole("link", { name: "Contact sales", exact: true }), "/company/contact#payment-review");
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await expect(page.locator("main")).not.toHaveAttribute("inert");
 });

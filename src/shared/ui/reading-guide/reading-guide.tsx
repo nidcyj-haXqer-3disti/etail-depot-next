@@ -48,7 +48,6 @@ export function ReadingGuide({title,article,jsonLd,navigation,heading,notice,ill
  const sections=<>{links.map(section=><a key={section.id} href={`#${section.id}`}>{section.title}</a>)}</>;
  return <Shell><script type="application/ld+json" dangerouslySetInnerHTML={{__html:jsonLd}}/><div className="documentation-page cw-docs"><div className={`docs-workspace page-container${navigation?"":" docs-workspace-resource"}`}>
   {navigation}
-  <ResponsiveContentsFocus rootSelector=".docs-workspace" desktopSelector=".docs-toc" mobileSelector=".docs-mobile-toc" breakpoint={1250}/>
   <article className="docs-article">
    <header className="docs-article-heading"><h1 tabIndex={-1}>{title}</h1>{heading}<p>{article.introduction}</p>{notice}</header>
    {links.length>0&&<details className="docs-mobile-toc"><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="Page sections">{sections}</nav></details>}
@@ -57,5 +56,6 @@ export function ReadingGuide({title,article,jsonLd,navigation,heading,notice,ill
    <span className="docs-legacy-anchor" id="documentation-support" aria-hidden="true"/>
   </article>
   {links.length>0&&<aside className="docs-toc"><nav aria-label="On this page"><p>On this page</p>{sections}</nav></aside>}
+  <ResponsiveContentsFocus rootSelector=".docs-workspace" desktopSelector=".docs-toc" mobileSelector=".docs-mobile-toc" breakpoint={1250}/>
  </div></div></Shell>;
 }

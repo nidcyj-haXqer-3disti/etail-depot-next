@@ -1,5 +1,5 @@
 /* Shared theme for the public website. */
-:where(.public-header, .public-main, .public-footer) {
+:where(.public-header, .public-main, .public-footer, .public-booking) {
   --public-font: Arial, Helvetica, sans-serif;
   --public-max: 1280px;
   --public-gutter: 48px;

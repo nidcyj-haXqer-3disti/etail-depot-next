@@ -12,7 +12,7 @@ const sales = [
 export function ReconciliationArt({ title, caption }: { title: string; caption: string }) {
   return <ServiceArtMotion className={shared.art} workflow="reconciliation" label={title}>
     <div className={`${shared.scene} ${s.scene}`}>
-      <div className={s.heading}><Label icon="link">Example reports</Label><span>Oct 2026 · USD</span></div>
+      <div className={s.heading}><Label icon="link">Sales reports</Label><span>Oct 2026 · USD</span></div>
       <div className={s.comparison}>
         {[
           { account: "Merchant account", report: "Summary Statement Report", icon: "business" },

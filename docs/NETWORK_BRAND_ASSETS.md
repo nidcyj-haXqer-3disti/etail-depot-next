@@ -55,7 +55,7 @@ Public assets are served locally rather than hotlinked, so displaying a mark doe
 
 ## Current implementation
 
-Shared marks live in [network-brands.tsx](../src/shared/brand/network-brands.tsx), [brand-image.tsx](../src/shared/brand/brand-image.tsx) and their styles in `src/shared/brand/`. [The brand generator](../tools/generate-inline-brand-images.mjs) maintains embedded assets. Preserve exact bytes and aspect ratios, including fractional SVG view boxes. Follow [the page paint standard](PAGE_PAINT_STANDARDS.md).
+Shared marks live in [network-brands.tsx](../src/shared/brand/network-brands.tsx), [brand-image.tsx](../src/shared/brand/brand-image.tsx) and their styles in `src/shared/brand/`. [The brand generator](../tools/generate-inline-brand-images.mjs) maintains embedded assets. Preserve exact payment network bytes and all aspect ratios, including fractional SVG view boxes. Follow [the page paint standard](PAGE_PAINT_STANDARDS.md).
 
 Etail logo originals were supplied by the user and are preserved with their [original note](../archive/retired-platform/assets/brand/README.md). Current approved public copies remain in `public/brand/`; shared component assets remain in `src/shared/brand/assets/`. Trolleys attribution uses the shared brand component. No new brand artwork or permission is established by this reorganization.
 
@@ -73,3 +73,9 @@ The user requested small Trolleys, Shopify and WooCommerce marks beside the corr
 The shared generator preserves the original vector paths, colors and view boxes in `src/shared/brand/platform-marks.tsx`. For Trolleys, it extracts the existing symbol from `src/shared/brand/assets/trolleys-portal-logo.png` into the compact embedded asset in `brand-images-platforms.css`. The full original portal logo remains unchanged. These decorative marks accompany named links and do not replace their accessible labels. All three marks render with the initial page without a separate image request.
 
 A private regeneration check reproduced all 31 generated or copied brand/artwork files byte for byte. Source originals and the generator belong in GitHub; private capture and regeneration evidence stay in local-work. Keep these marks distinct from payment-network acceptance claims.
+
+## Lossless embedded WebP delivery, 11 November 2026
+
+The shared generator uses lossless WebP for the embedded Etail wordmark, Etail symbol, Ledgix wordmark and full Trolleys portal logo. This reduces the stylesheets required for first paint without adding image requests. The public source originals and separately versioned copies remain byte identical. Network SVG/JPG marks and platform vector paths remain unchanged.
+
+The brand unit checks compare decoded dimensions and every visible RGB value and alpha value with the originals, and enforce smaller encoded size budgets. Regenerate with the pinned runtime using `node tools/generate-inline-brand-images.mjs`; do not replace these marks with lazy external images. This is an encoding change, not new artwork or permission.

@@ -1,0 +1,75 @@
+.button.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: var(--public-control-radius);
+  background: var(--public-ink);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.button.button:hover { background: var(--public-hover); color: #fff; }
+.button:focus-visible, .close:focus-visible, .footer a:focus-visible {
+  outline: 3px solid var(--public-focus);
+  outline-offset: 4px;
+}
+.dialog {
+  width: min(600px, calc(100vw - 48px));
+  height: min(800px, calc(100dvh - 48px));
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  margin: auto;
+  border: 0;
+  border-radius: var(--public-radius);
+  background: #fff;
+  box-shadow: 0 32px 96px #142e2933, 0 4px 16px #142e2914;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  color-scheme: light;
+}
+.dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.dialog::backdrop { background: #142e2980; }
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 32px 14px;
+  background: #fff;
+}
+.identity { min-width: 0; }
+.logo { display: block; width: 144px; height: auto; }
+.accessibleTitle { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.dialog .header p { margin: 10px 0 0; color: var(--public-muted); font-size: 13px; line-height: 1.5; }
+.close { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; }
+.close svg { width: 22px; height: 22px; }
+.close:hover { background: var(--public-tint); }
+.footer { display: flex; justify-content: center; padding: 0 24px 8px; font-size: 12px; line-height: 1.5; }
+.footer a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--public-muted); text-decoration: none; }
+.footer a:hover { color: var(--public-ink); text-decoration: underline; text-underline-offset: 4px; }
+.footer svg { width: 13px; height: 13px; }
+.frameArea { position: relative; min-height: 0; }
+.loading { position: absolute; inset: 32px 16px auto; margin: 0; text-align: center; color: var(--public-muted); font-size: 15px; }
+.frame { display: block; width: 100%; min-width: 320px; height: 100%; border: 0; background: #fff; }
+@media (max-width: 600px) {
+  .dialog { width: 100%; height: 100dvh; border-radius: 0; }
+  .header { padding: calc(18px + env(safe-area-inset-top)) 24px 12px; }
+  .logo { width: 136px; }
+  .footer { padding: 0 20px calc(6px + env(safe-area-inset-bottom)); }
+}
+@media (min-width: 601px) and (max-height: 520px) {
+  .dialog { height: calc(100dvh - 24px); }
+  .header { padding: 8px 24px 6px; }
+  .identity { display: flex; align-items: center; gap: 16px; }
+  .logo { width: 120px; }
+  .dialog .header p { margin: 0; }
+  .footer { padding-bottom: 4px; }
+}
+@media (forced-colors: active) {
+  .button, .dialog, .close { border: 1px solid CanvasText; }
+}

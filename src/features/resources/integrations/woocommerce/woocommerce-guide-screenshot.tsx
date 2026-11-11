@@ -33,23 +33,23 @@ const focusPoints = {
 } as const;
 const descriptions = {
   duckDownload: "Cyberduck’s official download area. Red arrows point to the Windows and macOS downloads.",
-  duckConnect: "Cyberduck Open Connection with SFTP selected, server sftp.wp.com, port 22 and path /htdocs/. The username is fictional and the password field is blank. An arrow points to Connect.",
-  duckFolders: "Cyberduck inside /htdocs. An arrow points to the wp-content folder. The account name is fictional.",
+  duckConnect: "Cyberduck Open Connection with SFTP selected, server sftp.wp.com, port 22 and path /htdocs/. The password field is blank. An arrow points to Connect.",
+  duckFolders: "Cyberduck inside /htdocs. An arrow points to the wp-content folder.",
   duckFolderPermissions: "Cyberduck folder permissions set to 700. Only the owner has read, write and execute permission.",
-  duckSelectFile: "Cyberduck’s file picker on Mac with a fictional example_store.p12 file selected. An arrow points to Upload. This example file is not a working certificate.",
+  duckSelectFile: "Cyberduck’s file picker on Mac with example_store.p12 selected. An arrow points to Upload.",
   duckComplete: "Cyberduck Transfers showing Upload complete. The certificate filename has been replaced with example_store.p12.",
-  duckFilePermissions: "Cyberduck certificate permissions set to 600. Only the owner has read and write permission. The filename is fictional.",
+  duckFilePermissions: "Cyberduck certificate permissions set to 600. Only the owner has read and write permission.",
   store: "WordPress Installed Plugins with the full navigation visible. A red arrow points to WooCommerce Settings.",
   plugin: "WordPress plugin list with a red arrow pointing to Configure Payment Settings beneath Visa Acceptance Solutions.",
   payments: "WooCommerce Payments screen with the provider list visible. A red arrow points to Manage beside Visa Acceptance Solutions.",
   login: "Live Cybersource Business Center sign in page with blank Organization ID, Username and Password fields. Red arrows mark each field and the Log in button.",
-  keys: "Cybersource Key Generation result with a visible fictional Key ID and Shared Secret. A red arrow points to Download key.",
-  certificate: "Two Cybersource screens: Download key for REST API Response MLE, followed by Set a Password. A fictional password is shown in both confirmation fields.",
-  credentials: "Production configuration example in the real WooCommerce form. Arrows mark Production, live credential fields and protected certificate details. Fictional example values replace private credentials.",
-  settings: "Complete Production configuration example with arrows marking Enable the gateway and Save changes. Credential fields contain fictional example values.",
-  storage: "Full WordPress.com SFTP screen. The connection details area is marked. The public WordPress.com SFTP host is shown with a fictional username.",
-  checkout: "Example checkout in the real WooCommerce interface. An arrow points to Checkout with card. Personal and product details are replaced with example labels.",
-  records: "Business Center transaction example with arrows marking the Request ID, merchant reference and amount. Identifiers are replaced with fictional values.",
+  keys: "Cybersource Key Generation result with Key ID and Shared Secret fields. A red arrow points to Download key.",
+  certificate: "Two Cybersource screens: Download key for REST API Response MLE, followed by Set a Password.",
+  credentials: "WooCommerce settings. Arrows mark Production, account credentials and certificate details.",
+  settings: "WooCommerce Production settings. Arrows mark Enable the gateway and Save changes.",
+  storage: "Full WordPress.com SFTP screen. The connection details area is marked. Server and username fields are shown.",
+  checkout: "WooCommerce checkout. An arrow points to Checkout with card.",
+  records: "Business Center transaction details. Arrows mark Request ID, merchant reference and amount.",
   refund: "WooCommerce order screen with a red arrow highlighting one dollar refunded and zero net payment. Private order details are hidden.",
 };
 type ScreenshotView = "apiValues" | "apiFields" | "certificateDownload" | "certificatePassword" | "certificateFields";
@@ -65,7 +65,7 @@ export function WooCommerceGuideScreenshot({ name, title, step, caption, view }:
   const focus = crop ? [crop[0] + crop[2] / 2, crop[1] + crop[3] / 2] : focusPoints[name];
   return <figure className={`${styles.figure} ${name === "login" ? woo.loginFigure : ""}`}>
     <a href={src.src} className={`${styles.screenshotButton} ${woo.fullScreenshot}`} aria-label={`Enlarge screenshot for step ${step}`} aria-haspopup="dialog" onClick={event => { if(dialog.current && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey){event.preventDefault();dialog.current.showModal();const frame = scrollport.current;if(frame){const [x,y] = focus;frame.scrollLeft = Math.max(0,x - frame.clientWidth / 2);frame.scrollTop = Math.max(0,y - frame.clientHeight / 2);}} }}>
-      <span className={woo.photoViews}>{frames.map((preview, index) => <span key={index} data-woo-photo className={woo.photoFrame} style={{display:"block",position:"relative",overflow:"hidden",aspectRatio:`${preview.image.width} / ${preview.image.height}`}}><GuidePreviewImage preview={preview} alt={name === "duckSelectFile" ? index === 0 ? "The downloaded .p12 file selected in Cyberduck’s file picker. The filename is a fictional example." : "The Upload button in the same file picker." : descriptions[name]} priority={step === 1} sizes="(max-width: 760px) calc(100vw - 78px), (max-width: 1120px) calc(100vw - 138px), 982px" style={{position:"absolute",maxWidth:"none",width:"100%",height:"100%",inset:0}} /></span>)}</span>
+      <span className={woo.photoViews}>{frames.map((preview, index) => <span key={index} data-woo-photo className={woo.photoFrame} style={{display:"block",position:"relative",overflow:"hidden",aspectRatio:`${preview.image.width} / ${preview.image.height}`}}><GuidePreviewImage preview={preview} alt={name === "duckSelectFile" ? index === 0 ? "The downloaded .p12 file selected in Cyberduck’s file picker." : "The Upload button in the same file picker." : descriptions[name]} priority={step === 1} sizes="(max-width: 760px) calc(100vw - 78px), (max-width: 1120px) calc(100vw - 138px), 982px" style={{position:"absolute",maxWidth:"none",width:"100%",height:"100%",inset:0}} /></span>)}</span>
       <span>Enlarge screenshot <span aria-hidden="true">＋</span></span>
     </a>
     <figcaption>{caption}</figcaption>

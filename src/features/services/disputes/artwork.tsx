@@ -9,7 +9,7 @@ const supportingRecords = ["Order receipt", "Delivery tracking", "Customer messa
 export function DisputesArt({ title, caption }: { title: string; caption: string }) {
   return <ServiceArtMotion className={shared.art} workflow="disputes" label={title}>
     <div className={`${shared.scene} ${s.scene}`}>
-      <div className={s.heading}><Label icon="document">Example dispute</Label><span>USD</span></div>
+      <div className={s.heading}><Label icon="document">Dispute</Label><span>USD</span></div>
       <div className={s.notice}>
         <div className={s.caseBody}>
           <div className={s.caseHeading}><strong>Case D1046</strong><span className={s.status}>Response needed</span></div>

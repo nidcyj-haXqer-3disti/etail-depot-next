@@ -16,6 +16,14 @@ Use only the exact repository and site IDs in `project-targets.json`. Preserve d
 
 Independent 8583 sources are distinct from ISO republication permission. Keep the excluded reproduced tables out of public source and packages. New reference data requires source, licence and scope review.
 
+## Subagent collaboration
+
+Use subagents when they materially improve speed, coverage or independent review, especially for website audits, major changes and difficult investigations. Small, self-contained edits can stay with the main agent.
+
+Give each subagent a clear task, scope and expected result. Divide independent work and assign file ownership before parallel edits. Coordinate shared browser state, builds and performance measurements to avoid conflicts or unreliable results.
+
+The main agent remains responsible for the final result. Review delegated findings, evidence and exact diffs; verify conclusions, resolve conflicting recommendations and run appropriate checks on the combined changes. Do not treat subagent agreement as proof of correctness. All agents follow the same project boundaries and release authorization requirements.
+
 ## Delivery
 
 Use pinned Node, pnpm and one lockfile. Read installed Next.js documentation before framework changes. Use a feature branch and review the exact diff. No force push or direct main feature changes.

@@ -1,7 +1,26 @@
 import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { createRequire } from "node:module";
 import { expect, test } from "vitest";
 
-test("embedded marks preserve every byte of the original artwork and stay small", () => {
+const require = createRequire(import.meta.url);
+const sharp = createRequire(require.resolve("next/package.json"))("sharp");
+
+async function expectSamePixels(embedded: Buffer, original: Buffer) {
+  const [actual, source] = await Promise.all([embedded, original].map(bytes =>
+    sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true })));
+  expect(actual.info).toEqual(source.info);
+  // Fully transparent RGB cannot affect any rendered pixel. Lossless WebP may
+  // discard those unused color values; alpha and every visible channel must match.
+  for (const { data } of [actual, source]) {
+    for (let offset = 0; offset < data.length; offset += 4) {
+      if (data[offset + 3] === 0) data.fill(0, offset, offset + 3);
+    }
+  }
+  expect(createHash("sha256").update(actual.data).digest("hex")).toBe(createHash("sha256").update(source.data).digest("hex"));
+}
+
+test("embedded marks preserve original pixels and network artwork bytes while staying small", async () => {
   const originals = {
     etail: "logo.png",
     ledgix: "ledgix-logo.png",
@@ -15,14 +34,18 @@ test("embedded marks preserve every byte of the original artwork and stay small"
   let bytes = 0;
   for (const [name, file] of Object.entries(originals)) {
     const data = images[name]!;
-    const mime = file.endsWith(".svg") ? "image/svg+xml" : "image/png";
+    const mime = file.endsWith(".svg") ? "image/svg+xml" : "image/webp";
     expect(data.startsWith(`data:${mime};base64,`)).toBe(true);
     const decoded = Buffer.from(data.split(",")[1]!, "base64");
-    expect(decoded).toEqual(readFileSync(new URL(`../../public/brand/${file}`, import.meta.url)));
+    const original = readFileSync(new URL(`../../public/brand/${file}`, import.meta.url));
+    if (file.endsWith(".png")) {
+      await expectSamePixels(decoded, original);
+      expect(decoded.length).toBeLessThan(original.length * 0.6);
+    } else expect(decoded).toEqual(original);
     bytes += decoded.length;
   }
   // Large artwork stays a separately cached resource rather than growing every HTML response.
-  expect(bytes).toBeLessThan(32_768);
+  expect(bytes).toBeLessThan(20_480);
 });
 
 
@@ -59,13 +82,13 @@ test("versioned artwork sources remain byte identical to the approved public ori
 });
 
 
-test("Trolleys is embedded without changing its approved artwork", () => {
+test("Trolleys is losslessly embedded without changing its approved artwork", async () => {
   const css = readFileSync(new URL("../../src/shared/brand/brand-images-trolleys.css", import.meta.url), "utf8");
-  const data = css.match(/data:image\/png;base64,([^"]+)/)?.[1];
+  const data = css.match(/data:image\/webp;base64,([^"]+)/)?.[1];
   expect(data).toBeDefined();
   const bytes = Buffer.from(data!, "base64");
-  expect(bytes).toEqual(readFileSync(new URL("../../src/shared/brand/assets/trolleys-portal-logo.png", import.meta.url)));
-  expect(bytes.length).toBeLessThan(24_576);
+  await expectSamePixels(bytes, readFileSync(new URL("../../src/shared/brand/assets/trolleys-portal-logo.png", import.meta.url)));
+  expect(bytes.length).toBeLessThan(12_288);
 });
 
 
@@ -86,11 +109,11 @@ test("opening checkout marks preserve their originals in a route scoped styleshe
 });
 
 
-test("opening artwork symbol keeps the original bytes in its shared stylesheet", () => {
+test("opening artwork symbol keeps the original pixels in its shared stylesheet", async () => {
   const css = readFileSync(new URL("../../src/shared/brand/brand-images-symbol.css", import.meta.url), "utf8");
-  const encoded = css.match(/data:image\/png;base64,([^"]+)/)?.[1];
+  const encoded = css.match(/data:image\/webp;base64,([^"]+)/)?.[1];
   expect(encoded).toBeDefined();
   const bytes = Buffer.from(encoded!, "base64");
-  expect(bytes).toEqual(readFileSync(new URL("../../src/shared/brand/assets/symbol.png", import.meta.url)));
-  expect(bytes.length).toBeLessThan(16_384);
+  await expectSamePixels(bytes, readFileSync(new URL("../../src/shared/brand/assets/symbol.png", import.meta.url)));
+  expect(bytes.length).toBeLessThan(6_144);
 });

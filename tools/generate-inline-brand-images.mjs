@@ -3,8 +3,13 @@ import { createRequire } from "node:module";
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const root = new URL("../", import.meta.url);
+const require = createRequire(import.meta.url);
+const sharp = createRequire(require.resolve("next/package.json"))("sharp");
+// Lossless encoding reduces render-blocking CSS while source originals remain intact.
+const compactMark = bytes => sharp(bytes).webp({ lossless: true, effort: 6 }).toBuffer();
 const groups = {
   etail: { etail: "brand/logo.png" },
+  symbol: { symbol: "brand/symbol.png" },
   ledgix: { ledgix: "brand/ledgix-logo.png" },
   checkout: {
     "apple-pay": "brand/wallets/apple-pay.svg",
@@ -21,18 +26,17 @@ const groups = {
   },
 };
 for (const [group, images] of Object.entries(groups)) {
-  const lines = Object.entries(images).map(([name, file]) => {
-    const bytes = readFileSync(new URL(`public/${file}`, root));
-    const type = file.endsWith(".svg") ? "image/svg+xml" : file.endsWith(".jpg") ? "image/jpeg" : "image/png";
+  const lines = await Promise.all(Object.entries(images).map(async ([name, file]) => {
+    const original = readFileSync(new URL(`public/${file}`, root));
+    const bytes = file.endsWith(".png") ? await compactMark(original) : original;
+    const type = file.endsWith(".svg") ? "image/svg+xml" : file.endsWith(".jpg") ? "image/jpeg" : "image/webp";
     return `.brand-image-${name} { --brand-image: url("data:${type};base64,${bytes.toString("base64")}"); }`;
-  });
+  }));
   writeFileSync(new URL(`src/shared/brand/brand-images-${group}.css`, root),
     "/* Generated from original public/brand assets. Regenerate: node tools/generate-inline-brand-images.mjs */\n" + lines.join("\n") + "\n");
 }
 
 // Extract the existing portal-symbol window for a 14px mark at up to 3x density.
-const require = createRequire(import.meta.url);
-const sharp = createRequire(require.resolve("next/package.json"))("sharp");
 const portalSymbol = await sharp(new URL("src/shared/brand/assets/trolleys-portal-logo.png", root).pathname)
   .extract({ left: 127, top: 25, width: 66, height: 50 }).resize(28, 21)
   .png({ palette: true, colours: 64 }).toBuffer();
@@ -57,10 +61,10 @@ writeFileSync(new URL("src/shared/brand/platform-marks.tsx", root),
   vectorBranches.join("\n") + '\n  return null;\n}\n');
 
 // The portal mark uses the same embedded delivery as the site wordmark.
-const portalLogo = readFileSync(new URL("src/shared/brand/assets/trolleys-portal-logo.png", root));
+const portalLogo = await compactMark(readFileSync(new URL("src/shared/brand/assets/trolleys-portal-logo.png", root)));
 writeFileSync(new URL("src/shared/brand/brand-images-trolleys.css", root),
   "/* Generated from src/shared/brand/assets/trolleys-portal-logo.png. Regenerate: node tools/generate-inline-brand-images.mjs */\n" +
-  `.brand-image-trolleys { --brand-image: url("data:image/png;base64,${portalLogo.toString("base64")}"); }\n`);
+  `.brand-image-trolleys { --brand-image: url("data:image/webp;base64,${portalLogo.toString("base64")}"); }\n`);
 
 // Preserve public compatibility URLs while giving rendered artwork versioned cache keys.
 const artwork = [

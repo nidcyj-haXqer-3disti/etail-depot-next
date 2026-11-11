@@ -9,9 +9,9 @@ const payments = [
 ] as const;
 
 export function PlatformJourneyArt() {
-  return <figure className={s.journey} data-platform-journey aria-label="Example merchant journey for Cotton Supply. A $150 checkout is one of three payments totaling $432. After $13.43 in example fees, payout P1048 is $418.57. A matching $418.57 bank credit is shown as posted.">
+  return <figure className={s.journey} data-platform-journey aria-label="Merchant journey for Cotton Supply. A $150 checkout is one of three payments totaling $432. After $13.43 in processing fees, payout P1048 is $418.57. A matching $418.57 bank credit is shown as posted.">
     <div className={s.scene}>
-      <div className={s.context}><span><Icon name="business" /><strong>Cotton Supply</strong><small>MID 824630170001</small></span><span>Example merchant journey · USD</span></div>
+      <div className={s.context}><span><Icon name="business" /><strong>Cotton Supply</strong><small>MID 824630170001</small></span><span>USD</span></div>
       <div className={s.flow}>
         <div className={s.checkout} data-journey-checkout>
           <div className={s.cardHeading}><Icon name="lock" /><span>Checkout</span></div>
@@ -26,7 +26,7 @@ export function PlatformJourneyArt() {
             <div className={s.reportHeading}><strong>Payments in this payout</strong><span>P1048</span></div>
             <div className={s.salesTotal}><span>Gross sales</span><strong>$432.00</strong><small>3 payments</small></div>
             <div className={s.payments}>{payments.map(payment=><div className={s.payment} key={payment.order}><span><strong>Order #{payment.order}</strong><small>{payment.item}</small></span><b>{payment.amount}</b></div>)}</div>
-            <dl className={s.breakdown}><div><dt>Example processing fees</dt><dd>−$13.43</dd></div><div><dt>Net payout</dt><dd>$418.57</dd></div></dl>
+            <dl className={s.breakdown}><div><dt>Processing fees</dt><dd>−$13.43</dd></div><div><dt>Net payout</dt><dd>$418.57</dd></div></dl>
           </div>
         </div>
         <div className={s.bank} data-journey-bank>
@@ -43,6 +43,6 @@ export function PlatformJourneyArt() {
         <li><span>03</span><div><h3>The bank records the credit.</h3><p>Match the payout with the bank statement.</p></div></li>
       </ol>
     </div>
-    <figcaption>Example records. Checkout and bank views are separate from the merchant portal. Payout timing, fees and available payment methods depend on the approved account.</figcaption>
+    <figcaption>Checkout, merchant records and banking are separate views. Timing, fees and payment methods depend on your approved account.</figcaption>
   </figure>;
 }

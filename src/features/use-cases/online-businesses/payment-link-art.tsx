@@ -5,7 +5,7 @@ import "./payment-link-art.css";
 
 /** Static acceptance flow; no payable link, encoded QR or payment action. */
 export function PaymentLinkArt() {
-  return <figure className="payment-link-art" role="img" aria-label={`Payment request flow: create a $100 request for ${serviceExample.description}, share it with a customer, and let the customer pay on a hosted payment page. The example request is ${serviceExample.requestReference} for ${serviceExample.customer}, linked to order ${serviceExample.orderReference}. No payment is made here.`}>
+  return <figure className="payment-link-art" role="img" aria-label={`Payment request flow: create a $100 request for ${serviceExample.description}, share it with a customer, and let the customer pay on a hosted payment page. Request ${serviceExample.requestReference} for ${serviceExample.customer}, linked to order ${serviceExample.orderReference}. No payment is made here.`}>
     <div className="payment-link-art-window" aria-hidden="true">
       <div className="payment-link-art-header"><span><Icon name="business" />Your business</span><span>{serviceExample.requestReference}</span></div>
       <ol className="payment-link-art-flow">
