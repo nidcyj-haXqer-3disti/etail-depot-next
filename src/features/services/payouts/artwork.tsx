@@ -18,7 +18,7 @@ const dollars = (cents: number) => new Intl.NumberFormat("en-US", { style: "curr
 export function PayoutsArt({ title, caption }: { title: string; caption: string }) {
   return <ServiceArtMotion className={shared.art} workflow="payouts" label={title}>
     <div className={`${shared.scene} ${s.scene}`}>
-      <div className={s.heading}><Label icon="document">Example payout</Label><span>USD</span></div>
+      <div className={s.heading}><Label icon="document">Payout</Label><span>USD</span></div>
       <div className={s.paper}>
         <div className={s.paperHeading}><strong>Sales included</strong><span>3 card payments</span></div>
         <dl className={s.sales}>{sales.map(sale => <div key={sale.order}><dt>#{sale.order}</dt><dd>{dollars(sale.cents)}</dd></div>)}</dl>
@@ -35,7 +35,7 @@ export function PayoutsArt({ title, caption }: { title: string; caption: string 
         <div className={s.bankCredit}><div><span>Card processing deposit</span><small>Reference P1048</small></div><strong>+{dollars(net)}</strong></div>
         <span className={s.posted}><Icon name="check" />Posted by your bank</span>
       </div>
-      <p className={s.note}>Example fees: 2.9% + 30¢ per card sale. Other fees and adjustments may apply.</p>
+      <p className={s.note}>Calculated at 2.9% + 30¢ per card sale. Other fees and adjustments may apply.</p>
     </div>
     <figcaption>{caption}</figcaption>
   </ServiceArtMotion>;

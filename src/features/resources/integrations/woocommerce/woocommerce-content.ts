@@ -83,7 +83,7 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
     ],
     "note": "Missing the email? Contact Trolleys before continuing. Do not create another merchant account.",
     "artwork": "email",
-    "caption": "Example account email. Use the details sent to you."
+    "caption": "Use the details in your account email."
   },
   {
     "id": "sign-in-business-center",

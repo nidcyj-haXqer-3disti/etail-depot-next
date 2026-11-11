@@ -12,8 +12,8 @@ export const reconciliationContent = {
     href: "/company/contact#payment-review",
   },
   art: {
-    title: "Example merchant account and gateway account reports for October 2026 in USD. Both show 12 sales totaling $2,640.00: eight Visa sales totaling $1,860.00 and four Mastercard sales totaling $780.00. The sales total difference is $0.00.",
-    caption: "Example reports for the same business and period. Matching totals are a starting point; individual payment references confirm which records belong together.",
+    title: "Merchant account and gateway account reports for October 2026 in USD. Both show 12 sales totaling $2,640.00: eight Visa sales totaling $1,860.00 and four Mastercard sales totaling $780.00. The sales total difference is $0.00.",
+    caption: "Match payment references as well as totals.",
     steps: [],
   },
   sections: [

@@ -229,7 +229,8 @@ src/shared/  [TECHNICAL] Reused website code and shared company facts
 └── ui/  Reusable UI primitives and page components
     ├── artwork/  Artwork shared by more than one business area
     │   └── assets/  Shared artwork images
-    └── reading-guide/  Shared guide layout and workflow diagrams
+    ├── reading-guide/  Shared guide layout and workflow diagrams
+    └── sales-booking/  Shared appointment panel and sales links
 ```
 
 `src/shared/` serves multiple business areas. A feature-local `shared/` or `components/` folder serves only that feature. For example, `src/features/services/shared/` owns the common service-page presentation, while `src/shared/layout/` owns the site-wide header and footer. Do not duplicate either into a developer-specific folder.
@@ -448,6 +449,7 @@ Changing a business area does not isolate it from technical review. A developer 
 | What to validate and what counts as evidence | [Acceptance criteria](ACCEPTANCE_TESTS.md), [test evidence](TEST_AND_EVIDENCE.md) |
 | Access and security | [Access boundaries](ACCESS_POLICY.md), [security](SECURITY_AND_IDENTITY.md) |
 | Source/assets and publication | [Dependencies and licensing](DEPENDENCIES_AND_LICENSING.md), [brand assets](NETWORK_BRAND_ASSETS.md), [file publication](FILE_PUBLICATION_POLICY.md) |
+| Contact sales appointments | [Sales booking setup](SALES_BOOKING.md) |
 | Authorized release | [Netlify runbook](NETLIFY_DEPLOYMENT.md) |
 
 The [Stage 1 file map](plans/repository-file-map.json) is the original migration proposal. Stage receipts record the actual reviewed moves and any adjustments. Historical paths inside those records describe their original source revision.

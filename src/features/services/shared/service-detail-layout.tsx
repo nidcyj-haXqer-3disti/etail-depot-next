@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { CommercialLink } from "@/shared/ui/sales-booking/commercial-link";
 import { hostedServices } from "@/shared/site/hosted-services";
 import type { ReactNode } from "react";
 import type { ServiceDetailContent } from "./content-types";
@@ -29,8 +29,8 @@ export function ServiceDetailLayout({ path, page, artwork }: { path: Parameters<
   }[page.kind];
   return <Shell><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured).replace(/</g, "\\u003c") }} /><div className={s.page} data-service-page={page.kind}>
     <ServiceDetailHero label={page.label} title={page.heading} intro={page.intro} note={page.note} actions={<>
-      {page.action.href === hostedServices.payments.registrationUrl ? <PaymentPortalLink intent="register" className={s.primary}>{page.action.label}</PaymentPortalLink> : <Link className={s.primary} href={page.action.href}>{page.action.label}</Link>}
-      {page.secondaryAction && <Link className={s.secondary} href={page.secondaryAction.href}>{page.secondaryAction.label}</Link>}
+      {page.action.href === hostedServices.payments.registrationUrl ? <PaymentPortalLink intent="register" className={s.primary}>{page.action.label}</PaymentPortalLink> : <CommercialLink className={s.primary} href={page.action.href}>{page.action.label}</CommercialLink>}
+      {page.secondaryAction && <CommercialLink className={s.secondary} href={page.secondaryAction.href}>{page.secondaryAction.label}</CommercialLink>}
     </>} artwork={artwork} />
     <section id={overview.id} className={s.overview} aria-labelledby="service-section-1"><div className={s.container}>
       <div className={s.sectionHeading}><h2 id="service-section-1">{overview.title}</h2>{overview.intro && <p>{overview.intro}</p>}</div>

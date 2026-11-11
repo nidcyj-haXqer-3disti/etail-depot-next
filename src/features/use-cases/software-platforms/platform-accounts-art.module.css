@@ -1,55 +1,135 @@
-.figure{margin:0;color:#234b3c;min-width:0;container-type:inline-size;font-variant-numeric:tabular-nums}
-.window{background:#fff;border:1px solid #d7e1d1;border-radius:16px;overflow:hidden;box-shadow:0 22px 48px -32px #234b3c55}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px;background:#f1f5eb}
-.brand{display:flex;align-items:center;gap:10px;min-width:0}.brand :global(.brand-image-symbol){width:30px;height:auto;flex:none}.brand strong{font-size:15px;line-height:1.4;font-weight:500;letter-spacing:-.02em}.bar>span:last-child{font-size:11px;color:#526756;white-space:nowrap}
-.summary{display:grid;grid-template-columns:1fr 1fr;padding:20px 24px;gap:24px;background:#f9fbf7}.summary>div{display:flex;align-items:center;gap:12px}.summary strong{font-size:32px;font-weight:500;line-height:1.2;letter-spacing:-.04em}.summary span{font-size:12px;line-height:1.5;color:#526756}
-.workspace{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.4fr)}.directory{padding:24px 12px;background:#f4f7f0}.label{display:block;font-size:11px;line-height:1.5;color:#526756;letter-spacing:.03em}.directoryHeading{display:flex;justify-content:space-between;gap:8px;padding:0 10px;margin-bottom:12px;font-size:10px;line-height:1.5;color:#526756}
-.business{position:relative;border:0;color:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;gap:8px;padding:13px 9px;border-radius:8px;min-width:0}.businessCopy{display:grid;gap:3px;min-width:0}.businessCopy strong{font-size:12px;line-height:1.4;font-weight:500}.businessCopy>span{font-size:10px;line-height:1.4;color:#526756}.businessCount{margin-left:auto;font-size:11px;color:#526756}.business:has(input:checked){background:#fff;box-shadow:0 3px 12px #234b3c09}.emblem{display:grid;place-items:center;width:26px;height:28px;flex:none;color:#365d43}.emblem svg{width:25px;height:25px}.emblem{--mark-accent:#a6bb87}.emblemMark{display:block}.business[data-business-kind="freight"] .emblem{color:#805939;--mark-accent:#c0a17a}.business[data-business-kind="travel"] .emblem{color:#4f6572;--mark-accent:#9db4b3}.business[data-business-kind="legal"] .emblem{color:#587332;--mark-accent:#b3c389}.business[data-business-kind="market"] .emblem{color:#735754;--mark-accent:#c3ac91}.business[data-business-kind="logistics"] .emblem{color:#7b683a;--mark-accent:#c4ad7a}
-.details{display:grid;min-width:0}.detail{grid-area:1/1;visibility:hidden;pointer-events:none;padding:24px 20px;min-width:0}
-.company{display:block;font-weight:500;font-size:22px;letter-spacing:-.035em;line-height:1.3;margin:7px 0 20px}
-.account dt{font-size:11px;line-height:1.5;color:#526756}
-.accountsHeading{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:11px}
-.accountsHeading strong{font-size:12px;font-weight:500;line-height:1.5}.accountsHeading>span{font-size:10px;line-height:1.5;color:#526756}
-.accounts{display:grid;gap:10px}
-.account{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 8px;background:#f5f8f1;border:1px solid #e0e7d9;border-radius:9px;padding:14px;min-width:0}
-.account dl{margin:0;min-width:0}.accountName dd{font-size:15px;font-weight:500;line-height:1.4;letter-spacing:-.02em;margin:4px 0 0}
-.status{display:flex;align-items:center;gap:3px;font-size:10px;line-height:1.5;color:#365e3d;align-self:start;padding-top:21px;white-space:nowrap}.status svg{width:12px;height:12px}
-.mid{grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:4px 8px}
-.mid dd{font-size:12px;line-height:1.5;font-weight:500;letter-spacing:.025em;margin:0}
-.figure figcaption{font-size:12px;line-height:1.6;color:#526756;margin:15px 5px 0}
-@container(max-width:480px){
-  .bar{padding:18px 16px}.summary{padding:18px;gap:16px}.summary>div{gap:8px}.summary strong{font-size:28px}.summary span{font-size:11px}
-  .workspace{grid-template-columns:1fr}.directory{padding:18px 14px;display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}.directoryHeading{grid-column:1/-1;margin-bottom:5px}
-  .business{padding:9px 7px;gap:7px}.businessCount{font-size:12px}.businessCopy strong{font-size:12px}
-  .detail{padding:23px}.company{font-size:24px;margin-bottom:21px}.label,.account dt{font-size:12px}
-  .accountsHeading strong{font-size:14px}.accountsHeading>span{font-size:12px}.account{padding:16px}.accountName dd{font-size:18px}.status{font-size:12px;gap:4px;padding-top:23px}.mid dd{font-size:13px}.figure figcaption{font-size:13px}
+.figure {
+  margin: 0;
+  min-width: 0;
+  container-type: inline-size;
+  color: var(--public-ink, #193c33);
+  font-variant-numeric: tabular-nums;
 }
-@container(max-width:310px){
-  .bar{gap:8px}.brand{gap:8px}.brand strong{font-size:14px}.bar>span:last-child{font-size:10px}.directory{gap:2px 4px;padding:14px 9px}.business{gap:5px}.emblem{width:20px}.emblem svg{width:19px}.businessCopy strong{font-size:11px}.businessCopy>span{font-size:10px}.detail{padding:20px}.summary span{max-width:75px}
-  .account{padding:14px}.accountName dd{font-size:16px}.status{font-size:11px}.mid{display:block}.mid dd{margin-top:4px;font-size:14px}
+.window {
+  overflow: hidden;
+  border: 1px solid #dce3d8;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 20px 50px -32px #193c3345;
 }
-@media(forced-colors:active){
-  .window,.account{border-color:CanvasText}.bar,.summary,.directory,.account,.business:has(input:checked){background:Canvas;color:CanvasText}
-  .emblem,.status,.label,.account dt,.accountsHeading>span,.figure figcaption{color:CanvasText}
+.bar { display: flex; align-items: center; padding: 20px 24px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand :global(.brand-image-symbol) { width: 28px; height: auto; flex: none; }
+.brand strong { font-size: 14px; line-height: 1.5; font-weight: 500; }
+.workspace { display: grid; grid-template-columns: minmax(0, .87fr) minmax(0, 1.3fr); }
+.directory { padding: 22px 10px 20px; background: #f3f5ee; }
+.directoryHeading { padding: 0 12px; margin-bottom: 12px; color: #5a6a5f; font-size: 11px; line-height: 1.5; }
+.business {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 56px;
+  padding: 10px;
+  border-radius: 7px;
+  cursor: pointer;
 }
-
-.selector{position:absolute;width:1px;height:1px;opacity:0;left:0;top:50%}
-.business:has(input:focus-visible){outline:3px solid var(--public-focus,#2b7652);outline-offset:2px}
-.selectionHint{display:block;font-size:11px;line-height:1.5;color:#526756;padding:0 9px;margin:15px 0 0;grid-column:1/-1}
-.window:has(input[value="cotton"]:checked) [data-business-panel="cotton"]{visibility:visible;pointer-events:auto}
-.window:has(input[value="freight"]:checked) [data-business-panel="freight"]{visibility:visible;pointer-events:auto}
-.window:has(input[value="travel"]:checked) [data-business-panel="travel"]{visibility:visible;pointer-events:auto}
-.window:has(input[value="legal"]:checked) [data-business-panel="legal"]{visibility:visible;pointer-events:auto}
-.window:has(input[value="market"]:checked) [data-business-panel="market"]{visibility:visible;pointer-events:auto}
-.window:has(input[value="logistics"]:checked) [data-business-panel="logistics"]{visibility:visible;pointer-events:auto}
-@media(prefers-reduced-motion:no-preference){
-  .window[data-has-advanced] .business:has(input:checked) .emblem{animation:mark-select .45s ease-out}
-.window[data-has-advanced]:has(input[value="cotton"]:checked) [data-business-panel="cotton"] .accounts{animation:account-select .4s ease-out}
-.window[data-has-advanced]:has(input[value="freight"]:checked) [data-business-panel="freight"] .accounts{animation:account-select .4s ease-out}
-.window[data-has-advanced]:has(input[value="travel"]:checked) [data-business-panel="travel"] .accounts{animation:account-select .4s ease-out}
-.window[data-has-advanced]:has(input[value="legal"]:checked) [data-business-panel="legal"] .accounts{animation:account-select .4s ease-out}
-.window[data-has-advanced]:has(input[value="market"]:checked) [data-business-panel="market"] .accounts{animation:account-select .4s ease-out}
-.window[data-has-advanced]:has(input[value="logistics"]:checked) [data-business-panel="logistics"] .accounts{animation:account-select .4s ease-out}
+.business + .business { margin-top: 4px; }
+.business:hover { background: #e9eee3; }
+.business:has(input:checked) { background: #fff; box-shadow: 0 2px 8px #193c330a; }
+.businessCopy { display: grid; gap: 3px; min-width: 0; }
+.businessCopy strong { font-size: 12px; line-height: 1.4; font-weight: 500; }
+.businessCopy > span { color: #5a6a5f; font-size: 10px; line-height: 1.4; }
+.businessArrow { display: flex; margin-left: auto; opacity: 0; flex: none; }
+.businessArrow svg { width: 12px; height: 12px; }
+.business:has(input:checked) .businessArrow { opacity: 1; }
+.emblem { display: grid; place-items: center; width: 30px; height: 34px; flex: none; color: #365d43; --mark-accent: #a6bb87; }
+.emblemMark { display: block; width: 28px; height: 28px; }
+.business[data-business-kind="freight"] .emblem { color: #805939; --mark-accent: #c0a17a; }
+.business[data-business-kind="travel"] .emblem { color: #4f6572; --mark-accent: #9db4b3; }
+.business[data-business-kind="legal"] .emblem { color: #587332; --mark-accent: #b3c389; }
+.business[data-business-kind="market"] .emblem { color: #735754; --mark-accent: #c3ac91; }
+.business[data-business-kind="logistics"] .emblem { color: #7b683a; --mark-accent: #c4ad7a; }
+.details { display: grid; min-width: 0; }
+.detail { grid-area: 1 / 1; visibility: hidden; pointer-events: none; padding: 20px; min-width: 0; }
+.companyHeader { display: flex; align-items: center; gap: 13px; padding: 20px 17px; min-height: 96px; background: #214638; color: #fff; border-radius: 9px; }
+.companyHeader > div { min-width: 0; }
+.companyEmblem { display: grid; place-items: center; flex: none; width: 36px; height: 42px; color: #edf2df; --mark-accent: #adc591; }
+.companyEmblem .emblemMark { width: 34px; height: 34px; }
+.label { display: block; color: #d4e0cc; font-size: 10px; line-height: 1.5; }
+.company { display: block; font-weight: 500; font-size: 18px; letter-spacing: -.025em; line-height: 1.3; margin-top: 5px; }
+.accountsHeading { margin: 21px 0 11px; color: #526756; font-size: 11px; line-height: 1.5; }
+.accounts { display: grid; gap: 10px; position: relative; padding-left: 13px; }
+.account { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 8px; position: relative; padding: 13px 14px; min-width: 0; border: 1px solid #e0e6db; border-radius: 8px; background: #fff; }
+.account::before { content: ""; position: absolute; width: 13px; height: 1px; left: -14px; top: 50%; background: #cfdbca; }
+.account::after { content: ""; position: absolute; left: -14px; top: -11px; bottom: -11px; width: 1px; background: #cfdbca; }
+.account:last-child::after { bottom: 50%; }
+.account dl { margin: 0; min-width: 0; }
+.account dt { font-size: 10px; line-height: 1.5; color: #647266; }
+.accountName dd { font-size: 15px; font-weight: 500; line-height: 1.4; letter-spacing: -.02em; margin: 3px 0 0; }
+.status { display: flex; align-items: center; gap: 3px; font-size: 10px; line-height: 1.5; color: #356148; align-self: start; white-space: nowrap; padding-top: 19px; }
+.status svg { width: 11px; height: 11px; }
+.mid { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; }
+.mid dd { font-size: 11px; line-height: 1.5; font-weight: 500; letter-spacing: .035em; margin: 0; }
+.figure figcaption { margin: 14px 3px 0; font-size: 12px; line-height: 1.6; color: #526756; }
+.selector { position: absolute; width: 1px; height: 1px; opacity: 0; left: 0; top: 50%; }
+.business:has(input:focus-visible) { outline: 3px solid var(--public-focus, #2b7652); outline-offset: 2px; }
+.selectionHint { display: block; grid-column: 1 / -1; font-size: 10px; line-height: 1.5; color: #5a6a5f; margin-top: 18px; padding-inline: 12px; }
+.window:has(input[value="cotton"]:checked) [data-business-panel="cotton"],
+.window:has(input[value="freight"]:checked) [data-business-panel="freight"],
+.window:has(input[value="travel"]:checked) [data-business-panel="travel"],
+.window:has(input[value="legal"]:checked) [data-business-panel="legal"],
+.window:has(input[value="market"]:checked) [data-business-panel="market"],
+.window:has(input[value="logistics"]:checked) [data-business-panel="logistics"] { visibility: visible; pointer-events: auto; }
+@container (min-width: 421px) and (max-width: 520px) {
+  .directory { padding-inline: 8px; }
+  .business { gap: 8px; padding-inline: 8px; }
+  .businessArrow { display: none; }
+  .detail { padding: 16px; }
 }
-@keyframes account-select{from{transform:translateY(5px);opacity:.72}to{transform:translateY(0);opacity:1}}
-@keyframes mark-select{0%{transform:scale(.94)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@container (max-width: 420px) {
+  .bar { padding: 19px 20px; }
+  .workspace { grid-template-columns: 1fr; }
+  .directory { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; padding: 17px 12px; }
+  .directoryHeading { grid-column: 1 / -1; margin-bottom: 3px; padding-inline: 8px; }
+  .business { padding: 8px; gap: 8px; min-height: 54px; }
+  .business + .business { margin-top: 0; }
+  .businessArrow { display: none; }
+  .selectionHint { margin-top: 8px; padding-inline: 8px; }
+  .detail { padding: 20px; }
+  .companyHeader { padding: 21px; gap: 15px; }
+  .company { font-size: 23px; }
+  .label, .account dt { font-size: 11px; }
+  .accountsHeading { font-size: 12px; }
+  .account { padding: 16px; }
+  .accountName dd { font-size: 18px; }
+  .status { padding-top: 21px; font-size: 11px; }
+  .mid dd { font-size: 12px; }
+}
+@container (max-width: 310px) {
+  .directory { gap: 4px; padding-inline: 8px; }
+  .business { gap: 6px; padding: 7px 5px; }
+  .businessCopy strong { font-size: 11px; }
+  .emblem { width: 25px; }
+  .emblemMark { width: 24px; height: 24px; }
+  .detail { padding: 16px; }
+  .companyHeader { padding: 17px; gap: 12px; }
+  .company { font-size: 21px; }
+  .account { padding: 12px; }
+  .accountName dd { font-size: 16px; }
+  .mid { display: block; }
+  .mid dd { margin-top: 3px; }
+}
+@media (forced-colors: active) {
+  .window, .account, .companyHeader { border: 1px solid CanvasText; }
+  .directory, .companyHeader, .business:has(input:checked) { background: Canvas; color: CanvasText; }
+  .business:has(input:checked) { outline: 1px solid Highlight; }
+  .emblem, .companyEmblem, .label, .status, .account dt { color: CanvasText; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .window[data-has-advanced] .business:has(input:checked) .emblem { animation: mark-select .45s ease-out; }
+  .window[data-has-advanced]:has(input[value="cotton"]:checked) [data-business-panel="cotton"],
+  .window[data-has-advanced]:has(input[value="freight"]:checked) [data-business-panel="freight"],
+  .window[data-has-advanced]:has(input[value="travel"]:checked) [data-business-panel="travel"],
+  .window[data-has-advanced]:has(input[value="legal"]:checked) [data-business-panel="legal"],
+  .window[data-has-advanced]:has(input[value="market"]:checked) [data-business-panel="market"],
+  .window[data-has-advanced]:has(input[value="logistics"]:checked) [data-business-panel="logistics"] { animation: account-select .4s ease-out; }
+}
+@keyframes account-select { from { transform: translateY(4px); opacity: .72; } to { transform: translateY(0); opacity: 1; } }
+@keyframes mark-select { 0% { transform: scale(.94); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }

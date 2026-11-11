@@ -4,7 +4,7 @@ The only target is `etail-depot-next`, site `cbbb6c24-9dbc-43a2-9234-e4357b5b528
 
 ## Candidate and authorization
 
-[CURRENT_WORK_CONTEXT.md](CURRENT_WORK_CONTEXT.md) records current release state. Earlier dated approvals do not authorize a new candidate. Preparation, a passing local package and a PR merge are not deployment authorization.
+[CURRENT_WORK_CONTEXT.md](CURRENT_WORK_CONTEXT.md) records current release state. Earlier dated approvals do not authorize a new candidate. Preparation, a passing local package and a PR merge are not deployment authorization. Before a batch push, read its open items and give the operator any reminders explicitly requested for the next release. A deferred feature is not automatically a blocker for unrelated changes.
 
 Use the pinned runtime and frozen lockfile. Run `pnpm verify:public`, `pnpm test:seo:production`, `pnpm package:netlify` and `pnpm verify:package` against the exact candidate. [tools/reference-release.json](../tools/reference-release.json) records the approved counts, reference licences and legal-source hashes. The ten merchant legal routes and two website policy pages remain noindex and outside the sitemap. Publishing general terms does not establish merchant acceptance or provider approval.
 

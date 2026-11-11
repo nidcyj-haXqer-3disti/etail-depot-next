@@ -59,25 +59,27 @@ const businesses = [
 ] as const;
 
 export function PlatformAccountsArt() {
-  return <figure className={s.figure} data-attention-art="platform" data-platform-accounts aria-label="Example platform account view. Six businesses across retail, transportation, travel and legal services have fourteen merchant accounts. Select a business to view its legal company, DBAs and merchant IDs.">
+  return <figure className={s.figure} data-attention-art="platform" data-platform-accounts aria-label="Businesses and their merchant accounts. Select a business to view its legal company, DBAs and merchant IDs.">
     <AccountsMotion className={s.window}>
-      <div className={s.bar}><span className={s.brand}><BrandImage brand="symbol" alt="" width={800} height={484} className="" /><strong>Merchant accounts</strong></span><span>Example view</span></div>
-      <div className={s.summary}><div><strong>{businesses.length}</strong><span>Businesses</span></div><div><strong>{businesses.reduce((total, business) => total + business.accounts.length, 0)}</strong><span>Merchant accounts</span></div></div>
+      <div className={s.bar}><span className={s.brand}><BrandImage brand="symbol" alt="" width={800} height={484} className="" /><strong>Merchant accounts</strong></span></div>
       <div className={s.workspace}>
-        <div className={s.directory} role="radiogroup" aria-label="Example businesses" aria-describedby="platform-account-selection-hint">
-          <div className={s.directoryHeading}><span>Businesses</span><span>Accounts</span></div>
+        <div className={s.directory} role="radiogroup" aria-label="Businesses" aria-describedby="platform-account-selection-hint">
+          <div className={s.directoryHeading}>Businesses</div>
           {businesses.map((business,index) => <label className={s.business} data-business-entry data-business-kind={business.kind} key={business.kind}>
             <input className={s.selector} type="radio" name="platform-example-business" value={business.kind} defaultChecked={index===0} data-example-selector aria-controls={`platform-company-${business.kind}`} aria-label={`${business.name}, ${business.accounts.length} merchant accounts`} />
             <span className={s.emblem}><MerchantMark kind={business.kind} /></span>
             <span className={s.businessCopy}><strong>{business.name}</strong><span data-business-industry>{business.industry}</span></span>
-            <span className={s.businessCount}>{business.accounts.length}</span>
+            <span className={s.businessArrow} aria-hidden="true"><Icon name="arrow" /></span>
           </label>)}
           <span className={s.selectionHint} id="platform-account-selection-hint">Select a business to view its accounts.</span>
         </div>
         <div className={s.details} aria-live="off">
-          {businesses.map(business => <div className={s.detail} id={`platform-company-${business.kind}`} data-business-panel={business.kind} key={business.kind}>
-            <span className={s.label}>Legal company</span><strong className={s.company}>{business.company}</strong>
-            <div className={s.accountsHeading}><strong>Merchant accounts</strong><span>{business.accounts.length} accounts</span></div>
+          {businesses.map(business => <div className={s.detail} id={`platform-company-${business.kind}`} data-business-panel={business.kind} data-business-kind={business.kind} key={business.kind}>
+            <div className={s.companyHeader}>
+              <span className={s.companyEmblem}><MerchantMark kind={business.kind} /></span>
+              <div><span className={s.label}>Legal company</span><strong className={s.company}>{business.company}</strong></div>
+            </div>
+            <div className={s.accountsHeading}>Merchant accounts</div>
             <div className={s.accounts}>
               {business.accounts.map(account => <div className={s.account} data-example-merchant-account key={account.mid}>
                 <dl className={s.accountName}><dt>DBA</dt><dd>{account.dba}</dd></dl>
@@ -89,6 +91,6 @@ export function PlatformAccountsArt() {
         </div>
       </div>
     </AccountsMotion>
-    <figcaption>Example business and account details. Account structure and available views depend on your approved setup and permissions.</figcaption>
+    <figcaption>Account structure and views depend on your approved setup and permissions.</figcaption>
   </figure>;
 }

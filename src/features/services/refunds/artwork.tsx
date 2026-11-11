@@ -7,7 +7,7 @@ import s from "./refund-artwork.module.css";
 export function RefundsArt({ title, caption }: { title: string; caption: string }) {
   return <ServiceArtMotion className={shared.art} workflow="refunds" label={title}>
     <div className={`${shared.scene} ${s.scene}`}>
-      <div className={s.heading}><Label icon="document">Example partial refund</Label><span>USD</span></div>
+      <div className={s.heading}><Label icon="document">Partial refund</Label><span>USD</span></div>
       <div className={s.payment}>
         <div className={s.recordHeading}><strong>Order #1048</strong><span className={s.settled}><Icon name="check" />Settled</span></div>
         <div className={s.originalAmount}><span>Original payment</span><strong>$150.00</strong></div>

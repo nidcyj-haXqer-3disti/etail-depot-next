@@ -12,8 +12,8 @@ export const refundsContent = {
       "href": "/company/contact#payment-review"
     },
     "art": {
-      "title": "Example: a $150 settled card payment linked to a pending $75 partial refund, with a $75 sale balance if completed",
-      "caption": "Example figures. Available actions depend on payment status, processor support and account permissions.",
+      "title": "A $150 settled card payment linked to a pending $75 partial refund, with a $75 sale balance if completed",
+      "caption": "Available actions depend on payment status, processor support and account permissions.",
       "steps": []
     },
     "sections": [

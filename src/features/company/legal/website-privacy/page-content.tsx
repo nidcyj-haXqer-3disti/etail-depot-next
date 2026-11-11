@@ -18,6 +18,7 @@ const sections: LegalSection[] = [
       <p>The information we receive depends on how you use this website or contact us:</p>
       <ul>
         <li><strong>Contact information.</strong> When you email, call or write to us, this may include your contact details, business information, the service you ask about and the information you choose to provide.</li>
+        <li><strong>Appointments.</strong> When you book a sales call, Calendly collects your name, email address, selected appointment time and any answers you provide in the booking form. We use those details to arrange the call and communicate about your appointment.</li>
         <li><strong>Technical information.</strong> Companies that help us deliver and protect this website may process requested page addresses, IP addresses, browser details, request times, response information and other connection information.</li>
         <li><strong>Previous accounts on this website.</strong> If you previously held an account directly on this website, we may still retain related identity, access, activity and support records with restricted access. Those account services are no longer available here.</li>
       </ul>
@@ -38,6 +39,7 @@ const sections: LegalSection[] = [
   {
     id: "sharing", title: "Who can see your information", content: <>
       <p><strong>Website services.</strong> Companies that help us host, deliver and protect this website may handle the technical information described above. Account access takes place on separate service websites. For information about sharing within a merchant or card account, request the privacy notice for that service.</p>
+      <p><strong>Appointment booking.</strong> Calendly handles scheduling for us. Booking details are available to our sales team and the connected calendar service used to manage the appointment.</p>
       <p><strong>Support.</strong> Our team can access the information needed to answer your inquiry and handle your request.</p>
       <p><strong>Information you share.</strong> Email links open your email application. The message and information you send are handled by your email service and the recipient. Account service links open a separate website without forwarding your previous account details or information included in this website’s page address. Links to standards sources and other technical references also take you to external websites, whose notices apply when you visit them.</p>
       <p><strong>Legal and security matters.</strong> Information may need to be disclosed to comply with applicable law or valid legal process, or to investigate fraud, unauthorized access or threats to the service. Requests about these disclosures should be directed to our compliance contact.</p>
@@ -47,7 +49,8 @@ const sections: LegalSection[] = [
     id: "cookies", title: "Cookies and website activity", content: <>
       <p>This website does not set login or payment cookies. The fee calculator, payment walkthrough and wallet guide run in your browser. Calculator amounts and walkthrough selections are not sent to us or saved by this website. The checkout artwork does not collect card or bank account details.</p>
       <p>Pages you visit, including a code reference or section within a page, may appear in the page address and your browser history.</p>
-      <p>This website does not include advertising pixels or session replay scripts. Hosting and security services may process technical information for delivery, protection and traffic measurement, including requests for pages and files. That processing is separate from the information you enter into the fee calculator.</p>
+      <p>Etail’s website code does not include advertising pixels or session replay scripts. Hosting and security services may process technical information for delivery, protection and traffic measurement, including requests for pages and files. That processing is separate from the information you enter into the fee calculator.</p>
+      <p>Calendly loads when you open the booking panel or follow its booking link. Its booking service uses cookies and similar technologies, including optional activity measurement and marketing tools. Use Cookie settings in the booking panel to manage your choices. See <a href="https://calendly.com/legal/privacy-notice" rel="noreferrer" referrerPolicy="no-referrer">Calendly’s Privacy Notice</a> for its information practices.</p>
       <p>Cookies from previous accounts on this website may remain in your browser until they expire or you clear them. This website no longer uses or renews those account cookies. Clearing cookies does not delete retained account records.</p>
       <p>Separate account service websites have their own cookie practices and controls.</p>
     </>,
@@ -84,5 +87,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function PrivacyPage() {
-  return <LegalDocument title="Website Privacy Policy" description="How we handle information when you browse this website or contact us." updated="November 4, 2026" sections={sections} />;
+  return <LegalDocument title="Website Privacy Policy" description="How we handle information when you browse this website or contact us." updated="November 11, 2026" sections={sections} />;
 }

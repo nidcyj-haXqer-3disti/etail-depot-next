@@ -2,7 +2,27 @@
 
 import { useEffect } from "react";
 
-/** Enhances native contents links without moving article content into client JavaScript. */
+// Rendered after the article during SSR, so saved reloads align before hydration.
+// Keeping this fixed initializer in the existing client island avoids adding the
+// script text to every route's shared server payload. No extra script is fetched.
+const restoreReadingSection = `(function(){
+var nav=performance.getEntriesByType('navigation')[0],target;
+if(!nav||nav.type!=='reload')return;
+try{target=document.getElementById(decodeURIComponent(location.hash.slice(1)))}catch(_){}
+if(!target||!target.closest('.docs-article'))return;
+var hash=location.hash,moved=false,events=['pointerdown','touchstart','wheel','keydown'];
+function keep(){moved=true}
+function align(){if(!moved&&location.hash===hash&&target.isConnected)target.scrollIntoView({behavior:'instant',block:'start'})}
+function stop(){events.forEach(function(name){removeEventListener(name,keep,true)})}
+events.forEach(function(name){addEventListener(name,keep,{capture:true,passive:true})});
+align();
+addEventListener('pageshow',function(event){
+if(event.persisted||moved){stop();return}
+requestAnimationFrame(function(){align();stop()})
+},{once:true})
+})();`;
+
+/** Enhances native contents and saved reloads without client-rendering the article. */
 export function ResponsiveContentsFocus({ rootSelector, desktopSelector, mobileSelector, breakpoint }: {
   rootSelector: string;
   desktopSelector: string;
@@ -36,5 +56,5 @@ export function ResponsiveContentsFocus({ rootSelector, desktopSelector, mobileS
       query.removeEventListener("change", restore);
     };
   }, [rootSelector, desktopSelector, mobileSelector, breakpoint]);
-  return null;
+  return <script dangerouslySetInnerHTML={{ __html: restoreReadingSection }} />;
 }

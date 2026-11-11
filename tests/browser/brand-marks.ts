@@ -5,7 +5,7 @@ export async function expectDecodedBrandMarks(marks: Locator) {
     const ready = await Promise.all(elements.map(async element => {
       if (element instanceof HTMLImageElement) return element.complete && element.naturalWidth > 0 && element.naturalHeight > 0;
       const content = getComputedStyle(element).content;
-      const source = content.match(/^url\(["']?(data:image\/(?:png|svg\+xml);base64,[^"')]+)["']?\)$/)?.[1];
+      const source = content.match(/^url\(["']?(data:image\/(?:png|webp|svg\+xml);base64,[^"')]+)["']?\)$/)?.[1];
       if (!element.classList.contains("inline-brand-image") || !source) return false;
       const image = new Image();
       image.src = source;

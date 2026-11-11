@@ -257,7 +257,7 @@ test("account guide screenshots start before layout on direct links and refresh"
   if (["stylesheet", "script"].includes(request.resourceType())) await resourcesReady;
   await route.continue();
  });
- // Request interception disables cache, including on refresh.
+ // WebKit can reuse decoded images on refresh even with request interception.
  for (const refresh of [false, true]) {
   logoRequested = false;
   requestedScreenshots.clear();
@@ -265,13 +265,18 @@ test("account guide screenshots start before layout on direct links and refresh"
   try {
    if (refresh) await page.reload({ waitUntil: "commit" });
    else await page.goto("/resources/merchant-account-setup#registration-email", { waitUntil: "commit" });
-   await expect.poll(() => requestedScreenshots.size, { message: "All three account screenshots must start before layout or hydration, including on refresh" }).toBe(3);
+   await expect.poll(async () => {
+    const cached = await page.locator(".docs-article figure img").evaluateAll(images => images.flatMap(image =>
+     image instanceof HTMLImageElement && image.complete && image.naturalWidth === 1280
+      ? [new URL(image.currentSrc || image.src).pathname] : []));
+    return new Set([...requestedScreenshots, ...cached]).size;
+   }, { message: "All three account screenshots must start or already be decoded before layout or hydration, including on refresh" }).toBe(3);
   } finally { releaseResources(); }
   await page.waitForLoadState("load");
   expect(logoRequested, "The small logo must be embedded, with no separate image request").toBe(false);
   await expect(page.locator("main .brand-image-trolleys")).toHaveCount(9);
   for (const logo of await page.locator("main .brand-image-trolleys").all()) {
-   await expect(logo).toHaveCSS("content", /url\("data:image\/png;base64,/);
+   await expect(logo).toHaveCSS("content", /url\("data:image\/webp;base64,/);
   }
   const openingImages = page.locator('img[src^="/_next/static/media/welcome."]');
   await expect(openingImages).toHaveCount(1);

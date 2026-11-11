@@ -1,15 +1,16 @@
-.merchant {
+.merchant,
+.accountSupport {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 32px 48px;
   padding: 32px;
-  margin-bottom: 24px;
-  background: #f3f6ef;
-  border-radius: 18px;
   scroll-margin-top: 100px;
 }
+
+.merchant { background: #f3f6ef; border-radius: 18px; }
+.accountSupport { padding-inline: 0; margin-block: 8px; }
 
 .bookmark {
   position: absolute;
@@ -20,9 +21,10 @@
   scroll-margin-top: 100px;
 }
 
-.merchant .copy { min-width: 0; }
+.copy { min-width: 0; }
 
 .directory .merchant .copy h2,
+.directory .accountSupport .copy h2,
 .directory .specialist.specialist h2 {
   margin: 0 0 12px;
   color: var(--public-ink);
@@ -32,7 +34,7 @@
   letter-spacing: -.025em;
 }
 
-.merchant .copy p,
+.copy p,
 .specialist p {
   margin: 0;
   max-width: 55ch;
@@ -41,10 +43,12 @@
   line-height: 1.65;
 }
 
-.merchant .copy .support {
+.copy .detail {
   margin-top: 14px;
   font-size: 14px;
 }
+
+.actions { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; min-width: 0; }
 
 .email {
   display: inline-flex;
@@ -78,12 +82,15 @@
 .specialist .email { margin-top: auto; }
 
 @media (max-width: 959px) {
-  .merchant { grid-template-columns: 1fr; gap: 20px; }
+  .merchant, .accountSupport { grid-template-columns: 1fr; gap: 20px; }
 }
 
 @media (max-width: 700px) {
-  .merchant { padding: 24px; margin-bottom: 8px; }
-  .directory .merchant .copy h2, .directory .specialist.specialist h2 { font-size: 23px; }
+  .merchant { padding: 24px; }
+  .accountSupport { padding-block: 24px; }
+  .directory .merchant .copy h2,
+  .directory .accountSupport .copy h2,
+  .directory .specialist.specialist h2 { font-size: 23px; }
   .specialist { padding-block: 22px; gap: 14px; }
 }
 

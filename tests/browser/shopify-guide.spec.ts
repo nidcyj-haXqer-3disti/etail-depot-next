@@ -89,7 +89,7 @@ test("Shopify branding and first screenshot avoid delayed image requests", async
   expect(logoRequested, "The small logo must be embedded, with no separate image request").toBe(false);
   await expect(page.locator("main .brand-image-trolleys")).toHaveCount(2);
   for (const logo of await page.locator("main .brand-image-trolleys").all()) {
-   await expect(logo).toHaveCSS("content", /url\("data:image\/png;base64,/);
+   await expect(logo).toHaveCSS("content", /url\("data:image\/webp;base64,/);
   }
   const openingImages = page.locator('#open-settings figure > a img');
   await expect(openingImages).toHaveCount(1);

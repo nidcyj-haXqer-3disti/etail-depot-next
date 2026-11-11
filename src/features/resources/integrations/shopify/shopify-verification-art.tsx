@@ -66,6 +66,6 @@ export function ShopifyVerificationArt() {
         <div><strong>Then refund in Shopify</strong><span>Check the refund or void in Business Center.</span></div>
       </div>
     </div>
-    <figcaption>Example screens with fictional details. Your layout and status may differ with capture and settlement.</figcaption>
+    <figcaption>Payment status depends on capture and settlement.</figcaption>
   </figure>;
 }

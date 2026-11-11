@@ -1,3 +1,4 @@
+import { salesContactHref, salesContactLink, exerciseSalesAction, salesActionHref } from "./sales-contact";
 import { expect, test, type Page } from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
 
@@ -40,11 +41,11 @@ test("Home gives merchants and software partners distinct next steps", async ({ 
   await expect(page).toHaveURL(/\/services\/merchant-services$/);
   const menu = page.getByRole("banner").getByRole("button", { name: "Menu", exact: true });
   if (await menu.isVisible()) await menu.click();
-  await page.getByRole("banner").getByRole("link", { name: "Contact sales", exact: true }).click();
-  await expect(page).toHaveURL(/\/company\/contact$/);
+  await exerciseSalesAction(page, page.getByRole("banner").getByRole("link", { name: "Contact sales", exact: true }), "/company/contact#payment-review");
+  await page.goto("/company/contact");
   await expect(page.locator("#merchant-application")).toContainText("Account approval and setup apply.");
   await expect(page.locator("#cards")).toContainText("An inquiry is not an application.");
-  await expect(page.locator("[data-merchant-contact] a")).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+  await expect(salesContactLink(page)).toHaveAttribute("href", salesContactHref);
   await page.goto("/");
   await partners.click();
   await expect(page).toHaveURL(/\/use-cases\/software-platforms$/);
@@ -200,7 +201,7 @@ test("software partner preview stays out of indexing and offers contact rather t
   await expect(page.locator('meta[name="googlebot"]')).toHaveAttribute("content", /\bnoindex\b/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/use-cases/software-platforms");
   const contact = page.locator(".ec-platform-hero").getByRole("link", { name: "Discuss your platform", exact: true });
-  await expect(contact).toHaveAttribute("href", "/company/contact#platforms");
+  await expect(contact).toHaveAttribute("href", salesActionHref("/company/contact#platforms"));
   await expect(page.locator("main form")).toHaveCount(0);
   await expect(page.locator("main")).toContainText("Merchant approval is required.");
   await expect(page.locator("#payment-experience")).toContainText("After account approval and setup, follow each purchase through the merchant’s payment records to the bank deposit.");

@@ -1,3 +1,4 @@
+import { configuredSalesBooking, exerciseSalesAction, salesActionHref, stubSalesBooking } from "./sales-contact";
 import { expectReadOnlyPlatformExample } from "./platform-example";
 import { isPublicContentPath } from "../../src/shared/site/public-page-inventory";
 import {expect,test} from "@playwright/test";
@@ -91,7 +92,7 @@ test("home presents Etail brand artwork and local product discovery without acco
   await expect(symbol).toHaveCount(1);
   await expect(symbol).toBeVisible();
   await expect(symbol).toHaveCSS("aspect-ratio", "800 / 484");
-  expect(await symbol.evaluate(mark => getComputedStyle(mark).content.startsWith('url("data:image/png;base64,'))).toBe(true);
+  expect(await symbol.evaluate(mark => getComputedStyle(mark).content.startsWith('url("data:image/webp;base64,'))).toBe(true);
   await expectDecodedBrandMarks(symbol);
   await expect(art.locator('img[src*="everyday-sneaker"]')).toHaveCount(0);
   await expect(art).not.toContainText(/Designer sneaker|Studio Store|10482/);
@@ -155,7 +156,7 @@ test("software partners can review the payment experience and reach the fixed in
   await expect(experience).toBeInViewport();
   const art = page.locator("[data-attention-art=platform]");
   await expect(art).toBeVisible();
-  await expect(art).toHaveAccessibleName(/Six businesses across retail, transportation, travel and legal services have fourteen merchant accounts/);
+  await expect(art).toHaveAccessibleName(/Businesses and their merchant accounts/);
   await art.getByRole("radio", { name: "Pacific Freight, 3 merchant accounts", exact: true }).check();
   await expect(art.locator('[data-business-panel="freight"]')).toBeVisible();
   await expect(art.locator('[data-business-panel="cotton"]')).toBeHidden();
@@ -166,22 +167,14 @@ test("software partners can review the payment experience and reach the fixed in
   expect(box!.width).toBeGreaterThan(200);
   expect(box!.x).toBeGreaterThanOrEqual(0);
   expect(box!.x + box!.width).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
-  const localInquiry = page.locator('.ec-platform-hero a[href="/company/contact#platforms"]');
-  await expect(localInquiry).toHaveAccessibleName("Discuss your platform");
-  await localInquiry.focus();
-  await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/company\/contact#platforms$/);
-  const contact = page.locator("#platforms");
-  await expect(contact).toBeInViewport();
-  const email = page.locator('[data-merchant-contact] a[href^="mailto:"]');
-  await expect(email).toBeVisible();
-  await expect(email).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
-  await expect(page.locator('[data-merchant-contact] a[href^="mailto:"]')).toHaveCount(1);
-  await page.goBack();
-  await expect(page).toHaveURL(/\/use-cases\/software-platforms\?partner_probe=private#visit$/);
-  await page.goForward();
-  await expect(page).toHaveURL(/\/company\/contact#platforms$/);
-  await expect(contact).toBeInViewport();
+  const localInquiry = page.locator(".ec-platform-hero").getByRole("link", { name: "Discuss your platform", exact: true });
+  const historyLength = await page.evaluate(() => history.length);
+  await exerciseSalesAction(page, localInquiry, "/company/contact#platforms", true);
+  if (configuredSalesBooking) {
+    await expect(page).toHaveURL(/\/use-cases\/software-platforms\?partner_probe=private#visit$/);
+    expect(await page.evaluate(() => history.length)).toBe(historyLength);
+    await expect(localInquiry).toBeFocused();
+  }
   expect(await page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage } }))).toEqual(initialStorage);
   expect(await page.evaluate(() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth)).toBeLessThanOrEqual(1);
   expect(unexpected).toEqual([]);
@@ -206,18 +199,23 @@ test("software partner content and inquiry remain usable without JavaScript", as
     await art.scrollIntoViewIfNeeded();
     await expect(art).toBeVisible();
     await expect(art.locator("a,button,form,textarea,select,[tabindex],[role=button]")).toHaveCount(0);
-    await expect(art).toHaveAccessibleName(/Six businesses across retail, transportation, travel and legal services have fourteen merchant accounts/);
+    await expect(art).toHaveAccessibleName(/Businesses and their merchant accounts/);
     await art.getByRole("radio", { name: "Pacific Freight, 3 merchant accounts", exact: true }).check();
     await expect(art.locator('[data-business-panel="freight"]')).toBeVisible();
     await expect(art.locator('[data-business-panel="cotton"]')).toBeHidden();
     await expect(page.locator(".faq, .public-faq-section")).toHaveCount(0);
-    const inquiry = page.locator('.ec-platform-hero a[href="/company/contact#platforms"]');
-    await expect(inquiry).toHaveAccessibleName("Discuss your platform");
+    const inquiry = page.locator(".ec-platform-hero").getByRole("link", { name: "Discuss your platform", exact: true });
+    await expect(inquiry).toHaveAttribute("href", salesActionHref("/company/contact#platforms"));
+    await stubSalesBooking(page);
     await inquiry.focus();
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/\/company\/contact#platforms$/);
-    await expect(page.locator("#platforms")).toBeInViewport();
-    await expect(page.locator('[data-merchant-contact] a[href^="mailto:"]')).toHaveAttribute("href", "mailto:trolleys@etaildepot.com");
+    if (configuredSalesBooking) {
+      await expect(page).toHaveURL(configuredSalesBooking);
+      await expect(page.getByRole("heading", { name: "Choose a time", exact: true })).toBeVisible();
+    } else {
+      await expect(page).toHaveURL(/\/company\/contact#platforms$/);
+      await expect(page.locator("#platforms")).toBeInViewport();
+    }
     expect(await page.evaluate(() => Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) - innerWidth)).toBeLessThanOrEqual(1);
     expect(await context.cookies()).toEqual([]);
   } finally {
@@ -443,12 +441,12 @@ test("opening artwork symbols use embedded styles or early image requests on fir
       const preloads = page.locator(`head link[rel="preload"][as="image"][href*="/${symbolName}."]`);
       if (path === "/services/merchant-onboarding") {
         expect(symbolRequested).toBe(false);
-        await expect(page.locator("main .brand-image-trolleys")).toHaveCSS("content", /url\("data:image\/png;base64,/);
+        await expect(page.locator("main .brand-image-trolleys")).toHaveCSS("content", /url\("data:image\/webp;base64,/);
         await expect(preloads).toHaveCount(0);
       } else if (embedded) {
         const mark = page.locator('[data-company-art] .brand-image-symbol, [data-attention-art] .brand-image-symbol');
         await expect(mark).toHaveCount(1);
-        await expect(mark).toHaveCSS("content", /url\("data:image\/png;base64,/);
+        await expect(mark).toHaveCSS("content", /url\("data:image\/webp;base64,/);
         await expectDecodedBrandMarks(mark);
         // Other artwork and selectively prefetched routes may still use the PNG.
         // Only the opening artwork has switched to embedded delivery.

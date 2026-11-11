@@ -12,8 +12,8 @@ export const disputesContent = {
       "href": "/company/contact#payment-review"
     },
     "art": {
-      "title": "Example dispute D1046: $240 for order 1046, product not received, response due 18 November 2026. Supporting records are collected but not submitted.",
-      "caption": "Example case. Follow the deadline in your actual notice. Evidence does not guarantee a decision in your favor.",
+      "title": "Dispute D1046: $240 for order 1046, product not received, response due 18 November 2026. Supporting records are collected but not submitted.",
+      "caption": "Follow the deadline in your notice. Evidence does not guarantee a decision in your favor.",
       "steps": []
     },
     "sections": [

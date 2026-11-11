@@ -7,6 +7,7 @@ import Link from "next/link";
 import { PublicNavigation } from "./public-navigation";
 import { PaymentPortalLink } from "../ui/merchant-portal-link";
 import { Icon } from "../ui/icon";
+import { SalesContactLink } from "../ui/sales-booking/sales-booking-link";
 
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
@@ -135,7 +136,7 @@ export function PublicHeader() {
         <div className="header-actions">
           <PaymentPortalLink intent="register" className="header-start-now" />
           <PaymentPortalLink intent="sign-in" className="header-sign-in" showArrow />
-          <Link prefetch={false} href="/company/contact" className="header-contact header-contact-primary" onClick={closeMenu}>Contact sales</Link>
+          <SalesContactLink className="header-contact header-contact-primary" onOpen={closeMenu} returnFocusRef={toggle}>Contact sales</SalesContactLink>
         </div>
       </div>
     </div>
