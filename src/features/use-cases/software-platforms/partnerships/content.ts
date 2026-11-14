@@ -16,7 +16,7 @@ export const partnershipsContent = {
         { title: "Partnership pricing", text: "Payment methods, transaction activity and integration needs shape your pricing. Processing, platform and implementation charges are confirmed in the partnership agreement." },
       ] },
       { title: "Connect the purchase to the payment record.", items: [
-        { title: "Checkout integration", text: "Connect purchases to the checkout enabled for each merchant. Our integration team supplies the documentation, permissions and configuration details." },
+        { title: "Checkout integration", href: "/company/contact#platforms", text: "Connect purchases to the checkout enabled for each merchant. Our integration team supplies the documentation, permissions and configuration details." },
         { title: "Payment records and updates", text: "Follow payments, refunds, disputes and payouts using merchant and order references. Available records and delivery methods depend on your integration." },
         { title: "Merchant activation", text: "Merchants can accept payments after approval and setup. Our team helps your developers verify checkout, reporting and support before activation." },
       ] },

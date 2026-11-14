@@ -54,7 +54,6 @@
 .footer a:hover { color: var(--public-ink); text-decoration: underline; text-underline-offset: 4px; }
 .footer svg { width: 13px; height: 13px; }
 .frameArea { position: relative; min-height: 0; }
-.loading { position: absolute; inset: 32px 16px auto; margin: 0; text-align: center; color: var(--public-muted); font-size: 15px; }
 .frame { display: block; width: 100%; min-width: 320px; height: 100%; border: 0; background: #fff; }
 @media (max-width: 600px) {
   .dialog { width: 100%; height: 100dvh; border-radius: 0; }

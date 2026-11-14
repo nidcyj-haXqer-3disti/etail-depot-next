@@ -1,8 +1,26 @@
 import { describe, expect, it } from "vitest";
 import { DEVELOPER_PAGES } from "../../src/shared/site/developer-paths";
-import { publicDomainForPath, publicNavigationGroups } from "../../src/shared/site/site-navigation";
+import { audienceUseCaseNavigation, publicDomainForPath, publicFooterGroups, publicNavigationGroups } from "../../src/shared/site/site-navigation";
 
 describe("public navigation ownership", () => {
+  it("places no-code checkout in Use cases while keeping the five Resource destinations unchanged", () => {
+    const path = "/use-cases/no-code-checkout-experience";
+    expect(audienceUseCaseNavigation).toHaveLength(4);
+    expect(audienceUseCaseNavigation.at(-1)?.href).toBe(path);
+    expect(publicDomainForPath(path)).toBe("use-cases");
+    const resources = ["Merchant account setup", "Shopify integration", "WooCommerce integration", "Guides", "Help center"];
+    expect(publicNavigationGroups.find(group => group.id === "resources")?.sections.flatMap(section => section.links.map(link => link.label))).toEqual(resources);
+    expect(publicFooterGroups.find(group => group.label === "Resources")?.links.map(link => link.label)).toEqual(resources);
+    const useCases = publicFooterGroups.find(group => group.label === "Use cases")!;
+    expect(useCases.links.map(link => link.label)).toEqual(["Online businesses", "Software platforms", "Switch merchant services", "No code checkout experience"]);
+    expect(useCases.links.at(-1)?.href).toBe(path);
+    for (const groups of [publicFooterGroups, publicNavigationGroups.map(group => ({ label: group.label, links: group.sections.flatMap(section => section.links.map(link => ({ href: link.href }))) }))]) {
+      const owningGroups = groups.filter(group => group.links.some(link => link.href === path)).map(group => group.label);
+      expect(owningGroups).toEqual(["Use cases"]);
+      expect(groups.flatMap(group => [...group.links]).some(link => String(link.href) === "/resources/no-code-checkout-experience")).toBe(false);
+    }
+  });
+
   it("highlights the group containing each published menu destination", () => {
     for (const group of publicNavigationGroups) {
       for (const section of group.sections) {

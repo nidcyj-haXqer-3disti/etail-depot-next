@@ -1,5 +1,8 @@
+import { BLOG_PATHS } from "../site/blog-paths.ts";
+
 /** Static editorial previews. These labels describe page contents, not live account data. */
 export const socialPreviews = {
+  blog: { lines: ["Payments,", "explained."], detail: "The Etail Depot Blog", labels: ["Payment essentials", "Merchant accounts", "Business reporting"] },
   company: { lines: ["Merchant services", "for businesses and", "software platforms."], detail: "Merchant services, checkout and reporting", labels: ["Merchant services", "Software platforms", "Account support"] },
   brand: { lines: ["Merchant services.", "For your business."], detail: "Credit card processing, checkout and reporting", labels: ["Merchant accounts", "Online payments", "Software platforms"] },
   merchant: { lines: ["Merchant services.", "Connected payments."], detail: "Credit card and ACH processing for US businesses", labels: ["Account setup", "Payment acceptance", "Payout reporting"] },
@@ -13,6 +16,7 @@ export const socialPreviews = {
 } as const;
 export type SocialPreviewKey = keyof typeof socialPreviews;
 export function socialPreviewKey(path: string): SocialPreviewKey {
+  if ((BLOG_PATHS as readonly string[]).includes(path)) return "blog";
   if (path === "/company/about") return "company";
   if (path === "/resources/guides/iso-20022" || path.startsWith("/resources/guides/iso-20022/")) return "iso20022";
   if (path === "/resources/guides/iso-8583" || path.startsWith("/resources/guides/iso-8583/")) return "iso8583";
@@ -22,7 +26,7 @@ export function socialPreviewKey(path: string): SocialPreviewKey {
   if (path === "/services/card-services") return "cards";
   if (path === "/use-cases/switch-merchant-services") return "provider";
   if (["/use-cases/software-platforms", "/use-cases/software-platforms/payment-models", "/use-cases/software-platforms/partnerships"].includes(path)) return "platforms";
-  if (["/services/merchant-services", "/use-cases/online-businesses", "/services/payment-methods", "/services/merchant-onboarding", "/services/payouts", "/services/refunds", "/services/ach-payments", "/services/reconciliation", "/services/disputes", "/pricing"].includes(path)) return "merchant";
+  if (["/use-cases/no-code-checkout-experience", "/services/merchant-services", "/use-cases/online-businesses", "/services/payment-methods", "/services/merchant-onboarding", "/services/payouts", "/services/refunds", "/services/ach-payments", "/services/reconciliation", "/services/disputes", "/pricing"].includes(path)) return "merchant";
   return "brand";
 }
 export function socialPreviewImage(path: string, origin: string) {

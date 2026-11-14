@@ -1,0 +1,15 @@
+.detail {padding-bottom:20px;min-width:0;color:var(--docs-muted);font-size:15px;line-height:1.8}
+.detail > a + a {margin-left:18px}
+.code {margin:22px 0;border:1px solid var(--docs-line);border-radius:6px;overflow:hidden}
+.code figcaption {padding:10px 16px;background:var(--docs-tint);color:var(--docs-ink);font-size:12px;font-weight:600;line-height:1.6}
+.code pre {margin:0;padding:16px;overflow-x:auto;max-width:100%;background:#f7f8f6;color:#233d36;font-size:12px;line-height:1.75;tab-size:2}
+.code pre code {font-size:inherit;white-space:pre;word-break:normal;overflow-wrap:normal;background:none;padding:0}
+.endpoints code,.operations code {font-size:12px;overflow-wrap:anywhere}
+.operations {margin:16px 0}
+.operations > div {padding:16px 0;border-bottom:1px solid var(--docs-line)}
+.operations dt {color:var(--docs-ink);font-weight:600}
+.operations dd {margin:6px 0 0}
+.operations dd p {margin:8px 0 0}
+.anchor {scroll-margin-top:100px}
+.anchor h3 {font-size:17px;font-weight:600;line-height:1.5;margin:26px 0 8px}
+@media(max-width:680px){.detail > a + a{margin-left:0}.detail > a{display:flex}.code pre{padding:14px}}

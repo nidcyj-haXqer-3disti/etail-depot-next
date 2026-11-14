@@ -28,8 +28,8 @@ test("Guides opens both ISO collections, preserves exact code identity and retur
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", origin + tablePath);
     await page.goBack();
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", origin + codePath);
-    await breadcrumb.getByRole("link", {name:"Guides", exact:true}).click();
-    await expect(page.getByRole("heading", {level:1})).toHaveText("Guides");
+    await breadcrumb.getByRole("link", {name:"Payment code reference", exact:true}).click();
+    await expect(page.getByRole("heading", {level:1})).toHaveText("Payment code reference");
   }
 });
 
@@ -82,7 +82,7 @@ for (const [interaction, reducedMotion] of [["keyboard", "no-preference"], ["poi
     if (interaction === "keyboard") { await status.focus(); await page.keyboard.press("Enter"); }
     else await status.click();
     await expect(page.locator("#definition")).toBeVisible();
-    await page.getByRole("navigation", {name:"Breadcrumb"}).getByRole("link", {name:"Guides", exact:true}).click();
+    await page.getByRole("navigation", {name:"Breadcrumb"}).getByRole("link", {name:"Payment code reference", exact:true}).click();
     await page.locator('.standards-collections a[href="/resources/guides/iso-8583"]').click();
     await page.locator('main a[href="/resources/guides/iso-8583/messages"]').click();
     const message = page.getByRole("cell").getByRole("link", {name:"2100", exact:true});

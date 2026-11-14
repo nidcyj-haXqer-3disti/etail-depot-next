@@ -32,7 +32,7 @@ test("payment requests explain the acceptance flow without duplicate actions", a
   await expect(page.getByRole("tablist", { name: "Checkout layouts", exact: true })).toHaveCount(0);
   await expect(page.getByRole("tablist", { name: "Payment journey views", exact: true })).toBeVisible();
   await expect(channels.getByRole("link")).toHaveCount(1);
-  await expect(channels.getByRole("link", {name:"Use payment requests",exact:true})).toHaveAttribute("href", "/developers/developer-tools");
+  await expect(channels.getByRole("link", {name:"Use payment requests",exact:true})).toHaveAttribute("href", "/developers/developer-tools#payment-requests");
   await expect(channels.locator("details")).toHaveCount(0);
   await expect(channels).not.toContainText("What to include in a request");
   await expect(channels.locator("button, input, textarea, form, iframe")).toHaveCount(0);

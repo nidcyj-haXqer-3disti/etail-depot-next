@@ -36,13 +36,13 @@ export default function OnlineBusinessesPage() {
         </section>
       </section>
       <div className="page-container">
-        <section className="cw-order-outcome" aria-labelledby="order-outcome-title"><div><p className="eyebrow">After checkout</p><h2 id="order-outcome-title">Know whether an order is paid.</h2><p>Confirm the payment before fulfillment or another attempt. A browser message alone does not establish the outcome.</p><Link href="/developers/getting-started#checkout" className="consumer-text-link">Connect online checkout</Link></div><dl><div><dt>Payment confirmed</dt><dd>Match the amount and reference to the order before fulfillment. Capture and bank receipt are separate.</dd></div><div><dt>Result unclear</dt><dd>Check the existing payment attempt before requesting another payment. An interruption is not a decline.</dd></div><div><dt>Customer needs a refund</dt><dd>Return to the original transaction. Follow the refund’s own status and reference.</dd></div></dl></section>
+        <section className="cw-order-outcome" aria-labelledby="order-outcome-title"><div><p className="eyebrow">After checkout</p><h2 id="order-outcome-title">Know whether an order is paid.</h2><p>Confirm the payment before fulfillment or another attempt. A browser message alone does not establish the outcome.</p><Link prefetch={false} href="/services/reconciliation" className="consumer-text-link">Compare payment records</Link></div><dl><div><dt>Payment confirmed</dt><dd>Match the amount and reference to the order before fulfillment. Capture and bank receipt are separate.</dd></div><div><dt>Result unclear</dt><dd>Check the existing payment attempt before requesting another payment. An interruption is not a decline.</dd></div><div><dt>Customer needs a refund</dt><dd>Return to the original transaction. Follow the refund’s own status and reference.</dd></div></dl></section>
         <section className="payment-sharing-note" id="payment-channels" aria-labelledby="payment-sharing-title">
           <div className="payment-sharing-copy" id="request-details">
             <p className="eyebrow">Payment requests</p><h2 id="payment-sharing-title">Send a payment request{" "}<br />when the order is ready.</h2>
             <p>Share a hosted payment page for orders arranged by phone, email or another channel.</p>
             <p className="payment-sharing-qualification">Available options depend on your account setup.</p>
-            <Link href="/developers/developer-tools" className="consumer-text-link">Use payment requests</Link>
+            <Link href="/developers/developer-tools#payment-requests" className="consumer-text-link">Use payment requests</Link>
           </div>
           <PaymentLinkArt />
         </section>

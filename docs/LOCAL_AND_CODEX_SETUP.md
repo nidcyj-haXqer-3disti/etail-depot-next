@@ -10,7 +10,7 @@ pnpm preview
 
 The static preview runs at `http://127.0.0.1:3100` and exercises the Edge request boundary. For UI development, stop it and run `pnpm dev --port 3100`. Development mode does not exercise the full hosting boundary.
 
-Keep ports 3100 and 3101 free for verification. Install Chromium using `pnpm exec playwright install chromium`, then run `pnpm verify`. On Linux, `pnpm exec playwright install --with-deps chromium` also installs required system libraries. Use the same pinned runtime in local and CI checks.
+Keep ports 3100 and 3101 free for verification. Install Chromium and WebKit using `pnpm exec playwright install chromium webkit`, then run `pnpm verify`. On Linux, `pnpm exec playwright install --with-deps chromium webkit` also installs required system libraries. Use the same pinned runtime in local and CI checks.
 
 Ordinary local builds remain noindex with an empty sitemap. Production SEO checks and package preparation intentionally generate the exact production context locally without publishing it. The preview boundary still protects preview/unapproved contexts; rebuild with `pnpm build` when returning to the ordinary local export. Do not place production markers in an environment file to imitate production.
 

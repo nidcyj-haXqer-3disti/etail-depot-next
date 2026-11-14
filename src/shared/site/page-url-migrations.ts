@@ -1,5 +1,7 @@
 /** Exact former public page addresses, approved for local migration on 8 November 2026. */
 export const CORE_PAGE_MOVES: Readonly<Record<string,string>> = {
+  "/resources/blog": "/company/blog",
+  "/resources/no-code-checkout-experience": "/use-cases/no-code-checkout-experience",
   "/merchant-onboarding": "/services/merchant-onboarding",
   "/payment-methods": "/services/payment-methods",
   "/ach-payments": "/services/ach-payments",

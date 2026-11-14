@@ -256,8 +256,9 @@ test("eight service pages have distinct artwork and usable primary journeys", as
   }
   await page.goto("/services/payouts#reconciliation");
   await page.locator("#reconciliation").getByRole("link", {name:"A different amount"}).click();
-  await expect(page).toHaveURL(/\/services\/reconciliation$/);
-  await expect(page.getByRole("heading", {level:1})).toBeInViewport();
+  await expect(page).toHaveURL(/\/company\/contact#account-support$/);
+  await expect(page.getByRole("heading", {name:"Account and integration support",exact:true})).toBeInViewport();
+  await expect(page.getByRole("dialog", {name:"Book a call",exact:true})).toHaveCount(0);
   await page.goto("/services/refunds#disputes");
   await page.locator("#disputes").getByRole("link", {name:"Payment already disputed"}).click();
   await expect(page).toHaveURL(/\/services\/disputes$/);
@@ -358,4 +359,38 @@ test("sales booking loads only on request and preserves a native fallback", asyn
   await expect(dialog).toBeVisible();
   await dialog.getByRole("button", { name: "Close", exact: true }).click();
   await expect(book).toBeFocused();
+});
+
+
+test("booking loading status stays clear of a calendar that renders before its load event", async ({ page }) => {
+  test.skip(!configuredSalesBooking, "No approved booking URL is configured.");
+  let releaseResource = () => {};
+  const resourceReady = new Promise<void>(resolve => { releaseResource = resolve; });
+  await page.route("https://calendly.com/**", async route => {
+    if (new URL(route.request().url()).pathname === "/calendar-delay.svg") {
+      await resourceReady;
+      await route.fulfill({ contentType: "image/svg+xml", body: '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1" />' });
+    } else {
+      await route.fulfill({ contentType: "text/html", body: '<!doctype html><html lang="en"><title>Booking loading fixture</title><body><h1>Select a Day</h1><img src="/calendar-delay.svg" width="1" height="1" alt=""></body></html>' });
+    }
+  });
+  try {
+    await page.goto("/company/contact#payment-review");
+    await page.locator("#payment-review").getByRole("link", { name: "Book a call", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "Book a call", exact: true });
+    const frame = dialog.locator("iframe");
+    await expect(frame.contentFrame().getByRole("heading", { name: "Select a Day", exact: true })).toBeVisible();
+    const status = dialog.getByRole("status");
+    await expect(status).toHaveText("Loading available times…");
+    const calendarBefore = (await frame.boundingBox())!;
+    const statusBox = (await status.boundingBox())!;
+    expect(statusBox.y + statusBox.height).toBeLessThanOrEqual(calendarBefore.y);
+    releaseResource();
+    await expect(status).toHaveText(/\d+ minutes with /);
+    expect(await frame.boundingBox()).toEqual(calendarBefore);
+    await dialog.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(page.locator("#payment-review").getByRole("link", { name: "Book a call", exact: true })).toBeFocused();
+  } finally {
+    releaseResource();
+  }
 });

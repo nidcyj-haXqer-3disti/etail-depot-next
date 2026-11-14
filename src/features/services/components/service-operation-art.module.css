@@ -70,7 +70,7 @@
 .dark .branchIcon {background:#365940;border-color:#64815b;color:#dbe9c4;}
 .dark li {border-color:#4d6952;color:#e2ecd9;}
 .mark {display:grid;place-items:center;flex:none;width:36px;height:36px;border-radius:8px;background:#f0f5e8;border:1px solid #cbd9bb;}
-.mark img {width:26px;height:auto;}
+.mark .markImage {width:26px;height:auto;}
 .branchCard > .mark {margin-bottom:18px;}
 .platform {position:relative;background:white;border:1px solid #d0ddc6;border-radius:12px;padding:23px;display:grid;grid-template-columns:28px 1fr;gap:8px 14px;}
 .platform svg {width:24px;height:24px;grid-row:1 / 4;}
@@ -100,7 +100,7 @@
 .integrationHeader svg {width:22px;height:22px;flex:none;}
 .integrationHeader strong {font-size:14px;line-height:1.5;font-weight:500;}
 .integrationHeader .mark {width:30px;height:30px;}
-.integrationHeader .mark img {width:22px;}
+.integrationHeader .mark .markImage {width:22px;}
 .integrationRows {padding:0 24px;background:#fff;}
 .integrationRow {padding:24px 0;}
 .integrationRow + .integrationRow {border-top:1px solid #dce5d5;}

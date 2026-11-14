@@ -66,6 +66,15 @@ writeFileSync(new URL("src/shared/brand/brand-images-trolleys.css", root),
   "/* Generated from src/shared/brand/assets/trolleys-portal-logo.png. Regenerate: node tools/generate-inline-brand-images.mjs */\n" +
   `.brand-image-trolleys { --brand-image: url("data:image/webp;base64,${portalLogo.toString("base64")}"); }\n`);
 
+// Keep the footer symbol shared; load the full wordmark only on its use-case page.
+const cybersourceMarks = { cybersource: "cybersource-logo.png", "cybersource-symbol": "cybersource-symbol.png" };
+for (const [name, file] of Object.entries(cybersourceMarks)) {
+  const bytes = await compactMark(readFileSync(new URL(`src/shared/brand/assets/${file}`, root)));
+  writeFileSync(new URL(`src/shared/brand/brand-images-${name}.css`, root),
+    `/* Generated from original src/shared/brand/assets/${file}. Regenerate: node tools/generate-inline-brand-images.mjs */\n` +
+    `.brand-image-${name} { --brand-image: url("data:image/webp;base64,${bytes.toString("base64")}"); }\n`);
+}
+
 // Preserve public compatibility URLs while giving rendered artwork versioned cache keys.
 const artwork = [
   "brand/symbol.png",

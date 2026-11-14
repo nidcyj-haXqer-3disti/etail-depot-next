@@ -4,10 +4,12 @@ import Link from "next/link";
 import { BrandImage } from "../brand/brand-image";
 import { PlatformMark } from "../brand/platform-marks";
 import "../brand/brand-images-platforms.css";
+import "../brand/brand-images-cybersource-symbol.css";
 import { useCallback, useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import { publicFooterGroups } from "@/shared/site/site-navigation";
 
 const guideBrands = {
+  "/use-cases/no-code-checkout-experience": "cybersource",
   "/resources/merchant-account-setup": "trolleys",
   "/resources/shopify-gateway-integration": "shopify",
   "/resources/woocommerce-gateway-integration": "woocommerce",
@@ -19,7 +21,7 @@ function FooterLinkLabel({ href, label }: { href: string; label: string }) {
   const lastSpace = label.lastIndexOf(" ");
   // Keep the small raised mark with the final word when a narrow column wraps.
   return <span>{label.slice(0, lastSpace + 1)}<span className="public-footer-guide-ending">{label.slice(lastSpace + 1)}<span className={`public-footer-guide-brand public-footer-guide-brand-${brand}`} aria-hidden="true">
-    {brand === "trolleys" ? <BrandImage brand="trolleys-symbol" alt="" width={28} height={21} className="public-footer-guide-mark" /> : <PlatformMark brand={brand} className="public-footer-guide-mark" />}
+    {brand === "trolleys" ? <BrandImage brand="trolleys-symbol" alt="" width={28} height={21} className="public-footer-guide-mark" /> : brand === "cybersource" ? <BrandImage brand="cybersource-symbol" alt="" width={64} height={64} className="public-footer-guide-mark" /> : <PlatformMark brand={brand} className="public-footer-guide-mark" />}
   </span></span></span>;
 }
 

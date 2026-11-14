@@ -1,9 +1,6 @@
+import { CORE_PUBLIC_PATHS } from "../../src/shared/site/public-page-inventory";
 import { expectReadOnlyPlatformExample } from "./platform-example";
-import { LEGAL_CENTER_PATHS } from "../../src/shared/site/legal-paths";
-import { COMMERCIAL_PATHS } from "../../src/shared/site/commercial-paths";
-import { RESOURCE_PATHS } from "../../src/shared/site/resource-paths";
 import { STANDARD_REFERENCE_PATHS } from "../../src/shared/site/standard-reference-paths";
-import { DEVELOPER_PATHS } from "../../src/shared/site/developer-paths";
 import { shopifySetupSteps } from "../../src/features/resources/integrations/shopify/shopify-content";
 import { expect, test } from "@playwright/test";
 
@@ -16,6 +13,8 @@ test("renamed product bookmarks retain their section and reject submitted data",
     ["/software-partners", "/use-cases/software-platforms", "#integration"],
     ["/contact", "/company/contact", "#account-support"],
     ["/docs/merchant-onboarding", "/resources/merchant-account-setup", "#registration-email"],
+    ["/resources/blog", "/company/blog", "#main-content"],
+    ["/resources/no-code-checkout-experience", "/use-cases/no-code-checkout-experience", "#setup"],
     ["/guides/iso-20022/payment-transaction-status/acsp", "/resources/guides/iso-20022/payment-transaction-status/acsp", "#definition"],
   ];
   for (const [oldPath, destination, section] of destinations) {
@@ -49,7 +48,7 @@ test("renamed product bookmarks retain their section and reject submitted data",
 });
 
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
-  const pages = [...LEGAL_CENTER_PATHS, ...COMMERCIAL_PATHS, ...RESOURCE_PATHS, "/", ...DEVELOPER_PATHS, "/use-cases/software-platforms", "/use-cases/online-businesses", "/services/card-services", "/services/merchant-services", "/resources/help", "/company/privacy", "/company/terms", "/resources/guides"];
+  const pages = CORE_PUBLIC_PATHS;
   const privateRequests: string[] = [], errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });
@@ -92,7 +91,9 @@ test("public pages and every internal link resolve without account APIs or cooki
     if (renderedScreenshots.has(url.pathname) || shopifySetupSteps.some(step => "file" in step && url.pathname === `/help/shopify/${step.file}`)) {
       const screenshot = await request.get(url.pathname);
       expect(screenshot.status()).toBe(200);
-      expect(screenshot.headers()["content-type"]).toContain("image/webp");
+      const imageType = ({ webp: "image/webp", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg" } as Record<string, string>)[url.pathname.split(".").at(-1)!];
+      expect(imageType, `Reviewed screenshot format: ${url.pathname}`).toBeDefined();
+      expect(screenshot.headers()["content-type"].split(";")[0]).toBe(imageType);
       expect(url.search + url.hash).toBe("");
       continue;
     }

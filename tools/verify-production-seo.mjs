@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { DEVELOPER_PATHS } from "../src/shared/site/developer-paths.ts";
+import { DRAFT_BLOG_PATHS } from "../src/shared/site/blog-paths.ts";
 import { LEGAL_DOCUMENT_PATHS } from "../src/shared/site/legal-paths.ts";
 import { socialPreviewImage } from "../src/shared/seo/social-preview.ts";
 import { publicPageModified } from "../src/shared/site/public-page-revisions.ts";
@@ -316,9 +317,9 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of [...LEGAL_DOCUMENT_PATHS, ...DEVELOPER_PATHS, "/company/legal/unreviewed", "/production-seo-missing-page", "/resources/guides/unreviewed-missing-page", "/legal/unreviewed", "/resources/guides/payment-processing-fees", "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal", "/resources/guides/use-a-cash-register", "/resources/guides/unreviewed-charge-cards", "/resources/guides/sections/payment-processing-checkout", "/resources/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
+  for (const route of [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS, ...DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience", "/company/legal/unreviewed", "/production-seo-missing-page", "/resources/guides/unreviewed-missing-page", "/legal/unreviewed", "/resources/guides/payment-processing-fees", "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal", "/resources/guides/use-a-cash-register", "/resources/guides/unreviewed-charge-cards", "/resources/guides/sections/payment-processing-checkout", "/resources/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
     const response = await localFetch(route);
-    assert.equal(response.status, [...LEGAL_DOCUMENT_PATHS,...DEVELOPER_PATHS].includes(route) ? 200 : 404, `${route}: unexpected status.`);
+    assert.equal(response.status, [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS,...DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience"].includes(route) ? 200 : 404, `${route}: unexpected status.`);
     const body = await response.text();
     const metadata = /<head[\s>]/i.test(body) ? documentMetadata(body, route) : { metaValues: () => [] };
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];

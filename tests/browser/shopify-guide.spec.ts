@@ -10,7 +10,7 @@ test("Shopify guide is discoverable and its screenshots can be enlarged with the
   const nav = await openMainNavigation(page, "Resources");
   await nav.getByRole("link", { name: "Shopify integration", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`${path}$`));
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Connect Shopify to Cybersource.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Set up your Shopify checkout.");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://etaildepot.com${path}`);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   await expect(page.locator("main figure")).toHaveCount(12);

@@ -79,3 +79,14 @@ A private regeneration check reproduced all 31 generated or copied brand/artwork
 The shared generator uses lossless WebP for the embedded Etail wordmark, Etail symbol, Ledgix wordmark and full Trolleys portal logo. This reduces the stylesheets required for first paint without adding image requests. The public source originals and separately versioned copies remain byte identical. Network SVG/JPG marks and platform vector paths remain unchanged.
 
 The brand unit checks compare decoded dimensions and every visible RGB value and alpha value with the originals, and enforce smaller encoded size budgets. Regenerate with the pinned runtime using `node tools/generate-inline-brand-images.mjs`; do not replace these marks with lazy external images. This is an encoding change, not new artwork or permission.
+
+## Cybersource checkout attribution, 13 November 2026
+
+The user requested a small Cybersource mark on the No code checkout experience footer link and inside the page, with the header remaining text only. Originals were obtained from the [official Cybersource homepage](https://www.cybersource.com/en-us.html):
+
+| Source | Local original | Dimensions | SHA-256 |
+| --- | --- | --- | --- |
+| [Site symbol](https://www.cybersource.com/content/dam/cybs2020/images/evergreen/favicon-64x64.png) | `src/shared/brand/assets/cybersource-symbol.png` | 64 × 64 | `85cc8298c21e68dee76e5ecc55f9dcdb76e48a89a8de77683f9e47b3c2e8b1ce` |
+| [Header wordmark](https://www.cybersource.com/conf/cybs-2020/settings/wcm/templates/en-us-content-page-template/structure/_jcr_content/root/header/logo.img.png/1618856916900.png) | `src/shared/brand/assets/cybersource-logo.png` | 180 × 44 | `57102f46ea213d85b08b8be937b2fd30cff51c5b75b2da3e3adf8cc450631a12` |
+
+The shared generator embeds the symbol as lossless WebP in shared `brand-images-cybersource-symbol.css` and the full wordmark in page-only `brand-images-cybersource.css`. Original colors, transparency and proportions are preserved. The footer uses the decorative 14 pixel symbol with its existing text label; the page uses the wordmark for provider attribution. Trolleys remains the primary preview brand. No browser request to Cybersource is required to show either logo. This attribution does not assert account activation or provider endorsement.

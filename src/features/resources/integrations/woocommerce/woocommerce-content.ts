@@ -54,7 +54,7 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
       }
     ],
     "screenshot": "plugin",
-    "caption": "Visa Acceptance Solutions 3.0.0. Select Configure Payment Settings to open its settings."
+    "caption": "Select Configure Payment Settings beneath Visa Acceptance Solutions."
   },
   {
     "id": "open-payment-settings",
@@ -78,7 +78,7 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
     "actions": [
       {
         "title": "Open the Trolleys email",
-        "text": "Find your Cybersource Organization ID and Username. Follow the email to set your Cybersource password."
+        "text": "Choose the account for this store. Find its Cybersource Organization ID and Username, then follow the password setup link."
       }
     ],
     "note": "Missing the email? Contact Trolleys before continuing. Do not create another merchant account.",
@@ -106,7 +106,7 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
   },
   {
     "id": "create-shared-secret",
-    "title": "Copy and paste your API details",
+    "title": "Add your gateway ID and API keys",
     "location": "cybersource",
     "menu": "Payment Configuration → Key Management",
     "actions": [],
@@ -115,7 +115,7 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
   },
   {
     "id": "download-certificate",
-    "title": "Download your .p12 file",
+    "title": "Download your .p12 security file",
     "location": "cybersource",
     "menu": "Key Management → Generate key → REST – API Response MLE",
     "actions": [],
@@ -148,11 +148,11 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
     "actions": [
       {
         "title": "Enable the gateway",
-        "text": "Choose Embedded or Sidebar for the checkout display."
+        "text": "Choose Embedded to show payment fields in checkout, or Sidebar to open them in a side panel."
       },
       {
         "title": "Check collection settings",
-        "text": "Use the Charge Virtual-Only Orders and Capture Paid Orders settings confirmed by Trolleys."
+        "text": "With Charge Virtual-Only Orders enabled, approved payments for entirely virtual orders are collected automatically. With Capture Paid Orders enabled, marking an order Processing or Completed requests collection. Confirm both settings with Trolleys."
       },
       {
         "title": "Save changes",
@@ -178,7 +178,7 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
         "text": "Enter your details and complete any bank verification. Pay once; wait for Order received."
       }
     ],
-    "note": "This makes a real charge and may incur fees. Never use sandbox card numbers in Production.",
+    "note": "This makes a real charge and may incur fees. Never use sandbox card numbers in Production. If checkout stalls, check the order and Cybersource before paying again.",
     "screenshot": "checkout",
     "caption": "The WooCommerce payment interface. Your store theme may differ."
   },
@@ -194,7 +194,7 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
       },
       {
         "title": "Open Cybersource → Transaction Management → Transactions",
-        "text": "Find the Request ID. Match the order reference, amount and currency."
+        "text": "Use the WooCommerce payment reference to find the transaction. Match its Request ID, order reference, amount and currency."
       }
     ],
     "note": "Authorization is approval, not collection. Pending is not complete. If records disagree, contact Trolleys before taking more orders.",
@@ -209,7 +209,7 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
     "actions": [
       {
         "title": "Refund the captured payment",
-        "text": "Open the WooCommerce order. Select Refund, enter the amount, then Refund via Visa Acceptance Solutions."
+        "text": "Open the WooCommerce order. Select Refund, enter the full amount for this check, then Refund via Visa Acceptance Solutions."
       },
       {
         "title": "Check both accounts",

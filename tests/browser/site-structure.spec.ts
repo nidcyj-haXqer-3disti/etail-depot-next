@@ -104,8 +104,8 @@ test("Services, Use cases and Documentation remain usable without JavaScript", a
     await nav.locator("summary").filter({hasText:/^Developers$/}).click();
     await nav.getByRole("link",{name:"Testing",exact:true}).click();
     await expect(page).toHaveURL(/\/developers\/testing$/);
-    await expect(page.locator("#acceptance-tests")).toContainText("Invalid, repeated or delayed event");
-    const guidance = page.locator("#customer-journey details");
+    await expect(page.locator("#acceptance-tests")).toContainText("Test invalid signatures, decryption failures");
+    const guidance = page.locator("#acceptance-tests details").filter({ hasText: "Notifications and interrupted processing" });
     await expect(guidance.locator("p")).toBeHidden();
     await guidance.locator("summary").focus();
     await page.keyboard.press("Enter");
@@ -139,9 +139,11 @@ test("online business use case owns the merchant walkthrough and preserves navig
   await expect(page.getByRole("contentinfo").getByRole("link", { name: "Merchant onboarding", exact: true })).toHaveAttribute("href", "/services/merchant-onboarding");
   const service = page.locator(".online-business-actions").getByRole("link", { name: "Merchant services", exact: true });
   await expect(service).toHaveAttribute("href", "/services/merchant-services");
-  await page.getByRole("link", { name: "Connect online checkout", exact: true }).click();
-  await expect(page).toHaveURL(/\/developers\/getting-started#checkout$/);
-  await expect(page.locator("#checkout > h2")).toBeInViewport();
+  const comparison = page.locator(".cw-order-outcome").getByRole("link", { name: "Compare payment records", exact: true });
+  await expect(comparison).toHaveAttribute("href", "/services/reconciliation");
+  await comparison.click();
+  await expect(page).toHaveURL(/\/services\/reconciliation$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
   await page.goBack();
   await expect(page).toHaveURL(/\/use-cases\/online-businesses$/);
   await page.goBack();
@@ -234,7 +236,7 @@ test("all four industry cases remain readable without JavaScript", async ({brows
     }
     const nav = page.getByRole("navigation", {name:"Main navigation"});
     await nav.locator("summary").filter({hasText:/^Use cases$/}).click();
-    await expect(nav.locator("details[open] a")).toHaveCount(7);
+    await expect(nav.locator("details[open] a")).toHaveCount(8);
     await expect(nav.getByRole("link",{name:"Software platforms",exact:true})).toBeVisible();
     expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
   } finally { await context.close(); }
@@ -244,7 +246,7 @@ test("footer use cases remain distinct and usable at every breakpoint", async ({
   for (const width of [1440,1024,960,959,768,390,320]) {
     await page.setViewportSize({width,height:900}); await page.goto("/");
     const nav = await openFooterGroup(page, "Use cases");
-    const links = nav.getByRole("link"); await expect(links).toHaveCount(3);
+    const links = nav.getByRole("link"); await expect(links).toHaveCount(4);
     const boxes = await links.evaluateAll(items=>items.map(item=>{const r=item.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,height:r.height};}));
     for (const [index,box] of boxes.entries()) {
       expect(box.x).toBeGreaterThanOrEqual(0);expect(box.right).toBeLessThanOrEqual(width+1);expect(box.height).toBeGreaterThanOrEqual(44);
@@ -261,7 +263,7 @@ test("compact navigation preserves merchant and developer journeys", async ({ pa
   const navigation = header.getByRole("navigation", { name: "Main navigation", includeHidden: true });
   const directory = page.locator(".public-footer-navigation");
   await expect(directory.getByRole("navigation")).toHaveCount(5);
-  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(25);
+  await expect(directory.getByRole("link", { includeHidden: true })).toHaveCount(27);
   const destinations = await directory.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")));
   expect(new Set(destinations).size).toBe(destinations.length);
   await expect(navigation.locator('a[href^="/developers/"]')).toHaveCount(5);
@@ -387,7 +389,7 @@ test("footer groups work with a keyboard and adapt to screen size", async ({ pag
   await expect(page).toHaveURL(/\/developers\/testing$/);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "false");
-  await expect(directory.getByRole("link")).toHaveCount(25);
+  await expect(directory.getByRole("link")).toHaveCount(27);
   await expect(directory.locator("summary")).toHaveCount(0);
   await page.setViewportSize({ width: 320, height: 900 });
   await expect(directory).toHaveAttribute("data-compact", "true");
@@ -440,9 +442,9 @@ test("the complete footer remains usable without JavaScript", async ({ browser }
           await summary.click();
           destinations += await directory.getByRole("link").count();
         }
-        expect(destinations).toBe(25);
+        expect(destinations).toBe(27);
         await directory.locator("summary").filter({ hasText: /^Services$/ }).click();
-      } else await expect(directory.getByRole("link")).toHaveCount(25);
+      } else await expect(directory.getByRole("link")).toHaveCount(27);
       await directory.getByRole("link", { name: "Payouts", exact: true }).click();
       await expect(page).toHaveURL(/\/services\/payouts$/);
       await expect(page.getByRole("heading", {level:1})).toBeInViewport();
@@ -541,6 +543,12 @@ test("footer guide brands paint before scripts and keep link labels and layout s
     const directory = page.locator(".public-footer-navigation");
     const group = page.locator('.public-footer-group[aria-label="Footer resources"]:visible');
     const compact = await page.evaluate(() => matchMedia("(max-width: 959px)").matches);
+    const useCases = page.locator('.public-footer-group[aria-label="Footer use cases"]:visible');
+    if (compact) await useCases.locator("summary").click();
+    const noCode = useCases.getByRole("link", { name: "No code checkout experience", exact: true });
+    await expect(noCode.locator(".public-footer-guide-brand")).toBeVisible();
+    await expect(noCode.locator(".inline-brand-image")).toHaveCSS("content", /data:image\/webp;base64/);
+    await expect(noCode).toHaveAttribute("href", "/use-cases/no-code-checkout-experience");
     await expect(group).toBeVisible();
     if (compact) await group.locator("summary").click();
     await page.evaluate(async () => {
@@ -567,6 +575,7 @@ test("footer guide brands paint before scripts and keep link labels and layout s
     await expect(directory).toHaveAttribute("data-compact", String(compact));
     if (compact) await expect(group.locator("details")).toHaveAttribute("open", "");
     expect(await geometry()).toEqual(before);
+    await expect(directory.locator(".public-footer-guide-brand")).toHaveCount(4);
     for (const width of [320, 390, 768, 960, 1024, 1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       const resources = await openFooterGroup(page, "Resources");
@@ -580,6 +589,17 @@ test("footer guide brands paint before scripts and keep link labels and layout s
         expect(mark!.height).toBe(14);
         expect(mark!.x + mark!.width).toBeLessThanOrEqual(bounds!.x + bounds!.width + 1);
       }
+      const useCaseGroup = await openFooterGroup(page, "Use cases");
+      const noCodeLink = useCaseGroup.getByRole("link", { name: "No code checkout experience", exact: true });
+      const bounds = await noCodeLink.boundingBox();
+      const ending = await noCodeLink.locator(".public-footer-guide-ending").boundingBox();
+      const mark = await noCodeLink.locator(".public-footer-guide-brand").boundingBox();
+      expect(bounds).not.toBeNull(); expect(ending).not.toBeNull(); expect(mark).not.toBeNull();
+      expect(bounds!.height).toBeGreaterThanOrEqual(44);
+      expect(mark!.height).toBe(14);
+      expect(mark!.width).toBeLessThanOrEqual(26);
+      expect(mark!.x).toBeGreaterThan(ending!.x);
+      expect(mark!.x + mark!.width).toBeLessThanOrEqual(bounds!.x + bounds!.width + 1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     await page.reload();

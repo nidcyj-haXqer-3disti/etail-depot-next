@@ -67,15 +67,15 @@ export const merchantOnboardingContent = {
       "steps": [
         {
           "title": "Apply",
-          "detail": "Submit business and ownership information through Trolleys."
+          "detail": "Enter business and ownership information through Trolleys."
+        },
+        {
+          "title": "Review the agreement",
+          "detail": "Review fees, permitted activity, payout timing and reserve conditions before signing and submitting."
         },
         {
           "title": "Complete the review",
           "detail": "Provide requested records and resolve any outstanding requirements."
-        },
-        {
-          "title": "Review the agreement",
-          "detail": "Understand fees, permitted activity, payout timing and reserve conditions."
         },
         {
           "title": "Complete account setup",

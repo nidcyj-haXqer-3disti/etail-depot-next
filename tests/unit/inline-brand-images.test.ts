@@ -117,3 +117,15 @@ test("opening artwork symbol keeps the original pixels in its shared stylesheet"
   await expectSamePixels(bytes, readFileSync(new URL("../../src/shared/brand/assets/symbol.png", import.meta.url)));
   expect(bytes.length).toBeLessThan(6_144);
 });
+
+
+test("Cybersource page and footer marks retain their source pixels without external requests", async () => {
+  for (const [name, file, budget] of [["cybersource", "cybersource-logo.png", 8192], ["cybersource-symbol", "cybersource-symbol.png", 4096]] as const) {
+    const css = readFileSync(new URL(`../../src/shared/brand/brand-images-${name}.css`, import.meta.url), "utf8");
+    const encoded = css.match(/data:image\/webp;base64,([^"]+)/)?.[1];
+    expect(encoded, name).toBeDefined();
+    const bytes = Buffer.from(encoded!, "base64");
+    await expectSamePixels(bytes, readFileSync(new URL(`../../src/shared/brand/assets/${file}`, import.meta.url)));
+    expect(bytes.length, name).toBeLessThan(budget);
+  }
+});

@@ -59,7 +59,11 @@ test("merchant terms require acceptance and retain financial and legal boundarie
 
 test("fee and funding schedules distinguish approved prices from conditional account timing", async ({ page }) => {
   await page.goto("/company/legal/fees");
-  await expect(page.locator(".legal-rate-list > div")).toHaveCount(9);
+  await expect(page.locator(".legal-rate-list > div")).toHaveCount(10);
+  const linkFee = page.locator(".legal-rate-list > div").filter({ hasText: "Payment link or QR payment" });
+  await expect(linkFee).toContainText("+20¢");
+  await expect(linkFee).toContainText("per successful payment");
+  await expect(linkFee).toContainText("once, not twice");
   await expect(page.locator(".legal-rate-list")).toContainText("2.9% + 30¢");
   await expect(page.locator(".legal-rate-list")).toContainText("$35");
   await expect(page.locator(".legal-rate-list")).toContainText("$15");

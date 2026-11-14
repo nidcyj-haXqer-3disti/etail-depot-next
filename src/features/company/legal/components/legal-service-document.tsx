@@ -8,7 +8,8 @@ import { LegalDocument, type LegalSection } from "./legal-document";
 type SectionCopy = { id: string; title: string; paragraphs: string[]; bullets?: string[]; links?: { label: string; href: string }[]; table?: string; record?: { label: string; description: string }[] };
 const fees = productFacts.payments;
 const feeRows = [
-  ["Domestic online card payment", fees.cardRateLabel, "Per successful payment. Payment request creation and sharing are included."],
+  ["Domestic online card payment", fees.cardRateLabel, "Per successful payment. Basic payment receipts are included."],
+  ["Payment link or QR payment", `+${fees.paymentLinkOrQrFeeCents}¢`, "Additional fee per successful payment through either method. A QR payment incurs this fee once, not twice."],
   ["Monthly account fee", `$${fees.monthlyFeeDollars}`, "Under the standard merchant offer."],
   ["Account setup", `$${fees.setupFeeDollars}`, "Under the standard merchant offer."],
   ["International card", `+${fees.internationalRateLabel}`, "Additional percentage of the payment amount."],
@@ -41,6 +42,6 @@ export function LegalServiceDocument({ slug }: { slug: LegalDocumentSlug }) {
       {section.links && <ul className="legal-related-links">{section.links.map(link => <li key={link.href}>{link.href.startsWith("/") ? <Link href={currentPublicHref(link.href)}>{link.label}</Link> : <a href={link.href} {...(link.href.startsWith("https:") ? { rel: "external noreferrer", referrerPolicy: "no-referrer" as const } : {})}>{link.label}</a>}</li>)}</ul>}
     </>,
   }));
-  const updated = ["merchant-services", "fees", "payouts-and-reserves", "acceptable-use", "software-platforms", "acquirer-disclosure", "data-processing", "merchant-privacy"].includes(slug) ? "November 5, 2026" : "November 4, 2026";
+  const updated = slug === "fees" ? "November 14, 2026" : ["merchant-services", "fees", "payouts-and-reserves", "acceptable-use", "software-platforms", "acquirer-disclosure", "data-processing", "merchant-privacy"].includes(slug) ? "November 5, 2026" : "November 4, 2026";
   return <LegalDocument title={document.title} description={document.description} updated={updated} sections={sections} />;
 }

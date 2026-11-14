@@ -1,5 +1,6 @@
 import { brandSymbol } from "./artwork-assets";
 import Image from "next/image";
+import { BrandImage } from "../../brand/brand-image";
 import { legalIdentity } from "@/shared/site/legal-identity";
 import { Icon } from "../icon";
 import styles from "./company-reference-art.module.css";
@@ -20,7 +21,7 @@ export function CompanyContextArt({ kind }: { kind: "company" | "trust" | "facil
   </figure>;
   return <figure className="company-context-art facilitator-context">
     <div className="context-art-heading"><Icon name="layers" /><h2>The merchant service relationship</h2></div>
-    <div className="facilitator-relationship"><div><Icon name="business" /><h3>Merchant</h3><p>The sale and customer relationship</p></div><div className="facilitator-etail"><Image src={brandSymbol} alt="" width={800} height={484} unoptimized preload /><h3>Etail Depot</h3><p>Merchant service and payment facilitation</p></div><div><Icon name="bank" /><h3>Acquiring partner</h3><p>The acquiring arrangement</p></div></div>
+    <div className="facilitator-relationship"><div><Icon name="business" /><h3>Merchant</h3><p>The sale and customer relationship</p></div><div className="facilitator-etail"><BrandImage brand="symbol" alt="" width={800} height={484} className="facilitator-brand" /><h3>Etail Depot</h3><p>Merchant service and payment facilitation</p></div><div><Icon name="bank" /><h3>Acquiring partner</h3><p>The acquiring arrangement</p></div></div>
     <div className="facilitator-network-context"><div><span>Card network</span><p>Participation and transaction rules</p></div><div><span>Card issuer</span><p>The customer’s card account</p></div></div>
     <figcaption>This diagram shows the participants in a card payment. Card messages and settlement follow the applicable network rules and account agreements.</figcaption>
   </figure>;

@@ -1,3 +1,4 @@
+import "@/shared/brand/brand-images-symbol.css";
 import { CommercialPage } from "@/shared/ui/commercial-page";
 import { partnershipsContent as page } from "./content";
 import { ServiceWorkflowArt } from "@/features/services/components/service-workflow-art";

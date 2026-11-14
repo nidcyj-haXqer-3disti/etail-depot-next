@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { WooCommerceGuideScreenshot } from "./woocommerce-guide-screenshot";
 import { CertificateFile } from "./woocommerce-connection-walkthrough";
 import woo from "../../components/integration-guide.module.css";
@@ -14,6 +15,7 @@ export function WooCommerceFileTransfer() {
     <div className={woo.fileHandoff}><CertificateFile label="Move this file to your store" /><p>Computer → Cyberduck → Your store. The pictures show Mac; Windows uses the same fields.</p></div>
     <TransferAction number={1} id="wordpress-file-access" title="Get your file access details" where="WordPress.com" photo={<WooCommerceGuideScreenshot name="storage" title="Get file access details" step="8.1" caption="Use the server, port, username and password for your own store." />}>
       <p>Select your store, then <strong>Settings → SFTP/SSH</strong>.</p><p>Click <strong>Create credentials</strong> if shown. Save the password and leave this tab open. SSH can stay disabled.</p><p className={woo.essentialNote}>This is the file access password, separate from your WordPress sign in.</p>
+      <details className={woo.smallHelp}><summary>Already have credentials but no password?</summary><p>Use your saved SFTP password. If you lost it, select <strong>Reset password</strong> and save the replacement. Any other file-transfer app using the old password will need the new one.</p></details>
     </TransferAction>
     <TransferAction number={2} id="download-cyberduck" title="Open Cyberduck" where="Your browser" photo={<WooCommerceGuideScreenshot name="duckDownload" title="Download Cyberduck" step="8.2" caption="Use the download for your computer. A paid edition is not needed." />}>
       <p>Download Cyberduck from <a href="https://cyberduck.io/download/" target="_blank" rel="noopener noreferrer">cyberduck.io/download</a>.</p><p><strong>Mac:</strong> Open the .zip, move Cyberduck to Applications and open it.</p><p><strong>Windows:</strong> Open the installer, finish installation and open Cyberduck.</p>
@@ -25,7 +27,7 @@ export function WooCommerceFileTransfer() {
     </TransferAction>
     <TransferAction number={4} id="certificate-folder" title="Create a folder for your .p12" where="Cyberduck" photo={<WooCommerceGuideScreenshot name="duckFolders" title="Open wp-content" step="8.4" caption="Open wp-content, then create the certificate folder inside it." />}>
       <p>Open <strong>htdocs → wp-content</strong>. You may already be inside htdocs.</p><p>Select <strong>View → Show Hidden Files</strong>, then <strong>File → New Folder</strong>.</p><p>Name the folder <code>.certificates</code>, including the first dot. Click <strong>Create</strong>, or open it if it already exists. This is a folder you create, not another file to download.</p>
-      <p id="check-certificate-folder" className={`${woo.essentialNote} ${woo.storageNote}`}>The folder must block public downloads before you upload the .p12. A dot in its name or file permissions alone does not guarantee this. If unsure, contact Trolleys.</p>
+      <p id="check-certificate-folder" className={`${woo.essentialNote} ${woo.storageNote}`}>The folder must block public downloads before you upload the .p12. <Link prefetch={false} href="/company/contact#account-support">Ask Trolleys to confirm protected storage</Link> if this has not been checked. WordPress must still be able to read the file; a dot in the folder name and the permissions below do not prove protection.</p>
     </TransferAction>
     <TransferAction number={5} id="certificate-folder-permissions" title="Set the folder permissions" where="Cyberduck" photo={<WooCommerceGuideScreenshot name="duckFolderPermissions" title="Set folder permissions" step="8.5" caption="Set the folder to 700. Keep Apply changes recursively unselected." />}>
       <p>Select the <strong>.certificates</strong> folder, then <strong>File → Info → Permissions</strong>.</p><p>Enter <strong>700</strong> and press Tab. Close and reopen Info to check that 700 remains.</p>
@@ -37,7 +39,7 @@ export function WooCommerceFileTransfer() {
       <p>Look for <strong>Upload complete</strong> in the Transfers window.</p><p>If the window is hidden, select <strong>Window → Transfers</strong>. Do not continue while the upload is running or failed.</p>
     </TransferAction>
     <TransferAction number={8} id="certificate-file-permissions" title="Protect the uploaded .p12" where="Cyberduck" photo={<WooCommerceGuideScreenshot name="duckFilePermissions" title="Set file permissions" step="8.8" caption="600 is for the .p12 file. The folder uses 700." />}>
-      <p>Select the uploaded <strong>.p12</strong>, then <strong>File → Info → Permissions</strong>.</p><p>Enter <strong>600</strong> and press Tab. Close and reopen Info to check that 600 remains.</p><p className={woo.essentialNote}>Do not upload the certificate to the WordPress Media Library.</p>
+      <p>Select the uploaded <strong>.p12</strong>, then <strong>File → Info → Permissions</strong>.</p><p>Enter <strong>600</strong> and press Tab. Close and reopen Info to check that 600 remains.</p><p className={woo.essentialNote}>Do not upload the certificate to the WordPress Media Library.</p><p>Your .p12 is now on the store. Keep its exact filename for the WordPress settings.</p>
     </TransferAction>
   </div>;
 }

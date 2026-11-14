@@ -1,0 +1,20 @@
+.portals { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:24px 0; }
+.portal { display:flex;flex-direction:column;min-width:0;padding:24px;background:var(--docs-tint);border:1px solid var(--docs-line);border-radius:8px; }
+.eyebrow { display:flex;align-items:center;gap:8px; }
+.eyebrow svg { width:18px;height:18px;flex:none; }
+.portal h3 { margin:0 0 10px;font-size:18px;line-height:1.35;font-weight:500; }
+.portal p,.portal dd { color:var(--docs-muted);font-size:14px;line-height:1.75; }
+.portal p,.portal dl { margin:0 0 18px; }
+.portal dl > div + div { margin-top:14px; }
+.portal dt { margin-bottom:4px;font-size:13px;font-weight:600;line-height:1.6; }
+.portal dd { margin:0; }
+.portal > a { margin-top:auto; }
+ul.connections > li:not(:last-child)::before { display:none; }
+.connections > li > span svg { width:18px;height:18px; }
+.wallet { padding-bottom:20px;color:var(--docs-muted);font-size:15px;line-height:1.8; }
+.wallet ol { padding-left:22px; }
+.wallet li { margin-bottom:14px; }
+.wallet code { display:block;margin-top:10px;padding:12px;background:var(--docs-tint);font-size:12px;overflow-wrap:anywhere; }
+.handoff ul { margin:0;padding-left:18px; }
+.handoff li + li { margin-top:10px; }
+@media(max-width:680px){.portals{grid-template-columns:minmax(0,1fr)}.portal{padding:22px}.portal h3{font-size:20px}.portal p,.portal dd{font-size:15px}}
