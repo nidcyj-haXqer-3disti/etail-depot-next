@@ -20,6 +20,27 @@ Keep excluded reproduced ISO tables, original account captures, credentials and 
 2. Confirm applicable authorization covers this candidate's publication.
 3. Use the [GitHub review procedure](GITHUB_DELIVERY.md). Bind passing CI and the merge to the exact reviewed source. No force push or protection bypass.
 4. Use the bound site's reviewed Git build and manual **Trigger deploy**, so the enabled Emails plugin and final `onPostBuild` verifier run. Preserve `build.ignore = "exit 0"`. Do not add unattended hooks or use a static-only upload.
-5. Record deploy ID, exact commit, build result and read-back status. Verify hosted pages, sitemap, canonicals, security headers, mobile behavior, compression, cache and retirement responses. Confirm `/tools/reference-release.json` and `/reference-release.json` return 404. Do not submit merchant accounts or payments as a deployment check.
+5. Record deploy ID, exact commit, build result and read-back status. Verify hosted pages, sitemap, canonicals, security headers, mobile behavior, compression, cache and retirement responses. Use the separate hosted health and boundary checks below; the boundary check confirms both release manifests remain unavailable. Do not submit merchant accounts or payments as a deployment check.
 
 Stop if identity, source, checks or authorization differ. Keep the enabled Netlify Emails extension and all its settings. Only its pinned authenticated POST handler is allowed. Preserve databases, Identity, DNS, email, denied projects and provider resources. A website rollback does not restore a retired backend or alter financial records.
+
+## Hosted verification and Netlify error reporting
+
+After confirming the published deploy ID and commit in Netlify, run the shared checker from that source revision:
+
+```sh
+pnpm verify:hosted --deploy <Netlify-deploy-ID>
+pnpm verify:hosted --boundaries --deploy <Netlify-deploy-ID>
+```
+
+The default **health** run requests the registered core pages, robots.txt and sitemap.xml. It expects HTTP 200 and the site's security headers. Any unexpected status, header, timeout or response failure fails the run. These checks do not replace content, sitemap membership, assets, compression/cache, desktop/mobile or booking verification.
+
+The separate **boundary** run makes only five GET requests: two representative retired URLs expecting 410, both release manifests expecting 404, and one internal document expecting 404. Expected security, noindex and applicable no-store headers must also match. An exposed private file returning 200, a different error code or a redirect is a failure. Do not repeat the exhaustive alias/retirement matrix against production; the unit and production-SEO suites already cover it locally. Run the small hosted boundary check once per release, repeating only when investigating a failure.
+
+Each mode uses its own User-Agent containing a unique run ID. Private receipts in `.local/hosted-verification/` record the operator-supplied deploy ID, local commit/dirty state, UTC run/request windows, Netlify request IDs, actual status counts, expected boundary responses and unexpected failures. The deploy ID is an attribution label, not an authenticated remote identity check. Confirm it before running. Interrupted runs remain incomplete and fail; response bodies, cookies and credentials are not retained. Commands are GET-only, use the bound canonical origin, do not follow redirects and do not retry automatically. They are manual hosted checks, not part of CI or the four local release gates.
+
+Netlify's raw traffic totals still include these requests. Its Observability Errors percentage groups Client Error and Server Error responses; Not Found is displayed separately in the dashboard reviewed on 15 November 2026. An expected 410 can therefore raise that percentage even when the test passes. This tool does not change Netlify filters, security settings or HTTP behavior.
+
+When investigating an error percentage, record the dashboard time window, filter by the exact receipt User-Agent and compare each path/status with the planned assertion. Report **expected boundary responses**, **unexpected verification failures** and **other traffic errors** separately. Never exclude all 4xx, all verifier traffic or all traffic during the test window. A verifier receiving an unexpected 500 still indicates a real problem. Inspect remaining failures by status and URL before attributing them to visitors, bots or tests.
+
+Every release summary must state the healthy-check result, expected 404/410 counts and UTC window, unexpected failures, and remaining hosted checks. Tell the operator when deliberate boundary probes affect the aggregate metric; do not report it as a percentage of visitors experiencing failure. Preserve real 404/410 responses instead of returning 200 to improve a dashboard number.

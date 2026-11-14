@@ -30,4 +30,6 @@ Preserve the distinction between static checks over all generated URLs and brows
 
 Do not count older evidence as a new run, hide failures with blanket skips, or weaken a reproduced regression. A previous green CI run does not verify changed source. A PR merge, package or ready deployment does not establish merchant activation, successful payments or account-term acceptance.
 
+Hosted HTTP checks use the separate health and boundary modes in the [Netlify runbook](NETLIFY_DEPLOYMENT.md#hosted-verification-and-netlify-error-reporting). Record the exact User-Agent/run ID and UTC window, expected 404/410 responses and unexpected failures separately. A matched HTTP status with missing security headers is still a failure. Keep exhaustive negative checks local; production error-rate totals must be investigated by request rather than presented as visitor failure percentages.
+
 Hosted checks follow an authorized [manual release](NETLIFY_DEPLOYMENT.md) and are reported separately. The former platform test specification is retained in [history](../archive/project-history/docs/TEST_AND_EVIDENCE.md).

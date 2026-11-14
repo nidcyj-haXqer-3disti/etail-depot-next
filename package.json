@@ -27,7 +27,8 @@
     "verify": "pnpm verify:public && pnpm test:seo:production && pnpm package:netlify && pnpm verify:package",
     "package:review": "node tools/package-public-site.mjs --local-review",
     "verify:package:review": "node tools/verify-architecture.mjs --artifacts --local-review",
-    "test:publication": "node tools/verify-file-publication.mjs"
+    "test:publication": "node tools/verify-file-publication.mjs",
+    "verify:hosted": "node tools/verify-hosted-site.mjs"
   },
   "dependencies": {
     "next": "16.4.1",
