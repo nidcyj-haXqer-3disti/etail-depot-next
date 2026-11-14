@@ -42,11 +42,15 @@ test("merchant services explain the lifecycle, pricing and safe account handoff"
   const setup = page.locator("#payments details").filter({ hasText: "Can my business apply for a merchant account?" });
   await setup.locator("summary").click();
   await expect(setup).toContainText("Payments can start once the account is approved and set up");
-  await expect(setup.getByRole("link", { name: "merchant account setup", exact: true })).toHaveAttribute("href", "/services/merchant-onboarding");
-  const wallets = page.locator("#payments details").filter({ hasText: "Can customers pay by ACH, Apple Pay or Google Pay?" });
+  await expect(setup.getByRole("link", { name: "merchant account setup", exact: true })).toHaveAttribute("href", "/resources/merchant-account-setup");
+  const wallets = page.locator("#checkout details").filter({ hasText: "Can customers pay by ACH, Apple Pay or Google Pay?" });
   await wallets.locator("summary").click();
   await expect(wallets).toContainText("checkout options for your account during setup");
   await expect(wallets).toContainText("Wallet availability also depends on the customer’s card and device");
+  const feeHelp = page.locator("#payments details").filter({ hasText: "What will I pay to accept card payments?" });
+  await feeHelp.locator("summary").click();
+  await expect(feeHelp).toContainText("An additional fee applies per successful payment through a link or QR code");
+  await expect(feeHelp).toContainText("A QR payment incurs this fee once");
 });
 
 test("domestic card fee breakdown reconciles and recovers invalid input without submitting data", async ({ page }) => {
@@ -72,11 +76,13 @@ test("domestic card fee breakdown reconciles and recovers invalid input without 
   expect(rateContrast, "The actual card rate must remain readable against its pricing panel").toBeGreaterThanOrEqual(4.5);
   await expect(offer.locator(".pricing-account-fees dt")).toHaveText(["Monthly fee", "Setup fee"]);
   await expect(offer.locator(".pricing-account-fees dd")).toHaveText(["$0", "$0"]);
-  await expect(offer.getByRole("list", { name: "Included services" }).getByRole("listitem")).toHaveText(["Payment links", "QR sharing", "Basic payment receipts"]);
+  await expect(offer.getByRole("list", { name: "Included services" }).getByRole("listitem")).toHaveText(["Basic payment receipts"]);
+  await expect(offer).not.toContainText("20¢");
   const estimate = page.locator(".fee-estimate");
   await expect(estimate.locator("dl dt")).toHaveText(["2.9% of the payment", "Fixed fee", "Processing fee", "After card processing"]);
   await expect(estimate.locator("dl dd")).toHaveText(["$2.90", "$0.30", "$3.20", "$96.80"]);
   await expect(estimate).toContainText("other applicable charges");
+  await expect(estimate).toContainText("Excludes payment link and QR fees");
   await expect(estimate).toContainText("This is not a guaranteed payout");
   await expect(estimate.locator("input")).toHaveCount(1);
   const amount = estimate.getByLabel("Payment amount USD");
@@ -186,6 +192,8 @@ test("pricing keeps additional charges and refund conditions with the shared off
   await fees.locator(".offer-details > summary").click();
   await expect(fees.locator(".fee-exceptions")).toBeVisible();
   await expect(fees.locator(".offer-details .payment-method-scope")).toBeVisible();
+  await expect(fees.locator(".fee-exceptions")).toContainText("Payment links and QR payments+20¢ per successful payment");
+  await expect(fees.locator(".offer-details")).toContainText("A QR payment incurs the additional 20¢ fee once, not twice");
   await expect(fees.locator(".fee-exceptions")).toContainText("$35 each");
   await expect(fees.locator(".fee-exceptions")).toContainText("$15; returned if you win");
   await expect(fees).toContainText("Original processing and currency conversion fees are not returned");

@@ -4,6 +4,10 @@ import { developerJsonLd,developerMetadata } from "../../src/features/developers
 import { isPublicContentPath,isIndexablePath } from "../../src/shared/site/public-page-inventory";
 import { publicPageRedirect,managedContentRoute } from "../../src/shared/site/public-routes";
 import { publicNavigationGroups,publicFooterGroups } from "../../src/shared/site/site-navigation";
+import { gettingStartedArticle } from "../../src/features/developers/getting-started/content";
+import { webhooksArticle } from "../../src/features/developers/webhooks/content";
+import { testingArticle } from "../../src/features/developers/testing/content";
+import { developerToolsArticle } from "../../src/features/developers/developer-tools/content";
 
 test("the five Developer navigation links share destinations while published pages retain metadata",()=>{
  expect(DEVELOPER_NAVIGATION.map(page=>page.label)).toEqual(["Getting started","API reference","Webhooks","Testing","Developer tools"]);
@@ -28,4 +32,29 @@ test("old documentation pages redirect only known document aliases to current pa
  }
  for(const path of DEVELOPER_PATHS)expect(publicPageRedirect(path)).toBeNull();
  for(const path of ["/developers/unknown","/developers/api-reference/secret","/developers%2Fsecret"]){expect(managedContentRoute(path)).toBe(true);expect(isPublicContentPath(path)).toBe(false);}
+});
+
+test("the approved-account guide retains all former access and checkout bookmarks",()=>{
+ const anchors=gettingStartedArticle.sections.flatMap(section=>[section.id,...(section.aliases??[])]);
+ expect(new Set(anchors).size).toBe(anchors.length);
+ for(const anchor of [
+  "integration-access","developer-integration","integration-access-specifications","connection-map","account-mapping","credentials","verify-access","implementation-handoff",
+  "checkout","checkout-setup","checkout-specifications","checkout-flow","completion-policy","server-setup","customer-interface","complete-payment","checkout-recovery","checkout-validation",
+  "related-guides","topics","merchant-operations","getting-started","payment-requests","payment-records","refunds-and-disputes","payouts","webhooks","testing-and-launch",
+ ])expect(anchors).toContain(anchor);
+});
+
+test("the Cybersource webhook guide retains former notification and funding bookmarks",()=>{
+ const anchors=webhooksArticle.sections.flatMap(section=>[section.id,...(section.aliases??[])]);
+ expect(new Set(anchors).size).toBe(anchors.length);
+ for(const anchor of ['webhooks','webhooks-specifications','event-domains','event-security','payment-event','event-handler','funding-events','recovery-cases'])expect(anchors).toContain(anchor);
+});
+
+test.each([
+ ["Testing",testingArticle,["testing-and-launch","testing-and-launch-specifications","test-environment","acceptance-tests","customer-journey","technical-review","production-readiness","ongoing-support"]],
+ ["Developer tools",developerToolsArticle,["payment-requests","choose-request","create-share","request-result","request-follow-up"]],
+] as const)("%s retains every former guide bookmark",(_name,article,expected)=>{
+ const anchors=article.sections.flatMap(section=>[section.id,...(section.aliases??[])]);
+ expect(new Set(anchors).size).toBe(anchors.length);
+ for(const anchor of expected)expect(anchors).toContain(anchor);
 });

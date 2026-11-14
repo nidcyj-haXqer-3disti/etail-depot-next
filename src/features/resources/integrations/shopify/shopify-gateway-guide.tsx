@@ -35,8 +35,8 @@ function ShopifyStepLocation({ id }: { id: string }) {
 export function ShopifyGatewayGuide() {
   const structuredData = {
     "@context": "https://schema.org", "@type": "TechArticle",
-    headline: "Connect Shopify to Cybersource", description: "A screenshot guide to installing and activating Cybersource for your Shopify checkout with Trolleys, powered by Etail Depot.",
-    url: `https://etaildepot.com${shopifyGuidePath}`, dateModified: "2026-11-07", inLanguage: "en-US",
+    headline: "Set up your Shopify checkout", description: "A screenshot guide to setting up card payments for your Shopify store with Trolleys, powered by Etail Depot.",
+    url: `https://etaildepot.com${shopifyGuidePath}`, dateModified: "2026-11-14", inLanguage: "en-US",
     author: { "@type": "Organization", name: "Etail Depot", url: "https://etaildepot.com/company/about" },
     publisher: { "@type": "Organization", name: "Etail Depot", url: "https://etaildepot.com" },
   };
@@ -45,9 +45,9 @@ export function ShopifyGatewayGuide() {
     <header className={`${styles.hero} ${guide.hero}`}>
       <div>
         <p className={styles.eyebrow}>Shopify integration</p>
-        <h1>Connect Shopify<br /> to Cybersource.</h1>
+        <h1>Set up your<br /> Shopify checkout.</h1>
         <p className={styles.lead}>Add card payments to your Shopify checkout. No coding is needed for this setup.</p>
-        <p className={styles.meta}>Live store setup <span aria-hidden="true">·</span> Updated November 7, 2026</p>
+        <p className={styles.meta}>Live store setup <span aria-hidden="true">·</span> Updated November 14, 2026</p>
       </div>
     </header>
     <div className={guide.readingLayout}>

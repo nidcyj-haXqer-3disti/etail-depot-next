@@ -91,7 +91,7 @@ test("Help application guidance opens account setup at the beginning", async ({ 
   await setup.scrollIntoViewIfNeeded();
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
   await setup.click();
-  await expect(page).toHaveURL(/\/services\/merchant-onboarding$/);
+  await expect(page).toHaveURL(/\/resources\/merchant-account-setup$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(1);
   await page.goBack();

@@ -239,7 +239,7 @@ test("public service discovery explains eligibility and card inquiries without l
   for(const path of ["/","/use-cases/software-platforms","/services/card-services","/services/merchant-services","/pricing","/resources/help"]){
     await page.goto(path);
     const mainNavigation=await openMainNavigation(page);
-    await expect(mainNavigation.locator("a")).toHaveCount(26);
+    await expect(mainNavigation.locator("a")).toHaveCount(27);
     for(const [name,href] of [["Merchant onboarding","/services/merchant-onboarding"],["Software platforms","/use-cases/software-platforms"],["Online businesses","/use-cases/online-businesses"],["Card services","/services/card-services"],["Getting started","/developers/getting-started"],["Guides","/resources/guides"],["Pricing","/pricing"]]){
       await expect(mainNavigation.getByRole("link",{name,exact:true,includeHidden:true})).toHaveAttribute("href",href);
     }
@@ -420,6 +420,15 @@ test("opening artwork symbols use embedded styles or early image requests on fir
   let resourcesReady = Promise.resolve();
   let symbolRequested = false;
   let symbolName = "symbol";
+  // WebKit can reuse decoded images without another request, including SVG image elements.
+  // Observe successful native loads rather than starting a request from the test itself.
+  await page.addInitScript(() => {
+    const loaded = new WeakSet<Element>();
+    (window as Window & { __etailLoadedSvgImages?: WeakSet<Element> }).__etailLoadedSvgImages = loaded;
+    document.addEventListener("load", event => {
+      if (event.target instanceof SVGImageElement) loaded.add(event.target);
+    }, true);
+  });
   await page.route("**/*", async route => {
     const request = route.request();
     if (new RegExp(`/_next/static/media/${symbolName}\\.[^/]+\\.png$`).test(new URL(request.url()).pathname)) symbolRequested = true;
@@ -427,7 +436,7 @@ test("opening artwork symbols use embedded styles or early image requests on fir
     await route.continue();
   });
   for (const path of ["/", "/use-cases/software-platforms", "/use-cases/switch-merchant-services", "/services/merchant-onboarding", "/use-cases/software-platforms/partnerships", "/use-cases/software-platforms/payment-models", "/services/payment-facilitator", "/company/contact"]) {
-    const embedded = ["/", "/use-cases/software-platforms", "/use-cases/switch-merchant-services"].includes(path);
+    const embedded = ["/", "/use-cases/software-platforms", "/use-cases/switch-merchant-services", "/use-cases/software-platforms/partnerships", "/services/payment-facilitator"].includes(path);
     symbolName = path === "/services/merchant-onboarding" ? "trolleys-portal-logo" : "symbol";
     for (const refresh of [false, true]) {
       symbolRequested = false;
@@ -435,7 +444,12 @@ test("opening artwork symbols use embedded styles or early image requests on fir
       try {
         if (refresh) await page.reload({ waitUntil: "commit" });
         else await page.goto(path, { waitUntil: "commit" });
-        if (!embedded && path !== "/services/merchant-onboarding") await expect.poll(() => symbolRequested, { message: `${path} must request its opening symbol before layout and hydration` }).toBe(true);
+        if (!embedded && path !== "/services/merchant-onboarding") {
+          await expect.poll(async () => symbolRequested || page.locator(`img[src*="/${symbolName}."], image[href*="/${symbolName}."]`).evaluateAll(images => {
+            const loaded = (window as Window & { __etailLoadedSvgImages?: WeakSet<Element> }).__etailLoadedSvgImages;
+            return images.some(image => image instanceof HTMLImageElement ? image.complete && image.naturalWidth > 0 : loaded?.has(image) === true);
+          }), { message: `${path} must request or already have its opening symbol before layout and hydration` }).toBe(true);
+        }
       } finally { releaseResources(); }
       await page.waitForLoadState("load");
       const preloads = page.locator(`head link[rel="preload"][as="image"][href*="/${symbolName}."]`);
@@ -444,13 +458,17 @@ test("opening artwork symbols use embedded styles or early image requests on fir
         await expect(page.locator("main .brand-image-trolleys")).toHaveCSS("content", /url\("data:image\/webp;base64,/);
         await expect(preloads).toHaveCount(0);
       } else if (embedded) {
-        const mark = page.locator('[data-company-art] .brand-image-symbol, [data-attention-art] .brand-image-symbol');
+        const mark = page.locator('[data-company-art] .brand-image-symbol, [data-attention-art] .brand-image-symbol, [data-service-workflow="partnerships"] .brand-image-symbol, .facilitator-brand');
         await expect(mark).toHaveCount(1);
         await expect(mark).toHaveCSS("content", /url\("data:image\/webp;base64,/);
         await expectDecodedBrandMarks(mark);
         // Other artwork and selectively prefetched routes may still use the PNG.
         // Only the opening artwork has switched to embedded delivery.
-        await expect(page.locator('[data-company-art] img[src*="/symbol."], [data-attention-art] img[src*="/symbol."]')).toHaveCount(0);
+        await expect(page.locator('[data-company-art] img[src*="/symbol."], [data-attention-art] img[src*="/symbol."], [data-service-workflow="partnerships"] img[src*="/symbol."], .facilitator-etail img[src*="/symbol."]')).toHaveCount(0);
+        if (["/use-cases/software-platforms/partnerships", "/services/payment-facilitator"].includes(path)) {
+          expect(symbolRequested).toBe(false);
+          await expect(preloads).toHaveCount(0);
+        }
       } else await expect(preloads).toHaveCount(1);
       await expect(page.locator(`img[src*="/${symbolName}."][loading="lazy"]`)).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);

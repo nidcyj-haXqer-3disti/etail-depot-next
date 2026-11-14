@@ -57,12 +57,11 @@ export function SalesBookingLink({ url, children = "Book a call", className = st
         <div className={styles.identity}>
           <BrandImage brand="etail" alt="Etail Depot" width={800} height={150} className={styles.logo} />
           <h2 id={titleId} className={styles.accessibleTitle}>Book a call</h2>
-          <p>{hostedServices.sales.durationMinutes} minutes with {hostedServices.sales.hostName}</p>
+          <p role="status">{frameLoaded ? `${hostedServices.sales.durationMinutes} minutes with ${hostedServices.sales.hostName}` : "Loading available times…"}</p>
         </div>
         <button type="button" className={styles.close} onClick={() => dialog.current?.close()} aria-label="Close" autoFocus><Icon name="close" /></button>
       </div>
       <div className={styles.frameArea}>
-        {!frameLoaded && <p className={styles.loading} role="status">Loading available times…</p>}
         <iframe src={embedUrl} title="Book a call with Etail Depot" className={styles.frame} referrerPolicy="no-referrer" onLoad={() => setFrameLoaded(true)} />
       </div>
       <div className={styles.footer}>

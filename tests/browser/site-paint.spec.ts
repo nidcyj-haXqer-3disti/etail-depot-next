@@ -1,10 +1,55 @@
 import { exerciseSalesAction } from "./sales-contact";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Request } from "@playwright/test";
 import { expectCompleteGuidePaint } from "./guide-rendering";
 
 test("page families do not paint an incomplete header during document delivery", async ({ page, request, baseURL }) => {
   for (const path of ["/", "/services/payment-methods", "/company/legal/merchant-services", "/resources/guides/iso-20022/purpose"]) {
     await expectCompleteGuidePaint(page, request, baseURL, path, "", "h1");
+  }
+});
+
+test("service artwork logos paint without an image or application-script request", async ({ page }) => {
+  for (const [path, selector, expectedWidth, expectedHeight] of [
+    ["/services/payment-facilitator", ".facilitator-brand", 48, 42],
+    ["/use-cases/software-platforms/partnerships", '[data-service-workflow="partnerships"] .brand-image-symbol', 26, 15.73],
+    ["/use-cases/software-platforms#integration", '#integration .brand-image-symbol', 22, 13.31],
+  ] as const) {
+    let release = () => {};
+    const held = new Promise<void>(resolve => { release = resolve; });
+    const logoRequests: string[] = [];
+    const recordLogoRequest = (request: Request) => {
+      if (/\/symbol\.[^/]+\.png(?:\?|$)/.test(request.url())) logoRequests.push(request.url());
+    };
+    page.on("request", recordLogoRequest);
+    await page.route("**/*.js", async route => { await held; await route.continue(); });
+    await page.route(/\/symbol\.[^/]+\.png(?:\?|$)/, async route => { await held; await route.continue(); });
+    try {
+      await page.goto(path, { waitUntil: "commit" });
+      await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+        [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+      await page.waitForFunction(() => document.fonts.status === "loaded");
+      const logo = page.locator(selector);
+      await expect(logo).toBeVisible();
+      const dimensions = () => logo.evaluate(el => {
+        const box = el.getBoundingClientRect();
+        return { width: box.width, height: box.height };
+      });
+      expect(await logo.evaluate(el => getComputedStyle(el).content)).toContain("data:image/webp;base64,");
+      const before = await dimensions();
+      expect(before.width).toBe(expectedWidth);
+      expect(before.height).toBeCloseTo(expectedHeight, 1);
+      expect(logoRequests).toEqual([]);
+      release();
+      await page.waitForLoadState("load");
+      expect(await dimensions()).toEqual(before);
+      await page.reload();
+      expect(await dimensions()).toEqual(before);
+      expect(logoRequests).toEqual([]);
+    } finally {
+      release();
+      await page.unrouteAll({ behavior: "wait" });
+      page.off("request", recordLogoRequest);
+    }
   }
 });
 
@@ -431,6 +476,9 @@ test("first visits keep render-blocking CSS within page-family budgets", async (
     ["/resources/merchant-account-setup", 99_000],
     ["/developers/getting-started", 69_000],
     ["/developers/api-reference", 69_000],
+    ["/developers/webhooks", 69_000],
+    ["/developers/testing", 69_000],
+    ["/developers/developer-tools", 69_000],
     ["/resources/help", 46_000],
     ["/resources/guides/iso-20022/purpose", 56_000],
   ] as const) {

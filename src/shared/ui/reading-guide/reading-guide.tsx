@@ -16,7 +16,7 @@ function DocumentationLink({href,label}:{href:string;label:string}){
  return <Link prefetch={false} className="docs-text-link" href={href}>{label}</Link>;
 }
 
-function ArticleSection({section,illustration}:{section:DocSection;illustration?:ReactNode}){
+function ArticleSection({section,illustration,content,details}:{section:DocSection;illustration?:ReactNode;content?:ReactNode;details?:ReactNode}){
  const integratedSteps = section.steps && (section.flow === "onboarding" || section.flow === "events" || section.flow === "disputes" || section.flow === "payouts") ? section.steps : undefined;
  return <section className="docs-section" id={section.id} aria-labelledby={`${section.id}-title`}>
   {section.aliases?.map(id=><span className="docs-legacy-anchor" key={id} id={id} aria-hidden="true"/>)}
@@ -24,6 +24,7 @@ function ArticleSection({section,illustration}:{section:DocSection;illustration?
   {section.paragraphs?.map(p=><p key={p}>{p}</p>)}
   {section.prerequisites&&section.prerequisites.length>0&&<div className="docs-prerequisites"><h3>Before you begin</h3><ul>{section.prerequisites.map(text=><li key={text}><Icon name="check"/>{text}</li>)}</ul></div>}
   {illustration}
+  {content}
   {section.flow&&<DocumentationFlow kind={section.flow} steps={integratedSteps}/>}
   {section.steps&&!integratedSteps&&<ol className="docs-steps">{section.steps.map((step,i)=><li key={step.title}><span className="docs-step-number" aria-hidden="true">{i+1}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol>}
   {section.rows&&<dl className="docs-facts">{section.rows.map(row=><div key={row.title}><dt>{row.title}</dt><dd>{row.text}</dd></div>)}</dl>}
@@ -33,16 +34,19 @@ function ArticleSection({section,illustration}:{section:DocSection;illustration?
    </table>
   </div>}
   {section.note&&<aside className="docs-note" aria-label={section.note.title}><Icon name="info"/><div><strong>{section.note.title}</strong><p>{section.note.text}</p></div></aside>}
+  {details}
   {section.details&&<div className="docs-details">{section.details.map(item=><details key={item.title}><summary>{item.title}<span aria-hidden="true">+</span></summary><p>{item.text}</p></details>)}</div>}
   {section.outcome&&<div className="docs-outcome"><Icon name="check"/><div><strong>What to confirm</strong><p>{section.outcome}</p></div></div>}
   {section.link&&<DocumentationLink {...section.link}/>}
  </section>;
 }
 
-export function ReadingGuide({title,article,jsonLd,navigation,heading,notice,illustrations,contents}: {
+export function ReadingGuide({title,article,jsonLd,navigation,heading,notice,illustrations,contents,sectionContent,sectionDetails}: {
  title:string;article:DocArticle;jsonLd:string;navigation?:ReactNode;heading?:ReactNode;notice?:ReactNode;
  illustrations?:Partial<Record<NonNullable<DocSection["illustratedGuide"]>,ReactNode>>;
  contents?:{id:string;title:string}[];
+ sectionContent?:Partial<Record<string,ReactNode>>;
+ sectionDetails?:Partial<Record<string,ReactNode>>;
 }){
  const links=contents??article.sections;
  const sections=<>{links.map(section=><a key={section.id} href={`#${section.id}`}>{section.title}</a>)}</>;
@@ -52,7 +56,7 @@ export function ReadingGuide({title,article,jsonLd,navigation,heading,notice,ill
    <header className="docs-article-heading"><h1 tabIndex={-1}>{title}</h1>{heading}<p>{article.introduction}</p>{notice}</header>
    {links.length>0&&<details className="docs-mobile-toc"><summary>On this page <span aria-hidden="true">⌄</span></summary><nav aria-label="Page sections">{sections}</nav></details>}
    {article.prerequisites.length>0&&<div className="docs-prerequisites"><h2>Before you begin</h2><ul>{article.prerequisites.map(p=><li key={p}><Icon name="check"/>{p}</li>)}</ul></div>}
-   {article.sections.map(section=><ArticleSection key={section.id} section={section} illustration={section.illustratedGuide?illustrations?.[section.illustratedGuide]:undefined}/>)}
+   {article.sections.map(section=><ArticleSection key={section.id} section={section} illustration={section.illustratedGuide?illustrations?.[section.illustratedGuide]:undefined} content={sectionContent?.[section.id]} details={sectionDetails?.[section.id]}/>)}
    <span className="docs-legacy-anchor" id="documentation-support" aria-hidden="true"/>
   </article>
   {links.length>0&&<aside className="docs-toc"><nav aria-label="On this page"><p>On this page</p>{sections}</nav></aside>}

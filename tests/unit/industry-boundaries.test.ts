@@ -15,13 +15,13 @@ describe("industry use cases share the Software platforms page", () => {
     vi.stubEnv("SITE_ID", PUBLIC_INDEXING_APPROVAL.siteId); vi.stubEnv("CONTEXT", "production");
     try {
       expect(localPreviewPageSources.every(page => page.startsWith("legal/"))).toBe(true);
-      expect(localReviewHtmlFiles).toHaveLength(3751);
+      expect(localReviewHtmlFiles).toHaveLength(3764);
       expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3731);
       const sitemap = publicSitemap();
       expect(sitemap).toHaveLength(3731);
       expect(sitemap.filter(item => item.url.includes("#"))).toEqual([]);
       expect(sitemap.filter(item => item.url.includes("/use-cases/"))).toHaveLength(5);
-      expect(sitemap.find(item => item.url === `${canonicalOrigin}/use-cases/software-platforms`)?.lastModified).toBe("2026-11-11");
+      expect(sitemap.find(item => item.url === `${canonicalOrigin}/use-cases/software-platforms`)?.lastModified).toBe("2026-11-13");
       for (const slug of removed) {
         const route = `/use-cases/${slug}`;
         expect(PUBLIC_CONTENT_PATHS).not.toContain(route);

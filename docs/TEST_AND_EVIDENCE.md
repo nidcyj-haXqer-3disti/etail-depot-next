@@ -10,7 +10,7 @@ Use pinned Node and pnpm, the frozen lockfile and the existing Playwright config
 | --- | --- |
 | `pnpm lint`, `pnpm typecheck`, `pnpm test:unit` | Source quality, types and behavioral units |
 | `pnpm test:architecture`, `pnpm test:publication` | Allowed runtime, dependencies and source/asset placement |
-| `pnpm build` then `pnpm test:e2e` | Current static preview with Chromium desktop/mobile journeys |
+| `pnpm build` then `pnpm test:e2e` | Current static preview with Chromium desktop/mobile journeys and mobile WebKit Blog regressions |
 | `pnpm test:a11y` | Existing automated accessibility suite |
 | `pnpm test:security` | Credential/exposure checks and dependency audit |
 | `pnpm test:seo:production` | Exact approved indexing context, sitemap and negative hosting contexts |
@@ -18,7 +18,7 @@ Use pinned Node and pnpm, the frozen lockfile and the existing Playwright config
 
 For release candidates run, in order: `pnpm verify:public`, `pnpm test:seo:production`, `pnpm package:netlify`, `pnpm verify:package`. `pnpm verify` is their combined entry point. None publishes. GitHub uses the same required sequence.
 
-Use additional WebKit and responsive/loading checks when the changed behavior needs them. WebKit is additional local coverage, not part of the current Chromium CI projects. Do not describe it as an actual iPhone or Safari-device test. The [paint standard](PAGE_PAINT_STANDARDS.md) specifies cold visits, refresh, delayed assets, split document delivery, early clicks and saved links.
+The Blog WebKit project runs in local and CI verification. Use additional WebKit and responsive/loading checks for other pages when the changed behavior needs them. These are browser-engine checks, not tests on a physical iPhone or Safari device. The [paint standard](PAGE_PAINT_STANDARDS.md) specifies cold visits, refresh, delayed assets, split document delivery, early clicks and saved links.
 
 For documentation-only edits, check file destinations, linked paths, code examples and formatting. For moves, compare the original bytes, every active consumer and the resulting import/reference graph. Run broader application checks when tooling or packaging inputs change.
 

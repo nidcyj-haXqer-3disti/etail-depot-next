@@ -12,7 +12,7 @@
 .public-main .cw-company .trust-documents figcaption {font-size:13px;line-height:1.7;}
 .public-main .cw-company .facilitator-relationship > div {border-radius:12px;box-shadow:0 14px 28px -27px #193c3345;}
 .public-main .cw-company .facilitator-etail {background:#204638;}
-.public-main .cw-company .facilitator-etail img {flex:none;width:48px;height:42px;object-fit:contain;padding:8px;background:#f0f5e8;border-radius:9px;}
+.public-main .cw-company .facilitator-etail .facilitator-brand {flex:none;width:48px;height:42px;object-fit:contain;padding:8px;background:#f0f5e8;border-radius:9px;}
 .public-main .cw-company .facilitator-context figcaption {font-size:13px;line-height:1.7;}
 @media(max-width:700px) {
  .public-main .cw-company .facilitator-relationship > div{grid-template-columns:48px minmax(0,1fr);}

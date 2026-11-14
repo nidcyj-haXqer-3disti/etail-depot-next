@@ -1,3 +1,4 @@
+import { BLOG_PATHS } from "../src/shared/site/blog-paths.ts";
 import { DEVELOPER_PATHS } from "../src/shared/site/developer-paths.ts";
 import { sourceOnlyStaticFile } from "./file-publication-policy.ts";
 /** Pure deployment-boundary detectors, shared by packaging checks and adversarial tests. */
@@ -23,13 +24,13 @@ const retainedCorePageSources = [
 ] as const;
 export const publicHtmlFiles = PUBLIC_CONTENT_PATHS.map(path => path === "/" ? "index.html" : `${path.slice(1)}.html`);
 /** Local source/export permission is separate from the published-page allowlist. */
-export const localCorePreviewPageSources = ["use-cases/software-platforms/page.tsx", "use-cases/online-businesses/page.tsx", ...DEVELOPER_PATHS.map(path=>`${path.slice(1)}/page.tsx`)] as const;
+export const localCorePreviewPageSources = ["use-cases/software-platforms/page.tsx", "use-cases/online-businesses/page.tsx", "use-cases/no-code-checkout-experience/page.tsx", ...DEVELOPER_PATHS.map(path=>`${path.slice(1)}/page.tsx`)] as const;
 export const localStandardPageSources = [
   "resources/guides/iso-20022/page.tsx", "resources/guides/iso-20022/[set]/page.tsx", "resources/guides/iso-20022/[set]/[code]/page.tsx",
   "resources/guides/iso-8583/page.tsx", "resources/guides/iso-8583/[table]/page.tsx", "resources/guides/iso-8583/[table]/[code]/page.tsx",
 ] as const;
 export const commercialPageSources = COMMERCIAL_PATHS.map(path => `${path.slice(1)}/page.tsx`);
-export const publicPageSources = [...RESOURCE_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...LEGAL_CENTER_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...commercialPageSources, ...retainedCorePageSources, ...localCorePreviewPageSources, ...localStandardPageSources];
+export const publicPageSources = [...BLOG_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...RESOURCE_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...LEGAL_CENTER_PATHS.map(path => `${path.slice(1)}/page.tsx`), ...commercialPageSources, ...retainedCorePageSources, ...localCorePreviewPageSources, ...localStandardPageSources];
 /** Customer facing publication scope authorized on 5 November 2026. Account acceptance remains separate. */
 export const reviewedLegalPageSources: readonly string[] = [
   "company/legal/page.tsx", "company/legal/merchant-services/page.tsx", "company/legal/fees/page.tsx",
@@ -53,16 +54,37 @@ export function reviewedPublicAppModule(appPath: string): boolean {
 }
 
 const reviewedFeatureSources = new Set<string>([
+  "src/features/company/blog/article-page.tsx",
+  "src/features/company/blog/blog.module.css",
+  "src/features/company/blog/content.ts",
+  "src/features/company/blog/metadata.ts",
+  "src/features/company/blog/page-content.tsx",
+  "src/features/company/blog/money-stops-moving-page.tsx",
+  "src/features/company/blog/merchant-payout-holds-page.tsx",
+  "src/features/company/blog/frozen-funds-page.tsx",
+  "src/features/company/blog/risk-communication-page.tsx",
+  "src/features/company/blog/merchant-support-page.tsx",
+  "src/features/company/blog/instant-onboarding-page.tsx",
+  "src/features/company/blog/riverside-payments-case-page.tsx",
+  "src/features/company/blog/declined-processing-page.tsx",
+  "src/features/company/blog/provider-approval-page.tsx",
+  "src/features/company/blog/payfac-operations-page.tsx",
+  "src/features/company/blog/merchant-cancellation-page.tsx",
+
   "src/features/services/components/service-art-motion.tsx",
   "src/features/services/components/service-art-motion.module.css",
-  "src/features/developers/guidance/checkout.ts",
-  "src/features/developers/guidance/integration-access.ts",
-  "src/features/developers/guidance/payment-requests.ts",
-  "src/features/developers/guidance/payment-status.ts",
-  "src/features/developers/guidance/payouts.ts",
-  "src/features/developers/guidance/refunds-and-disputes.ts",
-  "src/features/developers/guidance/testing-and-launch.ts",
-  "src/features/developers/guidance/webhooks.ts",
+  "src/features/developers/getting-started/content.ts",
+  "src/features/developers/getting-started/page-content.tsx",
+  "src/features/developers/getting-started/page.module.css",
+  "src/features/developers/developer-tools/content.ts",
+  "src/features/developers/developer-tools/page-content.tsx",
+  "src/features/developers/api-reference/content.ts",
+  "src/features/developers/api-reference/page-content.tsx",
+  "src/features/developers/api-reference/page.module.css",
+  "src/features/developers/testing/content.ts",
+  "src/features/developers/testing/page-content.tsx",
+  "src/features/developers/webhooks/content.ts",
+  "src/features/developers/webhooks/page-content.tsx",
   "src/features/developers/metadata.ts",
   "src/features/developers/navigation.tsx",
   "src/features/developers/page-content.tsx",
@@ -300,6 +322,10 @@ const reviewedFeatureSources = new Set<string>([
   "src/features/services/shared/content-types.ts",
   "src/features/services/shared/service-detail-layout.tsx",
   "src/features/services/shared/service-detail.module.css",
+  "src/features/use-cases/no-code-checkout-experience/checkout-experience.module.css",
+  "src/features/use-cases/no-code-checkout-experience/metadata.ts",
+  "src/features/use-cases/no-code-checkout-experience/page-content.tsx",
+  "src/features/use-cases/no-code-checkout-experience/setup-guide.tsx",
   "src/features/use-cases/online-businesses/metadata.ts",
   "src/features/use-cases/online-businesses/online-business-page.css",
   "src/features/use-cases/online-businesses/page-content.tsx",

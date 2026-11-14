@@ -10,6 +10,7 @@ export const audienceUseCaseNavigation = [
   { href: "/use-cases/software-platforms", label: "Software platforms", description: "Merchant services for your software." },
   { href: "/use-cases/online-businesses", label: "Online businesses", description: "Online checkout for your customers." },
   { href: "/use-cases/switch-merchant-services", label: "Switch merchant services", description: "Account options, fees and the steps to switch." },
+  { href: "/use-cases/no-code-checkout-experience", label: "No code checkout experience", description: "Accept payments with a link or QR code." },
 ] as const;
 
 export const useCaseNavigation = audienceUseCaseNavigation;
@@ -29,6 +30,7 @@ export const merchantDetailNavigation = [
 
 /** One label and destination for each entry in the shared menu and footer. */
 const destinations = {
+  noCodeCheckout: { label: "No code checkout experience", href: "/use-cases/no-code-checkout-experience" },
   online: { label: "Online businesses", href: "/use-cases/online-businesses" },
   methods: { label: "Payment methods", href: "/services/payment-methods" },
   ach: { label: "ACH payments", href: "/services/ach-payments" },
@@ -50,6 +52,7 @@ const destinations = {
   accountSetup: { label: "Merchant account setup", href: "/resources/merchant-account-setup" },
   woocommerce: { label: "WooCommerce integration", href: "/resources/woocommerce-gateway-integration" },
   shopify: { label: "Shopify integration", href: "/resources/shopify-gateway-integration" },
+  blog: { label: "Blog", href: "/company/blog" },
   company: { label: "About", href: "/company/about" },
   trust: { label: "Security and privacy", href: "/company/security" },
   contact: { label: "Contact", href: "/company/contact" },
@@ -61,7 +64,7 @@ export const publicNavigationGroups = [
     { label: "Services", links: [destinations.onboarding, destinations.methods, destinations.ach, destinations.payouts, destinations.reconciliation, destinations.refunds, destinations.disputes, destinations.cards] },
   ] },
   { id: "use-cases", label: "Use cases", sections: [
-    { label: "Use cases", links: [destinations.online, destinations.platforms, destinations.marketplaces, destinations.freight, destinations.travel, destinations.legal, destinations.switchProvider] },
+    { label: "Use cases", links: [destinations.online, destinations.platforms, destinations.marketplaces, destinations.freight, destinations.travel, destinations.legal, destinations.switchProvider, destinations.noCodeCheckout] },
   ] },
   { id: "developers", label: "Developers", sections: [
     { label: "Developers", links: DEVELOPER_NAVIGATION },
@@ -76,10 +79,10 @@ export const publicNavigationLinks = [destinations.pricing] as const;
 /** Core service and integration destinations, with audience detail in the header. */
 export const publicFooterGroups = [
   { label: "Services", links: [destinations.onboarding, destinations.methods, destinations.ach, destinations.payouts, destinations.reconciliation, destinations.refunds, destinations.disputes, destinations.cards] },
-  { label: "Use cases", links: [destinations.online, destinations.platforms, destinations.switchProvider] },
+  { label: "Use cases", links: [destinations.online, destinations.platforms, destinations.switchProvider, destinations.noCodeCheckout] },
   { label: "Developers", links: DEVELOPER_NAVIGATION },
   { label: "Resources", links: [destinations.accountSetup, destinations.shopify, destinations.woocommerce, destinations.guides, destinations.help] },
-  { label: "Company", links: [destinations.company, destinations.trust, destinations.contact, destinations.legalCenter] },
+  { label: "Company", links: [destinations.company, destinations.blog, destinations.trust, destinations.contact, destinations.legalCenter] },
 ] as const;
 
 export function publicDomainForPath(pathname: string): string | undefined {

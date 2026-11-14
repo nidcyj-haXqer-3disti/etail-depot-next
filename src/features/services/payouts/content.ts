@@ -52,7 +52,7 @@ export const payoutsContent = {
           {
             "title": "A different amount",
             "text": "Compare included transactions and adjustments with the bank credit before closing the period.",
-            "href": "/services/reconciliation"
+            "href": "/company/contact#account-support"
           }
         ]
       }

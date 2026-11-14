@@ -28,6 +28,6 @@ export function PaymentFeeEstimate() {
         <div className="fee-net"><dt>After card processing</dt><dd>{formatUsdCents(estimate.subtotalCents)}</dd></div>
       </dl> : <p className="fee-error" id="fee-estimate-error">Enter an amount from $1 to $100,000, with up to two decimal places. Leave out currency symbols and commas.</p>}
     </div>
-    <p className="fee-estimate-note" id="fee-estimate-note">For one domestic online card payment. Excludes international cards, currency conversion, payments entered by the merchant and other applicable charges. This is not a guaranteed payout.</p>
+    <p className="fee-estimate-note" id="fee-estimate-note">For one domestic online card payment. Excludes payment link and QR fees, international cards, currency conversion, payments entered by the merchant and other applicable charges. This is not a guaranteed payout.</p>
   </section>;
 }

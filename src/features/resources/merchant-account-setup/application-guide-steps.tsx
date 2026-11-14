@@ -142,7 +142,7 @@ export function ApplicationGuideSteps() {
       </dl>
       <p className={guide.approval} id="account-readiness">Wait for account approval and confirmation that your payment setup is ready.</p>
       <p className={guide.hint}>Returning later? Sign in with the same email to check this application.</p>
-      <p id="after-approval"><strong>After approval:</strong> follow the <Link href="/resources/shopify-gateway-integration" prefetch={false}>Shopify</Link> or <Link href="/resources/woocommerce-gateway-integration" prefetch={false}>WooCommerce</Link> guide using your account email. For another website, <Link href="/company/contact#account-support" prefetch={false}>ask Etail for setup instructions</Link>.</p>
+      <p id="after-approval"><strong>After approval:</strong> follow <Link href="/developers/getting-started" prefetch={false}>Getting started</Link> to open your accounts and choose your checkout connection. For <Link href="/resources/shopify-gateway-integration" prefetch={false}>Shopify</Link> or <Link href="/resources/woocommerce-gateway-integration" prefetch={false}>WooCommerce</Link>, use the guide for your store. <Link href="/company/contact#account-support" prefetch={false}>Contact Etail</Link> if you need help.</p>
     </Step>
   </>;
 }

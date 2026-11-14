@@ -216,7 +216,7 @@ pnpm package:netlify
 pnpm verify:package
 ```
 
-Install the browser required by the tests first: `pnpm exec playwright install chromium`. On Linux, use `pnpm exec playwright install --with-deps chromium` when system dependencies are needed. Use the pinned runtime in local and CI checks. Do not run the four release commands concurrently against the same build output.
+Install the browsers required by the tests first: `pnpm exec playwright install chromium webkit`. On Linux, use `pnpm exec playwright install --with-deps chromium webkit` when system dependencies are needed. Use the pinned runtime in local and CI checks. Do not run the four release commands concurrently against the same build output.
 
 For documentation-only changes, check linked files, commands and formatting, and report which application checks were not rerun. Every release candidate still requires all four commands. See [Testing and evidence](docs/TEST_AND_EVIDENCE.md).
 

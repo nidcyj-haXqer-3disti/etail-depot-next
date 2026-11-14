@@ -75,8 +75,9 @@ All current feature directories are shown. Individual files are omitted from the
 
 ```text
 src/features/  [BUSINESS] Content and UI owned by each business area
-├── company/  Company information, contact, trust and legal content
+├── company/  Company information, Blog, contact, trust and legal content
 │   ├── about/
+│   ├── blog/  Human-authored articles and reading layouts
 │   ├── contact/
 │   ├── legal/
 │   │   ├── components/  Shared legal document renderer
@@ -84,8 +85,12 @@ src/features/  [BUSINESS] Content and UI owned by each business area
 │   │   ├── website-privacy/  Website Privacy page
 │   │   └── website-terms/  Website Terms page
 │   └── trust/
-├── developers/  Public developer information; Etail API products unavailable
-│   └── guidance/  Current guidance reused inside the listed developer pages
+├── developers/  Merchant-facing vendor integration guidance; Etail API products unavailable
+│   ├── getting-started/  Approved-account access, connection choices and handoff
+│   ├── api-reference/  Cybersource server/browser flow and static code samples
+│   ├── webhooks/  Cybersource notifications, security and recovery guidance
+│   ├── testing/  Sandbox checks, live validation and launch handoff
+│   └── developer-tools/  Official SDKs, test tools, account records and support
 ├── home/  Company introduction and customer entry points
 ├── pricing/  Approved offer and pricing presentation
 ├── resources/  Merchant setup, integration guides, Help and references
@@ -121,6 +126,7 @@ src/features/  [BUSINESS] Content and UI owned by each business area
 │   ├── service-model/  Payment facilitator explanation
 │   └── shared/  Layout and types reused within Services
 └── use-cases/  Who the services are for and why
+    ├── no-code-checkout-experience/
     ├── online-businesses/
     ├── software-platforms/  Platforms and industry-specific sections
     │   ├── partnerships/
@@ -138,7 +144,7 @@ src/features/  [BUSINESS] Content and UI owned by each business area
 | Company | Explain the company, contact options, trust and legal provisions. |
 | Pricing | Present the approved offer and its conditions. |
 
-These folders represent current implemented content. There are no Magento, custom-website integration or marketing-article feature folders yet. Add a new feature only when its scope is approved; a future navigation idea is not an implemented service.
+These folders represent current implemented content. There are no Magento or custom-website integration feature folders yet. Human-authored marketing articles live in `src/features/company/blog/`. Add a new feature only when its scope is approved; a future navigation idea is not an implemented service.
 
 A feature keeps its content and visual implementation together. Existing file conventions include `content.ts` for content, `metadata.ts` for page metadata, `page-content.tsx` for page composition, `artwork.tsx` or a descriptive component name for artwork, and `assets/` for images. Use the conventions that fit the feature. Do not add empty folders or duplicate wrapper files merely to make every feature identical.
 
@@ -152,6 +158,18 @@ The nine merchant legal document routes reuse approved legal content and a rende
 src/app/  [TECHNICAL] URL entry points that compose business features
 ├── company/
 │   ├── about/
+│   ├── blog/
+│   │   ├── you-can-leave-that-is-the-point/
+│   │   ├── reselling-payments-vs-running-a-payfac/
+│   │   ├── what-your-payment-provider-is-really-saying-yes-to/
+│   │   ├── declined-for-payment-processing/
+│   │   ├── riverside-payments-case-fine-print/
+│   │   ├── how-etail-depot-handles-risk/
+│   │   ├── payment-service-providers-freeze-funds-without-justification/
+│   │   ├── payment-service-providers-holding-merchant-payouts/
+│   │   ├── when-your-money-stops-moving/
+│   │   ├── when-your-payment-provider-freezes-your-funds/
+│   │   └── why-instant-onboarding-is-a-trap/
 │   ├── contact/
 │   ├── legal/
 │   │   ├── acceptable-use/
@@ -207,6 +225,7 @@ src/app/  [TECHNICAL] URL entry points that compose business features
 │   └── refunds/
 ├── sitemap.ts  Approved search URL inventory
 └── use-cases/
+    ├── no-code-checkout-experience/
     ├── online-businesses/
     ├── software-platforms/
     │   ├── partnerships/
@@ -284,6 +303,7 @@ The navigation label, public address and source folder serve different purposes.
 | Refunds and disputes | `/services/refunds`, `/services/disputes` | `src/features/services/refunds/`, `src/features/services/disputes/` |
 | Card services | `/services/card-services` | `src/features/services/card-services/` |
 | Service overview and model | `/services/merchant-services`, `/services/payment-facilitator` | `src/features/services/overview/`, `src/features/services/service-model/` |
+| No code checkout experience | `/use-cases/no-code-checkout-experience` | `src/features/use-cases/no-code-checkout-experience/` |
 | Online businesses | `/use-cases/online-businesses` | `src/features/use-cases/online-businesses/` |
 | Software platforms and industries | `/use-cases/software-platforms` and its four industry anchors | `src/features/use-cases/software-platforms/` |
 | Platform partnerships and models | `/use-cases/software-platforms/partnerships`, `/use-cases/software-platforms/payment-models` | `src/features/use-cases/software-platforms/partnerships/`, `src/features/use-cases/software-platforms/payment-models/` |
@@ -293,6 +313,7 @@ The navigation label, public address and source folder serve different purposes.
 | Shopify and WooCommerce guides | `/resources/shopify-gateway-integration`, `/resources/woocommerce-gateway-integration` | `src/features/resources/integrations/shopify/`, `src/features/resources/integrations/woocommerce/` |
 | Help and guide directory | `/resources/help`, `/resources/guides` | `src/features/resources/help/`, `src/features/resources/guides/` |
 | Payment code references | `/resources/guides/iso-20022` and `/resources/guides/iso-8583`, including their generated reference addresses | `src/features/resources/references/` |
+| Blog and articles | `/company/blog`, `/company/blog/when-your-money-stops-moving`, `/company/blog/payment-service-providers-holding-merchant-payouts`, `/company/blog/payment-service-providers-freeze-funds-without-justification`, `/company/blog/how-etail-depot-handles-risk`, `/company/blog/when-your-payment-provider-freezes-your-funds`, `/company/blog/why-instant-onboarding-is-a-trap`, `/company/blog/riverside-payments-case-fine-print`, `/company/blog/declined-for-payment-processing`, `/company/blog/what-your-payment-provider-is-really-saying-yes-to`, `/company/blog/reselling-payments-vs-running-a-payfac`, `/company/blog/you-can-leave-that-is-the-point` | `src/features/company/blog/` |
 | About, Contact and Trust | `/company/about`, `/company/contact`, `/company/security` | `src/features/company/about/`, `src/features/company/contact/`, `src/features/company/trust/` |
 | Legal, Terms and Privacy | `/company/legal`, its merchant legal documents, `/company/terms`, `/company/privacy` | `src/features/company/legal/` |
 | Pricing | `/pricing` | `src/features/pricing/` |

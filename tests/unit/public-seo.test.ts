@@ -47,7 +47,7 @@ describe("public search release boundary", () => {
     expect(PUBLIC_INDEXING_APPROVAL).toMatchObject({
       siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3751 content pages and 3731 search eligible URLs");
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("3764 content pages and 3731 search eligible URLs");
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
@@ -189,7 +189,7 @@ describe("reviewed public metadata", () => {
 
   it("requires an explicit revision for every core page and preserves unchanged reference dates", () => {
     expect(Object.keys(CORE_PAGE_MODIFIED).sort()).toEqual([...CORE_PUBLIC_PATHS].sort());
-    expect(publicPageModified("/services/merchant-onboarding")).toBe("2026-11-05");
+    expect(publicPageModified("/services/merchant-onboarding")).toBe("2026-11-14");
     expect(publicPageModified("/services/payment-methods")).toBe("2026-11-01");
     for (const [collection, date] of Object.entries(REFERENCE_PAGE_MODIFIED)) {
       expect(date).toBe("2026-10-29");
@@ -208,10 +208,10 @@ describe("reviewed public metadata", () => {
   it("keeps reviewed page revision dates stable as the build clock advances", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
-    expect(PUBLIC_PAGE_MODIFIED["/resources/guides"]).toBe("2026-11-09");
-    expect(PUBLIC_PAGE_MODIFIED["/services/merchant-services"]).toBe("2026-11-05");
-    expect(PUBLIC_PAGE_MODIFIED["/resources/help"]).toBe("2026-11-05");
-    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-05");
+    expect(PUBLIC_PAGE_MODIFIED["/resources/guides"]).toBe("2026-11-13");
+    expect(PUBLIC_PAGE_MODIFIED["/services/merchant-services"]).toBe("2026-11-14");
+    expect(PUBLIC_PAGE_MODIFIED["/resources/help"]).toBe("2026-11-14");
+    expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-14");
     expect(PUBLIC_PAGE_MODIFIED["/services/card-services"]).toBe("2026-11-01");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -269,7 +269,7 @@ describe("public structured data", () => {
   });
 
   it("provides two-level breadcrumbs for inner pages and no artificial home breadcrumb", () => {
-    const labels = { "/services/card-services": "Card services", "/services/merchant-services": "Merchant services", "/resources/help": "Help", "/resources/guides": "Guides" } as const;
+    const labels = { "/services/card-services": "Card services", "/services/merchant-services": "Merchant services", "/resources/help": "Help", "/resources/guides": "Payment code reference" } as const;
     for (const path of Object.keys(labels) as (keyof typeof labels)[]) {
       const graph = JSON.parse(publicPageJsonLd(path))["@graph"];
       const breadcrumb = graph.find((node: { "@type": string }) => node["@type"] === "BreadcrumbList");

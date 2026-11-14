@@ -20,17 +20,16 @@ export function PaymentOffer() {
         <div className="pricing-included">
           <p>Included</p>
           <ul aria-label="Included services">
-            <li><Icon name="link" /><span>Payment links</span></li>
-            <li><Icon name="qr" /><span>QR sharing</span></li>
             <li><Icon name="document" /><span>Basic payment receipts</span></li>
           </ul>
         </div>
-        <p className="pricing-scope">Published offer for US businesses accepting payments in USD. Account approval applies. Your accepted fee schedule determines your charges.</p>
+        <p className="pricing-scope">Payment links must be enabled for your merchant account. Published offer for US businesses accepting payments in USD. Account approval applies. Your accepted fee schedule determines your charges.</p>
       </div>
       <PaymentFeeEstimate />
     </div>
     <details className="offer-details"><summary>Additional fees and refunds<span aria-hidden="true">+</span></summary><div className="offer-details-body">
       <dl className="fee-exceptions">
+        <div><dt>Payment links and QR payments</dt><dd>+{fees.paymentLinkOrQrFeeCents}¢ per successful payment</dd></div>
         <div><dt>International cards</dt><dd>+{fees.internationalRateLabel}</dd></div>
         <div><dt>Currency conversion, when required</dt><dd>+{fees.conversionRateLabel}</dd></div>
         <div><dt>Card details entered by the merchant</dt><dd>+{fees.manualEntryRateLabel}</dd></div>
@@ -39,6 +38,7 @@ export function PaymentOffer() {
       </dl>
       <div className="pricing-conditions">
         <h3>When other charges apply</h3>
+        <p>A QR payment incurs the additional {fees.paymentLinkOrQrFeeCents}¢ fee once, not twice.</p>
         <p>The additional fee for manual entry applies when you enter a customer’s card details. It does not apply when customers enter their own details at online checkout.</p>
         <h3>Refunds and other costs</h3>
         <p>Original processing and currency conversion fees are not returned when a payment is refunded. Network charges and optional services may add costs. Sharing a link by text does not include a messaging subscription.</p>

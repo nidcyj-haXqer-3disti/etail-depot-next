@@ -60,8 +60,8 @@ export default function Page() {
 
       <section className={`${styles.container} ${styles.resources}`} aria-label="Developers and guides">
         <span className={styles.anchor} id="resources-title" /><span className={styles.anchor} id="questions-title" />
-        <Link className={styles.resource} href="/developers/getting-started" id="home-docs-title"><span className={styles.resourceIcon}><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m10 8-8 8 8 8m12-16 8 8-8 8M19 4l-6 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span><div><h2>Developers</h2><p>Integration requirements, checkout and payment operations.</p></div></Link>
-        <Link className={styles.resource} href="/resources/guides" id="home-guides-title"><span className={styles.resourceIcon}><Icon name="document" /></span><div><h2>Guides</h2><p>ISO 20022 and independent ISO 8583 references.</p></div></Link>
+        <Link className={styles.resource} href="/developers/getting-started" id="home-docs-title"><span className={styles.resourceIcon}><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m10 8-8 8 8 8m12-16 8 8-8 8M19 4l-6 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span><div><h2>Developers</h2><p>Connect your store after merchant approval.</p></div></Link>
+        <Link className={styles.resource} href="/resources/guides" id="home-guides-title"><span className={styles.resourceIcon}><Icon name="document" /></span><div><h2>Payment code reference</h2><p>ISO 20022 and independent ISO 8583 references.</p></div></Link>
       </section>
     </div>
   </Shell>;

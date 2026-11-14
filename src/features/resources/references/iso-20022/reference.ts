@@ -62,7 +62,7 @@ export function isoMetadata(set?: IsoCodeSet, code?: IsoCode): Metadata {
 }
 export function isoJsonLd(set?: IsoCodeSet, code?: IsoCode) {
   const entry = isoIdentity(set, code), url = canonicalOrigin + entry.path;
-  const crumbs = [{ name: "Guides", path: "/resources/guides" }, { name: "ISO 20022", path: ISO20022_PATH }];
+  const crumbs = [{ name: "Payment code reference", path: "/resources/guides" }, { name: "ISO 20022", path: ISO20022_PATH }];
   if (set) crumbs.push({ name: set.title, path: set.path });
   if (code) crumbs.push({ name: code.code, path: code.path });
   return JSON.stringify({ "@context": "https://schema.org", "@graph": [

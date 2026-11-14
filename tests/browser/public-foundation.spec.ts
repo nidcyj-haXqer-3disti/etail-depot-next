@@ -57,7 +57,7 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.locator("a")).toHaveCount(26);
+    await expect(navigation.locator("a")).toHaveCount(27);
     for (const [label, destination] of [["Software platforms", "/use-cases/software-platforms"], ["Online businesses", "/use-cases/online-businesses"], ["Merchant onboarding", "/services/merchant-onboarding"], ["Card services", "/services/card-services"], ["Getting started", "/developers/getting-started"], ["Guides", "/resources/guides"], ["Pricing", "/pricing"]]) {
       await expect(navigation.getByRole("link", { name: label, exact: true, includeHidden: true })).toHaveAttribute("href", destination);
     }
@@ -307,6 +307,54 @@ test("help topics and answers work with a keyboard without sign-in", async ({pag
   await expect(recovery.locator("..").getByRole("link",{name:"trolleys@etaildepot.com"})).toHaveAttribute("href","mailto:trolleys@etaildepot.com");
   await openMainNavigation(page);
   await expect(page.getByRole("banner").getByRole("link",{name:"Sign in to Trolleys",exact:true})).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
+});
+
+test("help connects approved merchants to the correct setup and portal guidance", async ({page}) => {
+  await page.goto("/resources/help");
+  const topics = page.getByRole("navigation", { name: "Help topics" });
+  await expect(topics.getByRole("link")).toHaveText(["Merchant services", "Checkout setup", "Software platforms", "Card services", "Help signing in"]);
+  await topics.getByRole("link", { name: "Checkout setup", exact: true }).click();
+  await expect(page).toHaveURL(/\/resources\/help#checkout$/);
+  for (const question of await page.locator("#checkout summary").all()) await question.click();
+  const checkout = page.locator("#checkout");
+  for (const [name, href] of [
+    ["setup after approval", "/developers/getting-started"],
+    ["Shopify guide", "/resources/shopify-gateway-integration"],
+    ["WooCommerce guide", "/resources/woocommerce-gateway-integration"],
+    ["checkout integration instructions", "/developers/api-reference"],
+    ["payment method setup instructions", "/developers/getting-started#payment-methods"],
+    ["No code checkout experience", "/use-cases/no-code-checkout-experience"],
+  ]) await expect(checkout.getByRole("link", { name, exact: true })).toHaveAttribute("href", href);
+  await expect(checkout).toContainText("once Pay by Link is enabled for your merchant account");
+  await expect(checkout).toContainText("its preview does not accept payments");
+  const portals = page.locator("#access details").filter({ has: page.locator("summary", { hasText: "Which login do I use after approval?" }) });
+  await portals.locator("summary").click();
+  await expect(portals).toContainText("administrator email and enrollment password");
+  await expect(portals).toContainText("separate Organization ID, User ID and password");
+  await portals.getByRole("link", { name: "both portals and their sign in steps" }).click();
+  await expect(page).toHaveURL(/\/developers\/getting-started#portal-access$/);
+  await expect(page.locator("#portal-access")).toBeVisible();
+});
+
+test("help sales booking opens on demand while account support stays separate", async ({page}) => {
+  const bookingRequests: string[] = [];
+  await page.route("https://calendly.com/**", route => {
+    bookingRequests.push(route.request().url());
+    return route.fulfill({ contentType: "text/html", body: "<!doctype html><html lang=\"en\"><title>Booking test</title><body>Available times</body></html>" });
+  });
+  await page.goto("/resources/help#partners");
+  const answer = page.locator("#partners details").filter({ has: page.locator("summary", { hasText: "Who can I talk to about payments for my software?" }) });
+  await answer.locator("summary").click();
+  await expect(answer.getByRole("link", { name: "merchant support", exact: true })).toHaveAttribute("href", "/company/contact#account-support");
+  expect(bookingRequests).toEqual([]);
+  await answer.getByRole("link", { name: "Book a call", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Book a call", exact: true });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator("iframe")).toHaveAttribute("title", "Book a call with Etail Depot");
+  await expect.poll(() => bookingRequests.length).toBe(1);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(answer.getByRole("link", { name: "Book a call", exact: true })).toBeFocused();
 });
 
 test("public pages have unique canonical metadata and no private data", async ({page,request}) => {
@@ -815,7 +863,7 @@ test("mobile navigation preserves the reading position and leaves reference navi
 });
 
 
-test("account actions remain distinct and reachable across mobile menu and desktop breakpoints", async ({ page }) => {
+test("account actions remain distinct and reachable across mobile menu and desktop breakpoints", async ({ page, browserName }) => {
   await page.goto("/");
   const header = page.getByRole("banner");
   const menu = header.getByRole("button", { name: "Menu", exact: true });
@@ -840,9 +888,10 @@ test("account actions remain distinct and reachable across mobile menu and deskt
     await expect(signIn).toHaveAccessibleDescription("Trolleys is an Etail Depot service. Enter your email on the welcome page to access your merchant account.");
     await expect(page.locator("main")).toHaveAttribute("inert", "");
     await start.focus();
-    await page.keyboard.press("Tab");
+    // WebKit on macOS uses Option+Tab to include links in keyboard navigation.
+    await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
     await expect(signIn).toBeFocused();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(browserName === "webkit" ? "Alt+Tab" : "Tab");
     await expect(contact).toBeFocused();
     await page.keyboard.press("Escape");
     await expect(menu).toBeFocused();

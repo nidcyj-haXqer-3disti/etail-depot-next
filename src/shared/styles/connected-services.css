@@ -101,8 +101,8 @@
 .cw-online.online-craft .online-business-intro h1 {font-size:var(--public-title-size);margin-top:16px;}
 .cw-online.online-craft .online-business-copy>p:first-child {font-size:18px;}
 .cw-online .cw-order-outcome {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);gap:72px;padding-block:64px;border-bottom:0;}
-.cw-online .cw-order-outcome h2 {font-size:38px;line-height:1.15;letter-spacing:-.035em;max-width:20ch;}
-.cw-online .cw-order-outcome>div>p:last-child {font-size:16px;line-height:1.75;max-width:42ch;margin-top:20px;}
+.cw-online .cw-order-outcome h2 {margin-top:16px;font-size:38px;line-height:1.15;letter-spacing:-.035em;max-width:20ch;}
+.cw-online .cw-order-outcome>div>h2+p {font-size:16px;line-height:1.75;max-width:42ch;margin-top:20px;}
 .cw-order-outcome dl>div+div {border-top:0;margin-top:22px;padding-top:22px;}
 .cw-order-outcome dt {font-size:20px;font-weight:500;color:#193c33;}
 .cw-order-outcome dd {font-size:15px;line-height:1.75;margin-top:9px;color:#4a6257;}
@@ -162,7 +162,7 @@
  .cw-online.online-craft .online-business-intro h1,.cw-cards.card-craft.service-blueprint.consumer-cards .consumer-hero h1 {font-size:var(--public-title-size);}
  .cw-online.online-craft .online-business-copy>p:first-child {font-size:16px;}
  .cw-online .cw-order-outcome {padding-block:44px;gap:26px;}.cw-online .cw-order-outcome h2 {font-size:32px;}
- .cw-online .cw-order-outcome>div>p:last-child {font-size:15px;}.cw-order-outcome dd {font-size:14px;}
+ .cw-online .cw-order-outcome>div>h2+p {font-size:15px;}.cw-order-outcome dd {font-size:14px;}
  .cw-cards.card-craft.service-blueprint.consumer-cards .consumer-hero-grid {padding-block:var(--public-hero-space);}
  .cw-cards.card-craft .card-details-section,.cw-cards.card-craft .wallet-credit-section {padding-block:44px;}
 }

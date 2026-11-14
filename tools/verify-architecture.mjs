@@ -59,11 +59,11 @@ function sourceChecks(filename, source) {
   inspect(tree);
 }
 
-assert.equal(publicPageSources.length, 51, "The candidate contains forty five core sources and six reference templates.");
+assert.equal(publicPageSources.length, 64, "The candidate contains fifty eight core sources and six reference templates.");
 assert.equal(new Set(publicPageSources).size, publicPageSources.length, "Reviewed page paths must be unique.");
-assert.equal(publicHtmlFiles.length, 3751);
-assert.deepEqual(localCorePreviewPageSources, ["use-cases/software-platforms/page.tsx", "use-cases/online-businesses/page.tsx", "developers/getting-started/page.tsx", "developers/api-reference/page.tsx", "developers/sdks/page.tsx", "developers/webhooks/page.tsx", "developers/testing/page.tsx", "developers/developer-tools/page.tsx", "developers/changelog/page.tsx", "developers/api-status/page.tsx"], "Only the exact reviewed public information pages may be added.");
-assert.equal(builtPageSources.length, 51, "The four industry use cases are sections of Software platforms.");
+assert.equal(publicHtmlFiles.length, 3764);
+assert.deepEqual(localCorePreviewPageSources, ["use-cases/software-platforms/page.tsx", "use-cases/online-businesses/page.tsx", "use-cases/no-code-checkout-experience/page.tsx", "developers/getting-started/page.tsx", "developers/api-reference/page.tsx", "developers/sdks/page.tsx", "developers/webhooks/page.tsx", "developers/testing/page.tsx", "developers/developer-tools/page.tsx", "developers/changelog/page.tsx", "developers/api-status/page.tsx"], "Only the exact reviewed public information pages may be added.");
+assert.equal(builtPageSources.length, 64, "The four industry use cases are sections of Software platforms.");
 assert.equal(reviewedLegalPageSources.length, 10, "Only the ten reviewed legal sources are admitted.");
 assert.equal(localPreviewPageSources.length, 0, "Unreviewed legal pages must not join the publication candidate.");
 assert.equal(STANDARD_REFERENCE_PATHS.length, 3706, "Only the exact reviewed ISO reference inventory is included.");

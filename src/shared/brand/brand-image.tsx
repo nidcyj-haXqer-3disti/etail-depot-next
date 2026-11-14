@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 /** Original small artwork is carried by render-blocking CSS, once per cached stylesheet. */
 export function BrandImage({ brand, alt, width, height, className, style }: {
-  brand: "symbol" | "etail" | "ledgix" | "visa" | "mastercard" | "amex" | "trolleys" | "apple-pay" | "google-pay" | "discover" | "trolleys-symbol";
+  brand: "symbol" | "etail" | "ledgix" | "visa" | "mastercard" | "amex" | "trolleys" | "apple-pay" | "google-pay" | "discover" | "trolleys-symbol" | "cybersource" | "cybersource-symbol";
   alt: string;
   width: number;
   height: number;

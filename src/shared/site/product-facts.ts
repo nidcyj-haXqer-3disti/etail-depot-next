@@ -1,12 +1,13 @@
 /** Operator-selected public offer. This is not a processor configuration or card agreement. */
 export const productFacts = {
-  version: "2026-10-14.1",
+  version: "2026-11-14.1",
   currency: "USD",
   payments: {
     offerName: "Trolleys merchant services",
     cardRateLabel: "2.9% + 30¢",
     cardRateBasisPoints: 290,
     cardFixedFeeCents: 30,
+    paymentLinkOrQrFeeCents: 20,
     saleRecordsRateLabel: "0.4%",
     saleRecordsRateBasisPoints: 40,
     monthlyFeeDollars: 0,
@@ -28,11 +29,12 @@ export const productFacts = {
 
 /** Provenance stays available for content review; no provider capability is inferred from a benchmark. */
 export const productFactEvidence = {
-  approvedBy: "Etail Depot operator, D132 card and additional-payment pricing, D137 optional-service pricing, D138 live integration approval, D147 customer-facing fee language, D154 commercial presentation, D158 Two Step packaging, D159 base pricing, D191 merchant-entry fee scope and D193 dispute pricing",
-  reviewedOn: "2026-10-14",
+  approvedBy: "Etail Depot operator, D132 card and additional-payment pricing, D137 optional-service pricing, D138 live integration approval, D147 customer-facing fee language, D154 commercial presentation, D158 Two Step packaging, D159 base pricing, D191 merchant-entry fee scope, D193 dispute pricing and the 14 November 2026 payment-link/QR fee confirmation",
+  reviewedOn: "2026-11-14",
   payments: {
     source: ["https://stripe.com/pricing"],
-    approval: "D159 sets the operator-selected Trolleys Two Step rate to 2.9% + 30 cents per successful domestic online card payment, preserving D158's no monthly fee and included creation/sharing. No separate 0.1% charge or membership is added. D193 replaces D132's dispute-received fee with $35 per dispute; the other selected fees remain. D137 sets a separate optional 0.4% Trolleys service fee on eligible enrolled successful-payment volume. D138 records the operator's confirmation that the Order Insight integration is live and approved. D154 names that service Trolleys Clarity without changing its price or coverage. D419 retires that public product name in favor of the descriptive service name Dispute prevention; fee and eligibility terms are unchanged. D147 removes vendor-charge line items and sourcing language from the public offer. Only displayed base and service fees are calculated; applicable account charges remain governed by the disclosed service agreement. Public offer approval does not configure provider billing or waive unverified upstream costs.",
+    approval: "D159 sets the operator-selected Trolleys Two Step rate to 2.9% + 30 cents per successful domestic online card payment, preserving D158's no monthly fee. Its earlier included creation/sharing treatment is superseded by the operator's 14 November 2026 payment-link and QR fee confirmation below. No separate 0.1% charge or membership is added. D193 replaces D132's dispute-received fee with $35 per dispute; the other selected fees remain. D137 sets a separate optional 0.4% Trolleys service fee on eligible enrolled successful-payment volume. D138 records the operator's confirmation that the Order Insight integration is live and approved. D154 names that service Trolleys Clarity without changing its price or coverage. D419 retires that public product name in favor of the descriptive service name Dispute prevention; fee and eligibility terms are unchanged. D147 removes vendor-charge line items and sourcing language from the public offer. Only displayed base and service fees are calculated; applicable account charges remain governed by the disclosed service agreement. Public offer approval does not configure provider billing or waive unverified upstream costs.",
+    paymentLinkAndQrApproval: "On 14 November 2026, the operator confirmed an additional 20 cents per successful payment through either a payment link or QR code. A QR payment incurs one 20-cent fee, not two fees. The charge is not for creating or sharing a link. Base processing rates and other fees remain unchanged. This public offer confirmation does not configure provider billing or determine refund treatment.",
     disputeFeeApproval: "D193 sets the fee for each dispute received to $35. The separate manual dispute response fee and its existing return-on-win condition are unchanged.",
     manualEntryScopeApproval: "D191 confirms the additional 0.5% applies to merchant-entered card details, not customer-entered online checkout.",
     achAvailabilityApproval: "D233: the operator confirms ACH is available through Trolleys. ACH fees, timing, account-specific checkout options and Clarity eligibility are not supplied or inferred. The published fee calculator covers card payments only.",

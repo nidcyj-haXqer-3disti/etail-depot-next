@@ -16,10 +16,15 @@ test("the consolidated pages retain navigation, accessible sections and exact me
   await expect(page.locator('main a[href^="/docs"]')).toHaveCount(0);
   await expect(page.getByRole("navigation",{name:"Breadcrumb",exact:true})).toHaveCount(0);
   await expect(page.getByText("Browse topics",{exact:true})).toHaveCount(0);
-  if(item.group==="Developers")await expect(page.locator('.docs-coming-soon')).toHaveText("Coming soon");
+  if(item.group==="Developers")await expect(page.locator('.docs-coming-soon')).toHaveCount(0);
   await expect(page.locator('a[href="/developers/sdks"], a[href="/developers/changelog"], a[href="/developers/api-status"]')).toHaveCount(0);
-  const nav=await openMainNavigation(page,item.group);
-  await expect(nav.locator('a[aria-current="page"]')).toHaveAttribute("href",item.href);
+  if(item.group === "Developers") {
+   const nav=page.getByRole("navigation",{name:"Developer pages",includeHidden:true});
+   await expect(nav.locator('a[aria-current="page"]')).toHaveAttribute("href",item.href);
+   await expect(page.getByRole("banner").locator('a[href^="/developers/"]')).toHaveCount(DEVELOPER_NAVIGATION.length);
+  }
+  const headerNav=await openMainNavigation(page,item.group);
+  await expect(headerNav.locator('a[aria-current="page"]')).toHaveAttribute("href",item.href);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
  }
 });
@@ -50,18 +55,32 @@ test("former overview bookmarks open the introduction without a second guide dir
 
 test("Developers navigation and browser Back retain a clear reading path",async({page})=>{
  await page.goto('/developers/getting-started');
- let nav=await openMainNavigation(page,"Developers");await nav.getByRole('link',{name:'Webhooks',exact:true}).click();await expect(page).toHaveURL(/\/developers\/webhooks$/);
- nav=await openMainNavigation(page,"Developers");await nav.getByRole('link',{name:'Testing',exact:true}).click();await expect(page).toHaveURL(/\/developers\/testing$/);
+ for(const [label,href] of [["Webhooks","/developers/webhooks"],["Testing","/developers/testing"]]) {
+  const link=page.getByRole("navigation",{name:"Developer pages",includeHidden:true}).getByRole("link",{name:label,exact:true,includeHidden:true});
+  if(await link.isVisible()) await link.click();
+  else {
+   const headerNav=await openMainNavigation(page,"Developers");
+   await headerNav.getByRole("link",{name:label,exact:true}).click();
+  }
+  await expect(page).toHaveURL(href);
+ }
  await page.goBack();await expect(page).toHaveURL(/\/developers\/webhooks$/);
- nav=await openMainNavigation(page,"Resources");await nav.getByRole('link',{name:'Merchant account setup',exact:true}).click();await expect(page).toHaveURL(/\/resources\/merchant-account-setup$/);
+ const nav=await openMainNavigation(page,"Resources");await nav.getByRole('link',{name:'Merchant account setup',exact:true}).click();await expect(page).toHaveURL(/\/resources\/merchant-account-setup$/);
 });
 
 test("existing guidance stays distinct from unavailable Etail APIs",async({page})=>{
  for(const slug of ["getting-started","api-reference","webhooks","testing","developer-tools"]){
   await page.goto('/developers/'+slug);
-  await expect(page.locator('.docs-availability')).toContainText('Etail APIs and tools are not available yet.');
+  if(slug==="getting-started"){
+   await expect(page.locator('#checkout')).toContainText('Connect Cybersource Unified Checkout');
+   await expect(page.locator('#checkout')).toContainText('No API integration with the portal is required for this setup.');
+  }else if(slug==="api-reference")await expect(page.locator('#api-credentials')).toContainText('It is not an Etail API.');
+  else if(slug==="webhooks")await expect(page.locator('#event-domains')).toContainText('It is not an Etail webhook service.');
+  else if(slug==="testing")await expect(page.locator('#testing-and-launch-specifications')).toContainText('There is no Etail test API.');
+  else await expect(page.locator('#integration-tools')).toContainText('Etail does not provide a separate API or SDK');
   await expect(page.locator('.docs-article')).not.toContainText(/ORD-1048|tx_demo|sk_test|transientToken|example API|mocked/i);
-  await expect(page.locator('.docs-article pre,main form,main iframe')).toHaveCount(0);
+  await expect(page.locator('main form,main iframe')).toHaveCount(0);
+  await expect(page.locator('.docs-article pre')).toHaveCount(slug==="api-reference"?3:0);
  }
  for(const slug of ['sdks','changelog','api-status']){
   await page.goto('/developers/'+slug);
@@ -72,12 +91,179 @@ test("existing guidance stays distinct from unavailable Etail APIs",async({page}
  }
 });
 
+test("approved merchants can choose the correct connection without exposing account input",async({page,browser})=>{
+ await page.goto('/developers/getting-started?merchant=private-input#portal-access');
+ const portals=page.locator('#portal-access');
+ for(const [name,url] of [
+  ['Open Back Office','https://backoffice.infinicept.com/etaildepot/login'],
+  ['Open Business Center','https://ebc2.cybersource.com/ebc2/'],
+ ]){
+  const link=portals.getByRole('link',{name,exact:true});
+  await expect(link).toHaveAttribute('href',url);
+  await expect(link).toHaveAttribute('referrerpolicy','no-referrer');
+  await expect(link).toHaveAttribute('rel','noreferrer');
+ }
+ await expect(page.locator('#integration-access')).toContainText('The processing MID and gateway Organization ID may be different.');
+ await expect(page.locator('#integration-access')).toContainText('A portal password is not an API key.');
+ await page.locator('#checkout').getByRole('link',{name:'WooCommerce integration',exact:true}).click();
+ await expect(page).toHaveURL(/\/resources\/woocommerce-gateway-integration$/);
+ await page.goBack();
+ await expect(page).toHaveURL(/\/developers\/getting-started/);
+ await expect(page.locator('#checkout').getByRole('link',{name:'Shopify integration',exact:true})).toHaveAttribute('href','/resources/shopify-gateway-integration');
+ await expect(page.locator('#checkout').getByRole('link',{name:'Custom website API reference',exact:true})).toHaveAttribute('href','/developers/api-reference');
+ await expect(page.locator('#payment-methods')).toContainText('Unified Checkout setup is not required for that path.');
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:page.viewportSize()!});
+ const plain=await context.newPage();
+ try{
+  await plain.goto('http://127.0.0.1:3100/developers/getting-started');
+  await expect(plain.locator('.docs-section > h2')).toHaveCount(5);
+  const wallet=plain.locator('#payment-methods details');
+  await wallet.locator('summary').click();
+  await expect(wallet.locator('code')).toBeVisible();
+  await plain.locator('#complete-payment').getByRole('link',{name:'Review the testing checklist',exact:true}).click();
+  await expect(plain).toHaveURL(/\/developers\/testing$/);
+ }finally{await context.close();}
+});
+
 test("phone readers can jump to each topic without another navigation layer",async({page})=>{
  await page.setViewportSize({width:390,height:844});
  for(const slug of ['getting-started','api-reference','webhooks','testing','developer-tools']){
   await page.goto('/developers/'+slug);const toc=page.locator('.docs-mobile-toc');
   await toc.locator('summary').focus();await page.keyboard.press('Enter');const last=toc.getByRole('link').last();const href=await last.getAttribute('href');await last.click();await expect(page.locator(href+' > h2')).toBeInViewport();
  }
+});
+
+test("testing and tools work without JavaScript or an embedded provider connection",async({browser,page})=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:page.viewportSize()!});
+ const plain=await context.newPage();
+ const vendorRequests:string[]=[];
+ plain.on('request',request=>{if(/cybersource\.com|visaacceptance\.com|infinicept\.com/.test(new URL(request.url()).hostname))vendorRequests.push(request.url());});
+ try{
+  await plain.goto('http://127.0.0.1:3100/developers/testing');
+  await expect(plain.locator('.docs-section > h2')).toHaveCount(6);
+  await expect(plain.locator('#testing-and-launch-specifications')).toContainText('https://apitest.cybersource.com');
+  await expect(plain.locator('#production-readiness')).toContainText('Sandbox test cards must never be used for live transactions.');
+  const methods=plain.locator('#acceptance-tests details').first();
+  expect(await methods.evaluate(element => Boolean(element.compareDocumentPosition(document.querySelector('#acceptance-tests > .docs-facts')!) & Node.DOCUMENT_POSITION_PRECEDING))).toBe(true);
+  await methods.locator('summary').focus();await plain.keyboard.press('Enter');
+  await expect(methods).toHaveAttribute('open','');
+  await expect(methods).toContainText('Domain verification and the wallet test setup are separate.');
+  await plain.locator('#customer-journey').getByRole('link',{name:'Find the right records and tools',exact:true}).click();
+  await expect(plain).toHaveURL(/\/developers\/developer-tools#account-records$/);
+  await expect(plain.locator('#account-records > h2')).toBeInViewport();
+  const lookup=plain.locator('#account-records details');
+  await lookup.locator('summary').click();
+  await expect(lookup).toContainText('An empty search result does not establish that a payment failed');
+  await expect(plain.locator('#integration-tools')).toContainText('No API integration with the Back Office Operations Portal is required for standard merchant checkout.');
+  await expect(plain.locator('#sandbox-tools').getByRole('link',{name:'Open sandbox utilities',exact:true})).toHaveAttribute('href','https://developer.cybersource.com/hello-world.html');
+  const hosted=plain.locator('#payment-requests details');await hosted.locator('summary').click();
+  await expect(hosted).toContainText('A QR code opens the same hosted destination');
+  await expect(plain.locator('main form,main input,main iframe,main pre')).toHaveCount(0);
+  expect(vendorRequests).toEqual([]);
+  expect(await plain.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+ }finally{await context.close();}
+});
+
+test("legacy testing and payment-request bookmarks reach the relevant new sections",async({page})=>{
+ for(const [old,anchor,path,target] of [
+  ['/docs/testing-and-launch','testing-and-launch','/developers/testing','testing-and-launch-specifications'],
+  ['/developers/testing','technical-review','/developers/testing','production-readiness'],
+  ['/docs/payment-requests','request-result','/developers/developer-tools','payment-requests'],
+  ['/developers/developer-tools','request-follow-up','/developers/developer-tools','payment-requests'],
+ ]){
+  await page.goto(old+'#'+anchor);
+  await expect(page).toHaveURL(url=>url.pathname===path&&url.hash==='#'+anchor);
+  await expect(page.locator('#'+target+' > h2')).toBeInViewport();
+  await page.reload();
+  await expect(page.locator('#'+target+' > h2')).toBeInViewport();
+ }
+});
+
+test("launch support retains the original attempt and a useful handoff",async({page})=>{
+ await page.goto('/developers/testing');
+ await expect(page.locator('#acceptance-tests')).toContainText('a malformed request tests validation, not an issuer decline.');
+ await expect(page.locator('#acceptance-tests')).toContainText('Resolve the original attempt before another charge');
+ await expect(page.locator('#customer-journey')).toContainText('may not appear in the live merchant portal.');
+ await expect(page.locator('#production-readiness')).toContainText('A software rollback does not reverse a payment already accepted.');
+ await page.locator('#ongoing-support').getByRole('link',{name:'Prepare an integration support request',exact:true}).click();
+ await expect(page).toHaveURL(/\/developers\/developer-tools#support-handoff$/);
+ await expect(page.locator('#support-handoff > h2')).toBeInViewport();
+ await expect(page.locator('#support-handoff')).toContainText('timestamp with time zone');
+ await expect(page.locator('#support-handoff')).toContainText('Remove card numbers, security codes, passwords');
+ await expect(page.locator('#support-handoff').getByRole('link',{name:'Contact integration support',exact:true})).toHaveAttribute('href','/company/contact#integration');
+ await expect(page.locator('#payment-requests')).toContainText('Do not assume Pay by Link or invoicing is included because you can sign in.');
+});
+
+test("Cybersource reference is readable without JavaScript and never loads payment fields",async({browser,page})=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:page.viewportSize()!});
+ const plain=await context.newPage();
+ const vendorRequests:string[]=[];
+ plain.on('request',request=>{if(/cybersource\.com|visaacceptance\.com/.test(new URL(request.url()).hostname))vendorRequests.push(request.url());});
+ try{
+  await plain.goto('http://127.0.0.1:3100/developers/api-reference');
+  await expect(plain.locator('.docs-section > h2')).toHaveCount(7);
+  const request=plain.locator('#create-session details');
+  await request.locator('summary').focus();await plain.keyboard.press('Enter');
+  const sample=plain.getByRole('region',{name:'Server · Session request body. Scroll horizontally if needed.',exact:true});
+  await expect(sample).toBeVisible();
+  const payload=JSON.parse(await sample.innerText());
+  expect(payload.completeMandate.type).toBe('CAPTURE');
+  expect(payload.data.orderInformation.amountDetails).toEqual({totalAmount:'24.00',currency:'USD'});
+  expect(payload.targetOrigins).toEqual(['https://shop.example.com']);
+  const browserCode=plain.locator('#display-checkout details').first();
+  await browserCode.locator('summary').click();
+  await expect(browserCode.locator('pre').last()).toContainText('checkout.mount');
+  await expect(plain.locator('#display-checkout')).toContainText('Do not submit that result as a new payment');
+  await expect(plain.locator('#payment-status')).toContainText('A browser message, redirect or decoded token is not sufficient evidence');
+  expect(await plain.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+  await expect(plain.locator('main iframe,main form,main input,script[src*="cybersource"],script[src*="visaacceptance"]')).toHaveCount(0);
+  expect(vendorRequests).toEqual([]);
+ }finally{await context.close();}
+});
+
+test("former API reference bookmarks still lead to the relevant guidance",async({page})=>{
+ await page.goto('/developers/api-reference');
+ for(const anchor of ['payment-status','find-payment','read-status','uncertain-result','reporting-results','support-reference','refunds-and-disputes','choose-action','refund-payment','dispute-case','financial-impact','payouts','payment-to-deposit','reconcile','funding-status','payout-help','funding-instructions']){
+  await expect(page.locator('#'+anchor)).toHaveCount(1);
+ }
+ await page.goto('/docs/refunds-and-disputes#refund-payment');
+ await expect(page.locator('#refund-payment h3')).toBeInViewport();
+ await page.goto('/docs/payouts#payment-to-deposit');
+ await expect(page.locator('#payment-to-deposit h3')).toBeInViewport();
+});
+
+test("webhook setup remains static, accessible and readable without JavaScript",async({browser,page})=>{
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:page.viewportSize()!});
+ const plain=await context.newPage();
+ const providerRequests:string[]=[];
+ plain.on('request',request=>{if(/cybersource\.com|visaacceptance\.com/.test(new URL(request.url()).hostname))providerRequests.push(request.url());});
+ try{
+  await plain.goto('http://127.0.0.1:3100/developers/webhooks');
+  await expect(plain.locator('.docs-section > h2')).toHaveCount(6);
+  await expect(plain.locator('#event-domains')).toContainText('uc.orders.transactionresults');
+  await expect(plain.locator('#event-domains')).toContainText('not a subscription to every later capture, refund or bank deposit');
+  const setup=plain.locator('#webhooks-specifications details');
+  await setup.locator('summary').focus();await plain.keyboard.press('Enter');
+  await expect(setup.getByRole('table')).toBeVisible();
+  await expect(setup).toContainText('/notification-subscriptions/v2/webhooks');
+  const security=plain.locator('#event-security details');
+  await security.locator('summary').click();
+  await expect(security.getByRole('link',{name:'Register the certificate',exact:true})).toBeVisible();
+  await expect(plain.locator('#event-security')).toContainText('unique asymmetric certificate for each webhook subscription');
+  await expect(plain.locator('#payment-event')).toContainText('changes on retries');
+  await expect(plain.locator('#event-handler')).toContainText('Return the required acknowledgment only after that work is safely recorded');
+  await expect(plain.locator('main form,main iframe,main input')).toHaveCount(0);
+  expect(providerRequests).toEqual([]);
+  expect(await plain.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
+  await plain.goto('http://127.0.0.1:3100/docs/webhooks#event-handler');
+  await expect(plain).toHaveURL(url=>url.pathname==='/developers/webhooks'&&url.hash==='#event-handler');
+  await expect(plain.locator('#event-handler > h2')).toBeInViewport();
+ }finally{await context.close();}
+ await page.goto('/developers/api-reference#uncertain-result');
+ await page.getByRole('link',{name:'Set up payment notifications',exact:true}).click();
+ await expect(page).toHaveURL(/\/developers\/webhooks$/);
+ await page.getByRole('link',{name:'Recover an uncertain payment',exact:true}).click();
+ await expect(page).toHaveURL(/\/developers\/api-reference#uncertain-result$/);
 });
 
 test("developer sidebar transfers focus when hidden on a phone",async({page})=>{
@@ -91,15 +277,15 @@ test("documentation distinguishes approval, payment results and bank receipt",as
  await expect(page.locator('#application-review')).toContainText('Creating a login is not approval to accept payments.');
  await expect(page.locator('#account-readiness')).toContainText('Wait for account approval and confirmation that your payment setup is ready.');
  await page.goto('/developers/getting-started');
- await expect(page.locator('#checkout')).toContainText('verify the payment result and recover an interrupted attempt');
- await expect(page.locator('main')).toContainText('The checkout connection and instructions provided for your merchant account');
- await expect(page.locator('#complete-payment')).toContainText('Do not fulfill from a browser redirect');
- await expect(page.locator('#complete-payment')).toContainText('retain an unresolved state until the original attempt is reconciled');
+ await expect(page.locator('#checkout')).toContainText('a secure server to create checkout sessions and verify payment results');
+ await expect(page.locator('#complete-payment')).toContainText('Account approval comes before connection testing.');
+ await expect(page.locator('#complete-payment')).toContainText('A browser redirect alone does not prove payment.');
+ await expect(page.locator('#complete-payment')).toContainText('check the original attempt in Cybersource before trying another charge');
  await page.goto('/developers/api-reference');
  await expect(page.locator('#payment-to-deposit')).toContainText('Submission for funding is not confirmation of bank receipt.');
  await page.goto('/developers/webhooks');
- await expect(page.locator('#event-security')).toContainText('integration instructions');
- await expect(page.locator('#event-handler')).toContainText('Prevent duplicate deliveries');
+ await expect(page.locator('#event-security')).toContainText('Use both decryption and signature verification');
+ await expect(page.locator('#payment-event')).toContainText('Prevent duplicate deliveries');
 });
 
 test("documentation contents keep keyboard focus across responsive layouts", async ({ page }) => {
@@ -126,32 +312,32 @@ test("documentation contents keep keyboard focus across responsive layouts", asy
 
 test("merchant guidance retains recovery and reconciliation without fabricated records", async ({page}) => {
  await page.goto('/developers/developer-tools');
- await expect(page.locator('#request-result')).toContainText('Opening a link, scanning a QR code or viewing an invoice does not prove payment.');
+ await expect(page.locator('#payment-requests')).toContainText('Opening a link, scanning a QR code or viewing an invoice does not prove payment.');
  await page.goto('/developers/api-reference');
  await expect(page.locator('#uncertain-result')).toContainText('retain the unresolved attempt instead of submitting a new charge');
  await page.goto('/developers/api-reference');
  await expect(page.locator('#refund-payment')).toContainText('investigate that operation before repeating it');
  await expect(page.locator('#dispute-case')).toContainText('retain its acknowledgment');
  await page.goto('/developers/api-reference');
- await expect(page.locator('#reconcile')).toContainText('Compare the reported funding amount with the posted bank credit and reference');
+ await expect(page.locator('#payment-to-deposit')).toContainText('Compare the reported funding amount with the posted bank credit and reference');
 });
 
-test("restored diagrams and recovery guidance remain usable without API samples", async ({page}) => {
+test("account setup and payment guidance retain native disclosures and distinct provider roles", async ({page}) => {
  await page.goto('/developers/getting-started');
- await expect(page.getByRole('figure',{name:'Checkout journey from order to verified payment',exact:true})).toBeVisible();
- await expect(page.locator('#server-setup')).toContainText('Request checkout setup instructions');
- await expect(page.locator('#completion-policy table')).toContainText('Which service submits the payment');
- const recovery=page.locator('#checkout-recovery details').first();
- await recovery.locator('summary').focus();await page.keyboard.press('Enter');
- await expect(recovery).toHaveAttribute('open','');
- await expect(recovery.locator('p')).toBeVisible();
- await page.keyboard.press('Enter');await expect(recovery).not.toHaveAttribute('open','');
+ await expect(page.locator('#portal-access')).toContainText('One login for your assigned MIDs.');
+ await expect(page.locator('#portal-access')).toContainText('Organization ID, User ID');
+ const wallet=page.locator('#payment-methods details');
+ await wallet.locator('summary').focus();await page.keyboard.press('Enter');
+ await expect(wallet).toHaveAttribute('open','');
+ await expect(wallet.locator('code')).toHaveText('https://yourstore.com/.well-known/apple-developer-merchantid-domain-association');
+ await expect(wallet).toContainText('not the private .p12 encryption certificate');
+ await page.keyboard.press('Enter');await expect(wallet).not.toHaveAttribute('open','');
  await page.goto('/developers/api-reference');
- await expect(page.getByRole('figure',{name:'From payment to bank deposit',exact:true})).toBeVisible();
- await expect(page.locator('#reconcile')).toContainText('Do not subtract a fee again');
+ await expect(page.locator('#reconcile')).toContainText('Compare Cybersource’s transaction records with the related merchant account activity.');
+ await expect(page.locator('#payment-to-deposit')).toContainText('Do not subtract a fee again');
  await page.goto('/developers/webhooks');
  await expect(page.getByRole('figure',{name:'From delivery to a verified update',exact:true})).toBeVisible();
- await expect(page.locator('#event-domains')).toContainText('Event delivery instructions');
+ await expect(page.locator('#event-domains')).toContainText('uc.orders.transactionresults');
  await expect(page.locator('#event-handler')).toContainText('Durably record the receipt');
 });
 
