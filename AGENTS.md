@@ -28,4 +28,4 @@ The main agent remains responsible for the final result. Review delegated findin
 
 Use pinned Node, pnpm and one lockfile. Read installed Next.js documentation before framework changes. Use a feature branch and review the exact diff. No force push or direct main feature changes.
 
-Run `pnpm verify:public`, `pnpm test:seo:production`, `pnpm package:netlify` and `pnpm verify:package` for release candidates. Record failures, corrections, final results and remaining hosted checks. Preserve the manual publication process in `docs/NETLIFY_DEPLOYMENT.md`.
+Run `pnpm verify:public`, `pnpm test:seo:production`, `pnpm package:netlify` and `pnpm verify:package` for release candidates. Record failures, corrections, final results and remaining hosted checks. Preserve the manual publication process in `docs/NETLIFY_DEPLOYMENT.md`. For hosted checks, use its separate health and boundary commands. Keep exhaustive negative tests local; report expected 404/410 probes separately from unexpected failures, with the run ID and UTC window. Never describe the aggregate Netlify error percentage as visitor failure without checking the requests.
