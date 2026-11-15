@@ -20,6 +20,8 @@ For release candidates run, in order: `pnpm verify:public`, `pnpm test:seo:produ
 
 The Blog WebKit project runs in local and CI verification. Use additional WebKit and responsive/loading checks for other pages when the changed behavior needs them. These are browser-engine checks, not tests on a physical iPhone or Safari device. The [paint standard](PAGE_PAINT_STANDARDS.md) specifies cold visits, refresh, delayed assets, split document delivery, early clicks and saved links.
 
+The static page inventory in `public-boundary.spec.ts` waits for pending network work to settle after its explicit UI and image assertions, before forcing another full document load. It caches rendered section IDs so each bookmark does not cause a new reload. This settlement is an audit teardown barrier, not proof of application readiness or a performance requirement. Keep it out of interaction and timing tests. Keep full browser error names/stacks and all error assertions. For a WebKit access-control diagnostic, correlate document replacement, request type, native errors/rejections and server responses before classifying it; never ignore errors just because their wording mentions access control. The [upstream WebKit investigation](https://github.com/microsoft/playwright/issues/43120) explains why cancellation can carry that wording.
+
 For documentation-only edits, check file destinations, linked paths, code examples and formatting. For moves, compare the original bytes, every active consumer and the resulting import/reference graph. Run broader application checks when tooling or packaging inputs change.
 
 ## Record what happened

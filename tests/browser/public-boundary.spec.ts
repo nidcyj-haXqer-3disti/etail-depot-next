@@ -15,6 +15,8 @@ test("renamed product bookmarks retain their section and reject submitted data",
     ["/docs/merchant-onboarding", "/resources/merchant-account-setup", "#registration-email"],
     ["/resources/blog", "/company/blog", "#main-content"],
     ["/resources/no-code-checkout-experience", "/use-cases/no-code-checkout-experience", "#setup"],
+    ["/guides/how-to-create-a-payment-link", "/use-cases/no-code-checkout-experience", "#create-the-request"],
+    ["/guides/consuming-webhooks", "/developers/webhooks", "#event-handler"],
     ["/guides/iso-20022/payment-transaction-status/acsp", "/resources/guides/iso-20022/payment-transaction-status/acsp", "#definition"],
   ];
   for (const [oldPath, destination, section] of destinations) {
@@ -47,10 +49,38 @@ test("renamed product bookmarks retain their section and reject submitted data",
   }
 });
 
+test("restored guide section bookmarks reach matching current content", async ({ page, baseURL }) => {
+ const origin = new URL(baseURL!).origin;
+ const guides = [
+  { from: "/guides/consuming-webhooks", to: "/developers/webhooks", sections: [
+   ["receipt", "event-handler"], ["interpret", "payment-event"],
+   ["failure-example", "recovery-cases"], ["operations", "recovery-cases"],
+  ] },
+  { from: "/guides/how-to-create-a-payment-link", to: "/use-cases/no-code-checkout-experience", sections: [
+   ["prepare-the-request", "prepare-the-request"], ["create-the-request", "create-the-request"],
+   ["check-before-sending", "check-before-sending"], ["share-the-link", "share-the-link"],
+   ["card-payment-fees", "card-payment-fees"], ["confirm-the-payment", "confirm-the-payment"],
+  ] },
+ ];
+ for (const guide of guides) {
+  for (const [oldSection, currentSection] of guide.sections) {
+   const response = await page.goto(`${guide.from}#${oldSection}`);
+   expect(response!.status()).toBe(200);
+   await expect(page).toHaveURL(`${origin}${guide.to}#${oldSection}`);
+   await expect(page.locator(`#${oldSection}`)).toHaveCount(1);
+   await expect(page.locator(`#${currentSection}`)).toBeInViewport();
+   expect(response!.headers()["x-robots-tag"]).toBe("noindex, nofollow");
+  }
+ }
+ await expect(page.locator("#card-payment-fees")).toHaveAttribute("href", "/pricing");
+});
+
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
+  test.setTimeout(90_000);
   const pages = CORE_PUBLIC_PATHS;
+  const renderedIds = new Map<string, Set<string>>();
   const privateRequests: string[] = [], errors: string[] = [];
-  page.on("pageerror", error => errors.push(error.message));
+  page.on("pageerror", error => errors.push(error.stack || `${error.name}: ${error.message}`));
   page.on("request", req => { if (new URL(req.url()).pathname.startsWith("/api/")) privateRequests.push(req.url()); });
   const destinations = new Set<string>();
   const renderedScreenshots = new Set<string>();
@@ -85,6 +115,13 @@ test("public pages and every internal link resolve without account APIs or cooki
       await expect.poll(() => image.evaluate(el => el instanceof HTMLImageElement && el.complete && el.naturalWidth > 0)).toBe(true);
     }
     expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+    // This static inventory has already checked the UI and images. Let background
+    // work finish before replacing its document: WebKit can report teardown of a
+    // handled prefetch as an access-control pageerror. This is not a readiness or
+    // performance assertion; keep actual navigation tests and error checks intact.
+    await page.waitForLoadState("networkidle");
+    renderedIds.set(path, new Set(await page.locator("[id]").evaluateAll(nodes => nodes.map(node => node.id))));
+    expect(errors, `Unexpected browser errors while inspecting ${path}`).toEqual([]);
   }
   for (const destination of destinations) {
     const url = new URL(destination, "http://127.0.0.1:3100");
@@ -100,8 +137,14 @@ test("public pages and every internal link resolve without account APIs or cooki
     expect([...pages, ...STANDARD_REFERENCE_PATHS]).toContain(url.pathname);
     expect((await request.get(url.pathname)).status()).toBe(200);
     if (url.hash) {
-      await page.goto(url.pathname);
-      expect(await page.evaluate(id => document.getElementById(id) !== null, decodeURIComponent(url.hash.slice(1)))).toBe(true);
+      // Reuse the rendered document instead of reloading it for every bookmark.
+      if (!renderedIds.has(url.pathname)) {
+        expect((await page.goto(url.pathname))!.status()).toBe(200);
+        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+        await page.waitForLoadState("networkidle");
+        renderedIds.set(url.pathname, new Set(await page.locator("[id]").evaluateAll(nodes => nodes.map(node => node.id))));
+      }
+      expect(renderedIds.get(url.pathname)!.has(decodeURIComponent(url.hash.slice(1))), `Missing section: ${destination}`).toBe(true);
     }
   }
   expect(await context.cookies()).toEqual([]);
