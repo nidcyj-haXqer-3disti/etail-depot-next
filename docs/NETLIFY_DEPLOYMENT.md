@@ -43,4 +43,15 @@ Netlify's raw traffic totals still include these requests. Its Observability Err
 
 When investigating an error percentage, record the dashboard time window, filter by the exact receipt User-Agent and compare each path/status with the planned assertion. Report **expected boundary responses**, **unexpected verification failures** and **other traffic errors** separately. Never exclude all 4xx, all verifier traffic or all traffic during the test window. A verifier receiving an unexpected 500 still indicates a real problem. Inspect remaining failures by status and URL before attributing them to visitors, bots or tests.
 
+Classify the remaining requests after matching test receipts:
+
+| Request group | Treatment |
+| --- | --- |
+| Current pages, their assets and visitor links | Investigate unexpected 4xx/5xx, broken destinations and reproducible loading failures as website problems. |
+| Known removed pages and retired endpoints | Report separately. Keep 404/410 when there is no equivalent current page. Add an exact redirect only after comparing the old content and destination. |
+| Unknown paths, unsupported methods and optional discovery files | Report separately as unmatched requests. Do not assume they are all bots or turn them into successful homepage responses. |
+| Client cancellations, including 499 | Report separately and look for repeatable visitor impact. A cancellation alone does not establish a server failure or prove harmless navigation. |
+
+For a replacement, check the exact HTML aliases, old section bookmarks, final page status, canonical and indexing policy. Do not redirect submissions, read or forward their bodies, retain old query parameters, or send obsolete application payloads to an HTML page. Repair stale internal links at their source. Keep removed URLs out of current navigation and the sitemap. No-index destinations remain noindex until separately approved.
+
 Every release summary must state the healthy-check result, expected 404/410 counts and UTC window, unexpected failures, and remaining hosted checks. Tell the operator when deliberate boundary probes affect the aggregate metric; do not report it as a percentage of visitors experiencing failure. Preserve real 404/410 responses instead of returning 200 to improve a dashboard number.

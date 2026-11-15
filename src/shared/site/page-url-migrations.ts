@@ -1,4 +1,4 @@
-/** Exact former public page addresses, approved for local migration on 8 November 2026. */
+/** Exact former public addresses with reviewed current content equivalents. */
 export const CORE_PAGE_MOVES: Readonly<Record<string,string>> = {
   "/resources/blog": "/company/blog",
   "/resources/no-code-checkout-experience": "/use-cases/no-code-checkout-experience",
@@ -19,6 +19,8 @@ export const CORE_PAGE_MOVES: Readonly<Record<string,string>> = {
   "/platform-payment-models": "/use-cases/software-platforms/payment-models",
   "/help": "/resources/help",
   "/guides": "/resources/guides",
+  "/guides/how-to-create-a-payment-link": "/use-cases/no-code-checkout-experience",
+  "/guides/consuming-webhooks": "/developers/webhooks",
   "/company": "/company/about",
   "/contact": "/company/contact",
   "/trust": "/company/security",

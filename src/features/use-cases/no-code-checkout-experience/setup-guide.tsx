@@ -8,7 +8,7 @@ const businessCenter = "https://businesscenter.cybersource.com";
 export function NoCodeCheckoutSetup() {
   return <section className={s.setup} id="setup" data-integration-guide aria-labelledby="checkout-setup-title">
     <div className={classic.container}>
-      <div className={classic.sectionHeading}>
+      <div className={classic.sectionHeading} id="prepare-the-request">
         <div><p className={classic.eyebrow}>Set up your own</p><h2 id="checkout-setup-title">One link. Ready to share.</h2></div>
         <p>Start after Trolleys confirms that Pay by Link is enabled for your merchant account. <Link href="/resources/merchant-account-setup" prefetch={false}>Set up your account</Link></p>
       </div>
@@ -23,7 +23,7 @@ export function NoCodeCheckoutSetup() {
           </div>
         </li>
         <li id="create-payment-link">
-          <div className={s.stepHeading}><span className={s.stepNumber} aria-hidden="true">02</span><h3>Create your payment link</h3></div>
+          <div className={s.stepHeading} id="create-the-request"><span className={s.stepNumber} aria-hidden="true">02</span><h3>Create your payment link</h3></div>
           <div className={s.stepBody}>
             <p>Select <strong>Create Pay by Link</strong>, then choose how the amount is set.</p>
             <dl className={s.priceOptions}>
@@ -35,7 +35,7 @@ export function NoCodeCheckoutSetup() {
           </div>
         </li>
         <li id="share-payment-link">
-          <div className={s.stepHeading}><span className={s.stepNumber} aria-hidden="true">03</span><h3>Share the link or QR code</h3></div>
+          <div className={s.stepHeading} id="share-the-link"><span className={s.stepNumber} aria-hidden="true">03</span><h3>Share the link or QR code</h3></div>
           <div className={s.stepBody}>
             <p>Open the link by selecting its name in <strong>Manage Links</strong>.</p>
             <ul className={s.sharingOptions}>
@@ -51,12 +51,12 @@ export function NoCodeCheckoutSetup() {
         <li id="check-payment">
           <div className={s.stepHeading}><span className={s.stepNumber} aria-hidden="true">04</span><h3>Check the payment</h3></div>
           <div className={s.stepBody}>
-            <p>Before sharing, open the link and scan the QR code. Both should show the same payment page. Check the business name, item, currency and amount.</p>
-            <p>After a customer pays, open <strong>Transaction Management</strong>, then <strong>Transactions</strong> in Cybersource. Find the payment and check its status, amount and reference before fulfilling the order.</p>
+            <p id="check-before-sending">Before sharing, open the link and scan the QR code. Both should show the same payment page. Check the business name, item, currency and amount.</p>
+            <p id="confirm-the-payment">After a customer pays, open <strong>Transaction Management</strong>, then <strong>Transactions</strong> in Cybersource. Find the payment and check its status, amount and reference before fulfilling the order.</p>
           </div>
         </li>
       </ol>
-      <div className={s.setupFootnote}><p>Customers enter their payment details on the Cybersource page. You do not need to build a payment server or database for this setup.</p><a href="https://developer.cybersource.com/docs/cybs/en-us/paybylink/developer/all/rest/paybylink/paybylink-ebc-intro.html" target="_blank" rel="noopener noreferrer">Cybersource setup reference<Icon name="external" /></a></div>
+      <div className={s.setupFootnote}><p>Customers enter their payment details on the Cybersource page. You do not need to build a payment server or database for this setup.</p><Link id="card-payment-fees" href="/pricing" prefetch={false}>Pricing and additional fees</Link><a href="https://developer.cybersource.com/docs/cybs/en-us/paybylink/developer/all/rest/paybylink/paybylink-ebc-intro.html" target="_blank" rel="noopener noreferrer">Cybersource setup reference<Icon name="external" /></a></div>
     </div>
   </section>;
 }

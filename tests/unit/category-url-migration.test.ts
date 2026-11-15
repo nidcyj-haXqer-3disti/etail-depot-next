@@ -3,7 +3,7 @@ import { expect,test,vi } from "vitest";
 import { CORE_PAGE_MOVES,currentPublicHref } from "../../src/shared/site/page-url-migrations";
 import { DOCUMENTATION_REDIRECTS } from "../../src/shared/site/developer-paths";
 import { PUBLIC_CONTENT_PATHS,INDEXABLE_PUBLIC_PATHS,publicPayloadPath } from "../../src/shared/site/public-page-inventory";
-import { publicPageRedirect,retiredRoute } from "../../src/shared/site/public-routes";
+import { publicPageRedirect,retiredRoute,retiredArticleRoute } from "../../src/shared/site/public-routes";
 import { handlePublicRequest } from "../../netlify/edge-functions/public-boundary";
 import { forbiddenStatic } from "../../tools/public-artifact-policy";
 const map=JSON.parse(readFileSync("docs/plans/category-url-map.json","utf8")) as {pages:{from:string;to:string}[]};
@@ -53,4 +53,37 @@ test("nested reference payloads use the new resources route segments",()=>{
  expect(publicPayloadPath('/resources/guides/iso-20022/purpose/__next.resources.guides.iso-20022.$d$set.__PAGE__.txt')).toBe('/resources/guides/iso-20022/purpose');
  expect(publicPayloadPath('/resources/guides/iso-20022/purpose/sala/__next.resources.guides.iso-20022.$d$set.$d$code.__PAGE__.txt')).toBe('/resources/guides/iso-20022/purpose/sala');
  expect(publicPayloadPath('/guides/iso-20022/purpose/__next.guides.iso-20022.$d$set.__PAGE__.txt')).toBeNull();
+});
+
+
+test.each([
+ ["/guides/how-to-create-a-payment-link", "/use-cases/no-code-checkout-experience"],
+ ["/guides/consuming-webhooks", "/developers/webhooks"],
+])("restores only reviewed HTML addresses for %s", async (from, destination) => {
+ expect(PUBLIC_CONTENT_PATHS).toContain(destination);
+ expect(INDEXABLE_PUBLIC_PATHS).not.toContain(destination);
+ expect(publicPageRedirect(destination)).toBeNull();
+ expect(currentPublicHref(from + "#saved-section")).toBe(destination + "#saved-section");
+ for (const suffix of ["", "/", ".html", "/index.html"]) {
+  const path = from + suffix;
+  expect(retiredArticleRoute(path)).toBe(false);
+  expect(forbiddenStatic(path.slice(1))).toBe(true);
+  for (const method of ["GET", "HEAD"]) {
+   const next = vi.fn(async () => new Response("unexpected"));
+   const response = await handlePublicRequest(new Request(`https://preview.invalid${path}?token=do-not-forward`, { method }), { next }, {});
+   expect(response.status).toBe(308);
+   expect(response.headers.get("location")).toBe(`https://preview.invalid${destination}`);
+   expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+   expect(response.headers.get("cache-control")).toBe("no-store");
+   expect(next).not.toHaveBeenCalled();
+  }
+ }
+ for (const suffix of [".txt", ".__next._tree.txt", "/__next._tree.txt", "/unrelated", "-other"]) {
+  const next = vi.fn(async () => new Response("unexpected"));
+  const response = await handlePublicRequest(new Request(`https://preview.invalid${from}${suffix}`), { next }, {});
+  expect(response.status).toBe(404);
+  expect(response.headers.has("location")).toBe(false);
+  expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+  expect(next).not.toHaveBeenCalled();
+ }
 });

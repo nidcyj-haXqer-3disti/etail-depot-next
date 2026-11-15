@@ -35,7 +35,7 @@ describe("article retirement without changing ISO references", () => {
   });
 
   it("retires each published address, alias and payload without reading or forwarding submissions", async () => {
-    expect(RETIRED_ARTICLE_PATHS).toHaveLength(20);
+    expect(RETIRED_ARTICLE_PATHS).toHaveLength(18);
     for (const path of RETIRED_ARTICLE_PATHS) {
       for (const suffix of ["", "/", ".html", "/index.html", ".txt", ".__next._tree.txt", "/__next._tree.txt"]) {
         for (const method of ["GET", "HEAD", "POST"]) {

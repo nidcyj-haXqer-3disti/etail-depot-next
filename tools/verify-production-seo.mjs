@@ -325,7 +325,27 @@ async function verifyResponses() {
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
     assert.ok(values.some(forbidsIndexing), `${route}: must remain noindex.`);
   }
-  // Previously published articles have no equivalent replacement; do not redirect them.
+  // These reviewed replacements retain their existing search-publication holds.
+  for (const [oldPath, destination] of [
+    ["/guides/how-to-create-a-payment-link", "/use-cases/no-code-checkout-experience"],
+    ["/guides/consuming-webhooks", "/developers/webhooks"],
+  ]) {
+    for (const suffix of ["", "/", ".html", "/index.html"]) {
+      for (const method of ["GET", "HEAD"]) {
+        const response = await localFetch(`${oldPath}${suffix}?token=synthetic-test`, { method });
+        assert.equal(response.status, 308);
+        assert.equal(response.headers.get("location"), `${localOrigin}${destination}`);
+        assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""));
+        assert.equal(response.headers.get("cache-control"), "no-store");
+        assert.equal(await response.text(), "");
+      }
+    }
+    const response = await localFetch(`${oldPath}.txt`);
+    assert.equal(response.status, 404, "Obsolete navigation data must not redirect to HTML.");
+    assert.equal(response.headers.has("location"), false);
+    await response.arrayBuffer();
+  }
+  // Remaining retired articles have no equivalent replacement; do not redirect them.
   for (const path of RETIRED_ARTICLE_PATHS) {
     for (const suffix of ["", ".html", "/index.html", ".txt"]) {
       const response = await localFetch(`${path}${suffix}`);
