@@ -76,8 +76,10 @@ test("restored guide section bookmarks reach matching current content", async ({
 });
 
 test("public pages and every internal link resolve without account APIs or cookies", async ({ page, request, context }) => {
-  test.setTimeout(90_000);
   const pages = CORE_PUBLIC_PATHS;
+  // The inventory deliberately waits for 500 ms of network idle per document.
+  // Budget that fixed wait separately from the existing 90 seconds of checks.
+  test.setTimeout(90_000 + pages.length * 500);
   const renderedIds = new Map<string, Set<string>>();
   const privateRequests: string[] = [], errors: string[] = [];
   page.on("pageerror", error => errors.push(error.stack || `${error.name}: ${error.message}`));

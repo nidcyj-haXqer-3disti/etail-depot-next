@@ -4,7 +4,7 @@ import type { CommercialPage } from "@/shared/ui/page-content-types";
 
 export const pricingContent = {
     label: "Pricing", title: "Credit Card Processing Fees and Pricing",
-    description: "Review Etail’s credit card processing fees, estimate the cost of domestic online payments and check additional charges, ACH pricing and platform terms.",
+    description: "Review Trolleys’ credit card processing fees, estimate the cost of domestic online payments and check additional charges, ACH pricing and platform terms.",
     heading: "Clear pricing for card processing.",
     intro: "Review card processing rates, estimate fees and check additional charges. ACH and platform terms are confirmed separately.",
     action: { label: "Start now", href: hostedServices.payments.registrationUrl },

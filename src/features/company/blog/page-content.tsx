@@ -23,7 +23,7 @@ export function BlogIndexContent({ articles: entries }: { articles: readonly Blo
       {featured ? <>
         <article className={`${s.featured} ${featured.cover ? s.withCover : s.textOnly}`} aria-labelledby="featured-article-title">
           <div className={s.featuredCopy}>
-            <p className={s.articleMeta}><span>{featured.category}</span>{featured.publishedAt && <time dateTime={featured.publishedAt}>{articleDate(featured.publishedAt)}</time>}</p>
+            {featured.publishedAt && <p className={s.articleMeta}><time dateTime={featured.publishedAt}>{articleDate(featured.publishedAt)}</time></p>}
             <h2 id="featured-article-title"><Link prefetch={false} href={featured.path}>{featured.title}</Link></h2>
             <p className={s.summary}>{featured.summary}</p>
             <p className={s.featuredByline}>By {featured.author.name}</p>
@@ -32,9 +32,9 @@ export function BlogIndexContent({ articles: entries }: { articles: readonly Blo
         </article>
         {articles.length > 0 && <section className={s.latest} aria-labelledby="latest-title">
           <h2 id="latest-title">More articles</h2>
-          <div className={s.articleGrid}>{articles.map(article => <article key={article.path}>
+          <div className={s.articleGrid}>{articles.map((article, index) => <article key={article.path}>
             {article.cover && <Link className={s.cardCover} prefetch={false} href={article.path} aria-label={`Read: ${article.title}`}><Image src={article.cover.src} width={article.cover.width} height={article.cover.height} alt={article.cover.alt} loading="lazy" sizes="(max-width: 760px) 100vw, 50vw" /></Link>}
-            <p className={s.articleMeta}><span>{article.category}</span>{article.publishedAt && <time dateTime={article.publishedAt}>{articleDate(article.publishedAt)}</time>}</p>
+            {article.publishedAt ? <p className={s.articleMeta}><time dateTime={article.publishedAt}>{articleDate(article.publishedAt)}</time></p> : articles[index % 2 === 0 ? index + 1 : index - 1]?.publishedAt ? <div className={`${s.articleMeta} ${s.datePlaceholder}`} aria-hidden="true" /> : null}
             <h3><Link prefetch={false} href={article.path}>{article.title}</Link></h3>
             <p className={s.cardSummary}>{article.summary}</p>
             <p className={s.cardByline}>By {article.author.name}</p>

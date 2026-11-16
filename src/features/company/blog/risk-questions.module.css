@@ -1,0 +1,18 @@
+/* One semantic table: columns on desktop, labeled question groups on mobile. */
+.matrix { margin-block: 28px; }
+.matrix table { table-layout: fixed; }
+.matrix thead th:first-child { width: 28%; }
+.matrix table th, .matrix table td { padding: 16px 12px; }
+.matrix tbody th { color: var(--public-ink); font-weight: 600; }
+.number { display: block; margin-bottom: 6px; color: var(--public-muted); font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.label { display: none; }
+@media (max-width: 900px) {
+  .matrix table { display: block; font-size: 16px; }
+  .matrix thead { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .matrix tbody { display: grid; gap: 32px; }
+  .matrix tbody tr { display: grid; }
+  .matrix table tbody th { width: auto; padding: 0 0 12px; border-bottom: 0; font-size: 18px; line-height: 1.5; }
+  .matrix table tbody td { padding: 12px 0; }
+  .matrix tbody td:last-child { border-bottom: 0; padding-bottom: 0; }
+  .label { display: block; margin-bottom: 4px; color: var(--public-ink); font-size: 13px; font-weight: 600; }
+}

@@ -43,7 +43,7 @@ export function PlatformAccountArt({ title, caption }: { title: string; caption:
           </dl>
           <div className={styles.service}>
             <span className={styles.brandMark}><Image src={brandSymbol} width={36} height={22} alt="" unoptimized preload /></span>
-            <div><strong>Etail Depot</strong><span>Merchant services</span></div>
+            <div><strong>Trolleys</strong><span>Merchant services</span></div>
           </div>
         </div>
       </div>

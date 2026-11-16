@@ -1,17 +1,19 @@
+import { paymentLinkArticle } from "../../src/features/company/blog/payment-link-content";
 import { createHash } from "node:crypto";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { moneyStopsMovingArticle, merchantPayoutHoldsArticle, frozenFundsArticle, riskCommunicationArticle, merchantSupportArticle, instantOnboardingArticle, riversidePaymentsArticle, declinedProcessingArticle, providerApprovalArticle, payfacOperationsArticle, merchantCancellationArticle } from "../../src/features/company/blog/content";
+import { blogArticles, moneyStopsMovingArticle, merchantPayoutHoldsArticle, frozenFundsArticle, riskCommunicationArticle, merchantSupportArticle, instantOnboardingArticle, riversidePaymentsArticle, declinedProcessingArticle, providerApprovalArticle, payfacOperationsArticle, merchantCancellationArticle } from "../../src/features/company/blog/content";
 import { openFooterGroup } from "./public-footer";
 
-// Digests reflect the supplied articles plus the operator-approved minimum wording changes.
+// Digests retain the supplied articles plus reviewed minimum wording, Trolleys naming
+// and the 17 November spelling and cited-source precision corrections.
 const fixtures = [
-  { entry: moneyStopsMovingArticle, count: 7, digest: "156f5f1151a2f08465371af2e3417073533174f6a0b92bf46b133babe2ce5fa6" },
-  { entry: merchantPayoutHoldsArticle, count: 6, digest: "256987eebca203969f6a9611effaf635c80b08af6162eae7983e1cbeedc2ff71" },
-  { entry: frozenFundsArticle, count: 4, digest: "60cf8265ca6d97c36d4a69b5a6d8998f8fe7e63e0e369e1bce25c215c0224685" },
-  { entry: riskCommunicationArticle, count: 8, digest: "4c1e7a296e3aac263dcf8d432cf4f3c5c3744ae4aa6fb9c8054613b65f41d706" },
-  { entry: merchantSupportArticle, count: 6, digest: "7ed15d0e8746157ed8f3a7cc2fe92016a138e8d61bff3e75bc8ddd82e339bc35" },
-  { entry: instantOnboardingArticle, count: 6, digest: "51a727609da1af5ab3a0d772b219b7906623ce3460f211f471aa77699e9d802f" },
+  { entry: moneyStopsMovingArticle, count: 7, digest: "43d96c42aa853eada9e6fc988f751168ea93a83f09f2ce22952598510e8c5180" },
+  { entry: merchantPayoutHoldsArticle, count: 6, digest: "0b4e789fc4433c9583064af145da29d497418f23bab23286bf0cc83ae0491cbf" },
+  { entry: frozenFundsArticle, count: 4, digest: "5df936c27a4f95b051df415024788e238530a22d32a039ba21b7b58eeead128d" },
+  { entry: riskCommunicationArticle, count: 8, digest: "70e8410e74317fc5d14367c168dab52493dafa77abefd84fc45e58ac720a987d" },
+  { entry: merchantSupportArticle, count: 6, digest: "0b039dd73ef3710c7322960022926e0995ac5da92895561d3d167e749ba9e4a1" },
+  { entry: instantOnboardingArticle, count: 6, digest: "9f46db5dc2a7e10352d41275977641e4a4cb00120f8ff842ebdf9d125a7dc3ff" },
 ] as const;
 for (const { entry, count, digest } of fixtures) {
   const articlePath = entry.path;
@@ -24,11 +26,12 @@ for (const { entry, count, digest } of fixtures) {
     await company.getByRole("link", { name: "Blog", exact: true }).click();
     await expect(page).toHaveURL(/\/company\/blog$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Etail Depot Blog");
-    await expect(page.locator("main article")).toHaveCount(11);
+    await expect(page.locator("main article")).toHaveCount(236);
     await expect(page.locator("main")).toContainText("By Etail Depot");
     await expect(page.locator("main img")).toHaveCount(0);
-    await expect(page.locator("main time")).toHaveCount(5);
-    expect(await page.locator("main time").evaluateAll(times => times.map(time => time.getAttribute("datetime")))).toEqual(["2026-11-12", "2026-11-12", "2026-11-12", "2026-11-12", "2026-11-12"]);
+    const publishedDates = blogArticles.flatMap(article => article.publishedAt ? [article.publishedAt] : []);
+    await expect(page.locator("main time")).toHaveCount(publishedDates.length);
+    expect(await page.locator("main time").evaluateAll(times => times.map(time => time.getAttribute("datetime")))).toEqual(publishedDates);
     await expect(page.getByText("Articles are coming soon.", { exact: true })).toHaveCount(0);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com/company/blog");
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
@@ -116,7 +119,7 @@ test("Riverside article preserves approved text and table with original date and
   const article = page.locator("article[data-reading-article]");
   const blocks = await article.locator('h1, [class*="articleDeck"], [data-source-block]').allTextContents();
   expect(blocks).toHaveLength(42);
-  expect(createHash("sha256").update(blocks.map(text => text.trim()).join("\n\n")).digest("hex")).toBe("f7caf1f2113f2d892c66c07192997042f8b45f9e3a50daf5f6154e4d13177448");
+  expect(createHash("sha256").update(blocks.map(text => text.trim()).join("\n\n")).digest("hex")).toBe("e256fc2a3aca9f1b95efecab976db632dfccd56ad37231099eea0d7ec0501026");
   await expect(article.locator("time")).toHaveText("November 12, 2026");
   await expect(article.locator("time")).toHaveAttribute("datetime", "2026-11-12");
   await expect(article.locator('a[rel="author"]')).toHaveText("Etail Depot");
@@ -170,7 +173,7 @@ test("Processing-decline article preserves the approved wording, date and metada
   const article = page.locator("article[data-reading-article]");
   const blocks = await article.locator('h1, [class*="articleDeck"], [data-source-block]').allTextContents();
   expect(blocks).toHaveLength(13);
-  expect(createHash("sha256").update(blocks.map(text => text.trim()).join("\n\n")).digest("hex")).toBe("d9ddd28469a6cdf4fda344e637dfd75a786cc640e4b6f458bde38ebdcdb3b62f");
+  expect(createHash("sha256").update(blocks.map(text => text.trim()).join("\n\n")).digest("hex")).toBe("726cafdc20d7bd006df053c46a128a834a01b0e12e318c6b2b2261a68c7765bd");
   await expect(article.locator("time")).toHaveText("November 12, 2026");
   await expect(article.locator("time")).toHaveAttribute("datetime", "2026-11-12");
   await expect(article.locator('a[rel="author"]')).toHaveText("Etail Depot");
@@ -326,7 +329,7 @@ test("Merchant cancellation article preserves the approved wording, date and met
   const article = page.locator("article[data-reading-article]");
   const blocks = await article.locator('h1, [class*="articleDeck"], [data-source-block]').allTextContents();
   expect(blocks).toHaveLength(13);
-  expect(createHash("sha256").update(blocks.map(text => text.trim()).join("\n\n")).digest("hex")).toBe("31da5e73d6645cd463cf48fc698b0f66cb7b0cd4fb26a6685db5469bfd193798");
+  expect(createHash("sha256").update(blocks.map(text => text.trim()).join("\n\n")).digest("hex")).toBe("2afe60dc3234880517ed32454895b21552d7591b20aa549623eea8be27303bd2");
   await expect(article.locator("time")).toHaveText("November 12, 2026");
   await expect(article.locator("time")).toHaveAttribute("datetime", "2026-11-12");
   await expect(article.locator('a[rel="author"]')).toHaveText("Etail Depot");
@@ -344,9 +347,9 @@ test("Merchant cancellation article opens from Blog and follows section links on
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(cancellation.title);
   const contents = page.locator(isMobile ? "[data-article-mobile-contents]" : "[data-article-contents]");
   if (isMobile) await contents.locator("summary").click();
-  await contents.getByRole("link", { name: "Cancelling with Etail Depot", exact: true }).click();
+  await contents.getByRole("link", { name: "Cancelling with Trolleys", exact: true }).click();
   await expect(page).toHaveURL(/#cancelling-with-etail-depot$/);
-  const heading = page.getByRole("heading", { name: "At Etail Depot, you can request closure. Directly. At any time.", exact: true });
+  const heading = page.getByRole("heading", { name: "With Trolleys, you can request closure. Directly. At any time.", exact: true });
   await expect(heading).toBeInViewport();
   await page.reload();
   await expect(heading).toBeInViewport();
@@ -392,4 +395,96 @@ test("Blog saved-section reload stays on the selected section at 320px", async (
   await page.goto("/company/blog");
   await page.goBack({ waitUntil: "networkidle" });
   await expect.poll(async () => Math.abs(await page.evaluate(() => scrollY) - readingPosition)).toBeLessThanOrEqual(2);
+});
+
+
+test("payment link article uses the existing Blog flow without categories or a live checkout", async ({ page, isMobile }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.goto("/company/blog");
+  await expect(page.locator("main article")).toHaveCount(236);
+  await expect(page.locator('main [class*="articleMeta"] span')).toHaveCount(0);
+  await page.getByRole("link", { name: paymentLinkArticle.title, exact: true }).click();
+  const article = page.locator("article[data-reading-article]");
+  await expect(article.getByRole("heading", { level: 1 })).toHaveText(paymentLinkArticle.title);
+  await expect(article.locator('a[rel="author"]')).toHaveText("Etail Depot");
+  await expect(article).toContainText("First, ask the Trolleys team to confirm that Pay by Link is enabled for your merchant account.");
+  await expect(article).toContainText("Payment links and QR payments carry an additional charge per successful payment");
+  await expect(article.locator("iframe, form, input, time")).toHaveCount(0);
+  await expect(page.locator('meta[property="article:section"]')).toHaveCount(0);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://etaildepot.com" + paymentLinkArticle.path);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  if (isMobile) await page.locator("[data-article-mobile-contents] summary").click();
+  const contents = page.getByRole("navigation", { name: "In this article" }).filter({ visible: true });
+  await contents.getByRole("link", { name: "Confirm the payment", exact: true }).click();
+  await expect(page).toHaveURL(/#confirm-the-payment$/);
+  await expect(page.locator("#confirm-the-payment")).toBeInViewport();
+  const sources = article.getByRole("complementary", { name: "Sources", exact: true });
+  await expect(sources.getByRole("link")).toHaveCount(4);
+  const related = page.getByRole("complementary", { name: "Continue reading" });
+  await expect(related.getByRole("link")).toHaveCount(2);
+  expect(await related.evaluate(node => Boolean(node.closest("article")))).toBe(false);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(errors).toEqual([]);
+  expect((await new AxeBuilder({ page }).include("main").analyze()).violations).toEqual([]);
+});
+
+test("payment link guidance stays readable without JavaScript", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  try {
+    const response = await page.goto(baseURL + paymentLinkArticle.path);
+    expect(response?.status()).toBe(200);
+    expect(response?.headers()["x-robots-tag"]).toBe("noindex, nofollow");
+    await expect(page.locator("article[data-reading-article] section")).toHaveCount(6);
+    await expect(page.locator("#create-the-request")).toContainText("Cybersource Business Center");
+    await expect(page.locator("#confirm-the-payment")).toContainText("before marking the order as paid");
+    await expect(page.locator('a[href="/pricing"]')).not.toHaveCount(0);
+  } finally { await context.close(); }
+});
+
+test("Blog paired headlines align without inventing dates or adding mobile space", async ({ page }) => {
+  await page.goto("/company/blog");
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.evaluate(() => document.fonts.ready);
+    const rows = await page.locator('[class*="articleGrid"] > article').evaluateAll(nodes => nodes.map(node => {
+      const heading = node.querySelector("h3")!.getBoundingClientRect();
+      const byline = node.querySelector('[class*="cardByline"]')!.getBoundingClientRect();
+      return { top: heading.top, byline: byline.bottom };
+    }));
+    if (width > 760) {
+      for (let i = 0; i + 1 < rows.length; i += 2) {
+        expect(Math.abs(rows[i].top - rows[i + 1].top)).toBeLessThan(1);
+        expect(Math.abs(rows[i].byline - rows[i + 1].byline)).toBeLessThan(1);
+      }
+    } else {
+      for (const spacer of await page.locator('[class*="datePlaceholder"]').all()) await expect(spacer).toBeHidden();
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  const dates = blogArticles.flatMap(article => article.publishedAt ? [article.publishedAt] : []);
+  expect(await page.locator("main time").evaluateAll(nodes => nodes.map(node => node.getAttribute("datetime")))).toEqual(dates);
+});
+
+test("Blog reading columns and responsive comparisons align at phone, tablet and desktop widths", async ({ page }) => {
+  for (const path of ["payment-gateway-vs-payfac", "merchant-risk-questions-before-applying"]) {
+    await page.goto(`/company/blog/${path}`);
+    for (const width of [1440, 1024, 900, 768, 390, 320]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.evaluate(() => document.fonts.ready);
+      const geometry = await page.evaluate(() => {
+        const rect = (selector: string) => {
+          const box = document.querySelector(selector)!.getBoundingClientRect();
+          return { left: box.left, right: box.right, width: box.width };
+        };
+        return { title: rect("h1"), body: rect('[class*="readingLayout"] > [class*="body"]'), related: rect('[aria-labelledby="related-articles-title"] ul'), table: rect("table"), row: rect("tbody th") };
+      });
+      expect(Math.abs(geometry.title.left - geometry.body.left)).toBeLessThan(1);
+      expect(Math.abs(geometry.related.left - geometry.body.left)).toBeLessThan(1);
+      expect(Math.abs(geometry.related.right - geometry.body.right)).toBeLessThan(1);
+      if (width <= 900) expect(Math.abs(geometry.row.width - geometry.table.width)).toBeLessThan(1);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+  }
 });

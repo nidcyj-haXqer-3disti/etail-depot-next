@@ -16,6 +16,20 @@ For instructions, identify the actual website or app and the visible control. Ke
 
 Avoid dash punctuation in authored public prose. Technical identifiers, URLs, licence notices, addresses and mathematical notation retain their required characters. Preserve authentic logos and their aspect ratios.
 
+## Trolleys and Etail Depot naming
+
+The operator clarified on 16 November 2026 that the payment facilitator registration uses Trolleys and that Etail Depot US, Inc. owns Trolleys. Current company identity records identify its operator as Etail Depot US, Inc. DBA Trolleys. Distinguish the merchant service name from the legal company; do not imply they are unrelated businesses or interchangeable legal entities.
+
+Use these forms naturally according to the subject:
+
+- **Trolleys, an Etail Depot service** introduces the merchant service and its ownership context.
+- **Trolleys powered by Etail Depot** is an approved marketing attribution, already used in the shared brand component.
+- **Trolleys** is appropriate when discussing the merchant service, payment facilitator offering, account access or merchant workflow after the relationship is clear.
+- **Etail Depot**, or **Etail** when clear, is appropriate for the company, editorial voice and company support. Use **Etail’s** as the possessive, not “Etails” as another brand.
+- **Etail Depot US, Inc. DBA Trolleys** identifies the operator when that precise legal relationship is needed. Preserve the contracting entity and registration wording in legal disclosures unless a separately scoped correction is requested.
+
+Introduce the relationship where useful, then use the shorter relevant name. Do not rotate full attributions mechanically, repeat the ownership explanation in every paragraph or imply that Trolleys supplies a proprietary gateway or unsupported integration. Existing Blog bylines remain By Etail Depot. The user authorized a naming-only review of all completed Blog articles and other public copy on 16 November 2026. Use “Trolleys merchants” or “a Trolleys merchant” for service customers, and “Trolleys account” for the merchant account. Keep Etail Depot for the company, publisher and editorial guidance. This permission does not authorize substantive rewrites of the original supplied articles, legal entity changes or new capability claims. Retired offer names stay retired.
+
 ## Review
 
 Check headings, body text, action labels, alt text, artwork labels and metadata together. Preserve meaningful distinctions and required conditions while removing repeated or vague language. Do not claim Stripe parity, legal certification, guaranteed search ranking or measured usability from screenshots or automated checks.

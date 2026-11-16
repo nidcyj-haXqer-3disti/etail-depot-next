@@ -37,7 +37,7 @@ export function AttentionArt({ kind }: { kind: "business" | "platform" | "provid
   const labels = {
     business: "Business review begins with what you sell, how customers pay and when you deliver. Account options follow review, not automatic approval.",
     platform: "Commerce, freight, travel and legal software connect their business records to merchant account setup, checkout and reporting. Access and account structure depend on the approved integration.",
-    provider: "A previous provider’s account decision is separate from Etail’s new business review. Existing payments and obligations remain with the previous provider. New payments require account approval and setup.",
+    provider: "A previous provider’s account decision is separate from Trolleys’ new business review. Existing payments and obligations remain with the previous provider. New payments require account approval and setup.",
   };
   return <figure className={`${styles.art} ${styles[kind]}`} data-attention-art={kind} role="img" aria-label={labels[kind]}>
     <div className={styles.decor} aria-hidden="true"><div className={styles.orbit} /></div>
@@ -53,7 +53,7 @@ export function AttentionArt({ kind }: { kind: "business" | "platform" | "provid
       <div className={`${styles.sheet} ${styles.platformSheet}`} data-art-record><span className={styles.caption}>Your software</span>
         {[["Commerce", "Order"], ["Freight", "Invoice"], ["Travel", "Booking"], ["Legal", "Matter"]].map(([name, record]) => <div className={styles.platformLine} key={name}><strong>{name}</strong><span>{record}</span></div>)}
       </div>
-      <div className={styles.platformReview} data-art-record><Mark /><small>Etail Depot</small><strong>Merchant<br />services</strong><p>Account setup<br />Checkout<br />Reporting</p></div>
+      <div className={styles.platformReview} data-art-record><Mark /><small>Trolleys</small><strong>Merchant<br />services</strong><p>Account setup<br />Checkout<br />Reporting</p></div>
     </div>}
     {kind === "provider" && <div className={styles.scene} aria-hidden="true">
       <div className={styles.previous} data-art-record><span className={styles.caption}>Previous provider</span><strong>Account decision</strong><p>Existing payments<br />and obligations remain.</p></div>

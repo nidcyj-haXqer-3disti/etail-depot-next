@@ -52,7 +52,7 @@ export default function Page() {
         <div className={`${styles.container} ${styles.reviewGrid}`}>
           <div><p className={styles.eyebrow}>Changing providers</p><h2 id="review-title">Need a different{" "}<br /><span>provider?</span></h2></div>
           <div className={styles.reviewCopy}>
-            <p>Application declined or account closed? Etail offers credit card processing and ACH, with guidance on account setup, checkout and switching providers.</p>
+            <p>Application declined or account closed? Trolleys offers credit card processing and ACH, with guidance on account setup, checkout and switching providers.</p>
             <Link className={styles.textLink} href="/use-cases/switch-merchant-services">Switch merchant services</Link>
           </div>
         </div>

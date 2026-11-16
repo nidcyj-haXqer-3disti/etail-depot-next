@@ -18,7 +18,7 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe("no-code checkout use case", () => {
   it("has one current page and canonical while its unfinished setup stays out of search", () => {
-    expect(CORE_PUBLIC_PATHS).toHaveLength(58);
+    expect(CORE_PUBLIC_PATHS).toHaveLength(283);
     expect(PUBLIC_CONTENT_PATHS.filter(value => value === path)).toEqual([path]);
     expect(PUBLIC_CONTENT_PATHS).not.toContain(oldPath);
     expect(publicPageSources).toContain("use-cases/no-code-checkout-experience/page.tsx");
@@ -36,7 +36,7 @@ describe("no-code checkout use case", () => {
     for (const [key, value] of Object.entries(production)) vi.stubEnv(key, value);
     expect(pageRobots(path)).toEqual(privateRobots);
     expect(INDEXABLE_PUBLIC_PATHS).not.toContain(path);
-    expect(publicSitemap()).toHaveLength(3731);
+    expect(publicSitemap()).toHaveLength(3743);
     expect(publicSitemap().some(entry => entry.url === canonicalOrigin + path)).toBe(false);
     vi.stubEnv("CONTEXT", "deploy-preview");
     expect(pageRobots(path)).toEqual(privateRobots);

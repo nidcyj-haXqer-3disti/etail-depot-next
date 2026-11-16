@@ -1,0 +1,28 @@
+import Link from "next/link";
+import { BlogArticlePage } from "./article-page";
+import { sharedCompanyCardsArticle } from "./shared-company-cards-content";
+
+export function SharedCompanyCardsPage() {
+  return <BlogArticlePage article={sharedCompanyCardsArticle}>
+    <p>Imagine replacing the company credit card, then discovering it also pays for the website hosting, the advertising account and software a former employee set up. The replacement is straightforward. Finding everyone who needs to update it is the job nobody planned for.</p>
+    <p>That is an overlooked cost of sharing one company card. Passing the details to a colleague solves an immediate purchasing problem. Repeating that shortcut can leave several parts of the business dependent on the same number, with no complete record of where it is saved.</p>
+    <p>The trouble can appear before anything goes wrong with the card. A statement arrives with a familiar software supplier and an unfamiliar amount. Someone has to find the invoice, identify who approved the purchase and decide whether it still belongs in the budget. A shared number offers little help distinguishing one employee’s purchase from another’s.</p>
+    <p>There is an important distinction here. A company account with named employee cards is different from circulating the same card details. Capital One, for example, links employee cards to the business account while distinguishing an authorized user’s access from an account manager’s broader permissions. Central billing does not require everyone to use the same credential or share the administrator’s login.</p>
+    <section id="replacement-disruption" aria-labelledby="replacement-disruption-title">
+      <h2 id="replacement-disruption-title">One replacement, several interruptions</h2>
+      <p>When unrelated purchases depend on one card number, a problem with that number can spread beyond the original purchase. A replacement may mean updating several supplier accounts. If the business cannot identify them, it may discover the missing ones through failed renewals and service notices.</p>
+      <p>That is a reason to prepare, never a reason to delay protecting a compromised card. Report suspected fraud promptly through the issuer’s official channel and follow its instructions. Work on restoring legitimate supplier payments alongside that response. Keeping an exposed credential active because it pays an important bill creates another problem.</p>
+      <p>Do not assume every saved payment will behave the same way after replacement. Capital One tells customers replacing a card after fraud to review where their details are saved and update them. Visa Account Updater, meanwhile, can provide updated account information to participating merchants. Some payments may continue without manual changes; others may require attention. Ask the issuer what applies, then confirm the suppliers that matter.</p>
+      <p>A useful record connects each recurring supplier to its payment method, renewal date and the person who can access its billing settings. It should identify the card safely, without becoming another spreadsheet of full card numbers and security codes. The aim is to find the right account quickly, not create another copy of the credential.</p>
+      <p>Depending on the issuer’s program, named employee cards or supplier specific <Link href="/company/blog/virtual-credit-cards" prefetch={false}>virtual cards</Link> can help separate purchases. Check how cancellation affects other cards, recurring charges and the underlying account. Separation is useful only when you understand which payments a change will actually affect.</p>
+    </section>
+    <section id="employee-handover" aria-labelledby="employee-handover-title">
+      <h2 id="employee-handover-title">The card is only one part of the handover</h2>
+      <p>Consider an employee who leaves after setting up a service the company still needs. Taking back a physical card does not tell you whether its details remain saved. Removing the employee from the card account does not, by itself, transfer administration of the software they bought.</p>
+      <p>These are separate permissions: the ability to spend, the ability to manage the card account and the ability to administer a supplier’s service. Each needs an owner after the employee leaves. Updating the payment method will not help if the only person who can reach the supplier’s billing page has already lost access.</p>
+      <p>The FTC advises businesses to limit access to what employees need and to remove access when people leave or change roles. Applied to purchasing, that means arranging an authorized handover of necessary services while removing the departing employee’s access. Use the provider’s account transfer process rather than continuing to use someone else’s login.</p>
+      <p>Good records also protect the people doing the buying. An unexplained transaction deserves investigation, not an immediate accusation. Connecting the invoice, approval and purchaser makes it easier to distinguish a legitimate renewal, a mistake and activity that needs to be reported.</p>
+      <p>A small business does not need an elaborate purchasing department to improve this. It needs to know who may buy, who may change access and who will keep essential services paid when something changes. Among the choices for <Link href="/company/blog/b2b-payment-methods" prefetch={false}>paying suppliers</Link>, the most convenient arrangement is one the business can still manage after the person who set it up is gone.</p>
+    </section>
+  </BlogArticlePage>;
+}

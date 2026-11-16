@@ -7,7 +7,7 @@ import { articleDate, relatedArticles, type BlogArticle } from "./content";
 import { articleJsonLd } from "./metadata";
 import s from "./blog.module.css";
 
-/** Presentation only. The route supplies marketing-approved copy as children. */
+/** Presentation only. The route supplies editorial copy as children. */
 type ArticleProps = { article: BlogArticle; children: ReactNode };
 
 export function BlogArticlePage({ article, children }: ArticleProps) {
@@ -24,7 +24,7 @@ export function BlogArticleContent({ article, children }: ArticleProps) {
   return <div className={`${s.page} ${s.article}`}><article data-reading-article>
       <header className={`${s.articleHeader} ${article.sections.length ? s.withContentsHeader : ""}`}>
         <Link className={s.backLink} prefetch={false} href="/company/blog"><span aria-hidden="true">←</span> All articles</Link>
-        <p className={s.articleMeta}><span>{article.category}</span>{article.publishedAt && <time dateTime={article.publishedAt}>{articleDate(article.publishedAt)}</time>}{article.readingTime && <span>{article.readingTime}</span>}</p>
+        {(article.publishedAt || article.readingTime) && <p className={s.articleMeta}>{article.publishedAt && <time dateTime={article.publishedAt}>{articleDate(article.publishedAt)}</time>}{article.readingTime && <span>{article.readingTime}</span>}</p>}
         <h1>{article.title}</h1>
         <div className={s.attribution}>
           <p className={s.byline}>By {article.author.url ? <a rel="author" href={article.author.url}>{article.author.name}</a> : article.author.name}</p>
@@ -46,7 +46,7 @@ export function BlogArticleContent({ article, children }: ArticleProps) {
         </div>
       </div>
     </article>
-    {related.length > 0 && <aside className={s.related} aria-labelledby="related-articles-title">
+    {related.length > 0 && <aside className={`${s.related} ${article.sections.length ? s.withContentsRelated : ""}`} aria-labelledby="related-articles-title">
       <h2 id="related-articles-title">Continue reading</h2>
       <ul>{related.map(entry => <li key={entry.path}>
         <Link prefetch={false} href={entry.path}>{entry.title}</Link>
