@@ -25,4 +25,4 @@ export const legalIdentity = {
   ],
 } as const;
 
-export const publicCompanyDescription = `${legalIdentity.company} provides merchant services for US businesses and software platforms. It operates as a nonbank payment facilitator. Trolleys is its merchant service for card and ACH payments. Ledgix is its secured credit card service.`;
+export const publicCompanyDescription = `${legalIdentity.company} provides merchant services for US businesses and software platforms through Trolleys. Trolleys is its nonbank payment facilitator service for card and ACH payments. Ledgix is its secured credit card service.`;

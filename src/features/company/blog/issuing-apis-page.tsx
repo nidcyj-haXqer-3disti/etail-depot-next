@@ -1,0 +1,29 @@
+import Link from "next/link";
+import { BlogArticlePage } from "./article-page";
+import { issuingApisArticle } from "./issuing-apis-content";
+
+export function IssuingApisPage() {
+  return <BlogArticlePage article={issuingApisArticle}>
+    <p>A card issuing API lets software create and manage payment cards. Once those cards appear inside your product, customers may turn to you when a purchase declines, a pending amount changes or a refund has not appeared.</p>
+    <p>That is the less visible part of the feature. A card image and a working purchase are easy to demonstrate. The customer also needs an activity history they can trust, a clear explanation of available funds and someone who can investigate when the numbers do not make sense.</p>
+    <p>Issuing serves a different purpose from a merchant checkout integration. It provides cards that people use to spend. A payment gateway helps a merchant accept payments. An API, meaning the software interface to a provider, can expose controls for creating cards, changing their status and following their activity. It sits within a card program whose operating arrangements still need to be established.</p>
+    <p>Stripe’s issuing documentation, for example, describes bank and network partnerships alongside eligibility, funding and fraud management. Access to a test API does not settle those arrangements for a live program. Before committing to the feature, establish who provides the funds, who can receive cards and how customer support and disputes will be handled.</p>
+    <section id="changing-purchase" aria-labelledby="changing-purchase-title">
+      <h2 id="changing-purchase-title">The purchase keeps changing after approval</h2>
+      <p>Imagine a cardholder sees an approved purchase and a reduction in available funds. Later, the merchant collects only part of the amount, or cancels the purchase. The activity screen needs to explain what changed. Keeping the original amount permanently labeled “paid” would leave the customer with the wrong picture.</p>
+      <p>An <Link href="/company/blog/card-authorization" prefetch={false}>authorization</Link> is the decision and, where approved, can create a hold. Capture records the amount collected. A reversal or expiry can release a hold, while later transactions may still need to be accounted for under the program’s rules. Stripe represents authorizations and captured transactions separately, including partial captures and changes to the remaining hold.</p>
+      <p>That separation belongs in the product’s records as well. The cardholder, the card and its purchases need distinct identifiers. Replacing a credential should not erase the customer’s earlier activity. A transaction reference should let support find the purchase without asking for the full card number.</p>
+      <p>Some programs also let your software participate in the approval decision. A webhook is a message the provider sends to your application. In Stripe’s real time authorization flow, the application has a short response window before configured timeout or Autopilot settings determine the result. Some requests are handled without consulting your endpoint, such as a decline for insufficient issuing funds.</p>
+      <p>That fallback is a business decision. If your service becomes unavailable, what spending can continue and what should be declined? Agreeing on that behavior matters more than demonstrating a rule that works only while every system is responding normally.</p>
+    </section>
+    <section id="uncertain-result" aria-labelledby="uncertain-result-title">
+      <h2 id="uncertain-result-title">A missing response does not mean nothing happened</h2>
+      <p>Suppose your application requests a new <Link href="/company/blog/virtual-credit-cards" prefetch={false}>virtual card</Link> and the connection fails before a response arrives. The provider may already have created it. A fresh request could create another card while the customer still sees an error.</p>
+      <p>Providers can offer idempotency: a way to recognize a repeat of the same operation. Stripe documents how a request key and matching parameters support retries, with behavior and retention rules that depend on the API version. Recovery should follow those rules and retrieve the confirmed card record. If the outcome remains unclear, investigate the original operation rather than treating a new request as proof that the first one failed.</p>
+      <p>Purchase notifications need similar care. Stripe warns that ordinary webhook events can arrive more than once or out of order. Receiving a notification twice must not create two purchases in the customer’s history. A delayed message should not overwrite a newer, confirmed state. Verify event signatures, recognize repeat deliveries and reconcile the activity with the provider’s records.</p>
+      <p>These later notifications differ from the real time approval request. One asks the application to make a decision within a deadline; the others report activity that needs to be recorded and checked. Treating them as one undifferentiated stream can produce either a missed decision or misleading account history.</p>
+      <p>Card details require their own boundary. Stripe’s Issuing Elements display sensitive details inside frames hosted by the provider so the values do not pass through your servers. That supported approach reduces direct handling, but your application must still control who can view and manage each card. Full card details do not belong in analytics, logs or support screenshots.</p>
+      <p>A useful product review follows these uncomfortable moments: a timeout, a duplicate notification, a reversed purchase and a card replacement. For each, the team should be able to explain what the customer sees and how the result is confirmed. That is the work that turns card creation into a service people can rely on.</p>
+    </section>
+  </BlogArticlePage>;
+}

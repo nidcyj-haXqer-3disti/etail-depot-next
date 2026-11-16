@@ -2,9 +2,9 @@ import type { CommercialPage } from "@/shared/ui/page-content-types";
 
 export const aboutContent = {
     label: "About", title: "About Etail Depot",
-    description: "Etail Depot provides merchant services for US businesses and software platforms, from account setup and card and ACH acceptance to everyday account operations.",
+    description: "Etail Depot provides merchant services through Trolleys for US businesses and software platforms, from account setup and card and ACH acceptance to everyday account operations.",
     heading: "About Etail Depot",
-    intro: "Etail Depot provides merchant services for US businesses and the software platforms they use.",
+    intro: "Etail Depot provides merchant services through Trolleys for US businesses and the software platforms they use.",
     action: { label: "Contact our team", href: "/company/contact" },
     art: { title: "Connected services", caption: "", steps: [] },
     sections: [{ title: "Our company", items: [

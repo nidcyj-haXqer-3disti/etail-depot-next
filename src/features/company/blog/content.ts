@@ -1,4 +1,230 @@
-/** Human-authored editorial content. Preserve supplied wording unless the author
+import { riskQuestionsArticle } from "./risk-questions-content";
+import { mccApprovalArticle } from "./mcc-approval-content";
+import { cardBrandArticle } from "./card-brand-content";
+import { makeAWishArticle } from "./make-a-wish-content";
+import { gatewayPayfacArticle } from "./gateway-payfac-content";
+import { paymentApiAccountabilityArticle } from "./payment-api-accountability-content";
+import { travelBookingPaymentsArticle } from "./travel-booking-payments-content";
+import { currencyBalancesArticle } from "./currency-balances-content";
+import { supplierTransferCostsArticle } from "./supplier-transfer-costs-content";
+import { foreignFeeQuestionsArticle } from "./foreign-fee-questions-content";
+import { swiftTracingArticle } from "./swift-tracing-content";
+import { checkoutLocalizationArticle } from "./checkout-localization-content";
+import { gatewaySelectionArticle } from "./gateway-selection-content";
+import { internationalReceiptsArticle } from "./international-receipts-content";
+import { multicurrencyCommerceArticle } from "./multicurrency-commerce-content";
+import { transferTimingArticle } from "./transfer-timing-content";
+import { payoutExceptionsArticle } from "./payout-exceptions-content";
+import { crossBorderCommerceArticle } from "./cross-border-commerce-content";
+import { crossBorderPaymentsArticle } from "./cross-border-payments-content";
+import { crossBorderControlsArticle } from "./cross-border-controls-content";
+import { bicSwiftArticle } from "./bic-swift-content";
+import { marketPaymentsArticle } from "./market-payments-content";
+import { paymentSecurityArticle } from "./payment-security-content";
+import { chargebackRateArticle } from "./chargeback-rate-content";
+import { representmentArticle } from "./representment-content";
+import { refundAbuseArticle } from "./refund-abuse-content";
+import { partialRefundsArticle } from "./partial-refunds-content";
+import { cardDataStorageArticle } from "./card-data-storage-content";
+import { pciAttestationArticle } from "./pci-attestation-content";
+import { highRiskAccountsArticle } from "./high-risk-accounts-content";
+import { friendlyFraudArticle } from "./friendly-fraud-content";
+import { liabilityShiftArticle } from "./liability-shift-content";
+import { fraudRulesArticle } from "./fraud-rules-content";
+import { deliveryEvidenceArticle } from "./delivery-evidence-content";
+import { walletFraudArticle } from "./wallet-fraud-content";
+import { maskingTokenizationArticle } from "./masking-tokenization-content";
+import { maskingEncryptionArticle } from "./masking-encryption-content";
+import { cardVaultingArticle } from "./card-vaulting-content";
+import { arbitrationArticle } from "./arbitration-content";
+import { achReturnCostsArticle } from "./ach-return-costs-content";
+import { achRejectionArticle } from "./ach-rejection-content";
+import { cardRefundsArticle } from "./card-refunds-content";
+import { accountTakeoverArticle } from "./account-takeover-content";
+import { threeDSecureArticle } from "./three-d-secure-content";
+import { chargebackArticle } from "./chargeback-content";
+import { apiRateLimitsArticle } from "./api-rate-limits-content";
+import { orchestrationGatewayArticle } from "./orchestration-gateway-content";
+import { paymentFailoverArticle } from "./payment-failover-content";
+import { paymentApiArticle } from "./payment-api-content";
+import { payfacIsoArticle } from "./payfac-iso-content";
+import { payfacServiceArticle } from "./payfac-service-content";
+import { openBankingArticle } from "./open-banking-content";
+import { morSellerArticle } from "./mor-seller-content";
+import { morPayfacArticle } from "./mor-payfac-content";
+import { multipleGatewaysArticle } from "./multiple-gateways-content";
+import { websiteGatewayArticle } from "./website-gateway-content";
+import { multivendorArticle } from "./multivendor-content";
+import { isvPaymentsArticle } from "./isv-payments-content";
+import { paymentIntegrationArticle } from "./payment-integration-content";
+import { saasEmbeddedArticle } from "./saas-embedded-content";
+import { marketplacePaymentsArticle } from "./marketplace-payments-content";
+import { embeddedFinanceArticle } from "./embedded-finance-content";
+import { localWebhooksArticle } from "./local-webhooks-content";
+import { confirmationArticle } from "./confirmation-content";
+import { gatewayTestingArticle } from "./gateway-testing-content";
+import { mobileAppArticle } from "./mobile-app-content";
+import { paymentRoutingArticle } from "./payment-routing-content";
+import { erpPaymentsArticle } from "./erp-payments-content";
+import { crmPaymentsArticle } from "./crm-payments-content";
+import { gatewayProcessorArticle } from "./gateway-processor-content";
+import { paymentRetriesArticle } from "./payment-retries-content";
+import { consumingWebhooksArticle } from "./consuming-webhooks-content";
+import { invoiceNumberArticle } from "./invoice-number-content";
+import { creditNotesArticle } from "./credit-notes-content";
+import { billingAddressArticle } from "./billing-address-content";
+import { annualMonthlyBillingArticle } from "./annual-monthly-billing-content";
+import { statementInvoiceArticle } from "./statement-invoice-content";
+import { recurringSubscriptionArticle } from "./recurring-subscription-content";
+import { paymentTermsArticle } from "./payment-terms-content";
+import { openInvoicesArticle } from "./open-invoices-content";
+import { monthlyRecurringRevenueArticle } from "./monthly-recurring-revenue-content";
+import { meteredBillingArticle } from "./metered-billing-content";
+import { invoiceReceiptArticle } from "./invoice-receipt-content";
+import { invoiceReconciliationArticle } from "./invoice-reconciliation-content";
+import { invoiceEmailArticle } from "./invoice-email-content";
+import { recurringInvoicesArticle } from "./recurring-invoices-content";
+import { expiredCardsArticle } from "./expired-cards-content";
+import { createInvoiceArticle } from "./create-invoice-content";
+import { invoiceCardPaymentArticle } from "./invoice-card-payment-content";
+import { receivableTurnoverArticle } from "./receivable-turnover-content";
+import { grossChurnArticle } from "./gross-churn-content";
+import { estimateInvoiceArticle } from "./estimate-invoice-content";
+import { dunningEmailsArticle } from "./dunning-emails-content";
+import { billingPortalsArticle } from "./billing-portals-content";
+import { contractInvoicesArticle } from "./contract-invoices-content";
+import { billingModelsArticle } from "./billing-models-content";
+import { paymentReminderArticle } from "./payment-reminder-content";
+import { invoiceDiscrepanciesArticle } from "./invoice-discrepancies-content";
+import { invoiceManagementArticle } from "./invoice-management-content";
+import { tapToPayArticle } from "./tap-to-pay-content";
+import { posReaderArticle } from "./pos-reader-content";
+import { pointOfSaleArticle } from "./point-of-sale-content";
+import { offlinePaymentsArticle } from "./offline-payments-content";
+import { saasInPersonArticle } from "./saas-in-person-content";
+import { crossChannelArticle } from "./cross-channel-content";
+import { pinPadArticle } from "./pin-pad-content";
+import { cardSwipesArticle } from "./card-swipes-content";
+import { contactlessArticle } from "./contactless-content";
+import { cardPresenceArticle } from "./card-presence-content";
+import { cardLifecycleArticle } from "./card-lifecycle-content";
+import { cardFloatArticle } from "./card-float-content";
+import { singleUseCardsArticle } from "./single-use-cards-content";
+import { purchasingCardsArticle } from "./purchasing-cards-content";
+import { corporateCardManagementArticle } from "./corporate-card-management-content";
+import { cardProgramLaunchArticle } from "./card-program-launch-content";
+import { businessCreditLimitArticle } from "./business-credit-limit-content";
+import { cardExpensePolicyArticle } from "./card-expense-policy-content";
+import { businessCreditReportArticle } from "./business-credit-report-content";
+import { businessCardCountArticle } from "./business-card-count-content";
+import { globalCardProgramsArticle } from "./global-card-programs-content";
+import { chargeCardsArticle } from "./charge-cards-content";
+import { issuingApisArticle } from "./issuing-apis-content";
+import { personalBusinessExpensesArticle } from "./personal-business-expenses-content";
+import { cardChoiceArticle } from "./card-choice-content";
+import { buildingBusinessCreditArticle } from "./building-business-credit-content";
+import { sharedCompanyCardsArticle } from "./shared-company-cards-content";
+import { virtualCardsArticle } from "./virtual-cards-content";
+import { digitalWalletsArticle } from "./digital-wallets-content";
+import { securedCardsArticle } from "./secured-cards-content";
+import { cardInterestArticle } from "./card-interest-content";
+import { payableForecastArticle } from "./payable-forecast-content";
+import { netCashFlowArticle } from "./net-cash-flow-content";
+import { workingCapitalArticle } from "./working-capital-content";
+import { grossNetProfitArticle } from "./gross-net-profit-content";
+import { grossProfitArticle } from "./gross-profit-content";
+import { fixedVariableArticle } from "./fixed-variable-content";
+import { expenseReceiptsArticle } from "./expense-receipts-content";
+import { cardReconciliationArticle } from "./card-reconciliation-content";
+import { contributionMarginArticle } from "./contribution-margin-content";
+import { cogsExpensesArticle } from "./cogs-expenses-content";
+import { cashAccrualArticle } from "./cash-accrual-content";
+import { cashFlowStatementArticle } from "./cash-flow-statement-content";
+import { bankReconciliationArticle } from "./bank-reconciliation-content";
+import { payableControlsArticle } from "./payable-controls-content";
+import { revenueTimingArticle } from "./revenue-timing-content";
+import { accruedPayableArticle } from "./accrued-payable-content";
+import { payableEntriesArticle } from "./payable-entries-content";
+import { accountingReconciliationArticle } from "./accounting-reconciliation-content";
+import { accountingLedgersArticle } from "./accounting-ledgers-content";
+import { payablesReceivablesArticle } from "./payables-receivables-content";
+import { balanceSheetArticle } from "./balance-sheet-content";
+import { profitLossArticle } from "./profit-loss-content";
+import { deliveryPromiseArticle } from "./delivery-promise-content";
+import { saasRenewalArticle } from "./saas-renewal-content";
+import { netRetentionArticle } from "./net-retention-content";
+import { digitalProductArticle } from "./digital-product-content";
+import { ecommercePlatformsArticle } from "./ecommerce-platforms-content";
+import { ecommerceShippingArticle } from "./ecommerce-shipping-content";
+import { embeddedSoftwareArticle } from "./embedded-software-content";
+import { ecommerceDiscountsArticle } from "./ecommerce-discounts-content";
+import { eventPaymentsArticle } from "./event-payments-content";
+import { retailChannelsArticle } from "./retail-channels-content";
+import { onlineShopArticle } from "./online-shop-content";
+import { ecommerceCartArticle } from "./ecommerce-cart-content";
+import { nonprofitDonationsArticle } from "./nonprofit-donations-content";
+import { saasPaymentsArticle } from "./saas-payments-content";
+import { ecommercePaymentsArticle } from "./ecommerce-payments-content";
+import { b2bPaymentsArticle } from "./b2b-payments-content";
+import { nachaNetworkArticle } from "./nacha-network-content";
+import { achCreditArticle } from "./ach-credit-content";
+import { bankAccountNumberArticle } from "./bank-account-number-content";
+import { sortCodeRoutingArticle } from "./sort-code-routing-content";
+import { routingNumberArticle } from "./routing-number-content";
+import { instantAchArticle } from "./instant-ach-content";
+import { payByBankSafetyArticle } from "./pay-by-bank-safety-content";
+import { achFailuresArticle } from "./ach-failures-content";
+import { achVerificationArticle } from "./ach-verification-content";
+import { recurringAchArticle } from "./recurring-ach-content";
+import { echeckClearingArticle } from "./echeck-clearing-content";
+import { achTimingArticle } from "./ach-timing-content";
+import { fednowRtpArticle } from "./fednow-rtp-content";
+import { paymentReferencesArticle } from "./payment-references-content";
+import { achEftArticle } from "./ach-eft-content";
+import { bankTransfersArticle } from "./bank-transfers-content";
+import { achWireArticle } from "./ach-wire-content";
+import { achTraceArticle } from "./ach-trace-content";
+import { achPaymentsArticle } from "./ach-payments-content";
+import { cardAchArticle } from "./card-ach-content";
+import { ediPaymentsArticle } from "./edi-payments-content";
+import { achDebitArticle } from "./ach-debit-content";
+import { merchantDiscountArticle } from "./merchant-discount-rate-content";
+import { interchangeFeesArticle } from "./interchange-fees-content";
+import { pricingModelsArticle } from "./pricing-models-content";
+import { accountUpdaterArticle } from "./account-updater-content";
+import { cardOnFileArticle } from "./card-on-file-content";
+import { cardVerificationArticle } from "./card-verification-content";
+import { transactionReportsArticle } from "./transaction-reports-content";
+import { paymentServiceProvidersArticle } from "./payment-service-providers-content";
+import { processorsIsosArticle } from "./processors-isos-content";
+import { processorAcquirerArticle } from "./processor-acquirer-content";
+import { paymentRfpArticle } from "./payment-rfp-content";
+import { paymentCaptureArticle } from "./payment-capture-content";
+import { checkoutLayoutArticle } from "./checkout-layout-content";
+import { merchantIdArticle } from "./merchant-id-content";
+import { merchantCategoryCodesArticle } from "./merchant-category-codes-content";
+import { switchingProcessorsArticle } from "./switching-processors-content";
+import { gettingMerchantAccountArticle } from "./getting-merchant-account-content";
+import { multipleProcessorsArticle } from "./multiple-processors-content";
+import { choosingProviderArticle } from "./choosing-provider-content";
+import { applePayArticle } from "./apple-pay-content";
+import { settlementPayoutsArticle } from "./settlement-payouts-content";
+import { paymentAnalyticsArticle } from "./payment-analytics-content";
+import { batchProcessingArticle } from "./batch-processing-content";
+import { hostedPaymentsArticle } from "./hosted-payments-content";
+import { creditDebitArticle } from "./credit-debit-content";
+import { cardNetworksArticle } from "./card-networks-content";
+import { cardAuthorizationArticle } from "./card-authorization-content";
+import { guestCheckoutArticle } from "./guest-checkout-content";
+import { cardDeclinesArticle } from "./card-declines-content";
+import { merchantAccountsArticle } from "./merchant-accounts-content";
+import { checkoutAbandonmentArticle } from "./checkout-abandonment-content";
+import { mobileCheckoutArticle } from "./mobile-checkout-content";
+import { paymentProcessingArticle } from "./payment-processing-content";
+import { stripeAlternativesArticle } from "./stripe-alternatives-content";
+import { paymentLinkArticle } from "./payment-link-content";
+
+/** Editorial content. Preserve supplied wording unless the author
  * approves edits. Dates come from marketing; undated articles omit them during publication review.
  */
 export type BlogArticle = {
@@ -10,7 +236,6 @@ export type BlogArticle = {
   summary: string;
   searchTitle: string;
   relatedPaths: readonly `/company/blog/${string}`[];
-  category: string;
   author: { name: string; type: "Person" | "Organization"; url?: string };
   publishedAt?: string;
   updatedAt?: string;
@@ -29,8 +254,7 @@ export const moneyStopsMovingArticle: BlogArticle = {
   ],
   "path": "/company/blog/when-your-money-stops-moving",
   "title": "When your money stops moving: The payment processor’s preference is to freeze merchant funds",
-  "description": "The most damaging act a payment provider can do to its merchant is not over charge, but take the money its merchant already earned and then go silent.",
-  "category": "Merchant services",
+  "description": "The most damaging act a payment provider can do to its merchant is not overcharge, but take the money its merchant already earned and then go silent.",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -68,7 +292,7 @@ export const moneyStopsMovingBody = {
   "paragraphs": [
     "Holds occur across Stripe, Square, Shopify, PayPal and other mainstream providers. They do not have to follow a chargeback; a sharp increase in sales can also trigger a review or reserve.",
     "A Shopify seller with zero chargebacks says they were put on a 10% reserve for chargeback risk. A Square merchant says they were required to refund a $14,000 payment after the review team suspected a stolen credit card, and they could not speak with the review team about it.",
-    "Etail Depot has walked this path through Trolleys.ai, our global marketplace. It knows what happens behind the curtains of an honest business. This is why Etail Depot’s moat is processor continuity though direct communication and proper context with its merchants. Your success is Etail’s success."
+    "Etail Depot has walked this path through Trolleys.ai, our global marketplace. It knows what happens behind the curtains of an honest business. This is why Etail Depot’s moat is processor continuity through direct communication and proper context with Trolleys merchants. Your success is Etail’s success."
   ]
 } as const;
 
@@ -82,7 +306,6 @@ export const merchantPayoutHoldsArticle: BlogArticle = {
   "path": "/company/blog/payment-service-providers-holding-merchant-payouts",
   "title": "Payment Service Providers Holding Merchant Payouts",
   "description": "For small businesses, gig workers and contractors, a hold is not a delay, it is a liquidity event with no end date.",
-  "category": "Merchant services",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -90,6 +313,10 @@ export const merchantPayoutHoldsArticle: BlogArticle = {
   },
   "sections": [],
   "sources": [
+    {
+      "label": "Square merchant report: Transfer delays and support",
+      "href": "https://community.squareup.com/t5/Banking-With-Square/Transfering-funds/m-p/705638"
+    },
     {
       "label": "Hacker News: Account restoration and provider response",
       "href": "https://news.ycombinator.com/item?id=28085706"
@@ -115,9 +342,9 @@ export const merchantPayoutHoldsArticle: BlogArticle = {
 
 export const merchantPayoutHoldsParagraphs = [
   "“That was basically my working capital” wrote a Shopify merchant. A Stripe merchant wrote that a payout hold could put them out of business. This money held by Service Providers was supposed to pay suppliers, inventory replenishment, payroll and other critical elements of a business; however, the money is sitting in someone else’s ledger, earning nothing, with a release date that moves further away or does not exist.",
-  "The second major cost is time. Merchants describe calling almost every day and getting nowhere, promised callbacks within 24 hours that never happen, and countless tickets closed without an actual resolution. Business owners who should be selling spend weeks writing emails into a void.",
+  "The second major cost is time. Merchants describe calling almost every day and getting nowhere, promised escalations that produce no response, and countless tickets closed without an actual resolution. Business owners who should be selling spend weeks writing emails into a void.",
   "The third cost is dignity. One owner reported that their account was restored after a public thread and other outreach, and shared the provider’s email acknowledging the closure was a mistake. Is this a support process or a lottery?",
-  "Etail Depot wants its merchants to go online and write amazing compliments about the support structure. To achieve that, the merchants need to know they can raise concerns and ask for review under an Etail agreement. This is why Etail Depot’s moat is processor continuity though direct communication and proper context with its merchants. Your success is Etail’s success."
+  "Etail Depot wants merchants using Trolleys, our merchant service, to go online and write amazing compliments about the support structure. To achieve that, the merchants need to know they can raise concerns and ask for review under an Etail agreement. This is why Etail Depot’s moat is processor continuity through direct communication and proper context with Trolleys merchants. Your success is Etail’s success."
 ] as const;
 
 export const frozenFundsArticle: BlogArticle = {
@@ -130,7 +357,6 @@ export const frozenFundsArticle: BlogArticle = {
   "path": "/company/blog/payment-service-providers-freeze-funds-without-justification",
   "title": "Payment Service Providers Freeze Funds Without Justification",
   "description": "Merchants are not naïve about risk. They can understand the logic and still find 180 days of frozen funds abusive and absurd. The anger is not that a provider manages risk; it’s that it does it without engaging the merchant whatsoever.",
-  "category": "Merchant services",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -163,7 +389,7 @@ export const frozenFundsArticle: BlogArticle = {
 
 export const frozenFundsParagraphs = [
   "At scale, a payment provider can start with a risk signal rather than the full picture of your business. A busy weekend, a single large order, a launch that finally works; each can show up as a spike in an automated review. Providers can ask for your invoices, your tracking numbers or your business plan to understand the context. The provider may not explain the specific pattern behind its decision. When the explanation is unclear, the merchant can be left unsure of the amount affected, the release date or where to send proof.",
-  "Etail Depot reviews each business separately. With Etail Depot, the merchant holds the evidence, and the account terms identify who holds the money and who can release it. This is why Etail Depot’s moat is processor continuity though direct communication and proper context with its merchants. Your success is Etail’s success."
+  "Etail Depot reviews each business separately. With Trolleys, an Etail Depot service, the merchant holds the evidence, and the account terms identify who holds the money and who can release it. This is why Etail Depot’s moat is processor continuity through direct communication and proper context with Trolleys merchants. Your success is Etail’s success."
 ] as const;
 
 export const riskCommunicationArticle: BlogArticle = {
@@ -175,8 +401,7 @@ export const riskCommunicationArticle: BlogArticle = {
   ],
   "path": "/company/blog/how-etail-depot-handles-risk",
   "title": "How Etail Depot Handles Risk: Clear Communication and Proper Context",
-  "description": "Etail Depot will not promise that funds will never be held. A payment facilitator has responsibilities under its acquiring agreements and the applicable card network rules. What we DO promise is to explain the reason and available next steps where disclosure is permitted.",
-  "category": "Merchant services",
+  "description": "Trolleys, an Etail Depot service, will not promise that funds will never be held. A payment facilitator has responsibilities under its acquiring agreements and the applicable card network rules. What we DO promise is to explain the reason and available next steps where disclosure is permitted.",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -201,7 +426,7 @@ export const riskCommunicationParagraphs = [
   "You can submit relevant evidence for review through the contact in your reserve notice. Tracking, delivery proof, signed receipts, dispute history and business documents can support a review.",
   "Growth is declared, not punished. Tell us about the launch, the Black Friday push, or the large order ahead of time, so we can review any changes needed to your approved limits.",
   "Your money should never go silent. If you have had funds frozen without explanation, you already know the problem is not the hold. It is the silence. Payments infrastructure that cannot tell you why, when, or who is not managing risk, they’re passing it to you.",
-  "At Etail Depot, a score is a summary. A merchant is a business with a history and a story, a customer base and documents that prove it.  This is why Etail Depot’s moat is processor continuity though direct communication and proper context with its merchants. Your success is Etail’s success."
+  "At Etail Depot, a score is a summary. A merchant is a business with a history and a story, a customer base and documents that prove it.  This is why Etail Depot’s moat is processor continuity through direct communication and proper context with Trolleys merchants. Your success is Etail’s success."
 ] as const;
 
 export const merchantSupportArticle: BlogArticle = {
@@ -213,8 +438,7 @@ export const merchantSupportArticle: BlogArticle = {
   ],
   "path": "/company/blog/when-your-payment-provider-freezes-your-funds",
   "title": "When Your Payment Provider Freezes Your Funds, Who Picks Up the Phone?",
-  "description": "Some merchants who described a bad experience with a U.S. payment provider said the same thing: there was no one to talk to. A chat agent that repeats the help center. A ticket closed without resolution. A callback promised within 24 hours that never comes. One Square seller who reported about $700 being held summed it up: \"I call almost every day & get nowhere.\"",
-  "category": "Merchant services",
+  "description": "Some merchants who described a bad experience with a U.S. payment provider said the same thing: there was no one to talk to. A chat agent that repeats the help center. A ticket closed without resolution. An escalation promised with no response. One Square seller who reported about $700 being held summed it up: \"I call almost every day & get nowhere.\"",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -245,7 +469,7 @@ export const merchantSupportParagraphs = [
   "The absurd part is where merchants finally find help. Not in the product, but on Hacker News, at the CFPB, in a letter to the state attorney general or on the local news. One founder reported that their account was restored after a public thread and other outreach, and shared the provider’s email acknowledging the closure was a mistake. A support process that works best when it goes viral is not a support process.",
   "Etail Depot takes a different position: a hold on your money is a decision about your business, and you need a clear way to question it. Your account documents identify the support contact and any agreed service levels.",
   "Automation belongs in the parts of payments that should be invisible. The moment your working capital stops moving is not one of them.",
-  "This is why Etail Depot’s moat is processor continuity though direct communication and proper context with its merchants. Your success is Etail’s success."
+  "This is why Etail Depot’s moat is processor continuity through direct communication and proper context with Trolleys merchants. Your success is Etail’s success."
 ] as const;
 
 export const instantOnboardingArticle: BlogArticle = {
@@ -258,7 +482,6 @@ export const instantOnboardingArticle: BlogArticle = {
   "path": "/company/blog/why-instant-onboarding-is-a-trap",
   "title": "Approved in Minutes, Frozen After Your First Sale: Why Instant Onboarding Is a Trap",
   "description": "The pitch is seductive: sign up, get approved, start taking payments in five minutes. Then the first real transaction lands: one Australian Stripe merchant reported a $2,150 payment and a risk email announcing a 120-day hold. A Square merchant approved in late December reported being deactivated the day after taking their first payments, with funds held and no specific explanation. A Shopify merchant reported being told they were good to go, but still could not receive payouts.",
-  "category": "Merchant services",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -299,9 +522,9 @@ export const instantOnboardingArticle: BlogArticle = {
 
 export const instantOnboardingParagraphs = [
   "Fast approval does not mean the review process is finished. Aggregators can carry out initial checks and continue reviewing an account after the money arrives. The merchant can face a hold later, at the worst possible moment, with revenue they have already earned and often already spent on inventory.",
-  "Etail Depot reviews your business before you process. We do the know-your-business work up front, and when you are approved you see what you were approved for: the activities, payment methods and limits set out in your account terms. Nothing about your first month of sales should be a surprise to us, and nothing about our limits should be a surprise to you.",
+  "Trolleys, an Etail Depot service, reviews your business before you process. We do the know-your-business work up front, and when you are approved you see what you were approved for: the activities, payment methods and limits set out in your account terms. Nothing about your first month of sales should be a surprise to us, and nothing about our limits should be a surprise to you.",
   "That trade costs a little speed at signup. It prioritizes the thing instant approval alone cannot promise: a payments relationship that still exists after your first good week.",
-  "This is why Etail Depot’s moat is processor continuity though direct communication and proper context with its merchants. Your success is Etail’s success."
+  "This is why Etail Depot’s moat is processor continuity through direct communication and proper context with Trolleys merchants. Your success is Etail’s success."
 ] as const;
 
 export const riversidePaymentsArticle: BlogArticle = {
@@ -314,7 +537,6 @@ export const riversidePaymentsArticle: BlogArticle = {
   "path": "/company/blog/riverside-payments-case-fine-print",
   "title": "The Fine Print Is the Product: What the Riverside Payments Case Says About Your Processor",
   "description": "On November 2, 2026, the Federal Trade Commission and the State of Washington filed a complaint against payment processor Riverside Payments, its equipment-leasing affiliate Cascade Equipment Leasing and their two owners. The allegations read like a checklist of everything small merchants fear about their processor.",
-  "category": "Merchant services",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -367,8 +589,8 @@ export const riversidePaymentsBody = {
       "paragraphs": [
         "Etail Depot was built on the opposite premise. A payments relationship should be a partnership in which both sides make more money when the merchant sells more, and neither side profits from the other's confusion.",
         "That starts with the price. Your charges are disclosed before they apply, including what happens to a fee on a refund and any charges that apply when you process nothing. Only charges disclosed and accepted for your account may be collected.",
-        "It continues with the exit. You can leave. You can request account closure at any time through the support channel for your account. A merchant who stays with Etail Depot stays because the service is worth it, which is the only kind of retention worth having and the only kind that forces us to keep earning it.",
-        "And it shows up in how we work day to day. Our merchants have a support contact identified for their account. When volume grows, we review any account changes needed to support it. When something breaks, we help investigate service issues within our control. The job is to make running payments the least stressful part of running your business, and that is only possible when your success and ours are the same number."
+        "It continues with the exit. You can leave. You can request account closure at any time through the support channel for your account. A merchant who stays with Trolleys, an Etail Depot service, stays because the service is worth it, which is the only kind of retention worth having and the only kind that forces us to keep earning it.",
+        "And it shows up in how we work day to day. Trolleys merchants have a support contact identified for their account. When volume grows, we review any account changes needed to support it. When something breaks, we help investigate service issues within our control. The job is to make running payments the least stressful part of running your business, and that is only possible when your success and ours are the same number."
       ]
     }
   ],
@@ -401,7 +623,7 @@ export const riversidePaymentsBody = {
     ],
     [
       "When you grow",
-      "Not their problem",
+      "Not addressed in the cited complaint",
       "Growth reviewed against your approved account limits"
     ]
   ],
@@ -495,7 +717,6 @@ export const declinedProcessingArticle: BlogArticle = {
   "path": "/company/blog/declined-for-payment-processing",
   "title": "Declined for Payment Processing? Was Your Business Fully Evaluated?",
   "description": "If a payment provider has turned you down, the email probably said very little. \"Unable to support your business at this time.\" No reason, no appeal, no person to call. It is natural to read that as a verdict on your company.",
-  "category": "Merchant services",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -548,7 +769,7 @@ export const declinedProcessingBody = {
       "id": "business-evaluation",
       "title": "We evaluate the business, not the application",
       "paragraphs": [
-        "Etail Depot does standard underwriting, because we have to: identity, ownership, sanctions screening, financials. But we treat that as the beginning of the review, not the end of it. When a business is declined elsewhere, we review it separately against our account requirements.",
+        "Trolleys, an Etail Depot service, does standard underwriting, because we have to: identity, ownership, sanctions screening, financials. But we treat that as the beginning of the review, not the end of it. When a business is declined elsewhere, we review it separately against our account requirements.",
         "That means looking at the things a score cannot see. How you actually fulfil orders and what proof you keep. Your real refund and dispute history, with context, not just a ratio. How far ahead you take payment and what protects the customer in between. Where your customers are, how you reach them, and what your growth plan looks like for the next twelve months. We will ask for documents, and we will read them. We will ask questions, and the answers inform the review.",
         "The goal is not to find a reason to say yes to everyone. Some businesses carry risk we cannot absorb, and any binding restriction still applies. The goal is to make sure a decision about your livelihood is made by someone who understood your business first."
       ]
@@ -582,7 +803,6 @@ export const providerApprovalArticle: BlogArticle = {
   "path": "/company/blog/what-your-payment-provider-is-really-saying-yes-to",
   "title": "What Your Payment Provider Is Really Saying Yes To",
   "description": "When a payment facilitator approves your business, it feels like a formality. You filled in a form, uploaded a document, and a few minutes or days later you can take cards. Easy.",
-  "category": "Merchant services",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -686,7 +906,6 @@ export const payfacOperationsArticle: BlogArticle = {
   "path": "/company/blog/reselling-payments-vs-running-a-payfac",
   "title": "Anyone Can Resell Payments. Almost No One Can Run a PayFac.",
   "description": "\"Payment processing\" sounds like a commodity. Plug in an API, take a few basis points, move on. Thousands of companies resell it that way, and from the outside a payment facilitator looks like one more of them.",
-  "category": "Merchant services",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -768,7 +987,7 @@ export const payfacOperationsBody = {
 
 export const merchantCancellationArticle: BlogArticle = {
   "searchTitle": "Leaving your payment provider: cancellation and fees",
-  "summary": "Why payment contract exit terms matter, and Etail Depot’s approach to cancellation, transition planning and business continuity.",
+  "summary": "Why payment contract exit terms matter, and Trolleys’ approach to cancellation, transition planning and business continuity.",
   "relatedPaths": [
     "/company/blog/riverside-payments-case-fine-print",
     "/company/blog/when-your-payment-provider-freezes-your-funds"
@@ -776,7 +995,6 @@ export const merchantCancellationArticle: BlogArticle = {
   "path": "/company/blog/you-can-leave-that-is-the-point",
   "title": "You Can Leave. That Is the Point.",
   "description": "Ask a merchant what it took to leave their last payment provider and you will hear the same story. A three-year term they did not remember agreeing to. An early termination fee they discovered in the fine print. An equipment lease that outlived the service by a year. A cancellation line that did not exist, and a callback that never came. In the FTC's case against Riverside Payments this month, all four were alleged across the processing and leasing arrangements.",
-  "category": "Merchant services",
   "author": {
     "name": "Etail Depot",
     "type": "Organization",
@@ -790,7 +1008,7 @@ export const merchantCancellationArticle: BlogArticle = {
     },
     {
       "id": "cancelling-with-etail-depot",
-      "title": "Cancelling with Etail Depot"
+      "title": "Cancelling with Trolleys"
     },
     {
       "id": "stay-because-it-works",
@@ -833,9 +1051,9 @@ export const merchantCancellationBody = {
     },
     {
       "id": "cancelling-with-etail-depot",
-      "title": "At Etail Depot, you can request closure. Directly. At any time.",
+      "title": "With Trolleys, you can request closure. Directly. At any time.",
       "paragraphs": [
-        "Etail Depot lets merchants request account closure at any time. You use the support channel for your account, we acknowledge the request and explain any provider steps needed to complete it. Existing obligations remain, and final payouts and reserves follow your accepted funding terms.",
+        "Trolleys, an Etail Depot service, lets merchants request account closure at any time. You use the support channel for your account, we acknowledge the request and explain any provider steps needed to complete it. Existing obligations remain, and final payouts and reserves follow your accepted funding terms.",
         "We do this because it keeps us honest. A merchant who chooses to stay is a merchant we have to earn every month. Our revenue grows when your volume grows, so the one thing we cannot afford is a customer who stays out of obligation and resents it.",
         "It also reflects what we think a payments partner is for. We are not here to hold a contract over you. We are here to keep your business running through a busy weekend, a new product line, a new market, a bad month. Business continuity is the job. A cancellation clause that punishes you for making the right decision for your company is the opposite of continuity."
       ]
@@ -851,7 +1069,7 @@ export const merchantCancellationBody = {
   ]
 };
 
-export const blogArticles: readonly BlogArticle[] = [moneyStopsMovingArticle, merchantPayoutHoldsArticle, frozenFundsArticle, riskCommunicationArticle, merchantSupportArticle, instantOnboardingArticle, riversidePaymentsArticle, declinedProcessingArticle, providerApprovalArticle, payfacOperationsArticle, merchantCancellationArticle];
+export const blogArticles: readonly BlogArticle[] = [moneyStopsMovingArticle, merchantPayoutHoldsArticle, frozenFundsArticle, riskCommunicationArticle, merchantSupportArticle, instantOnboardingArticle, riversidePaymentsArticle, declinedProcessingArticle, providerApprovalArticle, payfacOperationsArticle, merchantCancellationArticle, gatewayPayfacArticle, makeAWishArticle, cardBrandArticle, mccApprovalArticle, riskQuestionsArticle, paymentLinkArticle, stripeAlternativesArticle, paymentProcessingArticle, mobileCheckoutArticle, checkoutAbandonmentArticle, merchantAccountsArticle, cardDeclinesArticle, guestCheckoutArticle, cardAuthorizationArticle, cardNetworksArticle, creditDebitArticle, hostedPaymentsArticle, batchProcessingArticle, paymentAnalyticsArticle, settlementPayoutsArticle, applePayArticle, choosingProviderArticle, multipleProcessorsArticle, gettingMerchantAccountArticle, switchingProcessorsArticle, merchantCategoryCodesArticle, merchantIdArticle, checkoutLayoutArticle, paymentCaptureArticle, paymentRfpArticle, processorAcquirerArticle, processorsIsosArticle, paymentServiceProvidersArticle, transactionReportsArticle, cardVerificationArticle, cardOnFileArticle, accountUpdaterArticle, pricingModelsArticle, interchangeFeesArticle, merchantDiscountArticle, achDebitArticle, ediPaymentsArticle, cardAchArticle, achPaymentsArticle, achTraceArticle, achWireArticle, bankTransfersArticle, achEftArticle, paymentReferencesArticle, fednowRtpArticle, achTimingArticle, echeckClearingArticle, recurringAchArticle, achVerificationArticle, achFailuresArticle, payByBankSafetyArticle, instantAchArticle, routingNumberArticle, sortCodeRoutingArticle, bankAccountNumberArticle, achCreditArticle, nachaNetworkArticle, b2bPaymentsArticle, ecommercePaymentsArticle, saasPaymentsArticle, nonprofitDonationsArticle, ecommerceCartArticle, onlineShopArticle, retailChannelsArticle, eventPaymentsArticle, ecommerceDiscountsArticle, embeddedSoftwareArticle, ecommerceShippingArticle, ecommercePlatformsArticle, digitalProductArticle, netRetentionArticle, saasRenewalArticle, deliveryPromiseArticle, profitLossArticle, balanceSheetArticle, payablesReceivablesArticle, accountingLedgersArticle, accountingReconciliationArticle, payableEntriesArticle, accruedPayableArticle, revenueTimingArticle, payableControlsArticle, bankReconciliationArticle, cashFlowStatementArticle, cashAccrualArticle, cogsExpensesArticle, contributionMarginArticle, cardReconciliationArticle, expenseReceiptsArticle, fixedVariableArticle, grossProfitArticle, grossNetProfitArticle, workingCapitalArticle, netCashFlowArticle, payableForecastArticle, cardInterestArticle, securedCardsArticle, digitalWalletsArticle, virtualCardsArticle, sharedCompanyCardsArticle, buildingBusinessCreditArticle, cardChoiceArticle, personalBusinessExpensesArticle, issuingApisArticle, chargeCardsArticle, globalCardProgramsArticle, businessCardCountArticle, businessCreditReportArticle, cardExpensePolicyArticle, businessCreditLimitArticle, cardProgramLaunchArticle, corporateCardManagementArticle, purchasingCardsArticle, singleUseCardsArticle, cardFloatArticle, cardLifecycleArticle, cardPresenceArticle, contactlessArticle, cardSwipesArticle, pinPadArticle, crossChannelArticle, saasInPersonArticle, offlinePaymentsArticle, pointOfSaleArticle, posReaderArticle, tapToPayArticle, invoiceManagementArticle, invoiceDiscrepanciesArticle, paymentReminderArticle, billingModelsArticle, contractInvoicesArticle, billingPortalsArticle, dunningEmailsArticle, estimateInvoiceArticle, grossChurnArticle, receivableTurnoverArticle, invoiceCardPaymentArticle, createInvoiceArticle, expiredCardsArticle, recurringInvoicesArticle, invoiceEmailArticle, invoiceReconciliationArticle, invoiceReceiptArticle, meteredBillingArticle, monthlyRecurringRevenueArticle, openInvoicesArticle, paymentTermsArticle, recurringSubscriptionArticle, statementInvoiceArticle, annualMonthlyBillingArticle, billingAddressArticle, creditNotesArticle, invoiceNumberArticle, consumingWebhooksArticle, paymentRetriesArticle, gatewayProcessorArticle, crmPaymentsArticle, erpPaymentsArticle, paymentRoutingArticle, mobileAppArticle, gatewayTestingArticle, confirmationArticle, localWebhooksArticle, embeddedFinanceArticle, marketplacePaymentsArticle, saasEmbeddedArticle, paymentIntegrationArticle, isvPaymentsArticle, multivendorArticle, websiteGatewayArticle, multipleGatewaysArticle, morPayfacArticle, morSellerArticle, openBankingArticle, payfacServiceArticle, payfacIsoArticle, paymentApiArticle, paymentFailoverArticle, orchestrationGatewayArticle, apiRateLimitsArticle, chargebackArticle, threeDSecureArticle, accountTakeoverArticle, cardRefundsArticle, achRejectionArticle, achReturnCostsArticle, arbitrationArticle, cardVaultingArticle, maskingEncryptionArticle, maskingTokenizationArticle, walletFraudArticle, deliveryEvidenceArticle, fraudRulesArticle, liabilityShiftArticle, friendlyFraudArticle, highRiskAccountsArticle, pciAttestationArticle, cardDataStorageArticle, partialRefundsArticle, refundAbuseArticle, representmentArticle, chargebackRateArticle, paymentSecurityArticle, marketPaymentsArticle, bicSwiftArticle, crossBorderControlsArticle, crossBorderPaymentsArticle, crossBorderCommerceArticle, payoutExceptionsArticle, transferTimingArticle, multicurrencyCommerceArticle, internationalReceiptsArticle, gatewaySelectionArticle, checkoutLocalizationArticle, swiftTracingArticle, foreignFeeQuestionsArticle, supplierTransferCostsArticle, currencyBalancesArticle, travelBookingPaymentsArticle, paymentApiAccountabilityArticle];
 
 export function relatedArticles(article: BlogArticle): BlogArticle[] {
   return article.relatedPaths.flatMap(path => {

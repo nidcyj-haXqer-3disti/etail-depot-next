@@ -17,7 +17,7 @@ concurrency:
 jobs:
   public-website:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 45
     env:
       CI: "true"
       APP_ENV: test

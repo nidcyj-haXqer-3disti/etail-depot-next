@@ -4,7 +4,7 @@ import { publicPageJsonLd } from "@/shared/seo/structured-data-builders";
 import { publicCompanyDescription } from "@/shared/site/legal-identity";
 import { blogArticles, type BlogArticle } from "./content";
 
-export const pageDetails = { title: "Merchant payments Blog", description: "Perspectives from Etail Depot on merchant accounts, payment holds, payout support and underwriting." } as const;
+export const pageDetails = { title: "Merchant payments Blog", description: "Articles from Etail Depot on accepting payments, merchant accounts, payment holds and working with a payment provider." } as const;
 export const metadata = publicPageMetadata("/company/blog", pageDetails);
 export const pageJsonLd = () => publicPageJsonLd("/company/blog", pageDetails, publicCompanyDescription, "Blog", blogArticles.length ? {
   id: "articles", name: "Etail Depot articles", items: blogArticles.map(article => ({ name: article.title, path: article.path })),
@@ -16,7 +16,7 @@ export function articleMetadata(article: BlogArticle): Metadata {
   return {
     ...base,
     authors: [{ name: article.author.name, ...(article.author.url ? { url: new URL(article.author.url, canonicalOrigin).href } : {}) }],
-    openGraph: { ...base.openGraph, type: "article", section: article.category, ...(article.publishedAt ? { publishedTime: article.publishedAt } : {}), ...(article.updatedAt ? { modifiedTime: article.updatedAt } : {}), images: [image] },
+    openGraph: { ...base.openGraph, type: "article", ...(article.publishedAt ? { publishedTime: article.publishedAt } : {}), ...(article.updatedAt ? { modifiedTime: article.updatedAt } : {}), images: [image] },
     twitter: { ...base.twitter, images: [image.url] },
   };
 }
@@ -41,7 +41,7 @@ export function articleJsonLd(article: BlogArticle): string {
   if (image) webpage.primaryImageOfPage = image;
   base["@graph"].push({
     "@type": "BlogPosting", "@id": `${url}#article`, url, headline: article.title, description: article.summary,
-    articleSection: article.category, inLanguage: "en-US", isAccessibleForFree: true,
+    inLanguage: "en-US", isAccessibleForFree: true,
     ...(article.publishedAt ? { datePublished: article.publishedAt } : {}), ...(article.updatedAt ? { dateModified: article.updatedAt } : {}),
     author: { "@type": article.author.type, name: article.author.name, ...(article.author.url ? { url: new URL(article.author.url, canonicalOrigin).href } : {}) },
     publisher: { "@id": `${canonicalOrigin}/#organization` }, mainEntityOfPage: { "@id": `${url}#webpage` },

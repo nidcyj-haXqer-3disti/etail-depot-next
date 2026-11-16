@@ -26,7 +26,7 @@ export function ServiceWorkflowArt({ path, art }: { path: CommercialPath; art: A
   return <Frame art={art} icon="layers" kind="partnerships">
     <div className={styles.body}><div className={styles.platform}><Icon name="layers"/><span>Your software</span><strong>The purchase experience</strong><span>Orders, invoices and bookings</span></div><div className={styles.branch}>
       <div className={styles.branchCard}><span className={styles.branchIcon}><Icon name="business"/></span><span className={styles.small}>The selling business</span><strong>Merchant</strong><ul><li>Customer relationship</li><li>Account agreement</li><li>Purchase and delivery</li></ul></div>
-      <div className={`${styles.branchCard} ${styles.dark}`}><Mark/><span className={styles.small}>Merchant services</span><strong>Etail Depot</strong><ul><li>Account setup</li><li>Payment acceptance</li><li>Account support</li></ul></div>
+      <div className={`${styles.branchCard} ${styles.dark}`}><Mark/><span className={styles.small}>Merchant services</span><strong>Trolleys</strong><ul><li>Account setup</li><li>Payment acceptance</li><li>Account support</li></ul></div>
     </div></div><div className={styles.recordFoot}><Icon name="link"/><span>Merchant, order and payment references</span></div>
   </Frame>;
 }

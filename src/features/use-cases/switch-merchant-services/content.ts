@@ -2,7 +2,7 @@ import type { CommercialPage } from "@/shared/ui/page-content-types";
 
 export const switchMerchantServicesContent = {
     label: "Switch merchant services", title: "Switch Merchant Services Providers",
-    description: "Stripe application declined or account closed? Discuss merchant services and credit card processing with Etail. New accounts require review and approval.",
+    description: "Stripe application declined or account closed? Discuss Trolleys merchant services and credit card processing with our team. New accounts require review and approval.",
     heading: "Declined by Stripe? Let’s look at your business.",
     intro: "Merchant services for businesses declined, restricted or no longer supported by their provider.",
     action: { label: "Discuss your business", href: "/company/contact#payment-review" },
@@ -10,7 +10,7 @@ export const switchMerchantServicesContent = {
     art: { layout: "transition", title: "Your next payment setup starts with a review.", caption: "Changing providers does not transfer an existing account, release held funds or close outstanding refunds and disputes.", steps: [
       { title: "Current provider", detail: "Existing payments and open obligations" },
       { title: "Business review", detail: "Your activity, account needs and integration" },
-      { title: "Etail payment setup", detail: "New payments after approval and setup" },
+      { title: "Trolleys payment setup", detail: "New payments after approval and setup" },
     ] },
     sections: [
       { title: "Before you switch.", items: [

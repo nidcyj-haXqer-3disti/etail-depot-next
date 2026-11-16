@@ -7,7 +7,7 @@ export const partnershipsContent = {
     intro: "Connect merchant accounts, checkout and reporting to your software, including options for businesses your current provider cannot support.",
     action: { label: "Discuss your partnership", href: "/company/contact#platforms" },
     art: { title: "Your platform. Our merchant services.", caption: "Merchant accounts, integration access and commercial terms are approved for each partnership.", steps: [
-      { title: "Your software", detail: "Orders · invoices · customer experience" }, { title: "Etail Depot", detail: "Merchant services · payment operations" }, { title: "Your merchants", detail: "Account setup · checkout · support" },
+      { title: "Your software", detail: "Orders · invoices · customer experience" }, { title: "Trolleys", detail: "Merchant services · payment operations" }, { title: "Your merchants", detail: "Account setup · checkout · support" },
     ] },
     sections: [
       { title: "Merchant accounts, pricing and support.", items: [

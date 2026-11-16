@@ -103,7 +103,7 @@ export function ApplicationGuideSteps() {
     }>
       <p>On <strong>Banking Information</strong>, enter the bank account for your merchant account.</p>
       <dl className={s.definitions}>
-        <div><dt>Account types</dt><dd>Choose the DDA and ACH account types that match your bank records. Ask your bank or Etail if you are unsure which option applies.</dd></div>
+        <div><dt>Account types</dt><dd>Choose the DDA and ACH account types that match your bank records. Ask your bank or Trolleys if you are unsure which option applies.</dd></div>
         <div><dt>Routing Number</dt><dd>Your bank’s 9 digit US routing number for ACH payments.</dd></div>
         <div><dt>Account Number</dt><dd>Your bank account number, not your debit card number. Keep any leading zeros.</dd></div>
       </dl>
@@ -125,7 +125,7 @@ export function ApplicationGuideSteps() {
         <li>Read the agreement and credit inquiry authorization. Use <strong>Download PDF</strong> to keep a copy.</li>
         <li>If you are authorized to sign for the business and agree to the terms, enter your full name and choose <strong>Accept & Continue</strong>.</li>
       </ol>
-      <p className={guide.hint}>If something is incorrect or unclear, choose <strong>Not now</strong> and <Link href="/company/contact#account-support" prefetch={false}>contact Etail</Link> before signing.</p>
+      <p className={guide.hint}>If something is incorrect or unclear, choose <strong>Not now</strong> and <Link href="/company/contact#account-support" prefetch={false}>contact Trolleys</Link> before signing.</p>
     </Step>
 
     <Step number={7} id="application-submitted" title="Check your application status" artwork={
@@ -138,11 +138,11 @@ export function ApplicationGuideSteps() {
       <p>Choose <strong>Merchant Dashboard</strong> to check your application status and find your Agreement and Application PDF.</p>
       <dl className={s.definitions}>
         <div><dt>In review / Processing</dt><dd>Allow 1 business day for application review. Additional checks can take longer. The status may take a few minutes to update.</dd></div>
-        <div><dt>Action needed</dt><dd>Respond to the request shown. If there are no instructions, contact Etail for the next step.</dd></div>
+        <div><dt>Action needed</dt><dd>Respond to the request shown. If there are no instructions, contact Trolleys for the next step.</dd></div>
       </dl>
       <p className={guide.approval} id="account-readiness">Wait for account approval and confirmation that your payment setup is ready.</p>
       <p className={guide.hint}>Returning later? Sign in with the same email to check this application.</p>
-      <p id="after-approval"><strong>After approval:</strong> follow <Link href="/developers/getting-started" prefetch={false}>Getting started</Link> to open your accounts and choose your checkout connection. For <Link href="/resources/shopify-gateway-integration" prefetch={false}>Shopify</Link> or <Link href="/resources/woocommerce-gateway-integration" prefetch={false}>WooCommerce</Link>, use the guide for your store. <Link href="/company/contact#account-support" prefetch={false}>Contact Etail</Link> if you need help.</p>
+      <p id="after-approval"><strong>After approval:</strong> follow <Link href="/developers/getting-started" prefetch={false}>Getting started</Link> to open your accounts and choose your checkout connection. For <Link href="/resources/shopify-gateway-integration" prefetch={false}>Shopify</Link> or <Link href="/resources/woocommerce-gateway-integration" prefetch={false}>WooCommerce</Link>, use the guide for your store. <Link href="/company/contact#account-support" prefetch={false}>Contact Trolleys</Link> if you need help.</p>
     </Step>
   </>;
 }
@@ -157,7 +157,7 @@ export function AdditionalLocationGuide() {
         </Screen>
       }>
         <p>Sign in and find the existing application on <strong>Merchant Dashboard</strong>. Choose <strong>+ Location</strong> beside it.</p>
-        <p className={guide.hint}>Use this option for another DBA under the same company. For a different legal company, ask Etail which application to use.</p>
+        <p className={guide.hint}>Use this option for another DBA under the same company. For a different legal company, ask Trolleys which application to use.</p>
       </Step>
       <Step number={2} id="new-dba-details" title="Enter the new DBA" artwork={
         <Screen title="Company Profile" caption="Keep the same legal company. Enter the new DBA and its own business details.">

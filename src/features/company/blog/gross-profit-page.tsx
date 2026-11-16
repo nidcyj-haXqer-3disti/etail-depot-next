@@ -1,0 +1,26 @@
+import Link from "next/link";
+import { BlogArticlePage } from "./article-page";
+import { grossProfitArticle } from "./gross-profit-content";
+import s from "./blog.module.css";
+
+export function GrossProfitPage() {
+  return <BlogArticlePage article={grossProfitArticle}>
+    <p>There is a way to improve your gross margin that nobody would put in a growth plan: lose sales of a product whose margin is below the company average.</p>
+    <p>If the rest of the business stays unchanged, removing those sales can lift the average percentage while reducing total gross profit. The report appears to reward the business for getting smaller. That does not mean the product was worth keeping at any cost. It means the percentage cannot make that decision for you.</p>
+    <p>Gross profit and gross profit margin describe the same sales from different angles. One is an amount. The other expresses that amount relative to revenue. Reading only the percentage can hide how much the business actually has left toward its other expenses.</p>
+    <p>The calculation starts with sales and the cost associated with those sales:</p>
+    <p><strong className={s.editorialFormula}>Gross profit = net sales − cost of goods sold.</strong></p>
+    <p>Net sales reflect the relevant returns, allowances and discounts. Use revenue and cost figures for the same reporting period and scope. For a service business, the comparable line may be called cost of services or cost of revenue. The gross profit subtotal comes before the expenses presented below it on the income statement.</p>
+    <p>To calculate gross profit margin, divide gross profit by net sales and multiply by 100. A 40% gross margin means gross profit equals 40% of net sales. It does not mean that 40% is available for the owner to withdraw, and it does not establish how much cash customers have paid.</p>
+    <p>Now consider a conditional calculation. Net sales fall by 20%, while gross margin rises from 40% to 45%. The new sales total is 80% of the old one. Multiplying 80% by 45% leaves gross profit equal to 36% of the original sales total, compared with 40% before.</p>
+    <p><strong>The margin rose by five percentage points. Gross profit fell by 10%.</strong></p>
+    <p>There is no contradiction. The business kept a larger share of a smaller sales total. Whether the overall result improved still depends on what happened to its other expenses. Celebrating the margin alone would skip that question.</p>
+    <p>The reverse can happen too: enough additional sales can produce more total gross profit at a lower margin. That is not a reason to pursue every order. Extra service work, selling costs and cash needs still matter. It is a reason to compare the amount and the percentage before deciding that a falling margin proves the business is deteriorating.</p>
+    <p>Product mix deserves particular attention. A company’s margin reflects how much revenue each product contributes; it is not simply the average of the percentages on a product list. If customers buy more of a lower margin item, the company percentage can fall even when no individual product’s price or cost has changed. Raising prices across the entire catalog would address a different problem.</p>
+    <p>A useful review separates that mix change from changes in selling prices, discounts, returns and product costs. Then the conversation becomes specific. Did a popular line become more expensive to source? Did fewer customers buy the premium product? Did a promotion change what people ordered? Those explanations point to different decisions that a single margin target cannot supply.</p>
+    <p>The inputs need to be comparable before the explanation is credible. Under accrual inventory accounting, buying stock does not automatically put the entire purchase into the current period’s cost of goods sold. Unsold inventory generally remains an asset, subject to any required write down. Production costs can also include labor and allocated overhead. The article on <Link href="/company/blog/cogs-vs-operating-expenses" prefetch={false}>cost of goods sold and operating expenses</Link> explains why classification matters when comparing results.</p>
+    <p>Pricing introduces another easily missed distinction: markup uses cost as its base, while margin uses sales. Adding 40% to cost does not produce a 40% margin. The selling price is then 140% of cost, so the margin is 40 divided by 140, or about 28.6%. Agree on which measure a pricing target uses before applying it to the catalog.</p>
+    <p>And before dropping a product to improve the reported margin, consider the costs you would actually avoid, the capacity you would release and what customers might buy instead. <Link href="/company/blog/contribution-margin" prefetch={false}>Contribution margin</Link> helps examine the costs that move with sales. Gross profit remains useful, but it is not a complete answer to a decision about one more order or one less product.</p>
+    <p>A better margin is worth understanding before it is worth celebrating. Ask what changed in the business, how much gross profit remains and what it took to earn it. The percentage becomes more useful when it starts that conversation instead of ending it.</p>
+  </BlogArticlePage>;
+}

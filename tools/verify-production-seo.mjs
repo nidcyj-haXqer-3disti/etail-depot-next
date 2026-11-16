@@ -30,7 +30,7 @@ const standardPaths = ["/resources/guides/iso-20022", "/resources/guides/iso-858
 const coreSchemaPaths = ["/", "/services/card-services", "/services/merchant-services", "/resources/help", "/resources/guides"];
 const publicPaths = INDEXABLE_PUBLIC_PATHS;
 assert.equal(guidePaths.length, 0);
-assert.equal(new Set(publicPaths).size, 3731, "Only the exact reviewed nonlegal pages are eligible for search.");
+assert.equal(new Set(publicPaths).size, 3743, "Only the exact reviewed nonlegal pages are eligible for search.");
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -244,7 +244,7 @@ async function verifyResponses() {
   assert.equal(descriptions.size, publicPaths.length, "Public descriptions must be distinct.");
   checkCrawlablePageGraph(documents);
 
-  for (const [oldPath, destination] of [["/card-services", "/services/card-services"], ["/payment-services", "/services/merchant-services"]]) {
+  for (const [oldPath, destination] of [["/card-services", "/services/card-services"], ["/payment-services", "/services/merchant-services"], ["/resources/blog", "/company/blog"]]) {
     for (const suffix of ["", "/", ".html", "/index.html"]) {
       for (const method of ["GET", "HEAD"]) {
         const response = await localFetch(`${oldPath}${suffix}?token=synthetic-test`, { method });
@@ -317,7 +317,7 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS, ...DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience", "/company/legal/unreviewed", "/production-seo-missing-page", "/resources/guides/unreviewed-missing-page", "/legal/unreviewed", "/resources/guides/payment-processing-fees", "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal", "/resources/guides/use-a-cash-register", "/resources/guides/unreviewed-charge-cards", "/resources/guides/sections/payment-processing-checkout", "/resources/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
+  for (const route of [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS, ...DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience", "/company/legal/unreviewed", "/company/blog/unreviewed", "/production-seo-missing-page", "/resources/guides/unreviewed-missing-page", "/legal/unreviewed", "/resources/guides/payment-processing-fees", "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal", "/resources/guides/use-a-cash-register", "/resources/guides/unreviewed-charge-cards", "/resources/guides/sections/payment-processing-checkout", "/resources/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
     const response = await localFetch(route);
     assert.equal(response.status, [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS,...DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience"].includes(route) ? 200 : 404, `${route}: unexpected status.`);
     const body = await response.text();
@@ -374,7 +374,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: 3731 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: 3743 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {

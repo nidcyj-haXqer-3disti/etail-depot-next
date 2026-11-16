@@ -3,8 +3,8 @@ import { forbiddenLocalReviewStatic, forbiddenStatic, localReviewHtmlFiles, publ
 
 describe("isolated local package review", () => {
   it("contains the full reviewed inventory with the approved production inventory", () => {
-    expect(localReviewHtmlFiles).toHaveLength(3764);
-    expect(new Set(localReviewHtmlFiles).size).toBe(3764);
+    expect(localReviewHtmlFiles).toHaveLength(3989);
+    expect(new Set(localReviewHtmlFiles).size).toBe(3989);
     for (const file of ["use-cases/software-platforms.html", "developers/getting-started.html", "resources/guides/iso-8583/messages/2100.html"]) {
       expect(forbiddenLocalReviewStatic(file)).toBe(false);
       expect(forbiddenStatic(file)).toBe(false);
