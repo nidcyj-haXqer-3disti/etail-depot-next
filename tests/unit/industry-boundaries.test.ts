@@ -15,7 +15,7 @@ describe("industry use cases share the Software platforms page", () => {
     vi.stubEnv("SITE_ID", PUBLIC_INDEXING_APPROVAL.siteId); vi.stubEnv("CONTEXT", "production");
     try {
       expect(localPreviewPageSources.every(page => page.startsWith("legal/"))).toBe(true);
-      expect(localReviewHtmlFiles).toHaveLength(3989);
+      expect(localReviewHtmlFiles).toHaveLength(4145);
       expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3743);
       const sitemap = publicSitemap();
       expect(sitemap).toHaveLength(3743);

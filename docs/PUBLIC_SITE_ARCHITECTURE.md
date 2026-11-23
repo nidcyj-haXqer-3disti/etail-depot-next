@@ -2,6 +2,8 @@
 
 The website explains Etail's services and directs visitors to approved vendor services. The account-system boundary is the Sign in or Start now link. The vendor portal handles the subsequent account workflow. There is no Etail financial backend in this repository.
 
+The first new Blog expansion batch adds 25 articles about processing costs and quote comparisons. Their source stays in `src/features/company/blog/`, with individual `/company/blog/` routes and the existing article presentation. `cost-comparison-articles.ts` groups their metadata internally; it does not add a public category. The batch remains local and noindex pending separate publication and search decisions.
+
 ## Source ownership
 
 | Location | Responsibility |
@@ -58,3 +60,39 @@ The [manual Netlify process](NETLIFY_DEPLOYMENT.md) retains the existing project
 Team workflow belongs to [CONTRIBUTING.md](../CONTRIBUTING.md), `.github/` and `docs/`. Shared tools are maintained in `tools/`; image-generator data belongs in `tools/assets/`. Historical records are under [archive](../archive/README.md), outside runtime imports and deployment output.
 
 Current work and verification state live only in [CURRENT_WORK_CONTEXT.md](CURRENT_WORK_CONTEXT.md). Prior versions of this architecture and the former status log are preserved in the archive. Their use of words such as “current” or “authorized” describes the original date, not today's scope.
+
+### Local Blog expansion, Batch 2
+
+The second expansion batch covers planned topics 26 through 50 with 22 new article routes and three topics already covered by existing articles. The new content is in `src/features/company/blog/`, collected by `commercial-terms-articles.ts`, with matching `src/app/company/blog/` routes. All 22 new routes retain draft noindex status. The Blog remains one collection with no public categories. The local inventory is now 283 Blog articles, 330 core pages and 4,036 content pages; the production search-eligible inventory remains 3,743 URLs. No publication is authorized by these local checks.
+
+### Local Blog expansion, Batch 3
+
+The third expansion batch covers planned topics 51 through 75 with 20 new articles and five topics already covered. `provider-selection-articles.ts` collects their metadata internally; feature sources and app routes retain the existing single Blog collection and presentation. All new routes remain noindex drafts. The local inventory is 303 Blog articles, 350 core pages and 4,056 content pages. Search eligibility remains 3,743 URLs. Publication and search approval remain separate.
+
+### Local Blog expansion, Batch 4
+
+The fourth expansion batch covers planned topics 76 through 100 with 18 new articles and seven topics covered by existing articles. `migration-decision-articles.ts` groups metadata internally without adding a public category. Feature sources, app routes and the classic Blog presentation remain. All new routes are noindex drafts. The local inventory is 321 Blog articles, 368 core pages and 4,074 content pages. Search eligibility remains 3,743 URLs; publication and indexing need separate approval.
+
+### Local Blog expansion, Batch 5
+
+The fifth expansion batch covers planned topics 101 through 125 with 16 new articles, seven within-batch consolidations and two existing-article reuses. `onboarding-identity-articles.ts` groups metadata internally without a public category. Classic presentation, feature ownership and app routes remain. New routes are noindex drafts. The local inventory is 337 Blog articles, 384 core pages and 4,090 content pages. Search eligibility remains 3,743 URLs; publication and indexing need separate approval.
+
+### Local Blog expansion, Batch 6
+
+The sixth expansion batch covers planned topics 126 through 150 with 17 new articles, four within-batch consolidations and four existing-article reuses. `business-review-articles.ts` groups metadata internally without a public category. Classic presentation, feature ownership and app routes remain. New routes are noindex drafts. The local inventory is 354 Blog articles, 401 core pages and 4,107 content pages. Search eligibility remains 3,743 URLs; publication and indexing need separate approval.
+
+### Local Blog expansion, Batch 7
+
+The seventh expansion batch covers planned topics 151 through 175 with 12 new articles, four within-batch consolidations and nine existing-article reuses. `account-change-articles.ts` groups metadata internally without a public category. Classic presentation, feature ownership and app routes remain. New routes are noindex drafts. The local inventory is 366 Blog articles, 413 core pages and 4,119 content pages. Search eligibility remains 3,743 URLs; publication and indexing need separate approval.
+
+### Local Blog expansion, Batch 8
+
+The eighth expansion batch covers planned topics 176 through 200 with 10 new articles, eight within-batch consolidations and seven existing-article reuses. `review-readiness-articles.ts` collects their metadata internally in the same Blog collection. All new routes remain noindex drafts. The candidate contains 376 Blog articles, 423 core pages and 4129 content pages; approved search eligibility remains 3743 URLs. No publication or indexing authorization is inferred.
+
+### Local Blog expansion, Batch 9
+
+The ninth expansion batch covers planned topics 201 through 225 with 11 new articles, eight within-batch consolidations and six existing-article reuses. `checkout-experience-articles.ts` collects metadata internally in the same Blog collection. All new routes remain noindex drafts. The candidate contains 387 Blog articles, 434 core pages and 4140 content pages; approved search eligibility remains 3743 URLs. No publication or indexing authorization is inferred.
+
+### Local Blog expansion, Batch 10
+
+The tenth expansion batch covers planned topics 226 through 250 with five new articles, five within-batch consolidations and fifteen existing-article reuses. `wallet-experience-articles.ts` collects metadata internally in the same Blog collection. All new routes remain noindex drafts. The candidate contains 392 Blog articles, 439 core pages and 4145 content pages; approved search eligibility remains 3743 URLs. No publication or indexing authorization is inferred.

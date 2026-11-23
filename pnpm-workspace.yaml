@@ -11,9 +11,9 @@ overrides:
   # Resolve GHSA-g3hv-75wg-m249 in the TypeScript ESLint dependency only.
   '@typescript-eslint/typescript-estree>minimatch': 11.0.1
   # This single-root lint plugin uses the pinned Node glob API instead.
-  '@next/eslint-plugin-next@16.4.1>fast-glob': '-'
+  '@next/eslint-plugin-next@16.4.5>fast-glob': '-'
 patchedDependencies:
-  '@next/eslint-plugin-next@16.4.1': patches/@next__eslint-plugin-next@16.4.1.patch
+  '@next/eslint-plugin-next@16.4.5': patches/@next__eslint-plugin-next@16.4.5.patch
 allowBuilds:
   esbuild: true
   sharp: true

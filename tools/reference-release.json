@@ -1,10 +1,10 @@
 {
   "reviewed": "2026-11-05",
   "scope": {
-    "corePages": 283,
+    "corePages": 439,
     "iso20022Pages": 3455,
     "independent8583Pages": 251,
-    "contentPages": 3989,
+    "contentPages": 4145,
     "sitemapPages": 3743
   },
   "iso20022": {
