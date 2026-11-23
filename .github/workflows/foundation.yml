@@ -17,7 +17,9 @@ concurrency:
 jobs:
   public-website:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    # The expanded page inventory needs about 50 minutes on the hosted runner.
+    # Keep every release check; allow time for browser installation and the full accessibility suite.
+    timeout-minutes: 60
     env:
       CI: "true"
       APP_ENV: test
