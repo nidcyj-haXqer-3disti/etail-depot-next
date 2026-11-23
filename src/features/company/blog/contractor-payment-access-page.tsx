@@ -1,0 +1,16 @@
+import Link from "next/link";
+import { BlogArticlePage } from "./article-page";
+import { contractorPaymentAccessArticle } from "./contractor-payment-access-content";
+
+export function ContractorPaymentAccessPage() {
+  return <BlogArticlePage article={contractorPaymentAccessArticle}>
+    <p>A developer asks for access to finish the checkout connection. The quickest response is to share the owner’s login. It is also a way to give someone far more authority than the job may require and lose a clear record of who made each change.</p>
+    <p>A capable, trusted contractor can still be given the wrong scope of access. Trust answers why the business hired the person; the assignment should determine what they can do inside the account. Treating those as separate decisions makes it easier to give the contractor enough authority to work without making them the permanent keeper of the payment relationship.</p>
+    <p>Configuring a checkout, exporting a report and issuing a refund are different assignments. A role that can also create credentials, change bank details or administer users may carry responsibilities the business never meant to hand over. The provider’s supported permissions should match the assignment.</p>
+    <p>Keep the account owner and recovery contacts under company control. Use individual user access and the required authentication controls rather than a shared password. Where a task requires authority the contractor should not retain, an authorized employee can complete that step through the provider’s process without transferring permanent ownership.</p>
+    <p>Trolleys’ <Link href="/company/legal/security-policy#account-access" prefetch={false}>security responsibilities</Link> require appropriate account access and protection. Its <Link href="/company/legal/merchant-services#information" prefetch={false}>information terms</Link> also limit access to people with a legitimate role and a permitted purpose. Being hired to work on the website does not create a general entitlement to customer records or every merchant account in the portal.</p>
+    <p>The handoff is part of the job. Record what changed, where the business manages it and what access remains necessary. Remove unneeded users and permissions promptly. Replace credentials through a planned, authorized process where their exposure or continued access requires it; avoid breaking a working integration by deleting credentials without identifying what uses them.</p>
+    <p>Ongoing maintenance can justify ongoing access, but the work should be named. Who is expected to respond, which part of the integration will they maintain and when will the arrangement be reviewed? “We might need them again” leaves all three unanswered. Keeping someone available for future work is a different decision from leaving every permission in place.</p>
+    <p>The handoff should leave an authorized person in the business able to locate the relevant settings and records, use the recovery route and explain what the contractor changed. They do not need to become the developer. They do need enough knowledge to commission the next piece of work without first asking the previous contractor to return control of the account.</p>
+  </BlogArticlePage>;
+}

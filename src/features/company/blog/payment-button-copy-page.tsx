@@ -1,0 +1,19 @@
+import { BlogArticlePage } from "./article-page";
+import { paymentButtonCopyArticle } from "./payment-button-copy-content";
+
+export function PaymentButtonCopyPage() {
+  return <BlogArticlePage article={paymentButtonCopyArticle}>
+    <p>“Continue” feels safe. “Pay” asks for a commitment. Those are different promises to make at the end of a checkout.</p>
+    <p>If a customer expects one more chance to review the order, a button that immediately initiates payment can feel like a trap. If they believe they have paid, an undisclosed final confirmation step can leave the order unfinished.</p>
+    <p>A softer label may make the click feel easier by postponing the customer’s understanding of it. That is a poor bargain if the click already commits them. The words have to follow the transaction, including the point at which looking becomes buying.</p>
+    <p>Start by identifying the actions the customer actually takes. One button may open a wallet. A control inside that wallet may approve a payment or return information for a review step. The store may then show a result. Those moments can look closely related while doing different jobs.</p>
+    <p>Google Pay makes the distinction explicit in its transaction options: a supported configuration can indicate an immediate purchase or a return to order review. The immediate-purchase option requires a final price. The integration must choose the option that matches its real flow, rather than relying on a label that happens to look right in a mockup.</p>
+    <p>That distinction matters when a merchant commissions checkout work. A shared visual design does not guarantee a shared sequence: a wallet route may bypass the review page used for manual card entry. The merchant needs to see the amount and terms presented at the actual commitment point for each enabled method, rather than approve a set of labels detached from their actions.</p>
+    <p>Do not solve the problem by adding a second confirmation to every purchase. If the chosen flow already gives the customer the necessary details and a clear payment action, another unexplained “Complete order” screen creates work and uncertainty. If another review is necessary, say so and make it clear that the order is not yet complete.</p>
+    <p>Recurring purchases need particular care. A short payment label cannot replace an explanation of today’s amount, future billing and applicable cancellation terms. Taking a deposit or placing an authorization hold is also different from charging the full purchase price immediately. The approved payment arrangement and disclosures should determine the wording, not an attempt to make every purchase sound identical.</p>
+    <p>For Trolleys merchants, clear purchase terms and the actual amount belong before payment. Our service uses the approved gateway and platform flow; a website team should not rewrite wallet controls outside the provider’s supported options. There is plenty of room to improve the surrounding explanation without changing the meaning of the provider’s action.</p>
+    <p>“What will happen when I press this?” is the question the button has to answer. A customer returning from a wallet may reasonably believe they have finished, while the store is still waiting for another confirmation. Making that next step attractive does not resolve the mismatch. Its purpose and the unfinished order need to be clear.</p>
+    <p>The confirmation matters just as much as the button. Payment approved, payment still being checked and order not submitted are different outcomes. Report the established result. A successful animation or a return to the website cannot replace it.</p>
+    <p>The most effective payment button is not necessarily the most forceful. It is the one a customer can press without wondering what they have just agreed to.</p>
+  </BlogArticlePage>;
+}

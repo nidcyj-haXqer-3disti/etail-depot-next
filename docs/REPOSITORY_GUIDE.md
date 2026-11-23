@@ -159,6 +159,31 @@ src/app/  [TECHNICAL] URL entry points that compose business features
 ├── company/
 │   ├── about/
 │   ├── blog/
+│   │   ├── how-many-months-for-processing-cost-comparison/
+│   │   ├── payment-quote-actual-card-mix/
+│   │   ├── refunds-and-processing-cost-savings/
+│   │   ├── lower-processing-rate-higher-cost-per-order/
+│   │   ├── monthly-minimum-for-seasonal-business/
+│   │   ├── canceled-order-processing-fees/
+│   │   ├── authorization-fees-failed-payments/
+│   │   ├── batch-fees-in-processing-quotes/
+│   │   ├── merchant-account-costs-inactive-months/
+│   │   ├── gateway-fees-and-processing-savings/
+│   │   ├── are-international-cards-included-in-your-processing-quote/
+│   │   ├── what-happens-when-your-processing-promotion-ends/
+│   │   ├── how-smaller-orders-change-processing-costs/
+│   │   ├── qualifying-for-payment-processing-volume-discounts/
+│   │   ├── processing-fees-on-shipping-and-tax/
+│   │   ├── advertised-rate-vs-statement-rate/
+│   │   ├── payment-processing-setup-fees/
+│   │   ├── monthly-subscription-vs-transaction-fees/
+│   │   ├── compare-payment-dispute-fees/
+│   │   ├── optional-payment-feature-subscriptions/
+│   │   ├── smaller-bundle-processing-costs/
+│   │   ├── annual-renewal-processing-costs/
+│   │   ├── customer-mix-processing-costs/
+│   │   ├── compare-processing-quotes-for-a-high-return-store/
+│   │   ├── payment-processor-switching-break-even/
 │   │   ├── merchant-category-codes/
 │   │   ├── merchant-id/
 │   │   ├── one-page-checkout-vs-multistep-checkout/
@@ -694,3 +719,39 @@ Changing a business area does not isolate it from technical review. A developer 
 | Authorized release | [Netlify runbook](NETLIFY_DEPLOYMENT.md) |
 
 The [Stage 1 file map](plans/repository-file-map.json) is the original migration proposal. Stage receipts record the actual reviewed moves and any adjustments. Historical paths inside those records describe their original source revision.
+
+### Local Blog expansion, Batch 2
+
+The second expansion batch covers planned topics 26 through 50 with 22 new article routes and three topics already covered by existing articles. The new content is in `src/features/company/blog/`, collected by `commercial-terms-articles.ts`, with matching `src/app/company/blog/` routes. All 22 new routes retain draft noindex status. The Blog remains one collection with no public categories. The local inventory is now 283 Blog articles, 330 core pages and 4,036 content pages; the production search-eligible inventory remains 3,743 URLs. No publication is authorized by these local checks.
+
+### Local Blog expansion, Batch 3
+
+The third expansion batch covers planned topics 51 through 75 with 20 new articles and five topics already covered. `provider-selection-articles.ts` collects their metadata internally; feature sources and app routes retain the existing single Blog collection and presentation. All new routes remain noindex drafts. The local inventory is 303 Blog articles, 350 core pages and 4,056 content pages. Search eligibility remains 3,743 URLs. Publication and search approval remain separate.
+
+### Local Blog expansion, Batch 4
+
+The fourth expansion batch covers planned topics 76 through 100 with 18 new articles and seven topics covered by existing articles. `migration-decision-articles.ts` groups metadata internally without adding a public category. Feature sources, app routes and the classic Blog presentation remain. All new routes are noindex drafts. The local inventory is 321 Blog articles, 368 core pages and 4,074 content pages. Search eligibility remains 3,743 URLs; publication and indexing need separate approval.
+
+### Local Blog expansion, Batch 5
+
+The fifth expansion batch covers planned topics 101 through 125 with 16 new articles, seven within-batch consolidations and two existing-article reuses. `onboarding-identity-articles.ts` groups metadata internally without a public category. Classic presentation, feature ownership and app routes remain. New routes are noindex drafts. The local inventory is 337 Blog articles, 384 core pages and 4,090 content pages. Search eligibility remains 3,743 URLs; publication and indexing need separate approval.
+
+### Local Blog expansion, Batch 6
+
+The sixth expansion batch covers planned topics 126 through 150 with 17 new articles, four within-batch consolidations and four existing-article reuses. `business-review-articles.ts` groups metadata internally without a public category. Classic presentation, feature ownership and app routes remain. New routes are noindex drafts. The local inventory is 354 Blog articles, 401 core pages and 4,107 content pages. Search eligibility remains 3,743 URLs; publication and indexing need separate approval.
+
+### Local Blog expansion, Batch 7
+
+The seventh expansion batch covers planned topics 151 through 175 with 12 new articles, four within-batch consolidations and nine existing-article reuses. `account-change-articles.ts` groups metadata internally without a public category. Classic presentation, feature ownership and app routes remain. New routes are noindex drafts. The local inventory is 366 Blog articles, 413 core pages and 4,119 content pages. Search eligibility remains 3,743 URLs; publication and indexing need separate approval.
+
+### Local Blog expansion, Batch 8
+
+The eighth expansion batch covers planned topics 176 through 200 with 10 new articles, eight within-batch consolidations and seven existing-article reuses. `review-readiness-articles.ts` collects their metadata internally in the same Blog collection. All new routes remain noindex drafts. The candidate contains 376 Blog articles, 423 core pages and 4129 content pages; approved search eligibility remains 3743 URLs. No publication or indexing authorization is inferred.
+
+### Local Blog expansion, Batch 9
+
+The ninth expansion batch covers planned topics 201 through 225 with 11 new articles, eight within-batch consolidations and six existing-article reuses. `checkout-experience-articles.ts` collects metadata internally in the same Blog collection. All new routes remain noindex drafts. The candidate contains 387 Blog articles, 434 core pages and 4140 content pages; approved search eligibility remains 3743 URLs. No publication or indexing authorization is inferred.
+
+### Local Blog expansion, Batch 10
+
+The tenth expansion batch covers planned topics 226 through 250 with five new articles, five within-batch consolidations and fifteen existing-article reuses. `wallet-experience-articles.ts` collects metadata internally in the same Blog collection. All new routes remain noindex drafts. The candidate contains 392 Blog articles, 439 core pages and 4145 content pages; approved search eligibility remains 3743 URLs. No publication or indexing authorization is inferred.

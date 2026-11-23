@@ -26,7 +26,7 @@ for (const { entry, count, digest } of fixtures) {
     await company.getByRole("link", { name: "Blog", exact: true }).click();
     await expect(page).toHaveURL(/\/company\/blog$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Etail Depot Blog");
-    await expect(page.locator("main article")).toHaveCount(236);
+    await expect(page.locator("main article")).toHaveCount(392);
     await expect(page.locator("main")).toContainText("By Etail Depot");
     await expect(page.locator("main img")).toHaveCount(0);
     const publishedDates = blogArticles.flatMap(article => article.publishedAt ? [article.publishedAt] : []);
@@ -402,7 +402,7 @@ test("payment link article uses the existing Blog flow without categories or a l
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.goto("/company/blog");
-  await expect(page.locator("main article")).toHaveCount(236);
+  await expect(page.locator("main article")).toHaveCount(392);
   await expect(page.locator('main [class*="articleMeta"] span')).toHaveCount(0);
   await page.getByRole("link", { name: paymentLinkArticle.title, exact: true }).click();
   const article = page.locator("article[data-reading-article]");

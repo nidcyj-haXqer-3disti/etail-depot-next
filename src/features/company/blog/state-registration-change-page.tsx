@@ -1,0 +1,18 @@
+import Link from "next/link";
+import { BlogArticlePage } from "./article-page";
+import { stateRegistrationChangeArticle } from "./state-registration-change-content";
+
+export function StateRegistrationChangePage() {
+  return <BlogArticlePage article={stateRegistrationChangeArticle}>
+    <p>The business has a new address in another state. Someone describes the task as moving the company, and the payment account is treated as one more place to update the ZIP code.</p>
+    <p>That may be enough to describe a physical relocation. It may leave out a change to the legal entity itself.</p>
+    <p>Before changing account fields, establish what the business actually did. Did it move its office while keeping its original formation? Register the existing entity to operate elsewhere? Use a permitted conversion or continuation process? Or form a new company to take over the trade?</p>
+    <p>Those choices can produce a similar-looking storefront and different company records. They also need not happen on the day the moving truck arrives. A physical move, an entity change and an approved payment transition can have different effective dates. Have the person responsible for the legal work identify the entities and evidence of continuity or replacement, then connect those dates explicitly. A forwarding address cannot supply that explanation.</p>
+    <p>State procedures vary. California, for example, provides separate information about registering a foreign entity and converting entities under permitted legal arrangements. Its conversion guidance depends on the laws governing the entities involved. That is a reason to check the actual jurisdictions, not to assume the same procedure works everywhere.</p>
+    <p>For merchant-account purposes, explain what changes for the seller, owners, operating locations, bank destination and delivery model. A company can move an office without changing its seller identity, or keep a familiar trading name while a new company takes over sales. The account record needs the facts beneath the address.</p>
+    <p>Tell Trolleys before a material change to the approved business or account use. Ask which records need updating, whether the proposed arrangement requires further application or consent, and when any new processing arrangement may begin. A state filing is not a payment-provider approval.</p>
+    <p>Keep mailing addresses, operating addresses and registered-agent details distinct. Where older documents retain an earlier address, preserve their authenticity and explain the timeline. The <Link href="/company/blog/business-address-mismatch-onboarding" prefetch={false}>address-history article</Link> shows why consistent records do not require rewriting a document that was accurate when issued.</p>
+    <p>If operating locations also change, read the instructions attached to an order already in progress. In a hypothetical move, its return label could point to the old warehouse while a new support template supplies the office address. Both records might reflect a real address and still leave the customer unable to return the parcel. Preserve the original sale record while giving staff a clear current instruction for handling it; historical accuracy and useful directions serve different purposes.</p>
+    <p>Customers will experience the move through delivery instructions, returns and support, not a state filing. The company record and the payment record still need to agree about who serves them. Updating the ZIP code is the easy part; preserving that continuity is the work that makes the move complete.</p>
+  </BlogArticlePage>;
+}
