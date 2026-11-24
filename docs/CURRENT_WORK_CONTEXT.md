@@ -38,7 +38,7 @@ All four release gates passed for this candidate: `pnpm verify:public`, `pnpm te
 
 The private setup skill was reviewed against this candidate, including its 11 cited website pages and saved-brief continuation rules. It remains excluded from GitHub and the website package. A saved plan reference identifies instruction text, not account readiness; the owning guide takes precedence and unmet approval, access or capability gates still stop the work.
 
-The user authorized preparation only. The feature branch and proposed pull request are ready locally; push, merge, hosted CI and deployment remain pending. Actual merchant-account actions, live payments, booking confirmation emails and field performance were not tested by these local checks. The real calendar booking test remains deferred.
+The user authorized pushing, merging after required checks, and deployment of this candidate on 24 November 2026. Follow the reviewed feature-branch PR and manual Netlify Git-build process. Hosted CI, the exact merged and deployed commits, and live verification results are recorded in the release handoff as they complete. Actual merchant-account actions, live payments, booking confirmation emails and field performance were not tested by these local checks. The real calendar booking test remains deferred.
 
 Future guidance changes follow the [versioned handoff](GITHUB_DELIVERY.md#versioned-guidance-handoff): update the owning guide, review affected human and Agents instructions, check the optional private skill, test the journey and record the exact candidate. A reference map is a review aid, not factual or release approval. Revalidate changed inputs before publication.
 
