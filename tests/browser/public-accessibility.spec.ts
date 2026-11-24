@@ -357,3 +357,22 @@ for (const javaScriptEnabled of [true, false]) {
     }
   });
 }
+
+
+test("agent guidance results and copied briefs retain accessible semantics", async ({page}) => {
+  await page.setViewportSize({width:390,height:900});
+  await page.goto("/agents#next-step");
+  const helper=page.locator("#next-step");
+  await expect(helper.getByRole("navigation",{name:"Browse guidance"}).getByRole("link")).toHaveCount(6);
+  await helper.getByRole("button",{name:"Get help with a payment",exact:true}).click();
+  await helper.getByRole("button",{name:"I don’t know if a payment succeeded",exact:true}).click();
+  await expect(helper.getByRole("group",{name:"Your selections"})).toBeVisible();
+  await expectAccessible(page);
+  await helper.getByRole("button",{name:"View your brief",exact:true}).click();
+  await expect(helper.getByRole("textbox",{name:"Your next step brief"})).toHaveAttribute("readonly","");
+  await expectAccessible(page);
+  await helper.getByRole("button",{name:"Start again",exact:true}).click();
+  await helper.getByRole("button",{name:"Offer payments through my software",exact:true}).click();
+  await helper.getByRole("button",{name:"My company sells its own software or service",exact:true}).click();
+  await expectAccessible(page);
+});

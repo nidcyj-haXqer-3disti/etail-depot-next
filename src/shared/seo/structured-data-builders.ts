@@ -1,6 +1,21 @@
 import type { PageMetadataContent } from "./metadata";
 import { canonicalOrigin, socialImageForPage, publicPageModified } from "@/shared/seo/metadata";
 import { legalIdentity, publicCompanyDescription } from "@/shared/site/legal-identity";
+import { productFacts } from "@/shared/site/product-facts";
+
+export const merchantServiceId = `${canonicalOrigin}/services/merchant-services#service`;
+
+function merchantServiceData() {
+  return {
+    "@type": "Service", "@id": merchantServiceId, name: productFacts.payments.offerName,
+    url: `${canonicalOrigin}/services/merchant-services`, serviceType: "Merchant services",
+    description: "Card and ACH payments for US businesses through Trolleys, an Etail Depot service. Account approval and setup apply. ACH has separate fees and terms.",
+    provider: { "@id": `${canonicalOrigin}/#organization` },
+    brand: { "@type": "Brand", name: legalIdentity.brands.find(brand => brand.name === "Trolleys")!.name },
+    areaServed: { "@type": "Country", name: "United States" },
+    mainEntityOfPage: { "@id": `${canonicalOrigin}/services/merchant-services#webpage` },
+  };
+}
 
 export function publicPageJsonLd(path: string, page: PageMetadataContent, homeDescription: string, breadcrumbLabel?: string, collection?: { id: string; name: string; items: { name: string; path: string }[] }): string {
   const url = new URL(path, canonicalOrigin).href;
@@ -24,12 +39,13 @@ export function publicPageJsonLd(path: string, page: PageMetadataContent, homeDe
       },
       {
         "@type": collection ? "CollectionPage" : "WebPage", "@id": `${url}#webpage`, url, name: page.title, description: page.description,
-        ...(collection ? { mainEntity: { "@id": `${url}#${collection.id}` } } : {}),
+        ...(collection ? { mainEntity: { "@id": `${url}#${collection.id}` } } : path === "/services/merchant-services" ? { mainEntity: { "@id": merchantServiceId } } : {}),
         dateModified: publicPageModified(path),
         inLanguage: "en-US", isPartOf: { "@id": websiteId }, publisher: { "@id": organizationId },
         primaryImageOfPage: { "@type": "ImageObject", url: socialImageForPage(path).url, width: 1200, height: 630 },
         ...(path !== "/" ? { breadcrumb: { "@id": breadcrumbId } } : {}),
       },
+      ...(path === "/services/merchant-services" ? [merchantServiceData()] : []),
       ...(collection ? [{
         "@type": "ItemList", "@id": `${url}#${collection.id}`, name: collection.name,
         numberOfItems: collection.items.length, itemListOrder: "https://schema.org/ItemListUnordered",

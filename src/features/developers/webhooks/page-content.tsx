@@ -83,5 +83,5 @@ export function WebhooksPage() {
   return <ReadingGuide title="Webhooks" article={webhooksArticle} jsonLd={developerJsonLd("webhooks")}
     navigation={<DeveloperNavigation current="webhooks" />} contents={webhooksContents}
     heading={<span className="docs-audience">Cybersource payment notifications · For website developers</span>}
-    sectionContent={{ "event-domains": <CheckoutEvent />, "webhooks-specifications": <SubscriptionSetup />, "event-security": <DeliverySecurity />, "payment-event": <Source href={webhookReferences.fields}>Notification field reference</Source>, "event-handler": <ReceiptProcessing />, "recovery-cases": <Recovery /> }} />;
+    sectionContent={{ "event-domains": <CheckoutEvent />, "webhooks-specifications": <SubscriptionSetup />, "event-security": <DeliverySecurity />, "payment-event": <div className="docs-context"><Source href={webhookReferences.checkout}>Unified Checkout fields</Source><Source href={webhookReferences.fields}>General notification fields</Source></div>, "event-handler": <ReceiptProcessing />, "recovery-cases": <Recovery /> }} />;
 }

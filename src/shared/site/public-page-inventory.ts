@@ -1,5 +1,5 @@
 import { BLOG_PATHS, DRAFT_BLOG_PATHS } from "./blog-paths.ts";
-import { DEVELOPER_PATHS } from "./developer-paths.ts";
+import { DEVELOPER_PATHS, DRAFT_DEVELOPER_PATHS } from "./developer-paths.ts";
 import { LEGAL_CENTER_PATHS, LEGAL_DOCUMENT_PATHS } from "./legal-paths.ts";
 import { RESOURCE_PATHS } from "./resource-paths.ts";
 import { COMMERCIAL_PATHS } from "./commercial-paths.ts";
@@ -7,13 +7,13 @@ import { STANDARD_REFERENCE_PATHS } from "./standard-reference-paths.ts";
 
 /** Exact local candidate including the approved PayFac and payment evaluation pages. */
 export const CORE_PUBLIC_PATHS = [
-  "/", "/services/card-services", "/services/merchant-services", "/resources/help", "/company/privacy", "/company/terms", "/resources/guides",
+  "/", "/agents", "/services/card-services", "/services/merchant-services", "/resources/help", "/company/privacy", "/company/terms", "/resources/guides",
   "/use-cases/software-platforms", "/use-cases/online-businesses", "/use-cases/no-code-checkout-experience",
   ...BLOG_PATHS, ...COMMERCIAL_PATHS, ...LEGAL_CENTER_PATHS, ...RESOURCE_PATHS, ...DEVELOPER_PATHS,
 ] as const;
 export const PUBLIC_CONTENT_PATHS: readonly string[] = [...CORE_PUBLIC_PATHS, ...STANDARD_REFERENCE_PATHS];
 // Pending editorial drafts and the unverified no-code preview remain outside search.
-export const INDEXABLE_PUBLIC_PATHS = PUBLIC_CONTENT_PATHS.filter(path => path !== "/use-cases/no-code-checkout-experience" && !DRAFT_BLOG_PATHS.includes(path) && !(LEGAL_DOCUMENT_PATHS as readonly string[]).includes(path) && !(DEVELOPER_PATHS as readonly string[]).includes(path));
+export const INDEXABLE_PUBLIC_PATHS = PUBLIC_CONTENT_PATHS.filter(path => path !== "/use-cases/no-code-checkout-experience" && !DRAFT_BLOG_PATHS.includes(path) && !(LEGAL_DOCUMENT_PATHS as readonly string[]).includes(path) && !DRAFT_DEVELOPER_PATHS.includes(path));
 const pages = new Set(PUBLIC_CONTENT_PATHS);
 const indexable = new Set(INDEXABLE_PUBLIC_PATHS);
 export function isPublicContentPath(path: string): boolean { return pages.has(path); }
@@ -36,7 +36,7 @@ export function publicPayloadPath(path: string): string | null {
   if (parent.startsWith("/resources/guides/iso-20022/")) page = "resources.guides.iso-20022.$d$set" + (parent.split("/").length === 6 ? ".$d$code" : "");
   if (parent.startsWith("/resources/guides/iso-8583/")) page = "resources.guides.iso-8583.$d$table" + (parent.split("/").length === 6 ? ".$d$code" : "");
   const file = path.slice(split + 1);
-  return ["__next._tree.txt", "__next._full.txt", `__next.${page}.__PAGE__.txt`].includes(file) ? parent : null;
+  return ["__next._tree.txt", "__next._full.txt", "__next._index.txt", `__next.${page}.__PAGE__.txt`].includes(file) ? parent : null;
 }
 export function publicExportFile(file: string): boolean {
   if (file === "index.html") return true;

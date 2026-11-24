@@ -59,3 +59,25 @@
  .online-business-actions { gap: 12px 20px; }
  .online-business-actions .button { width: 100%; justify-content: space-between; padding-inline: 18px; gap: 12px; }
 }
+
+
+/* Reuse the page's quiet two-column rhythm for account and setup decisions. */
+.online-store-setup { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.06fr); gap: 64px; padding-block: 64px; align-items: start; }
+.online-store-setup > div, .online-store-paths { min-width: 0; }
+.online-business-page .online-store-setup .eyebrow { color: var(--public-accent); }
+.online-store-setup h2 { margin-top: 16px; font-size: 38px; line-height: 1.15; letter-spacing: -.035em; }
+.online-store-setup h2 + p { max-width: 43ch; margin-top: 20px; color: var(--public-muted); font-size: 16px; line-height: 1.75; }
+.online-store-setup .online-store-support { margin-top: 24px; font-size: 14px; line-height: 1.75; color: var(--public-muted); }
+.online-store-setup a { color: var(--public-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.online-store-setup a:hover { color: var(--public-accent); }
+.online-store-paths { display: grid; gap: 20px; list-style: none; margin: 0; padding: 0; }
+.online-store-paths h3 { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.4; }
+.online-store-paths h3 a { display: inline-flex; align-items: center; min-height: 44px; }
+.online-store-paths p { margin-top: 4px; color: var(--public-muted); font-size: 15px; line-height: 1.75; max-width: 48ch; }
+#plan-your-store { scroll-margin-top: 88px; }
+@media (max-width:900px) {
+ .online-store-setup { grid-template-columns: minmax(0,1fr); gap: 32px; padding-block: 48px; }
+ .online-store-setup h2 { font-size: 32px; }
+ .online-store-setup h2 + p, .online-store-paths p { max-width: 54ch; }
+ #plan-your-store { scroll-margin-top: 32px; }
+}

@@ -12,6 +12,17 @@ export const DEVELOPER_PAGES = [
 export type DeveloperSlug = typeof DEVELOPER_PAGES[number]["slug"];
 export const DEVELOPER_PATHS = DEVELOPER_PAGES.map(page=>page.href);
 
+/** Reviewed merchant integration guidance; no Etail API product is implied. */
+export const INDEXABLE_DEVELOPER_PATHS: readonly string[] = [
+  "/developers/getting-started",
+  "/developers/api-reference",
+  "/developers/webhooks",
+  "/developers/testing",
+  "/developers/developer-tools",
+];
+/** Future pages are held until individually reviewed, regardless of navigation. */
+export const DRAFT_DEVELOPER_PATHS: readonly string[] = DEVELOPER_PATHS.filter(path => !INDEXABLE_DEVELOPER_PATHS.includes(path));
+
 /** Keep published page addresses separate from the links shown in shared navigation. */
 export const DEVELOPER_NAVIGATION = DEVELOPER_PAGES.filter(page=>
  !["sdks","changelog","api-status"].includes(page.slug)

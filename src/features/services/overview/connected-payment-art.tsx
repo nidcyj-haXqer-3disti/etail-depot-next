@@ -1,6 +1,5 @@
 import "../../../shared/styles/site-artwork-polish.css";
 import { Icon } from "../../../shared/ui/icon";
-import { PlatformRecordArt } from "../components/service-workflow-art";
 
 export function MerchantOperationsArt() {
   return <figure className="cw-merchant-art" role="img" aria-label="Merchant payment activity diagram for Studio Store: account information, a captured card payment for order 10482, and separate payout reconciliation">
@@ -12,8 +11,4 @@ export function MerchantOperationsArt() {
     </div>
     <div className="cw-merchant-reconcile" aria-hidden="true"><Icon name="bank" className="cw-reconciliation-icon" /><div><strong>Payout reconciliation</strong><span>Match the report to the bank deposit.</span></div></div>
   </figure>;
-}
-
-export function PlatformIntegrationArt() {
-  return <PlatformRecordArt />;
 }

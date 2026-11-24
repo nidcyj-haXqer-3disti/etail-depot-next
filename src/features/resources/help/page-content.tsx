@@ -13,8 +13,6 @@ import { SalesContactLink } from "@/shared/ui/sales-booking/sales-booking-link";
 import { Icon } from "@/shared/ui/icon";
 import "@/shared/styles/public-site.css";
 import "../../../app/resources/help/help.css";
-import "@/features/resources/help/enterprise-support-help.css";
-import "@/features/resources/help/connected-resources-help.css";
 
 const topics = [
   {

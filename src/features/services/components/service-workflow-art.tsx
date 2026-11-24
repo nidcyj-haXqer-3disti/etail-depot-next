@@ -35,16 +35,6 @@ export function BankPaymentArt({ art }: { art: Artwork }) {
   return <ServiceProductArt kind="ach" art={art} />;
 }
 
-export function PlatformRecordArt() {
-  const rows=[{icon:"business",label:"Account",from:"Business reference",direction:"→",to:"Merchant account",note:"Approval and permissions"},{icon:"card",label:"Checkout",from:"Order or invoice",direction:"↔",to:"Payment result",note:"Status and transaction reference"},{icon:"document",label:"Reporting",from:"Reconciliation",direction:"←",to:"Payment records",note:"Refund and payout references"}];
-  return <figure className={`${styles.art} ${styles.integration}`} aria-label="Integration responsibilities: your software supplies merchant and purchase references; merchant services return payment results and reporting references. Follow the integration specifications provided for your account.">
-    <div className={styles.surface}><div className={styles.integrationHeader}><div><Icon name="layers"/><strong>Your software</strong></div><div><Mark/><strong>Merchant services</strong></div></div>
-      <div className={styles.integrationRows}>{rows.map(row=><div className={styles.integrationRow} key={row.label}><span className={styles.integrationLabel}><Icon name={row.icon}/>{row.label}</span><div className={styles.referencePair}><strong>{row.from}</strong><span className={styles.referenceDirection} aria-hidden="true">{row.direction}</span><div><strong>{row.to}</strong><span>{row.note}</span></div></div></div>)}</div>
-      <div className={styles.recordFoot}><Icon name="link"/><span>Keep the business reference with every payment.</span></div>
-    </div>
-  </figure>;
-}
-
 export function AccountProfileArt() {
   return <figure className={`${styles.art} ${styles.accountProfile}`} aria-label="Business information needed for account setup: Studio Store, an online retail business in the United States, prepares company details, ownership information and payout bank details.">
     <div className={styles.surface}><div className={styles.heading}><Icon name="business"/><strong>Business profile</strong></div><div className={styles.profile}><div className={styles.profileIdentity}><span className={styles.store}><Icon name="business"/></span><div><strong>Studio Store</strong><span>Online retail · United States</span></div></div></div><ol className={styles.timeline}>{[["business","Business information","Company and activity"],["person","Business owners","Ownership and representatives"],["bank","Payout account","Receiving bank details"]].map(([icon,title,detail],i)=><li key={title}><span className={styles.number}>{String(i+1).padStart(2,"0")}</span><div><strong>{title}</strong><span>{detail}</span></div><Icon name={icon}/></li>)}</ol><div className={styles.boundary}><Icon name="lock"/><span>Submitted through your account service.</span></div></div>

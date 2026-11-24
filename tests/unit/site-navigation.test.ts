@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEVELOPER_PAGES } from "../../src/shared/site/developer-paths";
-import { audienceUseCaseNavigation, publicDomainForPath, publicFooterGroups, publicNavigationGroups } from "../../src/shared/site/site-navigation";
+import { audienceUseCaseNavigation, publicDomainForPath, publicFooterGroups, publicNavigationGroups, publicNavigationLinks } from "../../src/shared/site/site-navigation";
 
 describe("public navigation ownership", () => {
   it("places no-code checkout in Use cases while keeping the five Resource destinations unchanged", () => {
@@ -50,4 +50,12 @@ describe("public navigation ownership", () => {
       expect(publicDomainForPath(pathname), pathname).toBeUndefined();
     }
   });
+});
+
+
+it("offers one agent entrance outside the traditional topic menus", () => {
+  expect(publicNavigationLinks.map(link => [link.label,link.href])).toEqual([["Pricing","/pricing"],["For agents","/agents"]]);
+  expect(publicNavigationGroups.some(group=>group.sections.some(section=>section.links.some(link=>String(link.href)==="/agents")))).toBe(false);
+  expect(publicFooterGroups.some(group=>group.links.some(link=>String(link.href)==="/agents"))).toBe(false);
+  expect(publicDomainForPath("/agents")).toBeUndefined();
 });

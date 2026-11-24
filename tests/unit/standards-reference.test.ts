@@ -6,10 +6,19 @@ import { PUBLIC_INDEXING_APPROVAL, canonicalOrigin } from "../../src/shared/site
 import { forbiddenStatic } from "../../tools/public-artifact-policy";
 const production = { NODE_ENV: "production", APP_ENV: "production", ETAIL_SEARCH_CONTEXT: "production", ETAIL_PUBLIC_ORIGIN: canonicalOrigin };
 describe("frozen release inventory", () => {
+  it("admits the generated index payload only beneath an approved public page", () => {
+    for (const path of PUBLIC_CONTENT_PATHS) {
+      const payload = `${path === "/" ? "" : path}/__next._index.txt`;
+      expect(publicPayloadPath(payload), payload).toBe(path);
+    }
+    for (const path of ["/.local/__next._index.txt", "/company/blog/page/2/__next._index.txt", "/company/blog/private/__next._index.txt", "/company/blog/__next.secret.txt"]) {
+      expect(publicPayloadPath(path), path).toBeNull();
+    }
+  });
   it("includes exactly the reviewed pages and legal exclusions", () => {
     expect(new Set(STANDARD_REFERENCE_PATHS).size).toBe(3706);
-    expect(new Set(PUBLIC_CONTENT_PATHS).size).toBe(4145);
-    expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3743);
+    expect(new Set(PUBLIC_CONTENT_PATHS).size).toBe(4146);
+    expect(INDEXABLE_PUBLIC_PATHS).toHaveLength(3769);
     expect(INDEXABLE_PUBLIC_PATHS).not.toContain("/company/privacy"); expect(INDEXABLE_PUBLIC_PATHS).not.toContain("/company/terms");
     for (const path of STANDARD_REFERENCE_PATHS) {
       expect(publicDocumentPath(path)).toBe(path);

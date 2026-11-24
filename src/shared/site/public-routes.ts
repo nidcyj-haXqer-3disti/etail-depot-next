@@ -59,7 +59,7 @@ function normalizedPreviewPath(pathname: string): string | null {
 export function managedContentRoute(pathname: string): boolean {
   const normalized = normalizedPreviewPath(pathname);
   if (normalized === null) return false;
-  if (/^\/(?:software-partners|docs|developers|online-businesses|use-cases|legal|resources|company|services)(?:$|[/.])/.test(normalized)) return true;
+  if (/^\/(?:agents|software-partners|docs|developers|online-businesses|use-cases|legal|resources|company|services)(?:$|[/.])/.test(normalized)) return true;
   if (Object.keys(CORE_PAGE_MOVES).some(path => path !== "/help" && (normalized === path || normalized.startsWith(path + "/") || normalized.startsWith(path + ".")))) return true;
   if (COMMERCIAL_PATHS.some(path => normalized === path || normalized.startsWith(path + "/") || normalized.startsWith(path + "."))) return true;
   if (/^\/guides(?:$|[/.])/.test(normalized)) return true;

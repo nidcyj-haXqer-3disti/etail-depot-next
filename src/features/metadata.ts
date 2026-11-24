@@ -1,3 +1,4 @@
+import { pageDetails as agentsDetails, pageJsonLd as agentsJson } from "@/features/agents/metadata";
 import { developerPageDetails } from "./developers/metadata";
 import { publicPageMetadata as buildPublicMetadata, servicePageMetadata as buildServiceMetadata } from "@/shared/seo/metadata";
 import type { Metadata } from "next";
@@ -33,6 +34,7 @@ import { pageDetails as details24 } from "@/features/services/disputes/metadata"
 import { pageDetails as details25 } from "@/features/resources/merchant-account-setup/metadata";
 
 export const PUBLIC_PAGES = {
+  "/agents": agentsDetails,
   "/": details0,
   "/services/card-services": details1,
   "/services/merchant-services": details2,
@@ -64,6 +66,7 @@ export const SERVICE_PAGES = {
   "/services/disputes": details24,
 } as const;
 export const PUBLIC_PAGE_MODIFIED = {
+  "/agents": CORE_PAGE_MODIFIED["/agents"],
   "/": CORE_PAGE_MODIFIED["/"],
   "/services/card-services": CORE_PAGE_MODIFIED["/services/card-services"],
   "/services/merchant-services": CORE_PAGE_MODIFIED["/services/merchant-services"],
@@ -71,6 +74,7 @@ export const PUBLIC_PAGE_MODIFIED = {
   "/resources/guides": CORE_PAGE_MODIFIED["/resources/guides"],
 } as const satisfies Record<PublicPath, string>;
 const jsonByPath = {
+  "/agents": agentsJson,
   "/": json0,
   "/services/card-services": json1,
   "/services/merchant-services": json2,

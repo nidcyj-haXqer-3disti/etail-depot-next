@@ -5,6 +5,7 @@ import { CORE_PUBLIC_PATHS, isPublicContentPath } from "./public-page-inventory.
  * Every core route must be recorded explicitly; no inherited or guessed dates.
  */
 export const CORE_PAGE_MODIFIED = {
+  "/agents": "2026-11-24",
   "/company/blog/product-page-wallet-checkout-cart": "2026-11-23",
   "/company/blog/wallet-checkout-store-pickup": "2026-11-23",
   "/company/blog/checkout-button-pay-or-review": "2026-11-23",
@@ -412,16 +413,16 @@ export const CORE_PAGE_MODIFIED = {
   "/developers/getting-started": "2026-11-14",
   "/developers/api-reference": "2026-11-14",
   "/developers/sdks": "2026-11-09",
-  "/developers/webhooks": "2026-11-14",
+  "/developers/webhooks": "2026-11-24",
   "/developers/testing": "2026-11-14",
   "/developers/developer-tools": "2026-11-14",
   "/developers/changelog": "2026-11-09",
   "/developers/api-status": "2026-11-09",
   "/resources/merchant-account-setup": "2026-11-14",
   "/": "2026-11-14",
-  "/services/merchant-services": "2026-11-14",
+  "/services/merchant-services": "2026-11-24",
   "/services/card-services": "2026-11-01",
-  "/use-cases/online-businesses": "2026-11-14",
+  "/use-cases/online-businesses": "2026-11-24",
   "/services/merchant-onboarding": "2026-11-14",
   "/services/payment-methods": "2026-11-01",
   "/services/ach-payments": "2026-11-01",

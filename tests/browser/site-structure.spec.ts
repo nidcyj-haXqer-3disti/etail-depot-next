@@ -11,7 +11,7 @@ test("primary categories support keyboard, outside dismissal and service navigat
   const nav = header.getByRole("navigation", { name: "Main navigation" });
   const services = nav.locator("summary").filter({ hasText: /^Services$/ });
   const useCases = nav.locator("summary").filter({ hasText: /^Use cases$/ });
-  await expect(nav.locator(":scope > a, :scope > details > summary")).toHaveText(["Services", "Use cases", "Developers", "Resources", "Pricing"]);
+  await expect(nav.locator(":scope > a, :scope > details > summary")).toHaveText(["Services", "Use cases", "Developers", "Resources", "Pricing", "For agents"]);
   await services.focus(); await page.keyboard.press("Enter");
   await expect(nav.getByRole("link", { name: "Merchant onboarding", exact: true })).toBeVisible();
   // WebKit on macOS uses Option+Tab to include links in keyboard navigation.
@@ -128,7 +128,7 @@ test("online business use case owns the merchant walkthrough and preserves navig
   if (await navigation.locator(".public-domain-use-cases").getAttribute("open") === null) await navigation.locator("summary").filter({hasText:/^Use cases$/}).click();
   await navigation.getByRole("link", { name: "Online businesses", exact: true }).click();
   await expect(page).toHaveURL(/\/use-cases\/online-businesses$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Online payments\.\s*Connected to your orders\./);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Payments for your\s*next online store\./);
   await expect(page.locator(".payment-service-explorer")).toHaveCount(1);
   await expect(page.locator("#payment-channels")).toContainText("Payment requests");
   await expect(page.locator("#fees, #payment-operations")).toHaveCount(0);
@@ -137,8 +137,8 @@ test("online business use case owns the merchant walkthrough and preserves navig
   expect(await (await request.get("/sitemap.xml")).text()).not.toContain("/use-cases/online-businesses");
   await openFooterGroup(page, "Services");
   await expect(page.getByRole("contentinfo").getByRole("link", { name: "Merchant onboarding", exact: true })).toHaveAttribute("href", "/services/merchant-onboarding");
-  const service = page.locator(".online-business-actions").getByRole("link", { name: "Merchant services", exact: true });
-  await expect(service).toHaveAttribute("href", "/services/merchant-services");
+  const application = page.locator(".online-business-actions").getByRole("link", { name: "Start now", exact: true });
+  await expect(application).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
   const comparison = page.locator(".cw-order-outcome").getByRole("link", { name: "Compare payment records", exact: true });
   await expect(comparison).toHaveAttribute("href", "/services/reconciliation");
   await comparison.click();

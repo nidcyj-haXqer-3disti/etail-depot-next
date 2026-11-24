@@ -1,3 +1,4 @@
+import { isIndexablePath } from "../../src/shared/site/public-page-inventory";
 import { LEGAL_CENTER_PATHS } from "../../src/shared/site/legal-paths";
 import { describe, expect, it, vi } from "vitest";
 import { managedContentRoute, retiredRoute } from "../../src/shared/site/public-routes";
@@ -31,13 +32,13 @@ const publicAliases = movedPublicPages.flatMap(([oldPath, destination]) =>
   [oldPath, `${oldPath}/`, `${oldPath}.html`, `${oldPath}/index.html`].map(path => [path, destination] as const),
 );
 
-describe.each(["use-cases/software-platforms", "resources/merchant-account-setup", "developers/getting-started", "use-cases/online-businesses"])("reviewed %s boundary", root => {
+describe.each(["use-cases/software-platforms", "resources/merchant-account-setup", "developers/getting-started", "developers/sdks", "use-cases/online-businesses"])("reviewed %s boundary", root => {
   it.each(["GET", "HEAD"])("serves approved %s documents and keeps aliases and payloads private", async method => {
     for (const suffix of ["", "/", ".html", "/index.html", ".txt", "/__next._tree.txt"]) {
       const path = `/${root}${suffix}`, next = context(new Response(method === "HEAD" ? null : "page"));
       const response = await handlePublicRequest(new Request(canonicalOrigin + path, { method }), next, production);
       expect(response.status).toBe(200);
-      expect(response.headers.has("x-robots-tag")).toBe(suffix !== "" || root.startsWith("developers/"));
+      expect(response.headers.has("x-robots-tag")).toBe(suffix !== "" || !isIndexablePath("/" + root));
       expect(next.next).toHaveBeenCalledTimes(1);
     }
   });
@@ -200,7 +201,7 @@ describe("renamed public product pages", () => {
       expect(response.headers.get("location")).toBe(`${canonicalOrigin}${destination}`);
       // No replacement fragment: the browser can retain an existing public section bookmark.
       expect(new URL(response.headers.get("location")!).hash).toBe("");
-      expect(response.headers.has("x-robots-tag")).toBe(destination.startsWith("/developers/"));
+      expect(response.headers.has("x-robots-tag")).toBe(!isIndexablePath(destination));
       expect(response.headers.has("set-cookie")).toBe(false);
       expect(await response.text()).toBe("");
       expect(next.next).not.toHaveBeenCalled();
@@ -462,4 +463,20 @@ describe("public response revalidation", () => {
     expect(response.headers.get("x-robots-tag")).toBe("noindex, nofollow");
     expect(await response.text()).toBe("Not found");
   });
+});
+
+
+it("serves the reviewed Agents page without opening account or runtime paths", async () => {
+  const accepted=context();
+  const page=await handlePublicRequest(new Request(canonicalOrigin+"/agents"),accepted,production);
+  expect(page.status).toBe(200);
+  expect(accepted.next).toHaveBeenCalledOnce();
+  expect(isIndexablePath("/agents")).toBe(true);
+  for(const path of ["/agents/private.html", "/agents/record.json", "/agents/__next.secret.txt", "/agents/server", "/agents%2fprivate.html"]) {
+    expect(managedContentRoute(path)).toBe(true);
+    const next=context();
+    const response=await handlePublicRequest(new Request(canonicalOrigin+path),next,production);
+    expect(response.status,path).toBe(404);
+    expect(next.next).not.toHaveBeenCalled();
+  }
 });
