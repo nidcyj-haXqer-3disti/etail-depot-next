@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useClientReady } from "@/shared/ui/use-client-ready";
-import { resolveSetupPath, setupHandoff } from "./setup-paths";
+import { resolveSetupPath, setupHandoff, setupPlan } from "./setup-paths";
+import { TaskPlan } from "./task-plan";
 import styles from "./next-step.module.css";
 
 export function NextStep() {
@@ -14,6 +15,8 @@ export function NextStep() {
   const heading = useRef<HTMLHeadingElement>(null);
   const focusNext = useRef(false);
   const revision = useRef(0);
+  const downloadUrl = useRef<string | null>(null);
+  useEffect(() => () => { if (downloadUrl.current) URL.revokeObjectURL(downloadUrl.current); }, []);
   const { node, selections, validAnswers } = resolveSetupPath(answers);
   const brief = node.kind === "result" ? setupHandoff(selections, node) : "";
 
@@ -42,11 +45,26 @@ export function NextStep() {
     }
   }
 
+  function saveBrief() {
+    if (node.kind !== "result") return;
+    try {
+      if (downloadUrl.current) URL.revokeObjectURL(downloadUrl.current);
+      downloadUrl.current = URL.createObjectURL(new Blob([brief], { type: "text/plain;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = downloadUrl.current;
+      link.download = `trolleys-${node.id.replaceAll(":", "-")}-plan.txt`;
+      document.body.append(link); link.click(); link.remove();
+      setCopyState("Download started. Keep your brief with your project notes.");
+    } catch {
+      setShowBrief(true); setCopyState("Select and copy the brief below.");
+    }
+  }
+
   return <section id="next-step" className={styles.helper} aria-labelledby="next-step-title">
     <div className={styles.intro}>
       <h1 id="next-step-title">Trolleys for Agents</h1>
-      <p>Choose a merchant task, find the next step and prepare a brief for your AI assistant or team.</p>
-      <p className={styles.privacy}>Your choices stay on this page. No account details needed.</p>
+      <p>Choose a merchant task and prepare a plan for your assistant or team, with steps and links to the relevant guides.</p>
+      <p className={styles.privacy}>No account details needed. Your choices stay in your browser until you copy or save your brief.</p>
       <nav className={styles.direct} aria-label="Browse guidance">
         <span>Go straight to a guide</span>
         <Link prefetch={false} href="/resources/merchant-account-setup">Account setup</Link>
@@ -56,6 +74,7 @@ export function NextStep() {
         <Link prefetch={false} href="/resources/help#payments">Payment questions</Link>
         <Link prefetch={false} href="/use-cases/software-platforms/payment-models">Platform payment models</Link>
       </nav>
+      <a className={styles.reference} href="#task-reference">Browse the task reference</a>
     </div>
     <div className={styles.panel} data-setup-ready={ready ? "true" : "false"}>
       {selections.length > 0 && <div className={styles.context} role="group" aria-label="Your selections">
@@ -66,14 +85,18 @@ export function NextStep() {
       {node.kind === "question" ? <>
         <p className={styles.note}>{node.note}</p>
         <div className={styles.choices}>{node.choices.map(choice => <button type="button" key={choice.id} disabled={!ready} onClick={() => change([...validAnswers, choice.id])}>{choice.label}</button>)}</div>
-        <noscript><p>Use the guide links to continue without JavaScript.</p></noscript>
+        <noscript><p>Use the guide links or task reference to continue without JavaScript.</p></noscript>
       </> : <>
         <p className={styles.body}>{node.body}</p>
         <Link prefetch={false} className={styles.action} href={node.action.href}>{node.action.label}</Link>
         <dl className={styles.details}><div><dt>Who handles it</dt><dd>{node.owner}</dd></div><div><dt>You’re ready to move on when</dt><dd>{node.complete}</dd></div></dl>
         <p className={styles.caution}>{node.note}</p>
         <Link prefetch={false} className={styles.reference} href={node.reference.href}>{node.reference.label}</Link>
-        <div className={styles.share}><button type="button" onClick={() => setShowBrief(!showBrief)} aria-expanded={showBrief} aria-controls="setup-brief">{showBrief ? "Hide your brief" : "View your brief"}</button><button type="button" onClick={copyBrief}>Copy brief</button></div>
+        <details key={node.id} className={styles.planDisclosure}>
+          <summary><h3>View your action plan</h3></summary>
+          <TaskPlan steps={setupPlan(node).steps} />
+        </details>
+        <div className={styles.share}><button type="button" onClick={() => setShowBrief(!showBrief)} aria-expanded={showBrief} aria-controls="setup-brief">{showBrief ? "Hide your brief" : "View your brief"}</button><button type="button" onClick={copyBrief}>Copy brief</button><button type="button" onClick={saveBrief}>Save brief</button></div>
         <p className={styles.copyStatus} role="status">{copyState}</p>
         {showBrief && <div className={styles.brief} id="setup-brief"><label htmlFor="setup-brief-text">Your next step brief</label><textarea id="setup-brief-text" readOnly value={brief} rows={12} spellCheck={false} /></div>}
       </>}

@@ -1,3 +1,4 @@
+import type { GuidanceSource } from "@/shared/site/guidance-source";
 export const woocommerceGuidePath = "/resources/woocommerce-gateway-integration";
 
 // Deliberately nonfunctional examples. Never replace these with account credentials.
@@ -221,3 +222,47 @@ export const woocommerceSetupSteps: readonly WooCommerceStep[] = [
     "caption": "A full refund shows the refunded amount and zero Net Payment."
   }
 ];
+
+/** Review dependencies, not a second copy of the guide. Consumed only by engineering tools. */
+export const woocommerceCredentialsSource = {
+  "id": "woocommerce-credentials",
+  "title": "WooCommerce host, credentials and protected certificate",
+  "sourceFiles": [
+    "src/features/resources/integrations/woocommerce/woocommerce-content.ts",
+    "src/features/resources/integrations/woocommerce/woocommerce-gateway-guide.tsx",
+    "src/features/resources/integrations/woocommerce/woocommerce-guide-panels.tsx",
+    "src/features/resources/integrations/woocommerce/woocommerce-connection-walkthrough.tsx",
+    "src/features/resources/integrations/woocommerce/woocommerce-file-transfer.tsx",
+    "src/features/resources/integrations/woocommerce/woocommerce-guide-screenshot.tsx"
+  ],
+  "sourceDirectories": [
+    "src/features/resources/integrations/woocommerce/assets/"
+  ],
+  "guides": [
+    "/resources/woocommerce-gateway-integration#before-you-start",
+    "/resources/woocommerce-gateway-integration#create-shared-secret",
+    "/resources/woocommerce-gateway-integration#download-certificate",
+    "/resources/woocommerce-gateway-integration#store-certificate",
+    "/resources/woocommerce-gateway-integration#enter-credentials"
+  ],
+  "reviewWith": [
+    {
+      "file": "src/features/developers/getting-started/content.ts",
+      "guides": [
+        "/developers/getting-started#checkout"
+      ]
+    },
+    {
+      "file": "src/features/resources/help/page-content.tsx",
+      "guides": [
+        "/resources/help#checkout"
+      ]
+    },
+    {
+      "file": "src/features/resources/integrations/shopify/shopify-credentials-email-art.tsx",
+      "guides": [
+        "/resources/woocommerce-gateway-integration#check-your-email"
+      ]
+    }
+  ]
+} as const satisfies GuidanceSource;

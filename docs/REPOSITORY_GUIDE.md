@@ -595,6 +595,9 @@ tools/  [TECHNICAL] Shared build, validation and image-generation tools
 ├── build-public-site.mjs
 ├── package-public-site.mjs
 ├── reference-release.json  Build-check manifest; never a website download
+├── review-guidance.ts  Review dependencies for human guidance and Agents outcomes
+├── guidance-report.ts  Human-readable engineering review summary
+├── guidance-review-ci.ts  Bound GitHub comparison and job-summary writer
 └── verify-file-publication.mjs
 ```
 

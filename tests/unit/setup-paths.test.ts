@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveSetupPath, setupHandoff, type SetupResult } from "../../src/features/agents/setup-paths";
+import { resolveSetupPath, setupHandoff, setupPlan, setupScenarios, type SetupResult } from "../../src/features/agents/setup-paths";
 import { PUBLIC_CONTENT_PATHS } from "../../src/shared/site/public-page-inventory";
 
 function outcome(path: string[]): SetupResult {
@@ -101,4 +101,65 @@ describe("merchant guidance decisions", () => {
     expect(brief).not.toContain("For my web team or AI assistant");
   });
 
+});
+
+describe("source-backed task plans", () => {
+  it("every reachable situation has bounded, uniquely identified steps and registered sources", () => {
+    const scenarios = setupScenarios();
+    expect(scenarios).toHaveLength(40);
+    expect(new Set(scenarios.map(item => item.result.id)).size).toBe(26);
+    for (const {result, selections} of scenarios) {
+      const plan = setupPlan(result);
+      expect(plan.steps.length).toBeGreaterThanOrEqual(2);
+      expect(plan.steps.length).toBeLessThanOrEqual(4);
+      expect(new Set(plan.steps.map(step => step.id)).size).toBe(plan.steps.length);
+      for (const step of plan.steps) {
+        expect(PUBLIC_CONTENT_PATHS).toContain(step.source.href.split("#")[0]);
+        expect(step.source.href).toMatch(/^\/[a-z][^?]*$/);
+        expect(step.owner.length).toBeGreaterThan(3);
+        expect(step.complete.length).toBeGreaterThan(15);
+        expect(setupHandoff(selections, result)).toContain(`Source: https://etaildepot.com${step.source.href}`);
+      }
+    }
+  });
+  it("gates capabilities and preserves the original payment investigation", () => {
+    const hosted = setupPlan(outcome(["setup","custom","approved","ready","no"])).steps;
+    expect(hosted[0].complete).toContain("provider has confirmed");
+    expect(hosted[1].condition).toContain("only after the provider confirms access");
+    const uncertain = setupPlan(outcome(["payment","uncertain"])).steps;
+    expect(uncertain[0].action).toContain("Prevent another submission");
+    expect(uncertain.at(-1)?.condition).toContain("waits for the original outcome");
+    const dba = setupPlan(outcome(["location","dba"])).steps;
+    expect(dba.at(-1)?.condition).toContain("does not activate");
+    const other = setupPlan(outcome(["setup","woocommerce","approved","ready","other"])).steps;
+    expect(other.at(-1)?.condition).toContain("Do not copy WordPress.com server paths");
+  });
+  it("binds a saved plan reference to the instructions without implying verified completion", () => {
+    const result = outcome(["payment","uncertain"]);
+    expect(setupPlan(result).reference).toBe(setupPlan({...result}).reference);
+    expect(setupPlan({...result, note: result.note + " Updated."}).reference).not.toBe(setupPlan(result).reference);
+    expect(setupHandoff([],result)).toContain("first unfinished step");
+    expect(setupHandoff([],result)).toContain("not account readiness");
+    expect(() => setupPlan({...result,id:"future-result"})).toThrow(/No task plan/);
+  });
+  it("consolidates only equivalent application plans in the static reference", () => {
+    const applications = setupScenarios().filter(item => item.result.id.startsWith("application:"));
+    for (const item of applications) expect(setupPlan(item.result).steps).toEqual(setupPlan(applications[0].result).steps);
+  });
+});
+
+
+it("keeps the owner and prerequisites before credential or live payment work", () => {
+  const shopify = outcome(["setup", "shopify", "approved", "ready"]);
+  expect(shopify.owner).toBe("Shopify store owner");
+  const woo = setupPlan(outcome(["setup", "woocommerce", "approved", "ready", "documented"])).steps;
+  expect(woo[0].condition).toMatch(/Unified Checkout readiness.*SFTP/);
+  expect(woo.find(step => step.id === "plugin-settings")?.action).toContain("Enable Response MLE");
+  const custom = setupPlan(outcome(["setup", "custom", "approved", "ready", "yes"])).steps;
+  expect(custom[0].condition).toMatch(/enabled.*sandbox.*separate authorization/);
+  expect(custom[1].action).toContain("verify the checkout session");
+  const payout = setupPlan(outcome(["payment", "payout"])).steps;
+  expect(payout[1].action).toContain("credit posted by the receiving bank");
+  const reports = setupPlan(outcome(["payment", "reports"])).steps;
+  expect(reports.map(step => step.action).join(" ")).not.toContain("bank credit");
 });

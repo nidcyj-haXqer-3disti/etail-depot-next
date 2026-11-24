@@ -104,6 +104,7 @@ etail-depot-next/
 ├── src/                         WEBSITE SOURCE
 │   ├── features/                [BUSINESS] Content, artwork and UI by business area
 │   │   ├── home/
+│   │   ├── agents/              Separate task guidance using approved website facts
 │   │   ├── services/
 │   │   ├── use-cases/
 │   │   ├── developers/          Public information for customers
@@ -140,6 +141,7 @@ The [detailed current folder map](docs/REPOSITORY_GUIDE.md) lists every active r
 | Home or Pricing | `src/features/home/` or `src/features/pricing/` |
 | Services and use cases | The corresponding folder under `src/features/services/` or `src/features/use-cases/` |
 | Public Developer content | `src/features/developers/` |
+| Agents questions, outcomes and copied briefs | `src/features/agents/`, coordinated with the owning guides |
 | Merchant setup, integration guides, Help and references | `src/features/resources/` |
 | About, Contact, trust and legal content | `src/features/company/` |
 | Page address or route entry point | `src/app/`, composed from its owning feature |
@@ -177,6 +179,18 @@ Keep a feature's content and artwork together. Reuse the existing Shell, design 
 - Tell the maintainer that the change affects every page, and coordinate with anyone editing navigation or styles.
 - Reproduce the issue, make the smallest appropriate correction, and check desktop and mobile representative pages, keyboard access and focus.
 - Add a regression check when it protects the reproduced behavior. Do not duplicate the footer inside individual features.
+
+### Example D: keep human and Agents guidance aligned
+
+**Task:** correct a credential instruction in the WooCommerce guide.
+
+1. Confirm the supported host/plugin and change the owning guide, including any affected artwork. A provider's general capability does not establish support for every merchant account.
+2. Run `pnpm review:guidance --base <comparison-commit> --markdown`. Review the listed human summaries and Agents questions, outcomes and copied brief. Inspect removed mappings in the diff too.
+3. Review the optional private skill against the same instruction when it is available. If unavailable, record **not reviewed**; public CI does not verify it. Keep the skill and its review evidence private.
+4. Exercise the affected journey and its conditions on desktop and mobile. Update the relevant scenario checks. Change page revision dates only for meaningful public content changes.
+5. Record corrections or why each related instruction remains correct in the [guidance handoff](docs/GITHUB_DELIVERY.md#versioned-guidance-handoff). Release only at the authorized stage.
+
+The task owner coordinates these areas; the maintainer decides commercial/provider questions and release scope. Do not create another copy of the guide or a separate content database. Apply the same review when a provider changes its workflow, a link moves or a dependency is removed. The report also identifies task plans affected by their cited page sources. This is separate from the three pilot mappings for human summaries and the private skill. Supplying the private skill locally also identifies affected sections from its actual website citations. Unmapped content still requires ordinary review.
 
 ## 5. Use AI with the same responsibilities
 
@@ -221,6 +235,8 @@ Install the browsers required by the tests first: `pnpm exec playwright install 
 For documentation-only changes, check linked files, commands and formatting, and report which application checks were not rerun. Every release candidate still requires all four commands. See [Testing and evidence](docs/TEST_AND_EVIDENCE.md).
 
 For UI changes, also inspect affected desktop and phone flows: keyboard navigation, visible focus, wrapping, overflow and the relevant loading behavior. Use the [paint standard](docs/PAGE_PAINT_STANDARDS.md) for first visits, refresh and saved section links. Record actual failures, corrections, reruns and skips. Never weaken tests to manufacture a passing result.
+
+Run `pnpm review:guidance --base <comparison-commit> --markdown` to see which mapped human pages and Agents instructions need review together. `--base HEAD` covers pending work; use the PR base commit for the whole branch. Add `--skill-dir <local-skill-directory>` only for a private local review. Record what you reviewed or corrected, and keep private reports out of Git. The [GitHub delivery guide](docs/GITHUB_DELIVERY.md#guidance-change-review) explains the CI report and its limited pilot scope.
 
 Before committing:
 
@@ -301,12 +317,14 @@ Task and result:
 Branch, commit and PR:
 Files and public pages changed:
 Checks run and their results:
+Shared guidance: reviewed pilots and corrections / not affected / not reviewed
+Private skill: reviewed against this candidate / unavailable / not reviewed
 Known limitations or checks still needed:
 Delivery status: local / pushed / merged / deployed
 If deployed: deploy ID, commit, live URL and hosted checks
 ```
 
-Keep `docs/CURRENT_WORK_CONTEXT.md` accurate for the active task and release, coordinate edits to that shared record, and preserve dated stage receipts. Do not copy old passing totals into a new completion claim.
+Keep `docs/CURRENT_WORK_CONTEXT.md` accurate for the active task and release, coordinate edits to that shared record, and preserve dated stage receipts. Use the [versioned guidance handoff](docs/GITHUB_DELIVERY.md#versioned-guidance-handoff) for mapped changes. Keep its private paths, skill hashes and evidence out of the public PR; report only the review status and public changes there. Do not copy old passing totals into a new completion claim.
 
 ## Boundaries that every task preserves
 
