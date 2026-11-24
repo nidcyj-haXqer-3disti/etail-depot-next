@@ -1,3 +1,7 @@
+import { taskPlanFor } from "./task-plans.ts";
+import { canonicalOrigin } from "../../shared/site/public-release.ts";
+import type { GuidanceDependency } from "@/shared/site/guidance-source";
+
 /** Public guidance only. Choices never establish approval or account access. */
 export type SetupLink = { label: string; href: string };
 export type SetupChoice = { id: string; label: string; next: string };
@@ -19,8 +23,8 @@ function result(id: string, title: string, body: string, owner: string, complete
 const results: Record<string, SetupResult> = {
   pending: result("pending", "Follow your existing application’s review.", "Check the application status and any requests from the account team. Provide the requested information through the portal before moving on to gateway setup.", "Merchant and account team", "The account is approved and you receive the store-specific welcome details.", "Submitting an application does not confirm approval. You do not need another application just because review is still in progress.", { label: "Check what happens after submission", href: "/resources/merchant-account-setup#application-submitted" }, { label: "Contact merchant support", href: "/company/contact#account-support" }),
   access: result("access", "Get the correct store’s welcome details.", "Ask the implementation team to confirm the store, processing MID and gateway account pairing, then restore any missing access.", "Merchant and implementation team", "You can open the intended gateway account using the separate details supplied for that store.", "The Back Office login and Cybersource gateway login are different. Keep passwords, codes and keys in their secure provider screens.", support, { label: "Which portal should I use?", href: "/developers/getting-started#portal-access" }),
-  shopify: result("shopify", "Connect the right payment app to your store.", "Start with the Shopify guide’s prerequisites. Confirm that your gateway account is ready for the app and environment you intend to use.", "Merchant or Shopify administrator", "The intended provider is active for the correct store and the agreed checkout checks have passed.", "Merchant approval alone does not confirm app readiness. Test credentials cannot be substituted into the live app.", { label: "Open the Shopify setup guide", href: "/resources/shopify-gateway-integration#before-you-start" }, { label: "Payment checks before launch", href: "/developers/testing#acceptance-tests" }),
-  woocommerce: result("woocommerce", "Prepare the plugin’s two kinds of credentials.", "The REST Key ID and Shared Secret are settings values. The separate private .p12 certificate is the file transferred to protected server storage.", "Merchant and web team", "The plugin uses the correct account, environment and protected certificate path, and payment checks pass.", "This illustrated guide uses WordPress.com and the Visa Acceptance Solutions plugin. The certificate password is different from the SFTP password.", { label: "Open the WooCommerce setup guide", href: "/resources/woocommerce-gateway-integration#before-you-start" }, { label: "Where each credential goes", href: "/resources/woocommerce-gateway-integration#enter-credentials" }),
+  shopify: result("shopify", "Connect the right payment app to your store.", "Start with the Shopify guide’s prerequisites. Confirm that your gateway account is ready for the app and environment you intend to use.", "Shopify store owner", "The intended provider is active for the correct store and the agreed checkout checks have passed.", "Merchant approval alone does not confirm app readiness. Test credentials cannot be substituted into the live app.", { label: "Open the Shopify setup guide", href: "/resources/shopify-gateway-integration#before-you-start" }, { label: "Payment checks before launch", href: "/developers/testing#acceptance-tests" }),
+  woocommerce: result("woocommerce", "Prepare the plugin’s two kinds of credentials.", "The REST Key ID and Shared Secret are settings values. The separate private .p12 certificate is the file transferred to protected server storage.", "Merchant and web team", "The plugin uses the correct account, environment and protected certificate path, and payment checks pass.", "This guide uses WordPress.com and the Visa Acceptance Solutions plugin without SMB in its name. The certificate password is different from the SFTP password.", { label: "Open the WooCommerce setup guide", href: "/resources/woocommerce-gateway-integration#before-you-start" }, { label: "Where each credential goes", href: "/resources/woocommerce-gateway-integration#enter-credentials" }),
   "woocommerce-other": result("woocommerce-other", "Confirm your host and plugin first.", "Give your web team the host and exact plugin name and version. Ask them to confirm its credential fields, supported environment and private certificate storage requirements.", "Web team or hosting provider", "Your team has instructions that match the installed plugin and hosting environment.", "The WordPress.com server paths and transfer steps in our illustrated guide do not apply to every host or plugin. Do not upload a private certificate to the Media Library.", { label: "Check the guide’s prerequisites", href: "/resources/woocommerce-gateway-integration#before-you-start" }, support),
   custom: result("custom", "Give your web team the checkout connection plan.", "Your server creates the checkout session and verifies the payment outcome. Cybersource hosts the payment fields. Your team also needs recovery and duplicate protection.", "Web team", "Successful, declined and interrupted payment checks pass, with the verified outcome recorded against the correct order.", "An embedded payment screen does not remove the need for secure server work. Our code fragments are not a complete payment application.", { label: "Open the integration instructions", href: "/developers/api-reference#api-credentials" }, { label: "Review the acceptance checks", href: "/developers/testing#acceptance-tests" }),
   manual: result("manual", "Check Virtual Terminal for the correct store.", "Use the store’s Business Center to confirm Virtual Terminal access, permitted payment types and your user permissions with the implementation team.", "Authorized merchant user", "The account team confirms the manual payment setup and you know how to check the resulting payment record.", "Virtual Terminal is for the merchant to enter a payment. It is separate from a customer’s payment link and does not require a Unified Checkout website integration. Enter payment details only in the approved provider screen.", { label: "Review portal payment tools", href: "/developers/developer-tools#payment-requests" }, { label: "Find the correct gateway login", href: "/developers/getting-started#portal-access" }),
@@ -68,7 +72,7 @@ const questions: Record<string, SetupQuestion> = {
     { id: "reports", label: "My payment reports do not match", next: "result:reports" },
   ] },
   "woocommerce-host": { kind: "question", id: "woocommerce-host", title: "Which WooCommerce setup do you use?", note: "The host and plugin determine the setup steps.", choices: [
-    { id: "documented", label: "WordPress.com with Visa Acceptance Solutions", next: "result:woocommerce" },
+    { id: "documented", label: "WordPress.com with Visa Acceptance Solutions (without SMB)", next: "result:woocommerce" },
     { id: "other", label: "Another host or plugin, or I’m not sure", next: "result:woocommerce-other" },
   ] },
   "custom-team": { kind: "question", id: "custom-team", title: "Can your web team maintain a payment server?", note: "Embedded checkout needs secure server work and payment recovery.", choices: [
@@ -112,10 +116,34 @@ export function resolveSetupPath(answers: readonly string[]): { node: SetupNode;
   return { node, selections, validAnswers };
 }
 
+/** Enumerate the same finite paths used by the interactive helper for static reference. */
+export function setupScenarios() {
+  const scenarios: { answers: string[]; selections: SetupSelection[]; result: SetupResult }[] = [];
+  function visit(answers: string[]) {
+    if (answers.length > 8) throw new Error("Setup path does not terminate");
+    const { node, selections } = resolveSetupPath(answers);
+    if (node.kind === "result") scenarios.push({ answers, selections, result: node });
+    else for (const choice of node.choices) visit([...answers, choice.id]);
+  }
+  visit([]);
+  return scenarios;
+}
+
+/** Identifies this plan's text, not a verification of the merchant or a security token. */
+export function setupPlan(outcome: SetupResult) {
+  const steps = taskPlanFor(outcome);
+  let revision = 2166136261;
+  for (const character of JSON.stringify([outcome, steps])) {
+    revision = Math.imul(revision ^ character.charCodeAt(0), 16777619) >>> 0;
+  }
+  return { steps, reference: `${outcome.id.replaceAll(":", "-")}-${revision.toString(16).padStart(8, "0")}` };
+}
+
 const paymentSupportResults = new Set(["uncertain", "payout", "refund", "dispute", "reports"]);
 const platformResults = new Set(["platform", "own-sales", "marketplace", "platform-role"]);
 
 export function setupHandoff(selections: readonly SetupSelection[], outcome: SetupResult): string {
+  const plan = setupPlan(outcome);
   const followUp = paymentSupportResults.has(outcome.id) ? [
     "For merchant support: have the affected store, relevant payment, payout or case reference, amount and currency, date or reporting period with time zone, and observed status ready. Describe what you already checked.",
     "Keep those account and customer records in the approved support channel. Do not add them to a public issue or AI chat. This copied brief contains only the choices made on the website.",
@@ -125,5 +153,23 @@ export function setupHandoff(selections: readonly SetupSelection[], outcome: Set
   ] : [
     "For my web team or AI assistant: reopen the current guides and help me plan this step. Do not request passwords, API secrets, card details or verification codes.",
   ];
-  return ["My Trolleys next step brief", "Trolleys, an Etail Depot service", "", "Based on my selections, not a verification of my account:", ...selections.map(item => `${item.question} ${item.answer}`), "", `Next step: ${outcome.title}`, outcome.body, `Owner: ${outcome.owner}`, `Completion check: ${outcome.complete}`, `Confirm: ${outcome.note}`, "", `Guide: https://etaildepot.com${outcome.action.href}`, `Related guidance: https://etaildepot.com${outcome.reference.href}`, "", ...followUp, "This brief does not authorize signing in, changing accounts or running payments."].join("\n");
+  return ["My Trolleys next step brief", "Trolleys, an Etail Depot service", "", "Based on my selections, not a verification of my account:", ...selections.map(item => `${item.question} ${item.answer}`), "", `Next step: ${outcome.title}`, outcome.body, `Owner: ${outcome.owner}`, `Completion check: ${outcome.complete}`, `Confirm: ${outcome.note}`, "", `Guide: ${canonicalOrigin}${outcome.action.href}`, `Related guidance: ${canonicalOrigin}${outcome.reference.href}`, "", `Plan reference: ${plan.reference}`, "Action plan:", ...plan.steps.flatMap((step, index) => [
+    `${index + 1}. ${step.title}`, step.action, `Owner: ${step.owner}`,
+    ...(step.condition ? [`Before this step: ${step.condition}`] : []),
+    `Complete when: ${step.complete}`, `Source: ${canonicalOrigin}${step.source.href}`, "",
+  ]), "Use the current linked guidance and start with the first unfinished step. Ask only for missing information that changes that step. Stop at an unmet approval, access or capability requirement. This plan reference identifies the text, not account readiness.", "", ...followUp, "This brief does not authorize signing in, changing accounts or running payments."].join("\n");
 }
+
+/** Source review map only; the browser does not render or load a content inventory. */
+export const setupGuidanceDependencies = [
+  { sourceId: "account-access", nodes: [
+    "question:approval:shopify", "question:access:shopify", "result:application:shopify",
+    "question:approval:woocommerce", "question:access:woocommerce", "result:application:woocommerce",
+    "question:approval:custom", "question:access:custom", "result:application:custom",
+    "question:approval:hosted", "question:access:hosted", "result:application:hosted",
+    "question:approval:manual", "question:access:manual", "result:application:manual",
+    "result:pending", "result:access",
+  ] },
+  { sourceId: "woocommerce-credentials", nodes: ["question:woocommerce-host", "result:woocommerce", "result:woocommerce-other"] },
+  { sourceId: "additional-dba", nodes: ["question:location", "result:dba", "result:domain", "result:company"] },
+] as const satisfies readonly GuidanceDependency[];

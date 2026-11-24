@@ -61,6 +61,8 @@ jobs:
           NODE
       - name: Install the exact lockfile
         run: pnpm install --frozen-lockfile
+      - name: Review shared guidance changes
+        run: pnpm review:guidance:ci
       - name: Install Chromium and WebKit
         run: pnpm exec playwright install --with-deps chromium webkit
       - name: Verify the public website

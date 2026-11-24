@@ -28,7 +28,9 @@
     "package:review": "node tools/package-public-site.mjs --local-review",
     "verify:package:review": "node tools/verify-architecture.mjs --artifacts --local-review",
     "test:publication": "node tools/verify-file-publication.mjs",
-    "verify:hosted": "node tools/verify-hosted-site.mjs"
+    "verify:hosted": "node tools/verify-hosted-site.mjs",
+    "review:guidance": "node tools/review-guidance.ts",
+    "review:guidance:ci": "node tools/guidance-review-ci.ts"
   },
   "dependencies": {
     "next": "16.4.5",

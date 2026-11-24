@@ -931,7 +931,7 @@ test("agent guidance checks WooCommerce host and lets visitors revise their answ
   await expect(helper.getByRole("heading",{name:"Confirm your host and plugin first."})).toBeFocused();
   await expect(helper.getByRole("heading",{name:"Confirm your host and plugin first."})).toBeInViewport({ratio:1});
   await helper.getByRole("button",{name:"Back",exact:true}).click();
-  await helper.getByRole("button",{name:"WordPress.com with Visa Acceptance Solutions",exact:true}).click();
+  await helper.getByRole("button",{name:"WordPress.com with Visa Acceptance Solutions (without SMB)",exact:true}).click();
   await expect(helper).toContainText("separate private .p12 certificate");
   await expect(helper.getByRole("link",{name:"Open the WooCommerce setup guide"})).toHaveAttribute("href","/resources/woocommerce-gateway-integration#before-you-start");
   await helper.getByRole("button",{name:"Start again"}).click();
@@ -1010,7 +1010,7 @@ test("agent guidance keeps new questions clear of the phone header after taps", 
     await page.goto("http://127.0.0.1:3100/agents#next-step");
     const helper=page.locator("#next-step");
     await expect(helper.locator('[data-setup-ready="true"]')).toBeVisible();
-    for (const name of ["Start or connect checkout", "WooCommerce", "My account is approved", "Yes, the details match and I can sign in", "WordPress.com with Visa Acceptance Solutions"]) {
+    for (const name of ["Start or connect checkout", "WooCommerce", "My account is approved", "Yes, the details match and I can sign in", "WordPress.com with Visa Acceptance Solutions (without SMB)"]) {
       await helper.getByRole("button",{name,exact:true}).tap();
       await expect(helper.locator("h2")).toBeFocused();
       await expect.poll(async () => {

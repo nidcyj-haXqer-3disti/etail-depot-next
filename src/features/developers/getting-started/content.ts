@@ -1,3 +1,4 @@
+import type { GuidanceSource } from "@/shared/site/guidance-source";
 import type { DocArticle } from "@/shared/ui/reading-guide/types";
 
 // Etail's approved-account handoff, supplied by the operator on 14 November 2026.
@@ -65,3 +66,53 @@ export const gettingStartedContents = [
   { id: "payment-methods", title: "Payment methods" },
   { id: "complete-payment", title: "Before launch" },
 ];
+
+/** Review dependencies, not a second copy of the guide. Consumed only by engineering tools. */
+export const accountAccessSource = {
+  "id": "account-access",
+  "title": "Account access after approval",
+  "sourceFiles": [
+    "src/features/developers/getting-started/content.ts",
+    "src/features/developers/getting-started/page-content.tsx",
+    "src/features/resources/merchant-account-setup/application-guide-steps.tsx"
+  ],
+  "guides": [
+    "/developers/getting-started#integration-access",
+    "/developers/getting-started#portal-access",
+    "/resources/merchant-account-setup#application-submitted"
+  ],
+  "reviewWith": [
+    {
+      "file": "src/features/resources/help/page-content.tsx",
+      "guides": [
+        "/resources/help#access",
+        "/resources/help#checkout"
+      ]
+    },
+    {
+      "file": "src/features/company/blog/merchant-id-page.tsx",
+      "guides": [
+        "/company/blog/merchant-id"
+      ]
+    },
+    {
+      "file": "src/features/resources/integrations/shopify/shopify-content.ts",
+      "guides": [
+        "/resources/shopify-gateway-integration#check-your-email"
+      ]
+    },
+    {
+      "file": "src/features/resources/integrations/shopify/shopify-credentials-email-art.tsx",
+      "guides": [
+        "/resources/shopify-gateway-integration#check-your-email",
+        "/resources/woocommerce-gateway-integration#check-your-email"
+      ]
+    },
+    {
+      "file": "src/features/resources/integrations/woocommerce/woocommerce-content.ts",
+      "guides": [
+        "/resources/woocommerce-gateway-integration#check-your-email"
+      ]
+    }
+  ]
+} as const satisfies GuidanceSource;

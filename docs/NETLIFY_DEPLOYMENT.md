@@ -8,7 +8,7 @@ The only target is `etail-depot-next`, site `cbbb6c24-9dbc-43a2-9234-e4357b5b528
 
 Use the pinned runtime and frozen lockfile. Run `pnpm verify:public`, `pnpm test:seo:production`, `pnpm package:netlify` and `pnpm verify:package` against the exact candidate. [tools/reference-release.json](../tools/reference-release.json) records the approved counts, reference licences and legal-source hashes. The ten merchant legal routes and two website policy pages remain noindex and outside the sitemap. Publishing general terms does not establish merchant acceptance or provider approval.
 
-Keep excluded reproduced ISO tables, original account captures, credentials and private research out of source publication and packaging. Source, export and package fingerprints must match the reviewed candidate. The only static publish directory is `.netlify/static/`, generated from `out/`; never publish the repository root.
+Keep excluded reproduced ISO tables, original account captures, credentials and private research out of source publication and packaging. Source, export and package fingerprints must match the reviewed candidate. For shared-guidance changes, maintain the [versioned guidance handoff](GITHUB_DELIVERY.md#versioned-guidance-handoff); record the private skill separately and recheck it against a restored source after any rollback. The only static publish directory is `.netlify/static/`, generated from `out/`; never publish the repository root.
 
 ## Production context
 

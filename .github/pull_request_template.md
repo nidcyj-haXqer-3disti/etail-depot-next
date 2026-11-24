@@ -7,6 +7,8 @@ Name the affected business feature or engineering files. Explain changes to publ
 ## Verification
 Record commands, exit statuses, source revision and relevant browser, accessibility and package evidence.
 
+Review the Guidance change review job summary. For affected pilots, record corrections or why no related change is needed. State whether private skill references were checked locally and whether its instructions were reviewed against this candidate. Use the versioned handoff in `docs/GITHUB_DELIVERY.md`; include only public review status here, never private receipts or paths. Outside-pilot files still need ordinary review; the report is not factual or release approval.
+
 ## Limits
 Identify checks not performed, including hosted vendor flows or production deployment.
 

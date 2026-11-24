@@ -439,7 +439,7 @@ export const CORE_PAGE_MODIFIED = {
   "/company/security": "2026-11-05",
   "/services/payment-facilitator": "2026-11-05",
   "/company/contact": "2026-11-11",
-  "/resources/help": "2026-11-14",
+  "/resources/help": "2026-11-24",
   "/resources/guides": "2026-11-13",
   "/resources/woocommerce-gateway-integration": "2026-11-14",
   "/resources/shopify-gateway-integration": "2026-11-14",

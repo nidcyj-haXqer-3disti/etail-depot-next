@@ -45,6 +45,22 @@ Use [Blog paths and search eligibility](../src/shared/site/blog-paths.ts), the [
 
 Individual drafting, editorial and indexing decisions remain in the dated [current-work records](CURRENT_WORK_CONTEXT.md) and Git history. Those records describe the decisions at their recorded stage; the current source allowlists and release context govern the candidate. Historical decisions are not recreated here as current policy.
 
+## Guidance dependency pilot
+
+Three guide-owned exports record stable source IDs, source files, relevant guide sections and human summaries to review: `accountAccessSource` in Developers Getting started, `woocommerceCredentialsSource` in the WooCommerce guide, and `additionalDbaSource` in Merchant account setup. They contain references, not copied instructions. `src/shared/site/guidance-source.ts` holds only their types; it imports no feature content.
+
+`setupGuidanceDependencies` in the Agents decision module associates those IDs with actual `question:` and `result:` node IDs. The optional private setup skill owns its separate section-reference map. Website components do not consume the engineering maps, and the private skill is not required or published by the website build.
+
+`pnpm review:guidance` validates this pilot and can report the review impact of supplied paths or a Git comparison. It includes WooCommerce originals and generated previews, plus inline account-guide artwork. It is deliberately conservative at file level. Registered URLs, valid node IDs and content hashes establish structural identity, not factual correctness, account enablement, search eligibility or publication approval. The generated report is a dated snapshot, not an authority over current content. See the [tool instructions](../tools/README.md#guidance-change-review).
+
+## Agent task plans
+
+The `/agents` experience is a planning interface within the static website. `setup-paths.ts` owns the finite questions and result selection; `task-plans.ts` owns the short plans attached to those results. Each step has a source, owner, completion check and any prerequisite. The same plan data feeds the result disclosure, plain-text brief and build-rendered task reference. Native disclosures keep the reference readable without JavaScript. No new routes, account connection, AI request or progress storage are introduced.
+
+Visitors can explicitly copy or download a brief. Its plan reference is a text revision identifier, not authentication, factual validation or confirmation that work is complete. The optional private skill treats it as unverified context, reopens current source guidance and resumes only from a confirmed unfinished step. The owning guide remains authoritative over a saved brief.
+
+The engineering review tool derives task-plan citation coverage from every reachable result and an explicit page-to-source map. Source edits identify affected plan IDs separately from the three shared-guidance pilots. Optional local review also derives private skill page dependencies from its actual website citations, including shared merchant-entry instructions and support destinations. This does not claim that uncited prose or every human summary has been mapped. Tests verify each plan source against the actual exported section. No engineering inventory is loaded into the browser.
+
 ## Rendering and interactions
 
 Next.js exports static HTML. The existing shared Shell, header, footer, mobile menu and design tokens serve all page families. Feature-owned illustrations and client components provide explanatory interaction, copy controls, local fee estimates, guide disclosures and filters. They do not submit merchant applications or financial transactions.

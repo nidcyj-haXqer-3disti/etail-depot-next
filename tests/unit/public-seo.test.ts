@@ -210,7 +210,7 @@ describe("reviewed public metadata", () => {
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
     expect(PUBLIC_PAGE_MODIFIED["/resources/guides"]).toBe("2026-11-13");
     expect(PUBLIC_PAGE_MODIFIED["/services/merchant-services"]).toBe("2026-11-24");
-    expect(PUBLIC_PAGE_MODIFIED["/resources/help"]).toBe("2026-11-14");
+    expect(PUBLIC_PAGE_MODIFIED["/resources/help"]).toBe("2026-11-24");
     expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-14");
     expect(PUBLIC_PAGE_MODIFIED["/services/card-services"]).toBe("2026-11-01");
     for (const date of Object.values(PUBLIC_PAGE_MODIFIED)) {

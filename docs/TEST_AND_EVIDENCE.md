@@ -24,6 +24,12 @@ The static page inventory in `public-boundary.spec.ts` waits for pending network
 
 For documentation-only edits, check file destinations, linked paths, code examples and formatting. For moves, compare the original bytes, every active consumer and the resulting import/reference graph. Run broader application checks when tooling or packaging inputs change.
 
+## Shared guidance scenarios
+
+After a fresh `pnpm build`, run `pnpm exec playwright test tests/browser/guidance-journeys.spec.ts --project=desktop --project=mobile` for the account-access, WooCommerce and additional-DBA pilots. The suite follows Agents choices, checks the copied brief, opens its human guide and verifies the conditions and next action. It also checks Help's distinct website and DBA routes and all declared guide section anchors. Task-plan coverage verifies every step citation against the export, static-reference access with JavaScript disabled, keyboard disclosures and identical visible/copied/downloaded plans. Unit checks exercise prerequisite boundaries, all reachable outcomes, plan identity and source-change review coverage. Expected scenario conditions are explicit, not generated from the implementation being tested.
+
+Review the actual wording alongside these checks. Run `pnpm review:guidance` for reference validation; use its optional `--skill-dir` only for a local private-skill review. Browser tests cannot establish that a merchant is approved, credentials work or a payment completed. Add responsive, WebKit and accessibility coverage for affected controls. This focused suite does not replace the release gates.
+
 ## Record what happened
 
 Record the exact branch/commit or source fingerprint, commands, exit statuses, failures, corrections, reruns, test counts and skips. Include routes, viewport widths, browser engine and network conditions for UI work. Keep unredacted captures and detailed local artifacts out of Git. A sanitized source receipt can record hashes and results without embedding private originals.
