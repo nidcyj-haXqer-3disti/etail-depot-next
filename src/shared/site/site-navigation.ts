@@ -74,7 +74,7 @@ export const publicNavigationGroups = [
   ] },
 ] as const;
 
-export const publicNavigationLinks = [destinations.pricing] as const;
+export const publicNavigationLinks = [destinations.pricing, { label: "For agents", href: "/agents" }] as const;
 
 /** Core service and integration destinations, with audience detail in the header. */
 export const publicFooterGroups = [

@@ -488,3 +488,21 @@ test("Blog reading columns and responsive comparisons align at phone, tablet and
     }
   }
 });
+
+
+test.describe("Single-page Blog without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("lists every article in order and opens the last article", async ({ page }) => {
+    await page.goto("/company/blog");
+    await expect(page.locator("main article")).toHaveCount(blogArticles.length);
+    await expect(page.locator("main article h2 a, main article h3 a")).toHaveText(blogArticles.map(article => article.title));
+    const lastArticle = blogArticles.at(-1)!;
+    await page.getByRole("link", { name: lastArticle.title, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${lastArticle.path}$`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(lastArticle.title);
+    await page.goBack();
+    await expect(page.locator("main article")).toHaveCount(blogArticles.length);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  });
+});

@@ -31,6 +31,10 @@ test("shared modules do not directly depend on a business feature", () => {
 });
 
 test("the exact feature allowlist admits reviewed components without opening a new runtime area", () => {
+  expect(publicSourcePath("src/features/agents/page-content.tsx")).toBe(true);
+  expect(publicSourcePath("src/features/agents/setup-paths.ts")).toBe(true);
+  expect(publicSourcePath("src/features/agents/server.ts")).toBe(false);
+  expect(publicSourcePath("src/features/agents/database.ts")).toBe(false);
   expect(publicSourcePath("src/features/services/ach-payments/page-content.tsx")).toBe(true);
   expect(publicSourcePath("src/features/services/ach-payments/page-content")).toBe(true);
   expect(publicSourcePath("src/features/services/shared/service-detail.module.css")).toBe(true);

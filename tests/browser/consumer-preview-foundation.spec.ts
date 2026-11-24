@@ -239,8 +239,8 @@ test("public service discovery explains eligibility and card inquiries without l
   for(const path of ["/","/use-cases/software-platforms","/services/card-services","/services/merchant-services","/pricing","/resources/help"]){
     await page.goto(path);
     const mainNavigation=await openMainNavigation(page);
-    await expect(mainNavigation.locator("a")).toHaveCount(27);
-    for(const [name,href] of [["Merchant onboarding","/services/merchant-onboarding"],["Software platforms","/use-cases/software-platforms"],["Online businesses","/use-cases/online-businesses"],["Card services","/services/card-services"],["Getting started","/developers/getting-started"],["Guides","/resources/guides"],["Pricing","/pricing"]]){
+    await expect(mainNavigation.locator("a")).toHaveCount(28);
+    for(const [name,href] of [["Merchant onboarding","/services/merchant-onboarding"],["Software platforms","/use-cases/software-platforms"],["Online businesses","/use-cases/online-businesses"],["Card services","/services/card-services"],["Getting started","/developers/getting-started"],["Guides","/resources/guides"],["Pricing","/pricing"],["For agents","/agents"]]){
       await expect(mainNavigation.getByRole("link",{name,exact:true,includeHidden:true})).toHaveAttribute("href",href);
     }
     await expect(page.getByRole("banner").getByRole("link",{name:"Help center",exact:true,includeHidden:true})).toHaveAttribute("href","/resources/help");
@@ -348,10 +348,16 @@ test("public service discovery explains eligibility and card inquiries without l
   await expect(explorer.getByRole("tabpanel",{name:"Card payout",exact:true})).toBeVisible();
   await expect(explorer.locator("a,input,form,textarea,select,iframe")).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)).toBe(false);
-  await expect(page.locator(".online-business-actions").getByRole("link",{name:"Merchant services",exact:true})).toHaveAttribute("href", "/services/merchant-services");
+  const onlineBusinessActions = page.locator(".online-business-actions");
+  const onlineBusinessSales = onlineBusinessActions.getByRole("link", { name: "Talk with our team", exact: true });
+  await expect(onlineBusinessSales).toHaveAttribute("href", salesActionHref("/company/contact#payment-review"));
+  if (configuredSalesBooking) await expect(onlineBusinessSales).toHaveAttribute("referrerpolicy", "no-referrer");
+  const onlineBusinessApplication = onlineBusinessActions.getByRole("link", { name: "Start now", exact: true });
+  await expect(onlineBusinessApplication).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
+  await expect(onlineBusinessApplication).toHaveAttribute("referrerpolicy", "no-referrer");
   const navigation=await openMainNavigation(page);
   await expect(navigation.getByRole("link",{name:"Online businesses",exact:true,includeHidden:true})).toHaveAttribute("aria-current","page");
-  await expect(page.locator(".online-business-copy")).toContainText("Connect checkout and hosted payment requests to your orders, with cards, wallets and ACH enabled for your account.");
+  await expect(page.locator(".online-business-copy")).toContainText("Connect your store with Trolleys, an Etail Depot service. Get guidance on your merchant account and checkout setup.");
   await expect(page.locator(".online-business-note")).toContainText("Account approval and setup apply.");
   await navigation.getByRole("link",{name:"Card services",exact:true}).focus();
   await page.keyboard.press("Enter");

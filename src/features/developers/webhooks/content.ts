@@ -31,7 +31,7 @@ export const webhooksArticle: DocArticle = {
         rows: [
           ["organizationId", "Check the gateway organization authorized for this receiver and environment. Do not substitute the processing MID."],
           ["productId / eventType", "Accept the subscribed product and event. A field value alone is not proof that the message is authentic."],
-          ["webhookId", "The Webhooks field reference describes this as the subscription identifier. Do not use it alone to decide whether a payment update is a duplicate."],
+          ["webhookId", "The Unified Checkout guide calls this a delivery identifier; the general Webhooks guide calls it a subscription identifier. Confirm its meaning for your notification format. Do not use it alone to identify duplicate payment updates."],
           ["transactionTraceId", "Identifies a delivery attempt and changes on retries. Keep it for investigation, not as the only duplicate check."],
           ["eventDate", "The event timestamp. Arrival time or a larger timestamp alone does not establish the latest payment state."],
           ["payload.id / payload.status", "Read the operation ID and result in the verified, decrypted transaction payload. Keep authorization, capture and refund records distinct."],

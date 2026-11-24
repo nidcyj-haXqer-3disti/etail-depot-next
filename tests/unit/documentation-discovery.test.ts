@@ -14,7 +14,7 @@ test("the five Developer navigation links share destinations while published pag
  expect(publicNavigationGroups.find(group=>group.id==="developers")?.sections[0].links).toEqual(DEVELOPER_NAVIGATION);
  expect(publicFooterGroups.find(group=>group.label==="Developers")?.links).toEqual(DEVELOPER_NAVIGATION);
  for(const page of DEVELOPER_PAGES){
-  expect(isPublicContentPath(page.href)).toBe(true);expect(isIndexablePath(page.href)).toBe(false);
+  expect(isPublicContentPath(page.href)).toBe(true);expect(isIndexablePath(page.href)).toBe(!["sdks","changelog","api-status"].includes(page.slug));
   const schema=JSON.parse(developerJsonLd(page.slug));
   expect(schema.url).toBe(`https://etaildepot.com${page.href}`);
   expect(developerMetadata(page.slug).alternates?.canonical).toBe(schema.url);

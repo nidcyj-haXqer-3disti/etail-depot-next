@@ -131,6 +131,47 @@ test("shared Contact sales action opens booking directly and restores the curren
   await expect(merchant.locator('a[href^="mailto:"]')).toHaveCount(configuredSalesBooking ? 0 : 1);
 });
 
+test("online store prospects can book or follow setup without forwarding campaign or personal data", async ({ page, baseURL }) => {
+  await stubSalesBooking(page);
+  const providerRequests: string[] = [];
+  page.on("request", request => {
+    if (new URL(request.url()).hostname === "calendly.com") providerRequests.push(request.url());
+  });
+  const landing = "/use-cases/online-businesses?utm_source=chatgpt&utm_campaign=next-store&email=private@example.com#main-content";
+  await page.goto(landing);
+  await expect(page.locator("iframe")).toHaveCount(0);
+  expect(providerRequests).toEqual([]);
+  const actions = page.locator(".online-business-actions");
+  const sales = actions.getByRole("link", { name: "Talk with our team", exact: true });
+  await exerciseSalesAction(page, sales, "/company/contact#payment-review", true);
+  if (configuredSalesBooking) {
+    await expect(sales).toBeFocused();
+    expect(providerRequests).toHaveLength(1);
+    expect(providerRequests[0]).not.toMatch(/utm_|next-store|private|email=/);
+  } else {
+    await page.goto(landing);
+  }
+  const application = actions.getByRole("link", { name: "Start now", exact: true });
+  await expect(application).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
+  await expect(application).toHaveAttribute("referrerpolicy", "no-referrer");
+  await expect(application).toHaveAttribute("rel", /noreferrer/);
+  for (const [name, href] of [
+    ["Adding another DBA", "/resources/merchant-account-setup#additional-mid"],
+    ["Connecting WooCommerce", "/resources/woocommerce-gateway-integration"],
+    ["Your account is approved", "/developers/getting-started"],
+    ["Get account support", "/company/contact#account-support"],
+  ]) {
+    await page.goto(landing);
+    const link = page.locator("#plan-your-store").getByRole("link", { name, exact: true });
+    await expect(link).toHaveAttribute("href", href);
+    await link.click();
+    await expect(page).toHaveURL(new URL(href, baseURL).href);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    if (href.includes("#")) await expect(page.locator("#" + href.split("#")[1])).toBeInViewport();
+    await expect(page.getByRole("dialog", { name: "Book a call", exact: true })).toHaveCount(0);
+  }
+});
+
 test("buyers can find ACH, provider change and platform model decisions through the existing site", async ({ page, isMobile }) => {
   await page.goto("/");
   if (isMobile) await page.getByRole("button", { name: "Menu", exact: true }).click();
@@ -202,6 +243,19 @@ test("contact options remain usable without JavaScript", async ({ browser, baseU
   const context = await browser.newContext({ javaScriptEnabled: false });
   try {
     const page = await context.newPage();
+    await page.goto(new URL("/use-cases/online-businesses?utm_source=chatgpt&email=private@example.com", baseURL).href);
+    const actions = page.locator(".online-business-actions");
+    await expect(actions.getByRole("link", { name: "Talk with our team", exact: true })).toHaveAttribute("href", configuredSalesBooking ?? "/company/contact#payment-review");
+    await expect(actions.getByRole("link", { name: "Start now", exact: true })).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
+    const setupLinks = page.locator("#plan-your-store").getByRole("link");
+    await expect(setupLinks).toHaveCount(4);
+    for (const [name, href] of [
+      ["Adding another DBA", "/resources/merchant-account-setup#additional-mid"],
+      ["Connecting WooCommerce", "/resources/woocommerce-gateway-integration"],
+      ["Your account is approved", "/developers/getting-started"],
+      ["Get account support", "/company/contact#account-support"],
+    ]) await expect(page.locator("#plan-your-store").getByRole("link", {name, exact: true})).toHaveAttribute("href", href);
+    await expect(page.locator("iframe")).toHaveCount(0);
     await page.goto(new URL("/company/contact", baseURL).href);
     for (const id of ["account-support", "cards", "compliance"]) {
       const contact = page.locator(`#${id}`);

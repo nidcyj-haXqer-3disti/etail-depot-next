@@ -480,6 +480,7 @@ test("first visits keep render-blocking CSS within page-family budgets", async (
     ["/developers/testing", 69_000],
     ["/developers/developer-tools", 69_000],
     ["/resources/help", 46_000],
+    ["/agents", 46_000],
     ["/resources/guides/iso-20022/purpose", 56_000],
   ] as const) {
     await page.goto(path);
@@ -764,3 +765,56 @@ for (const [path, kind] of [
     } finally { release(); }
   });
 }
+
+test("mobile navigation responds before application scripts and preserves its state through hydration", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "The mobile Menu button is hidden on desktop.");
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
+  for (const path of ["/", "/company/blog", "/use-cases/software-platforms"]) {
+    let release = () => {};
+    const held = new Promise<void>(resolve => { release = resolve; });
+    await page.route("**/*.js", async route => { await held; await route.continue(); });
+    try {
+      await page.goto(path, { waitUntil: "commit" });
+      await page.waitForFunction(() => document.querySelector("#public-page-ready") &&
+        [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].every(link => link.sheet));
+      const header = page.getByRole("banner");
+      const menu = header.getByRole("button", { name: "Menu", exact: true });
+      await menu.click();
+      await expect(menu).toHaveAttribute("aria-expanded", "true");
+      await expect(page.getByRole("dialog", { name: "Site menu", exact: true })).toBeVisible();
+      expect(await page.locator("main").evaluate(element => (element as HTMLElement).inert)).toBe(true);
+      const services = header.locator(".public-nav-group").filter({ has: page.locator("summary", { hasText: /^Services$/ }) });
+      await services.locator("summary").click();
+      await expect(services).toHaveAttribute("open", "");
+      await header.getByRole("button", { name: "Back", exact: true }).click();
+      await expect(services).not.toHaveAttribute("open", "");
+      await services.locator("summary").click();
+      await page.keyboard.press("Escape");
+      await expect(services).not.toHaveAttribute("open", "");
+      await expect(menu).toHaveAttribute("aria-expanded", "true");
+      await page.keyboard.press("Escape");
+      await expect(menu).toHaveAttribute("aria-expanded", "false");
+      await expect(menu).toBeFocused();
+      expect(await page.locator("main").evaluate(element => (element as HTMLElement).inert)).toBe(false);
+      await menu.click();
+      release();
+      await page.waitForLoadState("load");
+      // A first tap must not be discarded or replayed as a second toggle by React.
+      await expect(menu).toHaveAttribute("aria-expanded", "true");
+      await expect(menu.locator("path")).toHaveAttribute("d", "m6 6 12 12M6 18 18 6");
+      await menu.click();
+      await expect(menu).toHaveAttribute("aria-expanded", "false");
+      await expect(menu.locator("path")).toHaveAttribute("d", "M4 7h16M4 17h16");
+      await menu.click();
+      await expect(menu).toHaveAttribute("aria-expanded", "true");
+      await page.keyboard.press("Escape");
+      expect(await page.evaluate(() => document.body.style.overflow)).not.toBe("hidden");
+    } finally {
+      release();
+      await page.unrouteAll({ behavior: "wait" });
+    }
+  }
+  expect(errors).toEqual([]);
+});

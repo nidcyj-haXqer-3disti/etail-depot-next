@@ -15,6 +15,7 @@ export const edgeHandler = "public-boundary";
 /** Exact reviewed pages: adding a guide never opens the rest of its route family. */
 const retainedCorePageSources = [
   "page.tsx",
+  "agents/page.tsx",
   "services/card-services/page.tsx",
   "services/merchant-services/page.tsx",
   "resources/help/page.tsx",
@@ -54,6 +55,8 @@ export function reviewedPublicAppModule(appPath: string): boolean {
 }
 
 const reviewedFeatureSources = new Set<string>([
+  "src/features/agents/page-content.tsx",
+  "src/features/agents/metadata.ts",
   "src/features/company/blog/article-page.tsx",
   "src/features/company/blog/cost-comparison-articles.ts",
   "src/features/company/blog/commercial-terms-articles.ts",
@@ -910,9 +913,10 @@ const reviewedFeatureSources = new Set<string>([
   "src/features/resources/guides/guide-directory.css",
   "src/features/resources/guides/guide-directory.tsx",
   "src/features/resources/guides/metadata.ts",
-  "src/features/resources/help/connected-resources-help.css",
-  "src/features/resources/help/enterprise-support-help.css",
   "src/features/resources/help/metadata.ts",
+  "src/features/agents/next-step.tsx",
+  "src/features/agents/next-step.module.css",
+  "src/features/agents/setup-paths.ts",
   "src/features/resources/help/page-content.tsx",
   "src/features/resources/integrations/shopify/assets/activate.webp",
   "src/features/resources/integrations/shopify/assets/active.webp",
@@ -1043,6 +1047,7 @@ const reviewedFeatureSources = new Set<string>([
   "src/features/services/components/service-product-art.module.css",
   "src/features/services/components/service-product-art.tsx",
   "src/features/services/components/service-workflow-art.tsx",
+  "src/features/services/components/platform-record-art.tsx",
   "src/features/services/disputes/artwork.tsx",
   "src/features/services/disputes/dispute-artwork.module.css",
   "src/features/services/disputes/content.ts",

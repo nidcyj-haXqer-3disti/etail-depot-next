@@ -85,6 +85,9 @@ for (const width of [320, 390, 1440]) {
       await expect(explorer.getByRole("tabpanel", { name: "Bank payment", exact: true })).toContainText("Bank account details");
       if (width < 500) {
         const order = explorer.getByRole("button", { name: "Show screen 1: Order", exact: true });
+        // Native focus can leave this control at the bottom edge after the preceding
+        // view changes. Position the artwork before checking its horizontal screens.
+        await order.evaluate(node => node.scrollIntoView({ block: "center", behavior: "instant" }));
         await order.focus();
         await page.keyboard.press("ArrowRight");
         await expect(explorer.getByRole("button", { name: "Show screen 2: Details", exact: true })).toBeFocused();

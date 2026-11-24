@@ -1,12 +1,11 @@
 import "@/shared/brand/brand-images-symbol.css";
-import "@/shared/styles/site-artwork-polish.css";
 import Link from "next/link";
 import { SalesContactLink } from "@/shared/ui/sales-booking/sales-booking-link";
 import { AttentionHero } from "@/shared/ui/attention-hero";
 import "@/shared/styles/attention-pages.css";
 import "@/shared/styles/service-purpose.css";
 import { Shell } from "@/shared/layout/shell";
-import { PlatformIntegrationArt } from "@/features/services/overview/connected-payment-art";
+import { PlatformRecordArt as PlatformIntegrationArt } from "@/features/services/components/platform-record-art";
 import { PlatformAccountsArt } from "./platform-accounts-art";
 import { PlatformJourneyArt } from "@/features/use-cases/software-platforms/platform-journey-art";
 import "@/shared/styles/enterprise-pages.css";

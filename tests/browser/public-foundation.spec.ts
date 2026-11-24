@@ -1,6 +1,7 @@
+import { resolveSetupPath } from "../../src/features/agents/setup-paths";
 import { exerciseSalesAction, salesActionHref } from "./sales-contact";
 import { expectReadOnlyPlatformExample } from "./platform-example";
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { devices, expect, test, webkit, type Locator, type Page } from "@playwright/test";
 import { openFooterGroup } from "./public-footer";
 import { expectDecodedBrandMark } from "./brand-marks";
 import { closeMainNavigation, openMainNavigation } from "./public-header";
@@ -57,7 +58,7 @@ test("the shared company header stays consistent and its compact menu works with
     await expect(header).not.toContainText("by Etail Depot");
     await expect(header.getByRole("navigation", { name: "Main navigation", includeHidden: true })).toHaveCount(1);
     const navigation = await openMainNavigation(page);
-    await expect(navigation.locator("a")).toHaveCount(27);
+    await expect(navigation.locator("a")).toHaveCount(28);
     for (const [label, destination] of [["Software platforms", "/use-cases/software-platforms"], ["Online businesses", "/use-cases/online-businesses"], ["Merchant onboarding", "/services/merchant-onboarding"], ["Card services", "/services/card-services"], ["Getting started", "/developers/getting-started"], ["Guides", "/resources/guides"], ["Pricing", "/pricing"]]) {
       await expect(navigation.getByRole("link", { name: label, exact: true, includeHidden: true })).toHaveAttribute("href", destination);
     }
@@ -906,4 +907,194 @@ test("account actions remain distinct and reachable across mobile menu and deskt
   await expect(contact).toBeVisible();
   await expect(menu).toBeHidden();
   await expect(page.getByRole("contentinfo").getByRole("link", { name: "Sign in to Trolleys", exact: true })).toHaveAttribute("href", "https://merchantapp.io/etaildepot/UserAccount/Login");
+});
+
+test("agent guidance gates checkout setup by approval and store access", async ({page}) => {
+  await page.goto("/agents#next-step");
+  const helper=page.locator("#next-step");
+  await helper.getByRole("button",{name:"Start or connect checkout"}).click();
+  await helper.getByRole("button",{name:"Shopify",exact:true}).click();
+  await helper.getByRole("button",{name:"My application is under review"}).click();
+  await expect(helper.getByRole("link",{name:"Check what happens after submission"})).toHaveAttribute("href","/resources/merchant-account-setup#application-submitted");
+  await helper.getByRole("button",{name:"Back",exact:true}).click();
+  await helper.getByRole("button",{name:"My account is approved"}).click();
+  await helper.getByRole("button",{name:"The email or access is missing, or I’m unsure"}).click();
+  await expect(helper.getByRole("link",{name:"Contact the implementation team",exact:true})).toHaveAttribute("href","/company/contact#integration");
+  await expect(helper).not.toContainText("Open the Shopify setup guide");
+  await expect(page).toHaveURL(/\/agents#next-step$/);
+});
+
+test("agent guidance checks WooCommerce host and lets visitors revise their answer", async ({page}) => {
+  await page.goto("/agents#next-step");
+  const helper=page.locator("#next-step");
+  for(const name of ["Start or connect checkout","WooCommerce","My account is approved","Yes, the details match and I can sign in","Another host or plugin, or I’m not sure"]) await helper.getByRole("button",{name,exact:true}).click();
+  await expect(helper.getByRole("heading",{name:"Confirm your host and plugin first."})).toBeFocused();
+  await expect(helper.getByRole("heading",{name:"Confirm your host and plugin first."})).toBeInViewport({ratio:1});
+  await helper.getByRole("button",{name:"Back",exact:true}).click();
+  await helper.getByRole("button",{name:"WordPress.com with Visa Acceptance Solutions",exact:true}).click();
+  await expect(helper).toContainText("separate private .p12 certificate");
+  await expect(helper.getByRole("link",{name:"Open the WooCommerce setup guide"})).toHaveAttribute("href","/resources/woocommerce-gateway-integration#before-you-start");
+  await helper.getByRole("button",{name:"Start again"}).click();
+  await expect(helper.getByRole("heading",{name:"What would you like to do?"})).toBeFocused();
+  await expect(helper).not.toContainText("separate private .p12 certificate");
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test("agent guidance distinguishes a storefront domain from an additional DBA", async ({page}) => {
+  await page.goto("/agents#next-step");
+  const helper=page.locator("#next-step");
+  await helper.getByRole("button",{name:"Add a store or brand",exact:true}).click();
+  await helper.getByRole("button",{name:"Another website for the same DBA",exact:true}).click();
+  await expect(helper).toContainText("does not automatically require another MID");
+  await helper.getByRole("button",{name:"Back",exact:true}).click();
+  await helper.getByRole("button",{name:"A new DBA under the same legal company",exact:true}).click();
+  await expect(helper.getByRole("link",{name:"Follow the additional DBA steps"})).toHaveAttribute("href","/resources/merchant-account-setup#additional-mid");
+});
+
+test("agent guidance gives a usable brief when clipboard permission is unavailable", async ({page}) => {
+  await page.addInitScript(()=>Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async()=>{throw new Error("Permission unavailable");}}}));
+  const mutations=await preventMutationRequests(page);
+  await page.goto("/agents#next-step");
+  const helper=page.locator("#next-step");
+  await helper.getByRole("button",{name:"Get help with a payment",exact:true}).click();
+  await helper.getByRole("button",{name:"I don’t know if a payment succeeded",exact:true}).click();
+  await helper.getByRole("button",{name:"Copy brief",exact:true}).click();
+  await expect(helper.getByRole("status")).toHaveText("Select and copy the brief below.");
+  const brief=helper.getByRole("textbox",{name:"Your next step brief"});
+  await expect(brief).toHaveAttribute("readonly","");
+  await expect(brief).toHaveValue(/uncertain-result/);
+  await expect(brief).toHaveValue(/not a verification of my account/);
+  expect(mutations).toEqual([]);
+  expect(await page.evaluate(()=>localStorage.length)).toBe(0);
+});
+
+test("agent guidance copies only the chosen planning brief on request", async ({page}) => {
+  await page.addInitScript(()=>Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async(text:string)=>{document.documentElement.dataset.copiedBrief=text;}}}));
+  await page.goto("/agents#next-step");
+  const helper=page.locator("#next-step");
+  for(const name of ["Start or connect checkout","A custom website","My account is approved","Yes, the details match and I can sign in","No, I need a hosted option"]) await helper.getByRole("button",{name,exact:true}).click();
+  await helper.getByRole("button",{name:"Copy brief",exact:true}).click();
+  await expect(helper.getByRole("status")).toContainText("Copied.");
+  const copied=await page.locator("html").getAttribute("data-copied-brief");
+  expect(copied).toContain("does not prove Pay by Link is enabled");
+  expect(copied).toContain("/developers/developer-tools#payment-requests");
+  expect(copied).not.toContain("payment server? Yes");
+});
+
+test("agent guidance retains direct guides and native keyboard access without JavaScript", async ({browser}) => {
+  const context=await browser.newContext({javaScriptEnabled:false});
+  const page=await context.newPage();
+  try {
+    await page.goto("http://127.0.0.1:3100/agents#next-step");
+    const helper=page.locator("#next-step");
+    await expect(helper.getByRole("link",{name:"Account setup",exact:true})).toBeVisible();
+    await expect(helper.getByRole("button",{name:"Start or connect checkout"})).toBeDisabled();
+    await helper.getByRole("link",{name:"Developers",exact:true}).focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/developers\/getting-started$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/agents#next-step$/);
+    await page.goto("http://127.0.0.1:3100/resources/help#checkout");
+    await page.locator("#checkout summary").first().focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#checkout details").first()).toHaveAttribute("open","");
+  } finally {await context.close();}
+});
+
+
+test("agent guidance keeps new questions clear of the phone header after taps", async ({browser}, testInfo) => {
+  const safari=testInfo.project.name === "mobile" ? await webkit.launch() : undefined;
+  const context=await (safari ?? browser).newContext({...devices["iPhone 13"]});
+  const page=await context.newPage();
+  try {
+    await page.goto("http://127.0.0.1:3100/agents#next-step");
+    const helper=page.locator("#next-step");
+    await expect(helper.locator('[data-setup-ready="true"]')).toBeVisible();
+    for (const name of ["Start or connect checkout", "WooCommerce", "My account is approved", "Yes, the details match and I can sign in", "WordPress.com with Visa Acceptance Solutions"]) {
+      await helper.getByRole("button",{name,exact:true}).tap();
+      await expect(helper.locator("h2")).toBeFocused();
+      await expect.poll(async () => {
+        const question=await helper.locator("h2").boundingBox();
+        const header=await page.getByRole("banner").boundingBox();
+        const height=page.viewportSize()?.height ?? 0;
+        return !!question && !!header && question.y >= header.y + header.height && question.y + question.height <= height;
+      }).toBe(true);
+    }
+  } finally { await context.close(); await safari?.close(); }
+});
+
+test("agent guidance keeps every conditional destination and section reachable", async ({request}) => {
+  const links=new Set<string>();
+  function visit(answers: string[]) {
+    expect(answers.length).toBeLessThanOrEqual(5);
+    const {node}=resolveSetupPath(answers);
+    if(node.kind === "question") for(const choice of node.choices) visit([...answers,choice.id]);
+    else for(const link of [node.action,node.reference]) links.add(link.href);
+  }
+  visit([]);
+  for(const href of links) {
+    const [path,fragment]=href.split("#");
+    const response=await request.get(path);
+    expect(response.status(),href).toBe(200);
+    if(fragment) expect(await response.text(),href).toContain(`id="${fragment}"`);
+  }
+});
+
+test("agent guidance separates merchant entry from customer payment links", async ({page}) => {
+  await page.goto("/agents#next-step");
+  const helper=page.locator("#next-step");
+  for(const name of ["Start or connect checkout", "Enter a payment myself", "My account is approved", "Yes, the details match and I can sign in"]) await helper.getByRole("button",{name,exact:true}).click();
+  await expect(helper.getByRole("heading",{name:"Check Virtual Terminal for the correct store."})).toBeFocused();
+  await expect(helper).toContainText("does not require a Unified Checkout website integration");
+  await expect(helper).toContainText("permitted payment types and your user permissions");
+  await expect(helper.getByRole("link",{name:"Review portal payment tools"})).toHaveAttribute("href","/developers/developer-tools#payment-requests");
+});
+
+test("agent guidance distinguishes a software seller from merchants and marketplaces", async ({page}) => {
+  await page.goto("/agents#next-step");
+  const helper=page.locator("#next-step");
+  await helper.getByRole("button",{name:"Offer payments through my software",exact:true}).click();
+  await helper.getByRole("button",{name:"My company sells its own software or service",exact:true}).click();
+  await expect(helper).toContainText("does not automatically cover sales made by businesses using your software");
+  await expect(helper.getByRole("link",{name:"Review merchant account setup"})).toHaveAttribute("href","/resources/merchant-account-setup");
+  await helper.getByRole("button",{name:"Back",exact:true}).click();
+  await helper.getByRole("button",{name:"My marketplace connects buyers and sellers",exact:true}).click();
+  await expect(helper).toContainText("They need a separately approved structure");
+  await helper.getByRole("button",{name:"View your brief",exact:true}).click();
+  await expect(helper.getByRole("textbox",{name:"Your next step brief"})).toHaveValue(/For the platform discussion: describe who sells/);
+});
+
+test("traditional pages keep their purpose with one shared agent entrance", async ({page}) => {
+  for(const path of ["/", "/resources/help", "/use-cases/online-businesses", "/use-cases/software-platforms", "/company/contact", "/developers/getting-started"]) {
+    await page.goto(path);
+    await expect(page.getByRole("main").getByRole("link",{name:"Find your next step",exact:true})).toHaveCount(0);
+    await expect(page.locator("#next-step")).toHaveCount(0);
+    const menu=page.getByRole("banner").getByRole("button",{name:"Menu",exact:true});
+    if(await menu.isVisible()) await menu.click();
+    const navigation=page.getByRole("navigation",{name:"Main navigation"});
+    await expect(navigation.getByRole("link",{name:"For agents",exact:true})).toHaveAttribute("href","/agents");
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  }
+  await page.goto("/services/merchant-services");
+  await expect(page.getByRole("link",{name:"Prepare your application",exact:true})).toHaveAttribute("href","/resources/merchant-account-setup");
+});
+
+
+test("agent workspace has one title, native sources and a current navigation entry", async ({page}) => {
+  await page.goto("/agents");
+  await expect(page.getByRole("heading",{level:1})).toHaveText("Trolleys for Agents");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href","https://etaildepot.com/agents");
+  const menu=page.getByRole("banner").getByRole("button",{name:"Menu",exact:true});
+    if(await menu.isVisible()) await menu.click();
+    const navigation=page.getByRole("navigation",{name:"Main navigation"});
+  const entry=navigation.getByRole("link",{name:"For agents",exact:true});
+  await expect(entry).toHaveAttribute("aria-current","page");
+  await closeMainNavigation(page);
+  const guides=page.getByRole("navigation",{name:"Browse guidance"});
+  await expect(guides.getByRole("link")).toHaveCount(6);
+  await expect(guides.getByRole("link",{name:"Payment questions"})).toHaveAttribute("href","/resources/help#payments");
+  await expect(guides.getByRole("link",{name:"Platform payment models"})).toHaveAttribute("href","/use-cases/software-platforms/payment-models");
+  await page.getByText("Using your brief with an assistant",{exact:true}).click();
+  await expect(page.getByRole("main")).toContainText("treat your selections as unverified");
+  await expect(page.locator("main iframe, main form, main input")).toHaveCount(0);
 });

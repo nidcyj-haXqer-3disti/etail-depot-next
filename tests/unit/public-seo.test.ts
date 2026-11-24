@@ -17,7 +17,7 @@ const production = {
   SITE_ID: targets.netlify.site_id, ETAIL_PUBLIC_ORIGIN: canonicalOrigin,
 };
 const guidePaths = [] as const;
-const publicPaths = ["/", "/services/card-services", "/services/merchant-services", "/resources/help", "/resources/guides", ...guidePaths] as const;
+const publicPaths = ["/agents", "/", "/services/card-services", "/services/merchant-services", "/resources/help", "/resources/guides", ...guidePaths] as const;
 const heldPaths = [
   "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal",
   "/resources/guides/use-a-cash-register", "/resources/guides/charge-cards",
@@ -47,7 +47,7 @@ describe("public search release boundary", () => {
     expect(PUBLIC_INDEXING_APPROVAL).toMatchObject({
       siteId: "cbbb6c24-9dbc-43a2-9234-e4357b5b5280", canonicalOrigin: "https://etaildepot.com",
     });
-    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("4145 content pages and 3743 search eligible URLs");
+    expect(PUBLIC_INDEXING_APPROVAL.reviewReference).toContain("4146 content pages and 3769 search eligible URLs");
     expect(isApprovedSearchRelease(PUBLIC_INDEXING_APPROVAL, production)).toBe(true);
     expect(isApprovedSearchRelease(null, production)).toBe(false);
     for (const key of Object.keys(production).filter(key => key !== "CONTEXT")) {
@@ -126,7 +126,7 @@ describe("reviewed public metadata", () => {
       stubEnvironment(changes);
       expect(servicePageMetadata(previewPath).robots).toEqual(pageRobots(previewPath));
       expect(servicePageMetadata(previewPath).alternates).toEqual({ canonical: `${canonicalOrigin}${previewPath}` });
-      expect(publicSitemap().some(entry => entry.url.endsWith(previewPath))).toBe(publicIndexingEnabled() && !previewPath.startsWith("/developers/"));
+      expect(publicSitemap().some(entry => entry.url.endsWith(previewPath))).toBe(publicIndexingEnabled() && INDEXABLE_PUBLIC_PATHS.includes(previewPath));
     }
     expect(PUBLIC_PAGES).not.toHaveProperty(previewPath);
     expect(() => publicPageUrl(previewPath as PublicPath)).toThrow("Only reviewed public");
@@ -135,8 +135,8 @@ describe("reviewed public metadata", () => {
     }
   });
 
-  it("uses distinct truthful descriptions and fixed canonical URLs for the five retained nonlegal core pages", () => {
-    expect(publicPaths).toHaveLength(5);
+  it("uses distinct truthful descriptions and fixed canonical URLs for the six reviewed nonlegal core information pages", () => {
+    expect(publicPaths).toHaveLength(6);
     expect(Object.keys(PUBLIC_PAGES)).toEqual(publicPaths);
     expect(canonicalOrigin).toBe(targets.netlify.canonical_origin);
     expect(new URL(String(rootMetadata.metadataBase)).origin).toBe(canonicalOrigin);
@@ -209,7 +209,7 @@ describe("reviewed public metadata", () => {
     stubEnvironment();
     expect(Object.keys(PUBLIC_PAGE_MODIFIED)).toEqual(publicPaths);
     expect(PUBLIC_PAGE_MODIFIED["/resources/guides"]).toBe("2026-11-13");
-    expect(PUBLIC_PAGE_MODIFIED["/services/merchant-services"]).toBe("2026-11-14");
+    expect(PUBLIC_PAGE_MODIFIED["/services/merchant-services"]).toBe("2026-11-24");
     expect(PUBLIC_PAGE_MODIFIED["/resources/help"]).toBe("2026-11-14");
     expect(PUBLIC_PAGE_MODIFIED["/"]).toBe("2026-11-14");
     expect(PUBLIC_PAGE_MODIFIED["/services/card-services"]).toBe("2026-11-01");
@@ -228,11 +228,31 @@ describe("reviewed public metadata", () => {
 });
 
 describe("public structured data", () => {
+  it("identifies Trolleys as the merchant service and Etail Depot as its provider without inventing offers", () => {
+    const graph = JSON.parse(publicPageJsonLd("/services/merchant-services"))["@graph"];
+    const service = graph.find((node: { "@type": string }) => node["@type"] === "Service");
+    const page = graph.find((node: { "@type": string }) => node["@type"] === "WebPage");
+    expect(service).toMatchObject({
+      "@id": `${canonicalOrigin}/services/merchant-services#service`,
+      name: "Trolleys merchant services", serviceType: "Merchant services",
+      provider: { "@id": `${canonicalOrigin}/#organization` },
+      brand: { "@type": "Brand", name: "Trolleys" },
+      areaServed: { "@type": "Country", name: "United States" },
+      mainEntityOfPage: { "@id": page["@id"] },
+    });
+    expect(page.mainEntity).toEqual({ "@id": service["@id"] });
+    expect(service.description).toContain("Account approval and setup apply");
+    expect(service.description).toContain("ACH has separate fees and terms");
+    for (const key of ["offers", "aggregateRating", "review", "potentialAction", "availableChannel"]) expect(service).not.toHaveProperty(key);
+    for (const otherPath of publicPaths.filter(path => path !== "/services/merchant-services")) {
+      expect(JSON.parse(publicPageJsonLd(otherPath))["@graph"].some((node: { "@type": string }) => node["@type"] === "Service")).toBe(false);
+    }
+  });
   it.each(publicPaths)("connects confirmed organization, website and page facts for %s", path => {
     const serialized = publicPageJsonLd(path);
     const data = JSON.parse(serialized);
     const [organization, website, page] = data["@graph"];
-    const expectedTypes = ["Organization", "WebSite", path === "/resources/guides" ? "CollectionPage" : "WebPage", ...(path === "/resources/guides" ? ["ItemList"] : []), ...(path === "/" ? [] : ["BreadcrumbList"])];
+    const expectedTypes = ["Organization", "WebSite", path === "/resources/guides" ? "CollectionPage" : "WebPage", ...(path === "/services/merchant-services" ? ["Service"] : []), ...(path === "/resources/guides" ? ["ItemList"] : []), ...(path === "/" ? [] : ["BreadcrumbList"])];
     expect(data["@context"]).toBe("https://schema.org");
     expect(data["@graph"].map((node: { "@type": string }) => node["@type"])).toEqual(expectedTypes);
     expect(organization).toMatchObject({

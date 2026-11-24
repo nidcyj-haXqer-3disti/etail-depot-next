@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { DEVELOPER_PATHS } from "../src/shared/site/developer-paths.ts";
+import { DRAFT_DEVELOPER_PATHS } from "../src/shared/site/developer-paths.ts";
 import { DRAFT_BLOG_PATHS } from "../src/shared/site/blog-paths.ts";
 import { LEGAL_DOCUMENT_PATHS } from "../src/shared/site/legal-paths.ts";
 import { socialPreviewImage } from "../src/shared/seo/social-preview.ts";
@@ -27,10 +27,10 @@ assert.equal(targets.release.real_money_allowed, false);
 const canonicalOrigin = targets.netlify.canonical_origin;
 const guidePaths = [];
 const standardPaths = ["/resources/guides/iso-20022", "/resources/guides/iso-8583"];
-const coreSchemaPaths = ["/", "/services/card-services", "/services/merchant-services", "/resources/help", "/resources/guides"];
+const coreSchemaPaths = ["/agents", "/", "/services/card-services", "/services/merchant-services", "/resources/help", "/resources/guides"];
 const publicPaths = INDEXABLE_PUBLIC_PATHS;
 assert.equal(guidePaths.length, 0);
-assert.equal(new Set(publicPaths).size, 3743, "Only the exact reviewed nonlegal pages are eligible for search.");
+assert.equal(new Set(publicPaths).size, 3769, "Only the exact reviewed nonlegal pages are eligible for search.");
 const port = 3101;
 const localOrigin = `http://127.0.0.1:${port}`;
 const buildScript = path.join(root, "tools/build-public-site.mjs");
@@ -207,6 +207,40 @@ function checkCrawlablePageGraph(documents) {
   console.log(`Discovery graph passed: ${reached.size} canonical pages are reachable from Home; both reference collections are linked in the Guides HTML.`);
 }
 
+function checkCampaignDiscovery(documents) {
+  const landingPath = "/use-cases/online-businesses";
+  const merchantPath = "/services/merchant-services";
+  const setupPath = "/resources/merchant-account-setup";
+  const wooPath = "/resources/woocommerce-gateway-integration";
+  for (const route of [landingPath, merchantPath, setupPath, wooPath]) {
+    const html = documents.get(route);
+    assert.ok(html, `${route}: campaign destination must be search eligible.`);
+    const pages = schemaNodes(html).filter(node => ["WebPage", "TechArticle"].includes(node["@type"]));
+    assert.equal(pages.length, 1, `${route}: exactly one page or article entity is required.`);
+    assert.equal(pages[0].url, canonicalOrigin + route);
+    assert.equal(pages[0].description, documentMetadata(html, route).metaValues("name", "description")[0]);
+    assert.equal(pages[0].dateModified, publicPageModified(route));
+  }
+  const landingHtml = documents.get(landingPath);
+  const landing = schemaNodes(landingHtml).find(node => node["@type"] === "WebPage");
+  const service = schemaNodes(documents.get(merchantPath)).find(node => node["@type"] === "Service");
+  assert.ok(service, "The canonical merchant service needs a factual service identity.");
+  assert.equal(landing.about?.["@id"], service["@id"]);
+  assert.equal(service.name, "Trolleys merchant services");
+  assert.equal(service.brand?.name, "Trolleys");
+  assert.equal(service.provider?.["@id"], `${canonicalOrigin}/#organization`);
+  assert.equal(service.areaServed?.name, "United States");
+  for (const key of ["offers", "aggregateRating", "review", "potentialAction"]) assert.equal(key in service, false);
+  const hrefs = [...landingHtml.matchAll(/<a\b[^>]*>/gi)].map(match => attributes(match[0]).href);
+  for (const target of [setupPath + "#additional-mid", wooPath, "/developers/getting-started", "/company/contact#account-support", "https://merchantapp.io/etaildepot/UserAccount/Login"]) {
+    assert.ok(hrefs.includes(target), `${landingPath}: missing native journey link ${target}.`);
+  }
+  const readable = html => decode(html.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ");
+  assert.ok(readable(landingHtml).includes("A new website does not automatically need another merchant ID."), "The account qualification must be available in initial HTML.");
+  for (const term of ["WordPress.com", "Unified Checkout", ".p12"]) assert.ok(readable(documents.get(wooPath)).includes(term), `WooCommerce prerequisites must expose ${term} without JavaScript.`);
+  console.log("Campaign discovery passed: four indexable destinations, factual Trolleys identity, readable prerequisites and native setup/application links.");
+}
+
 async function verifyResponses() {
   const titles = new Set(), descriptions = new Set(), documents = new Map();
   for (const route of publicPaths) {
@@ -243,6 +277,7 @@ async function verifyResponses() {
   assert.equal(titles.size, publicPaths.length, "Public titles must be distinct.");
   assert.equal(descriptions.size, publicPaths.length, "Public descriptions must be distinct.");
   checkCrawlablePageGraph(documents);
+  checkCampaignDiscovery(documents);
 
   for (const [oldPath, destination] of [["/card-services", "/services/card-services"], ["/payment-services", "/services/merchant-services"], ["/resources/blog", "/company/blog"]]) {
     for (const suffix of ["", "/", ".html", "/index.html"]) {
@@ -317,15 +352,15 @@ async function verifyResponses() {
   assert.deepEqual(bytes.subarray(0, 8), Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   assert.equal(bytes.readUInt32BE(16), 1200); assert.equal(bytes.readUInt32BE(20), 630);
 
-  for (const route of [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS, ...DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience", "/company/legal/unreviewed", "/company/blog/unreviewed", "/production-seo-missing-page", "/resources/guides/unreviewed-missing-page", "/legal/unreviewed", "/resources/guides/payment-processing-fees", "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal", "/resources/guides/use-a-cash-register", "/resources/guides/unreviewed-charge-cards", "/resources/guides/sections/payment-processing-checkout", "/resources/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
+  for (const route of [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS, ...DRAFT_DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience", "/company/legal/unreviewed", "/company/blog/unreviewed", "/production-seo-missing-page", "/resources/guides/unreviewed-missing-page", "/legal/unreviewed", "/resources/guides/payment-processing-fees", "/resources/guides/booking-system-with-payment", "/resources/guides/countertop-payment-terminal", "/resources/guides/use-a-cash-register", "/resources/guides/unreviewed-charge-cards", "/resources/guides/sections/payment-processing-checkout", "/resources/guides/page/2", "/guide-search/pagefind.js", "/review/guides/manifest.json"]) {
     const response = await localFetch(route);
-    assert.equal(response.status, [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS,...DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience"].includes(route) ? 200 : 404, `${route}: unexpected status.`);
+    assert.equal(response.status, [...DRAFT_BLOG_PATHS, ...LEGAL_DOCUMENT_PATHS,...DRAFT_DEVELOPER_PATHS, "/use-cases/no-code-checkout-experience"].includes(route) ? 200 : 404, `${route}: unexpected status.`);
     const body = await response.text();
     const metadata = /<head[\s>]/i.test(body) ? documentMetadata(body, route) : { metaValues: () => [] };
     const values = [...metadata.metaValues("name", "robots"), ...metadata.metaValues("name", "googlebot"), response.headers.get("x-robots-tag") ?? ""];
     assert.ok(values.some(forbidsIndexing), `${route}: must remain noindex.`);
   }
-  // These reviewed replacements retain their existing search-publication holds.
+  // Reviewed HTML redirects follow destination eligibility; retired payloads stay excluded.
   for (const [oldPath, destination] of [
     ["/guides/how-to-create-a-payment-link", "/use-cases/no-code-checkout-experience"],
     ["/guides/consuming-webhooks", "/developers/webhooks"],
@@ -335,7 +370,7 @@ async function verifyResponses() {
         const response = await localFetch(`${oldPath}${suffix}?token=synthetic-test`, { method });
         assert.equal(response.status, 308);
         assert.equal(response.headers.get("location"), `${localOrigin}${destination}`);
-        assert.ok(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""));
+        assert.equal(forbidsIndexing(response.headers.get("x-robots-tag") ?? ""), !INDEXABLE_PUBLIC_PATHS.includes(destination));
         assert.equal(response.headers.get("cache-control"), "no-store");
         assert.equal(await response.text(), "");
       }
@@ -374,7 +409,7 @@ async function verifyResponses() {
     }
     await response.arrayBuffer();
   }
-  console.log("Production SEO passed: 3743 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
+  console.log("Production SEO passed: 3769 reviewed indexable pages, canonical/schema/social metadata, exact sitemap, and noindex legal, 404 and 17 retired route families. Runtime CONTEXT was absent.");
 }
 
 try {
